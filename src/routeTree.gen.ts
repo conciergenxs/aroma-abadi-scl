@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as BroadcastRouteImport } from './routes/broadcast'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InboxRoute = InboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/broadcast': typeof BroadcastRoute
   '/contacts': typeof ContactsRoute
   '/inbox': typeof InboxRoute
+  '/templates': typeof TemplatesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/broadcast': typeof BroadcastRoute
   '/contacts': typeof ContactsRoute
   '/inbox': typeof InboxRoute
+  '/templates': typeof TemplatesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/broadcast': typeof BroadcastRoute
   '/contacts': typeof ContactsRoute
   '/inbox': typeof InboxRoute
+  '/templates': typeof TemplatesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/broadcast' | '/contacts' | '/inbox'
+  fullPaths: '/' | '/broadcast' | '/contacts' | '/inbox' | '/templates'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/broadcast' | '/contacts' | '/inbox'
-  id: '__root__' | '/' | '/broadcast' | '/contacts' | '/inbox'
+  to: '/' | '/broadcast' | '/contacts' | '/inbox' | '/templates'
+  id: '__root__' | '/' | '/broadcast' | '/contacts' | '/inbox' | '/templates'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   BroadcastRoute: typeof BroadcastRoute
   ContactsRoute: typeof ContactsRoute
   InboxRoute: typeof InboxRoute
+  TemplatesRoute: typeof TemplatesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inbox': {
       id: '/inbox'
       path: '/inbox'
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastRoute: BroadcastRoute,
   ContactsRoute: ContactsRoute,
   InboxRoute: InboxRoute,
+  TemplatesRoute: TemplatesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
