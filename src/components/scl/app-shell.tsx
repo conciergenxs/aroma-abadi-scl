@@ -14,7 +14,14 @@ import {
   MessageSquareText,
 } from "lucide-react";
 
-const nav = [
+type NavItem = {
+  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/subscriptions" | "/analytics" | "/settings";
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  badge?: number;
+};
+const nav: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: 12 },
   { to: "/contacts", label: "Contacts", icon: Users },
@@ -23,7 +30,7 @@ const nav = [
   { to: "/subscriptions", label: "Subscriptions", icon: BellRing },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function AppShell({
   children,
@@ -77,7 +84,7 @@ export function AppShell({
                   className={`h-4 w-4 ${active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}
                 />
                 <span className="flex-1">{item.label}</span>
-                {"badge" in item && item.badge ? (
+                {item.badge ? (
                   <span className="ml-auto rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                     {item.badge}
                   </span>
