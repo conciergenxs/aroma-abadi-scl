@@ -36,7 +36,6 @@ export type Contact = {
   lastInteraction: string;
   status: "Active" | "Inactive" | "Blocked";
   avatar: string;
-  subscription: "Subscribed" | "Unsubscribed" | "Opted Out";
   /** Future PIC / owner reference. "me" represents the current user. */
   ownerId?: string;
   /** Sales/CRM lifecycle stage — powers the Kanban view. */
@@ -66,18 +65,18 @@ export const initialLists: ContactList[] = [
 ];
 
 export const contacts: Contact[] = [
-  { id: "c1", name: "Jenna Loomis", phone: "+1 415 220 8841", instagram: "@jenna.l", channel: "whatsapp", labelIds: ["lb-vip", "lb-influencer"], listIds: ["ls-vip", "ls-launch"], lastInteraction: "2m ago", status: "Active", avatar: avatars[0], subscription: "Subscribed", ownerId: "me" },
-  { id: "c2", name: "Mateo Rivera", phone: "+34 612 998 014", instagram: "@mateo.rv", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-launch"], lastInteraction: "11m ago", status: "Active", avatar: avatars[1], subscription: "Subscribed" },
-  { id: "c3", name: "Saanvi Patel", phone: "+91 98220 11045", channel: "whatsapp", labelIds: ["lb-partner", "lb-vip"], listIds: ["ls-vip", "ls-event"], lastInteraction: "32m ago", status: "Active", avatar: avatars[2], subscription: "Subscribed", ownerId: "me" },
-  { id: "c4", name: "Aria Kapoor", phone: "+971 50 441 2208", instagram: "@aria.k", channel: "instagram", labelIds: ["lb-influencer"], listIds: ["ls-influencers-jkt"], lastInteraction: "1h ago", status: "Active", avatar: avatars[3], subscription: "Subscribed" },
-  { id: "c5", name: "Diego Velasco", phone: "+52 55 8830 2014", channel: "whatsapp", labelIds: [], listIds: ["ls-community"], lastInteraction: "2h ago", status: "Active", avatar: avatars[4], subscription: "Subscribed", ownerId: "me" },
-  { id: "c6", name: "Rin Mori", phone: "+81 90 4422 0011", instagram: "@rin.mori", channel: "instagram", labelIds: ["lb-creator", "lb-vip"], listIds: ["ls-vip", "ls-community"], lastInteraction: "3h ago", status: "Active", avatar: avatars[5], subscription: "Subscribed" },
-  { id: "c7", name: "Noor Khalid", phone: "+966 55 220 7711", channel: "whatsapp", labelIds: ["lb-partner"], listIds: ["ls-event"], lastInteraction: "5h ago", status: "Active", avatar: avatars[6], subscription: "Unsubscribed", ownerId: "me" },
-  { id: "c8", name: "Priya Tan", phone: "+65 8112 4490", instagram: "@priya.t", channel: "instagram", labelIds: ["lb-team"], listIds: [], lastInteraction: "Yesterday", status: "Inactive", avatar: avatars[7], subscription: "Subscribed" },
-  { id: "c9", name: "Elena Castillo", phone: "+34 691 220 887", channel: "whatsapp", labelIds: [], listIds: ["ls-launch", "ls-community"], lastInteraction: "Yesterday", status: "Active", avatar: avatars[8], subscription: "Subscribed", ownerId: "me" },
-  { id: "c10", name: "Ben Lowery", phone: "+44 7720 998 441", instagram: "@ben.lowery", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-influencers-jkt"], lastInteraction: "2d ago", status: "Active", avatar: avatars[9], subscription: "Opted Out" },
-  { id: "c11", name: "Theo Halvorsen", phone: "+47 4422 8801", channel: "whatsapp", labelIds: ["lb-vip", "lb-partner"], listIds: ["ls-vip", "ls-event"], lastInteraction: "3d ago", status: "Active", avatar: avatars[10], subscription: "Subscribed", ownerId: "me" },
-  { id: "c12", name: "Olivia Wynn", phone: "+1 646 220 7780", instagram: "@oliviawynn", channel: "instagram", labelIds: ["lb-influencer"], listIds: ["ls-influencers-jkt", "ls-launch"], lastInteraction: "4d ago", status: "Active", avatar: avatars[11], subscription: "Subscribed" },
+  { id: "c1", name: "Jenna Loomis", phone: "+1 415 220 8841", instagram: "@jenna.l", channel: "whatsapp", labelIds: ["lb-vip", "lb-influencer"], listIds: ["ls-vip", "ls-launch"], lastInteraction: "2m ago", status: "Active", avatar: avatars[0], ownerId: "me" },
+  { id: "c2", name: "Mateo Rivera", phone: "+34 612 998 014", instagram: "@mateo.rv", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-launch"], lastInteraction: "11m ago", status: "Active", avatar: avatars[1] },
+  { id: "c3", name: "Saanvi Patel", phone: "+91 98220 11045", channel: "whatsapp", labelIds: ["lb-partner", "lb-vip"], listIds: ["ls-vip", "ls-event"], lastInteraction: "32m ago", status: "Active", avatar: avatars[2], ownerId: "me" },
+  { id: "c4", name: "Aria Kapoor", phone: "+971 50 441 2208", instagram: "@aria.k", channel: "instagram", labelIds: ["lb-influencer"], listIds: ["ls-influencers-jkt"], lastInteraction: "1h ago", status: "Active", avatar: avatars[3] },
+  { id: "c5", name: "Diego Velasco", phone: "+52 55 8830 2014", channel: "whatsapp", labelIds: [], listIds: ["ls-community"], lastInteraction: "2h ago", status: "Active", avatar: avatars[4], ownerId: "me" },
+  { id: "c6", name: "Rin Mori", phone: "+81 90 4422 0011", instagram: "@rin.mori", channel: "instagram", labelIds: ["lb-creator", "lb-vip"], listIds: ["ls-vip", "ls-community"], lastInteraction: "3h ago", status: "Active", avatar: avatars[5] },
+  { id: "c7", name: "Noor Khalid", phone: "+966 55 220 7711", channel: "whatsapp", labelIds: ["lb-partner"], listIds: ["ls-event"], lastInteraction: "5h ago", status: "Active", avatar: avatars[6], ownerId: "me" },
+  { id: "c8", name: "Priya Tan", phone: "+65 8112 4490", instagram: "@priya.t", channel: "instagram", labelIds: ["lb-team"], listIds: [], lastInteraction: "Yesterday", status: "Inactive", avatar: avatars[7] },
+  { id: "c9", name: "Elena Castillo", phone: "+34 691 220 887", channel: "whatsapp", labelIds: [], listIds: ["ls-launch", "ls-community"], lastInteraction: "Yesterday", status: "Active", avatar: avatars[8], ownerId: "me" },
+  { id: "c10", name: "Ben Lowery", phone: "+44 7720 998 441", instagram: "@ben.lowery", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-influencers-jkt"], lastInteraction: "2d ago", status: "Active", avatar: avatars[9] },
+  { id: "c11", name: "Theo Halvorsen", phone: "+47 4422 8801", channel: "whatsapp", labelIds: ["lb-vip", "lb-partner"], listIds: ["ls-vip", "ls-event"], lastInteraction: "3d ago", status: "Active", avatar: avatars[10], ownerId: "me" },
+  { id: "c12", name: "Olivia Wynn", phone: "+1 646 220 7780", instagram: "@oliviawynn", channel: "instagram", labelIds: ["lb-influencer"], listIds: ["ls-influencers-jkt", "ls-launch"], lastInteraction: "4d ago", status: "Active", avatar: avatars[11] },
 ];
 
 export type Message = {
@@ -165,7 +164,7 @@ export type Broadcast = {
 export const broadcasts: Broadcast[] = [
   { id: "b1", name: "Winter Drop — VIP Early Access", channel: "whatsapp", audience: "VIP · 12,408", reach: 12408, delivered: 12380, read: 11244, clicks: 4128, sentAt: "Today · 09:00", status: "Sent" },
   { id: "b2", name: "Studio Launch — Madrid", channel: "instagram", audience: "EU Leads · 4,910", reach: 4910, delivered: 4880, read: 4112, clicks: 1342, sentAt: "Yesterday", status: "Sent" },
-  { id: "b3", name: "Black Friday Teaser", channel: "whatsapp", audience: "All Subscribed · 84,221", reach: 84221, delivered: 0, read: 0, clicks: 0, sentAt: "Fri · 08:00", status: "Scheduled" },
+  { id: "b3", name: "Black Friday Teaser", channel: "whatsapp", audience: "All Contacts · 84,221", reach: 84221, delivered: 0, read: 0, clicks: 0, sentAt: "Fri · 08:00", status: "Scheduled" },
   { id: "b4", name: "Enterprise Holiday Gifting", channel: "whatsapp", audience: "Enterprise · 612", reach: 612, delivered: 610, read: 588, clicks: 244, sentAt: "3d ago", status: "Sent" },
   { id: "b5", name: "Loyalty Tier Refresh", channel: "instagram", audience: "Active Customers · 22,114", reach: 22114, delivered: 0, read: 0, clicks: 0, sentAt: "—", status: "Draft" },
 ];

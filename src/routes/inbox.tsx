@@ -156,7 +156,6 @@ function InboxPage() {
           <Field label="Phone number" value={contact.phone} />
           <Field label="Instagram" value={contact.instagram ?? "—"} />
           <Field label="Channel source" value={active.channel === "whatsapp" ? "WhatsApp Business" : "Instagram DM"} />
-          <Field label="Subscription" value={contact.subscription} tone={contact.subscription === "Subscribed" ? "good" : "warn"} />
           <Field label="Last interaction" value={contact.lastInteraction} />
 
           <div className="p-5 border-t border-border">
