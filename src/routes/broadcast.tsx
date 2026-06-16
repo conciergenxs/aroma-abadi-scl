@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
-import { broadcasts, templates } from "@/components/scl/mock-data";
+import { broadcasts, templates, initialLists, contacts } from "@/components/scl/mock-data";
 import { useState, type ReactNode } from "react";
 import { Users, MessageSquareText, FileText, Eye, Send, Check } from "lucide-react";
 
@@ -17,16 +17,16 @@ const steps = [
   { key: "send", label: "Send", icon: Send },
 ] as const;
 
-const segments = [
-  { name: "VIP Customers", count: 12408, desc: "Platinum tier · last 90 days" },
-  { name: "Active EU Leads", count: 4910, desc: "Engaged in last 30 days" },
-  { name: "Enterprise accounts", count: 612, desc: "Annual contract value > $25k" },
-  { name: "All subscribed", count: 84221, desc: "Opted-in across both channels" },
-];
+const audienceLists = initialLists.map((l) => ({
+  id: l.id,
+  name: l.name,
+  count: contacts.filter((c) => c.listIds.includes(l.id)).length,
+  desc: l.description ?? "Audience list",
+}));
 
 function BroadcastPage() {
   const [step, setStep] = useState(0);
-  const [seg, setSeg] = useState(segments[0]);
+  const [seg, setSeg] = useState(audienceLists[0]);
   const [channel, setChannel] = useState<"whatsapp" | "instagram">("whatsapp");
   const [tplId, setTplId] = useState(templates[0].id);
   const tpl = templates.find((t) => t.id === tplId)!;
@@ -76,8 +76,10 @@ function BroadcastPage() {
 
             <div className="p-5 space-y-4">
               {step === 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {segments.map((s) => (
+                <div className="space-y-2">
+                  <div className="text-[11px] text-muted-foreground mb-1">Choose a list to target. Lists are managed in Contacts.</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {audienceLists.map((s) => (
                     <button
                       key={s.name}
                       onClick={() => setSeg(s)}
@@ -92,6 +94,7 @@ function BroadcastPage() {
                       <p className="text-xs text-muted-foreground mt-1">{s.desc}</p>
                     </button>
                   ))}
+                  </div>
                 </div>
               )}
               {step === 1 && (

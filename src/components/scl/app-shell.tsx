@@ -183,18 +183,53 @@ export function ChannelDot({ channel }: { channel: "whatsapp" | "instagram" }) {
   );
 }
 
-export function Tag({ children, tone = "default" }: { children: ReactNode; tone?: "default" | "vip" | "lead" | "enterprise" | "active" | "prospect" }) {
-  const tones: Record<string, string> = {
-    default: "bg-white/5 text-muted-foreground border-white/10",
-    vip: "bg-primary/15 text-primary border-primary/30",
-    lead: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
-    enterprise: "bg-violet-500/10 text-violet-300 border-violet-500/20",
-    active: "bg-sky-500/10 text-sky-300 border-sky-500/20",
-    prospect: "bg-amber-500/10 text-amber-300 border-amber-500/20",
-  };
+import type { LabelColor, ContactLabel } from "./mock-data";
+import { X } from "lucide-react";
+
+export const labelColorClass: Record<LabelColor, string> = {
+  indigo: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30",
+  pink: "bg-pink-500/10 text-pink-300 border-pink-500/30",
+  emerald: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+  amber: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+  sky: "bg-sky-500/10 text-sky-300 border-sky-500/30",
+  violet: "bg-violet-500/10 text-violet-300 border-violet-500/30",
+  slate: "bg-slate-500/10 text-slate-300 border-slate-500/30",
+};
+
+export const labelColorDot: Record<LabelColor, string> = {
+  indigo: "bg-indigo-400",
+  pink: "bg-pink-400",
+  emerald: "bg-emerald-400",
+  amber: "bg-amber-400",
+  sky: "bg-sky-400",
+  violet: "bg-violet-400",
+  slate: "bg-slate-400",
+};
+
+export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?: () => void }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${tones[tone]}`}>
-      {children}
+    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium ${labelColorClass[label.color]}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[label.color]}`} />
+      {label.name}
+      {onRemove && (
+        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10">
+          <X className="h-2.5 w-2.5" />
+        </button>
+      )}
+    </span>
+  );
+}
+
+export function ListChip({ name, onRemove }: { name: string; onRemove?: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-foreground/80">
+      <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
+      {name}
+      {onRemove && (
+        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10">
+          <X className="h-2.5 w-2.5" />
+        </button>
+      )}
     </span>
   );
 }
