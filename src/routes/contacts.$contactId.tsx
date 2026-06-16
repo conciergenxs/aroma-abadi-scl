@@ -6,20 +6,13 @@ import {
   Phone,
   MessageCircle,
   Trash2,
-  Pencil,
   Plus,
   X,
   Check,
   ChevronDown,
-  Tag as TagIcon,
-  ListChecks,
   Activity as ActivityIcon,
-  StickyNote,
   Image as ImageIcon,
-  Clock,
-  Calendar,
   User2,
-  Trash,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +21,6 @@ import {
   useContactsStore,
   type ContactActivity,
   type ContactProperty,
-  type ContactRemark,
 } from "@/components/scl/contacts-store";
 import {
   LIFECYCLE_STAGES,
@@ -48,12 +40,12 @@ export const Route = createFileRoute("/contacts/$contactId")({
   component: ContactDetailPage,
 });
 
-type Tab = "activity" | "remarks" | "media";
+type Tab = "activity" | "media";
 
 function ContactDetailPage() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
   const state = useContactsStore();
-  const { contacts, labels, lists, properties, activities, remarks } = state;
+  const { contacts, labels, lists, properties, activities } = state;
   const navigate = useNavigate();
 
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
@@ -80,9 +72,7 @@ function ContactDetailPage() {
   const contactLabels = labels.filter((l) => contact.labelIds.includes(l.id));
   const contactLists = lists.filter((l) => contact.listIds.includes(l.id));
   const contactActivities = activities[contact.id] ?? [];
-  const contactRemarks = remarks[contact.id] ?? [];
 
-  // Derived activities — synthesised from contact state if none stored (e.g. seeded mock contacts)
   const derivedActivities = useMemo<ContactActivity[]>(() => {
     if (contactActivities.length > 0) return contactActivities;
     const base = contact.stageEnteredAt ?? new Date().toISOString();
@@ -101,7 +91,7 @@ function ContactDetailPage() {
         id: `d-lb-${contact.id}-${i}`,
         contactId: contact.id,
         type: "label_added",
-        message: `Added label “${l.name}”`,
+        message: `Added label "${l.name}"`,
         at: base,
       }),
     );
@@ -110,7 +100,7 @@ function ContactDetailPage() {
         id: `d-ls-${contact.id}-${i}`,
         contactId: contact.id,
         type: "list_added",
-        message: `Added to list “${l.name}”`,
+        message: `Added to list "${l.name}"`,
         at: base,
       }),
     );
@@ -127,8 +117,16 @@ function ContactDetailPage() {
   const handleDelete = () => {
     if (!confirm(`Delete ${contact.name}? This cannot be undone.`)) return;
     contactsStore.setContacts((cs) => cs.filter((c) => c.id !== contact.id));
-    toast.success("Contact deleted successfully");
+    toast.success("Contact deleted");
     navigate({ to: "/contacts" });
+  };
+
+  const updateField = <K extends keyof Contact>(key: K, value: Contact[K], label: string) => {
+    contactsStore.setContacts((cs) =>
+      cs.map((c) => (c.id === contact.id ? { ...c, [key]: value } : c)),
+    );
+    contactsStore.addActivity(contact.id, "updated", `Updated ${label}`);
+    toast.success("Contact updated");
   };
 
   const toggleLabel = (id: string) => {
@@ -145,9 +143,9 @@ function ContactDetailPage() {
       contactsStore.addActivity(
         contact.id,
         has ? "label_removed" : "label_added",
-        has ? `Removed label “${l.name}”` : `Added label “${l.name}”`,
+        has ? `Removed label "${l.name}"` : `Added label "${l.name}"`,
       );
-      toast.success(has ? `Removed “${l.name}”` : `Added “${l.name}”`);
+      toast.success("Label updated");
     }
   };
 
@@ -165,9 +163,9 @@ function ContactDetailPage() {
       contactsStore.addActivity(
         contact.id,
         has ? "list_removed" : "list_added",
-        has ? `Removed from list “${ls.name}”` : `Added to list “${ls.name}”`,
+        has ? `Removed from list "${ls.name}"` : `Added to list "${ls.name}"`,
       );
-      toast.success(has ? `Removed from “${ls.name}”` : `Added to “${ls.name}”`);
+      toast.success("List updated");
     }
   };
 
@@ -180,8 +178,8 @@ function ContactDetailPage() {
     contactsStore.setContacts((cs) =>
       cs.map((c) => (c.id === contact.id ? { ...c, labelIds: [...c.labelIds, id] } : c)),
     );
-    contactsStore.addActivity(contact.id, "label_added", `Added label “${trimmed}”`);
-    toast.success(`Label “${trimmed}” created`);
+    contactsStore.addActivity(contact.id, "label_added", `Added label "${trimmed}"`);
+    toast.success("Label updated");
   };
 
   const createList = (name: string) => {
@@ -192,8 +190,8 @@ function ContactDetailPage() {
     contactsStore.setContacts((cs) =>
       cs.map((c) => (c.id === contact.id ? { ...c, listIds: [...c.listIds, id] } : c)),
     );
-    contactsStore.addActivity(contact.id, "list_added", `Added to list “${trimmed}”`);
-    toast.success(`List “${trimmed}” created`);
+    contactsStore.addActivity(contact.id, "list_added", `Added to list "${trimmed}"`);
+    toast.success("List updated");
   };
 
   const setCustomProperty = (key: string, value: unknown, displayName: string) => {
@@ -205,6 +203,7 @@ function ContactDetailPage() {
       ),
     );
     contactsStore.addActivity(contact.id, "updated", `Updated ${displayName}`);
+    toast.success("Contact updated");
   };
 
   const setLifecycle = (next: LifecycleStage) => {
@@ -222,7 +221,7 @@ function ContactDetailPage() {
       "lifecycle",
       prev ? `Lifecycle changed from ${prev} → ${next}` : `Lifecycle set to ${next}`,
     );
-    toast.success("Lifecycle updated");
+    toast.success("Lifecycle stage updated");
   };
 
   return (
@@ -244,68 +243,69 @@ function ContactDetailPage() {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => toast.info("Edit form coming soon")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card"
-            >
-              <Pencil className="h-3.5 w-3.5" /> Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Delete
-            </button>
-          </div>
+          <button
+            onClick={handleDelete}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
         </header>
 
-        {/* 3-panel workspace */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-0">
-          {/* LEFT PANEL */}
-          <aside className="border-r border-border overflow-y-auto bg-card/20">
-            <LeftPanel
-              contact={contact}
-              labels={contactLabels}
-              lists={contactLists}
-            />
-          </aside>
-
-          {/* CENTER PANEL */}
+        {/* 2-panel workspace */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-0">
+          {/* LEFT: primary content */}
           <section className="flex flex-col min-w-0 min-h-0">
+            {/* Contact header card */}
+            <div className="border-b border-border px-4 lg:px-6 py-5 flex items-center gap-4">
+              <div className="h-14 w-14 rounded-full bg-primary/15 text-primary grid place-items-center text-base font-semibold shrink-0">
+                {contact.avatar || contact.name.slice(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <InlineText
+                  value={contact.name}
+                  onCommit={(v) => v && v !== contact.name && updateField("name", v, "name")}
+                  className="text-base font-semibold"
+                  placeholder="Contact name"
+                />
+                <div className="mt-1.5 flex items-center gap-2">
+                  <select
+                    value={contact.lifecycleStage ?? ""}
+                    onChange={(e) => setLifecycle(e.target.value as LifecycleStage)}
+                    className="h-7 rounded-md border border-primary/40 bg-primary/10 px-2 text-[11px] text-primary focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  >
+                    {LIFECYCLE_STAGES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs */}
             <div className="border-b border-border bg-background/60 px-4 lg:px-6">
               <div className="flex items-center gap-1">
                 <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={derivedActivities.length} />
-                <TabButton active={tab === "remarks"} onClick={() => setTab("remarks")} icon={<StickyNote className="h-3.5 w-3.5" />} label="Remarks" count={contactRemarks.length} />
                 <TabButton active={tab === "media"} onClick={() => setTab("media")} icon={<ImageIcon className="h-3.5 w-3.5" />} label="Media" />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 lg:p-6">
               {tab === "activity" && <ActivityTab activities={derivedActivities} />}
-              {tab === "remarks" && (
-                <RemarksTab
-                  remarks={contactRemarks}
-                  onAdd={(text) => contactsStore.addRemark(contact.id, "Me", text)}
-                  onUpdate={(id, text) => contactsStore.updateRemark(contact.id, id, text)}
-                  onDelete={(id) => contactsStore.deleteRemark(contact.id, id)}
-                />
-              )}
               {tab === "media" && <MediaTab />}
             </div>
           </section>
 
-          {/* RIGHT PANEL */}
+          {/* RIGHT: contact data panel */}
           <aside className="border-l border-border overflow-y-auto bg-card/20">
             <RightPanel
               contact={contact}
               labels={labels}
               lists={lists}
               customProps={customProps}
+              onUpdateField={updateField}
               onToggleLabel={toggleLabel}
               onCreateLabel={createLabel}
               onToggleList={toggleList}
               onCreateList={createList}
-              onSetLifecycle={setLifecycle}
               onSetCustomProperty={setCustomProperty}
             />
           </aside>
@@ -315,120 +315,54 @@ function ContactDetailPage() {
   );
 }
 
-/* ============================== LEFT PANEL ============================== */
+/* ============================== INLINE EDIT ============================== */
 
-function LeftPanel({
-  contact,
-  labels,
-  lists,
-}: {
-  contact: Contact;
-  labels: ContactLabel[];
-  lists: { id: string; name: string }[];
-}) {
-  const createdAt = contact.stageEnteredAt ?? new Date().toISOString();
-  return (
-    <div className="p-5 space-y-5">
-      <div className="flex flex-col items-center text-center gap-3 pb-5 border-b border-border">
-        <div className="h-16 w-16 rounded-full bg-primary/15 text-primary grid place-items-center text-base font-semibold">
-          {contact.avatar || contact.name.slice(0, 2).toUpperCase()}
-        </div>
-        <div className="min-w-0 w-full">
-          <div className="text-sm font-medium truncate">{contact.name}</div>
-          {contact.lifecycleStage && (
-            <div className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
-              {contact.lifecycleStage}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <SummaryRow icon={<Mail className="h-3.5 w-3.5" />} label="Email" value={contact.email || "—"} />
-      <SummaryRow icon={<Phone className="h-3.5 w-3.5" />} label="Phone" value={contact.phone} />
-      <SummaryRow
-        icon={<MessageCircle className="h-3.5 w-3.5" />}
-        label="Channel"
-        value={contact.channel === "whatsapp" ? "WhatsApp" : "Instagram"}
-      />
-      <SummaryRow
-        icon={<User2 className="h-3.5 w-3.5" />}
-        label="Owner"
-        value={contact.ownerId === "me" ? "Me" : contact.ownerId ?? "Unassigned"}
-      />
-
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 inline-flex items-center gap-1.5">
-          <TagIcon className="h-3 w-3" /> Labels
-        </div>
-        {labels.length === 0 ? (
-          <div className="text-[11px] text-muted-foreground">No labels</div>
-        ) : (
-          <div className="flex flex-wrap gap-1">
-            {labels.map((l) => (
-              <span
-                key={l.id}
-                className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${labelColorClass[l.color]}`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
-                {l.name}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 inline-flex items-center gap-1.5">
-          <ListChecks className="h-3 w-3" /> Lists
-        </div>
-        {lists.length === 0 ? (
-          <div className="text-[11px] text-muted-foreground">Not in any list</div>
-        ) : (
-          <div className="flex flex-wrap gap-1">
-            {lists.map((l) => (
-              <span
-                key={l.id}
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-foreground/80"
-              >
-                <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
-                {l.name}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="pt-4 border-t border-border space-y-2">
-        <SummaryRow icon={<Clock className="h-3.5 w-3.5" />} label="Last interaction" value={contact.lastInteraction} small />
-        <SummaryRow icon={<Calendar className="h-3.5 w-3.5" />} label="Created" value={formatDate(createdAt)} small />
-      </div>
-    </div>
-  );
-}
-
-function SummaryRow({
-  icon,
-  label,
+function InlineText({
   value,
-  small,
+  onCommit,
+  className = "",
+  placeholder,
+  type = "text",
 }: {
-  icon: React.ReactNode;
-  label: string;
   value: string;
-  small?: boolean;
+  onCommit: (v: string) => void;
+  className?: string;
+  placeholder?: string;
+  type?: string;
 }) {
+  const [draft, setDraft] = useState(value);
+  const [editing, setEditing] = useState(false);
+  useEffect(() => { setDraft(value); }, [value]);
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type={type}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => { setEditing(false); if (draft !== value) onCommit(draft); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); }
+          if (e.key === "Escape") { setDraft(value); setEditing(false); }
+        }}
+        placeholder={placeholder}
+        className={`w-full rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 ${className}`}
+      />
+    );
+  }
   return (
-    <div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 inline-flex items-center gap-1.5">
-        {icon}
-        {label}
-      </div>
-      <div className={`${small ? "text-[11px]" : "text-xs"} text-foreground break-words`}>{value}</div>
-    </div>
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className={`w-full text-left truncate rounded-md px-2 py-1 border border-transparent hover:bg-white/[0.04] hover:border-white/10 ${className}`}
+    >
+      {value || <span className="text-muted-foreground">{placeholder ?? "—"}</span>}
+    </button>
   );
 }
 
-/* ============================== CENTER TABS ============================== */
+/* ============================== TABS ============================== */
 
 function TabButton({
   active,
@@ -466,20 +400,14 @@ function TabButton({
 
 function ActivityTab({ activities }: { activities: ContactActivity[] }) {
   if (activities.length === 0) {
-    return (
-      <div className="text-xs text-muted-foreground text-center py-12">
-        No activity yet.
-      </div>
-    );
+    return <div className="text-xs text-muted-foreground text-center py-12">No activity yet.</div>;
   }
   const groups = groupByDay(activities);
   return (
     <div className="space-y-6 max-w-3xl">
       {groups.map((g) => (
         <div key={g.key}>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
-            {g.label}
-          </div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">{g.label}</div>
           <ol className="relative border-l border-border ml-1.5 space-y-3">
             {g.items.map((a) => (
               <li key={a.id} className="pl-4 relative">
@@ -497,144 +425,15 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
 
 function activityDot(type: ContactActivity["type"]) {
   switch (type) {
-    case "created":
-      return "bg-emerald-400";
-    case "lifecycle":
-      return "bg-primary";
+    case "created": return "bg-emerald-400";
+    case "lifecycle": return "bg-primary";
     case "label_added":
-    case "label_removed":
-      return "bg-pink-400";
+    case "label_removed": return "bg-pink-400";
     case "list_added":
-    case "list_removed":
-      return "bg-sky-400";
-    case "note":
-      return "bg-amber-400";
-    default:
-      return "bg-muted-foreground";
+    case "list_removed": return "bg-sky-400";
+    case "note": return "bg-amber-400";
+    default: return "bg-muted-foreground";
   }
-}
-
-function RemarksTab({
-  remarks,
-  onAdd,
-  onUpdate,
-  onDelete,
-}: {
-  remarks: ContactRemark[];
-  onAdd: (text: string) => void;
-  onUpdate: (id: string, text: string) => void;
-  onDelete: (id: string) => void;
-}) {
-  const [draft, setDraft] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
-
-  return (
-    <div className="max-w-3xl space-y-4">
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          rows={3}
-          placeholder="Write an internal remark…"
-          className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
-        />
-        <div className="flex items-center justify-end mt-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (!draft.trim()) return;
-              onAdd(draft.trim());
-              setDraft("");
-              toast.success("Remark added");
-            }}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
-            disabled={!draft.trim()}
-          >
-            <Plus className="h-3.5 w-3.5" /> Add Remark
-          </button>
-        </div>
-      </div>
-
-      {remarks.length === 0 ? (
-        <div className="text-xs text-muted-foreground text-center py-8">
-          No remarks yet.
-        </div>
-      ) : (
-        <ul className="space-y-2">
-          {remarks.map((r) => (
-            <li key={r.id} className="rounded-xl border border-border bg-card/40 p-4">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-primary/15 text-primary grid place-items-center text-[10px] font-semibold">
-                    {r.author.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="text-xs font-medium">{r.author}</div>
-                  <div className="text-[10px] text-muted-foreground">{relativeTime(r.createdAt)}</div>
-                  {r.updatedAt && (
-                    <div className="text-[10px] text-muted-foreground">(edited)</div>
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {editingId === r.id ? null : (
-                    <button
-                      type="button"
-                      onClick={() => { setEditingId(r.id); setEditText(r.text); }}
-                      className="h-6 w-6 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground"
-                      aria-label="Edit remark"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => { onDelete(r.id); toast.success("Remark deleted"); }}
-                    className="h-6 w-6 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                    aria-label="Delete remark"
-                  >
-                    <Trash className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-              {editingId === r.id ? (
-                <div className="space-y-2">
-                  <textarea
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    rows={3}
-                    className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
-                  />
-                  <div className="flex items-center gap-2 justify-end">
-                    <button
-                      type="button"
-                      onClick={() => { setEditingId(null); setEditText(""); }}
-                      className="rounded-md border border-border bg-card/60 px-2.5 py-1 text-xs hover:bg-card"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!editText.trim()) return;
-                        onUpdate(r.id, editText.trim());
-                        setEditingId(null);
-                        toast.success("Remark updated");
-                      }}
-                      className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed">{r.text}</div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
 }
 
 function MediaTab() {
@@ -656,36 +455,65 @@ function RightPanel({
   labels,
   lists,
   customProps,
+  onUpdateField,
   onToggleLabel,
   onCreateLabel,
   onToggleList,
   onCreateList,
-  onSetLifecycle,
   onSetCustomProperty,
 }: {
   contact: Contact;
   labels: ContactLabel[];
   lists: { id: string; name: string }[];
   customProps: ContactProperty[];
+  onUpdateField: <K extends keyof Contact>(key: K, value: Contact[K], label: string) => void;
   onToggleLabel: (id: string) => void;
   onCreateLabel: (name: string) => void;
   onToggleList: (id: string) => void;
   onCreateList: (name: string) => void;
-  onSetLifecycle: (stage: LifecycleStage) => void;
   onSetCustomProperty: (key: string, value: unknown, displayName: string) => void;
 }) {
   return (
-    <div className="p-4 space-y-5">
-      <RightSection title="Lifecycle Stage">
-        <select
-          value={contact.lifecycleStage ?? ""}
-          onChange={(e) => onSetLifecycle(e.target.value as LifecycleStage)}
-          className="h-8 w-full rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
-        >
-          {LIFECYCLE_STAGES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+    <div className="p-4 space-y-6">
+      <RightSection title="Contact Information">
+        <div className="space-y-2.5">
+          <FieldRow icon={<Mail className="h-3.5 w-3.5" />} label="Email">
+            <InlineText
+              value={contact.email ?? ""}
+              onCommit={(v) => onUpdateField("email", v, "email")}
+              type="email"
+              placeholder="Add email"
+              className="text-xs"
+            />
+          </FieldRow>
+          <FieldRow icon={<Phone className="h-3.5 w-3.5" />} label="Phone">
+            <InlineText
+              value={contact.phone}
+              onCommit={(v) => onUpdateField("phone", v, "phone")}
+              type="tel"
+              placeholder="Add phone"
+              className="text-xs"
+            />
+          </FieldRow>
+          <FieldRow icon={<MessageCircle className="h-3.5 w-3.5" />} label="Channel">
+            <select
+              value={contact.channel}
+              onChange={(e) => onUpdateField("channel", e.target.value as Contact["channel"], "channel")}
+              className="h-7 w-full rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+            >
+              <option value="whatsapp">WhatsApp</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </FieldRow>
+          <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Owner">
+            <InlineText
+              value={contact.ownerId === "me" ? "Me" : contact.ownerId ?? ""}
+              onCommit={(v) => onUpdateField("ownerId", v as Contact["ownerId"], "owner")}
+              placeholder="Unassigned"
+              className="text-xs"
+            />
+          </FieldRow>
+        </div>
       </RightSection>
 
       <RightSection title="Labels">
@@ -731,8 +559,20 @@ function RightPanel({
 function RightSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">{title}</div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{title}</div>
       {children}
+    </div>
+  );
+}
+
+function FieldRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[80px_minmax(0,1fr)] items-center gap-2">
+      <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
+        {icon}
+        {label}
+      </div>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }
@@ -933,7 +773,7 @@ function LabelSelector({
                 className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
               >
                 <Plus className="h-3 w-3 text-primary" />
-                Create <span className="font-medium text-foreground">“{search.trim()}”</span>
+                Create <span className="font-medium text-foreground">"{search.trim()}"</span>
               </button>
             )}
             {filtered.length === 0 && !canCreate && (
@@ -957,61 +797,93 @@ function ListSelector({
   onToggle: (id: string) => void;
   onCreate: (name: string) => void;
 }) {
-  const [adding, setAdding] = useState(false);
-  const [name, setName] = useState("");
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const filtered = lists.filter((l) => l.name.toLowerCase().includes(search.toLowerCase()));
+  const exact = lists.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
+  const canCreate = search.trim().length > 0 && !exact;
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) { setOpen(false); setSearch(""); }
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen(false); setSearch(""); } };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  const selected = lists.filter((l) => selectedIds.includes(l.id));
+
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap gap-1">
-        {lists.map((l) => {
-          const on = selectedIds.includes(l.id);
-          return (
-            <button
-              type="button"
-              key={l.id}
-              onClick={() => onToggle(l.id)}
-              className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] transition ${
-                on
-                  ? "border-primary/60 bg-primary/15 text-foreground"
-                  : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span className={`h-2.5 w-2.5 rounded-sm border grid place-items-center ${on ? "bg-primary border-primary" : "border-border"}`}>
-                {on && <Check className="h-2 w-2 text-primary-foreground" />}
-              </span>
-              {l.name}
-            </button>
-          );
-        })}
-      </div>
-      {adding ? (
-        <div className="flex items-center gap-1.5">
-          <input
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && name.trim()) { onCreate(name.trim()); setName(""); setAdding(false); }
-              if (e.key === "Escape") { setAdding(false); setName(""); }
-            }}
-            placeholder="New list"
-            className="h-7 flex-1 rounded-md border border-white/10 bg-white/[0.04] px-2 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/30"
-          />
-          <button
-            type="button"
-            onClick={() => { if (name.trim()) { onCreate(name.trim()); setName(""); setAdding(false); } }}
-            className="h-7 rounded-md bg-primary px-2 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+    <div className="relative" ref={wrapRef}>
+      <div className="flex flex-wrap gap-1 mb-1.5">
+        {selected.map((l) => (
+          <span
+            key={l.id}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-foreground/80"
           >
-            Add
-          </button>
+            <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
+            {l.name}
+            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5">
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-white/[0.06]"
+      >
+        <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add to list</span>
+        <ChevronDown className="h-3 w-3" />
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
+          <div className="p-1.5 border-b border-border">
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }}
+              placeholder="Search or create list…"
+              className="h-7 w-full rounded border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+            />
+          </div>
+          <div className="max-h-56 overflow-y-auto p-1">
+            {filtered.map((l) => {
+              const on = selectedIds.includes(l.id);
+              return (
+                <button
+                  type="button"
+                  key={l.id}
+                  onClick={() => onToggle(l.id)}
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2"
+                >
+                  <span className="h-2 w-2 rounded-sm bg-primary/70" />
+                  <span className="flex-1">{l.name}</span>
+                  {on && <Check className="h-3 w-3 text-primary" />}
+                </button>
+              );
+            })}
+            {canCreate && (
+              <button
+                type="button"
+                onClick={() => { onCreate(search.trim()); setSearch(""); }}
+                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
+              >
+                <Plus className="h-3 w-3 text-primary" />
+                Create <span className="font-medium text-foreground">"{search.trim()}"</span>
+              </button>
+            )}
+            {filtered.length === 0 && !canCreate && (
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No lists</div>
+            )}
+          </div>
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          className="inline-flex items-center gap-1 rounded-md border border-dashed border-border bg-card/40 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground"
-        >
-          <Plus className="h-2.5 w-2.5" /> Create list
-        </button>
       )}
     </div>
   );
@@ -1021,31 +893,14 @@ function ListSelector({
 
 function formatDate(iso: string) {
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      year: "numeric", month: "short", day: "numeric",
-    });
+    return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   } catch { return iso; }
 }
 
 function formatTime(iso: string) {
   try {
-    return new Date(iso).toLocaleString(undefined, {
-      hour: "numeric", minute: "2-digit", month: "short", day: "numeric",
-    });
+    return new Date(iso).toLocaleString(undefined, { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" });
   } catch { return iso; }
-}
-
-function relativeTime(iso: string) {
-  const t = new Date(iso).getTime();
-  const diff = Date.now() - t;
-  const m = Math.round(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m} minute${m === 1 ? "" : "s"} ago`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`;
-  const d = Math.round(h / 24);
-  if (d < 7) return `${d} day${d === 1 ? "" : "s"} ago`;
-  return formatDate(iso);
 }
 
 function groupByDay(activities: ContactActivity[]) {
