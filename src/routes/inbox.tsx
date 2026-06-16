@@ -120,7 +120,7 @@ function InboxPage() {
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
-      <div className={`grid h-[calc(100vh-64px)] min-h-0 ${contextOpen ? "grid-cols-[240px_340px_1fr_320px]" : "grid-cols-[240px_340px_1fr]"}`}>
+      <div className="relative grid h-[calc(100vh-64px)] min-h-0 grid-cols-[240px_340px_1fr]">
         {/* ============== LEFT NAV ============== */}
         <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
           <NavSection title="Inbox Views">
@@ -338,9 +338,13 @@ function InboxPage() {
           </div>
         </section>
 
-        {/* ============== CONTACT CONTEXT PANEL ============== */}
-        {contextOpen && (
-          <aside className="border-l border-border bg-sidebar/40 overflow-y-auto">
+        {/* ============== CONTACT CONTEXT PANEL (slide-in) ============== */}
+        <aside
+          className={`absolute right-0 top-0 h-full w-[340px] border-l border-border bg-sidebar/95 backdrop-blur overflow-y-auto shadow-2xl transition-transform duration-200 ease-out ${
+            contextOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
+          }`}
+          aria-hidden={!contextOpen}
+        >
             <div className="p-5 border-b border-border text-center">
               <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
@@ -420,8 +424,7 @@ function InboxPage() {
                 );
               })()}
             </Section>
-          </aside>
-        )}
+        </aside>
       </div>
     </AppShell>
   );
