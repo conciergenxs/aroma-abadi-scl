@@ -1286,3 +1286,102 @@ function TablePagination({
     </div>
   );
 }
+
+function formatInStage(iso?: string): string {
+  if (!iso) return "Just now";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 0) return "Just now";
+  const days = Math.floor(ms / 86400000);
+  if (days < 1) return "Today";
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"}`;
+  if (days < 30) {
+    const w = Math.floor(days / 7);
+    return `${w} week${w === 1 ? "" : "s"}`;
+  }
+  if (days < 365) {
+    const m = Math.floor(days / 30);
+    return `${m} month${m === 1 ? "" : "s"}`;
+  }
+  const y = Math.floor(days / 365);
+  return `${y} year${y === 1 ? "" : "s"}`;
+}
+
+function KanbanBoard({
+  contacts,
+  onMove,
+  onOpen,
+}: {
+  contacts: Contact[];
+  onMove: (id: string, stage: LifecycleStage) => void;
+  onOpen: (id: string) => void;
+}) {
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overStage, setOverStage] = useState<LifecycleStage | null>(null);
+
+  const byStage = useMemo(() => {
+    const map = new Map<LifecycleStage, Contact[]>();
+    LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
+    for (const c of contacts) {
+      const s = (c.lifecycleStage ?? "New Lead") as LifecycleStage;
+      map.get(s)?.push(c);
+    }
+    return map;
+  }, [contacts]);
+
+  return (
+    <div className="h-full overflow-x-auto overflow-y-hidden [overscroll-behavior-x:contain] scl-scroll">
+      <div className="flex gap-3 h-full min-w-max pb-2">
+        {LIFECYCLE_STAGES.map((stage) => {
+          const items = byStage.get(stage) ?? [];
+          const isOver = overStage === stage;
+          return (
+            <div
+              key={stage}
+              onDragOver={(e) => { e.preventDefault(); if (overStage !== stage) setOverStage(stage); }}
+              onDragLeave={() => { if (overStage === stage) setOverStage(null); }}
+              onDrop={() => {
+                if (dragId) onMove(dragId, stage);
+                setDragId(null);
+                setOverStage(null);
+              }}
+              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 ${
+                isOver ? "border-primary/60 bg-primary/5" : "border-border"
+              }`}
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 rounded-t-lg backdrop-blur">
+                <div className="text-xs font-medium">{stage}</div>
+                <span className="text-[10px] text-muted-foreground bg-white/[0.04] border border-border rounded px-1.5 py-0.5">
+                  {items.length}
+                </span>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-2 scl-scroll">
+                {items.map((c) => (
+                  <div
+                    key={c.id}
+                    draggable
+                    onDragStart={() => setDragId(c.id)}
+                    onDragEnd={() => { setDragId(null); setOverStage(null); }}
+                    onClick={() => onOpen(c.id)}
+                    className={`group rounded-md border border-border bg-card/80 hover:bg-card hover:border-primary/40 cursor-grab active:cursor-grabbing px-3 py-2.5 transition ${
+                      dragId === c.id ? "opacity-50" : ""
+                    }`}
+                  >
+                    <div className="text-sm font-medium text-foreground truncate">{c.name}</div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      In stage: {formatInStage(c.stageEnteredAt)}
+                    </div>
+                  </div>
+                ))}
+                {items.length === 0 && (
+                  <div className="text-[11px] text-muted-foreground text-center py-6 border border-dashed border-border/60 rounded-md">
+                    Drop here
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
