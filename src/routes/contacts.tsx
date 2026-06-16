@@ -1329,11 +1329,12 @@ function KanbanBoard({
   }, [contacts]);
 
   return (
-    <div className="h-full overflow-x-auto overflow-y-hidden [overscroll-behavior-x:contain] scl-scroll">
-      <div className="flex gap-3 h-full min-w-max pb-2">
+    <div className="h-full overflow-x-auto overflow-y-hidden [overscroll-behavior:contain] overscroll-x-none scl-scroll">
+      <div className="flex gap-4 h-full min-w-max pb-2">
         {LIFECYCLE_STAGES.map((stage) => {
           const items = byStage.get(stage) ?? [];
           const isOver = overStage === stage;
+          const c = STAGE_COLORS[stage as LifecycleStage];
           return (
             <div
               key={stage}
@@ -1344,17 +1345,21 @@ function KanbanBoard({
                 setDragId(null);
                 setOverStage(null);
               }}
-              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 ${
+              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 overflow-hidden transition ${
                 isOver ? "border-primary/60 bg-primary/5" : "border-border"
               }`}
             >
-              <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 rounded-t-lg backdrop-blur">
-                <div className="text-xs font-medium">{stage}</div>
-                <span className="text-[10px] text-muted-foreground bg-white/[0.04] border border-border rounded px-1.5 py-0.5">
+              <div className={`h-1 w-full ${c.bar}`} />
+              <div className="flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`h-2 w-2 rounded-full ${c.dot}`} />
+                  <div className="text-xs font-medium truncate">{stage}</div>
+                </div>
+                <span className={`text-[10px] rounded px-1.5 py-0.5 border ${c.badge}`}>
                   {items.length}
                 </span>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-2 scl-scroll">
+              <div className="flex-1 min-h-0 overflow-y-auto [overscroll-behavior:contain] p-2 space-y-2 scl-scroll">
                 {items.map((c) => (
                   <div
                     key={c.id}
@@ -1385,3 +1390,13 @@ function KanbanBoard({
     </div>
   );
 }
+
+const STAGE_COLORS: Record<LifecycleStage, { bar: string; dot: string; badge: string }> = {
+  "New Lead":        { bar: "bg-orange-500", dot: "bg-orange-500", badge: "border-orange-500/30 bg-orange-500/10 text-orange-300" },
+  "Contacted":       { bar: "bg-blue-500",   dot: "bg-blue-500",   badge: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
+  "Qualified":       { bar: "bg-purple-500", dot: "bg-purple-500", badge: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
+  "Pending Payment": { bar: "bg-yellow-500", dot: "bg-yellow-500", badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" },
+  "Customer":        { bar: "bg-green-500",  dot: "bg-green-500",  badge: "border-green-500/30 bg-green-500/10 text-green-300" },
+  "Lost":            { bar: "bg-red-500",    dot: "bg-red-500",    badge: "border-red-500/30 bg-red-500/10 text-red-300" },
+  "No Reply":        { bar: "bg-gray-500",   dot: "bg-gray-500",   badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" },
+};
