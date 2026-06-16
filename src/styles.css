@@ -107,11 +107,23 @@
     border-color: var(--color-border);
   }
 
+  /*
+   * Global typography scale-up.
+   * Tailwind sizes (text-sm, text-base, etc.) are rem-based, so bumping the
+   * root font-size scales the entire product proportionally while preserving
+   * the existing visual hierarchy. 16px -> 17px is a ~6% increase that
+   * meaningfully improves readability without crowding the UI.
+   */
+  html {
+    font-size: 17px;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
   }
 }
 
