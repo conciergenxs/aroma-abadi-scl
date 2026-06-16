@@ -279,7 +279,10 @@ function ContactsPage() {
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
               </button>
-              <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+              <button
+                onClick={() => navigate({ to: "/contacts/new" })}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              >
                 <Plus className="h-3.5 w-3.5" /> New Contact
               </button>
             </div>
