@@ -620,7 +620,7 @@ function ColorSwatch({ color, onChange }: { color: LabelColor; onChange: (c: Lab
 }
 
 function ContactDrawer({
-  contact, labels, lists, onClose, onToggleLabel, onToggleList,
+  contact, labels, lists, onClose, onToggleLabel, onToggleList, onCreateLabel, onDeleteLabel,
 }: {
   contact: Contact;
   labels: ContactLabel[];
@@ -628,6 +628,8 @@ function ContactDrawer({
   onClose: () => void;
   onToggleLabel: (id: string) => void;
   onToggleList: (id: string) => void;
+  onCreateLabel: (name: string, color: LabelColor) => void;
+  onDeleteLabel: (id: string) => void;
 }) {
   return (
     <div className="fixed inset-0 z-40 flex">
@@ -654,11 +656,12 @@ function ContactDrawer({
               return l ? <LabelChip key={id} label={l} onRemove={() => onToggleLabel(id)} /> : null;
             })}
           </div>
-          <Dropdown
-            placeholder="Add label…"
-            icon={<TagIcon className="h-3 w-3" />}
-            items={labels.map((l) => ({ id: l.id, name: l.name, color: l.color, selected: contact.labelIds.includes(l.id) }))}
-            onPick={onToggleLabel}
+          <LabelPicker
+            labels={labels}
+            selectedIds={contact.labelIds}
+            onToggle={onToggleLabel}
+            onCreate={onCreateLabel}
+            onDelete={onDeleteLabel}
           />
         </DrawerSection>
 
