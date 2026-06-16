@@ -11,7 +11,7 @@ import {
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { useMemo, useState } from "react";
 import {
-  Search, Filter, Paperclip, Smile, Send, MoreHorizontal,
+  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
   Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Instagram, PanelRightClose, PanelRightOpen,
   Mail, User2, ExternalLink,
