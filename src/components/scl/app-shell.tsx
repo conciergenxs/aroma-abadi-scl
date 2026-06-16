@@ -7,7 +7,6 @@ import {
   Megaphone,
   FileText,
   BellRing,
-  BarChart3,
   Settings,
   Search,
   Bell,
@@ -15,7 +14,7 @@ import {
 } from "lucide-react";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/subscriptions" | "/analytics" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/subscriptions" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -28,7 +27,6 @@ const nav: NavItem[] = [
   { to: "/broadcast", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/subscriptions", label: "Subscriptions", icon: BellRing },
-  { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -63,7 +61,7 @@ export function AppShell({
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-0.5">
+        <nav className="flex-1 px-2 py-5 space-y-1">
           <div className="px-3 pb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
             Workspace
           </div>
