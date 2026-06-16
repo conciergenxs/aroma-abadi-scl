@@ -44,7 +44,6 @@ function ContactsPage() {
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
-  const [openContactId, setOpenContactId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
@@ -152,8 +151,6 @@ function ContactsPage() {
     setContacts((cs) => cs.map((c) => ({ ...c, labelIds: c.labelIds.filter((x) => x !== id) })));
     if (removed) toast.success(`Label “${removed.name}” deleted`);
   };
-
-  const openContact = contacts.find((c) => c.id === openContactId) ?? null;
 
   return (
     <AppShell
@@ -341,7 +338,7 @@ function ContactsPage() {
               <KanbanBoard
                 contacts={visibleContacts}
                 onMove={moveToStage}
-                onOpen={(id) => setOpenContactId(id)}
+                onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
               />
             ) : (
             <SectionCard className="h-full flex flex-col">
@@ -365,7 +362,7 @@ function ContactsPage() {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {pageContacts.map((c) => (
-                      <tr key={c.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setOpenContactId(c.id)}>
+                      <tr key={c.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => navigate({ to: "/contacts/$contactId", params: { contactId: c.id } })}>
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
@@ -410,28 +407,6 @@ function ContactsPage() {
           </div>
         </div>
       </div>
-
-      {openContact && (
-        <ContactDrawer
-          contact={openContact}
-          labels={labels}
-          lists={lists}
-          onClose={() => setOpenContactId(null)}
-          onToggleLabel={(lid) => {
-            const has = openContact.labelIds.includes(lid);
-            updateContact(openContact.id, { labelIds: has ? openContact.labelIds.filter((x) => x !== lid) : [...openContact.labelIds, lid] });
-          }}
-          onToggleList={(lsId) => {
-            const has = openContact.listIds.includes(lsId);
-            updateContact(openContact.id, { listIds: has ? openContact.listIds.filter((x) => x !== lsId) : [...openContact.listIds, lsId] });
-          }}
-          onCreateLabel={(name, color) => {
-            const id = createLabel(name, color);
-            updateContact(openContact.id, { labelIds: [...openContact.labelIds, id] });
-          }}
-          onDeleteLabel={(id) => deleteLabel(id)}
-        />
-      )}
 
       {showManageProps && (
         <ManagePropertiesModal
