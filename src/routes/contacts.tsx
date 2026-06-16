@@ -7,6 +7,7 @@ import {
   type LabelColor,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
+import { LIFECYCLE_STAGES } from "@/components/scl/mock-data";
 import {
   contactsStore,
   useContactsStore,
