@@ -319,12 +319,12 @@ function ContactsPage() {
             </div>
           )}
 
-          <div className="flex-1 overflow-auto p-5">
-            <SectionCard>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
-                    <tr>
+          <div className="flex-1 min-h-0 p-5">
+            <SectionCard className="h-full flex flex-col">
+              <div className="flex-1 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] scroll-smooth">
+                <table className="min-w-full text-sm">
+                  <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <tr className="sticky top-0 z-10 bg-white/[0.02]">
                       <th className="w-10 px-4 py-3 whitespace-nowrap">
                         <input
                           type="checkbox"
