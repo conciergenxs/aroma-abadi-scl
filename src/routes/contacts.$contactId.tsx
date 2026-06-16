@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
+import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   ArrowLeft,
   Mail,
