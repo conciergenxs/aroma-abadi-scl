@@ -6,7 +6,6 @@ import {
   STAGE_COLORS,
   LIFECYCLE_STAGES,
   type LifecycleStage,
-  type Channel,
 } from "@/components/scl/mock-data";
 import type { Contact } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
@@ -17,7 +16,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
   Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
-  UserX, MessageSquare, Instagram, Info,
+  UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
 
@@ -26,21 +25,15 @@ export const Route = createFileRoute("/inbox")({
   component: InboxPage,
 });
 
-type InboxView = "my" | "team" | "mentions" | "unassigned";
-type ChannelFilter = "all" | Channel;
+type InboxView = "my" | "collaborations" | "mentions" | "unassigned";
+type TeamFilter = "all" | string;
 const tabs = ["All", "Unread", "Assigned", "Unassigned"] as const;
 
 const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
   { id: "my", label: "My Inbox", icon: InboxIcon },
-  { id: "team", label: "Team Inbox", icon: Users },
+  { id: "collaborations", label: "Collaborations", icon: Users },
   { id: "mentions", label: "Mentions", icon: AtSign },
   { id: "unassigned", label: "Unassigned", icon: UserX },
-];
-
-const CHANNELS: { id: ChannelFilter; label: string; icon: typeof MessageSquare }[] = [
-  { id: "all", label: "All Channels", icon: InboxIcon },
-  { id: "whatsapp", label: "WhatsApp", icon: MessageSquare },
-  { id: "instagram", label: "Instagram", icon: Instagram },
 ];
 
 /** Shared SCL team / user directory used by owner & collaborator selectors. */
@@ -55,6 +48,8 @@ const TEAM_USERS: TeamUser[] = [
   { id: "tomas", name: "Tomas Becker", team: "Success", avatar: "TB" },
 ];
 const TEAMS = Array.from(new Set(TEAM_USERS.map((u) => u.team)));
+const teamOfOwner = (ownerId?: string | null) =>
+  ownerId ? TEAM_USERS.find((u) => u.id === ownerId)?.team ?? null : null;
 const userLabel = (id?: string | null) =>
   !id ? "Unassigned" : TEAM_USERS.find((u) => u.id === id)?.name ?? id;
 
@@ -62,7 +57,7 @@ function InboxPage() {
   const { contacts, labels, lists, properties } = useContactsStore();
   const [view, setView] = useState<InboxView>("my");
   const [stage, setStage] = useState<LifecycleStage | null>(null);
-  const [channel, setChannel] = useState<ChannelFilter>("all");
+  const [team, setTeam] = useState<TeamFilter>("all");
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
@@ -77,10 +72,17 @@ function InboxPage() {
       if (view === "my" && ct.ownerId !== "me") return false;
       if (view === "unassigned" && ct.ownerId) return false;
       if (view === "mentions" && c.unread === 0) return false;
+      if (view === "collaborations") {
+        const collabs = collaborators[c.id] ?? [];
+        if (collabs.length < 2 && !collabs.includes("me")) return false;
+      }
       // Lifecycle stage
       if (stage && ct.lifecycleStage !== stage) return false;
-      // Channel
-      if (channel !== "all" && c.channel !== channel) return false;
+      // Team filter (owner's team)
+      if (team !== "all") {
+        const t = teamOfOwner(ct.ownerId);
+        if (t !== team) return false;
+      }
       // Tabs
       if (tab === "Unread" && c.unread === 0) return false;
       if (tab === "Assigned" && !ct.ownerId) return false;
@@ -92,7 +94,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, view, stage, channel, tab, search]);
+  }, [contacts, view, stage, team, tab, search, collaborators]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
@@ -109,16 +111,29 @@ function InboxPage() {
   }, [contacts]);
 
   const viewCounts = useMemo(() => {
-    const result: Record<InboxView, number> = { my: 0, team: 0, mentions: 0, unassigned: 0 };
+    const result: Record<InboxView, number> = { my: 0, collaborations: 0, mentions: 0, unassigned: 0 };
     for (const c of conversations) {
       const ct = contacts.find((x) => x.id === c.contactId);
       if (!ct) continue;
       if (ct.ownerId === "me") result.my += c.unread;
-      result.team += c.unread;
+      const collabs = collaborators[c.id] ?? [];
+      if (collabs.length >= 2 || collabs.includes("me")) result.collaborations += 1;
       if (c.unread > 0) result.mentions += 1;
       if (!ct.ownerId) result.unassigned += 1;
     }
     return result;
+  }, [contacts, collaborators]);
+
+  const teamCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const c of conversations) {
+      const ct = contacts.find((x) => x.id === c.contactId);
+      if (!ct) continue;
+      const t = teamOfOwner(ct.ownerId);
+      if (!t) continue;
+      map.set(t, (map.get(t) ?? 0) + 1);
+    }
+    return map;
   }, [contacts]);
 
   return (
@@ -189,21 +204,37 @@ function InboxPage() {
           </NavSection>
 
           <NavSection title="Company Inboxes">
-            {CHANNELS.map((ch) => {
-              const Icon = ch.icon;
-              const sel = channel === ch.id;
+            <button
+              onClick={() => setTeam("all")}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
+                team === "all"
+                  ? "bg-primary/15 text-primary font-medium"
+                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+              }`}
+            >
+              <Building2 className={`h-4 w-4 ${team === "all" ? "" : "opacity-70"}`} />
+              <span className="flex-1 text-left">All Teams</span>
+            </button>
+            {TEAMS.map((t) => {
+              const sel = team === t;
+              const count = teamCounts.get(t) ?? 0;
               return (
                 <button
-                  key={ch.id}
-                  onClick={() => setChannel(ch.id)}
+                  key={t}
+                  onClick={() => setTeam(t)}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
-                      : "text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.03]"
+                      : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
-                  <span className="flex-1 text-left">{ch.label}</span>
+                  <Users className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
+                  <span className="flex-1 text-left">{t} Team</span>
+                  {count > 0 && (
+                    <span className={`text-[11px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/55"}`}>
+                      {count}
+                    </span>
+                  )}
                 </button>
               );
             })}
