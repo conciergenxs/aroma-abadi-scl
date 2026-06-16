@@ -4,7 +4,7 @@ import { broadcasts } from "@/components/scl/mock-data";
 import { useMemo, useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 
-export const Route = createFileRoute("/broadcasts")({
+export const Route = createFileRoute("/broadcasts/")({
   head: () => ({ meta: [{ title: "Broadcasts — SCL" }] }),
   component: BroadcastListPage,
 });
