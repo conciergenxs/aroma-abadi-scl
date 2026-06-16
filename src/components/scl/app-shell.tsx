@@ -6,7 +6,6 @@ import {
   Users,
   Megaphone,
   FileText,
-  BellRing,
   Settings,
   Search,
   Bell,
@@ -14,7 +13,7 @@ import {
 } from "lucide-react";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/subscriptions" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -26,7 +25,6 @@ const nav: NavItem[] = [
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcast", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
-  { to: "/subscriptions", label: "Subscriptions", icon: BellRing },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
