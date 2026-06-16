@@ -98,6 +98,16 @@ function NewContactPage() {
       customFields: customValues,
     };
     contactsStore.setContacts((cs) => [contact, ...cs]);
+    contactsStore.addActivity(contact.id, "created", "Contact created");
+    if (stage) contactsStore.addActivity(contact.id, "lifecycle", `Lifecycle set to ${stage}`);
+    labelIds.forEach((id) => {
+      const l = labels.find((x) => x.id === id);
+      if (l) contactsStore.addActivity(contact.id, "label_added", `Added label “${l.name}”`);
+    });
+    listIds.forEach((id) => {
+      const ls = lists.find((x) => x.id === id);
+      if (ls) contactsStore.addActivity(contact.id, "list_added", `Added to list “${ls.name}”`);
+    });
     toast.success("Contact created successfully");
     navigate({ to: "/contacts/$contactId", params: { contactId: contact.id } });
   };
