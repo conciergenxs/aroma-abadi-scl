@@ -1019,7 +1019,6 @@ function ContactDrawer({
         <DrawerSection title="Details">
           <DrawerRow label="Channel"><ChannelDot channel={contact.channel} /></DrawerRow>
           <DrawerRow label="Status">{contact.status}</DrawerRow>
-          <DrawerRow label="Subscription">{contact.subscription}</DrawerRow>
           <DrawerRow label="Last interaction">{contact.lastInteraction}</DrawerRow>
         </DrawerSection>
       </aside>
