@@ -100,7 +100,7 @@ function NewContactPage() {
     };
     contactsStore.setContacts((cs) => [contact, ...cs]);
     toast.success("Contact created successfully");
-    navigate({ to: "/contacts" });
+    navigate({ to: "/contacts/$contactId", params: { contactId: contact.id } });
   };
 
   return (
