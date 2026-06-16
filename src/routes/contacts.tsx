@@ -1265,8 +1265,9 @@ function KanbanBoard({
     const map = new Map<LifecycleStage, Contact[]>();
     LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
     for (const c of contacts) {
-      const s = (c.lifecycleStage ?? "New Lead") as LifecycleStage;
-      map.get(s)?.push(c);
+      // Kanban only includes contacts with an assigned lifecycle stage.
+      if (!c.lifecycleStage) continue;
+      map.get(c.lifecycleStage as LifecycleStage)?.push(c);
     }
     return map;
   }, [contacts]);
