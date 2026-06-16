@@ -134,7 +134,7 @@ function NewContactPage() {
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-3xl px-6 py-8 space-y-8">
+          <div className="px-4 lg:px-6 py-6 space-y-6">
             {/* Section 1: Contact Information */}
             <Section
               title="Contact Information"
@@ -170,20 +170,30 @@ function NewContactPage() {
                     options={LIFECYCLE_STAGES.map((s) => ({ value: s, label: s }))}
                   />
                 </Field>
-                <div className="md:col-span-2">
-                  <Field label="Labels">
-                    <LabelMultiSelect
-                      labels={labels}
-                      selectedIds={labelIds}
-                      onToggle={(id) =>
-                        setLabelIds((ids) =>
-                          ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-                        )
-                      }
-                      onCreate={handleCreateLabel}
-                    />
-                  </Field>
-                </div>
+                <Field label="Labels">
+                  <LabelMultiSelect
+                    labels={labels}
+                    selectedIds={labelIds}
+                    onToggle={(id) =>
+                      setLabelIds((ids) =>
+                        ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                      )
+                    }
+                    onCreate={handleCreateLabel}
+                  />
+                </Field>
+                <Field label="Add To Lists">
+                  <ListCompactSelect
+                    lists={lists}
+                    selectedIds={listIds}
+                    onToggle={(id) =>
+                      setListIds((ids) =>
+                        ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                      )
+                    }
+                    onCreate={handleCreateList}
+                  />
+                </Field>
               </FormGrid>
             </Section>
 
@@ -213,23 +223,6 @@ function NewContactPage() {
                   ))}
                 </FormGrid>
               )}
-            </Section>
-
-            {/* Section 3: Add To Lists */}
-            <Section
-              title="Add To Lists"
-              description="Add this contact to one or more contact lists."
-            >
-              <ListMultiSelect
-                lists={lists}
-                selectedIds={listIds}
-                onToggle={(id) =>
-                  setListIds((ids) =>
-                    ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-                  )
-                }
-                onCreate={handleCreateList}
-              />
             </Section>
           </div>
         </div>
@@ -557,7 +550,7 @@ function LabelMultiSelect({
   );
 }
 
-function ListMultiSelect({
+function ListCompactSelect({
   lists,
   selectedIds,
   onToggle,
@@ -572,8 +565,8 @@ function ListMultiSelect({
   const [newName, setNewName] = useState("");
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1.5">
         {lists.map((l) => {
           const on = selectedIds.includes(l.id);
           return (
@@ -581,27 +574,20 @@ function ListMultiSelect({
               type="button"
               key={l.id}
               onClick={() => onToggle(l.id)}
-              className={`flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-left transition ${
+              className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] transition ${
                 on
-                  ? "border-primary/60 bg-primary/10"
-                  : "border-border bg-card/60 hover:bg-card"
+                  ? "border-primary/60 bg-primary/15 text-foreground"
+                  : "border-border bg-card/60 text-muted-foreground hover:text-foreground"
               }`}
             >
               <span
-                className={`mt-0.5 h-4 w-4 rounded border grid place-items-center transition ${
+                className={`h-3 w-3 rounded-sm border grid place-items-center transition ${
                   on ? "bg-primary border-primary" : "border-border bg-card/40"
                 }`}
               >
-                {on && <Check className="h-3 w-3 text-primary-foreground" />}
+                {on && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
               </span>
-              <span className="flex-1 min-w-0">
-                <span className="block text-xs font-medium truncate">{l.name}</span>
-                {l.description && (
-                  <span className="block text-[10px] text-muted-foreground truncate">
-                    {l.description}
-                  </span>
-                )}
-              </span>
+              {l.name}
             </button>
           );
         })}
@@ -646,9 +632,9 @@ function ListMultiSelect({
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border bg-card/40 px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
+          className="inline-flex items-center gap-1 rounded-md border border-dashed border-border bg-card/40 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
         >
-          <Plus className="h-3 w-3" /> Create new list
+          <Plus className="h-3 w-3" /> Create list
         </button>
       )}
     </div>
