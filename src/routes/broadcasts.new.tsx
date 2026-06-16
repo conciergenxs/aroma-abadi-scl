@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/broadcast/new")({
+export const Route = createFileRoute("/broadcasts/new")({
   head: () => ({ meta: [{ title: "Create Broadcast — SCL" }] }),
   component: CreateBroadcastPage,
 });
@@ -107,7 +107,7 @@ function CreateBroadcastPage() {
         ? `Broadcast scheduled for ${scheduleDate} ${scheduleTime}`
         : "Broadcast sent";
     toast.success(label);
-    navigate({ to: "/broadcast" });
+    navigate({ to: "/broadcasts" });
   };
 
   const audienceSummary = useMemo(() => {
@@ -122,7 +122,7 @@ function CreateBroadcastPage() {
       subtitle="Compose, target and schedule a new campaign"
       actions={
         <Link
-          to="/broadcast"
+          to="/broadcasts"
           className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to broadcasts
