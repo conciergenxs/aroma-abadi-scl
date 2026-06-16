@@ -565,15 +565,15 @@ function OwnerSelect({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-  useOutsideClose(ref, open, () => setOpen(false));
+  const btnRef = useRef<HTMLButtonElement>(null);
   const current = TEAM_USERS.find((u) => u.id === value);
   const filtered = TEAM_USERS.filter((u) =>
     u.name.toLowerCase().includes(q.toLowerCase()),
   );
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] text-xs"
@@ -590,8 +590,8 @@ function OwnerSelect({
         )}
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
       </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-1.5 w-64 rounded-md border border-border bg-popover shadow-xl p-2">
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={256}>
+        <div className="rounded-md border border-border bg-popover shadow-xl p-2">
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <input
@@ -647,7 +647,7 @@ function OwnerSelect({
             </button>
           </div>
         </div>
-      )}
+      </FloatingMenu>
     </div>
   );
 }
@@ -662,8 +662,7 @@ function CollaboratorsPopover({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [draft, setDraft] = useState<string[]>(value);
-  const ref = useRef<HTMLDivElement>(null);
-  useOutsideClose(ref, open, () => setOpen(false));
+  const btnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (open) setDraft(value);
   }, [open, value]);
@@ -673,8 +672,9 @@ function CollaboratorsPopover({
   const toggle = (id: string) =>
     setDraft((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]));
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         title="Collaborators"
@@ -689,8 +689,8 @@ function CollaboratorsPopover({
           </span>
         )}
       </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-md border border-border bg-popover shadow-xl p-2">
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={288}>
+        <div className="rounded-md border border-border bg-popover shadow-xl p-2">
           <div className="text-[11px] font-semibold px-1 pb-2 text-foreground">Add collaborators</div>
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
@@ -786,7 +786,7 @@ function CollaboratorsPopover({
             </button>
           </div>
         </div>
-      )}
+      </FloatingMenu>
     </div>
   );
 }
