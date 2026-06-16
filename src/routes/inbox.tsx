@@ -122,9 +122,9 @@ function InboxPage() {
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
-      <div className="relative grid h-[calc(100vh-64px)] min-h-0 grid-cols-[240px_340px_1fr] overflow-x-hidden">
+      <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
+        <aside className="shrink-0 w-[240px] border-r border-border bg-sidebar/40 overflow-y-auto">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
@@ -202,7 +202,7 @@ function InboxPage() {
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
-        <aside className="border-r border-border flex flex-col min-h-0 bg-sidebar/20">
+        <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-sidebar/20">
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -284,7 +284,7 @@ function InboxPage() {
         </aside>
 
         {/* ============== ACTIVE CONVERSATION ============== */}
-        <section className="flex flex-col min-h-0">
+        <section className="flex-1 min-w-0 flex flex-col min-h-0">
           <ConversationHeader
             contact={contact}
             active={active}
