@@ -90,7 +90,7 @@ function InboxPage() {
     return TEAM_USERS.filter((u) => u.id !== "me" && u.name.toLowerCase().includes(q)).slice(0, 6);
   }, [mentionQuery]);
 
-  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleNoteChange = (e: { target: HTMLTextAreaElement }) => {
     const v = e.target.value;
     setNoteText(v);
     const caret = e.target.selectionStart ?? v.length;
