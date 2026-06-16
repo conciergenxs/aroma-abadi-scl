@@ -230,3 +230,23 @@ export const recentActivity = [
   { id: "a4", icon: "alert", text: "Instagram channel rate-limit warning resolved", time: "1h ago" },
   { id: "a5", icon: "user", text: "47 new contacts imported from Shopify sync", time: "2h ago" },
 ];
+
+/**
+ * Connected messaging channels for this workspace. Acts as the single
+ * source of truth for any module that needs to pick a sending channel
+ * (Broadcast, Templates, etc.).
+ */
+export type ConnectedChannel = {
+  id: string;
+  channel: Channel;
+  name: string;
+  handle: string;
+  status: "connected" | "disconnected";
+};
+
+export const connectedChannels: ConnectedChannel[] = [
+  { id: "wa-main", channel: "whatsapp", name: "SCL HQ", handle: "+1 415 555 0144", status: "connected" },
+  { id: "wa-eu", channel: "whatsapp", name: "SCL Europe", handle: "+34 900 555 011", status: "connected" },
+  { id: "ig-brand", channel: "instagram", name: "@scl.studio", handle: "Instagram Business", status: "connected" },
+  { id: "ig-community", channel: "instagram", name: "@scl.community", handle: "Instagram Business", status: "connected" },
+];
