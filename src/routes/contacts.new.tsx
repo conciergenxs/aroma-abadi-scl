@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { ArrowLeft, Check, ChevronDown, Plus, X } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   LIFECYCLE_STAGES,
@@ -182,22 +182,27 @@ function NewContactPage() {
                     onCreate={handleCreateLabel}
                   />
                 </Field>
-                <Field label="Add To Lists">
-                  <ListCompactSelect
-                    lists={lists}
-                    selectedIds={listIds}
-                    onToggle={(id) =>
-                      setListIds((ids) =>
-                        ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-                      )
-                    }
-                    onCreate={handleCreateList}
-                  />
-                </Field>
               </FormGrid>
             </Section>
 
-            {/* Section 2: Additional Information */}
+            {/* Section 2: Add To Lists */}
+            <Section
+              title="Add To Lists"
+              description="Group this contact into one or more lists."
+            >
+              <ListCompactSelect
+                lists={lists}
+                selectedIds={listIds}
+                onToggle={(id) =>
+                  setListIds((ids) =>
+                    ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                  )
+                }
+                onCreate={handleCreateList}
+              />
+            </Section>
+
+            {/* Section 3: Additional Information */}
             <Section
               title="Additional Information"
               description="Custom properties defined in Manage Properties."
@@ -269,13 +274,13 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <div className="block">
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </div>
       {children}
-    </label>
+    </div>
   );
 }
 
@@ -296,7 +301,7 @@ function Input({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+      className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-2.5 text-xs text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
     />
   );
 }
@@ -316,7 +321,7 @@ function Textarea({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       rows={3}
-      className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+      className="w-full rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
     />
   );
 }
@@ -334,7 +339,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-9 w-full rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+      className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>
@@ -372,7 +377,7 @@ function PropertyInput({
           type="number"
           value={(v as number | string) ?? ""}
           onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
-          className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+          className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-2.5 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
         />
       );
     case "email":
@@ -424,7 +429,7 @@ function PropertyInput({
                 className={`rounded-md border px-2 py-1 text-[11px] transition ${
                   on
                     ? "border-primary/60 bg-primary/15 text-foreground"
-                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground"
+                    : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
                 }`}
               >
                 {o}
@@ -461,12 +466,35 @@ function LabelMultiSelect({
   const exact = labels.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
   const canCreate = search.trim().length > 0 && !exact;
 
+  useEffect(() => {
+    if (!open) return;
+    const onDocDown = (e: MouseEvent) => {
+      if (!wrapRef.current) return;
+      if (!wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
+    };
+    document.addEventListener("mousedown", onDocDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
     <div className="relative" ref={wrapRef}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-border bg-card/60 px-2 py-1.5 text-xs hover:bg-card focus:outline-none focus:ring-1 focus:ring-primary/40"
+        className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5 text-xs hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors"
       >
         {selectedIds.length === 0 && (
           <span className="text-muted-foreground">Select labels…</span>
@@ -495,9 +523,7 @@ function LabelMultiSelect({
         <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
       </button>
       {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => { setOpen(false); setSearch(""); }} />
-          <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
             <div className="p-1.5 border-b border-border">
               <input
                 autoFocus
@@ -510,7 +536,7 @@ function LabelMultiSelect({
                   }
                 }}
                 placeholder="Search or create label…"
-                className="h-7 w-full rounded border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-7 w-full rounded border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
             </div>
             <div className="max-h-56 overflow-y-auto p-1">
@@ -543,8 +569,7 @@ function LabelMultiSelect({
                 </button>
               )}
             </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -577,7 +602,7 @@ function ListCompactSelect({
               className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] transition ${
                 on
                   ? "border-primary/60 bg-primary/15 text-foreground"
-                  : "border-border bg-card/60 text-muted-foreground hover:text-foreground"
+                  : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
               }`}
             >
               <span
@@ -611,7 +636,7 @@ function ListCompactSelect({
               }
             }}
             placeholder="New list name"
-            className="h-8 flex-1 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            className="h-8 flex-1 rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30"
           />
           <button
             type="button"
