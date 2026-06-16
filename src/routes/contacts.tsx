@@ -11,10 +11,10 @@ import {
 } from "@/components/scl/mock-data";
 import {
   Search, Filter, Plus, MoreHorizontal,
-  Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
+  Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
@@ -83,6 +83,8 @@ function ContactsPage() {
   const [query, setQuery] = useState("");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
 
   const visibleContacts = useMemo(() => {
     let base: Contact[];
@@ -99,7 +101,13 @@ function ContactsPage() {
     );
   }, [contacts, activeView, query]);
 
-  const allSelected = selected.length > 0 && selected.length === visibleContacts.length;
+  const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
+  useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
+  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+  const pageStart = (page - 1) * perPage;
+  const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
+
+  const allSelected = selected.length > 0 && pageContacts.every((c) => selected.includes(c.id));
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
@@ -321,26 +329,26 @@ function ContactsPage() {
 
           <div className="flex-1 min-h-0 p-5">
             <SectionCard className="h-full flex flex-col">
-              <div className="flex-1 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] scroll-smooth">
+              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
                 <table className="min-w-full text-sm">
                   <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    <tr className="sticky top-0 z-10 bg-white/[0.02]">
-                      <th className="w-10 px-4 py-3 whitespace-nowrap">
+                    <tr>
+                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">
                         <input
                           type="checkbox"
                           className="accent-[oklch(0.62_0.17_40)]"
                           checked={allSelected}
-                          onChange={() => setSelected(allSelected ? [] : visibleContacts.map((c) => c.id))}
+                          onChange={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
                         />
                       </th>
                       {properties.filter((p) => p.visible).map((p) => (
-                        <th key={p.id} className="px-4 py-3 text-left font-medium whitespace-nowrap">{p.name}</th>
+                        <th key={p.id} className="sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">{p.name}</th>
                       ))}
-                      <th className="w-10 px-4 py-3 whitespace-nowrap"></th>
+                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {visibleContacts.map((c) => (
+                    {pageContacts.map((c) => (
                       <tr key={c.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setOpenContactId(c.id)}>
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                           <input
@@ -362,7 +370,7 @@ function ContactsPage() {
                         </td>
                       </tr>
                     ))}
-                    {visibleContacts.length === 0 && (
+                    {pageContacts.length === 0 && (
                       <tr>
                         <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
@@ -373,6 +381,14 @@ function ContactsPage() {
                   </tbody>
                 </table>
               </div>
+              <TablePagination
+                total={visibleContacts.length}
+                page={page}
+                perPage={perPage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                onPerPageChange={setPerPage}
+              />
             </SectionCard>
           </div>
         </div>
@@ -1142,6 +1158,83 @@ function LabelPicker({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function TablePagination({
+  total, page, perPage, totalPages, onPageChange, onPerPageChange,
+}: {
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  onPageChange: (p: number) => void;
+  onPerPageChange: (n: number) => void;
+}) {
+  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
+  const end = Math.min(page * perPage, total);
+
+  const pages: (number | "…")[] = [];
+  const add = (n: number) => { if (!pages.includes(n)) pages.push(n); };
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) add(i);
+  } else {
+    add(1);
+    if (page > 4) pages.push("…");
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) add(i);
+    if (page < totalPages - 3) pages.push("…");
+    add(totalPages);
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <span>Rows per page</span>
+        <select
+          value={perPage}
+          onChange={(e) => onPerPageChange(Number(e.target.value))}
+          className="h-7 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+        >
+          {[10, 20, 30, 40, 50].map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+        <span className="ml-2">{start}–{end} of {total}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+          disabled={page <= 1}
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="h-3 w-3" /> Prev
+        </button>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span key={`e-${i}`} className="px-1.5 text-muted-foreground">…</span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`h-7 min-w-7 px-2 rounded-md border text-xs ${
+                p === page
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border bg-card/60 hover:bg-card text-foreground"
+              }`}
+            >
+              {p}
+            </button>
+          ),
+        )}
+        <button
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Next <ChevronRight className="h-3 w-3" />
+        </button>
+      </div>
     </div>
   );
 }
