@@ -27,6 +27,10 @@ export const Route = createFileRoute("/inbox")({
 
 type InboxView = "my" | "collaborations" | "mentions" | "unassigned";
 type TeamFilter = "all" | string;
+type ActiveFilter =
+  | { kind: "view"; value: InboxView }
+  | { kind: "stage"; value: LifecycleStage }
+  | { kind: "team"; value: string };
 const tabs = ["All", "Unread", "Assigned", "Unassigned"] as const;
 
 const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
@@ -55,9 +59,7 @@ const userLabel = (id?: string | null) =>
 
 function InboxPage() {
   const { contacts, labels, lists, properties } = useContactsStore();
-  const [view, setView] = useState<InboxView>("my");
-  const [stage, setStage] = useState<LifecycleStage | null>(null);
-  const [team, setTeam] = useState<TeamFilter>("all");
+  const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ kind: "view", value: "my" });
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
@@ -68,20 +70,21 @@ function InboxPage() {
     return conversations.filter((c) => {
       const ct = contacts.find((x) => x.id === c.contactId);
       if (!ct) return false;
-      // Inbox view
-      if (view === "my" && ct.ownerId !== "me") return false;
-      if (view === "unassigned" && ct.ownerId) return false;
-      if (view === "mentions" && c.unread === 0) return false;
-      if (view === "collaborations") {
-        const collabs = collaborators[c.id] ?? [];
-        if (collabs.length < 2 && !collabs.includes("me")) return false;
-      }
-      // Lifecycle stage
-      if (stage && ct.lifecycleStage !== stage) return false;
-      // Team filter (owner's team)
-      if (team !== "all") {
+      // Single active primary filter
+      if (activeFilter.kind === "view") {
+        const v = activeFilter.value;
+        if (v === "my" && ct.ownerId !== "me") return false;
+        if (v === "unassigned" && ct.ownerId) return false;
+        if (v === "mentions" && c.unread === 0) return false;
+        if (v === "collaborations") {
+          const collabs = collaborators[c.id] ?? [];
+          if (collabs.length < 2 && !collabs.includes("me")) return false;
+        }
+      } else if (activeFilter.kind === "stage") {
+        if (ct.lifecycleStage !== activeFilter.value) return false;
+      } else if (activeFilter.kind === "team") {
         const t = teamOfOwner(ct.ownerId);
-        if (t !== team) return false;
+        if (t !== activeFilter.value) return false;
       }
       // Tabs
       if (tab === "Unread" && c.unread === 0) return false;
@@ -94,7 +97,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, view, stage, team, tab, search, collaborators]);
+  }, [contacts, activeFilter, tab, search, collaborators]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
@@ -136,6 +139,31 @@ function InboxPage() {
     return map;
   }, [contacts]);
 
+  const isViewActive = (id: InboxView) =>
+    activeFilter.kind === "view" && activeFilter.value === id;
+  const isStageActive = (s: LifecycleStage | null) =>
+    s === null
+      ? activeFilter.kind !== "stage"
+      : activeFilter.kind === "stage" && activeFilter.value === s;
+  const isTeamActive = (t: TeamFilter) =>
+    t === "all"
+      ? activeFilter.kind !== "team"
+      : activeFilter.kind === "team" && activeFilter.value === t;
+
+  const filterContext = useMemo(() => {
+    if (activeFilter.kind === "view") {
+      const v = activeFilter.value;
+      if (v === "my") return { title: "My Inbox", subtitle: "Showing conversations assigned to you" };
+      if (v === "collaborations") return { title: "Collaborations", subtitle: "Conversations where multiple teammates collaborate" };
+      if (v === "mentions") return { title: "Mentions", subtitle: "Conversations where you are mentioned" };
+      return { title: "Unassigned", subtitle: "Showing conversations with no owner" };
+    }
+    if (activeFilter.kind === "stage") {
+      return { title: activeFilter.value, subtitle: `Showing contacts in ${activeFilter.value} stage` };
+    }
+    return { title: `${activeFilter.value} Team`, subtitle: `Showing conversations handled by ${activeFilter.value} Team` };
+  }, [activeFilter]);
+
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
       <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
@@ -144,12 +172,12 @@ function InboxPage() {
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
-              const sel = view === v.id;
+              const sel = isViewActive(v.id);
               const count = viewCounts[v.id];
               return (
                 <button
                   key={v.id}
-                  onClick={() => setView(v.id)}
+                  onClick={() => setActiveFilter({ kind: "view", value: v.id })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
@@ -170,26 +198,26 @@ function InboxPage() {
 
           <NavSection title="Lifecycle Stages">
             <button
-              onClick={() => setStage(null)}
+              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                stage === null
-                  ? "bg-primary/15 text-primary font-medium"
-                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                activeFilter.kind === "stage"
+                  ? "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
               <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
               <span className="flex-1 text-left">All Stages</span>
             </button>
             {LIFECYCLE_STAGES.map((s) => {
-              const sel = stage === s;
+              const sel = isStageActive(s);
               const count = stageCounts.get(s) ?? 0;
               return (
                 <button
                   key={s}
-                  onClick={() => setStage(s)}
+                  onClick={() => setActiveFilter({ kind: "stage", value: s })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
-                      ? "bg-white/[0.05] text-foreground font-medium"
+                      ? "bg-primary/15 text-primary font-medium"
                       : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
@@ -205,23 +233,21 @@ function InboxPage() {
 
           <NavSection title="Company Inboxes">
             <button
-              onClick={() => setTeam("all")}
+              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                team === "all"
-                  ? "bg-primary/15 text-primary font-medium"
-                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
-              <Building2 className={`h-4 w-4 ${team === "all" ? "" : "opacity-70"}`} />
+              <Building2 className="h-4 w-4 opacity-70" />
               <span className="flex-1 text-left">All Teams</span>
             </button>
             {TEAMS.map((t) => {
-              const sel = team === t;
+              const sel = isTeamActive(t);
               const count = teamCounts.get(t) ?? 0;
               return (
                 <button
                   key={t}
-                  onClick={() => setTeam(t)}
+                  onClick={() => setActiveFilter({ kind: "team", value: t })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
@@ -243,6 +269,10 @@ function InboxPage() {
 
         {/* ============== CONVERSATION LIST ============== */}
         <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-background/40">
+          <div className="px-3.5 pt-3 pb-2 border-b border-border/60">
+            <div className="text-[13px] font-semibold text-foreground truncate">{filterContext.title}</div>
+            <div className="text-[11px] text-muted-foreground/70 truncate mt-0.5">{filterContext.subtitle}</div>
+          </div>
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
