@@ -13,6 +13,7 @@ import { useContactsStore, contactsStore } from "@/components/scl/contacts-store
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { TemplatePicker } from "@/components/scl/template-picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
@@ -83,6 +84,16 @@ function InboxPage() {
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionIndex, setMentionIndex] = useState(0);
   const noteRef = useRef<HTMLTextAreaElement | null>(null);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+
+  const insertTemplate = (body: string) => {
+    if (composerMode === "note") {
+      setNoteText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
+      requestAnimationFrame(() => noteRef.current?.focus());
+    } else {
+      setReplyText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
+    }
+  };
 
   const mentionMatches = useMemo(() => {
     if (mentionQuery === null) return [];
@@ -527,7 +538,12 @@ function InboxPage() {
                   <div className="flex items-center gap-0.5 text-muted-foreground/70">
                     <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
                     <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Smile className="h-4 w-4" /></button>
-                    <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground">Use template <ChevronDown className="h-3 w-3" /></button>
+                    <button
+                      onClick={() => setTemplatePickerOpen(true)}
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground"
+                    >
+                      Use template <ChevronDown className="h-3 w-3" />
+                    </button>
                     <button
                       onClick={() => { setComposerMode("note"); requestAnimationFrame(() => noteRef.current?.focus()); }}
                       className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90"
@@ -613,6 +629,12 @@ function InboxPage() {
                       className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"
                     >
                       <AtSignIcon className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setTemplatePickerOpen(true)}
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 hover:text-amber-200"
+                    >
+                      Use template
                     </button>
                   </div>
                   <button
@@ -724,6 +746,11 @@ function InboxPage() {
           </div>
         </aside>
       </div>
+      <TemplatePicker
+        open={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        onInsert={insertTemplate}
+      />
     </AppShell>
   );
 }
