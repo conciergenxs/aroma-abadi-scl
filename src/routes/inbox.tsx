@@ -125,7 +125,7 @@ function InboxPage() {
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
       <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="shrink-0 w-[240px] border-r border-border bg-sidebar/40 overflow-y-auto">
+        <aside className="shrink-0 w-[228px] border-r border-border/60 bg-sidebar/20 overflow-y-auto">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
@@ -135,14 +135,16 @@ function InboxPage() {
                 <button
                   key={v.id}
                   onClick={() => setView(v.id)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
-                    sel ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                    sel
+                      ? "bg-primary/15 text-primary font-medium"
+                      : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className={`h-3.5 w-3.5 ${sel ? "" : "opacity-70"}`} />
                   <span className="flex-1 text-left">{v.label}</span>
                   {count > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${sel ? "bg-primary/25 text-primary" : "bg-white/[0.06] text-muted-foreground"}`}>
+                    <span className={`text-[10px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/60"}`}>
                       {count}
                     </span>
                   )}
@@ -154,11 +156,13 @@ function InboxPage() {
           <NavSection title="Lifecycle Stages">
             <button
               onClick={() => setStage(null)}
-              className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
-                stage === null ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+              className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                stage === null
+                  ? "bg-primary/15 text-primary font-medium"
+                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60" />
               <span className="flex-1 text-left">All Stages</span>
             </button>
             {LIFECYCLE_STAGES.map((s) => {
@@ -168,14 +172,16 @@ function InboxPage() {
                 <button
                   key={s}
                   onClick={() => setStage(s)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
-                    sel ? "bg-white/[0.05] text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                    sel
+                      ? "bg-white/[0.05] text-foreground font-medium"
+                      : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
                   <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[s].dot}`} />
                   <span className="flex-1 text-left truncate">{s}</span>
                   {count > 0 && (
-                    <span className="text-[10px] text-muted-foreground">{count}</span>
+                    <span className="text-[10px] tabular-nums text-muted-foreground/50">{count}</span>
                   )}
                 </button>
               );
@@ -190,11 +196,13 @@ function InboxPage() {
                 <button
                   key={ch.id}
                   onClick={() => setChannel(ch.id)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
-                    sel ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                    sel
+                      ? "bg-primary/15 text-primary font-medium"
+                      : "text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className={`h-3.5 w-3.5 ${sel ? "" : "opacity-70"}`} />
                   <span className="flex-1 text-left">{ch.label}</span>
                 </button>
               );
@@ -203,7 +211,7 @@ function InboxPage() {
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
-        <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-sidebar/20">
+        <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-background/40">
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -237,44 +245,60 @@ function InboxPage() {
               if (!ct) return null;
               const sel = c.id === activeId;
               const stageColor = ct.lifecycleStage ? STAGE_COLORS[ct.lifecycleStage] : null;
+              const unread = c.unread > 0;
               return (
                 <button
                   key={c.id}
                   onClick={() => setActiveId(c.id)}
-                  className={`w-full text-left flex gap-2.5 px-3 py-2.5 border-b border-border/60 transition ${
-                    sel ? "bg-primary/10 border-l-2 border-l-primary" : "border-l-2 border-l-transparent hover:bg-white/[0.02]"
+                  className={`w-full text-left flex gap-3 px-3.5 py-3 border-b border-border/40 transition ${
+                    sel
+                      ? "bg-primary/10 border-l-2 border-l-primary"
+                      : "border-l-2 border-l-transparent hover:bg-white/[0.02]"
                   }`}
                 >
                   <div className="relative shrink-0">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sidebar ${c.channel === "whatsapp" ? "bg-emerald-500" : "bg-pink-500"}`} />
+                    <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${c.channel === "whatsapp" ? "bg-emerald-500" : "bg-pink-500"}`} />
+                    {unread && (
+                      <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium truncate">{ct.name}</span>
-                      <span className="text-[10px] text-muted-foreground shrink-0">{c.time}</span>
+                      <span className={`text-[15px] truncate ${unread ? "font-semibold text-foreground" : "font-medium text-foreground/90"}`}>
+                        {ct.name}
+                      </span>
+                      <span className={`text-[10px] shrink-0 tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
+                        {c.time}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between gap-2 mt-0.5">
-                      <p className={`text-xs truncate ${c.unread > 0 ? "text-foreground" : "text-muted-foreground"}`}>{c.preview}</p>
-                      {c.unread > 0 && (<span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground shrink-0">{c.unread}</span>)}
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <p className={`text-[12px] truncate leading-snug ${unread ? "text-foreground/85" : "text-muted-foreground/70"}`}>
+                        {c.preview}
+                      </p>
+                      {unread && (
+                        <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground shrink-0">
+                          {c.unread}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {stageColor && ct.lifecycleStage && (
-                        <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] ${stageColor.badge}`}>
-                          <span className={`h-1 w-1 rounded-full ${stageColor.dot}`} />
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/80">
+                          <span className={`h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
                           {ct.lifecycleStage}
                         </span>
                       )}
                       {ct.ownerId && (
-                        <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60">
                           <User2 className="h-2.5 w-2.5" />
                           {ct.ownerId === "me" ? "Me" : ct.ownerId}
                         </span>
                       )}
                       {!ct.ownerId && (
-                        <span className="text-[9px] text-amber-300/80">Unassigned</span>
+                        <span className="text-[10px] text-amber-300/70">Unassigned</span>
                       )}
                     </div>
                   </div>
@@ -307,13 +331,13 @@ function InboxPage() {
             onToggleContext={() => setContextOpen((v) => !v)}
           />
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 scl-grid-bg">
-            <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground">Today</div>
+          <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
+            <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">Today</div>
             {thread.map((m) => (
               <div key={m.id} className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[68%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.from === "me" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card/80 border border-border text-foreground rounded-bl-sm glass"}`}>
+                <div className={`max-w-[64%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm ${m.from === "me" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card/90 border border-border/60 text-foreground rounded-bl-sm"}`}>
                   <p>{m.text}</p>
-                  <div className={`mt-1 flex items-center gap-1 text-[10px] ${m.from === "me" ? "text-primary-foreground/70 justify-end" : "text-muted-foreground"}`}>
+                  <div className={`mt-1.5 flex items-center gap-1 text-[10px] ${m.from === "me" ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}>
                     <span>{m.time}</span>
                     {m.from === "me" && (m.status === "read" ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
                   </div>
@@ -325,17 +349,21 @@ function InboxPage() {
             )}
           </div>
 
-          <div className="border-t border-border bg-card/40 p-3">
-            <div className="rounded-xl border border-border bg-background/60 focus-within:ring-1 focus-within:ring-primary/40">
-              <textarea rows={2} placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`} className="w-full bg-transparent resize-none px-4 py-3 text-sm focus:outline-none placeholder:text-muted-foreground/70" />
-              <div className="flex items-center justify-between px-2 py-2 border-t border-border">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05]"><Paperclip className="h-4 w-4" /></button>
-                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05]"><Smile className="h-4 w-4" /></button>
-                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05]">Use template <ChevronDown className="h-3 w-3" /></button>
-                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] text-amber-300/80">Internal note</button>
+          <div className="border-t border-border/60 bg-background/30 px-6 py-4">
+            <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
+              <textarea
+                rows={2}
+                placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`}
+                className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
+              />
+              <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
+                <div className="flex items-center gap-0.5 text-muted-foreground/70">
+                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
+                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Smile className="h-4 w-4" /></button>
+                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground">Use template <ChevronDown className="h-3 w-3" /></button>
+                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/80">Internal note</button>
                 </div>
-                <button className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"><Send className="h-3.5 w-3.5" /> Send</button>
+                <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"><Send className="h-3.5 w-3.5" /> Send</button>
               </div>
             </div>
           </div>
@@ -493,10 +521,12 @@ function ConversationHeader({
   onToggleContext: () => void;
 }) {
   return (
-    <div className="relative z-30 min-h-[60px] px-5 py-2.5 flex items-center gap-6 border-b border-border bg-card/60 backdrop-blur">
+    <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
-      <div className="flex items-center gap-4 min-w-0">
-        <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
+      <div className="flex items-center gap-5 min-w-0">
+        <span className="text-[20px] font-semibold leading-tight truncate text-foreground tracking-tight">
+          {contact.name}
+        </span>
         <LifecycleSelect
           size="sm"
           value={contact.lifecycleStage ?? null}
@@ -506,17 +536,17 @@ function ConversationHeader({
 
       {/* CENTER — owner / assignee */}
       <div className="ml-auto flex items-center gap-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Assigned to</span>
+        <span className="text-[11px] text-muted-foreground/70">Assigned to</span>
         <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
       </div>
 
       {/* RIGHT — actions */}
-      <div className="flex items-center gap-1 text-muted-foreground">
+      <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="Star">
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="Star">
           <Star className="h-4 w-4" />
         </button>
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="More">
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
           <MoreHorizontal className="h-4 w-4" />
         </button>
         <button
