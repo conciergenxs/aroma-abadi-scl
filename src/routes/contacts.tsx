@@ -224,11 +224,6 @@ function ContactsPage() {
             <button className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
               <Filter className="h-3 w-3" /> Filters
             </button>
-            <div className="ml-auto">
-              <button className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
-                <Download className="h-3 w-3" /> Export
-              </button>
-            </div>
           </div>
 
           {selected.length > 0 && (
