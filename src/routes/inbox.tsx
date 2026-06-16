@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { AppShell, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
+import { AppShell, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { conversations, threadsByContact } from "@/components/scl/mock-data";
 import {
   STAGE_COLORS,
@@ -12,6 +12,7 @@ import type { Contact } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
+import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
@@ -492,30 +493,15 @@ function ConversationHeader({
   onToggleContext: () => void;
 }) {
   return (
-    <div className="min-h-[68px] px-5 py-3 flex items-center gap-4 border-b border-border bg-card/40 backdrop-blur">
-      {/* LEFT — contact name + lifecycle */}
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-sm font-medium shrink-0">
-          {contact.avatar}
-        </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
-            <ChannelDot channel={active.channel} />
-          </div>
-          <div className="mt-1 flex items-center gap-2">
-            <div className="w-[180px]">
-              <LifecycleSelect
-                size="sm"
-                value={contact.lifecycleStage ?? null}
-                onChange={onChangeLifecycle}
-              />
-            </div>
-            <span className="text-[11px] text-muted-foreground truncate">
-              {active.channel === "whatsapp" ? contact.phone : contact.instagram}
-            </span>
-          </div>
-        </div>
+    <div className="relative z-30 min-h-[60px] px-5 py-2.5 flex items-center gap-6 border-b border-border bg-card/60 backdrop-blur">
+      {/* LEFT — contact name + lifecycle (single row) */}
+      <div className="flex items-center gap-4 min-w-0">
+        <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
+        <LifecycleSelect
+          size="sm"
+          value={contact.lifecycleStage ?? null}
+          onChange={onChangeLifecycle}
+        />
       </div>
 
       {/* CENTER — owner / assignee */}
@@ -548,28 +534,6 @@ function ConversationHeader({
   );
 }
 
-function useOutsideClose(
-  ref: React.RefObject<HTMLElement | null>,
-  open: boolean,
-  close: () => void,
-) {
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) close();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, ref, close]);
-}
-
 function OwnerSelect({
   value,
   onChange,
@@ -579,15 +543,15 @@ function OwnerSelect({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-  useOutsideClose(ref, open, () => setOpen(false));
+  const btnRef = useRef<HTMLButtonElement>(null);
   const current = TEAM_USERS.find((u) => u.id === value);
   const filtered = TEAM_USERS.filter((u) =>
     u.name.toLowerCase().includes(q.toLowerCase()),
   );
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] text-xs"
@@ -604,8 +568,8 @@ function OwnerSelect({
         )}
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
       </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-1.5 w-64 rounded-md border border-border bg-popover shadow-xl p-2">
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={256}>
+        <div className="rounded-md border border-border bg-popover shadow-xl p-2">
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <input
@@ -661,7 +625,7 @@ function OwnerSelect({
             </button>
           </div>
         </div>
-      )}
+      </FloatingMenu>
     </div>
   );
 }
@@ -676,8 +640,7 @@ function CollaboratorsPopover({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [draft, setDraft] = useState<string[]>(value);
-  const ref = useRef<HTMLDivElement>(null);
-  useOutsideClose(ref, open, () => setOpen(false));
+  const btnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (open) setDraft(value);
   }, [open, value]);
@@ -687,8 +650,9 @@ function CollaboratorsPopover({
   const toggle = (id: string) =>
     setDraft((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]));
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         title="Collaborators"
@@ -703,8 +667,8 @@ function CollaboratorsPopover({
           </span>
         )}
       </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-md border border-border bg-popover shadow-xl p-2">
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={288}>
+        <div className="rounded-md border border-border bg-popover shadow-xl p-2">
           <div className="text-[11px] font-semibold px-1 pb-2 text-foreground">Add collaborators</div>
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
@@ -800,7 +764,7 @@ function CollaboratorsPopover({
             </button>
           </div>
         </div>
-      )}
+      </FloatingMenu>
     </div>
   );
 }

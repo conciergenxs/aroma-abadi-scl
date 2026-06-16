@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import {
   PROGRESSING_STAGES,
@@ -6,6 +6,7 @@ import {
   STAGE_COLORS,
   type LifecycleStage,
 } from "./mock-data";
+import { FloatingMenu } from "./floating-menu";
 
 type Props = {
   value: LifecycleStage | null | undefined;
@@ -21,23 +22,7 @@ type Props = {
  */
 export function LifecycleSelect({ value, onChange, size = "md", className = "" }: Props) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   const current = value ?? null;
   const color = current ? STAGE_COLORS[current] : null;
@@ -45,8 +30,9 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
   const hClass = size === "sm" ? "h-7 text-[11px] px-2" : "h-9 text-xs px-2.5";
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={`inline-flex w-full items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] ${hClass} text-foreground hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors`}
@@ -64,8 +50,13 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       </button>
 
-      {open && (
-        <div className="absolute z-50 mt-1.5 w-64 rounded-md border border-border bg-popover shadow-xl p-1 max-h-[320px] overflow-auto scl-scroll">
+      <FloatingMenu
+        anchorRef={btnRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        width={256}
+      >
+        <div className="rounded-md border border-border bg-popover shadow-xl p-1 max-h-[320px] overflow-auto scl-scroll">
           <Group label="PROGRESSING STAGE">
             {PROGRESSING_STAGES.map((s) => (
               <Row
@@ -107,7 +98,7 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
             Clear Selection
           </button>
         </div>
-      )}
+      </FloatingMenu>
     </div>
   );
 }
