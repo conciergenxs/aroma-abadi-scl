@@ -6,7 +6,6 @@ import {
   STAGE_COLORS,
   LIFECYCLE_STAGES,
   type LifecycleStage,
-  type Channel,
 } from "@/components/scl/mock-data";
 import type { Contact } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
