@@ -427,52 +427,10 @@ function InboxPage() {
                 );
               })()}
             </Section>
-        </ContactDrawer>
+          </div>
+        </aside>
       </div>
     </AppShell>
-  );
-}
-
-function ContactDrawer({
-  open,
-  onClose,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    const onClick = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (ref.current && !ref.current.contains(target)) {
-        // Ignore clicks on the toggle button (data-contact-toggle)
-        const el = target as HTMLElement;
-        if (el.closest?.("[data-contact-toggle]")) return;
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onClick);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-  return (
-    <aside
-      ref={ref}
-      className="fixed right-0 top-16 bottom-0 z-40 w-[400px] max-w-[100vw] border-l border-border bg-sidebar/95 backdrop-blur overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200"
-    >
-      {children}
-    </aside>
   );
 }
 
