@@ -16,7 +16,7 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
-  Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
+  Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
@@ -810,9 +810,6 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="Star">
-          <Star className="h-4 w-4" />
-        </button>
         <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
           <MoreHorizontal className="h-4 w-4" />
         </button>
