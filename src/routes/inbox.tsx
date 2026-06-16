@@ -16,7 +16,7 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
-  Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
+  Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
