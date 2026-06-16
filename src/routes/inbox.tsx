@@ -746,6 +746,11 @@ function InboxPage() {
           </div>
         </aside>
       </div>
+      <TemplatePicker
+        open={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        onInsert={insertTemplate}
+      />
     </AppShell>
   );
 }
