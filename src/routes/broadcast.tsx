@@ -1,47 +1,64 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
-import { broadcasts, templates, initialLists, contacts } from "@/components/scl/mock-data";
-import { useState, type ReactNode } from "react";
-import { Users, MessageSquareText, FileText, Eye, Send, Check } from "lucide-react";
-import { toast } from "sonner";
+import { broadcasts } from "@/components/scl/mock-data";
+import { useMemo, useState } from "react";
+import { Plus, Search, Filter } from "lucide-react";
 
 export const Route = createFileRoute("/broadcast")({
-  head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
-  component: BroadcastPage,
+  head: () => ({ meta: [{ title: "Broadcasts — SCL" }] }),
+  component: BroadcastListPage,
 });
 
-const steps = [
-  { key: "audience", label: "Audience", icon: Users },
-  { key: "channel", label: "Channel", icon: MessageSquareText },
-  { key: "template", label: "Template", icon: FileText },
-  { key: "preview", label: "Preview", icon: Eye },
-  { key: "send", label: "Send", icon: Send },
-] as const;
+const STATUSES = ["All", "Sent", "Scheduled", "Draft"] as const;
+type StatusFilter = (typeof STATUSES)[number];
 
-const audienceLists = initialLists.map((l) => ({
-  id: l.id,
-  name: l.name,
-  count: contacts.filter((c) => c.listIds.includes(l.id)).length,
-  desc: l.description ?? "Audience list",
-}));
+function BroadcastListPage() {
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState<StatusFilter>("All");
 
-function BroadcastPage() {
-  const [step, setStep] = useState(0);
-  const [seg, setSeg] = useState(audienceLists[0]);
-  const [channel, setChannel] = useState<"whatsapp" | "instagram">("whatsapp");
-  const [tplId, setTplId] = useState(templates[0].id);
-  const tpl = templates.find((t) => t.id === tplId)!;
+  const rows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return broadcasts.filter((b) => {
+      if (status !== "All" && b.status !== status) return false;
+      if (!q) return true;
+      return (
+        b.name.toLowerCase().includes(q) ||
+        b.audience.toLowerCase().includes(q) ||
+        b.channel.toLowerCase().includes(q)
+      );
+    });
+  }, [query, status]);
+
+  const stats = useMemo(() => {
+    const sent = broadcasts.filter((b) => b.status === "Sent");
+    const totalReach = sent.reduce((a, b) => a + b.reach, 0);
+    const totalDelivered = sent.reduce((a, b) => a + b.delivered, 0);
+    const totalRead = sent.reduce((a, b) => a + b.read, 0);
+    const scheduled = broadcasts.filter((b) => b.status === "Scheduled").length;
+    return [
+      { l: "Total reach (30d)", v: totalReach.toLocaleString() },
+      { l: "Delivery rate", v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—" },
+      { l: "Read rate", v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—" },
+      { l: "Scheduled", v: String(scheduled) },
+    ];
+  }, []);
 
   return (
-    <AppShell title="Broadcast" subtitle="Compose, target, and send to thousands in minutes">
+    <AppShell
+      title="Broadcasts"
+      subtitle="Compose, schedule and track outbound campaigns"
+      actions={
+        <Link
+          to="/broadcast/new"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          <Plus className="h-3.5 w-3.5" /> Create Broadcast
+        </Link>
+      }
+    >
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          {[
-            { l: "Sent (30d)", v: "1.42M" },
-            { l: "Delivery rate", v: "99.4%" },
-            { l: "Read rate", v: "88.1%" },
-            { l: "CTR", v: "32.7%" },
-          ].map((s) => (
+          {stats.map((s) => (
             <div key={s.l} className="rounded-xl border border-border bg-card/60 p-5 glass">
               <div className="text-xs text-muted-foreground">{s.l}</div>
               <div className="mt-2 text-2xl font-semibold">{s.v}</div>
@@ -49,135 +66,41 @@ function BroadcastPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
-          <SectionCard title="New broadcast" description="Follow the steps to launch your campaign">
-            <div className="flex items-center gap-2 px-5 py-4 border-b border-border overflow-x-auto">
-              {steps.map((s, i) => {
-                const done = i < step;
-                const active = i === step;
-                const Icon = s.icon;
+        <SectionCard
+          title="All broadcasts"
+          description="Search, filter, and manage campaigns"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-border">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search broadcasts…"
+                className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+              {STATUSES.map((s) => {
+                const sel = status === s;
                 return (
-                  <div key={s.key} className="flex items-center gap-2">
-                    <button
-                      onClick={() => setStep(i)}
-                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs border transition ${
-                        active ? "border-primary/40 bg-primary/15 text-foreground" :
-                        done ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" :
-                        "border-border bg-card/60 text-muted-foreground"
-                      }`}
-                    >
-                      {done ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
-                      {s.label}
-                    </button>
-                    {i < steps.length - 1 && <span className="h-px w-6 bg-border" />}
-                  </div>
+                  <button
+                    key={s}
+                    onClick={() => setStatus(s)}
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium border transition ${
+                      sel
+                        ? "border-primary/40 bg-primary/15 text-primary"
+                        : "border-border bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    {s}
+                  </button>
                 );
               })}
             </div>
+          </div>
 
-            <div className="p-5 space-y-4">
-              {step === 0 && (
-                <div className="space-y-2">
-                  <div className="text-[11px] text-muted-foreground mb-1">Choose a list to target. Lists are managed in Contacts.</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {audienceLists.map((s) => (
-                    <button
-                      key={s.name}
-                      onClick={() => setSeg(s)}
-                      className={`text-left rounded-lg border p-4 transition ${
-                        seg.name === s.name ? "border-primary/40 bg-primary/10" : "border-border bg-card/40 hover:bg-card"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{s.name}</span>
-                        <span className="text-[11px] text-muted-foreground">{s.count.toLocaleString()}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{s.desc}</p>
-                    </button>
-                  ))}
-                  </div>
-                </div>
-              )}
-              {step === 1 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {(["whatsapp", "instagram"] as const).map((ch) => (
-                    <button
-                      key={ch}
-                      onClick={() => setChannel(ch)}
-                      className={`rounded-lg border p-5 text-left transition ${
-                        channel === ch ? "border-primary/40 bg-primary/10" : "border-border bg-card/40 hover:bg-card"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full ${ch === "whatsapp" ? "bg-emerald-500" : "bg-pink-500"}`} />
-                        <span className="text-sm font-medium capitalize">{ch}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {ch === "whatsapp"
-                          ? "Business-approved templates · highest delivery"
-                          : "DMs to opted-in followers · rich media"}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {step === 2 && (
-                <div className="space-y-2">
-                  {templates.filter((t) => t.channel === channel && t.status === "Approved").map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setTplId(t.id)}
-                      className={`w-full text-left rounded-lg border p-4 transition ${
-                        tplId === t.id ? "border-primary/40 bg-primary/10" : "border-border bg-card/40 hover:bg-card"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{t.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{t.category}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{t.body}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {step >= 3 && (
-                <div className="rounded-lg border border-border bg-card/40 p-5">
-                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">Final preview</div>
-                  <div className="max-w-sm rounded-2xl border border-border bg-background/60 p-4 text-sm">
-                    {tpl.body}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <button onClick={() => setStep((s) => Math.max(0, s - 1))} className="text-xs text-muted-foreground hover:text-foreground">← Back</button>
-                {step < steps.length - 1 ? (
-                  <button onClick={() => setStep((s) => s + 1)} className="rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">Continue</button>
-                ) : (
-                  <button
-                    onClick={() => toast.success("Broadcast sent successfully")}
-                    className="rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2"
-                  >
-                    <Send className="h-3.5 w-3.5" /> Send broadcast
-                  </button>
-                )}
-              </div>
-            </div>
-          </SectionCard>
-
-          <SectionCard title="Campaign summary">
-            <dl className="divide-y divide-border text-xs">
-              <Row label="Audience" value={`${seg.name} · ${seg.count.toLocaleString()}`} />
-              <Row label="Channel" value={<ChannelDot channel={channel} />} />
-              <Row label="Template" value={tpl.name} />
-              <Row label="Est. delivery" value="98–99%" />
-              <Row label="Est. cost" value="$214.60" />
-              <Row label="Send window" value="Immediately" />
-            </dl>
-          </SectionCard>
-        </div>
-
-        <SectionCard title="Recent broadcasts" description="Last 30 days">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
@@ -194,7 +117,7 @@ function BroadcastPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {broadcasts.map((b) => (
+                {rows.map((b) => (
                   <tr key={b.id} className="hover:bg-white/[0.02]">
                     <td className="px-4 py-3 font-medium">{b.name}</td>
                     <td className="px-4 py-3"><ChannelDot channel={b.channel} /></td>
@@ -213,20 +136,18 @@ function BroadcastPage() {
                     </td>
                   </tr>
                 ))}
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="px-4 py-10 text-center text-xs text-muted-foreground">
+                      No broadcasts match your filters.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </SectionCard>
       </div>
     </AppShell>
-  );
-}
-
-function Row({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between px-5 py-3">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium">{value}</dd>
-    </div>
   );
 }
