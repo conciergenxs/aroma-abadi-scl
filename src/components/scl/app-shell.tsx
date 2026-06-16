@@ -216,16 +216,14 @@ export function SectionCard({
   );
 }
 
+import { ChannelIcon } from "./channel-badge";
+
 export function ChannelDot({ channel }: { channel: "whatsapp" | "instagram" }) {
-  const map = {
-    whatsapp: { color: "bg-emerald-500", label: "WhatsApp" },
-    instagram: { color: "bg-pink-500", label: "Instagram" },
-  } as const;
-  const c = map[channel];
+  const label = channel === "whatsapp" ? "WhatsApp" : "Instagram";
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-      <span className={`h-1.5 w-1.5 rounded-full ${c.color}`} />
-      {c.label}
+      <ChannelIcon channel={channel} className="h-4 w-4" />
+      {label}
     </span>
   );
 }
