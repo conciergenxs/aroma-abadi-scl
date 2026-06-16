@@ -23,12 +23,13 @@ import {
   type ContactProperty,
 } from "@/components/scl/contacts-store";
 import {
-  LIFECYCLE_STAGES,
   type Contact,
   type ContactLabel,
   type LabelColor,
   type LifecycleStage,
+  STAGE_COLORS,
 } from "@/components/scl/mock-data";
+import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 
 const SYSTEM_KEYS = new Set([
   "name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email",
@@ -206,21 +207,26 @@ function ContactDetailPage() {
     toast.success("Contact updated");
   };
 
-  const setLifecycle = (next: LifecycleStage) => {
+  const setLifecycle = (next: LifecycleStage | null) => {
     if (next === contact.lifecycleStage) return;
     const prev = contact.lifecycleStage;
     contactsStore.setContacts((cs) =>
       cs.map((c) =>
         c.id === contact.id
-          ? { ...c, lifecycleStage: next, stageEnteredAt: new Date().toISOString() }
+          ? {
+              ...c,
+              lifecycleStage: next ?? undefined,
+              stageEnteredAt: next ? new Date().toISOString() : undefined,
+            }
           : c,
       ),
     );
-    contactsStore.addActivity(
-      contact.id,
-      "lifecycle",
-      prev ? `Lifecycle changed from ${prev} → ${next}` : `Lifecycle set to ${next}`,
-    );
+    const msg = next
+      ? prev
+        ? `Lifecycle changed from ${prev} → ${next}`
+        : `Lifecycle set to ${next}`
+      : `Lifecycle cleared${prev ? ` (was ${prev})` : ""}`;
+    contactsStore.addActivity(contact.id, "lifecycle", msg);
     toast.success("Lifecycle stage updated");
   };
 
@@ -238,7 +244,14 @@ function ContactDetailPage() {
             </Link>
             <h1 className="text-sm font-medium truncate">{contact.name}</h1>
             {contact.lifecycleStage && (
-              <span className="rounded-md border border-border bg-card/60 px-2 py-0.5 text-[10px] text-muted-foreground">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] ${
+                  STAGE_COLORS[contact.lifecycleStage].badge
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`}
+                />
                 {contact.lifecycleStage}
               </span>
             )}
@@ -267,16 +280,12 @@ function ContactDetailPage() {
                   className="text-base font-semibold"
                   placeholder="Contact name"
                 />
-                <div className="mt-1.5 flex items-center gap-2">
-                  <select
-                    value={contact.lifecycleStage ?? ""}
-                    onChange={(e) => setLifecycle(e.target.value as LifecycleStage)}
-                    className="h-7 rounded-md border border-primary/40 bg-primary/10 px-2 text-[11px] text-primary focus:outline-none focus:ring-1 focus:ring-primary/40"
-                  >
-                    {LIFECYCLE_STAGES.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                <div className="mt-1.5 flex items-center gap-2 max-w-xs">
+                  <LifecycleSelect
+                    value={contact.lifecycleStage ?? null}
+                    onChange={setLifecycle}
+                    size="sm"
+                  />
                 </div>
               </div>
             </div>

@@ -69,6 +69,9 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
 
 const initialContacts: Contact[] = seedContacts.map((c, idx) => {
   if (c.lifecycleStage) return c;
+  // Leave roughly every 5th contact without a lifecycle stage — they appear
+  // in the Contacts list but are intentionally excluded from the Kanban view.
+  if (idx % 5 === 0) return c;
   const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
   const daysBack = 3 + ((idx * 11) % 118);
   const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();

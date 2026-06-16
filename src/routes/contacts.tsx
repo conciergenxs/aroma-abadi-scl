@@ -7,7 +7,7 @@ import {
   type LabelColor,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
-import { LIFECYCLE_STAGES } from "@/components/scl/mock-data";
+import { LIFECYCLE_STAGES, STAGE_COLORS } from "@/components/scl/mock-data";
 import {
   contactsStore,
   useContactsStore,
@@ -1265,8 +1265,9 @@ function KanbanBoard({
     const map = new Map<LifecycleStage, Contact[]>();
     LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
     for (const c of contacts) {
-      const s = (c.lifecycleStage ?? "New Lead") as LifecycleStage;
-      map.get(s)?.push(c);
+      // Kanban only includes contacts with an assigned lifecycle stage.
+      if (!c.lifecycleStage) continue;
+      map.get(c.lifecycleStage as LifecycleStage)?.push(c);
     }
     return map;
   }, [contacts]);
@@ -1349,13 +1350,3 @@ function KanbanBoard({
     </div>
   );
 }
-
-const STAGE_COLORS: Record<LifecycleStage, { bar: string; dot: string; badge: string }> = {
-  "New Lead":        { bar: "bg-orange-500", dot: "bg-orange-500", badge: "border-orange-500/30 bg-orange-500/10 text-orange-300" },
-  "Contacted":       { bar: "bg-blue-500",   dot: "bg-blue-500",   badge: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
-  "Qualified":       { bar: "bg-purple-500", dot: "bg-purple-500", badge: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
-  "Pending Payment": { bar: "bg-yellow-500", dot: "bg-yellow-500", badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" },
-  "Customer":        { bar: "bg-green-500",  dot: "bg-green-500",  badge: "border-green-500/30 bg-green-500/10 text-green-300" },
-  "Lost":            { bar: "bg-red-500",    dot: "bg-red-500",    badge: "border-red-500/30 bg-red-500/10 text-red-300" },
-  "No Reply":        { bar: "bg-gray-500",   dot: "bg-gray-500",   badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" },
-};

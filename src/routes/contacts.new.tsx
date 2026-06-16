@@ -4,12 +4,12 @@ import { ArrowLeft, Check, ChevronDown, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
-  LIFECYCLE_STAGES,
   type Contact,
   type ContactLabel,
   type LabelColor,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
+import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import {
   contactsStore,
   useContactsStore,
@@ -44,7 +44,7 @@ function NewContactPage() {
   const [email, setEmail] = useState("");
   const [labelIds, setLabelIds] = useState<string[]>([]);
   const [ownerId, setOwnerId] = useState<string>("me");
-  const [stage, setStage] = useState<LifecycleStage>("New Lead");
+  const [stage, setStage] = useState<LifecycleStage | null>(null);
   const [listIds, setListIds] = useState<string[]>([]);
   const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
 
@@ -93,8 +93,8 @@ function NewContactPage() {
       status: "Active",
       avatar: initials,
       ownerId: ownerId || undefined,
-      lifecycleStage: stage,
-      stageEnteredAt: new Date().toISOString(),
+      lifecycleStage: stage ?? undefined,
+      stageEnteredAt: stage ? new Date().toISOString() : undefined,
       customFields: customValues,
     };
     contactsStore.setContacts((cs) => [contact, ...cs]);
@@ -173,11 +173,7 @@ function NewContactPage() {
                   />
                 </Field>
                 <Field label="Lifecycle Stage">
-                  <Select
-                    value={stage}
-                    onChange={(v) => setStage(v as LifecycleStage)}
-                    options={LIFECYCLE_STAGES.map((s) => ({ value: s, label: s }))}
-                  />
+                  <LifecycleSelect value={stage} onChange={setStage} />
                 </Field>
                 <Field label="Labels">
                   <LabelMultiSelect
