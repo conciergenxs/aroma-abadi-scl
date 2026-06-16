@@ -4,7 +4,6 @@ import { ArrowLeft, Check, ChevronDown, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
-  LIFECYCLE_STAGES,
   type Contact,
   type ContactLabel,
   type LabelColor,
