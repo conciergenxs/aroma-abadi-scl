@@ -325,7 +325,7 @@ function ContactsPage() {
                 <table className="w-full text-sm">
                   <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                     <tr>
-                      <th className="w-10 px-4 py-3">
+                      <th className="w-10 px-4 py-3 whitespace-nowrap">
                         <input
                           type="checkbox"
                           className="accent-[oklch(0.62_0.17_40)]"
@@ -334,9 +334,9 @@ function ContactsPage() {
                         />
                       </th>
                       {properties.filter((p) => p.visible).map((p) => (
-                        <th key={p.id} className="px-4 py-3 text-left font-medium">{p.name}</th>
+                        <th key={p.id} className="px-4 py-3 text-left font-medium whitespace-nowrap">{p.name}</th>
                       ))}
-                      <th className="w-10 px-4 py-3"></th>
+                      <th className="w-10 px-4 py-3 whitespace-nowrap"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -351,7 +351,7 @@ function ContactsPage() {
                           />
                         </td>
                         {properties.filter((p) => p.visible).map((p) => (
-                          <td key={p.id} className="px-4 py-3">
+                          <td key={p.id} className="px-4 py-3 whitespace-nowrap align-middle">
                             {renderPropertyCell(p, c, labelById, listById)}
                           </td>
                         ))}
