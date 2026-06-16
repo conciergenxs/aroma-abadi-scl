@@ -8,11 +8,13 @@ import {
   type ContactLabel,
   type ContactList,
   type LabelColor,
+  LIFECYCLE_STAGES,
+  type LifecycleStage,
 } from "@/components/scl/mock-data";
 import {
   Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
+  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -72,12 +74,23 @@ const DEFAULT_PROPERTIES: ContactProperty[] = [
 ];
 
 function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(seedContacts);
+  const [contacts, setContacts] = useState<Contact[]>(() =>
+    seedContacts.map((c, idx) => {
+      if (c.lifecycleStage) return c;
+      const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
+      // Seed `stageEnteredAt` with varying durations (3..120 days back) so the
+      // Kanban "In stage: X" labels show a realistic spread of days/weeks/months.
+      const daysBack = 3 + ((idx * 11) % 118);
+      const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();
+      return { ...c, lifecycleStage: stage, stageEnteredAt: enteredAt };
+    }),
+  );
   const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
   const [lists, setLists] = useState<ContactList[]>(initialLists);
   const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
   const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [openContactId, setOpenContactId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -121,6 +134,15 @@ function ContactsPage() {
 
   const updateContact = (id: string, patch: Partial<Contact>) =>
     setContacts((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+
+  const moveToStage = (contactId: string, stage: LifecycleStage) =>
+    setContacts((cs) =>
+      cs.map((c) =>
+        c.id === contactId && c.lifecycleStage !== stage
+          ? { ...c, lifecycleStage: stage, stageEnteredAt: new Date().toISOString() }
+          : c,
+      ),
+    );
 
   const bulkAddLabel = (lid: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) && !c.labelIds.includes(lid) ? { ...c, labelIds: [...c.labelIds, lid] } : c)));
