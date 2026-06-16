@@ -11,7 +11,7 @@ import {
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { useMemo, useState } from "react";
 import {
-  Search, Filter, Paperclip, Smile, Send, Phone, Video, MoreHorizontal,
+  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
   Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Instagram, PanelRightClose, PanelRightOpen,
   Mail, User2, ExternalLink,
@@ -293,8 +293,6 @@ function InboxPage() {
               </div>
             </div>
             <div className="ml-auto flex items-center gap-1 text-muted-foreground">
-              <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Phone className="h-4 w-4" /></button>
-              <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Video className="h-4 w-4" /></button>
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Star className="h-4 w-4" /></button>
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><MoreHorizontal className="h-4 w-4" /></button>
               <button
