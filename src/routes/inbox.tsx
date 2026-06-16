@@ -283,44 +283,26 @@ function InboxPage() {
 
         {/* ============== ACTIVE CONVERSATION ============== */}
         <section className="flex flex-col min-h-0">
-          <div className="min-h-14 px-5 py-2.5 flex items-center gap-3 border-b border-border bg-card/30 backdrop-blur">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">{contact.avatar}</div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium truncate">{contact.name}</span>
-                <ChannelDot channel={active.channel} />
-                {contact.lifecycleStage && (
-                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${STAGE_COLORS[contact.lifecycleStage].badge}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`} />
-                    {contact.lifecycleStage}
-                  </span>
-                )}
-              </div>
-              <div className="text-[11px] text-muted-foreground flex items-center gap-2 flex-wrap">
-                <span>{active.channel === "whatsapp" ? contact.phone : contact.instagram}</span>
-                <span>·</span>
-                <span className="inline-flex items-center gap-1">
-                  <User2 className="h-3 w-3" />
-                  {contact.ownerId ? (contact.ownerId === "me" ? "Me" : contact.ownerId) : "Unassigned"}
-                </span>
-                <span>·</span>
-                <span className="inline-flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Open
-                </span>
-              </div>
-            </div>
-            <div className="ml-auto flex items-center gap-1 text-muted-foreground">
-              <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Star className="h-4 w-4" /></button>
-              <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><MoreHorizontal className="h-4 w-4" /></button>
-              <button
-                onClick={() => setContextOpen((v) => !v)}
-                title={contextOpen ? "Hide contact panel" : "Show contact panel"}
-                className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"
-              >
-                {contextOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
+          <ConversationHeader
+            contact={contact}
+            active={active}
+            collaborators={collaborators[active.id] ?? []}
+            onChangeLifecycle={(next) => {
+              contactsStore.setContacts((list) =>
+                list.map((c) => (c.id === contact.id ? { ...c, lifecycleStage: next ?? undefined } : c)),
+              );
+            }}
+            onChangeOwner={(ownerId) => {
+              contactsStore.setContacts((list) =>
+                list.map((c) => (c.id === contact.id ? { ...c, ownerId: ownerId ?? undefined } : c)),
+              );
+            }}
+            onChangeCollaborators={(ids) =>
+              setCollaborators((prev) => ({ ...prev, [active.id]: ids }))
+            }
+            contextOpen={contextOpen}
+            onToggleContext={() => setContextOpen((v) => !v)}
+          />
 
           <div className="flex-1 overflow-y-auto p-6 space-y-4 scl-grid-bg">
             <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground">Today</div>
