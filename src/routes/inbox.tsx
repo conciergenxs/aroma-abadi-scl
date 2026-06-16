@@ -125,7 +125,7 @@ function InboxPage() {
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
       <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="shrink-0 w-[228px] border-r border-border/60 bg-sidebar/20 overflow-y-auto">
+        <aside className="shrink-0 w-[252px] border-r border-border/60 bg-sidebar/25 overflow-y-auto py-1.5">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
@@ -135,16 +135,16 @@ function InboxPage() {
                 <button
                   key={v.id}
                   onClick={() => setView(v.id)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
                       : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className={`h-3.5 w-3.5 ${sel ? "" : "opacity-70"}`} />
+                  <Icon className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
                   <span className="flex-1 text-left">{v.label}</span>
                   {count > 0 && (
-                    <span className={`text-[10px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/60"}`}>
+                    <span className={`text-[11px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/60"}`}>
                       {count}
                     </span>
                   )}
@@ -156,13 +156,13 @@ function InboxPage() {
           <NavSection title="Lifecycle Stages">
             <button
               onClick={() => setStage(null)}
-              className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                 stage === null
                   ? "bg-primary/15 text-primary font-medium"
                   : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60" />
+              <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
               <span className="flex-1 text-left">All Stages</span>
             </button>
             {LIFECYCLE_STAGES.map((s) => {
@@ -172,16 +172,16 @@ function InboxPage() {
                 <button
                   key={s}
                   onClick={() => setStage(s)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-white/[0.05] text-foreground font-medium"
                       : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[s].dot}`} />
+                  <span className={`h-2 w-2 rounded-full ${STAGE_COLORS[s].dot}`} />
                   <span className="flex-1 text-left truncate">{s}</span>
                   {count > 0 && (
-                    <span className="text-[10px] tabular-nums text-muted-foreground/50">{count}</span>
+                    <span className="text-[11px] tabular-nums text-muted-foreground/55">{count}</span>
                   )}
                 </button>
               );
@@ -196,13 +196,13 @@ function InboxPage() {
                 <button
                   key={ch.id}
                   onClick={() => setChannel(ch.id)}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition ${
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
                       : "text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className={`h-3.5 w-3.5 ${sel ? "" : "opacity-70"}`} />
+                  <Icon className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
                   <span className="flex-1 text-left">{ch.label}</span>
                 </button>
               );
@@ -465,9 +465,11 @@ function InboxPage() {
 
 function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="p-2 border-b border-border/60">
-      <div className="px-2.5 pt-1 pb-2 text-[10px] uppercase tracking-wider text-muted-foreground/80">{title}</div>
-      <div className="space-y-0.5">{children}</div>
+    <div className="px-2.5 py-3 border-b border-border/40 last:border-b-0">
+      <div className="px-2.5 pt-1 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/90">
+        {title}
+      </div>
+      <div className="space-y-1">{children}</div>
     </div>
   );
 }
