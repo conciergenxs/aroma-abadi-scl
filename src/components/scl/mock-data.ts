@@ -1,6 +1,17 @@
 export type Channel = "whatsapp" | "instagram";
 export type LabelColor = "indigo" | "pink" | "emerald" | "amber" | "sky" | "violet" | "slate";
 
+export const LIFECYCLE_STAGES = [
+  "New Lead",
+  "Contacted",
+  "Qualified",
+  "Pending Payment",
+  "Customer",
+  "Lost",
+  "No Reply",
+] as const;
+export type LifecycleStage = (typeof LIFECYCLE_STAGES)[number];
+
 export type ContactLabel = {
   id: string;
   name: string;
@@ -27,6 +38,10 @@ export type Contact = {
   subscription: "Subscribed" | "Unsubscribed" | "Opted Out";
   /** Future PIC / owner reference. "me" represents the current user. */
   ownerId?: string;
+  /** Sales/CRM lifecycle stage — powers the Kanban view. */
+  lifecycleStage?: LifecycleStage;
+  /** ISO timestamp when contact entered the current lifecycleStage. */
+  stageEnteredAt?: string;
 };
 
 const avatars = ["JL", "MR", "SP", "AK", "DV", "RM", "NK", "PT", "EC", "BL", "TH", "OW"];

@@ -8,11 +8,13 @@ import {
   type ContactLabel,
   type ContactList,
   type LabelColor,
+  LIFECYCLE_STAGES,
+  type LifecycleStage,
 } from "@/components/scl/mock-data";
 import {
   Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
+  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -72,12 +74,23 @@ const DEFAULT_PROPERTIES: ContactProperty[] = [
 ];
 
 function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(seedContacts);
+  const [contacts, setContacts] = useState<Contact[]>(() =>
+    seedContacts.map((c, idx) => {
+      if (c.lifecycleStage) return c;
+      const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
+      // Seed `stageEnteredAt` with varying durations (3..120 days back) so the
+      // Kanban "In stage: X" labels show a realistic spread of days/weeks/months.
+      const daysBack = 3 + ((idx * 11) % 118);
+      const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();
+      return { ...c, lifecycleStage: stage, stageEnteredAt: enteredAt };
+    }),
+  );
   const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
   const [lists, setLists] = useState<ContactList[]>(initialLists);
   const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
   const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [openContactId, setOpenContactId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -121,6 +134,15 @@ function ContactsPage() {
 
   const updateContact = (id: string, patch: Partial<Contact>) =>
     setContacts((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+
+  const moveToStage = (contactId: string, stage: LifecycleStage) =>
+    setContacts((cs) =>
+      cs.map((c) =>
+        c.id === contactId && c.lifecycleStage !== stage
+          ? { ...c, lifecycleStage: stage, stageEnteredAt: new Date().toISOString() }
+          : c,
+      ),
+    );
 
   const bulkAddLabel = (lid: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) && !c.labelIds.includes(lid) ? { ...c, labelIds: [...c.labelIds, lid] } : c)));
@@ -259,6 +281,24 @@ function ContactsPage() {
         {/* Main content */}
         <div className="flex flex-col min-h-0 overflow-hidden">
           <div className="p-5 pb-3 flex flex-wrap items-center gap-2 border-b border-border">
+            <div className="inline-flex items-center rounded-md border border-border bg-card/60 p-0.5">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
+                  viewMode === "list" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Rows3 className="h-3.5 w-3.5" /> List
+              </button>
+              <button
+                onClick={() => setViewMode("kanban")}
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
+                  viewMode === "kanban" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Kanban
+              </button>
+            </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
@@ -328,6 +368,13 @@ function ContactsPage() {
           )}
 
           <div className="flex-1 min-h-0 p-5">
+            {viewMode === "kanban" ? (
+              <KanbanBoard
+                contacts={visibleContacts}
+                onMove={moveToStage}
+                onOpen={(id) => setOpenContactId(id)}
+              />
+            ) : (
             <SectionCard className="h-full flex flex-col">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
                 <table className="min-w-full text-sm">
@@ -390,6 +437,7 @@ function ContactsPage() {
                 onPerPageChange={setPerPage}
               />
             </SectionCard>
+            )}
           </div>
         </div>
       </div>
@@ -1234,6 +1282,105 @@ function TablePagination({
         >
           Next <ChevronRight className="h-3 w-3" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function formatInStage(iso?: string): string {
+  if (!iso) return "Just now";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 0) return "Just now";
+  const days = Math.floor(ms / 86400000);
+  if (days < 1) return "Today";
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"}`;
+  if (days < 30) {
+    const w = Math.floor(days / 7);
+    return `${w} week${w === 1 ? "" : "s"}`;
+  }
+  if (days < 365) {
+    const m = Math.floor(days / 30);
+    return `${m} month${m === 1 ? "" : "s"}`;
+  }
+  const y = Math.floor(days / 365);
+  return `${y} year${y === 1 ? "" : "s"}`;
+}
+
+function KanbanBoard({
+  contacts,
+  onMove,
+  onOpen,
+}: {
+  contacts: Contact[];
+  onMove: (id: string, stage: LifecycleStage) => void;
+  onOpen: (id: string) => void;
+}) {
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overStage, setOverStage] = useState<LifecycleStage | null>(null);
+
+  const byStage = useMemo(() => {
+    const map = new Map<LifecycleStage, Contact[]>();
+    LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
+    for (const c of contacts) {
+      const s = (c.lifecycleStage ?? "New Lead") as LifecycleStage;
+      map.get(s)?.push(c);
+    }
+    return map;
+  }, [contacts]);
+
+  return (
+    <div className="h-full overflow-x-auto overflow-y-hidden [overscroll-behavior-x:contain] scl-scroll">
+      <div className="flex gap-3 h-full min-w-max pb-2">
+        {LIFECYCLE_STAGES.map((stage) => {
+          const items = byStage.get(stage) ?? [];
+          const isOver = overStage === stage;
+          return (
+            <div
+              key={stage}
+              onDragOver={(e) => { e.preventDefault(); if (overStage !== stage) setOverStage(stage); }}
+              onDragLeave={() => { if (overStage === stage) setOverStage(null); }}
+              onDrop={() => {
+                if (dragId) onMove(dragId, stage);
+                setDragId(null);
+                setOverStage(null);
+              }}
+              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 ${
+                isOver ? "border-primary/60 bg-primary/5" : "border-border"
+              }`}
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 rounded-t-lg backdrop-blur">
+                <div className="text-xs font-medium">{stage}</div>
+                <span className="text-[10px] text-muted-foreground bg-white/[0.04] border border-border rounded px-1.5 py-0.5">
+                  {items.length}
+                </span>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-2 scl-scroll">
+                {items.map((c) => (
+                  <div
+                    key={c.id}
+                    draggable
+                    onDragStart={() => setDragId(c.id)}
+                    onDragEnd={() => { setDragId(null); setOverStage(null); }}
+                    onClick={() => onOpen(c.id)}
+                    className={`group rounded-md border border-border bg-card/80 hover:bg-card hover:border-primary/40 cursor-grab active:cursor-grabbing px-3 py-2.5 transition ${
+                      dragId === c.id ? "opacity-50" : ""
+                    }`}
+                  >
+                    <div className="text-sm font-medium text-foreground truncate">{c.name}</div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      In stage: {formatInStage(c.stageEnteredAt)}
+                    </div>
+                  </div>
+                ))}
+                {items.length === 0 && (
+                  <div className="text-[11px] text-muted-foreground text-center py-6 border border-dashed border-border/60 rounded-md">
+                    Drop here
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
