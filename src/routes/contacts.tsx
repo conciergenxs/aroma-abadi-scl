@@ -10,7 +10,7 @@ import {
   type LabelColor,
 } from "@/components/scl/mock-data";
 import {
-  Search, Filter, Plus, MoreHorizontal, ArrowUpDown,
+  Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
 } from "lucide-react";
