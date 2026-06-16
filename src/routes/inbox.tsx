@@ -1,10 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell, ChannelDot, LabelChip, ListChip } from "@/components/scl/app-shell";
-import { conversations, contacts, threadsByContact, initialLabels, initialLists } from "@/components/scl/mock-data";
-import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { AppShell, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
+import { conversations, threadsByContact } from "@/components/scl/mock-data";
+import {
+  STAGE_COLORS,
+  LIFECYCLE_STAGES,
+  type LifecycleStage,
+  type Channel,
+} from "@/components/scl/mock-data";
+import { useContactsStore } from "@/components/scl/contacts-store";
+import { useMemo, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, Video, MoreHorizontal,
-  Check, CheckCheck, Star, ChevronDown,
+  Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
+  UserX, MessageSquare, Instagram, PanelRightClose, PanelRightOpen,
+  Mail, User2, ExternalLink,
 } from "lucide-react";
 
 export const Route = createFileRoute("/inbox")({
@@ -12,25 +22,177 @@ export const Route = createFileRoute("/inbox")({
   component: InboxPage,
 });
 
-const tabs = ["All", "Unread", "Assigned to me", "Mentions"] as const;
+type InboxView = "my" | "team" | "mentions" | "unassigned";
+type ChannelFilter = "all" | Channel;
+const tabs = ["All", "Unread", "Assigned", "Unassigned"] as const;
+
+const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
+  { id: "my", label: "My Inbox", icon: InboxIcon },
+  { id: "team", label: "Team Inbox", icon: Users },
+  { id: "mentions", label: "Mentions", icon: AtSign },
+  { id: "unassigned", label: "Unassigned", icon: UserX },
+];
+
+const CHANNELS: { id: ChannelFilter; label: string; icon: typeof MessageSquare }[] = [
+  { id: "all", label: "All Channels", icon: InboxIcon },
+  { id: "whatsapp", label: "WhatsApp", icon: MessageSquare },
+  { id: "instagram", label: "Instagram", icon: Instagram },
+];
 
 function InboxPage() {
-  const [activeId, setActiveId] = useState(conversations[0].id);
+  const { contacts, labels, lists, properties } = useContactsStore();
+  const [view, setView] = useState<InboxView>("my");
+  const [stage, setStage] = useState<LifecycleStage | null>(null);
+  const [channel, setChannel] = useState<ChannelFilter>("all");
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
-  const active = conversations.find((c) => c.id === activeId)!;
+  const [search, setSearch] = useState("");
+  const [contextOpen, setContextOpen] = useState(true);
+  const [activeId, setActiveId] = useState(conversations[0].id);
+
+  const visible = useMemo(() => {
+    return conversations.filter((c) => {
+      const ct = contacts.find((x) => x.id === c.contactId);
+      if (!ct) return false;
+      // Inbox view
+      if (view === "my" && ct.ownerId !== "me") return false;
+      if (view === "unassigned" && ct.ownerId) return false;
+      if (view === "mentions" && c.unread === 0) return false;
+      // Lifecycle stage
+      if (stage && ct.lifecycleStage !== stage) return false;
+      // Channel
+      if (channel !== "all" && c.channel !== channel) return false;
+      // Tabs
+      if (tab === "Unread" && c.unread === 0) return false;
+      if (tab === "Assigned" && !ct.ownerId) return false;
+      if (tab === "Unassigned" && ct.ownerId) return false;
+      // Search
+      if (search) {
+        const q = search.toLowerCase();
+        if (!ct.name.toLowerCase().includes(q) && !c.preview.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [contacts, view, stage, channel, tab, search]);
+
+  const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
   const thread = threadsByContact[contact.id] ?? [];
 
-  const visible = conversations.filter((c) => (tab === "Unread" ? c.unread > 0 : true));
+  const stageCounts = useMemo(() => {
+    const map = new Map<LifecycleStage, number>();
+    for (const c of conversations) {
+      const ct = contacts.find((x) => x.id === c.contactId);
+      if (!ct?.lifecycleStage) continue;
+      map.set(ct.lifecycleStage, (map.get(ct.lifecycleStage) ?? 0) + 1);
+    }
+    return map;
+  }, [contacts]);
+
+  const viewCounts = useMemo(() => {
+    const result: Record<InboxView, number> = { my: 0, team: 0, mentions: 0, unassigned: 0 };
+    for (const c of conversations) {
+      const ct = contacts.find((x) => x.id === c.contactId);
+      if (!ct) continue;
+      if (ct.ownerId === "me") result.my += c.unread;
+      result.team += c.unread;
+      if (c.unread > 0) result.mentions += 1;
+      if (!ct.ownerId) result.unassigned += 1;
+    }
+    return result;
+  }, [contacts]);
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
-      <div className="grid grid-cols-[320px_1fr_320px] h-[calc(100vh-64px)] min-h-0">
-        <aside className="border-r border-border flex flex-col min-h-0 bg-sidebar/40">
-          <div className="p-3 border-b border-border space-y-3">
+      <div className={`grid h-[calc(100vh-64px)] min-h-0 ${contextOpen ? "grid-cols-[240px_340px_1fr_320px]" : "grid-cols-[240px_340px_1fr]"}`}>
+        {/* ============== LEFT NAV ============== */}
+        <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
+          <NavSection title="Inbox Views">
+            {VIEWS.map((v) => {
+              const Icon = v.icon;
+              const sel = view === v.id;
+              const count = viewCounts[v.id];
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => setView(v.id)}
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
+                    sel ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="flex-1 text-left">{v.label}</span>
+                  {count > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${sel ? "bg-primary/25 text-primary" : "bg-white/[0.06] text-muted-foreground"}`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </NavSection>
+
+          <NavSection title="Lifecycle Stages">
+            <button
+              onClick={() => setStage(null)}
+              className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
+                stage === null ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+              <span className="flex-1 text-left">All Stages</span>
+            </button>
+            {LIFECYCLE_STAGES.map((s) => {
+              const sel = stage === s;
+              const count = stageCounts.get(s) ?? 0;
+              return (
+                <button
+                  key={s}
+                  onClick={() => setStage(s)}
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
+                    sel ? "bg-white/[0.05] text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[s].dot}`} />
+                  <span className="flex-1 text-left truncate">{s}</span>
+                  {count > 0 && (
+                    <span className="text-[10px] text-muted-foreground">{count}</span>
+                  )}
+                </button>
+              );
+            })}
+          </NavSection>
+
+          <NavSection title="Company Inboxes">
+            {CHANNELS.map((ch) => {
+              const Icon = ch.icon;
+              const sel = channel === ch.id;
+              return (
+                <button
+                  key={ch.id}
+                  onClick={() => setChannel(ch.id)}
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition ${
+                    sel ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="flex-1 text-left">{ch.label}</span>
+                </button>
+              );
+            })}
+          </NavSection>
+        </aside>
+
+        {/* ============== CONVERSATION LIST ============== */}
+        <aside className="border-r border-border flex flex-col min-h-0 bg-sidebar/20">
+          <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <input placeholder="Search conversations" className="h-9 w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search conversations"
+                className="h-9 w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
             </div>
             <div className="flex items-center gap-1 text-[11px]">
               {tabs.map((t) => (
@@ -45,13 +207,28 @@ function InboxPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
+            {visible.length === 0 && (
+              <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
+                No conversations match the current filters.
+              </div>
+            )}
             {visible.map((c) => {
-              const ct = contacts.find((x) => x.id === c.contactId)!;
+              const ct = contacts.find((x) => x.id === c.contactId);
+              if (!ct) return null;
               const sel = c.id === activeId;
+              const stageColor = ct.lifecycleStage ? STAGE_COLORS[ct.lifecycleStage] : null;
               return (
-                <button key={c.id} onClick={() => setActiveId(c.id)} className={`w-full text-left flex gap-3 px-4 py-3 border-b border-border/60 transition ${sel ? "bg-primary/10 border-l-2 border-l-primary" : "hover:bg-white/[0.02]"}`}>
+                <button
+                  key={c.id}
+                  onClick={() => setActiveId(c.id)}
+                  className={`w-full text-left flex gap-2.5 px-3 py-2.5 border-b border-border/60 transition ${
+                    sel ? "bg-primary/10 border-l-2 border-l-primary" : "border-l-2 border-l-transparent hover:bg-white/[0.02]"
+                  }`}
+                >
                   <div className="relative shrink-0">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">{ct.avatar}</div>
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
+                      {ct.avatar}
+                    </div>
                     <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sidebar ${c.channel === "whatsapp" ? "bg-emerald-500" : "bg-pink-500"}`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -63,6 +240,23 @@ function InboxPage() {
                       <p className={`text-xs truncate ${c.unread > 0 ? "text-foreground" : "text-muted-foreground"}`}>{c.preview}</p>
                       {c.unread > 0 && (<span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground shrink-0">{c.unread}</span>)}
                     </div>
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      {stageColor && ct.lifecycleStage && (
+                        <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] ${stageColor.badge}`}>
+                          <span className={`h-1 w-1 rounded-full ${stageColor.dot}`} />
+                          {ct.lifecycleStage}
+                        </span>
+                      )}
+                      {ct.ownerId && (
+                        <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                          <User2 className="h-2.5 w-2.5" />
+                          {ct.ownerId === "me" ? "Me" : ct.ownerId}
+                        </span>
+                      )}
+                      {!ct.ownerId && (
+                        <span className="text-[9px] text-amber-300/80">Unassigned</span>
+                      )}
+                    </div>
                   </div>
                 </button>
               );
@@ -70,21 +264,46 @@ function InboxPage() {
           </div>
         </aside>
 
+        {/* ============== ACTIVE CONVERSATION ============== */}
         <section className="flex flex-col min-h-0">
-          <div className="h-14 px-5 flex items-center gap-3 border-b border-border bg-card/30 backdrop-blur">
+          <div className="min-h-14 px-5 py-2.5 flex items-center gap-3 border-b border-border bg-card/30 backdrop-blur">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">{contact.avatar}</div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium truncate">{contact.name}</span>
                 <ChannelDot channel={active.channel} />
+                {contact.lifecycleStage && (
+                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${STAGE_COLORS[contact.lifecycleStage].badge}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`} />
+                    {contact.lifecycleStage}
+                  </span>
+                )}
               </div>
-              <div className="text-[11px] text-muted-foreground">{active.channel === "whatsapp" ? contact.phone : contact.instagram} · Active now</div>
+              <div className="text-[11px] text-muted-foreground flex items-center gap-2 flex-wrap">
+                <span>{active.channel === "whatsapp" ? contact.phone : contact.instagram}</span>
+                <span>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <User2 className="h-3 w-3" />
+                  {contact.ownerId ? (contact.ownerId === "me" ? "Me" : contact.ownerId) : "Unassigned"}
+                </span>
+                <span>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Open
+                </span>
+              </div>
             </div>
             <div className="ml-auto flex items-center gap-1 text-muted-foreground">
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Phone className="h-4 w-4" /></button>
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Video className="h-4 w-4" /></button>
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><Star className="h-4 w-4" /></button>
               <button className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"><MoreHorizontal className="h-4 w-4" /></button>
+              <button
+                onClick={() => setContextOpen((v) => !v)}
+                title={contextOpen ? "Hide contact panel" : "Show contact panel"}
+                className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.04]"
+              >
+                {contextOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+              </button>
             </div>
           </div>
 
@@ -101,6 +320,9 @@ function InboxPage() {
                 </div>
               </div>
             ))}
+            {thread.length === 0 && (
+              <div className="text-center text-xs text-muted-foreground py-10">No messages yet.</div>
+            )}
           </div>
 
           <div className="border-t border-border bg-card/40 p-3">
@@ -111,6 +333,7 @@ function InboxPage() {
                   <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05]"><Paperclip className="h-4 w-4" /></button>
                   <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05]"><Smile className="h-4 w-4" /></button>
                   <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05]">Use template <ChevronDown className="h-3 w-3" /></button>
+                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] text-amber-300/80">Internal note</button>
                 </div>
                 <button className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"><Send className="h-3.5 w-3.5" /> Send</button>
               </div>
@@ -118,74 +341,125 @@ function InboxPage() {
           </div>
         </section>
 
-        <aside className="border-l border-border bg-sidebar/40 overflow-y-auto">
-          <div className="p-5 border-b border-border text-center">
-            <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
-            <div className="mt-3 text-sm font-medium">{contact.name}</div>
-            <div className="text-[11px] text-muted-foreground">Customer since Mar 2024</div>
-            <div className="mt-3 flex justify-center gap-1.5 flex-wrap">
-              {contact.labelIds.map((id) => {
-                const l = initialLabels.find((x) => x.id === id);
-                return l ? <LabelChip key={id} label={l} /> : null;
-              })}
+        {/* ============== CONTACT CONTEXT PANEL ============== */}
+        {contextOpen && (
+          <aside className="border-l border-border bg-sidebar/40 overflow-y-auto">
+            <div className="p-5 border-b border-border text-center">
+              <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+              <div className="mt-3 text-sm font-medium">{contact.name}</div>
+              {contact.lifecycleStage && (
+                <div className="mt-2">
+                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${STAGE_COLORS[contact.lifecycleStage].badge}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`} />
+                    {contact.lifecycleStage}
+                  </span>
+                </div>
+              )}
+              <div className="mt-3">
+                <Link
+                  to="/contacts/$contactId"
+                  params={{ contactId: contact.id }}
+                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                >
+                  Open full contact <ExternalLink className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-          </div>
 
-          <div className="p-5 border-b border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Labels</div>
-            <div className="flex flex-wrap gap-1">
-              {contact.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">No labels yet</span>}
-              {contact.labelIds.map((id) => {
-                const l = initialLabels.find((x) => x.id === id);
-                return l ? <LabelChip key={id} label={l} /> : null;
-              })}
-            </div>
-          </div>
+            <Section title="Labels">
+              <div className="flex flex-wrap gap-1">
+                {contact.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">No labels</span>}
+                {contact.labelIds.map((id) => {
+                  const l = labels.find((x) => x.id === id);
+                  return l ? <LabelChip key={id} label={l} /> : null;
+                })}
+              </div>
+            </Section>
 
-          <div className="p-5 border-b border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Lists</div>
-            <div className="flex flex-wrap gap-1">
-              {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any list</span>}
-              {contact.listIds.map((id) => {
-                const l = initialLists.find((x) => x.id === id);
-                return l ? <ListChip key={id} name={l.name} /> : null;
-              })}
-            </div>
-          </div>
+            <Section title="Lists">
+              <div className="flex flex-wrap gap-1">
+                {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any list</span>}
+                {contact.listIds.map((id) => {
+                  const l = lists.find((x) => x.id === id);
+                  return l ? <ListChip key={id} name={l.name} /> : null;
+                })}
+              </div>
+            </Section>
 
-          <Field label="Phone number" value={contact.phone} />
-          <Field label="Instagram" value={contact.instagram ?? "—"} />
-          <Field label="Channel source" value={active.channel === "whatsapp" ? "WhatsApp Business" : "Instagram DM"} />
-          <Field label="Last interaction" value={contact.lastInteraction} />
+            <Section title="Contact Information">
+              <InfoRow icon={<Mail className="h-3 w-3" />} label="Email" value={contact.email ?? "—"} />
+              <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
+              <InfoRow icon={<MessageSquare className="h-3 w-3" />} label="Channel" value={contact.channel === "whatsapp" ? "WhatsApp" : "Instagram"} />
+              <InfoRow icon={<User2 className="h-3 w-3" />} label="Owner" value={contact.ownerId ? (contact.ownerId === "me" ? "Me" : contact.ownerId) : "Unassigned"} />
+              <InfoRow icon={<span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>} label="Last interaction" value={contact.lastInteraction} />
+            </Section>
 
-          <div className="p-5 border-t border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Notes</div>
-            <div className="rounded-md border border-border bg-card/60 p-3 text-xs text-muted-foreground leading-relaxed">Prefers WhatsApp for time-sensitive updates. Loyalty tier: Platinum (renewed Q3).</div>
-          </div>
-
-          <div className="p-5 border-t border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Recent orders</div>
-            <ul className="space-y-2">
-              {[{ id: "#82201", v: "$284.00", d: "Nov 12" }, { id: "#80114", v: "$612.50", d: "Oct 28" }, { id: "#79008", v: "$129.00", d: "Sep 14" }].map((o) => (
-                <li key={o.id} className="flex items-center justify-between rounded-md border border-border bg-card/40 px-3 py-2 text-xs">
-                  <span className="font-medium">{o.id}</span>
-                  <span className="text-muted-foreground">{o.d}</span>
-                  <span>{o.v}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+            <Section title="Contact Properties">
+              {(() => {
+                const SYS = new Set(["name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email"]);
+                const custom = properties.filter((p) => !p.system && !SYS.has(p.key));
+                if (custom.length === 0) {
+                  return (
+                    <div className="text-[11px] text-muted-foreground">
+                      No custom properties. Add them in Manage Properties.
+                    </div>
+                  );
+                }
+                return (
+                  <div className="space-y-2">
+                    {custom.map((p) => {
+                      const v = contact.customFields?.[p.key];
+                      const display = formatPropertyValue(v);
+                      return (
+                        <div key={p.id} className="flex items-start justify-between gap-3 text-xs">
+                          <span className="text-muted-foreground">{p.name}</span>
+                          <span className={`text-right break-words ${display === "—" ? "text-muted-foreground" : "text-foreground"}`}>
+                            {display}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </Section>
+          </aside>
+        )}
       </div>
     </AppShell>
   );
 }
 
-function Field({ label, value, tone }: { label: string; value: string; tone?: "good" | "warn" }) {
+function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="px-5 py-3 border-b border-border flex items-center justify-between">
-      <span className="text-[11px] text-muted-foreground">{label}</span>
-      <span className={`text-xs ${tone === "good" ? "text-emerald-300" : tone === "warn" ? "text-amber-300" : "text-foreground"}`}>{value}</span>
+    <div className="p-2 border-b border-border/60">
+      <div className="px-2.5 pt-1 pb-2 text-[10px] uppercase tracking-wider text-muted-foreground/80">{title}</div>
+      <div className="space-y-0.5">{children}</div>
     </div>
   );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="p-5 border-b border-border">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5 text-xs">
+      <span className="inline-flex items-center gap-1.5 text-muted-foreground">{icon}{label}</span>
+      <span className={`text-right truncate ${value === "—" || value === "Unassigned" ? "text-muted-foreground" : "text-foreground"}`}>{value}</span>
+    </div>
+  );
+}
+
+function formatPropertyValue(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "—";
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
+  return String(v);
 }
