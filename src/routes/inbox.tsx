@@ -318,11 +318,14 @@ function InboxPage() {
                       : "border-l-2 border-l-transparent hover:bg-white/[0.02]"
                   }`}
                 >
-                  <div className="relative shrink-0">
+                  <div className="relative shrink-0 h-10 w-10 self-start">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
-                    <ChannelBadge channel={c.channel} className="absolute -bottom-1 -right-1 h-[18px] w-[18px] rounded-full ring-2 ring-background shadow-sm" />
+                    <ChannelBadge
+                      channel={c.channel}
+                      className="absolute -bottom-0.5 -right-0.5 h-[16px] w-[16px] rounded-full ring-2 ring-background shadow-sm"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
