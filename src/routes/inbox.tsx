@@ -122,7 +122,7 @@ function InboxPage() {
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
-      <div className="relative grid h-[calc(100vh-64px)] min-h-0 grid-cols-[240px_340px_1fr]">
+      <div className="relative grid h-[calc(100vh-64px)] min-h-0 grid-cols-[240px_340px_1fr] overflow-x-hidden">
         {/* ============== LEFT NAV ============== */}
         <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
           <NavSection title="Inbox Views">
