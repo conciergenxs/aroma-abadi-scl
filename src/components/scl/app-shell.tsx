@@ -46,9 +46,9 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <div className="flex min-h-screen w-full bg-background text-foreground">
+    <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border bg-sidebar">
+      <aside className="hidden md:flex h-full w-60 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar">
         <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[0_0_24px_-6px_var(--primary)]">
             <MessageSquareText className="h-4 w-4" />
@@ -61,7 +61,7 @@ export function AppShell({
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-5 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-2 py-5 space-y-1">
           <div className="px-3 pb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
             Workspace
           </div>
@@ -106,7 +106,7 @@ export function AppShell({
       </aside>
 
       {/* Main */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex h-full flex-col flex-1 min-w-0 overflow-hidden">
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-6">
           <div className="flex flex-col">
             {title ? (
@@ -132,7 +132,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className={noPadding ? "flex-1 min-h-0" : "flex-1 p-6"}>{children}</main>
+        <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto" : "flex-1 p-6 overflow-y-auto"}>{children}</main>
       </div>
     </div>
   );
