@@ -432,7 +432,7 @@ function ContactsPage() {
         <ManagePropertiesModal
           properties={properties}
           onClose={() => setShowManageProps(false)}
-          onChange={setProperties}
+          onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
         />
       )}
     </AppShell>
