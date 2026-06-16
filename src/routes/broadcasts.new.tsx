@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/broadcast/new")({
+export const Route = createFileRoute("/broadcasts/new")({
   head: () => ({ meta: [{ title: "Create Broadcast — SCL" }] }),
   component: CreateBroadcastPage,
 });
