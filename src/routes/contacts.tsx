@@ -329,26 +329,26 @@ function ContactsPage() {
 
           <div className="flex-1 min-h-0 p-5">
             <SectionCard className="h-full flex flex-col">
-              <div className="flex-1 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] scroll-smooth">
+              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
                 <table className="min-w-full text-sm">
                   <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    <tr className="sticky top-0 z-10 bg-white/[0.02]">
-                      <th className="w-10 px-4 py-3 whitespace-nowrap">
+                    <tr>
+                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">
                         <input
                           type="checkbox"
                           className="accent-[oklch(0.62_0.17_40)]"
                           checked={allSelected}
-                          onChange={() => setSelected(allSelected ? [] : visibleContacts.map((c) => c.id))}
+                          onChange={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
                         />
                       </th>
                       {properties.filter((p) => p.visible).map((p) => (
-                        <th key={p.id} className="px-4 py-3 text-left font-medium whitespace-nowrap">{p.name}</th>
+                        <th key={p.id} className="sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">{p.name}</th>
                       ))}
-                      <th className="w-10 px-4 py-3 whitespace-nowrap"></th>
+                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {visibleContacts.map((c) => (
+                    {pageContacts.map((c) => (
                       <tr key={c.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setOpenContactId(c.id)}>
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                           <input
@@ -370,7 +370,7 @@ function ContactsPage() {
                         </td>
                       </tr>
                     ))}
-                    {visibleContacts.length === 0 && (
+                    {pageContacts.length === 0 && (
                       <tr>
                         <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
@@ -381,6 +381,14 @@ function ContactsPage() {
                   </tbody>
                 </table>
               </div>
+              <TablePagination
+                total={visibleContacts.length}
+                page={page}
+                perPage={perPage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                onPerPageChange={setPerPage}
+              />
             </SectionCard>
           </div>
         </div>
