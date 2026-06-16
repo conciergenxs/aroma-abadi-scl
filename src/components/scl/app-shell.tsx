@@ -10,7 +10,17 @@ import {
   Search,
   Bell,
   MessageSquareText,
+  User,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type NavItem = {
   to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/settings";
@@ -72,20 +82,6 @@ export function AppShell({
             );
           })}
         </nav>
-
-        <div className="w-full px-2 py-3 border-t border-sidebar-border flex justify-center">
-          <div className="group/avatar relative">
-            <div
-              className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-xs font-semibold text-primary-foreground ring-1 ring-border cursor-pointer"
-              aria-label="Aria Kapoor — Acme Brands · Admin"
-            >
-              AK
-            </div>
-            <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/avatar:opacity-100 group-hover/avatar:translate-x-0 z-50">
-              Aria Kapoor · Admin
-            </span>
-          </div>
-        </div>
       </aside>
 
       {/* Main */}
