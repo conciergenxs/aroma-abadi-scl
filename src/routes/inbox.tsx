@@ -84,6 +84,16 @@ function InboxPage() {
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionIndex, setMentionIndex] = useState(0);
   const noteRef = useRef<HTMLTextAreaElement | null>(null);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+
+  const insertTemplate = (body: string) => {
+    if (composerMode === "note") {
+      setNoteText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
+      requestAnimationFrame(() => noteRef.current?.focus());
+    } else {
+      setReplyText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
+    }
+  };
 
   const mentionMatches = useMemo(() => {
     if (mentionQuery === null) return [];
