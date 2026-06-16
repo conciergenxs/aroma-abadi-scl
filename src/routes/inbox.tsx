@@ -538,7 +538,12 @@ function InboxPage() {
                   <div className="flex items-center gap-0.5 text-muted-foreground/70">
                     <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
                     <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Smile className="h-4 w-4" /></button>
-                    <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground">Use template <ChevronDown className="h-3 w-3" /></button>
+                    <button
+                      onClick={() => setTemplatePickerOpen(true)}
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground"
+                    >
+                      Use template <ChevronDown className="h-3 w-3" />
+                    </button>
                     <button
                       onClick={() => { setComposerMode("note"); requestAnimationFrame(() => noteRef.current?.focus()); }}
                       className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90"
@@ -624,6 +629,12 @@ function InboxPage() {
                       className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"
                     >
                       <AtSignIcon className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setTemplatePickerOpen(true)}
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 hover:text-amber-200"
+                    >
+                      Use template
                     </button>
                   </div>
                   <button
