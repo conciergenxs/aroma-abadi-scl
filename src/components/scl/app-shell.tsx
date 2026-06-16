@@ -46,7 +46,7 @@ export function AppShell({
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Sidebar */}
-      <aside className="hidden md:flex h-full w-16 shrink-0 flex-col items-center overflow-hidden border-r border-border bg-sidebar">
+      <aside className="hidden md:flex h-full w-16 shrink-0 flex-col items-center border-r border-border bg-sidebar">
         <div className="flex items-center justify-center h-16 w-full border-b border-sidebar-border">
           <div
             className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[0_0_24px_-6px_var(--primary)]"
