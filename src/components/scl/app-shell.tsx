@@ -108,6 +108,31 @@ export function AppShell({
               <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
             </button>
             {actions}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 pl-1 pr-2 h-9 rounded-md border border-border bg-card/60 hover:bg-card transition-colors">
+                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
+                    AK
+                  </div>
+                  <span className="text-xs font-medium text-foreground hidden lg:block">Aria Kapoor</span>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground hidden lg:block" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="cursor-pointer flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    Profile Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
