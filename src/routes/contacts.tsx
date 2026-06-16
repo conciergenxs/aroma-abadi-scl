@@ -281,6 +281,24 @@ function ContactsPage() {
         {/* Main content */}
         <div className="flex flex-col min-h-0 overflow-hidden">
           <div className="p-5 pb-3 flex flex-wrap items-center gap-2 border-b border-border">
+            <div className="inline-flex items-center rounded-md border border-border bg-card/60 p-0.5">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
+                  viewMode === "list" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Rows3 className="h-3.5 w-3.5" /> List
+              </button>
+              <button
+                onClick={() => setViewMode("kanban")}
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
+                  viewMode === "kanban" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Kanban
+              </button>
+            </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
