@@ -493,30 +493,15 @@ function ConversationHeader({
   onToggleContext: () => void;
 }) {
   return (
-    <div className="min-h-[68px] px-5 py-3 flex items-center gap-4 border-b border-border bg-card/40 backdrop-blur">
-      {/* LEFT — contact name + lifecycle */}
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-sm font-medium shrink-0">
-          {contact.avatar}
-        </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
-            <ChannelDot channel={active.channel} />
-          </div>
-          <div className="mt-1 flex items-center gap-2">
-            <div className="w-[180px]">
-              <LifecycleSelect
-                size="sm"
-                value={contact.lifecycleStage ?? null}
-                onChange={onChangeLifecycle}
-              />
-            </div>
-            <span className="text-[11px] text-muted-foreground truncate">
-              {active.channel === "whatsapp" ? contact.phone : contact.instagram}
-            </span>
-          </div>
-        </div>
+    <div className="relative z-30 min-h-[60px] px-5 py-2.5 flex items-center gap-6 border-b border-border bg-card/60 backdrop-blur">
+      {/* LEFT — contact name + lifecycle (single row) */}
+      <div className="flex items-center gap-4 min-w-0">
+        <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
+        <LifecycleSelect
+          size="sm"
+          value={contact.lifecycleStage ?? null}
+          onChange={onChangeLifecycle}
+        />
       </div>
 
       {/* CENTER — owner / assignee */}
