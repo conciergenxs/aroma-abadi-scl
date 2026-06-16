@@ -346,7 +346,8 @@ function InboxPage() {
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       <ChannelBadge channel={c.channel} className="h-3.5 w-3.5 rounded-full shrink-0" />
                       {stageColor && ct.lifecycleStage && (
-                        <span className={`inline-flex items-center rounded-sm px-1.5 py-px text-[10px] font-medium ${stageColor.badge ?? "bg-white/[0.06] text-foreground/80"}`}>
+                        <span className="inline-flex items-center rounded-sm bg-white/[0.06] px-1.5 py-px text-[10px] font-medium text-foreground/80">
+                          <span className={`mr-1 h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
                           {ct.lifecycleStage}
                         </span>
                       )}
