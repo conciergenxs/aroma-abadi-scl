@@ -11,10 +11,10 @@ import {
 } from "@/components/scl/mock-data";
 import {
   Search, Filter, Plus, MoreHorizontal,
-  Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
+  Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
