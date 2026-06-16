@@ -12,6 +12,7 @@ type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
+import { ChannelBadge } from "@/components/scl/channel-badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
