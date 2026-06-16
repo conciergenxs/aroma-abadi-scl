@@ -1,3 +1,4 @@
+import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   Settings,
   Search,
   Bell,
-  MessageSquareText,
   User,
   LogOut,
   ChevronDown,
