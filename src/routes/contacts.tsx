@@ -1329,8 +1329,8 @@ function KanbanBoard({
   }, [contacts]);
 
   return (
-    <div className="h-full overflow-x-auto overflow-y-hidden [overscroll-behavior:contain] overscroll-x-none scl-scroll">
-      <div className="flex gap-4 h-full min-w-max pb-2">
+    <div className="h-full overflow-auto [overscroll-behavior:contain] scl-scroll">
+      <div className="flex gap-4 min-w-max pb-2">
         {LIFECYCLE_STAGES.map((stage) => {
           const items = byStage.get(stage) ?? [];
           const isOver = overStage === stage;
@@ -1345,21 +1345,23 @@ function KanbanBoard({
                 setDragId(null);
                 setOverStage(null);
               }}
-              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 overflow-hidden transition ${
+              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 transition ${
                 isOver ? "border-primary/60 bg-primary/5" : "border-border"
               }`}
             >
-              <div className={`h-1 w-full ${c.bar}`} />
-              <div className="flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`h-2 w-2 rounded-full ${c.dot}`} />
-                  <div className="text-xs font-medium truncate">{stage}</div>
+              <div className="sticky top-0 z-10">
+                <div className={`h-1 w-full ${c.bar}`} />
+                <div className="flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`h-2 w-2 rounded-full ${c.dot}`} />
+                    <div className="text-xs font-medium truncate">{stage}</div>
+                  </div>
+                  <span className={`text-[10px] rounded px-1.5 py-0.5 border ${c.badge}`}>
+                    {items.length}
+                  </span>
                 </div>
-                <span className={`text-[10px] rounded px-1.5 py-0.5 border ${c.badge}`}>
-                  {items.length}
-                </span>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto [overscroll-behavior:contain] p-2 space-y-2 scl-scroll">
+              <div className="p-2 space-y-2">
                 {items.map((c) => (
                   <div
                     key={c.id}
