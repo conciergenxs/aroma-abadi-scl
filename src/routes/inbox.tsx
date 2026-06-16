@@ -341,12 +341,7 @@ function InboxPage() {
         </section>
 
         {/* ============== CONTACT CONTEXT PANEL (slide-in) ============== */}
-        <aside
-          className={`absolute right-0 top-0 h-full w-[340px] border-l border-border bg-sidebar/95 backdrop-blur overflow-y-auto shadow-2xl transition-transform duration-200 ease-out ${
-            contextOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
-          }`}
-          aria-hidden={!contextOpen}
-        >
+        <ContactDrawer open={contextOpen} onClose={() => setContextOpen(false)}>
             <div className="p-5 border-b border-border text-center">
               <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
@@ -426,9 +421,52 @@ function InboxPage() {
                 );
               })()}
             </Section>
-        </aside>
+        </ContactDrawer>
       </div>
     </AppShell>
+  );
+}
+
+function ContactDrawer({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (ref.current && !ref.current.contains(target)) {
+        // Ignore clicks on the toggle button (data-contact-toggle)
+        const el = target as HTMLElement;
+        if (el.closest?.("[data-contact-toggle]")) return;
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <aside
+      ref={ref}
+      className="fixed right-0 top-16 bottom-0 z-40 w-[400px] max-w-[100vw] border-l border-border bg-sidebar/95 backdrop-blur overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200"
+    >
+      {children}
+    </aside>
   );
 }
 
