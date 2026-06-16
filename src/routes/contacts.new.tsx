@@ -92,7 +92,6 @@ function NewContactPage() {
       lastInteraction: "Just now",
       status: "Active",
       avatar: initials,
-      subscription: "Subscribed",
       ownerId: ownerId || undefined,
       lifecycleStage: stage,
       stageEnteredAt: new Date().toISOString(),
