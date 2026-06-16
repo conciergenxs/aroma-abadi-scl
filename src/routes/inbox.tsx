@@ -27,6 +27,10 @@ export const Route = createFileRoute("/inbox")({
 
 type InboxView = "my" | "collaborations" | "mentions" | "unassigned";
 type TeamFilter = "all" | string;
+type ActiveFilter =
+  | { kind: "view"; value: InboxView }
+  | { kind: "stage"; value: LifecycleStage }
+  | { kind: "team"; value: string };
 const tabs = ["All", "Unread", "Assigned", "Unassigned"] as const;
 
 const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
@@ -55,9 +59,7 @@ const userLabel = (id?: string | null) =>
 
 function InboxPage() {
   const { contacts, labels, lists, properties } = useContactsStore();
-  const [view, setView] = useState<InboxView>("my");
-  const [stage, setStage] = useState<LifecycleStage | null>(null);
-  const [team, setTeam] = useState<TeamFilter>("all");
+  const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ kind: "view", value: "my" });
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
@@ -68,20 +70,21 @@ function InboxPage() {
     return conversations.filter((c) => {
       const ct = contacts.find((x) => x.id === c.contactId);
       if (!ct) return false;
-      // Inbox view
-      if (view === "my" && ct.ownerId !== "me") return false;
-      if (view === "unassigned" && ct.ownerId) return false;
-      if (view === "mentions" && c.unread === 0) return false;
-      if (view === "collaborations") {
-        const collabs = collaborators[c.id] ?? [];
-        if (collabs.length < 2 && !collabs.includes("me")) return false;
-      }
-      // Lifecycle stage
-      if (stage && ct.lifecycleStage !== stage) return false;
-      // Team filter (owner's team)
-      if (team !== "all") {
+      // Single active primary filter
+      if (activeFilter.kind === "view") {
+        const v = activeFilter.value;
+        if (v === "my" && ct.ownerId !== "me") return false;
+        if (v === "unassigned" && ct.ownerId) return false;
+        if (v === "mentions" && c.unread === 0) return false;
+        if (v === "collaborations") {
+          const collabs = collaborators[c.id] ?? [];
+          if (collabs.length < 2 && !collabs.includes("me")) return false;
+        }
+      } else if (activeFilter.kind === "stage") {
+        if (ct.lifecycleStage !== activeFilter.value) return false;
+      } else if (activeFilter.kind === "team") {
         const t = teamOfOwner(ct.ownerId);
-        if (t !== team) return false;
+        if (t !== activeFilter.value) return false;
       }
       // Tabs
       if (tab === "Unread" && c.unread === 0) return false;
@@ -94,7 +97,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, view, stage, team, tab, search, collaborators]);
+  }, [contacts, activeFilter, tab, search, collaborators]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
@@ -135,6 +138,31 @@ function InboxPage() {
     }
     return map;
   }, [contacts]);
+
+  const isViewActive = (id: InboxView) =>
+    activeFilter.kind === "view" && activeFilter.value === id;
+  const isStageActive = (s: LifecycleStage | null) =>
+    s === null
+      ? activeFilter.kind !== "stage"
+      : activeFilter.kind === "stage" && activeFilter.value === s;
+  const isTeamActive = (t: TeamFilter) =>
+    t === "all"
+      ? activeFilter.kind !== "team"
+      : activeFilter.kind === "team" && activeFilter.value === t;
+
+  const filterContext = useMemo(() => {
+    if (activeFilter.kind === "view") {
+      const v = activeFilter.value;
+      if (v === "my") return { title: "My Inbox", subtitle: "Showing conversations assigned to you" };
+      if (v === "collaborations") return { title: "Collaborations", subtitle: "Conversations where multiple teammates collaborate" };
+      if (v === "mentions") return { title: "Mentions", subtitle: "Conversations where you are mentioned" };
+      return { title: "Unassigned", subtitle: "Showing conversations with no owner" };
+    }
+    if (activeFilter.kind === "stage") {
+      return { title: activeFilter.value, subtitle: `Showing contacts in ${activeFilter.value} stage` };
+    }
+    return { title: `${activeFilter.value} Team`, subtitle: `Showing conversations handled by ${activeFilter.value} Team` };
+  }, [activeFilter]);
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
