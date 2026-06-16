@@ -12,6 +12,7 @@ type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
+import { ChannelBadge } from "@/components/scl/channel-badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
@@ -321,10 +322,7 @@ function InboxPage() {
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${c.channel === "whatsapp" ? "bg-emerald-500" : "bg-pink-500"}`} />
-                    {unread && (
-                      <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
-                    )}
+                    <ChannelBadge channel={c.channel} className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full ring-2 ring-background" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
@@ -346,9 +344,10 @@ function InboxPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <ChannelBadge channel={c.channel} className="h-3.5 w-3.5 rounded-full shrink-0" />
                       {stageColor && ct.lifecycleStage && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/80">
-                          <span className={`h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
+                        <span className="inline-flex items-center rounded-sm bg-white/[0.06] px-1.5 py-px text-[10px] font-medium text-foreground/80">
+                          <span className={`mr-1 h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
                           {ct.lifecycleStage}
                         </span>
                       )}
