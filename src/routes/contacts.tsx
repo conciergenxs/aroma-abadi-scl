@@ -11,7 +11,7 @@ import {
 } from "@/components/scl/mock-data";
 import {
   Search, Filter, Plus, Download, MoreHorizontal, ArrowUpDown,
-  Users, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
+  Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -27,7 +27,7 @@ function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>(seedContacts);
   const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
   const [lists, setLists] = useState<ContactList[]>(initialLists);
-  const [activeListId, setActiveListId] = useState<string | "all">("all");
+  const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [selected, setSelected] = useState<string[]>([]);
   const [openContactId, setOpenContactId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -35,7 +35,10 @@ function ContactsPage() {
   const [newListName, setNewListName] = useState("");
 
   const visibleContacts = useMemo(() => {
-    const base = activeListId === "all" ? contacts : contacts.filter((c) => c.listIds.includes(activeListId));
+    let base: Contact[];
+    if (activeView === "all") base = contacts;
+    else if (activeView === "mine") base = contacts.filter((c) => c.ownerId === "me");
+    else base = contacts.filter((c) => c.listIds.includes(activeView));
     if (!query.trim()) return base;
     const q = query.toLowerCase();
     return base.filter(
@@ -44,7 +47,7 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeListId, query]);
+  }, [contacts, activeView, query]);
 
   const allSelected = selected.length > 0 && selected.length === visibleContacts.length;
   const toggle = (id: string) =>
@@ -55,7 +58,8 @@ function ContactsPage() {
 
   const labelById = (id: string) => labels.find((l) => l.id === id);
   const listById = (id: string) => lists.find((l) => l.id === id);
-  const activeList = activeListId === "all" ? null : listById(activeListId) ?? null;
+  const activeList = activeView !== "all" && activeView !== "mine" ? listById(activeView) ?? null : null;
+  const myCount = contacts.filter((c) => c.ownerId === "me").length;
 
   const updateContact = (id: string, patch: Partial<Contact>) =>
     setContacts((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
@@ -88,7 +92,7 @@ function ContactsPage() {
   const deleteList = (id: string) => {
     setLists((l) => l.filter((x) => x.id !== id));
     setContacts((cs) => cs.map((c) => ({ ...c, listIds: c.listIds.filter((x) => x !== id) })));
-    if (activeListId === id) setActiveListId("all");
+    if (activeView === id) setActiveView("all");
   };
 
   const createLabel = (name: string, color: LabelColor) => {
@@ -107,11 +111,13 @@ function ContactsPage() {
 
   return (
     <AppShell
-      title={activeList ? activeList.name : "Contacts"}
+      title={activeList ? activeList.name : activeView === "mine" ? "My Contacts" : "Contacts"}
       subtitle={
         activeList
           ? `${visibleContacts.length} contacts in this list`
-          : `${contacts.length} contacts · ${lists.length} lists · ${labels.length} labels`
+          : activeView === "mine"
+            ? `${visibleContacts.length} contacts assigned to you`
+            : `${contacts.length} contacts · ${lists.length} lists`
       }
       noPadding
       actions={
@@ -125,9 +131,9 @@ function ContactsPage() {
         <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
           <div className="p-3 space-y-1">
             <button
-              onClick={() => { setActiveListId("all"); setSelected([]); }}
+              onClick={() => { setActiveView("all"); setSelected([]); }}
               className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                activeListId === "all" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                activeView === "all" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -135,10 +141,21 @@ function ContactsPage() {
               </span>
               <span className="text-[10px] text-muted-foreground">{contacts.length}</span>
             </button>
+            <button
+              onClick={() => { setActiveView("mine"); setSelected([]); }}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                activeView === "mine" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <UserCircle2 className="h-3.5 w-3.5" /> My contacts
+              </span>
+              <span className="text-[10px] text-muted-foreground">{myCount}</span>
+            </button>
           </div>
 
           <div className="px-3 pt-2 pb-1 flex items-center justify-between">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lists</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Contact lists</div>
             <button
               onClick={() => setShowNewList((v) => !v)}
               className="h-5 w-5 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
@@ -167,14 +184,14 @@ function ContactsPage() {
           <div className="px-3 pb-3 space-y-0.5">
             {lists.map((ls) => {
               const count = contacts.filter((c) => c.listIds.includes(ls.id)).length;
-              const active = activeListId === ls.id;
+              const active = activeView === ls.id;
               return (
                 <ListSidebarRow
                   key={ls.id}
                   list={ls}
                   count={count}
                   active={active}
-                  onSelect={() => { setActiveListId(ls.id); setSelected([]); }}
+                  onSelect={() => { setActiveView(ls.id); setSelected([]); }}
                   onRename={(name) => renameList(ls.id, name)}
                   onDelete={() => deleteList(ls.id)}
                 />
@@ -183,26 +200,6 @@ function ContactsPage() {
             {lists.length === 0 && (
               <div className="px-2 py-4 text-[11px] text-muted-foreground">No lists yet. Create one to group contacts for broadcasts.</div>
             )}
-          </div>
-
-          <div className="px-3 pt-2 pb-3 border-t border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center justify-between">
-              <span>Labels</span>
-              <LabelManager
-                labels={labels}
-                onCreate={createLabel}
-                onUpdate={updateLabel}
-                onDelete={deleteLabel}
-                trigger={
-                  <span className="inline-flex items-center gap-1 cursor-pointer text-muted-foreground hover:text-foreground">
-                    <Pencil className="h-3 w-3" /> Manage
-                  </span>
-                }
-              />
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {labels.map((l) => <LabelChip key={l.id} label={l} />)}
-            </div>
           </div>
         </aside>
 
