@@ -270,8 +270,14 @@ function ContactDetailPage() {
           <section className="flex flex-col min-w-0 min-h-0">
             {/* Contact header card */}
             <div className="border-b border-border px-4 lg:px-6 py-5 flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-primary/15 text-primary grid place-items-center text-base font-semibold shrink-0">
-                {contact.avatar || contact.name.slice(0, 2).toUpperCase()}
+              <div className="relative h-14 w-14 shrink-0">
+                <div className="h-14 w-14 rounded-full bg-primary/15 text-primary grid place-items-center text-base font-semibold">
+                  {contact.avatar || contact.name.slice(0, 2).toUpperCase()}
+                </div>
+                <ChannelIcon
+                  channel={contact.channel}
+                  className="absolute -bottom-0.5 -right-0.5 h-[20px] w-[20px] ring-2 ring-background shadow-sm"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <InlineText
