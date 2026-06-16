@@ -172,12 +172,12 @@ function InboxPage() {
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
-              const sel = view === v.id;
+              const sel = isViewActive(v.id);
               const count = viewCounts[v.id];
               return (
                 <button
                   key={v.id}
-                  onClick={() => setView(v.id)}
+                  onClick={() => setActiveFilter({ kind: "view", value: v.id })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
@@ -198,26 +198,26 @@ function InboxPage() {
 
           <NavSection title="Lifecycle Stages">
             <button
-              onClick={() => setStage(null)}
+              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                stage === null
-                  ? "bg-primary/15 text-primary font-medium"
-                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                activeFilter.kind === "stage"
+                  ? "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
               <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
               <span className="flex-1 text-left">All Stages</span>
             </button>
             {LIFECYCLE_STAGES.map((s) => {
-              const sel = stage === s;
+              const sel = isStageActive(s);
               const count = stageCounts.get(s) ?? 0;
               return (
                 <button
                   key={s}
-                  onClick={() => setStage(s)}
+                  onClick={() => setActiveFilter({ kind: "stage", value: s })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
-                      ? "bg-white/[0.05] text-foreground font-medium"
+                      ? "bg-primary/15 text-primary font-medium"
                       : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
@@ -233,23 +233,21 @@ function InboxPage() {
 
           <NavSection title="Company Inboxes">
             <button
-              onClick={() => setTeam("all")}
+              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                team === "all"
-                  ? "bg-primary/15 text-primary font-medium"
-                  : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
               }`}
             >
-              <Building2 className={`h-4 w-4 ${team === "all" ? "" : "opacity-70"}`} />
+              <Building2 className="h-4 w-4 opacity-70" />
               <span className="flex-1 text-left">All Teams</span>
             </button>
             {TEAMS.map((t) => {
-              const sel = team === t;
+              const sel = isTeamActive(t);
               const count = teamCounts.get(t) ?? 0;
               return (
                 <button
                   key={t}
-                  onClick={() => setTeam(t)}
+                  onClick={() => setActiveFilter({ kind: "team", value: t })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
@@ -271,6 +269,10 @@ function InboxPage() {
 
         {/* ============== CONVERSATION LIST ============== */}
         <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-background/40">
+          <div className="px-3.5 pt-3 pb-2 border-b border-border/60">
+            <div className="text-[13px] font-semibold text-foreground truncate">{filterContext.title}</div>
+            <div className="text-[11px] text-muted-foreground/70 truncate mt-0.5">{filterContext.subtitle}</div>
+          </div>
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
