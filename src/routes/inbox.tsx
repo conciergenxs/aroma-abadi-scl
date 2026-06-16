@@ -12,7 +12,7 @@ type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
-import { ChannelBadge } from "@/components/scl/channel-badge";
+import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
@@ -322,9 +322,9 @@ function InboxPage() {
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
-                    <ChannelBadge
+                    <ChannelIcon
                       channel={c.channel}
-                      className="absolute -bottom-0.5 -right-0.5 h-[16px] w-[16px] rounded-full ring-2 ring-background shadow-sm"
+                      className="absolute -bottom-0.5 -right-0.5 h-[16px] w-[16px] ring-2 ring-background shadow-sm"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -440,7 +440,13 @@ function InboxPage() {
         >
           <div className="w-[400px] h-full overflow-y-auto">
             <div className="p-5 border-b border-border text-center">
-              <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+              <div className="relative mx-auto h-16 w-16">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+                <ChannelIcon
+                  channel={contact.channel}
+                  className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
+                />
+              </div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
               {contact.lifecycleStage && (
                 <div className="mt-2">
