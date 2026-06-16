@@ -56,7 +56,7 @@ export function AppShell({
           </div>
         </div>
 
-        <nav className="flex-1 w-full overflow-y-auto py-4 flex flex-col items-center gap-1.5">
+        <nav className="flex-1 w-full py-4 flex flex-col items-center gap-1.5">
           {nav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
