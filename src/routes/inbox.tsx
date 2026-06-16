@@ -322,7 +322,7 @@ function InboxPage() {
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
-                    <ChannelBadge channel={c.channel} className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full ring-2 ring-background" />
+                    <ChannelBadge channel={c.channel} className="absolute -bottom-1 -right-1 h-[18px] w-[18px] rounded-full ring-2 ring-background shadow-sm" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
@@ -344,7 +344,6 @@ function InboxPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <ChannelBadge channel={c.channel} className="h-3.5 w-3.5 rounded-full shrink-0" />
                       {stageColor && ct.lifecycleStage && (
                         <span className="inline-flex items-center rounded-sm bg-white/[0.06] px-1.5 py-px text-[10px] font-medium text-foreground/80">
                           <span className={`mr-1 h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
