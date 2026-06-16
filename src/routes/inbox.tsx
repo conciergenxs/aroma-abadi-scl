@@ -8,13 +8,14 @@ import {
   type LifecycleStage,
   type Channel,
 } from "@/components/scl/mock-data";
-import { useContactsStore } from "@/components/scl/contacts-store";
-import { useMemo, useState } from "react";
+import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
+import { LifecycleSelect } from "@/components/scl/lifecycle-select";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
   Check, CheckCheck, Star, ChevronDown, Inbox as InboxIcon, Users, AtSign,
-  UserX, MessageSquare, Instagram, PanelRightClose, PanelRightOpen,
-  Mail, User2, ExternalLink,
+  UserX, MessageSquare, Instagram, Info,
+  Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/inbox")({
@@ -39,6 +40,21 @@ const CHANNELS: { id: ChannelFilter; label: string; icon: typeof MessageSquare }
   { id: "instagram", label: "Instagram", icon: Instagram },
 ];
 
+/** Shared SCL team / user directory used by owner & collaborator selectors. */
+type TeamUser = { id: string; name: string; team: string; avatar: string };
+const TEAM_USERS: TeamUser[] = [
+  { id: "me", name: "You", team: "Sales", avatar: "ME" },
+  { id: "sarah", name: "Sarah Burhan", team: "Sales", avatar: "SB" },
+  { id: "michael", name: "Michael Septiadi", team: "Sales", avatar: "MS" },
+  { id: "rina", name: "Rina Wijaya", team: "Sales", avatar: "RW" },
+  { id: "alex", name: "Alex Chen", team: "Support", avatar: "AC" },
+  { id: "priya", name: "Priya Patel", team: "Support", avatar: "PP" },
+  { id: "tomas", name: "Tomas Becker", team: "Success", avatar: "TB" },
+];
+const TEAMS = Array.from(new Set(TEAM_USERS.map((u) => u.team)));
+const userLabel = (id?: string | null) =>
+  !id ? "Unassigned" : TEAM_USERS.find((u) => u.id === id)?.name ?? id;
+
 function InboxPage() {
   const { contacts, labels, lists, properties } = useContactsStore();
   const [view, setView] = useState<InboxView>("my");
@@ -46,7 +62,8 @@ function InboxPage() {
   const [channel, setChannel] = useState<ChannelFilter>("all");
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
-  const [contextOpen, setContextOpen] = useState(true);
+  const [contextOpen, setContextOpen] = useState(false);
+  const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
   const [activeId, setActiveId] = useState(conversations[0].id);
 
   const visible = useMemo(() => {
