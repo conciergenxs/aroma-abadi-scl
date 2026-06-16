@@ -571,6 +571,7 @@ function ConversationHeader({
         </button>
         <button
           onClick={onToggleContext}
+          data-contact-toggle
           title={contextOpen ? "Hide contact details" : "Show contact details"}
           className={`h-9 w-9 grid place-items-center rounded transition ${
             contextOpen ? "bg-primary/15 text-primary" : "hover:bg-white/[0.05]"
