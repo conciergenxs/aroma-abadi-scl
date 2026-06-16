@@ -28,6 +28,7 @@ export type Contact = {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   instagram?: string;
   channel: Channel;
   labelIds: string[];
@@ -42,6 +43,8 @@ export type Contact = {
   lifecycleStage?: LifecycleStage;
   /** ISO timestamp when contact entered the current lifecycleStage. */
   stageEnteredAt?: string;
+  /** Values for user-defined custom properties, keyed by property key. */
+  customFields?: Record<string, unknown>;
 };
 
 const avatars = ["JL", "MR", "SP", "AK", "DV", "RM", "NK", "PT", "EC", "BL", "TH", "OW"];

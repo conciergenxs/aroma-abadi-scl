@@ -1,16 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import {
-  contacts as seedContacts,
-  initialLabels,
-  initialLists,
   type Contact,
   type ContactLabel,
   type ContactList,
   type LabelColor,
-  LIFECYCLE_STAGES,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
+import { LIFECYCLE_STAGES } from "@/components/scl/mock-data";
+import {
+  contactsStore,
+  useContactsStore,
+  PROPERTY_TYPE_LABELS,
+  type ContactProperty,
+  type PropertyType,
+} from "@/components/scl/contacts-store";
+import { toast } from "sonner";
 import {
   Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
@@ -25,69 +30,13 @@ export const Route = createFileRoute("/contacts")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
-type PropertyType =
-  | "text"
-  | "multiline"
-  | "number"
-  | "email"
-  | "phone"
-  | "url"
-  | "date"
-  | "labels"
-  | "list"
-  | "select"
-  | "multiselect"
-  | "boolean";
-
-const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
-  text: "Single Line Text",
-  multiline: "Multi Line Text",
-  number: "Number",
-  email: "Email",
-  phone: "Phone",
-  url: "URL",
-  date: "Date",
-  labels: "Labels",
-  list: "List",
-  select: "Dropdown Select",
-  multiselect: "Multi Select",
-  boolean: "Boolean / Toggle",
-};
-
-type ContactProperty = {
-  id: string;
-  key: string;
-  name: string;
-  type: PropertyType;
-  visible: boolean;
-  system?: boolean;
-};
-
-const DEFAULT_PROPERTIES: ContactProperty[] = [
-  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
-  { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
-  { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
-  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
-  { id: "p-lists", key: "lists", name: "Lists", type: "multiselect", visible: true, system: true },
-  { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
-  { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
-];
-
 function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(() =>
-    seedContacts.map((c, idx) => {
-      if (c.lifecycleStage) return c;
-      const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
-      // Seed `stageEnteredAt` with varying durations (3..120 days back) so the
-      // Kanban "In stage: X" labels show a realistic spread of days/weeks/months.
-      const daysBack = 3 + ((idx * 11) % 118);
-      const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();
-      return { ...c, lifecycleStage: stage, stageEnteredAt: enteredAt };
-    }),
-  );
-  const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
-  const [lists, setLists] = useState<ContactList[]>(initialLists);
-  const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
+  const { contacts, labels, lists, properties } = useContactsStore();
+  const setContacts = contactsStore.setContacts;
+  const setLabels = contactsStore.setLabels;
+  const setLists = contactsStore.setLists;
+  const setProperties = contactsStore.setProperties;
+  const navigate = useNavigate();
   const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
@@ -153,38 +102,50 @@ function ContactsPage() {
   const bulkRemoveList = (lsId: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
   const bulkDelete = () => {
+    const count = selected.length;
     setContacts((cs) => cs.filter((c) => !selected.includes(c.id)));
     setSelected([]);
+    toast.success(`Deleted ${count} contact${count === 1 ? "" : "s"}`);
   };
 
   const createList = () => {
     const name = newListName.trim();
-    if (!name) return;
+    if (!name) { toast.error("List name is required"); return; }
     const id = `ls-${Date.now()}`;
     setLists((l) => [...l, { id, name }]);
     setNewListName("");
     setShowNewList(false);
+    toast.success(`List “${name}” created`);
   };
 
-  const renameList = (id: string, name: string) =>
+  const renameList = (id: string, name: string) => {
     setLists((l) => l.map((x) => (x.id === id ? { ...x, name } : x)));
+    toast.success("List renamed");
+  };
 
   const deleteList = (id: string) => {
+    const removed = lists.find((x) => x.id === id);
     setLists((l) => l.filter((x) => x.id !== id));
     setContacts((cs) => cs.map((c) => ({ ...c, listIds: c.listIds.filter((x) => x !== id) })));
     if (activeView === id) setActiveView("all");
+    if (removed) toast.success(`List “${removed.name}” deleted`);
   };
 
   const createLabel = (name: string, color: LabelColor) => {
     const id = `lb-${Date.now()}`;
     setLabels((l) => [...l, { id, name, color }]);
+    toast.success(`Label “${name}” created`);
     return id;
   };
-  const updateLabel = (id: string, patch: Partial<ContactLabel>) =>
+  const updateLabel = (id: string, patch: Partial<ContactLabel>) => {
     setLabels((l) => l.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    toast.success("Label updated");
+  };
   const deleteLabel = (id: string) => {
+    const removed = labels.find((x) => x.id === id);
     setLabels((l) => l.filter((x) => x.id !== id));
     setContacts((cs) => cs.map((c) => ({ ...c, labelIds: c.labelIds.filter((x) => x !== id) })));
+    if (removed) toast.success(`Label “${removed.name}” deleted`);
   };
 
   const openContact = contacts.find((c) => c.id === openContactId) ?? null;
@@ -318,7 +279,10 @@ function ContactsPage() {
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
               </button>
-              <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+              <button
+                onClick={() => navigate({ to: "/contacts/new" })}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              >
                 <Plus className="h-3.5 w-3.5" /> New Contact
               </button>
             </div>
@@ -468,7 +432,7 @@ function ContactsPage() {
         <ManagePropertiesModal
           properties={properties}
           onClose={() => setShowManageProps(false)}
-          onChange={setProperties}
+          onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
         />
       )}
     </AppShell>
