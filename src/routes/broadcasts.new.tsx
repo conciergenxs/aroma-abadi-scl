@@ -117,18 +117,17 @@ function CreateBroadcastPage() {
   }, [lists, selectedLists, conditions]);
 
   return (
-    <AppShell
-      title="Create Broadcast"
-      subtitle="Compose, target and schedule a new campaign"
-      actions={
+    <AppShell>
+      <div className="mb-8">
         <Link
           to="/broadcasts"
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium text-foreground"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to broadcasts
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
         </Link>
-      }
-    >
+        <h1 className="text-xl font-semibold tracking-tight mt-2">Add New Broadcast</h1>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
         {/* Left — form */}
         <div className="space-y-6">
