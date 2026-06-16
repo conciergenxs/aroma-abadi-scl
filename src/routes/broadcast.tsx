@@ -3,6 +3,7 @@ import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { broadcasts, templates, initialLists, contacts } from "@/components/scl/mock-data";
 import { useState, type ReactNode } from "react";
 import { Users, MessageSquareText, FileText, Eye, Send, Check } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/broadcast")({
   head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
@@ -153,7 +154,10 @@ function BroadcastPage() {
                 {step < steps.length - 1 ? (
                   <button onClick={() => setStep((s) => s + 1)} className="rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">Continue</button>
                 ) : (
-                  <button className="rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2">
+                  <button
+                    onClick={() => toast.success("Broadcast sent successfully")}
+                    className="rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2"
+                  >
                     <Send className="h-3.5 w-3.5" /> Send broadcast
                   </button>
                 )}
