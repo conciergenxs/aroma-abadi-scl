@@ -134,7 +134,7 @@ function NewContactPage() {
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-3xl px-6 py-8 space-y-8">
+          <div className="px-4 lg:px-6 py-6 space-y-6">
             {/* Section 1: Contact Information */}
             <Section
               title="Contact Information"
@@ -170,20 +170,30 @@ function NewContactPage() {
                     options={LIFECYCLE_STAGES.map((s) => ({ value: s, label: s }))}
                   />
                 </Field>
-                <div className="md:col-span-2">
-                  <Field label="Labels">
-                    <LabelMultiSelect
-                      labels={labels}
-                      selectedIds={labelIds}
-                      onToggle={(id) =>
-                        setLabelIds((ids) =>
-                          ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-                        )
-                      }
-                      onCreate={handleCreateLabel}
-                    />
-                  </Field>
-                </div>
+                <Field label="Labels">
+                  <LabelMultiSelect
+                    labels={labels}
+                    selectedIds={labelIds}
+                    onToggle={(id) =>
+                      setLabelIds((ids) =>
+                        ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                      )
+                    }
+                    onCreate={handleCreateLabel}
+                  />
+                </Field>
+                <Field label="Add To Lists">
+                  <ListCompactSelect
+                    lists={lists}
+                    selectedIds={listIds}
+                    onToggle={(id) =>
+                      setListIds((ids) =>
+                        ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                      )
+                    }
+                    onCreate={handleCreateList}
+                  />
+                </Field>
               </FormGrid>
             </Section>
 
@@ -213,23 +223,6 @@ function NewContactPage() {
                   ))}
                 </FormGrid>
               )}
-            </Section>
-
-            {/* Section 3: Add To Lists */}
-            <Section
-              title="Add To Lists"
-              description="Add this contact to one or more contact lists."
-            >
-              <ListMultiSelect
-                lists={lists}
-                selectedIds={listIds}
-                onToggle={(id) =>
-                  setListIds((ids) =>
-                    ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-                  )
-                }
-                onCreate={handleCreateList}
-              />
             </Section>
           </div>
         </div>
