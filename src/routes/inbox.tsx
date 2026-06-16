@@ -465,3 +465,335 @@ function formatPropertyValue(v: unknown): string {
   if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
   return String(v);
 }
+
+// ============================================================
+// Conversation Header (Sleekflow-inspired)
+// ============================================================
+
+function ConversationHeader({
+  contact,
+  active,
+  collaborators,
+  contextOpen,
+  onChangeLifecycle,
+  onChangeOwner,
+  onChangeCollaborators,
+  onToggleContext,
+}: {
+  contact: Contact;
+  active: Conversation;
+  collaborators: string[];
+  contextOpen: boolean;
+  onChangeLifecycle: (next: LifecycleStage | null) => void;
+  onChangeOwner: (ownerId: string | null) => void;
+  onChangeCollaborators: (ids: string[]) => void;
+  onToggleContext: () => void;
+}) {
+  return (
+    <div className="min-h-[68px] px-5 py-3 flex items-center gap-4 border-b border-border bg-card/40 backdrop-blur">
+      {/* LEFT — contact name + lifecycle */}
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-sm font-medium shrink-0">
+          {contact.avatar}
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
+            <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
+            <ChannelDot channel={active.channel} />
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <div className="w-[180px]">
+              <LifecycleSelect
+                size="sm"
+                value={contact.lifecycleStage ?? null}
+                onChange={onChangeLifecycle}
+              />
+            </div>
+            <span className="text-[11px] text-muted-foreground truncate">
+              {active.channel === "whatsapp" ? contact.phone : contact.instagram}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* CENTER — owner / assignee */}
+      <div className="ml-auto flex items-center gap-2">
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Assigned to</span>
+        <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
+      </div>
+
+      {/* RIGHT — actions */}
+      <div className="flex items-center gap-1 text-muted-foreground">
+        <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="Star">
+          <Star className="h-4 w-4" />
+        </button>
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="More">
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
+        <button
+          onClick={onToggleContext}
+          title={contextOpen ? "Hide contact details" : "Show contact details"}
+          className={`h-9 w-9 grid place-items-center rounded transition ${
+            contextOpen ? "bg-primary/15 text-primary" : "hover:bg-white/[0.05]"
+          }`}
+        >
+          <Info className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function useOutsideClose(ref: React.RefObject<HTMLElement>, open: boolean, close: () => void) {
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) close();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, ref, close]);
+}
+
+function OwnerSelect({
+  value,
+  onChange,
+}: {
+  value: string | null;
+  onChange: (id: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+  useOutsideClose(ref, open, () => setOpen(false));
+  const current = TEAM_USERS.find((u) => u.id === value);
+  const filtered = TEAM_USERS.filter((u) =>
+    u.name.toLowerCase().includes(q.toLowerCase()),
+  );
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] text-xs"
+      >
+        {current ? (
+          <>
+            <span className="h-5 w-5 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[9px] font-medium">
+              {current.avatar}
+            </span>
+            <span className="text-foreground">{current.name}</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">Unassigned</span>
+        )}
+        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+      </button>
+      {open && (
+        <div className="absolute right-0 z-50 mt-1.5 w-64 rounded-md border border-border bg-popover shadow-xl p-2">
+          <div className="relative mb-2">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+            <input
+              autoFocus
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search users"
+              className="h-7 w-full rounded border border-border bg-card/60 pl-7 pr-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          <div className="max-h-60 overflow-y-auto">
+            {TEAMS.map((team) => {
+              const members = filtered.filter((u) => u.team === team);
+              if (members.length === 0) return null;
+              return (
+                <div key={team} className="mb-1.5">
+                  <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    {team}
+                  </div>
+                  {members.map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => {
+                        onChange(u.id);
+                        setOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-white/[0.05] ${
+                        value === u.id ? "bg-white/[0.06]" : ""
+                      }`}
+                    >
+                      <span className="h-5 w-5 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[9px]">
+                        {u.avatar}
+                      </span>
+                      <span className="flex-1 text-left">{u.name}</span>
+                      {value === u.id && <Check className="h-3.5 w-3.5 text-primary" />}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-t border-border mt-1 pt-1">
+            <button
+              type="button"
+              disabled={!value}
+              onClick={() => {
+                onChange(null);
+                setOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-white/[0.04] hover:text-foreground disabled:opacity-40"
+            >
+              <XIcon className="h-3.5 w-3.5" /> Unassign
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CollaboratorsPopover({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [draft, setDraft] = useState<string[]>(value);
+  const ref = useRef<HTMLDivElement>(null);
+  useOutsideClose(ref, open, () => setOpen(false));
+  useEffect(() => {
+    if (open) setDraft(value);
+  }, [open, value]);
+  const filtered = TEAM_USERS.filter((u) =>
+    u.name.toLowerCase().includes(q.toLowerCase()),
+  );
+  const toggle = (id: string) =>
+    setDraft((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]));
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        title="Collaborators"
+        className={`relative h-9 px-2 inline-flex items-center gap-1.5 rounded hover:bg-white/[0.05] ${
+          value.length > 0 ? "text-foreground" : ""
+        }`}
+      >
+        <Users className="h-4 w-4" />
+        {value.length > 0 && (
+          <span className="text-[10px] rounded-full bg-primary/20 text-primary px-1.5 py-0.5 leading-none">
+            {value.length}
+          </span>
+        )}
+      </button>
+      {open && (
+        <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-md border border-border bg-popover shadow-xl p-2">
+          <div className="text-[11px] font-semibold px-1 pb-2 text-foreground">Add collaborators</div>
+          <div className="relative mb-2">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+            <input
+              autoFocus
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search user"
+              className="h-7 w-full rounded border border-border bg-card/60 pl-7 pr-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          {draft.length > 0 && (
+            <div className="flex flex-wrap gap-1 px-1 pb-2">
+              {draft.map((id) => {
+                const u = TEAM_USERS.find((x) => x.id === id);
+                if (!u) return null;
+                return (
+                  <span
+                    key={id}
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-white/[0.04] pl-1 pr-1.5 py-0.5 text-[10px]"
+                  >
+                    <span className="h-4 w-4 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[8px]">
+                      {u.avatar}
+                    </span>
+                    {u.name}
+                    <button
+                      onClick={() => toggle(id)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+          <div className="max-h-56 overflow-y-auto">
+            {TEAMS.map((team) => {
+              const members = filtered.filter((u) => u.team === team);
+              if (members.length === 0) return null;
+              return (
+                <div key={team} className="mb-1.5">
+                  <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    {team}
+                  </div>
+                  {members.map((u) => {
+                    const checked = draft.includes(u.id);
+                    return (
+                      <button
+                        key={u.id}
+                        onClick={() => toggle(u.id)}
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-white/[0.05]"
+                      >
+                        <span
+                          className={`h-4 w-4 rounded border grid place-items-center ${
+                            checked
+                              ? "bg-primary border-primary text-primary-foreground"
+                              : "border-border"
+                          }`}
+                        >
+                          {checked && <Check className="h-3 w-3" />}
+                        </span>
+                        <span className="h-5 w-5 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[9px]">
+                          {u.avatar}
+                        </span>
+                        <span className="flex-1 text-left">{u.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex items-center justify-between gap-2 border-t border-border mt-2 pt-2">
+            <button
+              onClick={() => {
+                setDraft([]);
+                onChange([]);
+                setOpen(false);
+              }}
+              className="text-[11px] text-muted-foreground hover:text-foreground"
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => {
+                onChange(draft);
+                setOpen(false);
+              }}
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <UserPlus className="h-3.5 w-3.5" /> Add collaborators
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
