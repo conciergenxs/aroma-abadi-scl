@@ -46,59 +46,44 @@ export function AppShell({
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Sidebar */}
-      <aside className="hidden md:flex h-full w-60 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar">
-        <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[0_0_24px_-6px_var(--primary)]">
+      <aside className="hidden md:flex h-full w-16 shrink-0 flex-col items-center overflow-hidden border-r border-border bg-sidebar">
+        <div className="flex items-center justify-center h-16 w-full border-b border-sidebar-border">
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[0_0_24px_-6px_var(--primary)]"
+            title="SCL — Strategic Conversation Lab"
+          >
             <MessageSquareText className="h-4 w-4" />
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">SCL</div>
-            <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-              Conversation Lab
-            </div>
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 py-5 space-y-1">
-          <div className="px-3 pb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
-            Workspace
-          </div>
+        <nav className="flex-1 w-full overflow-y-auto py-4 flex flex-col items-center gap-1.5">
           {nav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
-              <Link
+              <SidebarIconLink
                 key={item.to}
                 to={item.to}
-                className={`group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                  active
-                    ? "bg-primary/15 text-foreground border border-primary/30 shadow-[inset_0_0_0_1px_oklch(1_0_0_/_4%)]"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03] border border-transparent"
-                }`}
-              >
-                <Icon
-                  className={`h-4 w-4 ${active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}
-                />
-                <span className="flex-1">{item.label}</span>
-                {item.badge ? (
-                  <span className="ml-auto rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                    {item.badge}
-                  </span>
-                ) : null}
-              </Link>
+                label={item.label}
+                active={active}
+                badge={item.badge}
+                Icon={Icon}
+              />
             );
           })}
         </nav>
 
-        <div className="m-3 rounded-lg border border-sidebar-border bg-card/60 p-3 glass">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-xs font-semibold text-primary-foreground">
+        <div className="w-full px-2 py-3 border-t border-sidebar-border flex justify-center">
+          <div className="group/avatar relative">
+            <div
+              className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-xs font-semibold text-primary-foreground ring-1 ring-border cursor-pointer"
+              aria-label="Aria Kapoor — Acme Brands · Admin"
+            >
               AK
             </div>
-            <div className="flex-1 leading-tight">
-              <div className="text-xs font-medium">Aria Kapoor</div>
-              <div className="text-[10px] text-muted-foreground">Acme Brands · Admin</div>
-            </div>
+            <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/avatar:opacity-100 group-hover/avatar:translate-x-0 z-50">
+              Aria Kapoor · Admin
+            </span>
           </div>
         </div>
       </aside>
@@ -132,6 +117,47 @@ export function AppShell({
 
         <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto" : "flex-1 p-6 overflow-y-auto"}>{children}</main>
       </div>
+    </div>
+  );
+}
+
+function SidebarIconLink({
+  to,
+  label,
+  active,
+  badge,
+  Icon,
+}: {
+  to: NavItem["to"];
+  label: string;
+  active: boolean;
+  badge?: number;
+  Icon: typeof LayoutDashboard;
+}) {
+  return (
+    <div className="group/nav relative">
+      <Link
+        to={to}
+        aria-label={label}
+        className={`relative grid h-10 w-10 place-items-center rounded-lg transition-colors ${
+          active
+            ? "bg-primary/15 text-foreground border border-primary/30"
+            : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+        }`}
+      >
+        <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
+        {badge ? (
+          <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-primary text-[9px] font-semibold text-primary-foreground grid place-items-center">
+            {badge}
+          </span>
+        ) : null}
+        {active && (
+          <span className="absolute left-0 -ml-2 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-primary" />
+        )}
+      </Link>
+      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
+        {label}
+      </span>
     </div>
   );
 }
