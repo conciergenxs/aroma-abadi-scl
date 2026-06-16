@@ -340,8 +340,14 @@ function InboxPage() {
           </div>
         </section>
 
-        {/* ============== CONTACT CONTEXT PANEL (slide-in) ============== */}
-        <ContactDrawer open={contextOpen} onClose={() => setContextOpen(false)}>
+        {/* ============== CONTACT CONTEXT PANEL (layout column) ============== */}
+        <aside
+          aria-hidden={!contextOpen}
+          className={`shrink-0 border-l border-border bg-sidebar/40 overflow-hidden transition-[width] duration-250 ease-out ${
+            contextOpen ? "w-[400px]" : "w-0"
+          }`}
+        >
+          <div className="w-[400px] h-full overflow-y-auto">
             <div className="p-5 border-b border-border text-center">
               <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
