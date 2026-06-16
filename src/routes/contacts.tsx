@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import {
   type Contact,
@@ -31,6 +31,9 @@ export const Route = createFileRoute("/contacts")({
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
 function ContactsPage() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isChildRoute = pathname !== "/contacts";
+
   const { contacts, labels, lists, properties } = useContactsStore();
   const setContacts = contactsStore.setContacts;
   const setLabels = contactsStore.setLabels;
@@ -47,6 +50,8 @@ function ContactsPage() {
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
+
+  if (isChildRoute) return <Outlet />;
 
   const visibleContacts = useMemo(() => {
     let base: Contact[];
