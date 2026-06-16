@@ -12,7 +12,7 @@ import {
 import {
   Search, Filter, Plus, MoreHorizontal, ArrowUpDown,
   Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check,
+  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -23,10 +23,60 @@ export const Route = createFileRoute("/contacts")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
+type PropertyType =
+  | "text"
+  | "multiline"
+  | "number"
+  | "email"
+  | "phone"
+  | "url"
+  | "date"
+  | "labels"
+  | "list"
+  | "select"
+  | "multiselect"
+  | "boolean";
+
+const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
+  text: "Single Line Text",
+  multiline: "Multi Line Text",
+  number: "Number",
+  email: "Email",
+  phone: "Phone",
+  url: "URL",
+  date: "Date",
+  labels: "Labels",
+  list: "List",
+  select: "Dropdown Select",
+  multiselect: "Multi Select",
+  boolean: "Boolean / Toggle",
+};
+
+type ContactProperty = {
+  id: string;
+  key: string;
+  name: string;
+  type: PropertyType;
+  visible: boolean;
+  system?: boolean;
+};
+
+const DEFAULT_PROPERTIES: ContactProperty[] = [
+  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
+  { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
+  { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
+  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
+  { id: "p-lists", key: "lists", name: "Lists", type: "multiselect", visible: true, system: true },
+  { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
+  { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
+];
+
 function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>(seedContacts);
   const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
   const [lists, setLists] = useState<ContactList[]>(initialLists);
+  const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
+  const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [selected, setSelected] = useState<string[]>([]);
   const [openContactId, setOpenContactId] = useState<string | null>(null);
@@ -120,11 +170,6 @@ function ContactsPage() {
             : `${contacts.length} contacts · ${lists.length} lists`
       }
       noPadding
-      actions={
-        <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-3.5 w-3.5" /> New contact
-        </button>
-      }
     >
       <div className="grid grid-cols-[240px_1fr] h-[calc(100vh-64px)] min-h-0">
         {/* Left sidebar: All Contacts + Lists */}
