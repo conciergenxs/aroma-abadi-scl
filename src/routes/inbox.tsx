@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell, ChannelDot, Tag } from "@/components/scl/app-shell";
-import { conversations, contacts, threadsByContact } from "@/components/scl/mock-data";
+import { AppShell, ChannelDot, LabelChip, ListChip } from "@/components/scl/app-shell";
+import { conversations, contacts, threadsByContact, initialLabels, initialLists } from "@/components/scl/mock-data";
 import { useState } from "react";
 import {
   Search, Filter, Paperclip, Smile, Send, Phone, Video, MoreHorizontal,
@@ -124,7 +124,32 @@ function InboxPage() {
             <div className="mt-3 text-sm font-medium">{contact.name}</div>
             <div className="text-[11px] text-muted-foreground">Customer since Mar 2024</div>
             <div className="mt-3 flex justify-center gap-1.5 flex-wrap">
-              {contact.tags.map((t) => (<Tag key={t.label} tone={t.tone}>{t.label}</Tag>))}
+              {contact.labelIds.map((id) => {
+                const l = initialLabels.find((x) => x.id === id);
+                return l ? <LabelChip key={id} label={l} /> : null;
+              })}
+            </div>
+          </div>
+
+          <div className="p-5 border-b border-border">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Labels</div>
+            <div className="flex flex-wrap gap-1">
+              {contact.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">No labels yet</span>}
+              {contact.labelIds.map((id) => {
+                const l = initialLabels.find((x) => x.id === id);
+                return l ? <LabelChip key={id} label={l} /> : null;
+              })}
+            </div>
+          </div>
+
+          <div className="p-5 border-b border-border">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Lists</div>
+            <div className="flex flex-wrap gap-1">
+              {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any list</span>}
+              {contact.listIds.map((id) => {
+                const l = initialLists.find((x) => x.id === id);
+                return l ? <ListChip key={id} name={l.name} /> : null;
+              })}
             </div>
           </div>
 
