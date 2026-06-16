@@ -368,6 +368,13 @@ function ContactsPage() {
           )}
 
           <div className="flex-1 min-h-0 p-5">
+            {viewMode === "kanban" ? (
+              <KanbanBoard
+                contacts={visibleContacts}
+                onMove={moveToStage}
+                onOpen={(id) => setOpenContactId(id)}
+              />
+            ) : (
             <SectionCard className="h-full flex flex-col">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
                 <table className="min-w-full text-sm">
@@ -430,6 +437,7 @@ function ContactsPage() {
                 onPerPageChange={setPerPage}
               />
             </SectionCard>
+            )}
           </div>
         </div>
       </div>
