@@ -47,14 +47,6 @@ function BroadcastListPage() {
     <AppShell
       title="Broadcasts"
       subtitle="Compose, schedule and track outbound campaigns"
-      actions={
-        <Link
-          to="/broadcast/new"
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          <Plus className="h-3.5 w-3.5" /> Create Broadcast
-        </Link>
-      }
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -69,6 +61,14 @@ function BroadcastListPage() {
         <SectionCard
           title="All broadcasts"
           description="Search, filter, and manage campaigns"
+          action={
+            <Link
+              to="/broadcasts/new"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-3.5 w-3.5" /> Create Broadcast
+            </Link>
+          }
         >
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-border">
             <div className="relative flex-1 max-w-md">

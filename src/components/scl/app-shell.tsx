@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcast" | "/templates" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -33,7 +33,7 @@ const nav: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: 12 },
   { to: "/contacts", label: "Contacts", icon: Users },
-  { to: "/broadcast", label: "Broadcast", icon: Megaphone },
+  { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

@@ -48,7 +48,7 @@ function Dashboard() {
               <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
                 Open Inbox
               </Link>
-              <Link to="/broadcast" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
+              <Link to="/broadcasts" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
                 New Broadcast
               </Link>
             </div>
