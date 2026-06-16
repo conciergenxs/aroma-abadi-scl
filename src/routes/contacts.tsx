@@ -1330,7 +1330,7 @@ function KanbanBoard({
 
   return (
     <div className="h-full overflow-auto [overscroll-behavior:contain] scl-scroll">
-      <div className="flex gap-4 min-w-max pb-2">
+      <div className="flex gap-4 min-w-max min-h-full items-stretch pb-2">
         {LIFECYCLE_STAGES.map((stage) => {
           const items = byStage.get(stage) ?? [];
           const isOver = overStage === stage;
@@ -1345,8 +1345,10 @@ function KanbanBoard({
                 setDragId(null);
                 setOverStage(null);
               }}
-              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 transition ${
-                isOver ? "border-primary/60 bg-primary/5" : "border-border"
+              className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 transition self-stretch ${
+                isOver
+                  ? "border-primary/70 bg-primary/10 ring-1 ring-primary/40"
+                  : "border-border"
               }`}
             >
               <div className="sticky top-0 z-10">
@@ -1361,29 +1363,41 @@ function KanbanBoard({
                   </span>
                 </div>
               </div>
-              <div className="p-2 space-y-2">
+              <div className="flex-1 p-2 space-y-2">
                 {items.map((c) => (
                   <div
                     key={c.id}
                     draggable
-                    onDragStart={() => setDragId(c.id)}
+                    onDragStart={(e) => { setDragId(c.id); e.dataTransfer.effectAllowed = "move"; }}
                     onDragEnd={() => { setDragId(null); setOverStage(null); }}
                     onClick={() => onOpen(c.id)}
-                    className={`group rounded-md border border-border bg-card/80 hover:bg-card hover:border-primary/40 cursor-grab active:cursor-grabbing px-3 py-2.5 transition ${
-                      dragId === c.id ? "opacity-50" : ""
+                    className={`group relative rounded-md border border-border bg-card/80 hover:bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 cursor-grab active:cursor-grabbing px-3 py-2.5 pr-8 transition ${
+                      dragId === c.id ? "opacity-60 shadow-xl ring-1 ring-primary/40 rotate-[0.5deg]" : ""
                     }`}
                   >
+                    <span
+                      aria-hidden
+                      className="absolute top-1.5 right-1.5 grid place-items-center h-5 w-5 rounded text-muted-foreground/60 group-hover:text-muted-foreground cursor-grab active:cursor-grabbing"
+                      title="Drag to move"
+                    >
+                      <GripVertical className="h-3.5 w-3.5" />
+                    </span>
                     <div className="text-sm font-medium text-foreground truncate">{c.name}</div>
                     <div className="mt-1 text-[11px] text-muted-foreground">
                       In stage: {formatInStage(c.stageEnteredAt)}
                     </div>
                   </div>
                 ))}
-                {items.length === 0 && (
-                  <div className="text-[11px] text-muted-foreground text-center py-6 border border-dashed border-border/60 rounded-md">
-                    Drop here
-                  </div>
-                )}
+                <div
+                  className={`text-[11px] text-muted-foreground text-center rounded-md border border-dashed transition ${
+                    isOver
+                      ? "border-primary/60 bg-primary/5 text-foreground py-8"
+                      : "border-border/50 py-6"
+                  } ${items.length === 0 ? "" : "opacity-0 group-[]:opacity-100"}`}
+                  style={items.length === 0 ? undefined : { display: isOver ? "block" : "none" }}
+                >
+                  Drop here
+                </div>
               </div>
             </div>
           );
