@@ -545,7 +545,11 @@ function ConversationHeader({
   );
 }
 
-function useOutsideClose(ref: React.RefObject<HTMLElement>, open: boolean, close: () => void) {
+function useOutsideClose(
+  ref: React.RefObject<HTMLElement | null>,
+  open: boolean,
+  close: () => void,
+) {
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
