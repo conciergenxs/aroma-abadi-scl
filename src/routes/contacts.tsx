@@ -102,38 +102,50 @@ function ContactsPage() {
   const bulkRemoveList = (lsId: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
   const bulkDelete = () => {
+    const count = selected.length;
     setContacts((cs) => cs.filter((c) => !selected.includes(c.id)));
     setSelected([]);
+    toast.success(`Deleted ${count} contact${count === 1 ? "" : "s"}`);
   };
 
   const createList = () => {
     const name = newListName.trim();
-    if (!name) return;
+    if (!name) { toast.error("List name is required"); return; }
     const id = `ls-${Date.now()}`;
     setLists((l) => [...l, { id, name }]);
     setNewListName("");
     setShowNewList(false);
+    toast.success(`List “${name}” created`);
   };
 
-  const renameList = (id: string, name: string) =>
+  const renameList = (id: string, name: string) => {
     setLists((l) => l.map((x) => (x.id === id ? { ...x, name } : x)));
+    toast.success("List renamed");
+  };
 
   const deleteList = (id: string) => {
+    const removed = lists.find((x) => x.id === id);
     setLists((l) => l.filter((x) => x.id !== id));
     setContacts((cs) => cs.map((c) => ({ ...c, listIds: c.listIds.filter((x) => x !== id) })));
     if (activeView === id) setActiveView("all");
+    if (removed) toast.success(`List “${removed.name}” deleted`);
   };
 
   const createLabel = (name: string, color: LabelColor) => {
     const id = `lb-${Date.now()}`;
     setLabels((l) => [...l, { id, name, color }]);
+    toast.success(`Label “${name}” created`);
     return id;
   };
-  const updateLabel = (id: string, patch: Partial<ContactLabel>) =>
+  const updateLabel = (id: string, patch: Partial<ContactLabel>) => {
     setLabels((l) => l.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    toast.success("Label updated");
+  };
   const deleteLabel = (id: string) => {
+    const removed = labels.find((x) => x.id === id);
     setLabels((l) => l.filter((x) => x.id !== id));
     setContacts((cs) => cs.map((c) => ({ ...c, labelIds: c.labelIds.filter((x) => x !== id) })));
+    if (removed) toast.success(`Label “${removed.name}” deleted`);
   };
 
   const openContact = contacts.find((c) => c.id === openContactId) ?? null;
