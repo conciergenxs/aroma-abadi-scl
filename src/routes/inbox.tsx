@@ -810,9 +810,6 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="Star">
-          <Star className="h-4 w-4" />
-        </button>
         <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
           <MoreHorizontal className="h-4 w-4" />
         </button>
