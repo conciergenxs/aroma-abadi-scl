@@ -122,9 +122,9 @@ function InboxPage() {
 
   return (
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
-      <div className="relative grid h-[calc(100vh-64px)] min-h-0 grid-cols-[240px_340px_1fr] overflow-x-hidden">
+      <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
+        <aside className="shrink-0 w-[240px] border-r border-border bg-sidebar/40 overflow-y-auto">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
@@ -202,7 +202,7 @@ function InboxPage() {
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
-        <aside className="border-r border-border flex flex-col min-h-0 bg-sidebar/20">
+        <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-sidebar/20">
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -284,7 +284,7 @@ function InboxPage() {
         </aside>
 
         {/* ============== ACTIVE CONVERSATION ============== */}
-        <section className="flex flex-col min-h-0">
+        <section className="flex-1 min-w-0 flex flex-col min-h-0">
           <ConversationHeader
             contact={contact}
             active={active}
@@ -340,8 +340,14 @@ function InboxPage() {
           </div>
         </section>
 
-        {/* ============== CONTACT CONTEXT PANEL (slide-in) ============== */}
-        <ContactDrawer open={contextOpen} onClose={() => setContextOpen(false)}>
+        {/* ============== CONTACT CONTEXT PANEL (layout column) ============== */}
+        <aside
+          aria-hidden={!contextOpen}
+          className={`shrink-0 border-l border-border bg-sidebar/40 overflow-hidden transition-[width] duration-250 ease-out ${
+            contextOpen ? "w-[400px]" : "w-0"
+          }`}
+        >
+          <div className="w-[400px] h-full overflow-y-auto">
             <div className="p-5 border-b border-border text-center">
               <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
@@ -421,52 +427,10 @@ function InboxPage() {
                 );
               })()}
             </Section>
-        </ContactDrawer>
+          </div>
+        </aside>
       </div>
     </AppShell>
-  );
-}
-
-function ContactDrawer({
-  open,
-  onClose,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    const onClick = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (ref.current && !ref.current.contains(target)) {
-        // Ignore clicks on the toggle button (data-contact-toggle)
-        const el = target as HTMLElement;
-        if (el.closest?.("[data-contact-toggle]")) return;
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onClick);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-  return (
-    <aside
-      ref={ref}
-      className="fixed right-0 top-16 bottom-0 z-40 w-[400px] max-w-[100vw] border-l border-border bg-sidebar/95 backdrop-blur overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200"
-    >
-      {children}
-    </aside>
   );
 }
 
