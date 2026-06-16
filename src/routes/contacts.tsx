@@ -83,6 +83,8 @@ function ContactsPage() {
   const [query, setQuery] = useState("");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
 
   const visibleContacts = useMemo(() => {
     let base: Contact[];
@@ -99,7 +101,13 @@ function ContactsPage() {
     );
   }, [contacts, activeView, query]);
 
-  const allSelected = selected.length > 0 && selected.length === visibleContacts.length;
+  const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
+  useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
+  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+  const pageStart = (page - 1) * perPage;
+  const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
+
+  const allSelected = selected.length > 0 && pageContacts.every((c) => selected.includes(c.id));
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
