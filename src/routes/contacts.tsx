@@ -754,3 +754,92 @@ function Dropdown({
     </div>
   );
 }
+
+function LabelPicker({
+  labels, selectedIds, onToggle, onCreate, onDelete,
+}: {
+  labels: ContactLabel[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  onCreate: (name: string, color: LabelColor) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = labels.filter((l) => l.name.toLowerCase().includes(search.toLowerCase()));
+  const exactMatch = labels.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
+  const canCreate = search.trim().length > 0 && !exactMatch;
+
+  const handleCreate = () => {
+    const name = search.trim();
+    if (!name) return;
+    const color = COLORS[(labels.length) % COLORS.length];
+    onCreate(name, color);
+    setSearch("");
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full inline-flex items-center gap-2 rounded-md border border-dashed border-border bg-card/40 px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
+      >
+        <TagIcon className="h-3 w-3" /> Add label…
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => { setOpen(false); setSearch(""); }} />
+          <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+            <div className="p-1.5 border-b border-border">
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && canCreate) handleCreate(); }}
+                placeholder="Search or create label…"
+                className="h-7 w-full rounded border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+            <div className="max-h-56 overflow-y-auto p-1">
+              {filtered.map((l) => {
+                const selected = selectedIds.includes(l.id);
+                return (
+                  <div key={l.id} className="group/row flex items-center gap-1">
+                    <button
+                      onClick={() => onToggle(l.id)}
+                      className="flex-1 text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2"
+                    >
+                      <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
+                      <span className="flex-1">{l.name}</span>
+                      {selected && <Check className="h-3 w-3 text-primary" />}
+                    </button>
+                    <button
+                      onClick={() => onDelete(l.id)}
+                      title="Delete label"
+                      className="opacity-0 group-hover/row:opacity-100 h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 mr-1"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                );
+              })}
+              {filtered.length === 0 && !canCreate && (
+                <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No labels</div>
+              )}
+              {canCreate && (
+                <button
+                  onClick={handleCreate}
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
+                >
+                  <Plus className="h-3 w-3 text-primary" />
+                  Create <span className="font-medium text-foreground">“{search.trim()}”</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
