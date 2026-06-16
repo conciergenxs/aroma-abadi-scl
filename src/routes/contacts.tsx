@@ -256,19 +256,24 @@ function ContactsPage() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search name, phone, IG handle…"
+                placeholder="Search contacts…"
                 className="h-9 w-80 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            {["All channels", "All labels", "All statuses"].map((f) => (
-              <button key={f} className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
-                {f}
-                <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
-              </button>
-            ))}
             <button className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
               <Filter className="h-3 w-3" /> Filters
             </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => setShowManageProps(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card"
+              >
+                <Settings2 className="h-3.5 w-3.5" /> Manage Properties
+              </button>
+              <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+                <Plus className="h-3.5 w-3.5" /> New Contact
+              </button>
+            </div>
           </div>
 
           {selected.length > 0 && (
