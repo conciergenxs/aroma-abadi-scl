@@ -10,9 +10,9 @@ import {
   type LabelColor,
 } from "@/components/scl/mock-data";
 import {
-  Search, Filter, Plus, MoreHorizontal, ArrowUpDown,
+  Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check,
+  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -23,10 +23,60 @@ export const Route = createFileRoute("/contacts")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
+type PropertyType =
+  | "text"
+  | "multiline"
+  | "number"
+  | "email"
+  | "phone"
+  | "url"
+  | "date"
+  | "labels"
+  | "list"
+  | "select"
+  | "multiselect"
+  | "boolean";
+
+const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
+  text: "Single Line Text",
+  multiline: "Multi Line Text",
+  number: "Number",
+  email: "Email",
+  phone: "Phone",
+  url: "URL",
+  date: "Date",
+  labels: "Labels",
+  list: "List",
+  select: "Dropdown Select",
+  multiselect: "Multi Select",
+  boolean: "Boolean / Toggle",
+};
+
+type ContactProperty = {
+  id: string;
+  key: string;
+  name: string;
+  type: PropertyType;
+  visible: boolean;
+  system?: boolean;
+};
+
+const DEFAULT_PROPERTIES: ContactProperty[] = [
+  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
+  { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
+  { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
+  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
+  { id: "p-lists", key: "lists", name: "Lists", type: "multiselect", visible: true, system: true },
+  { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
+  { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
+];
+
 function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>(seedContacts);
   const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
   const [lists, setLists] = useState<ContactList[]>(initialLists);
+  const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
+  const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [selected, setSelected] = useState<string[]>([]);
   const [openContactId, setOpenContactId] = useState<string | null>(null);
@@ -120,11 +170,6 @@ function ContactsPage() {
             : `${contacts.length} contacts · ${lists.length} lists`
       }
       noPadding
-      actions={
-        <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-3.5 w-3.5" /> New contact
-        </button>
-      }
     >
       <div className="grid grid-cols-[240px_1fr] h-[calc(100vh-64px)] min-h-0">
         {/* Left sidebar: All Contacts + Lists */}
@@ -211,19 +256,24 @@ function ContactsPage() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search name, phone, IG handle…"
+                placeholder="Search contacts…"
                 className="h-9 w-80 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            {["All channels", "All labels", "All statuses"].map((f) => (
-              <button key={f} className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
-                {f}
-                <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
-              </button>
-            ))}
             <button className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
               <Filter className="h-3 w-3" /> Filters
             </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => setShowManageProps(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card"
+              >
+                <Settings2 className="h-3.5 w-3.5" /> Manage Properties
+              </button>
+              <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+                <Plus className="h-3.5 w-3.5" /> New Contact
+              </button>
+            </div>
           </div>
 
           {selected.length > 0 && (
@@ -283,13 +333,9 @@ function ContactsPage() {
                           onChange={() => setSelected(allSelected ? [] : visibleContacts.map((c) => c.id))}
                         />
                       </th>
-                      <th className="px-4 py-3 text-left font-medium">Name</th>
-                      <th className="px-4 py-3 text-left font-medium">Phone number</th>
-                      <th className="px-4 py-3 text-left font-medium">Channel</th>
-                      <th className="px-4 py-3 text-left font-medium">Labels</th>
-                      <th className="px-4 py-3 text-left font-medium">Lists</th>
-                      <th className="px-4 py-3 text-left font-medium">Last interaction</th>
-                      <th className="px-4 py-3 text-left font-medium">Status</th>
+                      {properties.filter((p) => p.visible).map((p) => (
+                        <th key={p.id} className="px-4 py-3 text-left font-medium">{p.name}</th>
+                      ))}
                       <th className="w-10 px-4 py-3"></th>
                     </tr>
                   </thead>
@@ -304,48 +350,11 @@ function ContactsPage() {
                             onChange={() => toggle(c.id)}
                           />
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">
-                              {c.avatar}
-                            </div>
-                            <div className="leading-tight">
-                              <div className="text-sm font-medium">{c.name}</div>
-                              <div className="text-[11px] text-muted-foreground">{c.instagram ?? "—"}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground">{c.phone}</td>
-                        <td className="px-4 py-3"><ChannelDot channel={c.channel} /></td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {c.labelIds.map((id) => {
-                              const l = labelById(id);
-                              return l ? <LabelChip key={id} label={l} /> : null;
-                            })}
-                            {c.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {c.listIds.map((id) => {
-                              const l = listById(id);
-                              return l ? <ListChip key={id} name={l.name} /> : null;
-                            })}
-                            {c.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{c.lastInteraction}</td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-flex items-center gap-1.5 text-xs ${
-                            c.status === "Active" ? "text-emerald-300" : c.status === "Inactive" ? "text-muted-foreground" : "text-rose-300"
-                          }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${
-                              c.status === "Active" ? "bg-emerald-400" : c.status === "Inactive" ? "bg-muted-foreground" : "bg-rose-400"
-                            }`} />
-                            {c.status}
-                          </span>
-                        </td>
+                        {properties.filter((p) => p.visible).map((p) => (
+                          <td key={p.id} className="px-4 py-3">
+                            {renderPropertyCell(p, c, labelById, listById)}
+                          </td>
+                        ))}
                         <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                           <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
                             <MoreHorizontal className="h-4 w-4" />
@@ -355,7 +364,7 @@ function ContactsPage() {
                     ))}
                     {visibleContacts.length === 0 && (
                       <tr>
-                        <td colSpan={9} className="px-4 py-16 text-center text-xs text-muted-foreground">
+                        <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
                           No contacts match your filters.
                         </td>
@@ -390,7 +399,295 @@ function ContactsPage() {
           onDeleteLabel={(id) => deleteLabel(id)}
         />
       )}
+
+      {showManageProps && (
+        <ManagePropertiesModal
+          properties={properties}
+          onClose={() => setShowManageProps(false)}
+          onChange={setProperties}
+        />
+      )}
     </AppShell>
+  );
+}
+
+function renderPropertyCell(
+  p: ContactProperty,
+  c: Contact,
+  labelById: (id: string) => ContactLabel | undefined,
+  listById: (id: string) => ContactList | undefined,
+) {
+  switch (p.key) {
+    case "name":
+      return (
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">
+            {c.avatar}
+          </div>
+          <div className="leading-tight">
+            <div className="text-sm font-medium">{c.name}</div>
+            <div className="text-[11px] text-muted-foreground">{c.instagram ?? "—"}</div>
+          </div>
+        </div>
+      );
+    case "phone":
+      return <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>;
+    case "channel":
+      return <ChannelDot channel={c.channel} />;
+    case "labels":
+      return (
+        <div className="flex flex-wrap gap-1">
+          {c.labelIds.map((id) => {
+            const l = labelById(id);
+            return l ? <LabelChip key={id} label={l} /> : null;
+          })}
+          {c.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+        </div>
+      );
+    case "lists":
+      return (
+        <div className="flex flex-wrap gap-1">
+          {c.listIds.map((id) => {
+            const l = listById(id);
+            return l ? <ListChip key={id} name={l.name} /> : null;
+          })}
+          {c.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+        </div>
+      );
+    case "lastInteraction":
+      return <span className="text-xs text-muted-foreground">{c.lastInteraction}</span>;
+    case "status":
+      return (
+        <span className={`inline-flex items-center gap-1.5 text-xs ${
+          c.status === "Active" ? "text-emerald-300" : c.status === "Inactive" ? "text-muted-foreground" : "text-rose-300"
+        }`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${
+            c.status === "Active" ? "bg-emerald-400" : c.status === "Inactive" ? "bg-muted-foreground" : "bg-rose-400"
+          }`} />
+          {c.status}
+        </span>
+      );
+    default:
+      return <span className="text-[11px] text-muted-foreground">—</span>;
+  }
+}
+
+function ManagePropertiesModal({
+  properties, onClose, onChange,
+}: {
+  properties: ContactProperty[];
+  onClose: () => void;
+  onChange: (next: ContactProperty[]) => void;
+}) {
+  const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState<ContactProperty | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  const toggleVisible = (id: string) =>
+    onChange(properties.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
+
+  const deleteProp = (id: string) =>
+    onChange(properties.filter((p) => p.id !== id));
+
+  const upsertProp = (prop: ContactProperty) => {
+    const exists = properties.some((p) => p.id === prop.id);
+    if (exists) onChange(properties.map((p) => (p.id === prop.id ? prop : p)));
+    else onChange([...properties, prop]);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!dragId || dragId === targetId) return;
+    const next = [...properties];
+    const from = next.findIndex((p) => p.id === dragId);
+    const to = next.findIndex((p) => p.id === targetId);
+    if (from < 0 || to < 0) return;
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    onChange(next);
+    setDragId(null);
+  };
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass" onClick={(e) => e.stopPropagation()}>
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium">Manage Properties</div>
+            <div className="text-[11px] text-muted-foreground">Reorder, show/hide, edit, or add contact properties.</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setEditing(null); setShowAdd(true); }}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add Property
+            </button>
+            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className="max-h-[60vh] overflow-y-auto">
+          <table className="w-full text-sm">
+            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
+              <tr>
+                <th className="w-10 px-3 py-2"></th>
+                <th className="w-12 px-3 py-2 text-left font-medium">#</th>
+                <th className="px-3 py-2 text-left font-medium">Property Name</th>
+                <th className="px-3 py-2 text-left font-medium">Property Type</th>
+                <th className="w-24 px-3 py-2 text-left font-medium">Visible</th>
+                <th className="w-24 px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {properties.map((p, idx) => (
+                <tr
+                  key={p.id}
+                  draggable
+                  onDragStart={() => setDragId(p.id)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(p.id)}
+                  className={`hover:bg-white/[0.02] ${dragId === p.id ? "opacity-50" : ""}`}
+                >
+                  <td className="px-3 py-2 text-muted-foreground cursor-grab">
+                    <GripVertical className="h-4 w-4" />
+                  </td>
+                  <td className="px-3 py-2 text-xs text-muted-foreground">{idx + 1}</td>
+                  <td className="px-3 py-2">
+                    <div className="text-sm">{p.name}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">{p.key}{p.system ? " · default" : ""}</div>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-muted-foreground">{PROPERTY_TYPE_LABELS[p.type]}</td>
+                  <td className="px-3 py-2">
+                    <button
+                      onClick={() => toggleVisible(p.id)}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${p.visible ? "bg-primary" : "bg-white/10"}`}
+                      aria-label="toggle visible"
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${p.visible ? "translate-x-4" : "translate-x-0.5"}`} />
+                    </button>
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="inline-flex items-center gap-1">
+                      <button
+                        onClick={() => { setEditing(p); setShowAdd(true); }}
+                        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+                        title="Edit"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      {!p.system && (
+                        <button
+                          onClick={() => deleteProp(p.id)}
+                          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {showAdd && (
+        <PropertyFormModal
+          initial={editing}
+          onClose={() => { setShowAdd(false); setEditing(null); }}
+          onSave={(prop) => { upsertProp(prop); setShowAdd(false); setEditing(null); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function PropertyFormModal({
+  initial, onClose, onSave,
+}: {
+  initial: ContactProperty | null;
+  onClose: () => void;
+  onSave: (p: ContactProperty) => void;
+}) {
+  const [name, setName] = useState(initial?.name ?? "");
+  const [key, setKey] = useState(initial?.key ?? "");
+  const [type, setType] = useState<PropertyType>(initial?.type ?? "text");
+  const isEdit = !!initial;
+  const isSystem = !!initial?.system;
+
+  const autoKey = (n: string) =>
+    n.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+
+  const save = () => {
+    const finalName = name.trim();
+    if (!finalName) return;
+    const finalKey = (key.trim() || autoKey(finalName));
+    onSave({
+      id: initial?.id ?? `p-${Date.now()}`,
+      key: finalKey,
+      name: finalName,
+      type,
+      visible: initial?.visible ?? true,
+      system: initial?.system,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-[440px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass" onClick={(e) => e.stopPropagation()}>
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <div className="text-sm font-medium">{isEdit ? "Edit Property" : "Add Property"}</div>
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Property Name</label>
+            <input
+              autoFocus
+              value={name}
+              onChange={(e) => { setName(e.target.value); if (!isEdit) setKey(autoKey(e.target.value)); }}
+              placeholder="e.g. Company"
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Property Key</label>
+            <input
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
+              disabled={isSystem}
+              placeholder="company"
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:opacity-60"
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">Used internally. Lowercase, letters, numbers, underscores.</p>
+          </div>
+          <div>
+            <label className="block text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Property Type</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as PropertyType)}
+              disabled={isSystem}
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:opacity-60"
+            >
+              {Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card">Cancel</button>
+          <button onClick={save} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+            {isEdit ? "Save Changes" : "Add Property"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
