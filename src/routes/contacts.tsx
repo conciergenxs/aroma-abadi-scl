@@ -333,13 +333,9 @@ function ContactsPage() {
                           onChange={() => setSelected(allSelected ? [] : visibleContacts.map((c) => c.id))}
                         />
                       </th>
-                      <th className="px-4 py-3 text-left font-medium">Name</th>
-                      <th className="px-4 py-3 text-left font-medium">Phone number</th>
-                      <th className="px-4 py-3 text-left font-medium">Channel</th>
-                      <th className="px-4 py-3 text-left font-medium">Labels</th>
-                      <th className="px-4 py-3 text-left font-medium">Lists</th>
-                      <th className="px-4 py-3 text-left font-medium">Last interaction</th>
-                      <th className="px-4 py-3 text-left font-medium">Status</th>
+                      {properties.filter((p) => p.visible).map((p) => (
+                        <th key={p.id} className="px-4 py-3 text-left font-medium">{p.name}</th>
+                      ))}
                       <th className="w-10 px-4 py-3"></th>
                     </tr>
                   </thead>
@@ -354,48 +350,11 @@ function ContactsPage() {
                             onChange={() => toggle(c.id)}
                           />
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">
-                              {c.avatar}
-                            </div>
-                            <div className="leading-tight">
-                              <div className="text-sm font-medium">{c.name}</div>
-                              <div className="text-[11px] text-muted-foreground">{c.instagram ?? "—"}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground">{c.phone}</td>
-                        <td className="px-4 py-3"><ChannelDot channel={c.channel} /></td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {c.labelIds.map((id) => {
-                              const l = labelById(id);
-                              return l ? <LabelChip key={id} label={l} /> : null;
-                            })}
-                            {c.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {c.listIds.map((id) => {
-                              const l = listById(id);
-                              return l ? <ListChip key={id} name={l.name} /> : null;
-                            })}
-                            {c.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{c.lastInteraction}</td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-flex items-center gap-1.5 text-xs ${
-                            c.status === "Active" ? "text-emerald-300" : c.status === "Inactive" ? "text-muted-foreground" : "text-rose-300"
-                          }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${
-                              c.status === "Active" ? "bg-emerald-400" : c.status === "Inactive" ? "bg-muted-foreground" : "bg-rose-400"
-                            }`} />
-                            {c.status}
-                          </span>
-                        </td>
+                        {properties.filter((p) => p.visible).map((p) => (
+                          <td key={p.id} className="px-4 py-3">
+                            {renderPropertyCell(p, c, labelById, listById)}
+                          </td>
+                        ))}
                         <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                           <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
                             <MoreHorizontal className="h-4 w-4" />
@@ -405,7 +364,7 @@ function ContactsPage() {
                     ))}
                     {visibleContacts.length === 0 && (
                       <tr>
-                        <td colSpan={9} className="px-4 py-16 text-center text-xs text-muted-foreground">
+                        <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
                           No contacts match your filters.
                         </td>
