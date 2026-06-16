@@ -419,41 +419,51 @@ function renderPropertyCell(
 ) {
   switch (p.key) {
     case "name":
-      return (
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">
-            {c.avatar}
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-medium">{c.name}</div>
-            <div className="text-[11px] text-muted-foreground">{c.instagram ?? "—"}</div>
-          </div>
-        </div>
-      );
+      return <span className="text-sm font-medium">{c.name}</span>;
     case "phone":
       return <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>;
     case "channel":
       return <ChannelDot channel={c.channel} />;
     case "labels":
-      return (
-        <div className="flex flex-wrap gap-1">
-          {c.labelIds.map((id) => {
-            const l = labelById(id);
-            return l ? <LabelChip key={id} label={l} /> : null;
-          })}
-          {c.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-        </div>
-      );
+      return (() => {
+        const ids = c.labelIds;
+        const shown = ids.slice(0, 2);
+        const extra = ids.length - shown.length;
+        return (
+          <div className="flex items-center gap-1 flex-nowrap">
+            {shown.map((id) => {
+              const l = labelById(id);
+              return l ? <LabelChip key={id} label={l} /> : null;
+            })}
+            {extra > 0 && (
+              <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                +{extra}
+              </span>
+            )}
+            {ids.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+          </div>
+        );
+      })();
     case "lists":
-      return (
-        <div className="flex flex-wrap gap-1">
-          {c.listIds.map((id) => {
-            const l = listById(id);
-            return l ? <ListChip key={id} name={l.name} /> : null;
-          })}
-          {c.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
-        </div>
-      );
+      return (() => {
+        const ids = c.listIds;
+        const shown = ids.slice(0, 2);
+        const extra = ids.length - shown.length;
+        return (
+          <div className="flex items-center gap-1 flex-nowrap">
+            {shown.map((id) => {
+              const l = listById(id);
+              return l ? <ListChip key={id} name={l.name} /> : null;
+            })}
+            {extra > 0 && (
+              <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                +{extra}
+              </span>
+            )}
+            {ids.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+          </div>
+        );
+      })();
     case "lastInteraction":
       return <span className="text-xs text-muted-foreground">{c.lastInteraction}</span>;
     case "status":
