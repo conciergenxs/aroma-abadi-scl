@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
+import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   type Contact,
   type ContactLabel,
@@ -953,7 +954,13 @@ function ContactDrawer({
         </div>
 
         <div className="p-5 text-center border-b border-border">
-          <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+          <div className="relative mx-auto h-16 w-16">
+            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+            <ChannelIcon
+              channel={contact.channel}
+              className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
+            />
+          </div>
           <div className="mt-3 text-sm font-medium">{contact.name}</div>
           <div className="text-[11px] text-muted-foreground">{contact.phone}{contact.instagram ? ` · ${contact.instagram}` : ""}</div>
         </div>
