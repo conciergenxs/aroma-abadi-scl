@@ -1,16 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import {
-  contacts as seedContacts,
-  initialLabels,
-  initialLists,
   type Contact,
   type ContactLabel,
   type ContactList,
   type LabelColor,
-  LIFECYCLE_STAGES,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
+import {
+  contactsStore,
+  useContactsStore,
+  PROPERTY_TYPE_LABELS,
+  type ContactProperty,
+  type PropertyType,
+} from "@/components/scl/contacts-store";
+import { toast } from "sonner";
 import {
   Search, Filter, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
@@ -25,69 +29,13 @@ export const Route = createFileRoute("/contacts")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
-type PropertyType =
-  | "text"
-  | "multiline"
-  | "number"
-  | "email"
-  | "phone"
-  | "url"
-  | "date"
-  | "labels"
-  | "list"
-  | "select"
-  | "multiselect"
-  | "boolean";
-
-const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
-  text: "Single Line Text",
-  multiline: "Multi Line Text",
-  number: "Number",
-  email: "Email",
-  phone: "Phone",
-  url: "URL",
-  date: "Date",
-  labels: "Labels",
-  list: "List",
-  select: "Dropdown Select",
-  multiselect: "Multi Select",
-  boolean: "Boolean / Toggle",
-};
-
-type ContactProperty = {
-  id: string;
-  key: string;
-  name: string;
-  type: PropertyType;
-  visible: boolean;
-  system?: boolean;
-};
-
-const DEFAULT_PROPERTIES: ContactProperty[] = [
-  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
-  { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
-  { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
-  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
-  { id: "p-lists", key: "lists", name: "Lists", type: "multiselect", visible: true, system: true },
-  { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
-  { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
-];
-
 function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(() =>
-    seedContacts.map((c, idx) => {
-      if (c.lifecycleStage) return c;
-      const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
-      // Seed `stageEnteredAt` with varying durations (3..120 days back) so the
-      // Kanban "In stage: X" labels show a realistic spread of days/weeks/months.
-      const daysBack = 3 + ((idx * 11) % 118);
-      const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();
-      return { ...c, lifecycleStage: stage, stageEnteredAt: enteredAt };
-    }),
-  );
-  const [labels, setLabels] = useState<ContactLabel[]>(initialLabels);
-  const [lists, setLists] = useState<ContactList[]>(initialLists);
-  const [properties, setProperties] = useState<ContactProperty[]>(DEFAULT_PROPERTIES);
+  const { contacts, labels, lists, properties } = useContactsStore();
+  const setContacts = contactsStore.setContacts;
+  const setLabels = contactsStore.setLabels;
+  const setLists = contactsStore.setLists;
+  const setProperties = contactsStore.setProperties;
+  const navigate = useNavigate();
   const [showManageProps, setShowManageProps] = useState(false);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
