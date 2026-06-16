@@ -80,6 +80,33 @@ type State = {
   labels: ContactLabel[];
   lists: ContactList[];
   properties: ContactProperty[];
+  activities: Record<string, ContactActivity[]>;
+  remarks: Record<string, ContactRemark[]>;
+};
+
+export type ContactActivity = {
+  id: string;
+  contactId: string;
+  type:
+    | "created"
+    | "lifecycle"
+    | "label_added"
+    | "label_removed"
+    | "list_added"
+    | "list_removed"
+    | "updated"
+    | "note";
+  message: string;
+  at: string; // ISO
+};
+
+export type ContactRemark = {
+  id: string;
+  contactId: string;
+  author: string;
+  text: string;
+  createdAt: string; // ISO
+  updatedAt?: string;
 };
 
 let state: State = {
@@ -87,6 +114,8 @@ let state: State = {
   labels: initialLabels,
   lists: initialLists,
   properties: DEFAULT_PROPERTIES,
+  activities: {},
+  remarks: {},
 };
 
 const listeners = new Set<() => void>();
@@ -121,6 +150,52 @@ export const contactsStore = {
   },
   setProperties(u: Updater<ContactProperty[]>) {
     state = { ...state, properties: resolve(u, state.properties) };
+    emit();
+  },
+  addActivity(contactId: string, type: ContactActivity["type"], message: string) {
+    const entry: ContactActivity = {
+      id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      contactId,
+      type,
+      message,
+      at: new Date().toISOString(),
+    };
+    const list = state.activities[contactId] ?? [];
+    state = {
+      ...state,
+      activities: { ...state.activities, [contactId]: [entry, ...list] },
+    };
+    emit();
+  },
+  addRemark(contactId: string, author: string, text: string) {
+    const entry: ContactRemark = {
+      id: `rm-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      contactId,
+      author,
+      text,
+      createdAt: new Date().toISOString(),
+    };
+    const list = state.remarks[contactId] ?? [];
+    state = {
+      ...state,
+      remarks: { ...state.remarks, [contactId]: [entry, ...list] },
+    };
+    emit();
+  },
+  updateRemark(contactId: string, remarkId: string, text: string) {
+    const list = state.remarks[contactId] ?? [];
+    const next = list.map((r) =>
+      r.id === remarkId ? { ...r, text, updatedAt: new Date().toISOString() } : r,
+    );
+    state = { ...state, remarks: { ...state.remarks, [contactId]: next } };
+    emit();
+  },
+  deleteRemark(contactId: string, remarkId: string) {
+    const list = state.remarks[contactId] ?? [];
+    state = {
+      ...state,
+      remarks: { ...state.remarks, [contactId]: list.filter((r) => r.id !== remarkId) },
+    };
     emit();
   },
 };
