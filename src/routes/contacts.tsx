@@ -1161,3 +1161,80 @@ function LabelPicker({
     </div>
   );
 }
+
+function TablePagination({
+  total, page, perPage, totalPages, onPageChange, onPerPageChange,
+}: {
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  onPageChange: (p: number) => void;
+  onPerPageChange: (n: number) => void;
+}) {
+  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
+  const end = Math.min(page * perPage, total);
+
+  const pages: (number | "…")[] = [];
+  const add = (n: number) => { if (!pages.includes(n)) pages.push(n); };
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) add(i);
+  } else {
+    add(1);
+    if (page > 4) pages.push("…");
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) add(i);
+    if (page < totalPages - 3) pages.push("…");
+    add(totalPages);
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <span>Rows per page</span>
+        <select
+          value={perPage}
+          onChange={(e) => onPerPageChange(Number(e.target.value))}
+          className="h-7 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+        >
+          {[10, 20, 30, 40, 50].map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+        <span className="ml-2">{start}–{end} of {total}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+          disabled={page <= 1}
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="h-3 w-3" /> Prev
+        </button>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span key={`e-${i}`} className="px-1.5 text-muted-foreground">…</span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`h-7 min-w-7 px-2 rounded-md border text-xs ${
+                p === page
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border bg-card/60 hover:bg-card text-foreground"
+              }`}
+            >
+              {p}
+            </button>
+          ),
+        )}
+        <button
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Next <ChevronRight className="h-3 w-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
