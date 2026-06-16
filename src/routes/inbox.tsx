@@ -20,6 +20,7 @@ import {
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
+import { StickyNote, AtSign as AtSignIcon } from "lucide-react";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -66,6 +67,79 @@ function InboxPage() {
   const [contextOpen, setContextOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
   const [activeId, setActiveId] = useState(conversations[0].id);
+
+  // Internal note composer state
+  type InternalNote = {
+    id: string;
+    authorId: string;
+    text: string;
+    mentions: string[];
+    time: string;
+  };
+  const [composerMode, setComposerMode] = useState<"reply" | "note">("reply");
+  const [replyText, setReplyText] = useState("");
+  const [noteText, setNoteText] = useState("");
+  const [notesByConvo, setNotesByConvo] = useState<Record<string, InternalNote[]>>({});
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const noteRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const mentionMatches = useMemo(() => {
+    if (mentionQuery === null) return [];
+    const q = mentionQuery.toLowerCase();
+    return TEAM_USERS.filter((u) => u.id !== "me" && u.name.toLowerCase().includes(q)).slice(0, 6);
+  }, [mentionQuery]);
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const v = e.target.value;
+    setNoteText(v);
+    const caret = e.target.selectionStart ?? v.length;
+    const upto = v.slice(0, caret);
+    const m = upto.match(/(?:^|\s)@(\w*)$/);
+    if (m) {
+      setMentionQuery(m[1]);
+      setMentionIndex(0);
+    } else {
+      setMentionQuery(null);
+    }
+  };
+
+  const insertMention = (user: TeamUser) => {
+    const el = noteRef.current;
+    const caret = el?.selectionStart ?? noteText.length;
+    const before = noteText.slice(0, caret).replace(/@(\w*)$/, `@${user.name} `);
+    const after = noteText.slice(caret);
+    const next = before + after;
+    setNoteText(next);
+    setMentionQuery(null);
+    requestAnimationFrame(() => {
+      el?.focus();
+      const pos = before.length;
+      el?.setSelectionRange(pos, pos);
+    });
+  };
+
+  const submitNote = () => {
+    const text = noteText.trim();
+    if (!text) return;
+    const mentions = Array.from(text.matchAll(/@([A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g))
+      .map((m) => TEAM_USERS.find((u) => text.includes(`@${u.name}`))?.id)
+      .filter((x): x is string => Boolean(x));
+    const note: InternalNote = {
+      id: `n_${Date.now()}`,
+      authorId: "me",
+      text,
+      mentions: Array.from(new Set(mentions)),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setNotesByConvo((prev) => ({ ...prev, [active.id]: [...(prev[active.id] ?? []), note] }));
+    setNoteText("");
+  };
+
+  const exitNoteMode = () => {
+    setComposerMode("reply");
+    setMentionQuery(null);
+  };
 
   const visible = useMemo(() => {
     return conversations.filter((c) => {
@@ -409,25 +483,148 @@ function InboxPage() {
             {thread.length === 0 && (
               <div className="text-center text-xs text-muted-foreground py-10">No messages yet.</div>
             )}
+            {(notesByConvo[active.id] ?? []).map((n) => (
+              <div key={n.id} className="flex justify-center">
+                <div className="max-w-[80%] w-full rounded-xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold">
+                    <StickyNote className="h-3 w-3" />
+                    Internal note
+                    <span className="ml-auto text-muted-foreground/70 normal-case tracking-normal">
+                      {userLabel(n.authorId)} · {n.time}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                    {n.text.split(/(@[A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g).map((part, i) =>
+                      part.startsWith("@") && TEAM_USERS.some((u) => `@${u.name}` === part.trim()) ? (
+                        <span key={i} className="rounded bg-amber-300/20 text-amber-200 px-1 font-medium">{part}</span>
+                      ) : (
+                        <span key={i}>{part}</span>
+                      ),
+                    )}
+                  </p>
+                  {n.mentions.length > 0 && (
+                    <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground/80">
+                      <AtSignIcon className="h-3 w-3" />
+                      Notified {n.mentions.map((id) => userLabel(id)).join(", ")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="border-t border-border/60 bg-background/30 px-6 py-4">
-            <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
-              <textarea
-                rows={2}
-                placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`}
-                className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
-              />
-              <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
-                <div className="flex items-center gap-0.5 text-muted-foreground/70">
-                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
-                  <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Smile className="h-4 w-4" /></button>
-                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground">Use template <ChevronDown className="h-3 w-3" /></button>
-                  <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/80">Internal note</button>
+            {composerMode === "reply" ? (
+              <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
+                <textarea
+                  rows={2}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`}
+                  className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
+                />
+                <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
+                  <div className="flex items-center gap-0.5 text-muted-foreground/70">
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground"><Smile className="h-4 w-4" /></button>
+                    <button className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-white/[0.05] hover:text-foreground">Use template <ChevronDown className="h-3 w-3" /></button>
+                    <button
+                      onClick={() => { setComposerMode("note"); requestAnimationFrame(() => noteRef.current?.focus()); }}
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90"
+                    >
+                      <StickyNote className="h-3.5 w-3.5" /> Internal note
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setReplyText("")}
+                    className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"
+                  >
+                    <Send className="h-3.5 w-3.5" /> Send
+                  </button>
                 </div>
-                <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"><Send className="h-3.5 w-3.5" /> Send</button>
               </div>
-            </div>
+            ) : (
+              <div className="relative rounded-xl border-2 border-amber-300/40 bg-amber-300/[0.08] shadow-sm focus-within:border-amber-300/70 focus-within:ring-2 focus-within:ring-amber-300/20 transition">
+                <div className="flex items-center gap-2 px-4 pt-2.5 pb-1.5 border-b border-amber-300/20">
+                  <StickyNote className="h-3.5 w-3.5 text-amber-300" />
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">Internal note</span>
+                  <span className="text-[11px] text-muted-foreground/70">Only visible to teammates · use @ to mention</span>
+                  <button
+                    onClick={exitNoteMode}
+                    aria-label="Exit internal note"
+                    className="ml-auto h-6 w-6 grid place-items-center rounded hover:bg-amber-300/15 text-amber-300/80 hover:text-amber-200"
+                  >
+                    <XIcon className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <textarea
+                  ref={noteRef}
+                  rows={2}
+                  value={noteText}
+                  onChange={handleNoteChange}
+                  onKeyDown={(e) => {
+                    if (mentionQuery !== null && mentionMatches.length > 0) {
+                      if (e.key === "ArrowDown") { e.preventDefault(); setMentionIndex((i) => (i + 1) % mentionMatches.length); return; }
+                      if (e.key === "ArrowUp") { e.preventDefault(); setMentionIndex((i) => (i - 1 + mentionMatches.length) % mentionMatches.length); return; }
+                      if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); insertMention(mentionMatches[mentionIndex]); return; }
+                      if (e.key === "Escape") { e.preventDefault(); setMentionQuery(null); return; }
+                    }
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitNote(); }
+                  }}
+                  placeholder="Add a note for your team. Type @ to mention someone…"
+                  className="w-full bg-transparent resize-none px-4 pt-3 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-amber-200/40 text-foreground"
+                />
+                {mentionQuery !== null && mentionMatches.length > 0 && (
+                  <div className="absolute left-4 bottom-full mb-2 w-[280px] rounded-lg border border-border bg-popover shadow-lg overflow-hidden z-20">
+                    <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground/70 border-b border-border/60">Mention teammate</div>
+                    {mentionMatches.map((u, i) => (
+                      <button
+                        key={u.id}
+                        onMouseDown={(e) => { e.preventDefault(); insertMention(u); }}
+                        onMouseEnter={() => setMentionIndex(i)}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm ${i === mentionIndex ? "bg-accent" : "hover:bg-accent/60"}`}
+                      >
+                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[11px] font-medium">{u.avatar}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[13px] text-foreground truncate">{u.name}</div>
+                          <div className="text-[11px] text-muted-foreground truncate">{u.team}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between px-2 py-1.5 border-t border-amber-300/20">
+                  <div className="flex items-center gap-0.5 text-amber-300/70">
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"><Paperclip className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"><Smile className="h-4 w-4" /></button>
+                    <button
+                      onClick={() => {
+                        const el = noteRef.current;
+                        const caret = el?.selectionStart ?? noteText.length;
+                        const next = noteText.slice(0, caret) + "@" + noteText.slice(caret);
+                        setNoteText(next);
+                        setMentionQuery("");
+                        requestAnimationFrame(() => {
+                          el?.focus();
+                          const pos = caret + 1;
+                          el?.setSelectionRange(pos, pos);
+                        });
+                      }}
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"
+                    >
+                      <AtSignIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={submitNote}
+                    disabled={!noteText.trim()}
+                    className="inline-flex items-center gap-2 rounded-md bg-amber-400 px-4 py-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <StickyNote className="h-3.5 w-3.5" /> Add note
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
