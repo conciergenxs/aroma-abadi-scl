@@ -348,9 +348,7 @@ function InboxPage() {
               <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
               {contact.lifecycleStage && (
-                <div className="mt-2 inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] ${" "}"
-                  style={{}}
-                >
+                <div className="mt-2">
                   <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${STAGE_COLORS[contact.lifecycleStage].badge}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`} />
                     {contact.lifecycleStage}
