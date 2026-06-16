@@ -388,6 +388,11 @@ function ContactsPage() {
             const has = openContact.listIds.includes(lsId);
             updateContact(openContact.id, { listIds: has ? openContact.listIds.filter((x) => x !== lsId) : [...openContact.listIds, lsId] });
           }}
+          onCreateLabel={(name, color) => {
+            const id = createLabel(name, color);
+            updateContact(openContact.id, { labelIds: [...openContact.labelIds, id] });
+          }}
+          onDeleteLabel={(id) => deleteLabel(id)}
         />
       )}
     </AppShell>
