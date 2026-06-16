@@ -521,10 +521,12 @@ function ConversationHeader({
   onToggleContext: () => void;
 }) {
   return (
-    <div className="relative z-30 min-h-[60px] px-5 py-2.5 flex items-center gap-6 border-b border-border bg-card/60 backdrop-blur">
+    <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
-      <div className="flex items-center gap-4 min-w-0">
-        <span className="text-lg font-semibold truncate text-foreground">{contact.name}</span>
+      <div className="flex items-center gap-5 min-w-0">
+        <span className="text-[20px] font-semibold leading-tight truncate text-foreground tracking-tight">
+          {contact.name}
+        </span>
         <LifecycleSelect
           size="sm"
           value={contact.lifecycleStage ?? null}
@@ -534,17 +536,17 @@ function ConversationHeader({
 
       {/* CENTER — owner / assignee */}
       <div className="ml-auto flex items-center gap-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Assigned to</span>
+        <span className="text-[11px] text-muted-foreground/70">Assigned to</span>
         <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
       </div>
 
       {/* RIGHT — actions */}
-      <div className="flex items-center gap-1 text-muted-foreground">
+      <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="Star">
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="Star">
           <Star className="h-4 w-4" />
         </button>
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05]" title="More">
+        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
           <MoreHorizontal className="h-4 w-4" />
         </button>
         <button
