@@ -60,7 +60,7 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
   // Custom defaults used in the "Additional Information" section of New Contact.
   { id: "p-pic", key: "pic", name: "PIC", type: "text", visible: false },
   { id: "p-user-type", key: "user_type", name: "User Type", type: "select", visible: false, options: ["Customer", "Lead", "Partner", "Employee"] },
-  { id: "p-service-type", key: "service_type", name: "Service Type", type: "select", visible: false, options: ["Consulting", "Subscription", "One-off", "Support"] },
+  { id: "p-service-type", key: "service_type", name: "Service Type", type: "select", visible: false, options: ["Consulting", "One-off", "Support"] },
   { id: "p-business-type", key: "business_type", name: "Business Type", type: "select", visible: false, options: ["B2B", "B2C", "B2B2C"] },
   { id: "p-business-industry", key: "business_industry", name: "Business Industry", type: "select", visible: false, options: ["Retail", "Finance", "Tech", "Hospitality", "Education", "Healthcare", "Other"] },
   { id: "p-company-name", key: "company_name", name: "Company Name", type: "text", visible: false },
