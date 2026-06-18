@@ -2094,3 +2094,114 @@ function ForwardModal({
     </div>
   );
 }
+
+// ============================================================
+// Conversation message search
+// ============================================================
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightedText({ text, query, isActive }: { text: string; query: string; isActive?: boolean }) {
+  const q = query.trim();
+  if (!q) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${escapeRegExp(q)})`, "gi"));
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.toLowerCase() === q.toLowerCase() ? (
+          <mark
+            key={i}
+            className={
+              isActive
+                ? "rounded px-0.5 bg-amber-300 text-black font-medium"
+                : "rounded px-0.5 bg-amber-300/30 text-inherit"
+            }
+          >
+            {p}
+          </mark>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+function SearchStrip({
+  query,
+  setQuery,
+  total,
+  index,
+  onPrev,
+  onNext,
+  onClose,
+}: {
+  query: string;
+  setQuery: (v: string) => void;
+  total: number;
+  index: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  const hasQuery = query.trim().length > 0;
+  return (
+    <div className="relative z-20 flex items-center gap-2 px-7 py-2.5 border-b border-border/60 bg-background/40 backdrop-blur">
+      <div className="relative flex-1 min-w-0">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <input
+          ref={inputRef}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") { e.preventDefault(); onClose(); }
+            else if (e.key === "Enter") {
+              e.preventDefault();
+              if (e.shiftKey) onPrev(); else onNext();
+            }
+          }}
+          placeholder="Search messages..."
+          className="h-9 w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+        />
+      </div>
+      {hasQuery && (
+        total > 0 ? (
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[11px] text-muted-foreground tabular-nums">
+              {index + 1} of {total}
+            </span>
+            <button
+              onClick={onPrev}
+              aria-label="Previous match"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onNext}
+              aria-label="Next match"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <span className="text-[11px] text-muted-foreground shrink-0">No messages found</span>
+        )
+      )}
+      <button
+        onClick={onClose}
+        aria-label="Close search"
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] shrink-0"
+      >
+        <XIcon className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
