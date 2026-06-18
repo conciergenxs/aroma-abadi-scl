@@ -481,10 +481,72 @@ function InboxPage() {
                   {t}
                 </button>
               ))}
-              <button className="ml-auto h-7 w-7 grid place-items-center rounded border border-border text-muted-foreground hover:text-foreground">
-                <Filter className="h-3.5 w-3.5" />
-              </button>
+              <div className="ml-auto relative">
+                <button
+                  ref={filterBtnRef}
+                  onClick={() => setFiltersOpen((v) => !v)}
+                  aria-label="Filter conversations"
+                  className={`h-7 inline-flex items-center gap-1 px-1.5 rounded border transition ${
+                    filtersOpen || activeFilterCount > 0
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  {activeFilterCount > 0 && (
+                    <span className="text-[10px] font-semibold tabular-nums">{activeFilterCount}</span>
+                  )}
+                </button>
+                {filtersOpen && (
+                  <FilterPanel
+                    panelRef={filterPanelRef}
+                    category={filterCategory}
+                    setCategory={setFilterCategory}
+                    filters={filters}
+                    setFilters={setFilters}
+                    activeCount={activeFilterCount}
+                    search={filterSearch}
+                    setSearch={setFilterSearch}
+                    availableChannels={availableChannels}
+                    channelLabel={channelLabel}
+                    labels={labels}
+                    ownerOptions={ownerOptions}
+                    onClose={() => setFiltersOpen(false)}
+                    onClear={() => setFilters(emptyFilters)}
+                    toggleIn={toggleIn}
+                  />
+                )}
+              </div>
             </div>
+            {activeFilterCount > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {filters.channels.map((c) => (
+                  <FilterChip key={`ch-${c}`} label={channelLabel(c)} onRemove={() => setFilters((f) => ({ ...f, channels: f.channels.filter((x) => x !== c) }))} />
+                ))}
+                {filters.labels.map((id) => {
+                  const lb = labelById.get(id);
+                  if (!lb) return null;
+                  return (
+                    <FilterChip key={`lb-${id}`} label={lb.name} onRemove={() => setFilters((f) => ({ ...f, labels: f.labels.filter((x) => x !== id) }))} />
+                  );
+                })}
+                {filters.owners.map((id) => (
+                  <FilterChip key={`ow-${id}`} label={ownerLabel(id)} onRemove={() => setFilters((f) => ({ ...f, owners: f.owners.filter((x) => x !== id) }))} />
+                ))}
+                {filters.stages.map((s) => (
+                  <FilterChip key={`st-${s}`} label={s} onRemove={() => setFilters((f) => ({ ...f, stages: f.stages.filter((x) => x !== s) }))} />
+                ))}
+                {filters.unreadOnly && (
+                  <FilterChip label="Unread only" onRemove={() => setFilters((f) => ({ ...f, unreadOnly: false }))} />
+                )}
+                <button
+                  onClick={() => setFilters(emptyFilters)}
+                  className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">
