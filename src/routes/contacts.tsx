@@ -407,7 +407,8 @@ function ContactsPage() {
                       <tr>
                         <td colSpan={properties.filter((p) => p.visible).length + 1} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
-                          No contacts match your filters.
+                          <div className="font-medium text-foreground">No contacts found</div>
+                          <div className="mt-1">Try selecting another channel or clearing filters.</div>
                         </td>
                       </tr>
                     )}
