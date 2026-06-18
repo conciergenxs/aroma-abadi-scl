@@ -25,8 +25,6 @@ import {
   AlertTriangle,
   Check,
   Copy,
-  ExternalLink,
-  MessageSquare,
   Calendar,
   User,
   Clock,
