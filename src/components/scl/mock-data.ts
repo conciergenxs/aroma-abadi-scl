@@ -219,14 +219,49 @@ export type Broadcast = {
   clicks: number;
   sentAt: string;
   status: "Sent" | "Scheduled" | "Draft";
+  /** Channel connection id (matches `connectedChannels[i].id`). */
+  channelId?: string;
+  /** List ids selected for this broadcast (matches `initialLists[i].id`). */
+  listIds?: string[];
+  /** Total audience contact count. */
+  totalAudience?: number;
+  sendMode?: "now" | "schedule";
+  scheduleDate?: string;
+  scheduleTime?: string;
+  createdBy?: string;
+  createdAt?: string;
+  contentMode?: "template" | "manual";
+  templateId?: string;
+  body?: string;
+  footer?: string;
+  buttons?: { label: string; kind: "quick_reply" | "url" | "phone" }[];
+  /** Reply / failure counts surfaced by Analytics tab. */
+  replied?: number;
+  failed?: number;
 };
 
 export const broadcasts: Broadcast[] = [
-  { id: "b1", name: "Winter Drop — VIP Early Access", channel: "whatsapp", audience: "VIP · 12,408", reach: 12408, delivered: 12380, read: 11244, clicks: 4128, sentAt: "Today · 09:00", status: "Sent" },
-  { id: "b2", name: "Studio Launch — Madrid", channel: "instagram", audience: "EU Leads · 4,910", reach: 4910, delivered: 4880, read: 4112, clicks: 1342, sentAt: "Yesterday", status: "Sent" },
-  { id: "b3", name: "Black Friday Teaser", channel: "whatsapp", audience: "All Contacts · 84,221", reach: 84221, delivered: 0, read: 0, clicks: 0, sentAt: "Fri · 08:00", status: "Scheduled" },
-  { id: "b4", name: "Enterprise Holiday Gifting", channel: "whatsapp", audience: "Enterprise · 612", reach: 612, delivered: 610, read: 588, clicks: 244, sentAt: "3d ago", status: "Sent" },
-  { id: "b5", name: "Loyalty Tier Refresh", channel: "instagram", audience: "Active Customers · 22,114", reach: 22114, delivered: 0, read: 0, clicks: 0, sentAt: "—", status: "Draft" },
+  { id: "b1", name: "Winter Drop — VIP Early Access", channel: "whatsapp", audience: "VIP · 12,408", reach: 12408, delivered: 12380, read: 11244, clicks: 4128, sentAt: "Today · 09:00", status: "Sent",
+    channelId: "wa-main", listIds: ["ls-vip", "ls-launch"], totalAudience: 12408, sendMode: "now", createdBy: "Priya Tan", createdAt: "Today · 08:42",
+    contentMode: "template", templateId: "tp1", body: "Hi {{name}}, our Winter '26 drop just landed. VIPs get 24-hour early access — tap to shop.", footer: "Reply STOP to opt out.",
+    buttons: [{ label: "Shop now", kind: "url" }], replied: 824, failed: 28 },
+  { id: "b2", name: "Studio Launch — Madrid", channel: "instagram", audience: "EU Leads · 4,910", reach: 4910, delivered: 4880, read: 4112, clicks: 1342, sentAt: "Yesterday", status: "Sent",
+    channelId: "ig-brand", listIds: ["ls-launch"], totalAudience: 4910, sendMode: "now", createdBy: "Mateo Rivera", createdAt: "Yesterday · 17:10",
+    contentMode: "template", templateId: "tp3", body: "Hey {{name}}, our Madrid studio is open. Drop by this weekend for the launch party.", footer: "@scl.studio",
+    buttons: [{ label: "RSVP", kind: "url" }], replied: 312, failed: 30 },
+  { id: "b3", name: "Black Friday Teaser", channel: "whatsapp", audience: "All Contacts · 84,221", reach: 84221, delivered: 0, read: 0, clicks: 0, sentAt: "Fri · 08:00", status: "Scheduled",
+    channelId: "wa-main", listIds: ["ls-community", "ls-launch"], totalAudience: 84221, sendMode: "schedule", scheduleDate: "2026-06-26", scheduleTime: "08:00",
+    createdBy: "Priya Tan", createdAt: "2d ago",
+    contentMode: "manual", body: "Hi {{name}} — Black Friday starts Friday at 8am. Early access for community members.", footer: "Reply STOP to opt out.",
+    buttons: [{ label: "Preview drop", kind: "url" }], replied: 0, failed: 0 },
+  { id: "b4", name: "Enterprise Holiday Gifting", channel: "whatsapp", audience: "Enterprise · 612", reach: 612, delivered: 610, read: 588, clicks: 244, sentAt: "3d ago", status: "Sent",
+    channelId: "wa-eu", listIds: ["ls-vip"], totalAudience: 612, sendMode: "now", createdBy: "Noor Khalid", createdAt: "3d ago",
+    contentMode: "template", templateId: "tp2", body: "Hi {{name}}, your enterprise gifting catalog is ready. Bulk pricing attached.",
+    buttons: [{ label: "Download catalog", kind: "url" }], replied: 48, failed: 2 },
+  { id: "b5", name: "Loyalty Tier Refresh", channel: "instagram", audience: "Active Customers · 22,114", reach: 22114, delivered: 0, read: 0, clicks: 0, sentAt: "—", status: "Draft",
+    channelId: "ig-community", listIds: ["ls-community"], totalAudience: 22114, sendMode: "now", createdBy: "Rin Mori", createdAt: "30m ago",
+    contentMode: "template", templateId: "tp6", body: "Congrats {{name}}! You've unlocked a new loyalty tier. Here's what's new for you.",
+    buttons: [{ label: "View perks", kind: "url" }], replied: 0, failed: 0 },
 ];
 
 // Charts
