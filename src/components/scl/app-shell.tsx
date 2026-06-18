@@ -1,6 +1,6 @@
 import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
   Inbox,
@@ -22,9 +22,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { InviteModal } from "@/components/scl/invite-modal";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/invite-members" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -38,7 +39,6 @@ const topNav: NavItem[] = [
   { to: "/templates", label: "Templates", icon: FileText },
 ];
 const bottomNav: NavItem[] = [
-  { to: "/invite-members", label: "Invite Members", icon: UserPlus },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -56,6 +56,7 @@ export function AppShell({
   noPadding?: boolean;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
@@ -87,6 +88,11 @@ export function AppShell({
           })}
         </nav>
         <nav className="w-full pb-5 pt-2 flex flex-col items-center gap-2.5 border-t border-sidebar-border">
+          <SidebarIconButton
+            label="Invite Members"
+            Icon={UserPlus}
+            onClick={() => setInviteOpen(true)}
+          />
           {bottomNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
@@ -158,6 +164,7 @@ export function AppShell({
 
         <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto" : "flex-1 p-6 overflow-y-auto"}>{children}</main>
       </div>
+      {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
     </div>
   );
 }
@@ -196,6 +203,32 @@ function SidebarIconLink({
           <span className="absolute left-0 -ml-2 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-primary" />
         )}
       </Link>
+      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function SidebarIconButton({
+  label,
+  Icon,
+  onClick,
+}: {
+  label: string;
+  Icon: typeof LayoutDashboard;
+  onClick: () => void;
+}) {
+  return (
+    <div className="group/nav relative">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+      >
+        <Icon className="h-[18px] w-[18px]" />
+      </button>
       <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
         {label}
       </span>
