@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as ChannelsRouteImport } from './routes/channels'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as BroadcastsIndexRouteImport } from './routes/broadcasts.index'
@@ -34,6 +35,11 @@ const InboxRoute = InboxRouteImport.update({
 const ContactsRoute = ContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChannelsRoute = ChannelsRouteImport.update({
+  id: '/channels',
+  path: '/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -79,6 +85,7 @@ const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChannelsRoute: typeof ChannelsRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
   SettingsRoute: typeof SettingsRoute
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/contacts'
       fullPath: '/contacts'
       preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channels': {
+      id: '/channels'
+      path: '/channels'
+      fullPath: '/channels'
+      preLoaderRoute: typeof ChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -269,6 +289,7 @@ const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChannelsRoute: ChannelsRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   SettingsRoute: SettingsRoute,
