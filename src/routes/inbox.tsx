@@ -270,6 +270,18 @@ function InboxPage() {
       if (tab === "Unread" && c.unread === 0) return false;
       if (tab === "Assigned" && !ct.ownerId) return false;
       if (tab === "Unassigned" && ct.ownerId) return false;
+      // Inbox filter panel
+      if (filters.channels.length && !filters.channels.includes(c.channel)) return false;
+      if (filters.labels.length && !filters.labels.some((id) => ct.labelIds.includes(id))) return false;
+      if (filters.owners.length) {
+        const matchUnassigned = filters.owners.includes("__unassigned") && !ct.ownerId;
+        const matchUser = ct.ownerId ? filters.owners.includes(ct.ownerId) : false;
+        if (!matchUnassigned && !matchUser) return false;
+      }
+      if (filters.stages.length) {
+        if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
+      }
+      if (filters.unreadOnly && c.unread === 0) return false;
       // Search
       if (search) {
         const q = search.toLowerCase();
@@ -277,7 +289,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
