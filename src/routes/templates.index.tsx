@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/templates")({
+export const Route = createFileRoute("/templates/")({
   head: () => ({ meta: [{ title: "Message Templates — SCL" }] }),
   component: TemplatesPage,
 });
