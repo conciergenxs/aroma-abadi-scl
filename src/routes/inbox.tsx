@@ -1274,6 +1274,8 @@ function ConversationHeader({
   isUnread,
   onTogglePin,
   onToggleRead,
+  searchOpen,
+  onToggleSearch,
 }: {
   contact: Contact;
   active: Conversation;
@@ -1287,6 +1289,8 @@ function ConversationHeader({
   isUnread: boolean;
   onTogglePin: () => void;
   onToggleRead: () => void;
+  searchOpen: boolean;
+  onToggleSearch: () => void;
 }) {
   const moreRef = useRef<HTMLButtonElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -1313,6 +1317,15 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
+        <button
+          onClick={onToggleSearch}
+          title="Search messages"
+          className={`h-9 w-9 grid place-items-center rounded transition ${
+            searchOpen ? "bg-primary/15 text-primary" : "hover:bg-white/[0.05] hover:text-foreground"
+          }`}
+        >
+          <Search className="h-4 w-4" />
+        </button>
         <button
           onClick={onToggleContext}
           data-contact-toggle
