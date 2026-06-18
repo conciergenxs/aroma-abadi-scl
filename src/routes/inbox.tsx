@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { AppShell, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
-import { conversations, threadsByContact } from "@/components/scl/mock-data";
+import { conversations, threadsByContact, connectedChannels } from "@/components/scl/mock-data";
 import {
   STAGE_COLORS,
   LIFECYCLE_STAGES,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
-import type { Contact } from "@/components/scl/mock-data";
+import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
