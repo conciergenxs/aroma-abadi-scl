@@ -50,6 +50,7 @@ function ContactsPage() {
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [channelFilter, setChannelFilter] = useState<string>("all");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
@@ -58,11 +59,27 @@ function ContactsPage() {
 
   if (isChildRoute) return <Outlet />;
 
+  const channelOptions = useMemo(() => {
+    const connected = connectedChannels.filter((c) => c.status === "connected");
+    const unique = Array.from(new Set(connected.map((c) => c.channel)));
+    return [
+      { value: "all", label: "All Channels" },
+      ...unique.map((ch) => ({
+        value: ch,
+        label: ch === "whatsapp" ? "WhatsApp" : "Instagram",
+        icon: <ChannelIcon channel={ch as Channel} className="h-4 w-4" />,
+      })),
+    ];
+  }, []);
+
   const visibleContacts = useMemo(() => {
     let base: Contact[];
     if (activeView === "all") base = contacts;
     else if (activeView === "mine") base = contacts.filter((c) => c.ownerId === "me");
     else base = contacts.filter((c) => c.listIds.includes(activeView));
+    if (channelFilter !== "all") {
+      base = base.filter((c) => c.channel === channelFilter);
+    }
     if (!query.trim()) return base;
     const q = query.toLowerCase();
     return base.filter(
@@ -71,11 +88,11 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeView, query]);
+  }, [contacts, activeView, channelFilter, query]);
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
-  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+  useEffect(() => { setPage(1); }, [activeView, channelFilter, query, perPage]);
   const pageStart = (page - 1) * perPage;
   const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
 
