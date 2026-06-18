@@ -9,7 +9,11 @@ import {
   TEMPLATE_GROUP_DOT,
   TEMPLATE_GROUP_BADGE,
 } from "@/components/scl/templates-store";
-import type { Template, TemplateGroup } from "@/components/scl/mock-data";
+import {
+  TEMPLATE_LANGUAGES,
+  type Template,
+  type TemplateGroup,
+} from "@/components/scl/mock-data";
 import {
   Plus,
   Search,
@@ -20,6 +24,15 @@ import {
   Trash2,
   AlertTriangle,
   Check,
+  Copy,
+  ExternalLink,
+  MessageSquare,
+  Calendar,
+  User,
+  Clock,
+  CheckCircle2,
+  Hourglass,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 
