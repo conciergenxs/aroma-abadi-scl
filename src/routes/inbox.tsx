@@ -16,7 +16,7 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
+  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal, ChevronUp,
   Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
@@ -219,6 +219,11 @@ function InboxPage() {
   const [forwardSearch, setForwardSearch] = useState("");
   const [forwardContacts, setForwardContacts] = useState<Set<string>>(new Set());
 
+  // ============== MESSAGE SEARCH ==============
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchActiveIdx, setSearchActiveIdx] = useState(0);
+
   const exitForwardMode = () => {
     setForwardMode(false);
     setSelectedMsgIds(new Set());
@@ -377,6 +382,34 @@ function InboxPage() {
     () => [...thread, ...(sentByConvo[active.id] ?? [])],
     [thread, sentByConvo, active.id],
   );
+
+  // Search matches across messages + notes of the active conversation.
+  const searchMatches = useMemo(() => {
+    if (!searchOpen) return [] as string[];
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [] as string[];
+    const ids: string[] = [];
+    for (const m of combinedThread) {
+      if (m.text.toLowerCase().includes(q)) ids.push(m.id);
+    }
+    for (const n of notesByConvo[active.id] ?? []) {
+      if (n.text.toLowerCase().includes(q)) ids.push(n.id);
+    }
+    return ids;
+  }, [searchOpen, searchQuery, combinedThread, notesByConvo, active.id]);
+  const activeMatchId = searchMatches[searchActiveIdx];
+  useEffect(() => { setSearchActiveIdx(0); }, [searchQuery, active.id]);
+  useEffect(() => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  }, [active.id]);
+  useEffect(() => {
+    if (!activeMatchId) return;
+    const el = document.querySelector(`[data-search-id="${activeMatchId}"]`) as HTMLElement | null;
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [activeMatchId]);
+  const highlightQuery = searchOpen ? searchQuery.trim() : "";
+
   const senderName = (m: Message) => (m.from === "me" ? "You" : contact.name);
   const replyTarget = replyTargets[active.id];
   const startReply = (m: Message) => {
@@ -789,7 +822,29 @@ function InboxPage() {
             onToggleRead={() =>
               isUnread(active) ? markRead(active.id) : markUnread(active.id)
             }
+            searchOpen={searchOpen}
+            onToggleSearch={() => setSearchOpen((v) => !v)}
           />
+
+          {searchOpen && (
+            <SearchStrip
+              query={searchQuery}
+              setQuery={setSearchQuery}
+              total={searchMatches.length}
+              index={searchActiveIdx}
+              onPrev={() =>
+                setSearchActiveIdx((i) =>
+                  searchMatches.length === 0 ? 0 : (i - 1 + searchMatches.length) % searchMatches.length,
+                )
+              }
+              onNext={() =>
+                setSearchActiveIdx((i) =>
+                  searchMatches.length === 0 ? 0 : (i + 1) % searchMatches.length,
+                )
+              }
+              onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+            />
+          )}
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
             <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">Today</div>
@@ -805,14 +860,16 @@ function InboxPage() {
                 onCopy={() => copyToClipboard(m.text)}
                 onCopyToBox={() => copyToComposer(m.text)}
                 onForward={() => startForward(m)}
+                highlightQuery={highlightQuery}
+                isActiveMatch={activeMatchId === m.id}
               />
             ))}
             {combinedThread.length === 0 && (
               <div className="text-center text-xs text-muted-foreground py-10">No messages yet.</div>
             )}
             {(notesByConvo[active.id] ?? []).map((n) => (
-              <div key={n.id} className="flex justify-center">
-                <div className="max-w-[80%] w-full rounded-xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 shadow-sm">
+              <div key={n.id} data-search-id={n.id} className="flex justify-center">
+                <div className={`max-w-[80%] w-full rounded-xl border px-4 py-3 shadow-sm transition ${activeMatchId === n.id ? "border-amber-300/70 bg-amber-300/[0.12] ring-2 ring-amber-300/40" : "border-amber-300/30 bg-amber-300/[0.06]"}`}>
                   <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold">
                     <StickyNote className="h-3 w-3" />
                     Internal note
@@ -821,12 +878,16 @@ function InboxPage() {
                     </span>
                   </div>
                   <p className="mt-1.5 text-[14px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
-                    {n.text.split(/(@[A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g).map((part, i) =>
-                      part.startsWith("@") && TEAM_USERS.some((u) => `@${u.name}` === part.trim()) ? (
-                        <span key={i} className="rounded bg-amber-300/20 text-amber-200 px-1 font-medium">{part}</span>
-                      ) : (
-                        <span key={i}>{part}</span>
-                      ),
+                    {highlightQuery ? (
+                      <HighlightedText text={n.text} query={highlightQuery} isActive={activeMatchId === n.id} />
+                    ) : (
+                      n.text.split(/(@[A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g).map((part, i) =>
+                        part.startsWith("@") && TEAM_USERS.some((u) => `@${u.name}` === part.trim()) ? (
+                          <span key={i} className="rounded bg-amber-300/20 text-amber-200 px-1 font-medium">{part}</span>
+                        ) : (
+                          <span key={i}>{part}</span>
+                        ),
+                      )
                     )}
                   </p>
                   {n.mentions.length > 0 && (
@@ -1213,6 +1274,8 @@ function ConversationHeader({
   isUnread,
   onTogglePin,
   onToggleRead,
+  searchOpen,
+  onToggleSearch,
 }: {
   contact: Contact;
   active: Conversation;
@@ -1226,6 +1289,8 @@ function ConversationHeader({
   isUnread: boolean;
   onTogglePin: () => void;
   onToggleRead: () => void;
+  searchOpen: boolean;
+  onToggleSearch: () => void;
 }) {
   const moreRef = useRef<HTMLButtonElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -1252,6 +1317,15 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
+        <button
+          onClick={onToggleSearch}
+          title="Search messages"
+          className={`h-9 w-9 grid place-items-center rounded transition ${
+            searchOpen ? "bg-primary/15 text-primary" : "hover:bg-white/[0.05] hover:text-foreground"
+          }`}
+        >
+          <Search className="h-4 w-4" />
+        </button>
         <button
           onClick={onToggleContext}
           data-contact-toggle
@@ -1787,6 +1861,8 @@ function MessageRow({
   onCopy,
   onCopyToBox,
   onForward,
+  highlightQuery,
+  isActiveMatch,
 }: {
   message: SentMsg;
   senderName: string;
@@ -1797,6 +1873,8 @@ function MessageRow({
   onCopy: () => void;
   onCopyToBox: () => void;
   onForward: () => void;
+  highlightQuery: string;
+  isActiveMatch: boolean;
 }) {
   const m = message;
   const isMe = m.from === "me";
@@ -1806,11 +1884,11 @@ function MessageRow({
   const bubble = (
     <div className="group relative max-w-[64%]">
       <div
-        className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm ${
+        className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm transition ${
           isMe
             ? "bg-primary text-primary-foreground rounded-br-sm"
             : "bg-card/90 border border-border/60 text-foreground rounded-bl-sm"
-        }`}
+        } ${isActiveMatch ? "ring-2 ring-amber-300/70" : ""}`}
       >
         {m.replyTo && (
           <div
@@ -1833,7 +1911,13 @@ function MessageRow({
             <ForwardIcon className="h-3 w-3" /> Forwarded
           </div>
         )}
-        <p className="whitespace-pre-wrap">{m.text}</p>
+        <p className="whitespace-pre-wrap">
+          {highlightQuery ? (
+            <HighlightedText text={m.text} query={highlightQuery} isActive={isActiveMatch} />
+          ) : (
+            m.text
+          )}
+        </p>
         <div className={`mt-1.5 flex items-center gap-1 text-[10px] ${isMe ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}>
           <span>{m.time}</span>
           {isMe && (m.status === "read" ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
@@ -1869,7 +1953,7 @@ function MessageRow({
   );
 
   return (
-    <div className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
+    <div data-search-id={m.id} className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
       {forwardMode && !isMe && (
         <ForwardCheckbox checked={selected} onChange={onToggleSelect} />
       )}
@@ -2007,6 +2091,117 @@ function ForwardModal({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Conversation message search
+// ============================================================
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightedText({ text, query, isActive }: { text: string; query: string; isActive?: boolean }) {
+  const q = query.trim();
+  if (!q) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${escapeRegExp(q)})`, "gi"));
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.toLowerCase() === q.toLowerCase() ? (
+          <mark
+            key={i}
+            className={
+              isActive
+                ? "rounded px-0.5 bg-amber-300 text-black font-medium"
+                : "rounded px-0.5 bg-amber-300/30 text-inherit"
+            }
+          >
+            {p}
+          </mark>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+function SearchStrip({
+  query,
+  setQuery,
+  total,
+  index,
+  onPrev,
+  onNext,
+  onClose,
+}: {
+  query: string;
+  setQuery: (v: string) => void;
+  total: number;
+  index: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  const hasQuery = query.trim().length > 0;
+  return (
+    <div className="relative z-20 flex items-center gap-2 px-7 py-2.5 border-b border-border/60 bg-background/40 backdrop-blur">
+      <div className="relative flex-1 min-w-0">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <input
+          ref={inputRef}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") { e.preventDefault(); onClose(); }
+            else if (e.key === "Enter") {
+              e.preventDefault();
+              if (e.shiftKey) onPrev(); else onNext();
+            }
+          }}
+          placeholder="Search messages..."
+          className="h-9 w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+        />
+      </div>
+      {hasQuery && (
+        total > 0 ? (
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[11px] text-muted-foreground tabular-nums">
+              {index + 1} of {total}
+            </span>
+            <button
+              onClick={onPrev}
+              aria-label="Previous match"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onNext}
+              aria-label="Next match"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <span className="text-[11px] text-muted-foreground shrink-0">No messages found</span>
+        )
+      )}
+      <button
+        onClick={onClose}
+        aria-label="Close search"
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] shrink-0"
+      >
+        <XIcon className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
