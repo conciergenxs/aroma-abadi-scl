@@ -20,7 +20,6 @@ import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
-import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -77,11 +76,6 @@ const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
   path: '/broadcasts/$broadcastId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
-  id: '/broadcasts/$broadcastId',
-  path: '/broadcasts/$broadcastId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,7 +84,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
-  '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/templates/new': typeof TemplatesNewRoute
@@ -104,7 +97,6 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
-  '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/templates/new': typeof TemplatesNewRoute
@@ -119,7 +111,6 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
-  '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/templates/new': typeof TemplatesNewRoute
@@ -135,7 +126,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
-    | '/broadcasts/$broadcastId'
     | '/contacts/$contactId'
     | '/contacts/new'
     | '/templates/new'
@@ -149,7 +139,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
-    | '/broadcasts/$broadcastId'
     | '/contacts/$contactId'
     | '/contacts/new'
     | '/templates/new'
@@ -163,7 +152,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
-    | '/broadcasts/$broadcastId'
     | '/contacts/$contactId'
     | '/contacts/new'
     | '/templates/new'
@@ -178,7 +166,6 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
-  BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
   BroadcastsIndexRoute: typeof BroadcastsIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
@@ -263,13 +250,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastsBroadcastIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/broadcasts/$broadcastId': {
-      id: '/broadcasts/$broadcastId'
-      path: '/broadcasts/$broadcastId'
-      fullPath: '/broadcasts/$broadcastId'
-      preLoaderRoute: typeof BroadcastsBroadcastIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -294,7 +274,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
-  BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   TemplatesNewRoute: TemplatesNewRoute,
   BroadcastsIndexRoute: BroadcastsIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
