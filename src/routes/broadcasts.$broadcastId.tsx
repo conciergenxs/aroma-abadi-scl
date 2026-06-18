@@ -1,11 +1,10 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useBroadcastsStore } from "@/components/scl/broadcasts-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { useTemplatesStore, TEMPLATE_GROUP_BADGE } from "@/components/scl/templates-store";
 import { connectedChannels, type Broadcast } from "@/components/scl/mock-data";
-import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
@@ -752,6 +751,3 @@ function ListPickerModal({
     </div>
   );
 }
-
-/* Suppress unused import warning when ConfirmDialog later wired in */
-void ConfirmDialog;
