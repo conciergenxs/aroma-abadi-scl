@@ -412,6 +412,14 @@ function ContactsPage() {
           onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
         />
       )}
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={bulkDelete}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
     </AppShell>
   );
 }
