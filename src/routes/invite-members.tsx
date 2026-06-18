@@ -5,14 +5,12 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { AI_AGENTS, type AIAgent } from "@/components/scl/agents";
 import {
   Bot,
-  Check,
   Copy as CopyIcon,
   Link as LinkIcon,
   Mail,
   Plus,
   RefreshCw,
   Search,
-  Shield,
   Trash2,
   User as UserIcon,
   UserPlus,
