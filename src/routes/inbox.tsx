@@ -21,7 +21,12 @@ import {
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
-import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon } from "lucide-react";
+import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon, Reply as ReplyIcon, Copy as CopyIcon, ClipboardPaste, Forward as ForwardIcon, CornerDownRight } from "lucide-react";
+import { toast } from "sonner";
+import type { Message } from "@/components/scl/mock-data";
+
+type ReplyRef = { id: string; text: string; fromName: string; time: string };
+type SentMsg = Message & { replyTo?: ReplyRef; forwardedFrom?: string };
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
