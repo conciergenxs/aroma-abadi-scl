@@ -357,6 +357,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<TemplateGroup | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -470,10 +471,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => {
-                        templatesStore.deleteGroup(g.id);
-                        toast.success("Group deleted");
-                      }}
+                      onClick={() => setPendingDelete(g)}
                       className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -499,6 +497,28 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </div>
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete Group"
+        description={
+          pendingDelete ? (
+            <>
+              Are you sure you want to delete the group{" "}
+              <span className="text-foreground font-medium">
+                {pendingDelete.name}
+              </span>
+              ? Templates in this group will be unassigned. This action cannot be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          templatesStore.deleteGroup(pendingDelete.id);
+          toast.success("Group deleted");
+        }}
+        onClose={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
