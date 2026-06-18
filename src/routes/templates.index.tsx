@@ -403,6 +403,51 @@ function TemplateDetailModal({
 }) {
   const { groups } = useTemplatesStore();
   const group: TemplateGroup | undefined = groups.find((g) => g.id === template.groupId);
+
+  const languageLabel =
+    TEMPLATE_LANGUAGES.find((l) => l.code === template.language)?.name ??
+    template.language ??
+    "English (US)";
+
+  const channelLabel = template.channel === "whatsapp" ? "WhatsApp" : "Instagram";
+
+  // Derived metadata (deterministic placeholders so the demo feels complete)
+  const reviewers = ["Priya Tan", "Marcus Lee", "Saanvi Patel", "Joaquín Ruiz"];
+  const seed = template.id
+    .split("")
+    .reduce((a, c) => a + c.charCodeAt(0), 0);
+  const reviewer = reviewers[seed % reviewers.length];
+  const creator = reviewers[(seed + 1) % reviewers.length];
+  const createdAt = "Nov 12, 2025";
+  const reviewDate = template.status === "Approved" || template.status === "Rejected"
+    ? "Nov 14, 2025"
+    : null;
+
+  const variables = useMemo(() => {
+    const found = new Set<string>();
+    const re = /\{\{([^}]+)\}\}/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(template.body)) !== null) found.add(m[1].trim());
+    return Array.from(found);
+  }, [template.body]);
+
+  const variableHints: Record<string, string> = {
+    "1": "Customer Name",
+    "2": "Order Number",
+    "3": "Tracking URL",
+    "4": "Agent Name",
+    name: "Contact Name",
+  };
+
+  const primaryAction =
+    template.status === "Approved"
+      ? { label: "Edit", icon: <Pencil className="h-3.5 w-3.5" /> }
+      : template.status === "Draft"
+      ? { label: "Continue Editing", icon: <Pencil className="h-3.5 w-3.5" /> }
+      : template.status === "Rejected"
+      ? { label: "Edit & Resubmit", icon: <Pencil className="h-3.5 w-3.5" /> }
+      : { label: "View Submission", icon: <FileText className="h-3.5 w-3.5" /> };
+
   return (
     <div
       className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4"
@@ -410,58 +455,337 @@ function TemplateDetailModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+        className="w-[90vw] max-w-[1280px] h-[85vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
       >
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <div className="flex items-center gap-2 min-w-0">
-            <ChannelIcon channel={template.channel} className="h-4 w-4" />
-            <h2 className="text-sm font-semibold truncate">{template.name}</h2>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-border">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold tracking-tight truncate">
+              {template.name}
+            </h2>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[template.status]}`}
+              >
+                {template.status === "Rejected" && <AlertTriangle className="h-2.5 w-2.5" />}
+                {template.status === "Approved" && <CheckCircle2 className="h-2.5 w-2.5" />}
+                {template.status === "Pending" && <Hourglass className="h-2.5 w-2.5" />}
+                {template.status}
+              </span>
+              <span
+                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${categoryTone[template.category]}`}
+              >
+                {template.category}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium">
+                <ChannelIcon channel={template.channel} className="h-3 w-3" />
+                {channelLabel}
+              </span>
+              {group && (
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`} />
+                  {group.name}
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-5 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${categoryTone[template.category]}`}>
-              {template.category}
-            </span>
-            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[template.status]}`}>
-              {template.status === "Rejected" && <AlertTriangle className="h-2.5 w-2.5" />}
-              {template.status}
-            </span>
-            {group && (
-              <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`} />
-                {group.name}
-              </span>
+
+        {/* Body */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_360px]">
+          {/* Left — details (scrollable) */}
+          <div className="overflow-y-auto p-6 space-y-6 border-r border-border">
+            {/* Template Information */}
+            <DetailSection title="Template Information">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ReadField label="Template Name" value={template.name} />
+                <ReadField label="Category" value={template.category} />
+                <ReadField label="Language" value={languageLabel} />
+                <ReadField
+                  label="Template Group"
+                  value={
+                    group ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`} />
+                        {group.name}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )
+                  }
+                />
+                <ReadField label="Header Type" value="None" />
+                <ReadField
+                  label="Channel"
+                  value={
+                    <span className="inline-flex items-center gap-1.5">
+                      <ChannelIcon channel={template.channel} className="h-3.5 w-3.5" />
+                      {channelLabel}
+                    </span>
+                  }
+                />
+                <ReadField label="Status" value={template.status} />
+                <ReadField
+                  label="Created At"
+                  value={
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar className="h-3 w-3 text-muted-foreground" />
+                      {createdAt}
+                    </span>
+                  }
+                />
+                <ReadField
+                  label="Last Updated"
+                  value={
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      {template.updated}
+                    </span>
+                  }
+                />
+                <ReadField
+                  label="Created By"
+                  value={
+                    <span className="inline-flex items-center gap-1.5">
+                      <User className="h-3 w-3 text-muted-foreground" />
+                      {creator}
+                    </span>
+                  }
+                />
+              </div>
+            </DetailSection>
+
+            {/* Message Content */}
+            <DetailSection title="Message Content">
+              <ReadField label="Header Content" value={<span className="text-muted-foreground">No header configured</span>} />
+              <ReadField
+                label="Body Message"
+                value={
+                  <div className="rounded-md border border-border bg-background/40 p-3 text-[13px] whitespace-pre-wrap leading-relaxed">
+                    {renderBodyWithVars(template.body)}
+                  </div>
+                }
+                block
+              />
+              <ReadField label="Footer Message" value={<span className="text-muted-foreground">No footer configured</span>} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ReadField label="Button Type" value="None" />
+                <ReadField label="Buttons" value={<span className="text-muted-foreground">—</span>} />
+              </div>
+            </DetailSection>
+
+            {/* Variables */}
+            {variables.length > 0 && (
+              <DetailSection title="Variables Used">
+                <div className="rounded-md border border-border bg-background/40 divide-y divide-border">
+                  {variables.map((v) => (
+                    <div key={v} className="flex items-center gap-3 px-3 py-2 text-[12px]">
+                      <span className="font-mono rounded bg-primary/15 text-primary px-1.5 py-0.5 text-[11px]">
+                        {`{{${v}}}`}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {variableHints[v] ?? "Unmapped variable"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </DetailSection>
             )}
+
+            {/* Approval Details */}
+            <DetailSection title="Approval Details">
+              {template.status === "Approved" && (
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-[12px] font-semibold text-emerald-300">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Approved
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-[12px]">
+                    <ApprovalRow label="Review date" value={reviewDate ?? "—"} />
+                    <ApprovalRow label="Reviewer" value={reviewer} />
+                  </div>
+                </div>
+              )}
+              {template.status === "Rejected" && (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-[12px] font-semibold text-red-300">
+                    <AlertTriangle className="h-3.5 w-3.5" /> Rejected
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-[12px]">
+                    <ApprovalRow label="Rejected date" value={reviewDate ?? "—"} />
+                    <ApprovalRow label="Reviewer" value={reviewer} />
+                  </div>
+                  {template.rejectionReason && (
+                    <div>
+                      <div className="text-[11px] font-medium text-red-300/80 mb-1">
+                        Rejection reason
+                      </div>
+                      <p className="text-[12px] text-red-200/90 leading-relaxed">
+                        {template.rejectionReason}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {template.status === "Pending" && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 flex items-center gap-2 text-[12px] text-amber-200/90">
+                  <Hourglass className="h-3.5 w-3.5 text-amber-300" />
+                  Waiting for review by the channel provider.
+                </div>
+              )}
+              {template.status === "Draft" && (
+                <div className="rounded-lg border border-border bg-background/40 p-4 flex items-center gap-2 text-[12px] text-muted-foreground">
+                  <FileText className="h-3.5 w-3.5" />
+                  Not submitted yet — finish editing and submit for review.
+                </div>
+              )}
+            </DetailSection>
           </div>
 
-          {template.status === "Rejected" && template.rejectionReason && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-red-300 mb-1">
-                <AlertTriangle className="h-3 w-3" /> Rejection reason
+          {/* Right — sticky preview */}
+          <div className="hidden lg:block bg-background/30">
+            <div className="sticky top-0 p-5">
+              <div className="rounded-xl border border-border bg-card/60 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <ChannelIcon channel={template.channel} className="h-4 w-4" />
+                    <span className="text-sm font-medium">Live preview</span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {channelLabel}
+                  </span>
+                </div>
+                <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
+                  <DetailPhoneFrame channel={template.channel} senderName="Your business">
+                    <div className="whitespace-pre-wrap break-words">
+                      {renderBodyWithVars(template.body)}
+                    </div>
+                  </DetailPhoneFrame>
+                </div>
               </div>
-              <p className="text-[12px] text-red-200/90 leading-relaxed">
-                {template.rejectionReason}
-              </p>
             </div>
-          )}
+          </div>
+        </div>
 
-          <div>
-            <div className="text-[11px] font-medium text-muted-foreground mb-1">
-              Message body
+        {/* Footer actions */}
+        <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-border">
+          <button
+            onClick={() => toast.success("Template duplicated")}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            <Copy className="h-3.5 w-3.5" /> Duplicate
+          </button>
+          <button
+            onClick={() => toast.info(`${primaryAction.label} — coming soon`)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            {primaryAction.icon} {primaryAction.label}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        {title}
+      </h3>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function ReadField({
+  label,
+  value,
+  block,
+}: {
+  label: string;
+  value: React.ReactNode;
+  block?: boolean;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="text-[11px] font-medium text-muted-foreground">{label}</div>
+      {block ? (
+        value
+      ) : (
+        <div className="h-9 rounded-md border border-border bg-background/40 px-3 flex items-center text-[13px]">
+          {value}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ApprovalRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
+        {label}
+      </div>
+      <div className="text-[12px]">{value}</div>
+    </div>
+  );
+}
+
+function DetailPhoneFrame({
+  channel,
+  senderName,
+  children,
+}: {
+  channel: "whatsapp" | "instagram";
+  senderName: string;
+  children: React.ReactNode;
+}) {
+  const isWa = channel === "whatsapp";
+  return (
+    <div className="mx-auto w-full max-w-[280px] rounded-[28px] border border-border bg-background/60 p-3 shadow-xl">
+      <div className="rounded-[20px] bg-background overflow-hidden">
+        <div className="px-3 py-2 border-b border-border flex items-center gap-2">
+          <ChannelIcon channel={channel} className="h-5 w-5" />
+          <div className="min-w-0">
+            <div className="text-[12px] font-semibold truncate">{senderName}</div>
+            <div className="text-[10px] text-muted-foreground">
+              {isWa ? "WhatsApp Business" : "Instagram DM"}
             </div>
-            <div className="rounded-lg border border-border bg-background/40 p-3 text-[13px] whitespace-pre-wrap leading-relaxed">
-              {template.body}
-            </div>
+          </div>
+        </div>
+        <div className="min-h-[200px] p-3 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]">
+          <div
+            className={`max-w-[90%] rounded-2xl rounded-bl-sm px-3 py-2 text-[12px] leading-relaxed ${
+              isWa
+                ? "bg-emerald-500/15 border border-emerald-500/20 text-foreground"
+                : "bg-pink-500/10 border border-pink-500/20 text-foreground"
+            }`}
+          >
+            {children}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function renderBodyWithVars(body: string) {
+  const parts = body.split(/(\{\{[^}]+\}\})/g);
+  return parts.map((p, i) =>
+    /^\{\{[^}]+\}\}$/.test(p) ? (
+      <span key={i} className="rounded bg-primary/15 px-1 py-0.5 text-primary font-medium">
+        {p}
+      </span>
+    ) : (
+      <span key={i}>{p}</span>
+    ),
   );
 }
