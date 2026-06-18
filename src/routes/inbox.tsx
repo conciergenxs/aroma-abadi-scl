@@ -583,17 +583,19 @@ function InboxPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {visible.length === 0 && (
+            {sortedVisible.length === 0 && (
               <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
                 No conversations match the current filters.
               </div>
             )}
-            {visible.map((c) => {
+            {sortedVisible.map((c) => {
               const ct = contacts.find((x) => x.id === c.contactId);
               if (!ct) return null;
               const sel = c.id === activeId;
               const stageColor = ct.lifecycleStage ? STAGE_COLORS[ct.lifecycleStage] : null;
-              const unread = c.unread > 0;
+              const unread = isUnread(c);
+              const count = unreadCount(c);
+              const pinned = isPinned(c.id);
               return (
                 <button
                   key={c.id}
@@ -618,19 +620,26 @@ function InboxPage() {
                       <span className={`text-[15px] truncate ${unread ? "font-semibold text-foreground" : "font-medium text-foreground/90"}`}>
                         {ct.name}
                       </span>
-                      <span className={`text-[10px] shrink-0 tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
-                        {c.time}
+                      <span className="flex items-center gap-1 shrink-0">
+                        <span className={`text-[10px] tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
+                          {c.time}
+                        </span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-1">
                       <p className={`text-[12px] truncate leading-snug ${unread ? "text-foreground/85" : "text-muted-foreground/70"}`}>
                         {c.preview}
                       </p>
-                      {unread && (
-                        <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground shrink-0">
-                          {c.unread}
-                        </span>
-                      )}
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        {pinned && (
+                          <Pin className="h-3 w-3 text-primary fill-primary/80" aria-label="Pinned" />
+                        )}
+                        {unread && (
+                          <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground">
+                            {count}
+                          </span>
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {stageColor && ct.lifecycleStage && (
