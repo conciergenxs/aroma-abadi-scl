@@ -3,6 +3,7 @@ import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { SclSelect } from "@/components/scl/scl-select";
 import {
+  type Contact,
   type Channel,
   type ContactLabel,
   type ContactList,
