@@ -22,7 +22,6 @@ import {
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
 import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon } from "lucide-react";
-import { FloatingMenu } from "@/components/scl/floating-menu";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
