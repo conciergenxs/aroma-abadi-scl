@@ -124,10 +124,16 @@ function ContactDetailPage() {
   };
 
   const updateField = <K extends keyof Contact>(key: K, value: Contact[K], label: string) => {
+    const prev = contact[key];
+    if (sameValue(prev, value)) return;
     contactsStore.setContacts((cs) =>
       cs.map((c) => (c.id === contact.id ? { ...c, [key]: value } : c)),
     );
-    contactsStore.addActivity(contact.id, "updated", `Updated ${label}`);
+    contactsStore.addActivity(
+      contact.id,
+      "updated",
+      `Updated ${label}\n${displayValue(prev)} → ${displayValue(value)}`,
+    );
     toast.success("Contact updated");
   };
 
@@ -197,6 +203,8 @@ function ContactDetailPage() {
   };
 
   const setCustomProperty = (key: string, value: unknown, displayName: string) => {
+    const prev = contact.customFields?.[key];
+    if (sameValue(prev, value)) return;
     contactsStore.setContacts((cs) =>
       cs.map((c) =>
         c.id === contact.id
@@ -204,7 +212,11 @@ function ContactDetailPage() {
           : c,
       ),
     );
-    contactsStore.addActivity(contact.id, "updated", `Updated ${displayName}`);
+    contactsStore.addActivity(
+      contact.id,
+      "updated",
+      `Updated ${displayName}\n${displayValue(prev)} → ${displayValue(value)}`,
+    );
     toast.success("Contact updated");
   };
 
@@ -512,14 +524,10 @@ function RightPanel({
             />
           </FieldRow>
           <FieldRow icon={<MessageCircle className="h-3.5 w-3.5" />} label="Channel">
-            <select
-              value={contact.channel}
-              onChange={(e) => onUpdateField("channel", e.target.value as Contact["channel"], "channel")}
-              className="h-7 w-full rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
-            >
-              <option value="whatsapp">WhatsApp</option>
-              <option value="instagram">Instagram</option>
-            </select>
+            <div className="inline-flex items-center gap-1.5 px-2 py-1 text-xs text-foreground/90">
+              <ChannelIcon channel={contact.channel} className="h-3.5 w-3.5" />
+              <span className="capitalize">{contact.channel}</span>
+            </div>
           </FieldRow>
           <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Owner">
             <InlineText
