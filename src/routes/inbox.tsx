@@ -1137,6 +1137,25 @@ function InboxPage() {
         onClose={() => setTemplatePickerOpen(false)}
         onInsert={insertTemplate}
       />
+      {forwardModalOpen && (
+        <ForwardModal
+          count={selectedMsgIds.size}
+          contacts={contacts}
+          search={forwardSearch}
+          setSearch={setForwardSearch}
+          selected={forwardContacts}
+          toggle={(id) =>
+            setForwardContacts((prev) => {
+              const n = new Set(prev);
+              if (n.has(id)) n.delete(id);
+              else n.add(id);
+              return n;
+            })
+          }
+          onClose={() => setForwardModalOpen(false)}
+          onConfirm={confirmForward}
+        />
+      )}
     </AppShell>
   );
 }
