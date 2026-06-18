@@ -17,22 +17,25 @@ import {
 import {
   Plus,
   Search,
-  MoreHorizontal,
   Tags,
   X,
   Pencil,
   Trash2,
   AlertTriangle,
   Check,
-  Copy,
   Calendar,
   User,
   Clock,
   CheckCircle2,
   Hourglass,
   FileText,
+  Star,
+  FolderPlus,
+  FolderMinus,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+
 
 export const Route = createFileRoute("/templates/")({
   head: () => ({ meta: [{ title: "Message Templates — SCL" }] }),
@@ -76,13 +79,17 @@ const STATUS_OPTIONS = [
 ];
 
 function TemplatesPage() {
-  const { templates, groups } = useTemplatesStore();
+  const { templates, groups, starred } = useTemplatesStore();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [channel, setChannel] = useState("all");
   const [status, setStatus] = useState("all");
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [detail, setDetail] = useState<Template | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [addGroupOpen, setAddGroupOpen] = useState(false);
+  const [removeGroupOpen, setRemoveGroupOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,6 +101,16 @@ function TemplatesPage() {
       return true;
     });
   }, [templates, query, category, channel, status]);
+
+  // Keep selection in sync with what's currently visible.
+  const visibleIds = useMemo(() => filtered.map((t) => t.id), [filtered]);
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const toggleAll = () =>
+    setSelected(allVisibleSelected ? [] : visibleIds);
+  const clearSelection = () => setSelected([]);
 
   return (
     <AppShell>
@@ -153,28 +170,101 @@ function TemplatesPage() {
             </div>
           </div>
 
+          {selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
+              <span className="text-muted-foreground">
+                {selected.length} selected
+              </span>
+              <button
+                onClick={() => setAddGroupOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              >
+                <FolderPlus className="h-3 w-3" /> Add to Group
+              </button>
+              <button
+                onClick={() => setRemoveGroupOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              >
+                <FolderMinus className="h-3 w-3" /> Remove from Group
+              </button>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3" /> Delete Templates
+              </button>
+              <button
+                onClick={clearSelection}
+                className="ml-auto text-muted-foreground hover:text-foreground"
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      className="accent-[oklch(0.62_0.17_40)]"
+                      checked={allVisibleSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all"
+                    />
+                  </th>
+                  <th className="w-8 px-2 py-3"></th>
                   <th className="px-4 py-3 text-left font-medium">Template name</th>
                   <th className="px-4 py-3 text-left font-medium">Group</th>
                   <th className="px-4 py-3 text-left font-medium">Category</th>
                   <th className="px-4 py-3 text-left font-medium">Channel</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
                   <th className="px-4 py-3 text-left font-medium">Last updated</th>
-                  <th className="w-10 px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.map((t) => {
                   const group = groups.find((g) => g.id === t.groupId);
+                  const isStar = starred.includes(t.id);
+                  const isSel = selected.includes(t.id);
                   return (
                     <tr
                       key={t.id}
                       onClick={() => setDetail(t)}
                       className="hover:bg-white/[0.02] cursor-pointer"
                     >
+                      <td
+                        className="px-4 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          className="accent-[oklch(0.62_0.17_40)]"
+                          checked={isSel}
+                          onChange={() => toggleOne(t.id)}
+                          aria-label={`Select ${t.name}`}
+                        />
+                      </td>
+                      <td
+                        className="px-2 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => templatesStore.toggleStar(t.id)}
+                          className={`h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] ${
+                            isStar
+                              ? "text-amber-300"
+                              : "text-muted-foreground/50 hover:text-amber-300"
+                          }`}
+                          aria-label={isStar ? "Unstar template" : "Star template"}
+                        >
+                          <Star
+                            className={`h-3.5 w-3.5 ${isStar ? "fill-current" : ""}`}
+                          />
+                        </button>
+                      </td>
                       <td className="px-4 py-3">
                         <div className="text-sm font-medium">{t.name}</div>
                         <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-md">
@@ -210,20 +300,12 @@ function TemplatesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{t.updated}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
-                      </td>
                     </tr>
                   );
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-xs text-muted-foreground">
+                    <td colSpan={8} className="px-4 py-10 text-center text-xs text-muted-foreground">
                       No templates match your filters.
                     </td>
                   </tr>
@@ -236,6 +318,35 @@ function TemplatesPage() {
 
       {groupsOpen && <ManageGroupsModal onClose={() => setGroupsOpen(false)} />}
       {detail && <TemplateDetailModal template={detail} onClose={() => setDetail(null)} />}
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title={`Delete ${selected.length} template${selected.length === 1 ? "" : "s"}?`}
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => {
+          const count = selected.length;
+          templatesStore.deleteTemplates(selected);
+          setSelected([]);
+          toast.success(`Deleted ${count} template${count === 1 ? "" : "s"}`);
+        }}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
+
+      {addGroupOpen && (
+        <GroupPickerModal
+          mode="add"
+          selectedIds={selected}
+          onClose={() => setAddGroupOpen(false)}
+        />
+      )}
+      {removeGroupOpen && (
+        <GroupPickerModal
+          mode="remove"
+          selectedIds={selected}
+          onClose={() => setRemoveGroupOpen(false)}
+        />
+      )}
     </AppShell>
   );
 }
@@ -246,6 +357,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<TemplateGroup | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -359,10 +471,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => {
-                        templatesStore.deleteGroup(g.id);
-                        toast.success("Group deleted");
-                      }}
+                      onClick={() => setPendingDelete(g)}
                       className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -388,6 +497,28 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </div>
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete Group"
+        description={
+          pendingDelete ? (
+            <>
+              Are you sure you want to delete the group{" "}
+              <span className="text-foreground font-medium">
+                {pendingDelete.name}
+              </span>
+              ? Templates in this group will be unassigned. This action cannot be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          templatesStore.deleteGroup(pendingDelete.id);
+          toast.success("Group deleted");
+        }}
+        onClose={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
@@ -437,14 +568,7 @@ function TemplateDetailModal({
     name: "Contact Name",
   };
 
-  const primaryAction =
-    template.status === "Approved"
-      ? { label: "Edit", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : template.status === "Draft"
-      ? { label: "Continue Editing", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : template.status === "Rejected"
-      ? { label: "Edit & Resubmit", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : { label: "View Submission", icon: <FileText className="h-3.5 w-3.5" /> };
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div
@@ -675,19 +799,32 @@ function TemplateDetailModal({
         {/* Footer actions */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-border">
           <button
-            onClick={() => toast.success("Template duplicated")}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            onClick={() => setConfirmDelete(true)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
           >
-            <Copy className="h-3.5 w-3.5" /> Duplicate
-          </button>
-          <button
-            onClick={() => toast.info(`${primaryAction.label} — coming soon`)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            {primaryAction.icon} {primaryAction.label}
+            <Trash2 className="h-3.5 w-3.5" /> Delete Template
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete Template"
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="text-foreground font-medium">{template.name}</span>?
+            This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          templatesStore.deleteTemplate(template.id);
+          toast.success("Template deleted");
+          onClose();
+        }}
+        onClose={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }
@@ -785,5 +922,132 @@ function renderBodyWithVars(body: string) {
     ) : (
       <span key={i}>{p}</span>
     ),
+  );
+}
+
+function GroupPickerModal({
+  mode,
+  selectedIds,
+  onClose,
+}: {
+  mode: "add" | "remove";
+  selectedIds: string[];
+  onClose: () => void;
+}) {
+  const { groups, templates } = useTemplatesStore();
+  const [query, setQuery] = useState("");
+  const [picked, setPicked] = useState<string[]>([]);
+
+  const assignedGroupIds = useMemo(() => {
+    const set = new Set<string>();
+    templates.forEach((t) => {
+      if (selectedIds.includes(t.id) && t.groupId) set.add(t.groupId);
+    });
+    return set;
+  }, [templates, selectedIds]);
+
+  const list = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const base = mode === "remove"
+      ? groups.filter((g) => assignedGroupIds.has(g.id))
+      : groups;
+    return q ? base.filter((g) => g.name.toLowerCase().includes(q)) : base;
+  }, [groups, assignedGroupIds, query, mode]);
+
+  const toggle = (id: string) =>
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  const apply = () => {
+    if (picked.length === 0) {
+      toast.error("Pick at least one group");
+      return;
+    }
+    if (mode === "add") {
+      // Assign each picked group to all selected templates (last write wins for groupId).
+      picked.forEach((gid) => templatesStore.setGroupForTemplates(selectedIds, gid));
+      toast.success(`Added to ${picked.length} group${picked.length === 1 ? "" : "s"}`);
+    } else {
+      picked.forEach((gid) =>
+        templatesStore.removeGroupFromTemplates(selectedIds, gid),
+      );
+      toast.success(`Removed from ${picked.length} group${picked.length === 1 ? "" : "s"}`);
+    }
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+          <h2 className="text-sm font-semibold">
+            {mode === "add" ? "Add to Group" : "Remove from Group"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search groups…"
+              className="w-full h-9 rounded-md border border-border bg-background/40 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          <div className="rounded-lg border border-border divide-y divide-border max-h-72 overflow-y-auto">
+            {list.map((g) => {
+              const checked = picked.includes(g.id);
+              return (
+                <label
+                  key={g.id}
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-white/[0.03]"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-[oklch(0.62_0.17_40)]"
+                    checked={checked}
+                    onChange={() => toggle(g.id)}
+                  />
+                  <span className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`} />
+                  <span className="text-[13px]">{g.name}</span>
+                </label>
+              );
+            })}
+            {list.length === 0 && (
+              <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
+                {mode === "remove"
+                  ? "Selected templates aren't assigned to any group."
+                  : "No groups found."}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={apply}
+            className="inline-flex items-center rounded-md bg-primary px-3 h-9 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

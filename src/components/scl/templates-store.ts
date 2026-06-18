@@ -9,11 +9,13 @@ import {
 type State = {
   templates: Template[];
   groups: TemplateGroup[];
+  starred: string[];
 };
 
 let state: State = {
   templates: [...seedTemplates],
   groups: [...initialTemplateGroups],
+  starred: ["tp2", "tp4"],
 };
 
 const listeners = new Set<() => void>();
@@ -50,6 +52,57 @@ export const templatesStore = {
     state = { ...state, templates: [entry, ...state.templates] };
     emit();
     return entry;
+  },
+  deleteTemplate(id: string) {
+    state = {
+      ...state,
+      templates: state.templates.filter((t) => t.id !== id),
+      starred: state.starred.filter((s) => s !== id),
+    };
+    emit();
+  },
+  deleteTemplates(ids: string[]) {
+    const set = new Set(ids);
+    state = {
+      ...state,
+      templates: state.templates.filter((t) => !set.has(t.id)),
+      starred: state.starred.filter((s) => !set.has(s)),
+    };
+    emit();
+  },
+  toggleStar(id: string) {
+    state = {
+      ...state,
+      starred: state.starred.includes(id)
+        ? state.starred.filter((s) => s !== id)
+        : [...state.starred, id],
+    };
+    emit();
+  },
+  isStarred(id: string) {
+    return state.starred.includes(id);
+  },
+  /** Assign every template in `ids` to `groupId`. */
+  setGroupForTemplates(ids: string[], groupId: string | undefined) {
+    const set = new Set(ids);
+    state = {
+      ...state,
+      templates: state.templates.map((t) =>
+        set.has(t.id) ? { ...t, groupId } : t,
+      ),
+    };
+    emit();
+  },
+  /** Remove `groupId` from every template in `ids` that currently has it. */
+  removeGroupFromTemplates(ids: string[], groupId: string) {
+    const set = new Set(ids);
+    state = {
+      ...state,
+      templates: state.templates.map((t) =>
+        set.has(t.id) && t.groupId === groupId ? { ...t, groupId: undefined } : t,
+      ),
+    };
+    emit();
   },
   addGroup(name: string) {
     const color = GROUP_COLORS[state.groups.length % GROUP_COLORS.length];

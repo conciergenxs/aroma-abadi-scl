@@ -23,6 +23,7 @@ import {
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
@@ -50,6 +51,7 @@ function ContactsPage() {
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   if (isChildRoute) return <Outlet />;
 
@@ -325,10 +327,10 @@ function ContactsPage() {
                 onPick={(id) => bulkRemoveLabel(id)}
               />
               <button
-                onClick={bulkDelete}
+                onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
               >
-                <Trash2 className="h-3 w-3" /> Delete
+                <Trash2 className="h-3 w-3" /> Delete Contacts
               </button>
               <button onClick={() => setSelected([])} className="ml-auto text-muted-foreground hover:text-foreground">Clear selection</button>
             </div>
@@ -358,7 +360,6 @@ function ContactsPage() {
                       {properties.filter((p) => p.visible).map((p) => (
                         <th key={p.id} className="sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">{p.name}</th>
                       ))}
-                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -377,16 +378,11 @@ function ContactsPage() {
                             {renderPropertyCell(p, c, labelById, listById)}
                           </td>
                         ))}
-                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </td>
                       </tr>
                     ))}
                     {pageContacts.length === 0 && (
                       <tr>
-                        <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
+                        <td colSpan={properties.filter((p) => p.visible).length + 1} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
                           No contacts match your filters.
                         </td>
@@ -416,6 +412,14 @@ function ContactsPage() {
           onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
         />
       )}
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={bulkDelete}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
     </AppShell>
   );
 }
