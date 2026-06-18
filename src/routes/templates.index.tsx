@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
-import { FloatingMenu } from "@/components/scl/floating-menu";
+
 
 export const Route = createFileRoute("/templates/")({
   head: () => ({ meta: [{ title: "Message Templates — SCL" }] }),
