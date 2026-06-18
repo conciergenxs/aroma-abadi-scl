@@ -16,7 +16,7 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal,
+  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal, ChevronUp,
   Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
@@ -218,6 +218,11 @@ function InboxPage() {
   const [forwardModalOpen, setForwardModalOpen] = useState(false);
   const [forwardSearch, setForwardSearch] = useState("");
   const [forwardContacts, setForwardContacts] = useState<Set<string>>(new Set());
+
+  // ============== MESSAGE SEARCH ==============
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchActiveIdx, setSearchActiveIdx] = useState(0);
 
   const exitForwardMode = () => {
     setForwardMode(false);
