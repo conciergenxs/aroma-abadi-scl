@@ -160,20 +160,52 @@ export type Template = {
   name: string;
   category: "Marketing" | "Utility" | "Service" | "Reminder";
   channel: Channel;
-  status: "Approved" | "Pending" | "Draft";
+  status: "Approved" | "Pending" | "Rejected" | "Draft";
   updated: string;
   body: string;
+  groupId?: string;
+  language?: string;
+  rejectionReason?: string;
 };
 
+export type TemplateGroup = {
+  id: string;
+  name: string;
+  color: "indigo" | "pink" | "emerald" | "amber" | "sky" | "violet" | "slate" | "rose";
+};
+
+export const initialTemplateGroups: TemplateGroup[] = [
+  { id: "tg-promotions", name: "Promotions", color: "pink" },
+  { id: "tg-loyalty", name: "Loyalty", color: "amber" },
+  { id: "tg-cs", name: "Customer Service", color: "sky" },
+  { id: "tg-events", name: "Events", color: "violet" },
+  { id: "tg-membership", name: "Membership", color: "indigo" },
+  { id: "tg-leadnurture", name: "Lead Nurturing", color: "emerald" },
+  { id: "tg-transactional", name: "Transactional", color: "slate" },
+];
+
+export const TEMPLATE_LANGUAGES = [
+  { code: "en_US", name: "English (US)" },
+  { code: "en_GB", name: "English (UK)" },
+  { code: "es_ES", name: "Spanish" },
+  { code: "pt_BR", name: "Portuguese (Brazil)" },
+  { code: "fr_FR", name: "French" },
+  { code: "de_DE", name: "German" },
+  { code: "id_ID", name: "Indonesian" },
+  { code: "ja_JP", name: "Japanese" },
+  { code: "zh_CN", name: "Chinese (Simplified)" },
+] as const;
+
 export const templates: Template[] = [
-  { id: "tp1", name: "Winter Drop Launch", category: "Marketing", channel: "whatsapp", status: "Approved", updated: "2h ago", body: "Hi {{1}}, our Winter '26 drop just landed. VIPs get 24-hour early access — tap to shop." },
-  { id: "tp2", name: "Order Shipped", category: "Utility", channel: "whatsapp", status: "Approved", updated: "1d ago", body: "Your order {{1}} is on its way. Track it live: {{2}}" },
-  { id: "tp3", name: "Abandoned Cart Nudge", category: "Marketing", channel: "instagram", status: "Approved", updated: "3d ago", body: "Hey {{1}}, your cart is waiting. We held your {{2}} for the next 24 hours." },
-  { id: "tp4", name: "Appointment Reminder", category: "Reminder", channel: "whatsapp", status: "Approved", updated: "1w ago", body: "Reminder: your styling session is tomorrow at {{1}} with {{2}}." },
-  { id: "tp5", name: "Support Follow-up", category: "Service", channel: "instagram", status: "Pending", updated: "5h ago", body: "Hi {{1}}, just checking in on ticket #{{2}}. Did we resolve it?" },
-  { id: "tp6", name: "Loyalty Tier Upgrade", category: "Marketing", channel: "whatsapp", status: "Draft", updated: "30m ago", body: "Congrats {{1}}! You've unlocked Platinum. Here's what's new for you." },
-  { id: "tp7", name: "Restock Alert", category: "Utility", channel: "instagram", status: "Approved", updated: "2w ago", body: "{{1}} you wishlisted is back in stock. Tap to grab yours." },
-  { id: "tp8", name: "Payment Failed", category: "Service", channel: "whatsapp", status: "Pending", updated: "6h ago", body: "Heads up {{1}} — payment for order {{2}} didn't go through. Retry here." },
+  { id: "tp1", name: "Winter Drop Launch", category: "Marketing", channel: "whatsapp", status: "Approved", updated: "2h ago", body: "Hi {{1}}, our Winter '26 drop just landed. VIPs get 24-hour early access — tap to shop.", groupId: "tg-promotions", language: "en_US" },
+  { id: "tp2", name: "Order Shipped", category: "Utility", channel: "whatsapp", status: "Approved", updated: "1d ago", body: "Your order {{1}} is on its way. Track it live: {{2}}", groupId: "tg-transactional", language: "en_US" },
+  { id: "tp3", name: "Abandoned Cart Nudge", category: "Marketing", channel: "instagram", status: "Approved", updated: "3d ago", body: "Hey {{1}}, your cart is waiting. We held your {{2}} for the next 24 hours.", groupId: "tg-promotions", language: "en_US" },
+  { id: "tp4", name: "Appointment Reminder", category: "Reminder", channel: "whatsapp", status: "Approved", updated: "1w ago", body: "Reminder: your styling session is tomorrow at {{1}} with {{2}}.", groupId: "tg-events", language: "en_US" },
+  { id: "tp5", name: "Support Follow-up", category: "Service", channel: "instagram", status: "Pending", updated: "5h ago", body: "Hi {{1}}, just checking in on ticket #{{2}}. Did we resolve it?", groupId: "tg-cs", language: "en_US" },
+  { id: "tp6", name: "Loyalty Tier Upgrade", category: "Marketing", channel: "whatsapp", status: "Draft", updated: "30m ago", body: "Congrats {{1}}! You've unlocked Platinum. Here's what's new for you.", groupId: "tg-loyalty", language: "en_US" },
+  { id: "tp7", name: "Restock Alert", category: "Utility", channel: "instagram", status: "Approved", updated: "2w ago", body: "{{1}} you wishlisted is back in stock. Tap to grab yours.", groupId: "tg-transactional", language: "en_US" },
+  { id: "tp8", name: "Payment Failed", category: "Service", channel: "whatsapp", status: "Pending", updated: "6h ago", body: "Heads up {{1}} — payment for order {{2}} didn't go through. Retry here.", groupId: "tg-cs", language: "en_US" },
+  { id: "tp9", name: "Flash Sale Blast", category: "Marketing", channel: "whatsapp", status: "Rejected", updated: "1d ago", body: "🔥 FLASH SALE {{1}}! 80% OFF EVERYTHING — TAP NOW before it ends!!!", groupId: "tg-promotions", language: "en_US", rejectionReason: "Content uses excessive promotional language and all-caps wording that violates WhatsApp Business policy. Tone down the messaging and resubmit." },
 ];
 
 export type Broadcast = {
