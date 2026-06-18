@@ -440,7 +440,7 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
             {g.items.map((a) => (
               <li key={a.id} className="pl-4 relative">
                 <span className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${activityDot(a.type)}`} />
-                <div className="text-xs text-foreground">{a.message}</div>
+                <div className="text-xs text-foreground whitespace-pre-line">{a.message}</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">{formatTime(a.at)}</div>
               </li>
             ))}
