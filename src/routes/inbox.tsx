@@ -324,7 +324,7 @@ function InboxPage() {
     });
   }, [visible, pinnedIds]);
 
-  const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
+  const active = sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
   const thread = threadsByContact[contact.id] ?? [];
 
