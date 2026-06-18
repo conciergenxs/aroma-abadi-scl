@@ -66,6 +66,15 @@ function InboxPage() {
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
+
+  useEffect(() => {
+    if (!contextOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setContextOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [contextOpen]);
   const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
   const [activeId, setActiveId] = useState(conversations[0].id);
 
@@ -650,14 +659,35 @@ function InboxPage() {
           </div>
         </section>
 
-        {/* ============== CONTACT CONTEXT PANEL (layout column) ============== */}
-        <aside
-          aria-hidden={!contextOpen}
-          className={`shrink-0 border-l border-border bg-sidebar/40 overflow-hidden transition-[width] duration-250 ease-out ${
-            contextOpen ? "w-[400px]" : "w-0"
-          }`}
-        >
-          <div className="w-[400px] h-full overflow-y-auto">
+      </div>
+      {/* ============== CONTACT CONTEXT PANEL (overlay side drawer) ============== */}
+      {contextOpen && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/25 animate-fade-in"
+            onClick={() => setContextOpen(false)}
+            aria-hidden
+          />
+          {/* Drawer */}
+          <aside
+            role="dialog"
+            aria-label="Contact details"
+            className="absolute right-0 top-0 h-full w-[440px] max-w-[95vw] bg-background border-l border-border shadow-2xl flex flex-col animate-slide-in-right"
+          >
+            {/* Fixed header */}
+            <div className="shrink-0 flex items-center justify-between gap-3 px-5 h-14 border-b border-border bg-background">
+              <div className="text-sm font-semibold truncate">{contact.name}</div>
+              <button
+                onClick={() => setContextOpen(false)}
+                className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+                aria-label="Close"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto">
             <div className="p-5 border-b border-border text-center">
               <div className="relative mx-auto h-16 w-16">
                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
@@ -744,8 +774,9 @@ function InboxPage() {
               })()}
             </Section>
           </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      )}
       <TemplatePicker
         open={templatePickerOpen}
         onClose={() => setTemplatePickerOpen(false)}
