@@ -1042,6 +1042,10 @@ function ConversationHeader({
   onChangeOwner,
   onChangeCollaborators,
   onToggleContext,
+  isPinned,
+  isUnread,
+  onTogglePin,
+  onToggleRead,
 }: {
   contact: Contact;
   active: Conversation;
@@ -1051,7 +1055,13 @@ function ConversationHeader({
   onChangeOwner: (ownerId: string | null) => void;
   onChangeCollaborators: (ids: string[]) => void;
   onToggleContext: () => void;
+  isPinned: boolean;
+  isUnread: boolean;
+  onTogglePin: () => void;
+  onToggleRead: () => void;
 }) {
+  const moreRef = useRef<HTMLButtonElement>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
@@ -1075,9 +1085,6 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
         <button
           onClick={onToggleContext}
           data-contact-toggle
@@ -1088,6 +1095,39 @@ function ConversationHeader({
         >
           <Info className="h-4 w-4" />
         </button>
+        <button
+          ref={moreRef}
+          onClick={() => setMoreOpen((v) => !v)}
+          title="More actions"
+          className={`h-9 w-9 grid place-items-center rounded transition ${
+            moreOpen ? "bg-white/[0.06] text-foreground" : "hover:bg-white/[0.05] hover:text-foreground"
+          }`}
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
+        <FloatingMenu
+          anchorRef={moreRef}
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          align="end"
+          width={200}
+          className="rounded-md border border-border bg-popover/95 backdrop-blur shadow-lg py-1 text-[13px]"
+        >
+          <button
+            onClick={() => { onTogglePin(); setMoreOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-white/[0.05]"
+          >
+            {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+            <span>{isPinned ? "Unpin Contact" : "Pin Contact"}</span>
+          </button>
+          <button
+            onClick={() => { onToggleRead(); setMoreOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-white/[0.05]"
+          >
+            {isUnread ? <MailOpen className="h-3.5 w-3.5" /> : <MailIcon className="h-3.5 w-3.5" />}
+            <span>{isUnread ? "Mark as Read" : "Mark as Unread"}</span>
+          </button>
+        </FloatingMenu>
       </div>
     </div>
   );
