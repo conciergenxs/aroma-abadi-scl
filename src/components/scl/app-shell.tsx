@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronDown,
   UserPlus,
+  Radio,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,7 +26,7 @@ import {
 import { InviteModal } from "@/components/scl/invite-modal";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/channels" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -37,6 +38,7 @@ const topNav: NavItem[] = [
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
+  { to: "/channels", label: "Channels", icon: Radio },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings },
