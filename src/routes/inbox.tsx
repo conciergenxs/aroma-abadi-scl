@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { AppShell, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
-import { conversations, threadsByContact } from "@/components/scl/mock-data";
+import { conversations, threadsByContact, connectedChannels } from "@/components/scl/mock-data";
 import {
   STAGE_COLORS,
   LIFECYCLE_STAGES,
   type LifecycleStage,
 } from "@/components/scl/mock-data";
-import type { Contact } from "@/components/scl/mock-data";
+import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
@@ -66,6 +66,91 @@ function InboxPage() {
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
+
+  // ============== INBOX FILTER PANEL ==============
+  type FilterCategory = "channels" | "labels" | "owner" | "lifecycle" | "unread";
+  type InboxFilters = {
+    channels: Channel[];
+    labels: string[];
+    owners: string[]; // user ids; "__unassigned" for unassigned
+    stages: LifecycleStage[];
+    unreadOnly: boolean;
+  };
+  const emptyFilters: InboxFilters = {
+    channels: [],
+    labels: [],
+    owners: [],
+    stages: [],
+    unreadOnly: false,
+  };
+  const [filters, setFilters] = useState<InboxFilters>(emptyFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<FilterCategory>("channels");
+  const [filterSearch, setFilterSearch] = useState("");
+  const filterBtnRef = useRef<HTMLButtonElement | null>(null);
+  const filterPanelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (filterPanelRef.current?.contains(t)) return;
+      if (filterBtnRef.current?.contains(t)) return;
+      setFiltersOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFiltersOpen(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [filtersOpen]);
+
+  useEffect(() => {
+    setFilterSearch("");
+  }, [filterCategory]);
+
+  const toggleIn = <T,>(arr: T[], v: T): T[] =>
+    arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+
+  const activeFilterCount =
+    filters.channels.length +
+    filters.labels.length +
+    filters.owners.length +
+    filters.stages.length +
+    (filters.unreadOnly ? 1 : 0);
+
+  const availableChannels = useMemo(() => {
+    const seen = new Set<Channel>();
+    const out: Channel[] = [];
+    for (const c of connectedChannels) {
+      if (c.status === "connected" && !seen.has(c.channel)) {
+        seen.add(c.channel);
+        out.push(c.channel);
+      }
+    }
+    return out;
+  }, []);
+  const channelLabel = (c: Channel) => (c === "whatsapp" ? "WhatsApp" : "Instagram");
+
+  const ownerOptions = useMemo(
+    () => [
+      { id: "me", name: "Me" },
+      { id: "__unassigned", name: "Unassigned" },
+      ...TEAM_USERS.filter((u) => u.id !== "me").map((u) => ({ id: u.id, name: u.name })),
+    ],
+    [],
+  );
+  const ownerLabel = (id: string) =>
+    id === "__unassigned" ? "Unassigned" : id === "me" ? "Me" : userLabel(id);
+
+  const labelById = useMemo(
+    () => new Map(labels.map((l) => [l.id, l] as const)),
+    [labels],
+  );
 
   useEffect(() => {
     if (!contextOpen) return;
@@ -185,6 +270,18 @@ function InboxPage() {
       if (tab === "Unread" && c.unread === 0) return false;
       if (tab === "Assigned" && !ct.ownerId) return false;
       if (tab === "Unassigned" && ct.ownerId) return false;
+      // Inbox filter panel
+      if (filters.channels.length && !filters.channels.includes(c.channel)) return false;
+      if (filters.labels.length && !filters.labels.some((id) => ct.labelIds.includes(id))) return false;
+      if (filters.owners.length) {
+        const matchUnassigned = filters.owners.includes("__unassigned") && !ct.ownerId;
+        const matchUser = ct.ownerId ? filters.owners.includes(ct.ownerId) : false;
+        if (!matchUnassigned && !matchUser) return false;
+      }
+      if (filters.stages.length) {
+        if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
+      }
+      if (filters.unreadOnly && c.unread === 0) return false;
       // Search
       if (search) {
         const q = search.toLowerCase();
@@ -192,7 +289,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
@@ -384,10 +481,72 @@ function InboxPage() {
                   {t}
                 </button>
               ))}
-              <button className="ml-auto h-7 w-7 grid place-items-center rounded border border-border text-muted-foreground hover:text-foreground">
-                <Filter className="h-3.5 w-3.5" />
-              </button>
+              <div className="ml-auto relative">
+                <button
+                  ref={filterBtnRef}
+                  onClick={() => setFiltersOpen((v) => !v)}
+                  aria-label="Filter conversations"
+                  className={`h-7 inline-flex items-center gap-1 px-1.5 rounded border transition ${
+                    filtersOpen || activeFilterCount > 0
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  {activeFilterCount > 0 && (
+                    <span className="text-[10px] font-semibold tabular-nums">{activeFilterCount}</span>
+                  )}
+                </button>
+                {filtersOpen && (
+                  <FilterPanel
+                    panelRef={filterPanelRef}
+                    category={filterCategory}
+                    setCategory={setFilterCategory}
+                    filters={filters}
+                    setFilters={setFilters}
+                    activeCount={activeFilterCount}
+                    search={filterSearch}
+                    setSearch={setFilterSearch}
+                    availableChannels={availableChannels}
+                    channelLabel={channelLabel}
+                    labels={labels}
+                    ownerOptions={ownerOptions}
+                    onClose={() => setFiltersOpen(false)}
+                    onClear={() => setFilters(emptyFilters)}
+                    toggleIn={toggleIn}
+                  />
+                )}
+              </div>
             </div>
+            {activeFilterCount > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {filters.channels.map((c) => (
+                  <FilterChip key={`ch-${c}`} label={channelLabel(c)} onRemove={() => setFilters((f) => ({ ...f, channels: f.channels.filter((x) => x !== c) }))} />
+                ))}
+                {filters.labels.map((id) => {
+                  const lb = labelById.get(id);
+                  if (!lb) return null;
+                  return (
+                    <FilterChip key={`lb-${id}`} label={lb.name} onRemove={() => setFilters((f) => ({ ...f, labels: f.labels.filter((x) => x !== id) }))} />
+                  );
+                })}
+                {filters.owners.map((id) => (
+                  <FilterChip key={`ow-${id}`} label={ownerLabel(id)} onRemove={() => setFilters((f) => ({ ...f, owners: f.owners.filter((x) => x !== id) }))} />
+                ))}
+                {filters.stages.map((s) => (
+                  <FilterChip key={`st-${s}`} label={s} onRemove={() => setFilters((f) => ({ ...f, stages: f.stages.filter((x) => x !== s) }))} />
+                ))}
+                {filters.unreadOnly && (
+                  <FilterChip label="Unread only" onRemove={() => setFilters((f) => ({ ...f, unreadOnly: false }))} />
+                )}
+                <button
+                  onClick={() => setFilters(emptyFilters)}
+                  className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -1117,6 +1276,244 @@ function CollaboratorsPopover({
           </div>
         </div>
       </FloatingMenu>
+    </div>
+  );
+}
+// ============== Inbox filter chip & panel ==============
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 py-0.5 text-[10px] text-primary">
+      {label}
+      <button
+        onClick={onRemove}
+        aria-label={`Remove ${label}`}
+        className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20"
+      >
+        <XIcon className="h-2.5 w-2.5" />
+      </button>
+    </span>
+  );
+}
+
+type FilterPanelProps = {
+  panelRef: React.RefObject<HTMLDivElement | null>;
+  category: "channels" | "labels" | "owner" | "lifecycle" | "unread";
+  setCategory: (c: FilterPanelProps["category"]) => void;
+  filters: {
+    channels: Channel[];
+    labels: string[];
+    owners: string[];
+    stages: LifecycleStage[];
+    unreadOnly: boolean;
+  };
+  setFilters: React.Dispatch<React.SetStateAction<FilterPanelProps["filters"]>>;
+  activeCount: number;
+  search: string;
+  setSearch: (s: string) => void;
+  availableChannels: Channel[];
+  channelLabel: (c: Channel) => string;
+  labels: { id: string; name: string }[];
+  ownerOptions: { id: string; name: string }[];
+  onClose: () => void;
+  onClear: () => void;
+  toggleIn: <T,>(arr: T[], v: T) => T[];
+};
+
+function FilterPanel(props: FilterPanelProps) {
+  const {
+    panelRef, category, setCategory, filters, setFilters,
+    activeCount, search, setSearch,
+    availableChannels, channelLabel, labels, ownerOptions,
+    onClose, onClear, toggleIn,
+  } = props;
+
+  const categories: { id: FilterPanelProps["category"]; label: string; count: number }[] = [
+    { id: "channels", label: "Channels", count: filters.channels.length },
+    { id: "labels", label: "Labels", count: filters.labels.length },
+    { id: "owner", label: "Owner", count: filters.owners.length },
+    { id: "lifecycle", label: "Lifecycle Stage", count: filters.stages.length },
+    { id: "unread", label: "Unread Only", count: filters.unreadOnly ? 1 : 0 },
+  ];
+
+  const showSearch = category === "channels" || category === "labels" || category === "owner";
+  const q = search.toLowerCase();
+
+  return (
+    <div
+      ref={panelRef}
+      role="dialog"
+      aria-label="Filter conversations"
+      className="absolute right-0 top-9 z-40 w-[560px] rounded-lg border border-border bg-popover shadow-2xl overflow-hidden animate-fade-in"
+    >
+      <div className="flex items-center justify-between px-3 h-10 border-b border-border/70">
+        <div className="text-[12px] font-semibold text-foreground">Filters</div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onClear}
+            disabled={activeCount === 0}
+            className="text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-40"
+          >
+            Clear all
+          </button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+          >
+            <XIcon className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+      <div className="flex min-h-[320px] max-h-[420px]">
+        {/* Left: categories */}
+        <div className="w-[180px] shrink-0 border-r border-border/70 bg-sidebar/30 py-1.5">
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setCategory(c.id)}
+              className={`w-full flex items-center justify-between px-3 py-2 text-[12px] transition ${
+                category === c.id
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+              }`}
+            >
+              <span>{c.label}</span>
+              {c.count > 0 && (
+                <span className={`text-[10px] tabular-nums ${category === c.id ? "text-primary" : "text-muted-foreground/70"}`}>
+                  {c.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        {/* Right: options */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {showSearch && (
+            <div className="p-2 border-b border-border/60">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={`Search ${category}…`}
+                  className="h-8 w-full rounded-md border border-border bg-card/60 pl-7 pr-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                />
+              </div>
+            </div>
+          )}
+          <div className="flex-1 overflow-y-auto py-1">
+            {category === "channels" && (
+              <FilterCheckList
+                items={availableChannels
+                  .filter((c) => channelLabel(c).toLowerCase().includes(q))
+                  .map((c) => ({
+                    key: c,
+                    label: channelLabel(c),
+                    checked: filters.channels.includes(c),
+                    onToggle: () =>
+                      setFilters((f) => ({ ...f, channels: toggleIn(f.channels, c) })),
+                    leading: <ChannelIcon channel={c} className="h-4 w-4" />,
+                  }))}
+              />
+            )}
+            {category === "labels" && (
+              <FilterCheckList
+                items={labels
+                  .filter((l) => l.name.toLowerCase().includes(q))
+                  .map((l) => ({
+                    key: l.id,
+                    label: l.name,
+                    checked: filters.labels.includes(l.id),
+                    onToggle: () =>
+                      setFilters((f) => ({ ...f, labels: toggleIn(f.labels, l.id) })),
+                  }))}
+              />
+            )}
+            {category === "owner" && (
+              <FilterCheckList
+                items={ownerOptions
+                  .filter((o) => o.name.toLowerCase().includes(q))
+                  .map((o) => ({
+                    key: o.id,
+                    label: o.name,
+                    checked: filters.owners.includes(o.id),
+                    onToggle: () =>
+                      setFilters((f) => ({ ...f, owners: toggleIn(f.owners, o.id) })),
+                  }))}
+              />
+            )}
+            {category === "lifecycle" && (
+              <FilterCheckList
+                items={LIFECYCLE_STAGES.map((s) => ({
+                  key: s,
+                  label: s,
+                  checked: filters.stages.includes(s),
+                  onToggle: () =>
+                    setFilters((f) => ({ ...f, stages: toggleIn(f.stages, s) })),
+                  leading: (
+                    <span className={`h-2 w-2 rounded-full ${STAGE_COLORS[s].dot}`} />
+                  ),
+                }))}
+              />
+            )}
+            {category === "unread" && (
+              <div className="px-3 py-3">
+                <label className="flex items-center gap-2.5 text-[12px] text-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.unreadOnly}
+                    onChange={(e) =>
+                      setFilters((f) => ({ ...f, unreadOnly: e.target.checked }))
+                    }
+                    className="h-3.5 w-3.5 rounded border-border bg-card accent-primary"
+                  />
+                  Show only conversations with unread messages
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterCheckList({
+  items,
+}: {
+  items: {
+    key: string;
+    label: string;
+    checked: boolean;
+    onToggle: () => void;
+    leading?: React.ReactNode;
+  }[];
+}) {
+  if (items.length === 0) {
+    return (
+      <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
+        No options match.
+      </div>
+    );
+  }
+  return (
+    <div>
+      {items.map((it) => (
+        <label
+          key={it.key}
+          className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-foreground hover:bg-white/[0.03] cursor-pointer"
+        >
+          <input
+            type="checkbox"
+            checked={it.checked}
+            onChange={it.onToggle}
+            className="h-3.5 w-3.5 rounded border-border bg-card accent-primary"
+          />
+          {it.leading}
+          <span className="flex-1 truncate">{it.label}</span>
+        </label>
+      ))}
     </div>
   );
 }
