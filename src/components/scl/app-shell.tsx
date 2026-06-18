@@ -13,6 +13,7 @@ import {
   User,
   LogOut,
   ChevronDown,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,18 +24,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/settings";
+  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/invite-members" | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
   badge?: number;
 };
-const nav: NavItem[] = [
+const topNav: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: 12 },
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
+];
+const bottomNav: NavItem[] = [
+  { to: "/invite-members", label: "Invite Members", icon: UserPlus },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -67,7 +71,23 @@ export function AppShell({
         </div>
 
         <nav className="flex-1 w-full py-5 flex flex-col items-center gap-2.5">
-          {nav.map((item) => {
+          {topNav.map((item) => {
+            const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+            const Icon = item.icon;
+            return (
+              <SidebarIconLink
+                key={item.to}
+                to={item.to}
+                label={item.label}
+                active={active}
+                badge={item.badge}
+                Icon={Icon}
+              />
+            );
+          })}
+        </nav>
+        <nav className="w-full pb-5 pt-2 flex flex-col items-center gap-2.5 border-t border-sidebar-border">
+          {bottomNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (

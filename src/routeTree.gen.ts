@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as InviteMembersRouteImport } from './routes/invite-members'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,6 +25,11 @@ import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteMembersRoute = InviteMembersRouteImport.update({
+  id: '/invite-members',
+  path: '/invite-members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InboxRoute = InboxRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/invite-members': typeof InviteMembersRoute
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/invite-members': typeof InviteMembersRoute
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/invite-members': typeof InviteMembersRoute
   '/settings': typeof SettingsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/inbox'
+    | '/invite-members'
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/inbox'
+    | '/invite-members'
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/inbox'
+    | '/invite-members'
     | '/settings'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
+  InviteMembersRoute: typeof InviteMembersRoute
   SettingsRoute: typeof SettingsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite-members': {
+      id: '/invite-members'
+      path: '/invite-members'
+      fullPath: '/invite-members'
+      preLoaderRoute: typeof InviteMembersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inbox': {
@@ -271,6 +291,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
+  InviteMembersRoute: InviteMembersRoute,
   SettingsRoute: SettingsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
