@@ -548,14 +548,7 @@ function TemplateDetailModal({
     name: "Contact Name",
   };
 
-  const primaryAction =
-    template.status === "Approved"
-      ? { label: "Edit", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : template.status === "Draft"
-      ? { label: "Continue Editing", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : template.status === "Rejected"
-      ? { label: "Edit & Resubmit", icon: <Pencil className="h-3.5 w-3.5" /> }
-      : { label: "View Submission", icon: <FileText className="h-3.5 w-3.5" /> };
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div
@@ -786,19 +779,32 @@ function TemplateDetailModal({
         {/* Footer actions */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-border">
           <button
-            onClick={() => toast.success("Template duplicated")}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            onClick={() => setConfirmDelete(true)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
           >
-            <Copy className="h-3.5 w-3.5" /> Duplicate
-          </button>
-          <button
-            onClick={() => toast.info(`${primaryAction.label} — coming soon`)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            {primaryAction.icon} {primaryAction.label}
+            <Trash2 className="h-3.5 w-3.5" /> Delete Template
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete Template"
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="text-foreground font-medium">{template.name}</span>?
+            This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          templatesStore.deleteTemplate(template.id);
+          toast.success("Template deleted");
+          onClose();
+        }}
+        onClose={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }
