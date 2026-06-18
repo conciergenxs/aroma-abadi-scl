@@ -382,6 +382,34 @@ function InboxPage() {
     () => [...thread, ...(sentByConvo[active.id] ?? [])],
     [thread, sentByConvo, active.id],
   );
+
+  // Search matches across messages + notes of the active conversation.
+  const searchMatches = useMemo(() => {
+    if (!searchOpen) return [] as string[];
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [] as string[];
+    const ids: string[] = [];
+    for (const m of combinedThread) {
+      if (m.text.toLowerCase().includes(q)) ids.push(m.id);
+    }
+    for (const n of notesByConvo[active.id] ?? []) {
+      if (n.text.toLowerCase().includes(q)) ids.push(n.id);
+    }
+    return ids;
+  }, [searchOpen, searchQuery, combinedThread, notesByConvo, active.id]);
+  const activeMatchId = searchMatches[searchActiveIdx];
+  useEffect(() => { setSearchActiveIdx(0); }, [searchQuery, active.id]);
+  useEffect(() => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  }, [active.id]);
+  useEffect(() => {
+    if (!activeMatchId) return;
+    const el = document.querySelector(`[data-search-id="${activeMatchId}"]`) as HTMLElement | null;
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [activeMatchId]);
+  const highlightQuery = searchOpen ? searchQuery.trim() : "";
+
   const senderName = (m: Message) => (m.from === "me" ? "You" : contact.name);
   const replyTarget = replyTargets[active.id];
   const startReply = (m: Message) => {
