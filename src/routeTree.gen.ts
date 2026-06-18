@@ -15,6 +15,7 @@ import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BroadcastsIndexRouteImport } from './routes/broadcasts.index'
+import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
@@ -49,6 +50,11 @@ const BroadcastsIndexRoute = BroadcastsIndexRouteImport.update({
   path: '/broadcasts/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesNewRoute = TemplatesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => TemplatesRoute,
+} as any)
 const ContactsNewRoute = ContactsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -70,10 +76,11 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
+  '/templates': typeof TemplatesRouteWithChildren
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/templates/new': typeof TemplatesNewRoute
   '/broadcasts/': typeof BroadcastsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -81,10 +88,11 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
+  '/templates': typeof TemplatesRouteWithChildren
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/templates/new': typeof TemplatesNewRoute
   '/broadcasts': typeof BroadcastsIndexRoute
 }
 export interface FileRoutesById {
@@ -93,10 +101,11 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
+  '/templates': typeof TemplatesRouteWithChildren
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/templates/new': typeof TemplatesNewRoute
   '/broadcasts/': typeof BroadcastsIndexRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/templates/new'
     | '/broadcasts/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/templates/new'
     | '/broadcasts'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/templates/new'
     | '/broadcasts/'
   fileRoutesById: FileRoutesById
 }
@@ -140,7 +152,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
   SettingsRoute: typeof SettingsRoute
-  TemplatesRoute: typeof TemplatesRoute
+  TemplatesRoute: typeof TemplatesRouteWithChildren
   BroadcastsNewRoute: typeof BroadcastsNewRoute
   BroadcastsIndexRoute: typeof BroadcastsIndexRoute
 }
@@ -189,6 +201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates/new': {
+      id: '/templates/new'
+      path: '/new'
+      fullPath: '/templates/new'
+      preLoaderRoute: typeof TemplatesNewRouteImport
+      parentRoute: typeof TemplatesRoute
+    }
     '/contacts/new': {
       id: '/contacts/new'
       path: '/new'
@@ -227,12 +246,24 @@ const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
   ContactsRouteChildren,
 )
 
+interface TemplatesRouteChildren {
+  TemplatesNewRoute: typeof TemplatesNewRoute
+}
+
+const TemplatesRouteChildren: TemplatesRouteChildren = {
+  TemplatesNewRoute: TemplatesNewRoute,
+}
+
+const TemplatesRouteWithChildren = TemplatesRoute._addFileChildren(
+  TemplatesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   SettingsRoute: SettingsRoute,
-  TemplatesRoute: TemplatesRoute,
+  TemplatesRoute: TemplatesRouteWithChildren,
   BroadcastsNewRoute: BroadcastsNewRoute,
   BroadcastsIndexRoute: BroadcastsIndexRoute,
 }
