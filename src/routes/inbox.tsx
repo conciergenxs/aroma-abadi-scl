@@ -686,6 +686,12 @@ function InboxPage() {
             }
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
+            isPinned={isPinned(active.id)}
+            isUnread={isUnread(active)}
+            onTogglePin={() => togglePinned(active.id)}
+            onToggleRead={() =>
+              isUnread(active) ? markRead(active.id) : markUnread(active.id)
+            }
           />
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
