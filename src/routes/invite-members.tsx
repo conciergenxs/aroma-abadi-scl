@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { AI_AGENTS, type AIAgent } from "@/components/scl/agents";
 import {
