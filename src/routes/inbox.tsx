@@ -279,7 +279,7 @@ function InboxPage() {
         const v = activeFilter.value;
         if (v === "my" && ct.ownerId !== "me") return false;
         if (v === "unassigned" && ct.ownerId) return false;
-        if (v === "mentions" && c.unread === 0) return false;
+        if (v === "mentions" && !isUnread(c)) return false;
         if (v === "collaborations") {
           const collabs = collaborators[c.id] ?? [];
           if (collabs.length < 2 && !collabs.includes("me")) return false;
@@ -291,7 +291,7 @@ function InboxPage() {
         if (t !== activeFilter.value) return false;
       }
       // Tabs
-      if (tab === "Unread" && c.unread === 0) return false;
+      if (tab === "Unread" && !isUnread(c)) return false;
       if (tab === "Assigned" && !ct.ownerId) return false;
       if (tab === "Unassigned" && ct.ownerId) return false;
       // Inbox filter panel
@@ -305,7 +305,7 @@ function InboxPage() {
       if (filters.stages.length) {
         if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
       }
-      if (filters.unreadOnly && c.unread === 0) return false;
+      if (filters.unreadOnly && !isUnread(c)) return false;
       // Search
       if (search) {
         const q = search.toLowerCase();
@@ -313,7 +313,16 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators, filters]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides]);
+
+  // Pinned conversations float to the top while preserving original order.
+  const sortedVisible = useMemo(() => {
+    return [...visible].sort((a, b) => {
+      const ap = pinnedIds.has(a.id) ? 1 : 0;
+      const bp = pinnedIds.has(b.id) ? 1 : 0;
+      return bp - ap;
+    });
+  }, [visible, pinnedIds]);
 
   const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
