@@ -793,18 +793,21 @@ function InboxPage() {
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
             <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">Today</div>
-            {thread.map((m) => (
-              <div key={m.id} className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[64%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm ${m.from === "me" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card/90 border border-border/60 text-foreground rounded-bl-sm"}`}>
-                  <p>{m.text}</p>
-                  <div className={`mt-1.5 flex items-center gap-1 text-[10px] ${m.from === "me" ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}>
-                    <span>{m.time}</span>
-                    {m.from === "me" && (m.status === "read" ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
-                  </div>
-                </div>
-              </div>
+            {combinedThread.map((m) => (
+              <MessageRow
+                key={m.id}
+                message={m}
+                senderName={senderName(m)}
+                forwardMode={forwardMode}
+                selected={selectedMsgIds.has(m.id)}
+                onToggleSelect={() => toggleSelectMsg(m.id)}
+                onReply={() => startReply(m)}
+                onCopy={() => copyToClipboard(m.text)}
+                onCopyToBox={() => copyToComposer(m.text)}
+                onForward={() => startForward(m)}
+              />
             ))}
-            {thread.length === 0 && (
+            {combinedThread.length === 0 && (
               <div className="text-center text-xs text-muted-foreground py-10">No messages yet.</div>
             )}
             {(notesByConvo[active.id] ?? []).map((n) => (
