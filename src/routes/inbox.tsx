@@ -21,7 +21,8 @@ import {
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
-import { StickyNote, AtSign as AtSignIcon } from "lucide-react";
+import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon } from "lucide-react";
+import { FloatingMenu } from "@/components/scl/floating-menu";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -162,6 +163,30 @@ function InboxPage() {
   }, [contextOpen]);
   const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
   const [activeId, setActiveId] = useState(conversations[0].id);
+
+  // ============== PIN + READ STATE OVERRIDES ==============
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
+  // true = forced unread, false = marked read, undefined = use original
+  const [unreadOverrides, setUnreadOverrides] = useState<Record<string, boolean>>({});
+  const isPinned = (id: string) => pinnedIds.has(id);
+  const togglePinned = (id: string) =>
+    setPinnedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const unreadCount = (c: Conversation) => {
+    const o = unreadOverrides[c.id];
+    if (o === false) return 0;
+    if (o === true) return Math.max(c.unread, 1);
+    return c.unread;
+  };
+  const isUnread = (c: Conversation) => unreadCount(c) > 0;
+  const markRead = (id: string) =>
+    setUnreadOverrides((p) => ({ ...p, [id]: false }));
+  const markUnread = (id: string) =>
+    setUnreadOverrides((p) => ({ ...p, [id]: true }));
 
   // Internal note composer state
   type InternalNote = {
