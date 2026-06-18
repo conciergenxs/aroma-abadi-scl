@@ -1401,8 +1401,12 @@ function OwnerSelect({
   const [q, setQ] = useState("");
   const btnRef = useRef<HTMLButtonElement>(null);
   const current = TEAM_USERS.find((u) => u.id === value);
+  const currentAgent = findAgent(value);
   const filtered = TEAM_USERS.filter((u) =>
     u.name.toLowerCase().includes(q.toLowerCase()),
+  );
+  const filteredAgents = AI_AGENTS.filter((a) =>
+    a.name.toLowerCase().includes(q.toLowerCase()),
   );
   return (
     <div className="relative">
@@ -1418,6 +1422,16 @@ function OwnerSelect({
               {current.avatar}
             </span>
             <span className="text-foreground">{current.name}</span>
+          </>
+        ) : currentAgent ? (
+          <>
+            <span className="h-5 w-5 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
+              <Bot className="h-3 w-3 text-primary" />
+            </span>
+            <span className="text-foreground">{currentAgent.name}</span>
+            <span className="rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
+              AI Agent
+            </span>
           </>
         ) : (
           <span className="text-muted-foreground">Unassigned</span>
@@ -1437,12 +1451,17 @@ function OwnerSelect({
             />
           </div>
           <div className="max-h-60 overflow-y-auto">
+            {filtered.length > 0 && (
+              <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                People
+              </div>
+            )}
             {TEAMS.map((team) => {
               const members = filtered.filter((u) => u.team === team);
               if (members.length === 0) return null;
               return (
                 <div key={team} className="mb-1.5">
-                  <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  <div className="px-3 pt-1 pb-1 text-[10px] font-medium text-muted-foreground/60">
                     {team}
                   </div>
                   {members.map((u) => (
@@ -1466,6 +1485,34 @@ function OwnerSelect({
                 </div>
               );
             })}
+            {filteredAgents.length > 0 && (
+              <div className="mt-1 border-t border-border pt-1.5">
+                <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  AI Agents
+                </div>
+                {filteredAgents.map((a) => (
+                  <button
+                    key={a.id}
+                    onClick={() => {
+                      onChange(a.id);
+                      setOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-white/[0.05] ${
+                      value === a.id ? "bg-white/[0.06]" : ""
+                    }`}
+                  >
+                    <span className="h-5 w-5 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
+                      <Bot className="h-3 w-3 text-primary" />
+                    </span>
+                    <span className="flex-1 text-left">{a.name}</span>
+                    <span className="rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
+                      AI
+                    </span>
+                    {value === a.id && <Check className="h-3.5 w-3.5 text-primary" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="border-t border-border mt-1 pt-1">
             <button
