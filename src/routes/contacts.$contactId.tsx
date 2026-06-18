@@ -124,10 +124,16 @@ function ContactDetailPage() {
   };
 
   const updateField = <K extends keyof Contact>(key: K, value: Contact[K], label: string) => {
+    const prev = contact[key];
+    if (sameValue(prev, value)) return;
     contactsStore.setContacts((cs) =>
       cs.map((c) => (c.id === contact.id ? { ...c, [key]: value } : c)),
     );
-    contactsStore.addActivity(contact.id, "updated", `Updated ${label}`);
+    contactsStore.addActivity(
+      contact.id,
+      "updated",
+      `Updated ${label}\n${displayValue(prev)} → ${displayValue(value)}`,
+    );
     toast.success("Contact updated");
   };
 
@@ -197,6 +203,8 @@ function ContactDetailPage() {
   };
 
   const setCustomProperty = (key: string, value: unknown, displayName: string) => {
+    const prev = contact.customFields?.[key];
+    if (sameValue(prev, value)) return;
     contactsStore.setContacts((cs) =>
       cs.map((c) =>
         c.id === contact.id
@@ -204,7 +212,11 @@ function ContactDetailPage() {
           : c,
       ),
     );
-    contactsStore.addActivity(contact.id, "updated", `Updated ${displayName}`);
+    contactsStore.addActivity(
+      contact.id,
+      "updated",
+      `Updated ${displayName}\n${displayValue(prev)} → ${displayValue(value)}`,
+    );
     toast.success("Contact updated");
   };
 
@@ -428,7 +440,7 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
             {g.items.map((a) => (
               <li key={a.id} className="pl-4 relative">
                 <span className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${activityDot(a.type)}`} />
-                <div className="text-xs text-foreground">{a.message}</div>
+                <div className="text-xs text-foreground whitespace-pre-line">{a.message}</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">{formatTime(a.at)}</div>
               </li>
             ))}
@@ -512,14 +524,10 @@ function RightPanel({
             />
           </FieldRow>
           <FieldRow icon={<MessageCircle className="h-3.5 w-3.5" />} label="Channel">
-            <select
-              value={contact.channel}
-              onChange={(e) => onUpdateField("channel", e.target.value as Contact["channel"], "channel")}
-              className="h-7 w-full rounded-md border border-white/10 bg-white/[0.04] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
-            >
-              <option value="whatsapp">WhatsApp</option>
-              <option value="instagram">Instagram</option>
-            </select>
+            <div className="inline-flex items-center gap-1.5 px-2 py-1 text-xs text-foreground/90">
+              <ChannelIcon channel={contact.channel} className="h-3.5 w-3.5" />
+              <span className="capitalize">{contact.channel}</span>
+            </div>
           </FieldRow>
           <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Owner">
             <InlineText
@@ -610,20 +618,18 @@ function PropertyField({
         switch (property.type) {
           case "multiline":
             return (
-              <textarea
+              <DraftTextarea
                 value={(value as string) ?? ""}
-                onChange={(e) => onChange(e.target.value)}
-                rows={2}
-                className="w-full rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
+                onCommit={(v) => onChange(v)}
               />
             );
           case "number":
             return (
-              <input
+              <DraftInput
+                value={value == null ? "" : String(value)}
                 type="number"
-                value={(value as number | string) ?? ""}
-                onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
                 className={inputCls}
+                onCommit={(v) => onChange(v === "" ? "" : Number(v))}
               />
             );
           case "boolean":
@@ -684,16 +690,67 @@ function PropertyField({
             );
           default:
             return (
-              <input
-                type={property.type === "email" ? "email" : property.type === "phone" ? "tel" : property.type === "url" ? "url" : "text"}
+              <DraftInput
                 value={(value as string) ?? ""}
-                onChange={(e) => onChange(e.target.value)}
+                type={property.type === "email" ? "email" : property.type === "phone" ? "tel" : property.type === "url" ? "url" : "text"}
                 className={inputCls}
+                onCommit={(v) => onChange(v)}
               />
             );
         }
       })()}
     </div>
+  );
+}
+
+function DraftInput({
+  value,
+  onCommit,
+  type = "text",
+  className = "",
+}: {
+  value: string;
+  onCommit: (v: string) => void;
+  type?: string;
+  className?: string;
+}) {
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
+  return (
+    <input
+      type={type}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => { if (draft !== value) onCommit(draft); }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+        if (e.key === "Escape") { setDraft(value); (e.target as HTMLInputElement).blur(); }
+      }}
+      className={className}
+    />
+  );
+}
+
+function DraftTextarea({
+  value,
+  onCommit,
+}: {
+  value: string;
+  onCommit: (v: string) => void;
+}) {
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
+  return (
+    <textarea
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => { if (draft !== value) onCommit(draft); }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") { setDraft(value); (e.target as HTMLTextAreaElement).blur(); }
+      }}
+      rows={2}
+      className="w-full rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
+    />
   );
 }
 
@@ -934,4 +991,22 @@ function groupByDay(activities: ContactActivity[]) {
     map.get(key)!.items.push(a);
   }
   return Array.from(map.values()).sort((a, b) => b.key.localeCompare(a.key));
+}
+
+function sameValue(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (a == null && b === "") return true;
+  if (b == null && a === "") return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((v, i) => v === b[i]);
+  }
+  return false;
+}
+
+function displayValue(v: unknown): string {
+  if (v == null || v === "") return "—";
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
+  return String(v);
 }
