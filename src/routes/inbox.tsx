@@ -1861,6 +1861,8 @@ function MessageRow({
   onCopy,
   onCopyToBox,
   onForward,
+  highlightQuery,
+  isActiveMatch,
 }: {
   message: SentMsg;
   senderName: string;
@@ -1871,6 +1873,8 @@ function MessageRow({
   onCopy: () => void;
   onCopyToBox: () => void;
   onForward: () => void;
+  highlightQuery: string;
+  isActiveMatch: boolean;
 }) {
   const m = message;
   const isMe = m.from === "me";
@@ -1880,11 +1884,11 @@ function MessageRow({
   const bubble = (
     <div className="group relative max-w-[64%]">
       <div
-        className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm ${
+        className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm transition ${
           isMe
             ? "bg-primary text-primary-foreground rounded-br-sm"
             : "bg-card/90 border border-border/60 text-foreground rounded-bl-sm"
-        }`}
+        } ${isActiveMatch ? "ring-2 ring-amber-300/70" : ""}`}
       >
         {m.replyTo && (
           <div
@@ -1907,7 +1911,13 @@ function MessageRow({
             <ForwardIcon className="h-3 w-3" /> Forwarded
           </div>
         )}
-        <p className="whitespace-pre-wrap">{m.text}</p>
+        <p className="whitespace-pre-wrap">
+          {highlightQuery ? (
+            <HighlightedText text={m.text} query={highlightQuery} isActive={isActiveMatch} />
+          ) : (
+            m.text
+          )}
+        </p>
         <div className={`mt-1.5 flex items-center gap-1 text-[10px] ${isMe ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}>
           <span>{m.time}</span>
           {isMe && (m.status === "read" ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
@@ -1943,7 +1953,7 @@ function MessageRow({
   );
 
   return (
-    <div className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
+    <div data-search-id={m.id} className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
       {forwardMode && !isMe && (
         <ForwardCheckbox checked={selected} onChange={onToggleSelect} />
       )}
