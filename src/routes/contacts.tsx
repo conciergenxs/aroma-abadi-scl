@@ -327,10 +327,10 @@ function ContactsPage() {
                 onPick={(id) => bulkRemoveLabel(id)}
               />
               <button
-                onClick={bulkDelete}
+                onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
               >
-                <Trash2 className="h-3 w-3" /> Delete
+                <Trash2 className="h-3 w-3" /> Delete Contacts
               </button>
               <button onClick={() => setSelected([])} className="ml-auto text-muted-foreground hover:text-foreground">Clear selection</button>
             </div>
@@ -379,16 +379,11 @@ function ContactsPage() {
                             {renderPropertyCell(p, c, labelById, listById)}
                           </td>
                         ))}
-                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <button className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </td>
                       </tr>
                     ))}
                     {pageContacts.length === 0 && (
                       <tr>
-                        <td colSpan={properties.filter((p) => p.visible).length + 2} className="px-4 py-16 text-center text-xs text-muted-foreground">
+                        <td colSpan={properties.filter((p) => p.visible).length + 1} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
                           No contacts match your filters.
                         </td>
