@@ -94,11 +94,11 @@ export const initialLists: ContactList[] = [
 
 export const contacts: Contact[] = [
   { id: "c1", name: "Jenna Loomis", phone: "+1 415 220 8841", instagram: "@jenna.l", channel: "whatsapp", labelIds: ["lb-vip", "lb-influencer"], listIds: ["ls-vip", "ls-launch"], lastInteraction: "2m ago", status: "Active", avatar: avatars[0], ownerId: "me" },
-  { id: "c2", name: "Mateo Rivera", phone: "+34 612 998 014", instagram: "@mateo.rv", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-launch"], lastInteraction: "11m ago", status: "Active", avatar: avatars[1] },
+  { id: "c2", name: "Mateo Rivera", phone: "+34 612 998 014", instagram: "@mateo.rv", channel: "instagram", labelIds: ["lb-creator"], listIds: ["ls-launch"], lastInteraction: "11m ago", status: "Active", avatar: avatars[1], ownerId: "support-ai" },
   { id: "c3", name: "Saanvi Patel", phone: "+91 98220 11045", channel: "whatsapp", labelIds: ["lb-partner", "lb-vip"], listIds: ["ls-vip", "ls-event"], lastInteraction: "32m ago", status: "Active", avatar: avatars[2], ownerId: "me" },
   { id: "c4", name: "Aria Kapoor", phone: "+971 50 441 2208", instagram: "@aria.k", channel: "instagram", labelIds: ["lb-influencer"], listIds: ["ls-influencers-jkt"], lastInteraction: "1h ago", status: "Active", avatar: avatars[3] },
   { id: "c5", name: "Diego Velasco", phone: "+52 55 8830 2014", channel: "whatsapp", labelIds: [], listIds: ["ls-community"], lastInteraction: "2h ago", status: "Active", avatar: avatars[4], ownerId: "me" },
-  { id: "c6", name: "Rin Mori", phone: "+81 90 4422 0011", instagram: "@rin.mori", channel: "instagram", labelIds: ["lb-creator", "lb-vip"], listIds: ["ls-vip", "ls-community"], lastInteraction: "3h ago", status: "Active", avatar: avatars[5] },
+  { id: "c6", name: "Rin Mori", phone: "+81 90 4422 0011", instagram: "@rin.mori", channel: "instagram", labelIds: ["lb-creator", "lb-vip"], listIds: ["ls-vip", "ls-community"], lastInteraction: "3h ago", status: "Active", avatar: avatars[5], ownerId: "sales-ai" },
   { id: "c7", name: "Noor Khalid", phone: "+966 55 220 7711", channel: "whatsapp", labelIds: ["lb-partner"], listIds: ["ls-event"], lastInteraction: "5h ago", status: "Active", avatar: avatars[6], ownerId: "me" },
   { id: "c8", name: "Priya Tan", phone: "+65 8112 4490", instagram: "@priya.t", channel: "instagram", labelIds: ["lb-team"], listIds: [], lastInteraction: "Yesterday", status: "Inactive", avatar: avatars[7] },
   { id: "c9", name: "Elena Castillo", phone: "+34 691 220 887", channel: "whatsapp", labelIds: [], listIds: ["ls-launch", "ls-community"], lastInteraction: "Yesterday", status: "Active", avatar: avatars[8], ownerId: "me" },
