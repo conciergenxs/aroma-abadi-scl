@@ -360,7 +360,6 @@ function ContactsPage() {
                       {properties.filter((p) => p.visible).map((p) => (
                         <th key={p.id} className="sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">{p.name}</th>
                       ))}
-                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
