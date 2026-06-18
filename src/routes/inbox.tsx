@@ -1550,6 +1550,9 @@ function CollaboratorsPopover({
   const filtered = TEAM_USERS.filter((u) =>
     u.name.toLowerCase().includes(q.toLowerCase()),
   );
+  const filteredAgents = AI_AGENTS.filter((a) =>
+    a.name.toLowerCase().includes(q.toLowerCase()),
+  );
   const toggle = (id: string) =>
     setDraft((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]));
   return (
@@ -1587,16 +1590,28 @@ function CollaboratorsPopover({
             <div className="flex flex-wrap gap-1 px-1 pb-2">
               {draft.map((id) => {
                 const u = TEAM_USERS.find((x) => x.id === id);
-                if (!u) return null;
+                const a = !u ? findAgent(id) : undefined;
+                if (!u && !a) return null;
                 return (
                   <span
                     key={id}
                     className="inline-flex items-center gap-1 rounded-full border border-border bg-white/[0.04] pl-1 pr-1.5 py-0.5 text-[10px]"
                   >
-                    <span className="h-4 w-4 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[8px]">
-                      {u.avatar}
-                    </span>
-                    {u.name}
+                    {u ? (
+                      <>
+                        <span className="h-4 w-4 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[8px]">
+                          {u.avatar}
+                        </span>
+                        {u.name}
+                      </>
+                    ) : a ? (
+                      <>
+                        <span className="h-4 w-4 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
+                          <Bot className="h-2.5 w-2.5 text-primary" />
+                        </span>
+                        {a.name}
+                      </>
+                    ) : null}
                     <button
                       onClick={() => toggle(id)}
                       className="text-muted-foreground hover:text-foreground"
@@ -1609,12 +1624,17 @@ function CollaboratorsPopover({
             </div>
           )}
           <div className="max-h-56 overflow-y-auto">
+            {filtered.length > 0 && (
+              <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                People
+              </div>
+            )}
             {TEAMS.map((team) => {
               const members = filtered.filter((u) => u.team === team);
               if (members.length === 0) return null;
               return (
                 <div key={team} className="mb-1.5">
-                  <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  <div className="px-3 pt-1 pb-1 text-[10px] font-medium text-muted-foreground/60">
                     {team}
                   </div>
                   {members.map((u) => {
@@ -1644,6 +1664,40 @@ function CollaboratorsPopover({
                 </div>
               );
             })}
+            {filteredAgents.length > 0 && (
+              <div className="mt-1 border-t border-border pt-1.5">
+                <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  AI Agents
+                </div>
+                {filteredAgents.map((a) => {
+                  const checked = draft.includes(a.id);
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => toggle(a.id)}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-white/[0.05]"
+                    >
+                      <span
+                        className={`h-4 w-4 rounded border grid place-items-center ${
+                          checked
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "border-border"
+                        }`}
+                      >
+                        {checked && <Check className="h-3 w-3" />}
+                      </span>
+                      <span className="h-5 w-5 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
+                        <Bot className="h-3 w-3 text-primary" />
+                      </span>
+                      <span className="flex-1 text-left">{a.name}</span>
+                      <span className="rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
+                        AI
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-between gap-2 border-t border-border mt-2 pt-2">
             <button
