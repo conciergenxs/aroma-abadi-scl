@@ -397,7 +397,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                 <th className="px-4 py-3 text-left font-medium">Contact</th>
                 <th className="px-4 py-3 text-left font-medium">Channel</th>
                 <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-left font-medium">Groups</th>
+                <th className="px-4 py-3 text-left font-medium">Labels</th>
                 <th className="px-4 py-3 text-left font-medium">Last Updated</th>
               </tr>
             </thead>
