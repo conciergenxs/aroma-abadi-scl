@@ -209,6 +209,45 @@ function InboxPage() {
   const noteRef = useRef<HTMLTextAreaElement | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
 
+  // ============== MESSAGE ACTIONS (reply / copy / forward) ==============
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
+  const [replyTargets, setReplyTargets] = useState<Record<string, ReplyRef | undefined>>({});
+  const [sentByConvo, setSentByConvo] = useState<Record<string, SentMsg[]>>({});
+  const [forwardMode, setForwardMode] = useState(false);
+  const [selectedMsgIds, setSelectedMsgIds] = useState<Set<string>>(new Set());
+  const [forwardModalOpen, setForwardModalOpen] = useState(false);
+  const [forwardSearch, setForwardSearch] = useState("");
+  const [forwardContacts, setForwardContacts] = useState<Set<string>>(new Set());
+
+  const exitForwardMode = () => {
+    setForwardMode(false);
+    setSelectedMsgIds(new Set());
+  };
+  const toggleSelectMsg = (id: string) =>
+    setSelectedMsgIds((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
+  const copyToComposer = (text: string) => {
+    setComposerMode("reply");
+    setReplyText(text);
+    requestAnimationFrame(() => {
+      composerRef.current?.focus();
+      const end = text.length;
+      composerRef.current?.setSelectionRange(end, end);
+    });
+  };
+
   const insertTemplate = (body: string) => {
     if (composerMode === "note") {
       setNoteText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
