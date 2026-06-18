@@ -23,6 +23,7 @@ import {
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
@@ -50,6 +51,7 @@ function ContactsPage() {
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   if (isChildRoute) return <Outlet />;
 
