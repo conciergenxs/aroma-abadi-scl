@@ -924,3 +924,130 @@ function renderBodyWithVars(body: string) {
     ),
   );
 }
+
+function GroupPickerModal({
+  mode,
+  selectedIds,
+  onClose,
+}: {
+  mode: "add" | "remove";
+  selectedIds: string[];
+  onClose: () => void;
+}) {
+  const { groups, templates } = useTemplatesStore();
+  const [query, setQuery] = useState("");
+  const [picked, setPicked] = useState<string[]>([]);
+
+  const assignedGroupIds = useMemo(() => {
+    const set = new Set<string>();
+    templates.forEach((t) => {
+      if (selectedIds.includes(t.id) && t.groupId) set.add(t.groupId);
+    });
+    return set;
+  }, [templates, selectedIds]);
+
+  const list = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const base = mode === "remove"
+      ? groups.filter((g) => assignedGroupIds.has(g.id))
+      : groups;
+    return q ? base.filter((g) => g.name.toLowerCase().includes(q)) : base;
+  }, [groups, assignedGroupIds, query, mode]);
+
+  const toggle = (id: string) =>
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  const apply = () => {
+    if (picked.length === 0) {
+      toast.error("Pick at least one group");
+      return;
+    }
+    if (mode === "add") {
+      // Assign each picked group to all selected templates (last write wins for groupId).
+      picked.forEach((gid) => templatesStore.setGroupForTemplates(selectedIds, gid));
+      toast.success(`Added to ${picked.length} group${picked.length === 1 ? "" : "s"}`);
+    } else {
+      picked.forEach((gid) =>
+        templatesStore.removeGroupFromTemplates(selectedIds, gid),
+      );
+      toast.success(`Removed from ${picked.length} group${picked.length === 1 ? "" : "s"}`);
+    }
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+          <h2 className="text-sm font-semibold">
+            {mode === "add" ? "Add to Group" : "Remove from Group"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search groups…"
+              className="w-full h-9 rounded-md border border-border bg-background/40 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          <div className="rounded-lg border border-border divide-y divide-border max-h-72 overflow-y-auto">
+            {list.map((g) => {
+              const checked = picked.includes(g.id);
+              return (
+                <label
+                  key={g.id}
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-white/[0.03]"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-[oklch(0.62_0.17_40)]"
+                    checked={checked}
+                    onChange={() => toggle(g.id)}
+                  />
+                  <span className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`} />
+                  <span className="text-[13px]">{g.name}</span>
+                </label>
+              );
+            })}
+            {list.length === 0 && (
+              <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
+                {mode === "remove"
+                  ? "Selected templates aren't assigned to any group."
+                  : "No groups found."}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={apply}
+            className="inline-flex items-center rounded-md bg-primary px-3 h-9 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
