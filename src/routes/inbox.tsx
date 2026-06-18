@@ -67,6 +67,91 @@ function InboxPage() {
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
 
+  // ============== INBOX FILTER PANEL ==============
+  type FilterCategory = "channels" | "labels" | "owner" | "lifecycle" | "unread";
+  type InboxFilters = {
+    channels: Channel[];
+    labels: string[];
+    owners: string[]; // user ids; "__unassigned" for unassigned
+    stages: LifecycleStage[];
+    unreadOnly: boolean;
+  };
+  const emptyFilters: InboxFilters = {
+    channels: [],
+    labels: [],
+    owners: [],
+    stages: [],
+    unreadOnly: false,
+  };
+  const [filters, setFilters] = useState<InboxFilters>(emptyFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<FilterCategory>("channels");
+  const [filterSearch, setFilterSearch] = useState("");
+  const filterBtnRef = useRef<HTMLButtonElement | null>(null);
+  const filterPanelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (filterPanelRef.current?.contains(t)) return;
+      if (filterBtnRef.current?.contains(t)) return;
+      setFiltersOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFiltersOpen(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [filtersOpen]);
+
+  useEffect(() => {
+    setFilterSearch("");
+  }, [filterCategory]);
+
+  const toggleIn = <T,>(arr: T[], v: T): T[] =>
+    arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+
+  const activeFilterCount =
+    filters.channels.length +
+    filters.labels.length +
+    filters.owners.length +
+    filters.stages.length +
+    (filters.unreadOnly ? 1 : 0);
+
+  const availableChannels = useMemo(() => {
+    const seen = new Set<Channel>();
+    const out: Channel[] = [];
+    for (const c of connectedChannels) {
+      if (c.status === "connected" && !seen.has(c.channel)) {
+        seen.add(c.channel);
+        out.push(c.channel);
+      }
+    }
+    return out;
+  }, []);
+  const channelLabel = (c: Channel) => (c === "whatsapp" ? "WhatsApp" : "Instagram");
+
+  const ownerOptions = useMemo(
+    () => [
+      { id: "me", name: "Me" },
+      { id: "__unassigned", name: "Unassigned" },
+      ...TEAM_USERS.filter((u) => u.id !== "me").map((u) => ({ id: u.id, name: u.name })),
+    ],
+    [],
+  );
+  const ownerLabel = (id: string) =>
+    id === "__unassigned" ? "Unassigned" : id === "me" ? "Me" : userLabel(id);
+
+  const labelById = useMemo(
+    () => new Map(labels.map((l) => [l.id, l] as const)),
+    [labels],
+  );
+
   useEffect(() => {
     if (!contextOpen) return;
     const onKey = (e: KeyboardEvent) => {
