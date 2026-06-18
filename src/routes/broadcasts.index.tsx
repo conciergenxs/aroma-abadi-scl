@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
-import { broadcasts } from "@/components/scl/mock-data";
+import { useBroadcastsStore, broadcastsStore } from "@/components/scl/broadcasts-store";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Copy, Trash2 } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/broadcasts/")({
   head: () => ({ meta: [{ title: "Broadcasts — SCL" }] }),
@@ -13,8 +16,12 @@ const STATUSES = ["All", "Sent", "Scheduled", "Draft"] as const;
 type StatusFilter = (typeof STATUSES)[number];
 
 function BroadcastListPage() {
+  const navigate = useNavigate();
+  const { broadcasts } = useBroadcastsStore();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("All");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -27,7 +34,7 @@ function BroadcastListPage() {
         b.channel.toLowerCase().includes(q)
       );
     });
-  }, [query, status]);
+  }, [query, status, broadcasts]);
 
   const stats = useMemo(() => {
     const sent = broadcasts.filter((b) => b.status === "Sent");
@@ -41,7 +48,36 @@ function BroadcastListPage() {
       { l: "Read rate", v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—" },
       { l: "Scheduled", v: String(scheduled) },
     ];
-  }, []);
+  }, [broadcasts]);
+
+  const visibleIds = rows.map((r) => r.id);
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const toggleAll = () => {
+    if (allVisibleSelected) {
+      setSelected((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setSelected((prev) => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+  const toggleOne = (id: string) =>
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
+    );
+  const clearSelection = () => setSelected([]);
+
+  const doDuplicate = () => {
+    if (selected.length !== 1) return;
+    broadcastsStore.duplicate(selected[0]);
+    toast.success("Broadcast duplicated");
+    setSelected([]);
+  };
+  const doDelete = () => {
+    const count = selected.length;
+    broadcastsStore.deleteMany(selected);
+    toast.success(`${count} broadcast${count === 1 ? "" : "s"} deleted`);
+    setSelected([]);
+  };
 
   return (
     <AppShell
@@ -101,10 +137,47 @@ function BroadcastListPage() {
             </div>
           </div>
 
+          {selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
+              <span className="text-muted-foreground">
+                {selected.length} selected
+              </span>
+              <button
+                onClick={doDuplicate}
+                disabled={selected.length !== 1}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                title={selected.length === 1 ? "" : "Select a single broadcast to duplicate"}
+              >
+                <Copy className="h-3 w-3" /> Duplicate Broadcast
+              </button>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3" /> Delete Broadcast
+              </button>
+              <button
+                onClick={clearSelection}
+                className="ml-auto text-muted-foreground hover:text-foreground"
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      className="accent-[oklch(0.62_0.17_40)]"
+                      checked={allVisibleSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all"
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left font-medium">Name</th>
                   <th className="px-4 py-3 text-left font-medium">Channel</th>
                   <th className="px-4 py-3 text-left font-medium">Audience</th>
@@ -118,7 +191,22 @@ function BroadcastListPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {rows.map((b) => (
-                  <tr key={b.id} className="hover:bg-white/[0.02]">
+                  <tr
+                    key={b.id}
+                    onClick={() =>
+                      navigate({ to: "/broadcasts/$broadcastId", params: { broadcastId: b.id } })
+                    }
+                    className="hover:bg-white/[0.02] cursor-pointer"
+                  >
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        className="accent-[oklch(0.62_0.17_40)]"
+                        checked={selected.includes(b.id)}
+                        onChange={() => toggleOne(b.id)}
+                        aria-label={`Select ${b.name}`}
+                      />
+                    </td>
                     <td className="px-4 py-3 font-medium">{b.name}</td>
                     <td className="px-4 py-3"><ChannelDot channel={b.channel} /></td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">{b.audience}</td>
@@ -138,7 +226,7 @@ function BroadcastListPage() {
                 ))}
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-xs text-muted-foreground">
+                    <td colSpan={10} className="px-4 py-10 text-center text-xs text-muted-foreground">
                       No broadcasts match your filters.
                     </td>
                   </tr>
@@ -148,6 +236,22 @@ function BroadcastListPage() {
           </div>
         </SectionCard>
       </div>
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title="Delete Broadcast"
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            {selected.length === 1 ? "this broadcast" : `these ${selected.length} broadcasts`}?
+            <br />
+            This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        onConfirm={doDelete}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
     </AppShell>
   );
 }
