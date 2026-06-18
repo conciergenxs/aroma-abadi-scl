@@ -841,12 +841,59 @@ function InboxPage() {
           </div>
 
           <div className="border-t border-border/60 bg-background/30 px-6 py-4">
-            {composerMode === "reply" ? (
+            {forwardMode ? (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2.5">
+                <div className="text-[13px] font-medium text-foreground">
+                  {selectedMsgIds.size} message{selectedMsgIds.size === 1 ? "" : "s"} selected
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={exitForwardMode}
+                    className="h-8 px-3 rounded-md border border-border bg-card/60 text-xs hover:bg-white/[0.05]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={openForwardModal}
+                    disabled={selectedMsgIds.size === 0}
+                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ForwardIcon className="h-3.5 w-3.5" /> Forward
+                  </button>
+                </div>
+              </div>
+            ) : composerMode === "reply" ? (
               <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
+                {replyTarget && (
+                  <div className="flex items-start gap-2 mx-3 mt-3 rounded-md border-l-2 border-primary bg-primary/[0.08] pl-2.5 pr-2 py-2">
+                    <CornerDownRight className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                        <span className="font-semibold text-primary/90">Replying to {replyTarget.fromName}</span>
+                        <span>·</span>
+                        <span>{replyTarget.time}</span>
+                      </div>
+                      <div className="mt-0.5 text-[12px] text-foreground/80 line-clamp-2">
+                        {replyTarget.text}
+                      </div>
+                    </div>
+                    <button
+                      onClick={clearReply}
+                      aria-label="Cancel reply"
+                      className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+                    >
+                      <XIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
                 <textarea
+                  ref={composerRef}
                   rows={2}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitReply(); }
+                  }}
                   placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`}
                   className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
                 />
@@ -868,7 +915,8 @@ function InboxPage() {
                     </button>
                   </div>
                   <button
-                    onClick={() => setReplyText("")}
+                    onClick={submitReply}
+                    disabled={!replyText.trim()}
                     className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"
                   >
                     <Send className="h-3.5 w-3.5" /> Send
