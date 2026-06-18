@@ -17,22 +17,25 @@ import {
 import {
   Plus,
   Search,
-  MoreHorizontal,
   Tags,
   X,
   Pencil,
   Trash2,
   AlertTriangle,
   Check,
-  Copy,
   Calendar,
   User,
   Clock,
   CheckCircle2,
   Hourglass,
   FileText,
+  Star,
+  FolderPlus,
+  FolderMinus,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { FloatingMenu } from "@/components/scl/floating-menu";
 
 export const Route = createFileRoute("/templates/")({
   head: () => ({ meta: [{ title: "Message Templates — SCL" }] }),
@@ -76,13 +79,17 @@ const STATUS_OPTIONS = [
 ];
 
 function TemplatesPage() {
-  const { templates, groups } = useTemplatesStore();
+  const { templates, groups, starred } = useTemplatesStore();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [channel, setChannel] = useState("all");
   const [status, setStatus] = useState("all");
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [detail, setDetail] = useState<Template | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [addGroupOpen, setAddGroupOpen] = useState(false);
+  const [removeGroupOpen, setRemoveGroupOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,6 +101,16 @@ function TemplatesPage() {
       return true;
     });
   }, [templates, query, category, channel, status]);
+
+  // Keep selection in sync with what's currently visible.
+  const visibleIds = useMemo(() => filtered.map((t) => t.id), [filtered]);
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const toggleAll = () =>
+    setSelected(allVisibleSelected ? [] : visibleIds);
+  const clearSelection = () => setSelected([]);
 
   return (
     <AppShell>
@@ -153,28 +170,101 @@ function TemplatesPage() {
             </div>
           </div>
 
+          {selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
+              <span className="text-muted-foreground">
+                {selected.length} selected
+              </span>
+              <button
+                onClick={() => setAddGroupOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              >
+                <FolderPlus className="h-3 w-3" /> Add to Group
+              </button>
+              <button
+                onClick={() => setRemoveGroupOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              >
+                <FolderMinus className="h-3 w-3" /> Remove from Group
+              </button>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3" /> Delete Templates
+              </button>
+              <button
+                onClick={clearSelection}
+                className="ml-auto text-muted-foreground hover:text-foreground"
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      className="accent-[oklch(0.62_0.17_40)]"
+                      checked={allVisibleSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all"
+                    />
+                  </th>
+                  <th className="w-8 px-2 py-3"></th>
                   <th className="px-4 py-3 text-left font-medium">Template name</th>
                   <th className="px-4 py-3 text-left font-medium">Group</th>
                   <th className="px-4 py-3 text-left font-medium">Category</th>
                   <th className="px-4 py-3 text-left font-medium">Channel</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
                   <th className="px-4 py-3 text-left font-medium">Last updated</th>
-                  <th className="w-10 px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.map((t) => {
                   const group = groups.find((g) => g.id === t.groupId);
+                  const isStar = starred.includes(t.id);
+                  const isSel = selected.includes(t.id);
                   return (
                     <tr
                       key={t.id}
                       onClick={() => setDetail(t)}
                       className="hover:bg-white/[0.02] cursor-pointer"
                     >
+                      <td
+                        className="px-4 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          className="accent-[oklch(0.62_0.17_40)]"
+                          checked={isSel}
+                          onChange={() => toggleOne(t.id)}
+                          aria-label={`Select ${t.name}`}
+                        />
+                      </td>
+                      <td
+                        className="px-2 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => templatesStore.toggleStar(t.id)}
+                          className={`h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] ${
+                            isStar
+                              ? "text-amber-300"
+                              : "text-muted-foreground/50 hover:text-amber-300"
+                          }`}
+                          aria-label={isStar ? "Unstar template" : "Star template"}
+                        >
+                          <Star
+                            className={`h-3.5 w-3.5 ${isStar ? "fill-current" : ""}`}
+                          />
+                        </button>
+                      </td>
                       <td className="px-4 py-3">
                         <div className="text-sm font-medium">{t.name}</div>
                         <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-md">
@@ -210,20 +300,12 @@ function TemplatesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{t.updated}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
-                      </td>
                     </tr>
                   );
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-xs text-muted-foreground">
+                    <td colSpan={8} className="px-4 py-10 text-center text-xs text-muted-foreground">
                       No templates match your filters.
                     </td>
                   </tr>
@@ -236,6 +318,35 @@ function TemplatesPage() {
 
       {groupsOpen && <ManageGroupsModal onClose={() => setGroupsOpen(false)} />}
       {detail && <TemplateDetailModal template={detail} onClose={() => setDetail(null)} />}
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title={`Delete ${selected.length} template${selected.length === 1 ? "" : "s"}?`}
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => {
+          const count = selected.length;
+          templatesStore.deleteTemplates(selected);
+          setSelected([]);
+          toast.success(`Deleted ${count} template${count === 1 ? "" : "s"}`);
+        }}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
+
+      {addGroupOpen && (
+        <GroupPickerModal
+          mode="add"
+          selectedIds={selected}
+          onClose={() => setAddGroupOpen(false)}
+        />
+      )}
+      {removeGroupOpen && (
+        <GroupPickerModal
+          mode="remove"
+          selectedIds={selected}
+          onClose={() => setRemoveGroupOpen(false)}
+        />
+      )}
     </AppShell>
   );
 }
