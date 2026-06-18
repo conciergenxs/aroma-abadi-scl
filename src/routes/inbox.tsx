@@ -19,9 +19,10 @@ import {
   Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal, ChevronUp,
   Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
   UserX, MessageSquare, Info, Building2,
-  Mail, User2, ExternalLink, UserPlus, X as XIcon,
+  Mail, User2, ExternalLink, UserPlus, X as XIcon, Bot,
 } from "lucide-react";
 import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon, Reply as ReplyIcon, Copy as CopyIcon, ClipboardPaste, Forward as ForwardIcon, CornerDownRight } from "lucide-react";
+import { AI_AGENTS, findAgent, isAgentId } from "@/components/scl/agents";
 import { toast } from "sonner";
 import type { Message } from "@/components/scl/mock-data";
 
@@ -62,8 +63,14 @@ const TEAM_USERS: TeamUser[] = [
 const TEAMS = Array.from(new Set(TEAM_USERS.map((u) => u.team)));
 const teamOfOwner = (ownerId?: string | null) =>
   ownerId ? TEAM_USERS.find((u) => u.id === ownerId)?.team ?? null : null;
-const userLabel = (id?: string | null) =>
-  !id ? "Unassigned" : TEAM_USERS.find((u) => u.id === id)?.name ?? id;
+const userLabel = (id?: string | null) => {
+  if (!id) return "Unassigned";
+  const u = TEAM_USERS.find((x) => x.id === id);
+  if (u) return u.name;
+  const a = findAgent(id);
+  if (a) return a.name;
+  return id;
+};
 
 function InboxPage() {
   const { contacts, labels, lists, properties } = useContactsStore();
