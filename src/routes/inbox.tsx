@@ -822,7 +822,29 @@ function InboxPage() {
             onToggleRead={() =>
               isUnread(active) ? markRead(active.id) : markUnread(active.id)
             }
+            searchOpen={searchOpen}
+            onToggleSearch={() => setSearchOpen((v) => !v)}
           />
+
+          {searchOpen && (
+            <SearchStrip
+              query={searchQuery}
+              setQuery={setSearchQuery}
+              total={searchMatches.length}
+              index={searchActiveIdx}
+              onPrev={() =>
+                setSearchActiveIdx((i) =>
+                  searchMatches.length === 0 ? 0 : (i - 1 + searchMatches.length) % searchMatches.length,
+                )
+              }
+              onNext={() =>
+                setSearchActiveIdx((i) =>
+                  searchMatches.length === 0 ? 0 : (i + 1) % searchMatches.length,
+                )
+              }
+              onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+            />
+          )}
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
             <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">Today</div>
@@ -838,6 +860,8 @@ function InboxPage() {
                 onCopy={() => copyToClipboard(m.text)}
                 onCopyToBox={() => copyToComposer(m.text)}
                 onForward={() => startForward(m)}
+                highlightQuery={highlightQuery}
+                isActiveMatch={activeMatchId === m.id}
               />
             ))}
             {combinedThread.length === 0 && (
