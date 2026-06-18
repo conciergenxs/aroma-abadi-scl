@@ -1,12 +1,15 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { SclSelect } from "@/components/scl/scl-select";
 import {
   type Contact,
+  type Channel,
   type ContactLabel,
   type ContactList,
   type LabelColor,
   type LifecycleStage,
+  connectedChannels,
 } from "@/components/scl/mock-data";
 import { LIFECYCLE_STAGES, STAGE_COLORS } from "@/components/scl/mock-data";
 import {
@@ -18,7 +21,7 @@ import {
 } from "@/components/scl/contacts-store";
 import { toast } from "sonner";
 import {
-  Search, Filter, Plus, MoreHorizontal,
+  Search, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
@@ -47,6 +50,7 @@ function ContactsPage() {
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [channelFilter, setChannelFilter] = useState<string>("all");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
@@ -55,11 +59,27 @@ function ContactsPage() {
 
   if (isChildRoute) return <Outlet />;
 
+  const channelOptions = useMemo(() => {
+    const connected = connectedChannels.filter((c) => c.status === "connected");
+    const unique = Array.from(new Set(connected.map((c) => c.channel)));
+    return [
+      { value: "all", label: "All Channels" },
+      ...unique.map((ch) => ({
+        value: ch,
+        label: ch === "whatsapp" ? "WhatsApp" : "Instagram",
+        icon: <ChannelIcon channel={ch as Channel} className="h-4 w-4" />,
+      })),
+    ];
+  }, []);
+
   const visibleContacts = useMemo(() => {
     let base: Contact[];
     if (activeView === "all") base = contacts;
     else if (activeView === "mine") base = contacts.filter((c) => c.ownerId === "me");
     else base = contacts.filter((c) => c.listIds.includes(activeView));
+    if (channelFilter !== "all") {
+      base = base.filter((c) => c.channel === channelFilter);
+    }
     if (!query.trim()) return base;
     const q = query.toLowerCase();
     return base.filter(
@@ -68,11 +88,11 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeView, query]);
+  }, [contacts, activeView, channelFilter, query]);
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
-  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+  useEffect(() => { setPage(1); }, [activeView, channelFilter, query, perPage]);
   const pageStart = (page - 1) * perPage;
   const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
 
@@ -274,9 +294,12 @@ function ContactsPage() {
                 className="h-9 w-80 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            <button className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card">
-              <Filter className="h-3 w-3" /> Filters
-            </button>
+            <SclSelect
+              value={channelFilter}
+              onChange={setChannelFilter}
+              options={channelOptions}
+              className="w-44"
+            />
             <div className="ml-auto flex items-center gap-2">
               <button
                 onClick={() => setShowManageProps(true)}
@@ -384,7 +407,8 @@ function ContactsPage() {
                       <tr>
                         <td colSpan={properties.filter((p) => p.visible).length + 1} className="px-4 py-16 text-center text-xs text-muted-foreground">
                           <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
-                          No contacts match your filters.
+                          <div className="font-medium text-foreground">No contacts found</div>
+                          <div className="mt-1">Try selecting another channel or clearing filters.</div>
                         </td>
                       </tr>
                     )}
