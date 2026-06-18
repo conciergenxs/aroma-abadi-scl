@@ -372,6 +372,59 @@ function InboxPage() {
   const contact = contacts.find((c) => c.id === active.contactId)!;
   const thread = threadsByContact[contact.id] ?? [];
 
+  // Combined message list (mock thread + locally-sent messages)
+  const combinedThread: SentMsg[] = useMemo(
+    () => [...thread, ...(sentByConvo[active.id] ?? [])],
+    [thread, sentByConvo, active.id],
+  );
+  const senderName = (m: Message) => (m.from === "me" ? "You" : contact.name);
+  const replyTarget = replyTargets[active.id];
+  const startReply = (m: Message) => {
+    setComposerMode("reply");
+    setReplyTargets((prev) => ({
+      ...prev,
+      [active.id]: { id: m.id, text: m.text, fromName: senderName(m), time: m.time },
+    }));
+    requestAnimationFrame(() => composerRef.current?.focus());
+  };
+  const clearReply = () =>
+    setReplyTargets((prev) => ({ ...prev, [active.id]: undefined }));
+  const submitReply = () => {
+    const text = replyText.trim();
+    if (!text) return;
+    const sent: SentMsg = {
+      id: `s_${Date.now()}`,
+      from: "me",
+      text,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      status: "delivered",
+      replyTo: replyTarget,
+    };
+    setSentByConvo((prev) => ({ ...prev, [active.id]: [...(prev[active.id] ?? []), sent] }));
+    setReplyText("");
+    clearReply();
+  };
+  const startForward = (m: Message) => {
+    setForwardMode(true);
+    setSelectedMsgIds(new Set([m.id]));
+  };
+  const openForwardModal = () => {
+    if (selectedMsgIds.size === 0) return;
+    setForwardContacts(new Set());
+    setForwardSearch("");
+    setForwardModalOpen(true);
+  };
+  const confirmForward = () => {
+    const count = selectedMsgIds.size;
+    const recipients = forwardContacts.size;
+    setForwardModalOpen(false);
+    exitForwardMode();
+    toast.success(
+      `Messages forwarded successfully`,
+      { description: `${count} message${count === 1 ? "" : "s"} sent to ${recipients} contact${recipients === 1 ? "" : "s"}` },
+    );
+  };
+
   const stageCounts = useMemo(() => {
     const map = new Map<LifecycleStage, number>();
     for (const c of conversations) {
