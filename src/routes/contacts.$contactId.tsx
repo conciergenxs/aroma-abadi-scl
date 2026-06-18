@@ -992,3 +992,21 @@ function groupByDay(activities: ContactActivity[]) {
   }
   return Array.from(map.values()).sort((a, b) => b.key.localeCompare(a.key));
 }
+
+function sameValue(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (a == null && b === "") return true;
+  if (b == null && a === "") return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((v, i) => v === b[i]);
+  }
+  return false;
+}
+
+function displayValue(v: unknown): string {
+  if (v == null || v === "") return "—";
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
+  return String(v);
+}
