@@ -1,12 +1,14 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { SclSelect } from "@/components/scl/scl-select";
 import {
-  type Contact,
+  type Channel,
   type ContactLabel,
   type ContactList,
   type LabelColor,
   type LifecycleStage,
+  connectedChannels,
 } from "@/components/scl/mock-data";
 import { LIFECYCLE_STAGES, STAGE_COLORS } from "@/components/scl/mock-data";
 import {
@@ -18,7 +20,7 @@ import {
 } from "@/components/scl/contacts-store";
 import { toast } from "sonner";
 import {
-  Search, Filter, Plus, MoreHorizontal,
+  Search, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
 } from "lucide-react";
