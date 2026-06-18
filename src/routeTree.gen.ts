@@ -19,7 +19,6 @@ import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
-import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 
 const TemplatesRoute = TemplatesRouteImport.update({
   id: '/templates',
@@ -69,11 +68,6 @@ const ContactsContactIdRoute = ContactsContactIdRouteImport.update({
 const BroadcastsNewRoute = BroadcastsNewRouteImport.update({
   id: '/broadcasts/new',
   path: '/broadcasts/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesNewRoute = TemplatesNewRouteImport.update({
-  id: '/templates/new',
-  path: '/templates/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 
