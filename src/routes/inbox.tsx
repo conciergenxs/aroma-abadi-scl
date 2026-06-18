@@ -21,7 +21,7 @@ import {
   UserX, MessageSquare, Info, Building2,
   Mail, User2, ExternalLink, UserPlus, X as XIcon,
 } from "lucide-react";
-import { StickyNote, AtSign as AtSignIcon } from "lucide-react";
+import { StickyNote, AtSign as AtSignIcon, Pin, PinOff, MailOpen, Mail as MailIcon } from "lucide-react";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -163,6 +163,30 @@ function InboxPage() {
   const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
   const [activeId, setActiveId] = useState(conversations[0].id);
 
+  // ============== PIN + READ STATE OVERRIDES ==============
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
+  // true = forced unread, false = marked read, undefined = use original
+  const [unreadOverrides, setUnreadOverrides] = useState<Record<string, boolean>>({});
+  const isPinned = (id: string) => pinnedIds.has(id);
+  const togglePinned = (id: string) =>
+    setPinnedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const unreadCount = (c: Conversation) => {
+    const o = unreadOverrides[c.id];
+    if (o === false) return 0;
+    if (o === true) return Math.max(c.unread, 1);
+    return c.unread;
+  };
+  const isUnread = (c: Conversation) => unreadCount(c) > 0;
+  const markRead = (id: string) =>
+    setUnreadOverrides((p) => ({ ...p, [id]: false }));
+  const markUnread = (id: string) =>
+    setUnreadOverrides((p) => ({ ...p, [id]: true }));
+
   // Internal note composer state
   type InternalNote = {
     id: string;
@@ -255,7 +279,7 @@ function InboxPage() {
         const v = activeFilter.value;
         if (v === "my" && ct.ownerId !== "me") return false;
         if (v === "unassigned" && ct.ownerId) return false;
-        if (v === "mentions" && c.unread === 0) return false;
+        if (v === "mentions" && !isUnread(c)) return false;
         if (v === "collaborations") {
           const collabs = collaborators[c.id] ?? [];
           if (collabs.length < 2 && !collabs.includes("me")) return false;
@@ -267,7 +291,7 @@ function InboxPage() {
         if (t !== activeFilter.value) return false;
       }
       // Tabs
-      if (tab === "Unread" && c.unread === 0) return false;
+      if (tab === "Unread" && !isUnread(c)) return false;
       if (tab === "Assigned" && !ct.ownerId) return false;
       if (tab === "Unassigned" && ct.ownerId) return false;
       // Inbox filter panel
@@ -281,7 +305,7 @@ function InboxPage() {
       if (filters.stages.length) {
         if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
       }
-      if (filters.unreadOnly && c.unread === 0) return false;
+      if (filters.unreadOnly && !isUnread(c)) return false;
       // Search
       if (search) {
         const q = search.toLowerCase();
@@ -289,9 +313,18 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators, filters]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides]);
 
-  const active = visible.find((c) => c.id === activeId) ?? visible[0] ?? conversations[0];
+  // Pinned conversations float to the top while preserving original order.
+  const sortedVisible = useMemo(() => {
+    return [...visible].sort((a, b) => {
+      const ap = pinnedIds.has(a.id) ? 1 : 0;
+      const bp = pinnedIds.has(b.id) ? 1 : 0;
+      return bp - ap;
+    });
+  }, [visible, pinnedIds]);
+
+  const active = sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
   const thread = threadsByContact[contact.id] ?? [];
 
@@ -550,17 +583,19 @@ function InboxPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {visible.length === 0 && (
+            {sortedVisible.length === 0 && (
               <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
                 No conversations match the current filters.
               </div>
             )}
-            {visible.map((c) => {
+            {sortedVisible.map((c) => {
               const ct = contacts.find((x) => x.id === c.contactId);
               if (!ct) return null;
               const sel = c.id === activeId;
               const stageColor = ct.lifecycleStage ? STAGE_COLORS[ct.lifecycleStage] : null;
-              const unread = c.unread > 0;
+              const unread = isUnread(c);
+              const count = unreadCount(c);
+              const pinned = isPinned(c.id);
               return (
                 <button
                   key={c.id}
@@ -585,19 +620,26 @@ function InboxPage() {
                       <span className={`text-[15px] truncate ${unread ? "font-semibold text-foreground" : "font-medium text-foreground/90"}`}>
                         {ct.name}
                       </span>
-                      <span className={`text-[10px] shrink-0 tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
-                        {c.time}
+                      <span className="flex items-center gap-1 shrink-0">
+                        <span className={`text-[10px] tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
+                          {c.time}
+                        </span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-1">
                       <p className={`text-[12px] truncate leading-snug ${unread ? "text-foreground/85" : "text-muted-foreground/70"}`}>
                         {c.preview}
                       </p>
-                      {unread && (
-                        <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground shrink-0">
-                          {c.unread}
-                        </span>
-                      )}
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        {pinned && (
+                          <Pin className="h-3 w-3 text-primary fill-primary/80" aria-label="Pinned" />
+                        )}
+                        {unread && (
+                          <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground">
+                            {count}
+                          </span>
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {stageColor && ct.lifecycleStage && (
@@ -644,6 +686,12 @@ function InboxPage() {
             }
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
+            isPinned={isPinned(active.id)}
+            isUnread={isUnread(active)}
+            onTogglePin={() => togglePinned(active.id)}
+            onToggleRead={() =>
+              isUnread(active) ? markRead(active.id) : markUnread(active.id)
+            }
           />
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
@@ -994,6 +1042,10 @@ function ConversationHeader({
   onChangeOwner,
   onChangeCollaborators,
   onToggleContext,
+  isPinned,
+  isUnread,
+  onTogglePin,
+  onToggleRead,
 }: {
   contact: Contact;
   active: Conversation;
@@ -1003,7 +1055,13 @@ function ConversationHeader({
   onChangeOwner: (ownerId: string | null) => void;
   onChangeCollaborators: (ids: string[]) => void;
   onToggleContext: () => void;
+  isPinned: boolean;
+  isUnread: boolean;
+  onTogglePin: () => void;
+  onToggleRead: () => void;
 }) {
+  const moreRef = useRef<HTMLButtonElement>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
@@ -1027,9 +1085,6 @@ function ConversationHeader({
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
-        <button className="h-9 w-9 grid place-items-center rounded hover:bg-white/[0.05] hover:text-foreground" title="More">
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
         <button
           onClick={onToggleContext}
           data-contact-toggle
@@ -1040,6 +1095,39 @@ function ConversationHeader({
         >
           <Info className="h-4 w-4" />
         </button>
+        <button
+          ref={moreRef}
+          onClick={() => setMoreOpen((v) => !v)}
+          title="More actions"
+          className={`h-9 w-9 grid place-items-center rounded transition ${
+            moreOpen ? "bg-white/[0.06] text-foreground" : "hover:bg-white/[0.05] hover:text-foreground"
+          }`}
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
+        <FloatingMenu
+          anchorRef={moreRef}
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          align="end"
+          width={200}
+          className="rounded-md border border-border bg-popover/95 backdrop-blur shadow-lg py-1 text-[13px]"
+        >
+          <button
+            onClick={() => { onTogglePin(); setMoreOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-white/[0.05]"
+          >
+            {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+            <span>{isPinned ? "Unpin Contact" : "Pin Contact"}</span>
+          </button>
+          <button
+            onClick={() => { onToggleRead(); setMoreOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-white/[0.05]"
+          >
+            {isUnread ? <MailOpen className="h-3.5 w-3.5" /> : <MailIcon className="h-3.5 w-3.5" />}
+            <span>{isUnread ? "Mark as Read" : "Mark as Unread"}</span>
+          </button>
+        </FloatingMenu>
       </div>
     </div>
   );
