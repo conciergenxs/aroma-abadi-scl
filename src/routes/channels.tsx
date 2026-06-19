@@ -172,7 +172,7 @@ function AccountsTab() {
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Meta Business Account
             </div>
-            <div className="mt-1 text-sm font-semibold">Camlets Support</div>
+            <div className="mt-1 text-sm font-semibold">Northstar Commerce</div>
             <div className="mt-3 flex items-center gap-3 text-[11px]">
               <button className="text-primary hover:underline">Get verified</button>
               <span className="text-border">•</span>
@@ -198,16 +198,28 @@ function AccountsTab() {
         </h3>
         <div className="space-y-3">
           <ConnectedNumberCard
-            businessAccount="Camlets Support – Staging"
-            phone="+62 811 6610 203"
-            displayName="Camlets Support – Staging"
-            accountId="waba_010203_staging"
+            businessAccount="Northstar Support"
+            phone="+62 811 9001 2233"
+            displayName="Northstar Support"
+            accountId="waba_northstar_support"
           />
           <ConnectedNumberCard
-            businessAccount="Camlets Support – Showcase"
-            phone="+62 811 1303 2507"
-            displayName="Camlets Support – Showcase"
-            accountId="waba_130325_showcase"
+            businessAccount="Northstar Sales"
+            phone="+62 811 9001 4455"
+            displayName="Northstar Sales"
+            accountId="waba_northstar_sales"
+          />
+          <ConnectedNumberCard
+            businessAccount="Northstar Marketing"
+            phone="+62 811 9001 6677"
+            displayName="Northstar Marketing"
+            accountId="waba_northstar_marketing"
+          />
+          <ConnectedNumberCard
+            businessAccount="Northstar Loyalty"
+            phone="+62 811 9001 8899"
+            displayName="Northstar Loyalty"
+            accountId="waba_northstar_loyalty"
           />
         </div>
       </div>
@@ -309,8 +321,8 @@ function ConnectedNumberCard({
 function BillingTab() {
   const [filter, setFilter] = useState<"all" | "mba" | "waba">("all");
   const cards = [
-    { name: "Camlets Support", balance: "US$13.61", source: "mba" as const },
-    { name: "Influence ID", balance: "US$20.81", source: "waba" as const },
+    { name: "Northstar Commerce", balance: "US$18.42", source: "mba" as const },
+    { name: "Aurora Retail Group", balance: "US$27.65", source: "waba" as const },
   ];
   const filtered = cards.filter((c) => filter === "all" || c.source === filter);
 
@@ -405,13 +417,18 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
   );
 }
 
+const WHATSAPP_CHANNELS = [
+  { id: "northstar-support", name: "Northstar Support", phone: "+62 811 9001 2233" },
+  { id: "northstar-sales", name: "Northstar Sales", phone: "+62 811 9001 4455" },
+  { id: "northstar-marketing", name: "Northstar Marketing", phone: "+62 811 9001 6677" },
+  { id: "northstar-loyalty", name: "Northstar Loyalty", phone: "+62 811 9001 8899" },
+];
+
 function OptInTab() {
-  const rows = [
-    { name: "Camlets Support", enabled: true },
-    { name: "Camlets Support KC", enabled: false },
-    { name: "Camlets Support Public", enabled: true },
-    { name: "Camlets Support Showcase", enabled: false },
-  ];
+  const [selected, setSelected] = useState(WHATSAPP_CHANNELS[0]);
+
+  const rows = WHATSAPP_CHANNELS.filter((c) => c.id === selected.id);
+
   return (
     <div className="space-y-5">
       <div className="rounded-xl border border-border bg-card/40 p-5">
@@ -422,13 +439,31 @@ function OptInTab() {
         </p>
         <div className="mt-4 flex items-center gap-3">
           <label className="text-[11px] text-muted-foreground">Meta Business Account</label>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-border bg-card/60 hover:bg-card px-3 py-1.5 text-xs"
-          >
-            Camlets Support
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-card/60 hover:bg-card px-3 py-1.5 text-xs"
+              >
+                Northstar Commerce
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64">
+              {WHATSAPP_CHANNELS.map((channel) => (
+                <DropdownMenuItem
+                  key={channel.id}
+                  onClick={() => setSelected(channel)}
+                  className="flex items-center justify-between"
+                >
+                  <span>{channel.name}</span>
+                  {selected.id === channel.id && (
+                    <span className="text-[10px] text-muted-foreground">Selected</span>
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -445,7 +480,7 @@ function OptInTab() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <OptInRow key={r.name} name={r.name} initialEnabled={r.enabled} />
+              <OptInRow key={r.id} channel={r} />
             ))}
           </tbody>
         </table>
@@ -454,11 +489,18 @@ function OptInTab() {
   );
 }
 
-function OptInRow({ name, initialEnabled }: { name: string; initialEnabled: boolean }) {
-  const [on, setOn] = useState(initialEnabled);
+function OptInRow({
+  channel,
+}: {
+  channel: (typeof WHATSAPP_CHANNELS)[number];
+}) {
+  const [on, setOn] = useState(false);
   return (
     <tr className="border-b border-border last:border-0 hover:bg-white/[0.02]">
-      <td className="px-4 py-3 font-medium">{name}</td>
+      <td className="px-4 py-3">
+        <div className="font-medium">{channel.name}</div>
+        <div className="text-[10px] text-muted-foreground">{channel.phone}</div>
+      </td>
       <td className="px-4 py-3">
         <Switch checked={on} onCheckedChange={setOn} />
       </td>
