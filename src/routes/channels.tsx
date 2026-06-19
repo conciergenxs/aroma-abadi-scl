@@ -480,7 +480,7 @@ function OptInTab() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <OptInRow key={r.id} channel={r} selected={selected.id === r.id} />
+              <OptInRow key={r.id} channel={r} />
             ))}
           </tbody>
         </table>
