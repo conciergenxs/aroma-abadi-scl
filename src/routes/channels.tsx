@@ -491,14 +491,12 @@ function OptInTab() {
 
 function OptInRow({
   channel,
-  selected,
 }: {
   channel: (typeof WHATSAPP_CHANNELS)[number];
-  selected: boolean;
 }) {
   const [on, setOn] = useState(false);
   return (
-    <tr className={`border-b border-border last:border-0 hover:bg-white/[0.02] ${selected ? "bg-white/[0.02]" : ""}`}>
+    <tr className="border-b border-border last:border-0 hover:bg-white/[0.02]">
       <td className="px-4 py-3">
         <div className="font-medium">{channel.name}</div>
         <div className="text-[10px] text-muted-foreground">{channel.phone}</div>
