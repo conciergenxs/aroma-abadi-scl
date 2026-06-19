@@ -417,7 +417,7 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
   );
 }
 
-const WHATSAPP_CHANNELS = [
+export const WHATSAPP_CHANNELS = [
   { id: "northstar-support", name: "Northstar Support", phone: "+62 811 9001 2233" },
   { id: "northstar-sales", name: "Northstar Sales", phone: "+62 811 9001 4455" },
   { id: "northstar-marketing", name: "Northstar Marketing", phone: "+62 811 9001 6677" },
