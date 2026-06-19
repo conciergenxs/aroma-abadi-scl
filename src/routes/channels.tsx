@@ -427,7 +427,7 @@ const WHATSAPP_CHANNELS = [
 function OptInTab() {
   const [selected, setSelected] = useState(WHATSAPP_CHANNELS[0]);
 
-  const rows = WHATSAPP_CHANNELS;
+  const rows = WHATSAPP_CHANNELS.filter((c) => c.id === selected.id);
 
   return (
     <div className="space-y-5">
