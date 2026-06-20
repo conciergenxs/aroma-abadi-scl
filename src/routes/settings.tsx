@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useMemo, useRef, useState } from "react";
+import { FloatingMenu } from "@/components/scl/floating-menu";
 import {
   ChevronDown,
   Upload,
@@ -69,8 +70,8 @@ function SettingsPage() {
 
   return (
     <AppShell title="Settings" subtitle="Manage your workspace preferences and configuration">
-      <div className="grid grid-cols-[260px_1fr] gap-6">
-        <aside className="rounded-xl border border-border bg-card/60 glass p-2 h-fit sticky top-4">
+      <div className="grid grid-cols-[260px_1fr] gap-6 items-start">
+        <aside className="rounded-xl border border-border bg-card/60 glass p-2 h-fit sticky top-0 self-start">
           {NAV.map((section) => {
             const isOpen = open[section.id];
             return (
@@ -117,7 +118,7 @@ function SettingsPage() {
           })}
         </aside>
 
-        <div className="space-y-6 min-w-0">
+        <div className="space-y-6 min-w-0 self-start">
           {active === "general" ? <GeneralPage /> : <ComingSoonPanel id={active} />}
         </div>
       </div>
@@ -135,9 +136,9 @@ function GeneralPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-semibold">General</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+      <div className="px-1 pt-0.5">
+        <h2 className="text-xl font-semibold leading-tight m-0">General</h2>
+        <p className="text-xs text-muted-foreground mt-1 m-0">
           Your personal profile and conversation entry points
         </p>
       </div>
@@ -297,12 +298,14 @@ function TeamMultiSelect({
   onChange: (v: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const toggle = (t: string) =>
     onChange(value.includes(t) ? value.filter((v) => v !== t) : [...value, t]);
 
   return (
     <div className="relative">
       <div
+        ref={triggerRef}
         onClick={() => setOpen((o) => !o)}
         className="flex flex-wrap items-center gap-1.5 min-h-9 rounded-md border border-border bg-background/60 px-2 py-1.5 cursor-pointer focus-within:ring-1 focus-within:ring-primary/40"
       >
@@ -329,34 +332,34 @@ function TeamMultiSelect({
         <ChevronDown className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
       </div>
 
-      {open && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute z-40 left-0 right-0 mt-1 rounded-md border border-border bg-popover glass shadow-xl p-1">
-            {TEAM_OPTIONS.map((t) => {
-              const checked = value.includes(t);
-              return (
-                <button
-                  key={t}
-                  onClick={() => toggle(t)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-white/[0.04]"
-                >
-                  <span
-                    className={`h-4 w-4 rounded border grid place-items-center ${
-                      checked
-                        ? "bg-primary border-primary text-primary-foreground"
-                        : "border-border"
-                    }`}
-                  >
-                    {checked && <Check className="h-3 w-3" />}
-                  </span>
-                  <span>{t}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
+      <FloatingMenu
+        anchorRef={triggerRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        className="rounded-md border border-border bg-popover glass shadow-xl p-1"
+      >
+        {TEAM_OPTIONS.map((t) => {
+          const checked = value.includes(t);
+          return (
+            <button
+              key={t}
+              onClick={() => toggle(t)}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-white/[0.04]"
+            >
+              <span
+                className={`h-4 w-4 rounded border grid place-items-center ${
+                  checked
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-border"
+                }`}
+              >
+                {checked && <Check className="h-3 w-3" />}
+              </span>
+              <span>{t}</span>
+            </button>
+          );
+        })}
+      </FloatingMenu>
     </div>
   );
 }
