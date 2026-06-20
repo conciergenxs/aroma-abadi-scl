@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useMemo, useRef, useState } from "react";
+import { FloatingMenu } from "@/components/scl/floating-menu";
 import {
   ChevronDown,
   Upload,
@@ -69,8 +70,8 @@ function SettingsPage() {
 
   return (
     <AppShell title="Settings" subtitle="Manage your workspace preferences and configuration">
-      <div className="grid grid-cols-[260px_1fr] gap-6">
-        <aside className="rounded-xl border border-border bg-card/60 glass p-2 h-fit sticky top-4">
+      <div className="grid grid-cols-[260px_1fr] gap-6 items-start">
+        <aside className="rounded-xl border border-border bg-card/60 glass p-2 h-fit sticky top-0 self-start">
           {NAV.map((section) => {
             const isOpen = open[section.id];
             return (
@@ -117,7 +118,7 @@ function SettingsPage() {
           })}
         </aside>
 
-        <div className="space-y-6 min-w-0">
+        <div className="space-y-6 min-w-0 self-start">
           {active === "general" ? <GeneralPage /> : <ComingSoonPanel id={active} />}
         </div>
       </div>
@@ -135,9 +136,9 @@ function GeneralPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-semibold">General</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+      <div className="px-1 pt-0.5">
+        <h2 className="text-xl font-semibold leading-tight m-0">General</h2>
+        <p className="text-xs text-muted-foreground mt-1 m-0">
           Your personal profile and conversation entry points
         </p>
       </div>
