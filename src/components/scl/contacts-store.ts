@@ -331,3 +331,18 @@ export const contactsStore = {
 export function useContactsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
+
+const FALLBACK_STAGE_STYLE = { bar: "bg-gray-500", dot: "bg-gray-500", badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" };
+
+/**
+ * Lookup the color/style for a stage name. Reads the live contacts-store
+ * lifecycleStages list, falling back to legacy STAGE_COLORS for safety.
+ * Components that render stage colors should also subscribe via
+ * `useContactsStore()` so they re-render when stages change.
+ */
+export function getStageStyle(name?: string | null) {
+  if (!name) return FALLBACK_STAGE_STYLE;
+  const def = state.lifecycleStages.find((s) => s.name === name);
+  if (def) return LIFECYCLE_COLORS[def.color];
+  return STAGE_COLORS[name] ?? FALLBACK_STAGE_STYLE;
+}
