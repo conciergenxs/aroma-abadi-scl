@@ -1176,7 +1176,7 @@ function PropertyFormPage({
           </label>
           <label className="block">
             <FieldLabel>Property Type</FieldLabel>
-            <div className="mt-1">
+            <div className={`mt-1 ${isSystem ? "pointer-events-none opacity-60" : ""}`}>
               <SclSelect
                 value={type}
                 onChange={(v) => setType(v as PropType)}
@@ -1184,7 +1184,6 @@ function PropertyFormPage({
                   value: t,
                   label: PROP_TYPE_LABELS[t],
                 }))}
-                disabled={isSystem}
               />
             </div>
           </label>
