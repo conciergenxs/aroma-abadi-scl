@@ -11,12 +11,14 @@ import {
   type LifecycleStage,
   connectedChannels,
 } from "@/components/scl/mock-data";
-import { LIFECYCLE_STAGES, STAGE_COLORS } from "@/components/scl/mock-data";
 import {
   contactsStore,
   useContactsStore,
   PROPERTY_TYPE_LABELS,
   type ContactProperty,
+  type LifecycleStageDef,
+  LIFECYCLE_COLORS,
+  getStageStyle,
 } from "@/components/scl/contacts-store";
 import { toast } from "sonner";
 import {
@@ -74,9 +76,10 @@ function ContactsPage() {
 
   const visibleContacts = useMemo(() => {
     let base: Contact[];
-    if (activeView === "all") base = contacts;
-    else if (activeView === "mine") base = contacts.filter((c) => c.ownerId === "me");
-    else base = contacts.filter((c) => c.listIds.includes(activeView));
+    const live = contacts.filter((c) => !c.deleted);
+    if (activeView === "all") base = live;
+    else if (activeView === "mine") base = live.filter((c) => c.ownerId === "me");
+    else base = live.filter((c) => c.listIds.includes(activeView));
     if (channelFilter !== "all") {
       base = base.filter((c) => c.channel === channelFilter);
     }
@@ -130,9 +133,11 @@ function ContactsPage() {
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
   const bulkDelete = () => {
     const count = selected.length;
-    setContacts((cs) => cs.filter((c) => !selected.includes(c.id)));
+    contactsStore.softDeleteContacts(selected);
     setSelected([]);
-    toast.success(`Deleted ${count} contact${count === 1 ? "" : "s"}`);
+    toast.success(
+      `Moved ${count} contact${count === 1 ? "" : "s"} to Recently Deleted`,
+    );
   };
 
   const createList = () => {
