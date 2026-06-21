@@ -849,7 +849,6 @@ function PropertiesListPage({
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const [deleteTarget, setDeleteTarget] = useState<PropertyRow | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -879,14 +878,6 @@ function PropertiesListPage({
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setSelected(next);
-  };
-
-  const bulkEdit = () => {
-    if (selected.size === 1) {
-      onEdit(Array.from(selected)[0]);
-    } else {
-      toast.info("Select a single property to edit");
-    }
   };
 
   return (
@@ -922,14 +913,16 @@ function PropertiesListPage({
               <span className="font-semibold">{selected.size}</span> selected
             </div>
             <div className="flex items-center gap-2">
-              <GhostButton onClick={bulkEdit}>
-                <Pencil className="h-3.5 w-3.5" /> Edit Property
-              </GhostButton>
+              {selected.size === 1 && (
+                <GhostButton onClick={() => onEdit(Array.from(selected)[0])}>
+                  <Pencil className="h-3.5 w-3.5" /> Edit Property
+                </GhostButton>
+              )}
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Delete Property
+                <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Property" : "Delete Properties"}
               </button>
             </div>
           </div>
