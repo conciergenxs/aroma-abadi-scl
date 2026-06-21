@@ -1398,9 +1398,6 @@ function TeamManagementPage() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4 px-1 pt-0.5">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
-            Company Settings
-          </div>
           <h2 className="text-xl font-semibold leading-tight m-0">Team Management</h2>
           <p className="text-xs text-muted-foreground mt-1 m-0">
             Manage workspace teams and dedicated channel ownership
