@@ -26,6 +26,7 @@ import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
+import { PlansBillingModule } from "@/components/scl/plans-billing";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -57,10 +58,9 @@ const NAV: NavSection[] = [
     id: "billing",
     label: "Plans & billing",
     items: [
-      { id: "subscription", label: "Subscription" },
-      { id: "payment-methods", label: "Payment Methods" },
-      { id: "add-ons", label: "Add-ons" },
-      { id: "invoices", label: "Invoices" },
+      { id: "subscription", label: "Subscription", enabled: true },
+      { id: "payment-methods", label: "Payment Methods", enabled: true },
+      { id: "invoices", label: "Invoice", enabled: true },
     ],
   },
   {
@@ -139,11 +139,22 @@ function SettingsPage() {
           {active === "user-management" && <UserManagementPage />}
           {active === "team-management" && <TeamManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
+          {(active === "subscription" ||
+            active === "payment-methods" ||
+            active === "invoices") && (
+            <PlansBillingModule
+              section={active}
+              onNavigate={(s) => setActive(s)}
+            />
+          )}
           {active !== "general" &&
             active !== "company-details" &&
             active !== "user-management" &&
             active !== "team-management" &&
-            active !== "roles" && <ComingSoonPanel id={active} />}
+            active !== "roles" &&
+            active !== "subscription" &&
+            active !== "payment-methods" &&
+            active !== "invoices" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
