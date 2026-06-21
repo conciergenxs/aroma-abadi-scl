@@ -17,6 +17,8 @@ import {
   UserPlus,
   Shield,
   Filter,
+  ArrowLeft,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
