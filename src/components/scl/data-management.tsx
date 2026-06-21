@@ -1,5 +1,8 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react";
-import { Search, Plus, Trash2, Pencil, X, Check, ChevronDown, Filter, Lock } from "lucide-react";
+import {
+  Search, Plus, Trash2, Pencil, X, Check, ChevronDown, Filter, Lock,
+  GripVertical, RotateCcw, AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -10,14 +13,24 @@ import {
   PROPERTY_TYPE_LABELS,
   type ContactProperty,
   type PropertyType,
+  type LifecycleStageDef,
+  type LifecycleColorKey,
+  type LifecycleGroup,
+  LIFECYCLE_COLORS,
 } from "./contacts-store";
+import { ChannelDot, LabelChip, ListChip } from "./app-shell";
+import type { Contact, ContactLabel, ContactList } from "./mock-data";
 import { PropertyFormModal } from "./property-form-modal";
 
 // =========================================================
 // Shared types & palette
 // =========================================================
 
-export type DMSection = "labels" | "contact-properties";
+export type DMSection =
+  | "labels"
+  | "contact-properties"
+  | "customer-lifecycle"
+  | "recently-deleted";
 
 type LabelColorKey =
   | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "gray";
@@ -50,7 +63,10 @@ type Props = {
 };
 
 export function DataManagementModule({ section }: Props) {
-  return section === "labels" ? <LabelsPage /> : <ContactPropertiesRouter />;
+  if (section === "labels") return <LabelsPage />;
+  if (section === "contact-properties") return <ContactPropertiesRouter />;
+  if (section === "customer-lifecycle") return <CustomerLifecyclePage />;
+  return <RecentlyDeletedContactsPage />;
 }
 
 // =========================================================
