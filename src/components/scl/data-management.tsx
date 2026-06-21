@@ -1,9 +1,17 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react";
-import { Search, Plus, Trash2, Pencil, X, ArrowLeft, Check, ChevronDown, GripVertical, Filter, Lock } from "lucide-react";
+import { Search, Plus, Trash2, Pencil, X, Check, ChevronDown, Filter, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
 import { ConfirmDialog } from "./confirm-dialog";
 import { SclSelect } from "./scl-select";
+import {
+  contactsStore,
+  useContactsStore,
+  PROPERTY_TYPE_LABELS,
+  type ContactProperty,
+  type PropertyType,
+} from "./contacts-store";
+import { PropertyFormModal } from "./property-form-modal";
 
 // =========================================================
 // Shared types & palette
