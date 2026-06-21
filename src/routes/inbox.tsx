@@ -1769,6 +1769,7 @@ function FilterPanel(props: FilterPanelProps) {
     availableChannels, channelLabel, labels, ownerOptions,
     onClose, onClear, toggleIn,
   } = props;
+  const { lifecycleStages } = useContactsStore();
 
   const categories: { id: FilterPanelProps["category"]; label: string; count: number }[] = [
     { id: "channels", label: "Channels", count: filters.channels.length },
