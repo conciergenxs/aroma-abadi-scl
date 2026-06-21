@@ -1060,6 +1060,7 @@ function PropertyFormPage({
   const [editable, setEditable] = useState(initial?.editable ?? true);
   const [options, setOptions] = useState<string[]>(initial?.options ?? []);
   const [newOption, setNewOption] = useState("");
+  const isSystem = !!initial?.system;
 
   // Auto-generate internal key from name until user edits it manually.
   useEffect(() => {
@@ -1086,6 +1087,7 @@ function PropertyFormPage({
       visible,
       editable,
       options: type === "dropdown" ? options : undefined,
+      system: isSystem,
     });
   };
 
@@ -1136,12 +1138,19 @@ function PropertyFormPage({
 
       <SectionCard title="Property Details">
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {isSystem && (
+            <div className="md:col-span-2 inline-flex items-center gap-2 rounded-md border border-border bg-white/[0.03] px-3 py-2 text-[11px] text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              System property — name and type cannot be changed.
+            </div>
+          )}
           <label className="block">
             <FieldLabel>Property Name</FieldLabel>
             <TextInput
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Annual Revenue"
+              disabled={isSystem}
             />
           </label>
           <label className="block">
@@ -1153,6 +1162,7 @@ function PropertyFormPage({
                 setKeyDirty(true);
               }}
               placeholder="annual_revenue"
+              disabled={isSystem}
             />
           </label>
           <label className="block md:col-span-2">
@@ -1174,6 +1184,7 @@ function PropertyFormPage({
                   value: t,
                   label: PROP_TYPE_LABELS[t],
                 }))}
+                disabled={isSystem}
               />
             </div>
           </label>
