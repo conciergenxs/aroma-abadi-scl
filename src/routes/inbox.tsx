@@ -69,7 +69,7 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  const { contacts, labels, lists, properties } = useContactsStore();
+  const { contacts, labels, lists, properties, lifecycleStages } = useContactsStore();
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ kind: "view", value: "my" });
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
@@ -566,12 +566,13 @@ function InboxPage() {
               <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
               <span className="flex-1 text-left">All Stages</span>
             </button>
-            {LIFECYCLE_STAGES.map((s) => {
+            {lifecycleStages.map((stageDef) => {
+              const s = stageDef.name;
               const sel = isStageActive(s);
               const count = stageCounts.get(s) ?? 0;
               return (
                 <button
-                  key={s}
+                  key={stageDef.id}
                   onClick={() => setActiveFilter({ kind: "stage", value: s })}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
@@ -579,7 +580,7 @@ function InboxPage() {
                       : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
                   }`}
                 >
-                  <span className={`h-2 w-2 rounded-full ${STAGE_COLORS[s].dot}`} />
+                  <span className={`h-2 w-2 rounded-full ${getStageStyle(s).dot}`} />
                   <span className="flex-1 text-left truncate">{s}</span>
                   {count > 0 && (
                     <span className="text-[11px] tabular-nums text-muted-foreground/55">{count}</span>
@@ -725,7 +726,7 @@ function InboxPage() {
               const ct = contacts.find((x) => x.id === c.contactId);
               if (!ct) return null;
               const sel = c.id === activeId;
-              const stageColor = ct.lifecycleStage ? STAGE_COLORS[ct.lifecycleStage] : null;
+              const stageColor = ct.lifecycleStage ? getStageStyle(ct.lifecycleStage) : null;
               const unread = isUnread(c);
               const count = unreadCount(c);
               const pinned = isPinned(c.id);
@@ -1127,8 +1128,8 @@ function InboxPage() {
               <div className="mt-3 text-sm font-medium">{contact.name}</div>
               {contact.lifecycleStage && (
                 <div className="mt-2">
-                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${STAGE_COLORS[contact.lifecycleStage].badge}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`} />
+                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${getStageStyle(contact.lifecycleStage).badge}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${getStageStyle(contact.lifecycleStage).dot}`} />
                     {contact.lifecycleStage}
                   </span>
                 </div>
@@ -1887,14 +1888,14 @@ function FilterPanel(props: FilterPanelProps) {
             )}
             {category === "lifecycle" && (
               <FilterCheckList
-                items={LIFECYCLE_STAGES.map((s) => ({
-                  key: s,
-                  label: s,
-                  checked: filters.stages.includes(s),
+                items={lifecycleStages.map((stageDef) => ({
+                  key: stageDef.name,
+                  label: stageDef.name,
+                  checked: filters.stages.includes(stageDef.name),
                   onToggle: () =>
-                    setFilters((f) => ({ ...f, stages: toggleIn(f.stages, s) })),
+                    setFilters((f) => ({ ...f, stages: toggleIn(f.stages, stageDef.name) })),
                   leading: (
-                    <span className={`h-2 w-2 rounded-full ${STAGE_COLORS[s].dot}`} />
+                    <span className={`h-2 w-2 rounded-full ${getStageStyle(stageDef.name).dot}`} />
                   ),
                 }))}
               />
