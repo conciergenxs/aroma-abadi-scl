@@ -46,7 +46,7 @@ const NAV: NavSection[] = [
     items: [
       { id: "company-details", label: "Company Details", enabled: true },
       { id: "user-management", label: "User Management", enabled: true },
-      { id: "team-management", label: "Team Management" },
+      { id: "team-management", label: "Team Management", enabled: true },
       { id: "roles", label: "Roles & Permissions" },
     ],
   },
