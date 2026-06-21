@@ -67,11 +67,15 @@ export type Contact = {
   /** Future PIC / owner reference. "me" represents the current user. */
   ownerId?: string;
   /** Sales/CRM lifecycle stage — powers the Kanban view. */
-  lifecycleStage?: LifecycleStage;
+  lifecycleStage?: string;
   /** ISO timestamp when contact entered the current lifecycleStage. */
   stageEnteredAt?: string;
   /** Values for user-defined custom properties, keyed by property key. */
   customFields?: Record<string, unknown>;
+  /** Soft-delete flag — deleted contacts appear in Recently Deleted Contacts. */
+  deleted?: boolean;
+  /** ISO timestamp when contact was soft-deleted. */
+  deletedAt?: string;
 };
 
 const avatars = ["JL", "MR", "SP", "AK", "DV", "RM", "NK", "PT", "EC", "BL", "TH", "OW"];
