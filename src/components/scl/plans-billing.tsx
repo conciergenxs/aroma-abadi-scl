@@ -16,8 +16,8 @@ import { SectionCard } from "@/components/scl/app-shell";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 
-type BillingSection = "subscription" | "payment-methods";
-type ModuleView = "subscription" | "manage-plan" | "payment-methods";
+type BillingSection = "subscription" | "payment-methods" | "invoice";
+type ModuleView = "subscription" | "manage-plan" | "payment-methods" | "invoice";
 type BillingCycle = "monthly" | "yearly";
 type InvoiceTab = "subscription" | "addons";
 
@@ -61,6 +61,7 @@ export function PlansBillingModule({ section, onNavigate }: PlansBillingModulePr
 
   if (view === "manage-plan") return <ManagePlanPage onBack={() => setView("subscription")} />;
   if (view === "payment-methods") return <PaymentMethodsPage />;
+  if (view === "invoice") return <InvoicePage />;
 
   return (
     <SubscriptionPage
@@ -181,8 +182,6 @@ function SubscriptionPage({
           <AddOnActions onCancel={() => setContactPackage("5000")} onPurchase={() => setPendingPurchase({ type: "Additional Contacts", quantity: contactOption.label, monthlyCost: contactOption.price })} />
         </AddOnCard>
       </div>
-
-      <InvoiceHistory />
 
       <PurchaseConfirmDialog purchase={pendingPurchase} onClose={() => setPendingPurchase(null)} />
     </div>
@@ -455,45 +454,82 @@ function PurchaseConfirmDialog({ purchase, onClose }: { purchase: AddOnPurchase 
   );
 }
 
-function InvoiceHistory() {
+function InvoicePage() {
   const [tab, setTab] = useState<InvoiceTab>("subscription");
   const [dateFilter, setDateFilter] = useState("all");
-  const rows = tab === "subscription" ? subscriptionInvoices : addonInvoices;
+  const [statusFilter, setStatusFilter] = useState("all");
+  const source = tab === "subscription" ? subscriptionInvoices : addonInvoices;
+  const rows = source.filter((row) => {
+    if (statusFilter !== "all" && row.status.toLowerCase() !== statusFilter) return false;
+    if (dateFilter === "all") return true;
+    return row.dateKey === dateFilter;
+  });
 
   return (
-    <SectionCard title="Invoice History" description="Review billing history and download invoices." action={<SclSelect value={dateFilter} onChange={setDateFilter} options={invoiceDateOptions} size="sm" className="w-44" ariaLabel="Invoice Date Filter" />}>
-      <div className="px-5 pt-4">
-        <div className="flex items-center gap-1 border-b border-border">
-          {(["subscription", "addons"] as InvoiceTab[]).map((item) => (
-            <button key={item} type="button" onClick={() => setTab(item)} className={`relative px-3 py-2 text-sm transition ${tab === item ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              {item === "subscription" ? "Subscription" : "Add-ons"}
-              {tab === item && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary" />}
-            </button>
-          ))}
+    <div className="space-y-5">
+      <PageHeader title="Invoice" description="Review billing history and download invoices." />
+      <SectionCard
+        title="Invoice History"
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <SclSelect value={dateFilter} onChange={setDateFilter} options={invoiceDateOptions} size="sm" className="w-44" ariaLabel="Invoice Date" />
+            <SclSelect value={statusFilter} onChange={setStatusFilter} options={invoiceStatusOptions} size="sm" className="w-36" ariaLabel="Status" />
+          </div>
+        }
+      >
+        <div className="px-5 pt-4">
+          <div className="flex items-center gap-1 border-b border-border">
+            {(["subscription", "addons"] as InvoiceTab[]).map((item) => (
+              <button key={item} type="button" onClick={() => setTab(item)} className={`relative px-3 py-2 text-sm transition ${tab === item ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                {item === "subscription" ? "Subscription" : "Add-ons"}
+                {tab === item && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary" />}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      {rows.length === 0 ? <EmptyState title={tab === "subscription" ? "No Invoices Found" : "No Add-on Purchases"} description={tab === "subscription" ? "Invoices will appear here once billing activity is generated." : "Add-on transactions will appear here."} /> : <InvoiceTable rows={rows} />}
-    </SectionCard>
+        {rows.length === 0 ? (
+          <EmptyState title="No invoices found" description="Invoices will appear here once billing activity is generated." />
+        ) : (
+          <InvoiceTable rows={rows} />
+        )}
+      </SectionCard>
+    </div>
   );
 }
 
-function InvoiceTable({ rows }: { rows: { date: string; amount: string; description: string }[] }) {
+type InvoiceRow = { date: string; dateKey: string; amount: string; description: string; status: "Paid" | "Pending" | "Failed" };
+
+function InvoiceTable({ rows }: { rows: InvoiceRow[] }) {
   return (
     <div className="overflow-hidden">
       <table className="w-full text-sm">
         <thead className="border-b border-border bg-muted/20 text-xs text-muted-foreground">
-          <tr><th className="px-5 py-3 text-left font-medium">Invoice Date</th><th className="px-5 py-3 text-left font-medium">Amount</th><th className="px-5 py-3 text-left font-medium">Description</th><th className="px-5 py-3 text-right font-medium">Download</th></tr>
+          <tr><th className="px-5 py-3 text-left font-medium">Invoice Date</th><th className="px-5 py-3 text-left font-medium">Amount</th><th className="px-5 py-3 text-left font-medium">Description</th><th className="px-5 py-3 text-left font-medium">Status</th><th className="px-5 py-3 text-right font-medium">Download</th></tr>
         </thead>
         <tbody className="divide-y divide-border">
           {rows.map((row) => (
             <tr key={`${row.date}-${row.description}`} className="hover:bg-white/[0.03]">
-              <td className="px-5 py-3">{row.date}</td><td className="px-5 py-3">{row.amount}</td><td className="px-5 py-3 text-muted-foreground">{row.description}</td><td className="px-5 py-3 text-right"><button type="button" onClick={() => downloadInvoice(row)} className="inline-grid h-8 w-8 place-items-center rounded-md border border-border bg-card/60 hover:bg-card" aria-label="Download invoice"><Download className="h-4 w-4" /></button></td>
+              <td className="px-5 py-3">{row.date}</td>
+              <td className="px-5 py-3">{row.amount}</td>
+              <td className="px-5 py-3 text-muted-foreground">{row.description}</td>
+              <td className="px-5 py-3"><StatusBadge status={row.status} /></td>
+              <td className="px-5 py-3 text-right"><button type="button" onClick={() => downloadInvoice(row)} className="inline-grid h-8 w-8 place-items-center rounded-md border border-border bg-card/60 hover:bg-card" aria-label="Download invoice"><Download className="h-4 w-4" /></button></td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
+}
+
+function StatusBadge({ status }: { status: "Paid" | "Pending" | "Failed" }) {
+  const tone =
+    status === "Paid"
+      ? "border-primary/30 bg-primary/10 text-primary"
+      : status === "Pending"
+      ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+      : "border-destructive/30 bg-destructive/10 text-destructive";
+  return <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${tone}`}>{status}</span>;
 }
 
 function downloadInvoice(row: { date: string; amount: string; description: string }) {
@@ -648,14 +684,21 @@ const invoiceDateOptions = [
   { value: "apr-2026", label: "April 2026" },
 ];
 
-const subscriptionInvoices = [
-  { date: "31 May 2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription" },
-  { date: "30 Apr 2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription" },
+const invoiceStatusOptions = [
+  { value: "all", label: "All statuses" },
+  { value: "paid", label: "Paid" },
+  { value: "pending", label: "Pending" },
+  { value: "failed", label: "Failed" },
 ];
 
-const addonInvoices = [
-  { date: "12 Jun 2026", amount: "Rp149,000", description: "Additional User Account" },
-  { date: "05 Jun 2026", amount: "Rp299,000", description: "Additional 5,000 Contacts" },
+const subscriptionInvoices: InvoiceRow[] = [
+  { date: "31 May 2026", dateKey: "may-2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription", status: "Paid" },
+  { date: "30 Apr 2026", dateKey: "apr-2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription", status: "Paid" },
+];
+
+const addonInvoices: InvoiceRow[] = [
+  { date: "12 Jun 2026", dateKey: "jun-2026", amount: "Rp149,000", description: "Additional User Account", status: "Paid" },
+  { date: "05 Jun 2026", dateKey: "jun-2026", amount: "Rp299,000", description: "Additional 5,000 Contacts", status: "Paid" },
 ];
 
 const plans = [
