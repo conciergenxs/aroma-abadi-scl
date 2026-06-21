@@ -16,8 +16,8 @@ import { SectionCard } from "@/components/scl/app-shell";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 
-type BillingSection = "subscription" | "payment-methods";
-type ModuleView = "subscription" | "manage-plan" | "payment-methods";
+type BillingSection = "subscription" | "payment-methods" | "invoice";
+type ModuleView = "subscription" | "manage-plan" | "payment-methods" | "invoice";
 type BillingCycle = "monthly" | "yearly";
 type InvoiceTab = "subscription" | "addons";
 
@@ -61,6 +61,7 @@ export function PlansBillingModule({ section, onNavigate }: PlansBillingModulePr
 
   if (view === "manage-plan") return <ManagePlanPage onBack={() => setView("subscription")} />;
   if (view === "payment-methods") return <PaymentMethodsPage />;
+  if (view === "invoice") return <InvoicePage />;
 
   return (
     <SubscriptionPage
@@ -181,8 +182,6 @@ function SubscriptionPage({
           <AddOnActions onCancel={() => setContactPackage("5000")} onPurchase={() => setPendingPurchase({ type: "Additional Contacts", quantity: contactOption.label, monthlyCost: contactOption.price })} />
         </AddOnCard>
       </div>
-
-      <InvoiceHistory />
 
       <PurchaseConfirmDialog purchase={pendingPurchase} onClose={() => setPendingPurchase(null)} />
     </div>
