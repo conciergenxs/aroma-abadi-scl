@@ -1290,3 +1290,627 @@ function ConnectedAgentsSection() {
     </SectionCard>
   );
 }
+// ============================================================
+// Team Management
+// ============================================================
+
+type Team = {
+  id: string;
+  name: string;
+  channelId: string | null;
+  memberIds: string[];
+  updatedOn: string;
+};
+
+const INITIAL_TEAMS: Team[] = [
+  {
+    id: "team-cs",
+    name: "Customer Support",
+    channelId: "northstar-support",
+    memberIds: ["u-tom", "u-sara", "u-aria", "u-pending-2"],
+    updatedOn: "Jun 12, 2026",
+  },
+  {
+    id: "team-mkt",
+    name: "Marketing",
+    channelId: "northstar-marketing",
+    memberIds: ["u-luca", "u-aria"],
+    updatedOn: "Jun 09, 2026",
+  },
+  {
+    id: "team-sales",
+    name: "Sales",
+    channelId: "northstar-sales",
+    memberIds: ["u-mei", "u-pending-1"],
+    updatedOn: "Jun 05, 2026",
+  },
+];
+
+function channelLabel(id: string | null): string {
+  if (!id) return "—";
+  const c = WHATSAPP_CHANNELS.find((x) => x.id === id);
+  return c ? c.name : "—";
+}
+
+function TeamManagementPage() {
+  const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS);
+  const [users, setUsers] = useState<WorkspaceUser[]>(USERS_SEED);
+  const [openTeamId, setOpenTeamId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const openTeam = teams.find((t) => t.id === openTeamId) ?? null;
+
+  if (openTeam) {
+    return (
+      <TeamDetailPage
+        team={openTeam}
+        users={users}
+        onBack={() => setOpenTeamId(null)}
+        onUpdate={(patch) =>
+          setTeams((s) =>
+            s.map((t) =>
+              t.id === openTeam.id
+                ? { ...t, ...patch, updatedOn: todayLabel() }
+                : t,
+            ),
+          )
+        }
+        onUsersChange={setUsers}
+      />
+    );
+  }
+
+  const filtered = teams.filter((t) =>
+    search.trim() ? t.name.toLowerCase().includes(search.toLowerCase()) : true,
+  );
+
+  const allSelected =
+    filtered.length > 0 && filtered.every((t) => selected.includes(t.id));
+  const toggleAll = () =>
+    setSelected(allSelected ? [] : filtered.map((t) => t.id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const handleDelete = () => {
+    setTeams((s) => s.filter((t) => !selected.includes(t.id)));
+    toast.success(`${selected.length} team(s) deleted`);
+    setSelected([]);
+  };
+
+  const handleCreate = (name: string, channelId: string | null) => {
+    const id = `team-${Date.now()}`;
+    setTeams((s) => [
+      ...s,
+      { id, name, channelId, memberIds: [], updatedOn: todayLabel() },
+    ]);
+    toast.success("Team created");
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-start justify-between gap-4 px-1 pt-0.5">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
+            Company Settings
+          </div>
+          <h2 className="text-xl font-semibold leading-tight m-0">Team Management</h2>
+          <p className="text-xs text-muted-foreground mt-1 m-0">
+            Manage workspace teams and dedicated channel ownership
+          </p>
+        </div>
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          <Plus className="h-3.5 w-3.5" /> Create Team
+        </button>
+      </div>
+
+      <SectionCard>
+        <div className="p-4 flex flex-wrap items-center gap-2 border-b border-border">
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by team name"
+              className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+        </div>
+
+        {selected.length > 0 && (
+          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
+            <span className="font-medium">{selected.length} selected</span>
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Delete Team
+            </button>
+          </div>
+        )}
+
+        <div className="overflow-x-auto scl-scroll">
+          <table className="w-full text-sm min-w-[900px]">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-4 py-2.5 text-left w-8">
+                  <Checkbox checked={allSelected} onChange={toggleAll} />
+                </th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Members</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Dedicated Channel</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Last Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((t) => (
+                <tr
+                  key={t.id}
+                  onClick={() => setOpenTeamId(t.id)}
+                  className="border-b border-border/60 hover:bg-white/[0.02] h-14 cursor-pointer"
+                >
+                  <td
+                    className="px-4 py-3 align-middle"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Checkbox
+                      checked={selected.includes(t.id)}
+                      onChange={() => toggleOne(t.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-md bg-primary/15 border border-primary/30 grid place-items-center text-primary">
+                        <Users className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-medium">{t.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {t.memberIds.length}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    {t.channelId ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
+                        WhatsApp · {channelLabel(t.channelId)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
+                    {t.updatedOn}
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No teams found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {createOpen && (
+        <TeamFormModal
+          title="Create Team"
+          submitLabel="Create Team"
+          onClose={() => setCreateOpen(false)}
+          onSubmit={(name, channelId) => {
+            handleCreate(name, channelId);
+            setCreateOpen(false);
+          }}
+        />
+      )}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleDelete}
+        title="Delete Team"
+        description="Are you sure you want to delete this team?"
+        confirmLabel="Delete"
+      />
+    </div>
+  );
+}
+
+function todayLabel() {
+  return new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
+function TeamFormModal({
+  title,
+  submitLabel,
+  initialName = "",
+  initialChannelId = null,
+  onClose,
+  onSubmit,
+}: {
+  title: string;
+  submitLabel: string;
+  initialName?: string;
+  initialChannelId?: string | null;
+  onClose: () => void;
+  onSubmit: (name: string, channelId: string | null) => void;
+}) {
+  const [name, setName] = useState(initialName);
+  const [channelId, setChannelId] = useState<string | null>(initialChannelId);
+
+  const channelOptions = [
+    { value: "__none", label: "No dedicated channel" },
+    ...WHATSAPP_CHANNELS.map((c) => ({
+      value: c.id,
+      label: c.name,
+      trailing: c.phone,
+    })),
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+      >
+        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
+          <h2 className="text-sm font-semibold">{title}</h2>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-4 border-t border-border">
+          <label className="block">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Team name <span className="text-destructive">*</span>
+            </span>
+            <input
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Customer Support"
+              className="mt-1 h-9 w-full rounded-md border border-border bg-background/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Dedicated channel (optional)
+            </span>
+            <div className="mt-1">
+              <SclSelect
+                value={channelId ?? "__none"}
+                onChange={(v) => setChannelId(v === "__none" ? null : v)}
+                options={channelOptions}
+                placeholder="Select a channel"
+              />
+            </div>
+          </label>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!name.trim()}
+            onClick={() => onSubmit(name.trim(), channelId)}
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeamDetailPage({
+  team,
+  users,
+  onBack,
+  onUpdate,
+  onUsersChange: _onUsersChange,
+}: {
+  team: Team;
+  users: WorkspaceUser[];
+  onBack: () => void;
+  onUpdate: (patch: Partial<Team>) => void;
+  onUsersChange: (users: WorkspaceUser[]) => void;
+}) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
+  const members = users.filter((u) => team.memberIds.includes(u.id));
+  const allSelected =
+    members.length > 0 && members.every((m) => selected.includes(m.id));
+  const toggleAll = () =>
+    setSelected(allSelected ? [] : members.map((m) => m.id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const handleRemove = () => {
+    onUpdate({ memberIds: team.memberIds.filter((id) => !selected.includes(id)) });
+    toast.success(`${selected.length} member(s) removed`);
+    setSelected([]);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="px-1 pt-0.5">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Team Management
+        </button>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold leading-tight m-0">{team.name}</h2>
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                Dedicated Channel
+              </span>
+              {team.channelId ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
+                  WhatsApp · {channelLabel(team.channelId)}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">None</span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setEditOpen(true)}
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
+            >
+              Edit Team
+            </button>
+            <button
+              onClick={() => setAddOpen(true)}
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <UserPlus className="h-3.5 w-3.5" /> Add Team Members
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <SectionCard
+        title="Team members"
+        description={`${members.length} member${members.length === 1 ? "" : "s"} in this team`}
+      >
+        {selected.length > 0 && (
+          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
+            <span className="font-medium">{selected.length} selected</span>
+            <button
+              onClick={() => setConfirmRemove(true)}
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Remove From Team
+            </button>
+          </div>
+        )}
+        <div className="overflow-x-auto scl-scroll">
+          <table className="w-full text-sm min-w-[900px]">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-4 py-2.5 text-left w-8">
+                  <Checkbox checked={allSelected} onChange={toggleAll} />
+                </th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Role</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Date Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.map((u) => (
+                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                  <td className="px-4 py-3 align-middle">
+                    <Checkbox
+                      checked={selected.includes(u.id)}
+                      onChange={() => toggleOne(u.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
+                        {u.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")}
+                      </div>
+                      <span className="font-medium">{u.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">{u.email}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">{u.role}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">{u.job}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">{u.joinedOn}</td>
+                </tr>
+              ))}
+              {members.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No members yet. Click “Add Team Members” to invite users to this team.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {editOpen && (
+        <TeamFormModal
+          title="Edit Team"
+          submitLabel="Save Changes"
+          initialName={team.name}
+          initialChannelId={team.channelId}
+          onClose={() => setEditOpen(false)}
+          onSubmit={(name, channelId) => {
+            onUpdate({ name, channelId });
+            setEditOpen(false);
+            toast.success("Team updated");
+          }}
+        />
+      )}
+
+      {addOpen && (
+        <AddMembersModal
+          users={users}
+          existingIds={team.memberIds}
+          onClose={() => setAddOpen(false)}
+          onSubmit={(ids) => {
+            onUpdate({ memberIds: Array.from(new Set([...team.memberIds, ...ids])) });
+            setAddOpen(false);
+            toast.success(`${ids.length} member(s) added`);
+          }}
+        />
+      )}
+
+      <ConfirmDialog
+        open={confirmRemove}
+        onClose={() => setConfirmRemove(false)}
+        onConfirm={handleRemove}
+        title="Remove Members"
+        description="Are you sure you want to remove the selected members from this team?"
+        confirmLabel="Remove"
+      />
+    </div>
+  );
+}
+
+function AddMembersModal({
+  users,
+  existingIds,
+  onClose,
+  onSubmit,
+}: {
+  users: WorkspaceUser[];
+  existingIds: string[];
+  onClose: () => void;
+  onSubmit: (ids: string[]) => void;
+}) {
+  const candidates = users.filter((u) => !existingIds.includes(u.id));
+  const [picked, setPicked] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
+
+  const toggle = (id: string) =>
+    setPicked((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const filtered = candidates.filter((u) =>
+    query.trim()
+      ? (u.name + u.email).toLowerCase().includes(query.toLowerCase())
+      : true,
+  );
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+      >
+        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
+          <h2 className="text-sm font-semibold">Add Team Members</h2>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-3 border-t border-border">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Members
+          </div>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search users…"
+              className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
+          <div className="max-h-72 overflow-auto scl-scroll rounded-md border border-border divide-y divide-border">
+            {filtered.map((u) => {
+              const checked = picked.includes(u.id);
+              return (
+                <button
+                  key={u.id}
+                  onClick={() => toggle(u.id)}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/[0.04]"
+                >
+                  <Checkbox checked={checked} onChange={() => toggle(u.id)} />
+                  <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
+                    {u.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium truncate">{u.name}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {u.email}
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">{u.role}</span>
+                </button>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="px-3 py-8 text-center text-xs text-muted-foreground">
+                No users available to add.
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={picked.length === 0}
+            onClick={() => onSubmit(picked)}
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add Members
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
