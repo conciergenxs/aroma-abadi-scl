@@ -60,6 +60,7 @@ const NAV: NavSection[] = [
     items: [
       { id: "subscription", label: "Subscription", enabled: true },
       { id: "payment-methods", label: "Payment Methods", enabled: true },
+      { id: "invoice", label: "Invoice", enabled: true },
     ],
   },
   {
@@ -138,7 +139,7 @@ function SettingsPage() {
           {active === "user-management" && <UserManagementPage />}
           {active === "team-management" && <TeamManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
-          {(active === "subscription" || active === "payment-methods") && (
+          {(active === "subscription" || active === "payment-methods" || active === "invoice") && (
             <PlansBillingModule
               section={active}
               onNavigate={(s) => setActive(s)}
@@ -150,7 +151,8 @@ function SettingsPage() {
             active !== "team-management" &&
             active !== "roles" &&
             active !== "subscription" &&
-            active !== "payment-methods" && <ComingSoonPanel id={active} />}
+            active !== "payment-methods" &&
+            active !== "invoice" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
