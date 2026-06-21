@@ -806,8 +806,25 @@ function ContactPropertiesRouter() {
       onAdd={() => setView({ kind: "add" })}
       onEdit={(id) => setView({ kind: "edit", id })}
       onDelete={(ids) => {
-        setProperties((prev) => prev.filter((p) => !ids.includes(p.id)));
-        toast.success(ids.length > 1 ? "Properties deleted" : "Property deleted");
+        const blocked = properties.filter((p) => ids.includes(p.id) && p.system);
+        const deletable = ids.filter(
+          (id) => !properties.find((p) => p.id === id)?.system,
+        );
+        if (blocked.length > 0) {
+          toast.error(
+            `${blocked.length} system propert${blocked.length === 1 ? "y" : "ies"} cannot be deleted`,
+          );
+        }
+        if (deletable.length > 0) {
+          setProperties((prev) => prev.filter((p) => !deletable.includes(p.id)));
+          toast.success(deletable.length > 1 ? "Properties deleted" : "Property deleted");
+        }
+      }}
+      onToggleVisible={(id, v) => {
+        const now = new Date().toISOString();
+        setProperties((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, visible: v, updatedAt: now } : p)),
+        );
       }}
     />
   );
@@ -818,11 +835,13 @@ function PropertiesListPage({
   onAdd,
   onEdit,
   onDelete,
+  onToggleVisible,
 }: {
   properties: PropertyRow[];
   onAdd: () => void;
   onEdit: (id: string) => void;
   onDelete: (ids: string[]) => void;
+  onToggleVisible: (id: string, v: boolean) => void;
 }) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
