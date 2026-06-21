@@ -1212,19 +1212,19 @@ function ConnectedAgentsSection() {
           </button>
         </div>
       )}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto scl-scroll">
+        <table className="w-full text-sm min-w-[1100px]">
           <thead>
             <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
               <th className="px-4 py-2.5 text-left w-8">
                 <Checkbox checked={allSelected} onChange={toggleAll} />
               </th>
-              <th className="px-3 py-2.5 text-left">Agent name</th>
-              <th className="px-3 py-2.5 text-left">Description</th>
-              <th className="px-3 py-2.5 text-left">Webhook URL</th>
-              <th className="px-3 py-2.5 text-left">Status</th>
-              <th className="px-3 py-2.5 text-left">Assigned conversations</th>
-              <th className="px-3 py-2.5 text-left">Connected on</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Agent name</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Description</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Webhook URL</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Status</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned conversations</th>
+              <th className="px-4 py-2.5 text-left whitespace-nowrap">Connected on</th>
             </tr>
           </thead>
           <tbody>
@@ -1234,14 +1234,14 @@ function ConnectedAgentsSection() {
                 connectedOn: "Today",
               };
               return (
-                <tr key={a.id} className="border-b border-border/60 hover:bg-white/[0.02]">
-                  <td className="px-4 py-3">
+                <tr key={a.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                  <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(a.id)}
                       onChange={() => toggleOne(a.id)}
                     />
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-md bg-primary/15 border border-primary/30 grid place-items-center text-primary">
                         <Bot className="h-3.5 w-3.5" />
@@ -1249,18 +1249,20 @@ function ConnectedAgentsSection() {
                       <span className="font-medium">{a.name}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground max-w-sm">{a.description}</td>
-                  <td className="px-3 py-3 text-muted-foreground font-mono text-xs">
-                    {a.webhookUrl}
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground max-w-sm">
+                    <span className="block truncate">{a.description}</span>
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground font-mono text-xs max-w-xs">
+                    <span className="block truncate">{a.webhookUrl}</span>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       {a.status}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">{meta.conversations}</td>
-                  <td className="px-3 py-3 text-muted-foreground text-xs">{meta.connectedOn}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">{meta.conversations}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">{meta.connectedOn}</td>
                 </tr>
               );
             })}
