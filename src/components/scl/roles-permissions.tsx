@@ -405,7 +405,7 @@ export function RolesPermissionsModule() {
         onCancel={() => setView({ mode: "list" })}
         onSubmit={(name, description, state) => {
           const id = `r-${Date.now()}`;
-          setRoles((s) => [...s, { id, name, description, assignedUsers: 0, state }]);
+          setRoles((s) => [...s, { id, name, description, state }]);
           toast.success(`Role "${name}" created`);
           setView({ mode: "list" });
         }}
