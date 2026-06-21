@@ -25,6 +25,7 @@ import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
+import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -49,7 +50,7 @@ const NAV: NavSection[] = [
       { id: "company-details", label: "Company Details", enabled: true },
       { id: "user-management", label: "User Management", enabled: true },
       { id: "team-management", label: "Team Management", enabled: true },
-      { id: "roles", label: "Roles & Permissions" },
+      { id: "roles", label: "Roles & Permissions", enabled: true },
     ],
   },
   {
@@ -135,10 +136,12 @@ function SettingsPage() {
           {active === "company-details" && <CompanyDetailsPage />}
           {active === "user-management" && <UserManagementPage />}
           {active === "team-management" && <TeamManagementPage />}
+          {active === "roles" && <RolesPermissionsModule />}
           {active !== "general" &&
             active !== "company-details" &&
             active !== "user-management" &&
-            active !== "team-management" && <ComingSoonPanel id={active} />}
+            active !== "team-management" &&
+            active !== "roles" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
