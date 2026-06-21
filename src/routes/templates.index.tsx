@@ -122,53 +122,54 @@ function TemplatesPage() {
           </p>
         </div>
 
-        <SectionCard className="overflow-visible">
-          <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-border">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search templates"
-                className="h-9 w-64 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-              />
-            </div>
-            <SclSelect
-              value={category}
-              onChange={setCategory}
-              options={CATEGORY_OPTIONS}
-              className="w-44"
-              ariaLabel="Filter by category"
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search Templates"
+              className="h-9 w-64 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
-            <SclSelect
-              value={channel}
-              onChange={setChannel}
-              options={CHANNEL_OPTIONS}
-              className="w-44"
-              ariaLabel="Filter by channel"
-            />
-            <SclSelect
-              value={status}
-              onChange={setStatus}
-              options={STATUS_OPTIONS}
-              className="w-44"
-              ariaLabel="Filter by status"
-            />
-            <div className="ml-auto flex items-center gap-2">
-              <button
-                onClick={() => setGroupsOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
-              >
-                <Tags className="h-3.5 w-3.5" /> Manage Groups
-              </button>
-              <Link
-                to="/templates/new"
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                <Plus className="h-3.5 w-3.5" /> New Template
-              </Link>
-            </div>
           </div>
+          <SclSelect
+            value={category}
+            onChange={setCategory}
+            options={CATEGORY_OPTIONS}
+            className="w-44"
+            ariaLabel="Filter by category"
+          />
+          <SclSelect
+            value={channel}
+            onChange={setChannel}
+            options={CHANNEL_OPTIONS}
+            className="w-44"
+            ariaLabel="Filter by channel"
+          />
+          <SclSelect
+            value={status}
+            onChange={setStatus}
+            options={STATUS_OPTIONS}
+            className="w-44"
+            ariaLabel="Filter by status"
+          />
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => setGroupsOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            >
+              <Tags className="h-3.5 w-3.5" /> Manage Groups
+            </button>
+            <Link
+              to="/templates/new"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-3.5 w-3.5" /> New Template
+            </Link>
+          </div>
+        </div>
+
+        <SectionCard className="overflow-visible">
 
           {selected.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
