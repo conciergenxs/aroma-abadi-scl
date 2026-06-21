@@ -89,17 +89,19 @@ function SettingsPage() {
             const isOpen = open[section.id];
             return (
               <div key={section.id} className="mb-1">
-                <button
-                  onClick={() => setOpen((o) => ({ ...o, [section.id]: !o[section.id] }))}
-                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80"
-                >
-                  <span>{section.label}</span>
-                  <ChevronDown
-                    className={`h-3 w-3 transition-transform opacity-60 ${isOpen ? "" : "-rotate-90"}`}
-                  />
-                </button>
+                {section.id !== "company" ? (
+                  <button
+                    onClick={() => setOpen((o) => ({ ...o, [section.id]: !o[section.id] }))}
+                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80"
+                  >
+                    <span>{section.label}</span>
+                    <ChevronDown
+                      className={`h-3 w-3 transition-transform opacity-60 ${isOpen ? "" : "-rotate-90"}`}
+                    />
+                  </button>
+                ) : null}
                 {isOpen && (
-                  <div className="mt-1 space-y-0.5">
+                  <div className={`space-y-0.5 ${section.id !== "company" ? "mt-1" : ""}`}>
                     {section.items.map((item) => {
                       const isActive = active === item.id;
                       return (
