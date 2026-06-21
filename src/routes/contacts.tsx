@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
