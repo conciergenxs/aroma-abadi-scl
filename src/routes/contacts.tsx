@@ -17,7 +17,6 @@ import {
   useContactsStore,
   PROPERTY_TYPE_LABELS,
   type ContactProperty,
-  type PropertyType,
 } from "@/components/scl/contacts-store";
 import { toast } from "sonner";
 import {
