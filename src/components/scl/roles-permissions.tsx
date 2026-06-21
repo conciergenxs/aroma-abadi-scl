@@ -1,5 +1,15 @@
-import { useMemo, useState } from "react";
-import { ArrowLeft, Plus, Trash2, Search, Check, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Check,
+  ChevronRight,
+  MoreHorizontal,
+  Pencil,
+  X,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
@@ -287,15 +297,44 @@ export type Role = {
   id: string;
   name: string;
   description: string;
-  assignedUsers: number;
   state: PermState;
+  /** System roles cannot be deleted or renamed. */
+  system?: boolean;
 };
 
 const SEED_ROLES: Role[] = [
-  { id: "r-super", name: "Super Admin", description: "Full unrestricted access to all workspace features and settings.", assignedUsers: 3, state: buildDefaultState() },
-  { id: "r-admin", name: "Admin", description: "Manages workspace operations, members, and most configuration.", assignedUsers: 2, state: buildDefaultState() },
-  { id: "r-team-admin", name: "Team Admin", description: "Manages a single team's members, conversations, and assignments.", assignedUsers: 2, state: buildDefaultState() },
-  { id: "r-staff", name: "Staff", description: "Day-to-day agent access to inbox, contacts, and broadcasts.", assignedUsers: 5, state: buildDefaultState() },
+  { id: "r-super", name: "Super Admin", description: "Full unrestricted access to all workspace features and settings.", state: buildDefaultState(), system: true },
+  { id: "r-admin", name: "Admin", description: "Manages workspace operations, members, and most configuration.", state: buildDefaultState() },
+  { id: "r-team-admin", name: "Team Admin", description: "Manages a single team's members, conversations, and assignments.", state: buildDefaultState() },
+  { id: "r-staff", name: "Staff", description: "Day-to-day agent access to inbox, contacts, and broadcasts.", state: buildDefaultState() },
+];
+
+// ----- Assigned-users seed (module-local) -----
+
+export type AssignedUser = {
+  id: string;
+  name: string;
+  email: string;
+  jobTitle: string;
+  team: string;
+  assignedDate: string;
+  /** Role name; matched against Role.name. */
+  role: string;
+};
+
+const SEED_USERS: AssignedUser[] = [
+  { id: "u-aria", name: "Aria Kapoor", email: "aria.kapoor@northstar.co", jobTitle: "Workspace Owner", team: "Customer Support", assignedDate: "Jan 12, 2024", role: "Super Admin" },
+  { id: "u-jonas", name: "Jonas Weber", email: "jonas.weber@northstar.co", jobTitle: "CTO", team: "Operations", assignedDate: "Jan 14, 2024", role: "Super Admin" },
+  { id: "u-ines", name: "Ines Carvalho", email: "ines.c@northstar.co", jobTitle: "VP Customer", team: "Customer Support", assignedDate: "Jan 20, 2024", role: "Super Admin" },
+  { id: "u-tom", name: "Tomas Bergstrom", email: "tomas.b@northstar.co", jobTitle: "Head of Support", team: "Customer Support", assignedDate: "Feb 02, 2024", role: "Admin" },
+  { id: "u-priya", name: "Priya Shah", email: "priya.shah@northstar.co", jobTitle: "Operations Manager", team: "Operations", assignedDate: "Feb 18, 2024", role: "Admin" },
+  { id: "u-mei", name: "Mei Tanaka", email: "mei.tanaka@northstar.co", jobTitle: "Sales Lead", team: "Sales", assignedDate: "Mar 18, 2024", role: "Team Admin" },
+  { id: "u-luca", name: "Luca Romano", email: "luca.romano@northstar.co", jobTitle: "Marketing Manager", team: "Marketing", assignedDate: "Apr 04, 2024", role: "Team Admin" },
+  { id: "u-sara", name: "Sara Iqbal", email: "sara.iqbal@northstar.co", jobTitle: "Support Specialist", team: "Customer Support", assignedDate: "May 22, 2024", role: "Staff" },
+  { id: "u-dimas", name: "Dimas Pratama", email: "dimas.p@northstar.co", jobTitle: "Operations Analyst", team: "Operations", assignedDate: "Jun 09, 2024", role: "Staff" },
+  { id: "u-hana", name: "Hana Wijaya", email: "hana.wijaya@northstar.co", jobTitle: "Sales Associate", team: "Sales", assignedDate: "Jul 03, 2024", role: "Staff" },
+  { id: "u-marco", name: "Marco Silva", email: "marco.silva@northstar.co", jobTitle: "Support Agent", team: "Customer Support", assignedDate: "Aug 15, 2024", role: "Staff" },
+  { id: "u-noor", name: "Noor Hassan", email: "noor.h@northstar.co", jobTitle: "Customer Insights", team: "Marketing", assignedDate: "Sep 01, 2024", role: "Staff" },
 ];
 
 // ----- UI atoms -----
@@ -345,13 +384,20 @@ function Checkbox({ checked, onChange, disabled }: { checked: boolean; onChange:
 
 // ----- Main component -----
 
-type View = { mode: "list" } | { mode: "create" } | { mode: "edit"; roleId: string };
+type View =
+  | { mode: "list" }
+  | { mode: "create" }
+  | { mode: "edit"; roleId: string }
+  | { mode: "detail"; roleId: string };
 
 export function RolesPermissionsModule() {
   const [roles, setRoles] = useState<Role[]>(SEED_ROLES);
+  const [users, setUsers] = useState<AssignedUser[]>(SEED_USERS);
   const [view, setView] = useState<View>({ mode: "list" });
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const usersByRole = (roleName: string) => users.filter((u) => u.role === roleName);
 
   if (view.mode === "create") {
     return (
@@ -359,7 +405,7 @@ export function RolesPermissionsModule() {
         onCancel={() => setView({ mode: "list" })}
         onSubmit={(name, description, state) => {
           const id = `r-${Date.now()}`;
-          setRoles((s) => [...s, { id, name, description, assignedUsers: 0, state }]);
+          setRoles((s) => [...s, { id, name, description, state }]);
           toast.success(`Role "${name}" created`);
           setView({ mode: "list" });
         }}
@@ -376,11 +422,52 @@ export function RolesPermissionsModule() {
     return (
       <RoleEditor
         initial={role}
-        onCancel={() => setView({ mode: "list" })}
+        onCancel={() => setView({ mode: "detail", roleId: role.id })}
         onSubmit={(name, description, state) => {
-          setRoles((s) => s.map((r) => (r.id === role.id ? { ...r, name, description, state } : r)));
+          setRoles((s) =>
+            s.map((r) =>
+              r.id === role.id
+                ? { ...r, name: r.system ? r.name : name, description, state }
+                : r,
+            ),
+          );
+          // If role name changed, propagate to assigned users
+          if (!role.system && role.name !== name) {
+            setUsers((s) => s.map((u) => (u.role === role.name ? { ...u, role: name } : u)));
+          }
           toast.success(`Role "${name}" updated`);
+          setView({ mode: "detail", roleId: role.id });
+        }}
+      />
+    );
+  }
+
+  if (view.mode === "detail") {
+    const role = roles.find((r) => r.id === view.roleId);
+    if (!role) {
+      setView({ mode: "list" });
+      return null;
+    }
+    return (
+      <RoleDetailPage
+        role={role}
+        roles={roles}
+        users={usersByRole(role.name)}
+        onBack={() => setView({ mode: "list" })}
+        onEdit={() => setView({ mode: "edit", roleId: role.id })}
+        onDelete={() => {
+          setRoles((s) => s.filter((r) => r.id !== role.id));
+          toast.success(`Role "${role.name}" deleted`);
           setView({ mode: "list" });
+        }}
+        onChangeUserRole={(userId, newRoleName) => {
+          setUsers((s) => s.map((u) => (u.id === userId ? { ...u, role: newRoleName } : u)));
+          toast.success("Role updated");
+        }}
+        onRemoveUsers={(ids) => {
+          // "Remove role" = unassign — for the prototype, we drop them from this role list.
+          setUsers((s) => s.filter((u) => !ids.includes(u.id)));
+          toast.success(`${ids.length} user(s) removed from role`);
         }}
       />
     );
@@ -392,8 +479,15 @@ export function RolesPermissionsModule() {
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   const handleDelete = () => {
-    setRoles((s) => s.filter((r) => !selected.includes(r.id)));
-    toast.success(`${selected.length} role(s) deleted`);
+    const protectedIds = roles.filter((r) => r.system).map((r) => r.id);
+    const removable = selected.filter((id) => !protectedIds.includes(id));
+    if (removable.length === 0) {
+      toast.error("System roles cannot be deleted");
+      setSelected([]);
+      return;
+    }
+    setRoles((s) => s.filter((r) => !removable.includes(r.id)));
+    toast.success(`${removable.length} role(s) deleted`);
     setSelected([]);
   };
 
@@ -444,18 +538,27 @@ export function RolesPermissionsModule() {
               {roles.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => setView({ mode: "edit", roleId: r.id })}
+                  onClick={() => setView({ mode: "detail", roleId: r.id })}
                   className="border-b border-border/60 hover:bg-white/[0.02] h-14 cursor-pointer"
                 >
                   <td className="px-4 py-3 align-middle" onClick={(e) => e.stopPropagation()}>
                     <Checkbox checked={selected.includes(r.id)} onChange={() => toggleOne(r.id)} />
                   </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap font-medium">{r.name}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap font-medium">
+                    <span className="inline-flex items-center gap-2">
+                      {r.name}
+                      {r.system && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 text-primary px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                          <ShieldCheck className="h-3 w-3" /> System
+                        </span>
+                      )}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground max-w-md truncate">
                     {r.description}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {r.assignedUsers} {r.assignedUsers === 1 ? "User" : "Users"}
+                    {usersByRole(r.name).length} {usersByRole(r.name).length === 1 ? "User" : "Users"}
                   </td>
                   <td className="px-4 py-3 align-middle text-muted-foreground">
                     <ChevronRight className="h-4 w-4" />
@@ -904,6 +1007,363 @@ function BreakdownTile({
     <div className={`rounded-lg border px-4 py-4 ${color}`}>
       <div className="text-2xl font-semibold leading-none">{value}</div>
       <div className="text-[11px] uppercase tracking-wider mt-2 opacity-80">{label}</div>
+    </div>
+  );
+}
+
+// ============================================================
+// Role Detail Page
+// ============================================================
+
+function RoleDetailPage({
+  role,
+  roles,
+  users,
+  onBack,
+  onEdit,
+  onDelete,
+  onChangeUserRole,
+  onRemoveUsers,
+}: {
+  role: Role;
+  roles: Role[];
+  users: AssignedUser[];
+  onBack: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onChangeUserRole: (userId: string, newRoleName: string) => void;
+  onRemoveUsers: (userIds: string[]) => void;
+}) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [confirmDeleteRole, setConfirmDeleteRole] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [pendingRowRemove, setPendingRowRemove] = useState<AssignedUser | null>(null);
+  const [changeRoleFor, setChangeRoleFor] = useState<AssignedUser | null>(null);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+
+  const allSelected = users.length > 0 && users.every((u) => selected.includes(u.id));
+  const toggleAll = () => setSelected(allSelected ? [] : users.map((u) => u.id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const canDeleteRole = !role.system && users.length === 0;
+
+  return (
+    <div className="space-y-5">
+      <div className="px-1 pt-0.5">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Roles & Permissions
+        </button>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-semibold leading-tight m-0">{role.name}</h2>
+              {role.system && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 text-primary px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                  <ShieldCheck className="h-3 w-3" /> System
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 m-0 max-w-2xl">
+              {role.description || "No description provided."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={onEdit}
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
+            >
+              <Pencil className="h-3.5 w-3.5" /> Edit Role
+            </button>
+            {!role.system && (
+              <button
+                onClick={() => canDeleteRole && setConfirmDeleteRole(true)}
+                disabled={!canDeleteRole}
+                title={
+                  !canDeleteRole
+                    ? "Reassign all users before deleting this role"
+                    : "Delete role"
+                }
+                className="h-9 inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 text-xs font-medium hover:bg-destructive/20 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete Role
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <SectionCard
+        title="Assigned users"
+        description={`${users.length} user${users.length === 1 ? "" : "s"} currently assigned to this role`}
+      >
+        {selected.length > 0 && (
+          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
+            <span className="font-medium">{selected.length} selected</span>
+            <button
+              onClick={() => setConfirmRemove(true)}
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Remove Role
+            </button>
+          </div>
+        )}
+        <div className="overflow-x-auto scl-scroll">
+          <table className="w-full text-sm min-w-[900px]">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-4 py-2.5 text-left w-8">
+                  <Checkbox checked={allSelected} onChange={toggleAll} />
+                </th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
+                <th className="px-4 py-2.5 text-left w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                  <td className="px-4 py-3 align-middle">
+                    <Checkbox
+                      checked={selected.includes(u.id)}
+                      onChange={() => toggleOne(u.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
+                        {u.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")}
+                      </div>
+                      <span className="font-medium">{u.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.email}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.jobTitle}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/40 px-2 py-0.5 text-[10px]">
+                      {u.team}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
+                    {u.assignedDate}
+                  </td>
+                  <td className="px-4 py-3 align-middle">
+                    <RowActionsMenu
+                      open={menuFor === u.id}
+                      onOpenChange={(o) => setMenuFor(o ? u.id : null)}
+                      onChangeRole={() => {
+                        setMenuFor(null);
+                        setChangeRoleFor(u);
+                      }}
+                      onRemoveRole={() => {
+                        setMenuFor(null);
+                        setPendingRowRemove(u);
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No users assigned to this role.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      <ConfirmDialog
+        open={confirmDeleteRole}
+        onClose={() => setConfirmDeleteRole(false)}
+        onConfirm={onDelete}
+        title="Delete role?"
+        description="This role will be permanently removed. This action cannot be undone."
+        confirmLabel="Delete Role"
+      />
+
+      <ConfirmDialog
+        open={confirmRemove}
+        onClose={() => setConfirmRemove(false)}
+        onConfirm={() => {
+          onRemoveUsers(selected);
+          setSelected([]);
+        }}
+        title="Remove role from selected users?"
+        description="Selected users will lose access associated with this role. You can assign a new role afterwards."
+        confirmLabel="Remove Role"
+      />
+
+      <ConfirmDialog
+        open={!!pendingRowRemove}
+        onClose={() => setPendingRowRemove(null)}
+        onConfirm={() => {
+          if (pendingRowRemove) onRemoveUsers([pendingRowRemove.id]);
+          setPendingRowRemove(null);
+        }}
+        title="Remove role from this user?"
+        description="The user will lose access associated with this role. You can assign a new role afterwards."
+        confirmLabel="Remove Role"
+      />
+
+      {changeRoleFor && (
+        <ChangeRoleModal
+          user={changeRoleFor}
+          roles={roles}
+          onClose={() => setChangeRoleFor(null)}
+          onSubmit={(newRoleName) => {
+            onChangeUserRole(changeRoleFor.id, newRoleName);
+            setChangeRoleFor(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function RowActionsMenu({
+  open,
+  onOpenChange,
+  onChangeRole,
+  onRemoveRole,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onChangeRole: () => void;
+  onRemoveRole: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onOpenChange(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open, onOpenChange]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => onOpenChange(!open)}
+        className="h-7 w-7 grid place-items-center rounded-md border border-transparent hover:border-border hover:bg-white/[0.04] text-muted-foreground"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-1 z-30 min-w-[160px] rounded-md border border-border bg-card shadow-xl py-1 text-xs">
+          <button
+            onClick={onChangeRole}
+            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05]"
+          >
+            Change Role
+          </button>
+          <button
+            onClick={onRemoveRole}
+            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05] text-destructive"
+          >
+            Remove Role
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChangeRoleModal({
+  user,
+  roles,
+  onClose,
+  onSubmit,
+}: {
+  user: AssignedUser;
+  roles: Role[];
+  onClose: () => void;
+  onSubmit: (newRoleName: string) => void;
+}) {
+  const options = roles.map((r) => ({ value: r.name, label: r.name }));
+  const [newRole, setNewRole] = useState<string>(
+    roles.find((r) => r.name !== user.role)?.name ?? user.role,
+  );
+  const unchanged = newRole === user.role;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+      >
+        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">Change Role</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Update the role assigned to {user.name}.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-4 border-t border-border">
+          <div>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Current Role
+            </span>
+            <div className="mt-1 h-9 w-full rounded-md border border-border bg-background/30 px-3 text-sm flex items-center text-muted-foreground">
+              {user.role}
+            </div>
+          </div>
+          <div>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              New Role <span className="text-destructive">*</span>
+            </span>
+            <div className="mt-1">
+              <SclSelect value={newRole} onChange={setNewRole} options={options} />
+            </div>
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={unchanged}
+            onClick={() => onSubmit(newRole)}
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
