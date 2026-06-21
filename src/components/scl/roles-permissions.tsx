@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   Plus,
   Trash2,
   Check,
   ChevronRight,
-  MoreHorizontal,
   Pencil,
   X,
   ShieldCheck,
+  Search,
+  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
@@ -453,6 +454,7 @@ export function RolesPermissionsModule() {
         role={role}
         roles={roles}
         users={usersByRole(role.name)}
+        allUsers={users}
         onBack={() => setView({ mode: "list" })}
         onEdit={() => setView({ mode: "edit", roleId: role.id })}
         onDelete={() => {
@@ -460,14 +462,16 @@ export function RolesPermissionsModule() {
           toast.success(`Role "${role.name}" deleted`);
           setView({ mode: "list" });
         }}
-        onChangeUserRole={(userId, newRoleName) => {
-          setUsers((s) => s.map((u) => (u.id === userId ? { ...u, role: newRoleName } : u)));
-          toast.success("Role updated");
-        }}
         onRemoveUsers={(ids) => {
           // "Remove role" = unassign — for the prototype, we drop them from this role list.
           setUsers((s) => s.filter((u) => !ids.includes(u.id)));
           toast.success(`${ids.length} user(s) removed from role`);
+        }}
+        onAssignUsers={(ids) => {
+          setUsers((s) =>
+            s.map((u) => (ids.includes(u.id) ? { ...u, role: role.name, assignedDate: todayLabel() } : u)),
+          );
+          toast.success("Users assigned successfully.");
         }}
       />
     );
@@ -1019,27 +1023,27 @@ function RoleDetailPage({
   role,
   roles,
   users,
+  allUsers,
   onBack,
   onEdit,
   onDelete,
-  onChangeUserRole,
   onRemoveUsers,
+  onAssignUsers,
 }: {
   role: Role;
   roles: Role[];
   users: AssignedUser[];
+  allUsers: AssignedUser[];
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onChangeUserRole: (userId: string, newRoleName: string) => void;
   onRemoveUsers: (userIds: string[]) => void;
+  onAssignUsers: (userIds: string[]) => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmDeleteRole, setConfirmDeleteRole] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
-  const [pendingRowRemove, setPendingRowRemove] = useState<AssignedUser | null>(null);
-  const [changeRoleFor, setChangeRoleFor] = useState<AssignedUser | null>(null);
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [showAssign, setShowAssign] = useState(false);
 
   const allSelected = users.length > 0 && users.every((u) => selected.includes(u.id));
   const toggleAll = () => setSelected(allSelected ? [] : users.map((u) => u.id));
@@ -1072,6 +1076,12 @@ function RoleDetailPage({
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setShowAssign(true)}
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <UserPlus className="h-3.5 w-3.5" /> Add User
+            </button>
             <button
               onClick={onEdit}
               className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
@@ -1123,7 +1133,6 @@ function RoleDetailPage({
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
-                <th className="px-4 py-2.5 text-left w-10" />
               </tr>
             </thead>
             <tbody>
@@ -1161,25 +1170,11 @@ function RoleDetailPage({
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
                     {u.assignedDate}
                   </td>
-                  <td className="px-4 py-3 align-middle">
-                    <RowActionsMenu
-                      open={menuFor === u.id}
-                      onOpenChange={(o) => setMenuFor(o ? u.id : null)}
-                      onChangeRole={() => {
-                        setMenuFor(null);
-                        setChangeRoleFor(u);
-                      }}
-                      onRemoveRole={() => {
-                        setMenuFor(null);
-                        setPendingRowRemove(u);
-                      }}
-                    />
-                  </td>
                 </tr>
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No users assigned to this role.
                   </td>
                 </tr>
@@ -1210,26 +1205,14 @@ function RoleDetailPage({
         confirmLabel="Remove Role"
       />
 
-      <ConfirmDialog
-        open={!!pendingRowRemove}
-        onClose={() => setPendingRowRemove(null)}
-        onConfirm={() => {
-          if (pendingRowRemove) onRemoveUsers([pendingRowRemove.id]);
-          setPendingRowRemove(null);
-        }}
-        title="Remove role from this user?"
-        description="The user will lose access associated with this role. You can assign a new role afterwards."
-        confirmLabel="Remove Role"
-      />
-
-      {changeRoleFor && (
-        <ChangeRoleModal
-          user={changeRoleFor}
-          roles={roles}
-          onClose={() => setChangeRoleFor(null)}
-          onSubmit={(newRoleName) => {
-            onChangeUserRole(changeRoleFor.id, newRoleName);
-            setChangeRoleFor(null);
+      {showAssign && (
+        <AssignUsersModal
+          role={role}
+          allUsers={allUsers}
+          onClose={() => setShowAssign(false)}
+          onSubmit={(ids) => {
+            onAssignUsers(ids);
+            setShowAssign(false);
           }}
         />
       )}
@@ -1237,73 +1220,41 @@ function RoleDetailPage({
   );
 }
 
-function RowActionsMenu({
-  open,
-  onOpenChange,
-  onChangeRole,
-  onRemoveRole,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onChangeRole: () => void;
-  onRemoveRole: () => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onOpenChange(false);
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open, onOpenChange]);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => onOpenChange(!open)}
-        className="h-7 w-7 grid place-items-center rounded-md border border-transparent hover:border-border hover:bg-white/[0.04] text-muted-foreground"
-      >
-        <MoreHorizontal className="h-4 w-4" />
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-1 z-30 min-w-[160px] rounded-md border border-border bg-card shadow-xl py-1 text-xs">
-          <button
-            onClick={onChangeRole}
-            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05]"
-          >
-            Change Role
-          </button>
-          <button
-            onClick={onRemoveRole}
-            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05] text-destructive"
-          >
-            Remove Role
-          </button>
-        </div>
-      )}
-    </div>
-  );
+function todayLabel() {
+  return new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
 }
 
-function ChangeRoleModal({
-  user,
-  roles,
+function AssignUsersModal({
+  role,
+  allUsers,
   onClose,
   onSubmit,
 }: {
-  user: AssignedUser;
-  roles: Role[];
+  role: Role;
+  allUsers: AssignedUser[];
   onClose: () => void;
-  onSubmit: (newRoleName: string) => void;
+  onSubmit: (ids: string[]) => void;
 }) {
-  const options = roles.map((r) => ({ value: r.name, label: r.name }));
-  const [newRole, setNewRole] = useState<string>(
-    roles.find((r) => r.name !== user.role)?.name ?? user.role,
-  );
-  const unchanged = newRole === user.role;
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return allUsers;
+    return allUsers.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        u.team.toLowerCase().includes(q),
+    );
+  }, [allUsers, query]);
+
+  const toggle = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   return (
     <div
@@ -1314,13 +1265,13 @@ function ChangeRoleModal({
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
       >
         <div className="px-5 pt-5 pb-3 flex items-start justify-between">
           <div>
-            <h2 className="text-sm font-semibold">Change Role</h2>
+            <h2 className="text-sm font-semibold">Assign Users to Role</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Update the role assigned to {user.name}.
+              Select workspace members to assign to {role.name}.
             </p>
           </div>
           <button
@@ -1330,38 +1281,97 @@ function ChangeRoleModal({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-5 py-4 space-y-4 border-t border-border">
-          <div>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              Current Role
-            </span>
-            <div className="mt-1 h-9 w-full rounded-md border border-border bg-background/30 px-3 text-sm flex items-center text-muted-foreground">
-              {user.role}
-            </div>
-          </div>
-          <div>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              New Role <span className="text-destructive">*</span>
-            </span>
-            <div className="mt-1">
-              <SclSelect value={newRole} onChange={setNewRole} options={options} />
-            </div>
+        <div className="px-5 pb-3 border-t border-border pt-3">
+          <div className="relative">
+            <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, email, or team"
+              className="h-9 w-full rounded-md border border-border bg-background/30 pl-8 pr-3 text-xs outline-none focus:border-primary/60"
+            />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={unchanged}
-            onClick={() => onSubmit(newRole)}
-            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Save Changes
-          </button>
+        <div className="flex-1 overflow-y-auto scl-scroll border-t border-border">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-card z-[1]">
+              <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-4 py-2.5 text-left w-8" />
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Current Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((u) => {
+                const already = u.role === role.name;
+                const isSel = selected.includes(u.id);
+                return (
+                  <tr
+                    key={u.id}
+                    className={`border-b border-border/60 h-12 ${
+                      already ? "opacity-50" : "hover:bg-white/[0.02] cursor-pointer"
+                    }`}
+                    onClick={() => !already && toggle(u.id)}
+                  >
+                    <td className="px-4 align-middle">
+                      <Checkbox
+                        checked={already || isSel}
+                        onChange={() => !already && toggle(u.id)}
+                        disabled={already}
+                      />
+                    </td>
+                    <td className="px-4 align-middle whitespace-nowrap font-medium">{u.name}</td>
+                    <td className="px-4 align-middle whitespace-nowrap text-muted-foreground text-xs">
+                      {u.email}
+                    </td>
+                    <td className="px-4 align-middle whitespace-nowrap text-xs">
+                      <span className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[10px]">
+                        {u.team}
+                      </span>
+                    </td>
+                    <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
+                      {already ? (
+                        <span className="text-[10px] uppercase tracking-wider text-primary">
+                          Already Assigned
+                        </span>
+                      ) : (
+                        u.role
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No users found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground">
+            {selected.length} user{selected.length === 1 ? "" : "s"} selected
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={selected.length === 0}
+              onClick={() => onSubmit(selected)}
+              className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Assign Users
+            </button>
+          </div>
         </div>
       </div>
     </div>
