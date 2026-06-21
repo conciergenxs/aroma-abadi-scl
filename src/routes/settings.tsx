@@ -1166,34 +1166,6 @@ function Checkbox({
   );
 }
 
-function FilterSelect({
-  value,
-  onChange,
-  options,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  label: string;
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 appearance-none rounded-md border border-border bg-background/60 pl-3 pr-8 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-        aria-label={label}
-      >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-    </div>
-  );
-}
-
 // ============================================================
 // Connected AI Agents
 // ============================================================
