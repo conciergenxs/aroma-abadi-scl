@@ -1,0 +1,411 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
+import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
+import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2, Users, Send, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Sign in — Strategic Conversation Lab" },
+      { name: "description", content: "Sign in or create your SCL workspace to manage WhatsApp and Instagram conversations." },
+      { property: "og:title", content: "Sign in — Strategic Conversation Lab" },
+      { property: "og:description", content: "Access your SCL workspace." },
+    ],
+  }),
+  component: AuthPage,
+});
+
+type Mode = "signin" | "signup" | "forgot" | "forgot-sent";
+
+function AuthPage() {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<Mode>("signin");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // form state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [company, setCompany] = useState("");
+  const [remember, setRemember] = useState(true);
+
+  function validateEmail(v: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    if (mode === "signin") {
+      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      if (password.length < 6) return setError("Password must be at least 6 characters.");
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 700));
+      setLoading(false);
+      toast.success("Welcome back, Aria.");
+      navigate({ to: "/" });
+      return;
+    }
+
+    if (mode === "signup") {
+      if (!fullName.trim()) return setError("Please enter your full name.");
+      if (!company.trim()) return setError("Please enter your company name.");
+      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      if (password.length < 6) return setError("Password must be at least 6 characters.");
+      if (password !== confirmPassword) return setError("Passwords don't match.");
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 900));
+      setLoading(false);
+      toast.success("Workspace created. Welcome to SCL.");
+      navigate({ to: "/" });
+      return;
+    }
+
+    if (mode === "forgot") {
+      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 700));
+      setLoading(false);
+      setMode("forgot-sent");
+      return;
+    }
+  }
+
+  return (
+    <div className="min-h-screen w-full bg-background text-foreground flex">
+      {/* LEFT — Visual panel */}
+      <aside className="relative hidden lg:flex lg:w-[45%] p-3">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.14_0_0)]">
+          {/* Glow blobs */}
+          <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-primary/30 blur-[110px]" />
+          <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.62_0.17_40)]/25 blur-[120px]" />
+          <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-orange-500/15 blur-[100px]" />
+          {/* Geometric shapes */}
+          <div className="absolute top-24 right-16 h-40 w-40 rounded-3xl border border-white/10 rotate-12 backdrop-blur-sm bg-white/[0.02]" />
+          <div className="absolute bottom-32 left-20 h-24 w-24 rounded-full border border-primary/30 bg-primary/5" />
+          {/* Grid + noise */}
+          <div className="absolute inset-0 scl-grid-bg opacity-40 pointer-events-none" />
+          <div
+            className="absolute inset-0 opacity-[0.06] pointer-events-none mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>\")",
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 flex h-full flex-col justify-between p-10">
+            <div className="flex items-center gap-2">
+              <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-8 rounded-md" />
+              <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">SCL</span>
+            </div>
+
+            <div className="max-w-lg">
+              <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05]">
+                Connect conversations.
+                <br />
+                <span className="bg-gradient-to-r from-primary via-orange-400 to-amber-300 bg-clip-text text-transparent">
+                  Grow relationships.
+                </span>
+              </h1>
+              <p className="mt-4 text-sm text-muted-foreground max-w-md leading-relaxed">
+                Manage WhatsApp, Instagram, and customer conversations in one workspace.
+              </p>
+
+              {/* Floating stat cards */}
+              <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
+                <StatCard icon={<Users className="h-3.5 w-3.5" />} value="29,841" label="Active Contacts" />
+                <StatCard icon={<Send className="h-3.5 w-3.5" />} value="212,884" label="Messages Sent" />
+                <StatCard icon={<Sparkles className="h-3.5 w-3.5" />} value="92%" label="Response Rate" />
+              </div>
+            </div>
+
+            <div className="text-[11px] text-muted-foreground">
+              © {new Date().getFullYear()} Strategic Conversation Lab
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* RIGHT — Auth panel */}
+      <main className="relative flex-1 flex items-center justify-center px-6 py-10">
+        {/* Mobile background gradient */}
+        <div className="absolute inset-0 lg:hidden pointer-events-none">
+          <div className="absolute -top-32 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute bottom-0 -left-24 h-72 w-72 rounded-full bg-orange-500/10 blur-[100px]" />
+        </div>
+
+        <div className="relative w-full max-w-[440px]">
+          {/* Logo + title */}
+          <div className="flex flex-col items-start">
+            <img src={sclLogoAsset.url} alt="SCL" className="h-9 w-9 rounded-md mb-6 lg:hidden" />
+            {mode !== "forgot" && mode !== "forgot-sent" && (
+              <div className="inline-flex rounded-lg border border-border bg-card/60 p-1 mb-6">
+                <TabButton active={mode === "signin"} onClick={() => { setMode("signin"); setError(null); }}>Sign In</TabButton>
+                <TabButton active={mode === "signup"} onClick={() => { setMode("signup"); setError(null); }}>Create Account</TabButton>
+              </div>
+            )}
+
+            {mode === "signin" && (
+              <>
+                <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Sign in to continue managing your customer conversations.
+                </p>
+              </>
+            )}
+            {mode === "signup" && (
+              <>
+                <h2 className="text-2xl font-semibold tracking-tight">Create your workspace</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Get started with SCL and manage customer conversations from one place.
+                </p>
+              </>
+            )}
+            {mode === "forgot" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signin"); setError(null); }}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
+                >
+                  <ArrowLeft className="h-3 w-3" /> Back to Sign In
+                </button>
+                <h2 className="text-2xl font-semibold tracking-tight">Reset your password</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Enter your email and we'll send you a reset link.
+                </p>
+              </>
+            )}
+            {mode === "forgot-sent" && (
+              <div className="w-full">
+                <div className="h-12 w-12 rounded-full bg-primary/15 border border-primary/30 grid place-items-center mb-4">
+                  <CheckCircle2 className="h-6 w-6 text-primary" />
+                </div>
+                <h2 className="text-2xl font-semibold tracking-tight">Check your inbox</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  We've sent a password reset link to <span className="text-foreground">{email || "your email"}</span>.
+                </p>
+                <button
+                  onClick={() => { setMode("signin"); setError(null); }}
+                  className="mt-6 w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Forms */}
+          {mode !== "forgot-sent" && (
+            <form onSubmit={onSubmit} className="mt-6 space-y-4">
+              {mode === "signup" && (
+                <>
+                  <Field label="Full Name">
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Aria Kapoor"
+                      className={inputCls}
+                      autoComplete="name"
+                    />
+                  </Field>
+                  <Field label="Company Name">
+                    <input
+                      type="text"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      placeholder="Acme Brands"
+                      className={inputCls}
+                      autoComplete="organization"
+                    />
+                  </Field>
+                </>
+              )}
+
+              <Field label="Email Address">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className={`${inputCls} pl-9`}
+                    autoComplete="email"
+                  />
+                </div>
+              </Field>
+
+              {mode !== "forgot" && (
+                <Field
+                  label="Password"
+                  rightSlot={
+                    mode === "signin" ? (
+                      <button
+                        type="button"
+                        onClick={() => { setMode("forgot"); setError(null); }}
+                        className="text-[11px] text-muted-foreground hover:text-primary transition"
+                      >
+                        Forgot password?
+                      </button>
+                    ) : null
+                  }
+                >
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className={`${inputCls} pr-10`}
+                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </Field>
+              )}
+
+              {mode === "signup" && (
+                <Field label="Confirm Password">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className={inputCls}
+                    autoComplete="new-password"
+                  />
+                </Field>
+              )}
+
+              {mode === "signin" && (
+                <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="h-3.5 w-3.5 rounded border-border bg-card accent-[oklch(0.62_0.17_40)]"
+                  />
+                  Remember me for 30 days
+                </label>
+              )}
+
+              {error && (
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {mode === "signin" && (loading ? "Signing in…" : "Sign In")}
+                {mode === "signup" && (loading ? "Creating account…" : "Create Account")}
+                {mode === "forgot" && (loading ? "Sending link…" : "Send Reset Link")}
+              </button>
+
+              {mode === "signin" && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Don't have an account?{" "}
+                  <button type="button" onClick={() => { setMode("signup"); setError(null); }} className="text-primary hover:underline">
+                    Create Account
+                  </button>
+                </p>
+              )}
+              {mode === "signup" && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Already have an account?{" "}
+                  <button type="button" onClick={() => { setMode("signin"); setError(null); }} className="text-primary hover:underline">
+                    Sign In
+                  </button>
+                </p>
+              )}
+            </form>
+          )}
+
+          <p className="mt-8 text-center text-[11px] text-muted-foreground">
+            By continuing you agree to our{" "}
+            <Link to="/" className="hover:text-foreground">Terms</Link> &{" "}
+            <Link to="/" className="hover:text-foreground">Privacy Policy</Link>.
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full rounded-md border border-border bg-card/60 px-3 py-2.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition";
+
+function Field({
+  label,
+  rightSlot,
+  children,
+}: {
+  label: string;
+  rightSlot?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</label>
+        {rightSlot}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-4 py-1.5 text-xs font-medium rounded-md transition ${
+        active
+          ? "bg-primary text-primary-foreground shadow"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-white/[0.03] backdrop-blur-md p-3 glass">
+      <div className="flex items-center gap-1.5 text-muted-foreground">
+        {icon}
+        <span className="text-[10px] uppercase tracking-wider">{label}</span>
+      </div>
+      <div className="mt-1 text-base font-semibold tracking-tight">{value}</div>
+    </div>
+  );
+}
