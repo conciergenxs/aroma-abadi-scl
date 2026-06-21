@@ -1023,27 +1023,27 @@ function RoleDetailPage({
   role,
   roles,
   users,
+  allUsers,
   onBack,
   onEdit,
   onDelete,
-  onChangeUserRole,
   onRemoveUsers,
+  onAssignUsers,
 }: {
   role: Role;
   roles: Role[];
   users: AssignedUser[];
+  allUsers: AssignedUser[];
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onChangeUserRole: (userId: string, newRoleName: string) => void;
   onRemoveUsers: (userIds: string[]) => void;
+  onAssignUsers: (userIds: string[]) => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmDeleteRole, setConfirmDeleteRole] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
-  const [pendingRowRemove, setPendingRowRemove] = useState<AssignedUser | null>(null);
-  const [changeRoleFor, setChangeRoleFor] = useState<AssignedUser | null>(null);
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [showAssign, setShowAssign] = useState(false);
 
   const allSelected = users.length > 0 && users.every((u) => selected.includes(u.id));
   const toggleAll = () => setSelected(allSelected ? [] : users.map((u) => u.id));
