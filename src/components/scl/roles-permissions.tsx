@@ -384,13 +384,20 @@ function Checkbox({ checked, onChange, disabled }: { checked: boolean; onChange:
 
 // ----- Main component -----
 
-type View = { mode: "list" } | { mode: "create" } | { mode: "edit"; roleId: string };
+type View =
+  | { mode: "list" }
+  | { mode: "create" }
+  | { mode: "edit"; roleId: string }
+  | { mode: "detail"; roleId: string };
 
 export function RolesPermissionsModule() {
   const [roles, setRoles] = useState<Role[]>(SEED_ROLES);
+  const [users, setUsers] = useState<AssignedUser[]>(SEED_USERS);
   const [view, setView] = useState<View>({ mode: "list" });
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const usersByRole = (roleName: string) => users.filter((u) => u.role === roleName);
 
   if (view.mode === "create") {
     return (
@@ -415,11 +422,52 @@ export function RolesPermissionsModule() {
     return (
       <RoleEditor
         initial={role}
-        onCancel={() => setView({ mode: "list" })}
+        onCancel={() => setView({ mode: "detail", roleId: role.id })}
         onSubmit={(name, description, state) => {
-          setRoles((s) => s.map((r) => (r.id === role.id ? { ...r, name, description, state } : r)));
+          setRoles((s) =>
+            s.map((r) =>
+              r.id === role.id
+                ? { ...r, name: r.system ? r.name : name, description, state }
+                : r,
+            ),
+          );
+          // If role name changed, propagate to assigned users
+          if (!role.system && role.name !== name) {
+            setUsers((s) => s.map((u) => (u.role === role.name ? { ...u, role: name } : u)));
+          }
           toast.success(`Role "${name}" updated`);
+          setView({ mode: "detail", roleId: role.id });
+        }}
+      />
+    );
+  }
+
+  if (view.mode === "detail") {
+    const role = roles.find((r) => r.id === view.roleId);
+    if (!role) {
+      setView({ mode: "list" });
+      return null;
+    }
+    return (
+      <RoleDetailPage
+        role={role}
+        roles={roles}
+        users={usersByRole(role.name)}
+        onBack={() => setView({ mode: "list" })}
+        onEdit={() => setView({ mode: "edit", roleId: role.id })}
+        onDelete={() => {
+          setRoles((s) => s.filter((r) => r.id !== role.id));
+          toast.success(`Role "${role.name}" deleted`);
           setView({ mode: "list" });
+        }}
+        onChangeUserRole={(userId, newRoleName) => {
+          setUsers((s) => s.map((u) => (u.id === userId ? { ...u, role: newRoleName } : u)));
+          toast.success("Role updated");
+        }}
+        onRemoveUsers={(ids) => {
+          // "Remove role" = unassign — for the prototype, we drop them from this role list.
+          setUsers((s) => s.filter((u) => !ids.includes(u.id)));
+          toast.success(`${ids.length} user(s) removed from role`);
         }}
       />
     );
@@ -431,8 +479,15 @@ export function RolesPermissionsModule() {
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   const handleDelete = () => {
-    setRoles((s) => s.filter((r) => !selected.includes(r.id)));
-    toast.success(`${selected.length} role(s) deleted`);
+    const protectedIds = roles.filter((r) => r.system).map((r) => r.id);
+    const removable = selected.filter((id) => !protectedIds.includes(id));
+    if (removable.length === 0) {
+      toast.error("System roles cannot be deleted");
+      setSelected([]);
+      return;
+    }
+    setRoles((s) => s.filter((r) => !removable.includes(r.id)));
+    toast.success(`${removable.length} role(s) deleted`);
     setSelected([]);
   };
 
@@ -483,18 +538,27 @@ export function RolesPermissionsModule() {
               {roles.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => setView({ mode: "edit", roleId: r.id })}
+                  onClick={() => setView({ mode: "detail", roleId: r.id })}
                   className="border-b border-border/60 hover:bg-white/[0.02] h-14 cursor-pointer"
                 >
                   <td className="px-4 py-3 align-middle" onClick={(e) => e.stopPropagation()}>
                     <Checkbox checked={selected.includes(r.id)} onChange={() => toggleOne(r.id)} />
                   </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap font-medium">{r.name}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap font-medium">
+                    <span className="inline-flex items-center gap-2">
+                      {r.name}
+                      {r.system && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 text-primary px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                          <ShieldCheck className="h-3 w-3" /> System
+                        </span>
+                      )}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground max-w-md truncate">
                     {r.description}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {r.assignedUsers} {r.assignedUsers === 1 ? "User" : "Users"}
+                    {usersByRole(r.name).length} {usersByRole(r.name).length === 1 ? "User" : "Users"}
                   </td>
                   <td className="px-4 py-3 align-middle text-muted-foreground">
                     <ChevronRight className="h-4 w-4" />
