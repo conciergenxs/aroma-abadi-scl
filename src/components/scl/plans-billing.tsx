@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Check,
@@ -50,8 +50,9 @@ const currentMonthlyTotal = 2445000;
 export function PlansBillingModule({ section, onNavigate }: PlansBillingModuleProps) {
   const [view, setView] = useState<ModuleView>(section);
 
-  if (section === "payment-methods" && view !== "payment-methods") setView("payment-methods");
-  if (section === "subscription" && view === "payment-methods") setView("subscription");
+  useEffect(() => {
+    setView(section);
+  }, [section]);
 
   const goPaymentMethods = () => {
     setView("payment-methods");
@@ -404,7 +405,7 @@ function ProgressBar({ value, className = "" }: { value: number; className?: str
   );
 }
 
-function AddOnCard({ title, description, currentLabel, currentValue, price, children }: { title: string; description: string; currentLabel: string; currentValue: string; price: string; children: React.ReactNode }) {
+function AddOnCard({ title, description, currentLabel, currentValue, price, children }: { title: string; description: string; currentLabel: string; currentValue: string; price: string; children: ReactNode }) {
   return (
     <SectionCard>
       <div className="p-5 space-y-4">
@@ -569,7 +570,7 @@ function PaymentMethodModal({ open, method, onClose, onSave }: { open: boolean; 
   const [address, setAddress] = useState(method?.billingAddress ?? "");
   const [country, setCountry] = useState(method?.country ?? "Indonesia");
 
-  useMemo(() => {
+  useEffect(() => {
     if (!open) return;
     setHolder(method?.holder ?? "");
     setCardNumber(method ? `•••• •••• •••• ${method.masked.slice(-4)}` : "");
