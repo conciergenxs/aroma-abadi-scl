@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { SclSelect } from "@/components/scl/scl-select";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -89,11 +90,11 @@ function SettingsPage() {
               <div key={section.id} className="mb-1">
                 <button
                   onClick={() => setOpen((o) => ({ ...o, [section.id]: !o[section.id] }))}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-md text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80"
                 >
                   <span>{section.label}</span>
                   <ChevronDown
-                    className={`h-3.5 w-3.5 transition-transform ${isOpen ? "" : "-rotate-90"}`}
+                    className={`h-3 w-3 transition-transform opacity-60 ${isOpen ? "" : "-rotate-90"}`}
                   />
                 </button>
                 {isOpen && (
@@ -888,6 +889,7 @@ function UserManagementPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"All" | UserRole>("All");
   const [teamFilter, setTeamFilter] = useState<string>("All teams");
+  const [joinedFilter, setJoinedFilter] = useState<string>("Anytime");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -918,6 +920,7 @@ function UserManagementPage() {
     setSearch("");
     setRoleFilter("All");
     setTeamFilter("All teams");
+    setJoinedFilter("Anytime");
   };
 
   const updateRole = (id: string, role: UserRole) =>
@@ -983,23 +986,29 @@ function UserManagementPage() {
               className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
-          <FilterSelect
+          <SclSelect
+            ariaLabel="Role"
             value={roleFilter}
             onChange={(v) => setRoleFilter(v as "All" | UserRole)}
-            options={["All", ...ROLE_OPTIONS]}
-            label="Role"
+            options={["All", ...ROLE_OPTIONS].map((o) => ({ value: o, label: o }))}
+            className="w-40"
           />
-          <FilterSelect
+          <SclSelect
+            ariaLabel="Team"
             value={teamFilter}
             onChange={setTeamFilter}
-            options={TEAM_FILTER_OPTIONS}
-            label="Team"
+            options={TEAM_FILTER_OPTIONS.map((o) => ({ value: o, label: o }))}
+            className="w-44"
           />
-          <FilterSelect
-            value="Anytime"
-            onChange={() => {}}
-            options={["Anytime", "Last 7 days", "Last 30 days", "This year"]}
-            label="Joined on"
+          <SclSelect
+            ariaLabel="Joined on"
+            value={joinedFilter}
+            onChange={setJoinedFilter}
+            options={["Anytime", "Last 7 days", "Last 30 days", "This year"].map((o) => ({
+              value: o,
+              label: o,
+            }))}
+            className="w-40"
           />
           <button
             onClick={resetFilters}
@@ -1021,33 +1030,33 @@ function UserManagementPage() {
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto scl-scroll">
+          <table className="w-full text-sm min-w-[1100px]">
             <thead>
               <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="px-4 py-2.5 text-left w-8">
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
-                <th className="px-3 py-2.5 text-left">Name</th>
-                <th className="px-3 py-2.5 text-left">Email</th>
-                <th className="px-3 py-2.5 text-left">Job title</th>
-                <th className="px-3 py-2.5 text-left">Role</th>
-                <th className="px-3 py-2.5 text-left">Status</th>
-                <th className="px-3 py-2.5 text-left">Teams</th>
-                <th className="px-3 py-2.5 text-left">Joined on</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job title</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Role</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Status</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Teams</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Joined on</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02]">
-                  <td className="px-4 py-3">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                  <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
                       onChange={() => toggleOne(u.id)}
                       disabled={u.owner}
                     />
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
                         {u.name
@@ -1064,31 +1073,30 @@ function UserManagementPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">{u.email}</td>
-                  <td className="px-3 py-3 text-muted-foreground">{u.job}</td>
-                  <td className="px-3 py-3">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">{u.email}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">{u.job}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     {u.owner ? (
                       <span className="text-xs">Super Admin</span>
                     ) : (
-                      <select
+                      <SclSelect
+                        ariaLabel="Role"
                         value={u.role}
-                        onChange={(e) => updateRole(u.id, e.target.value as UserRole)}
-                        className="h-7 rounded-md border border-border bg-background/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-                      >
-                        {ROLE_OPTIONS.map((r) => (
-                          <option key={r}>{r}</option>
-                        ))}
-                      </select>
+                        onChange={(v) => updateRole(u.id, v as UserRole)}
+                        options={ROLE_OPTIONS.map((r) => ({ value: r, label: r }))}
+                        size="sm"
+                        className="w-36"
+                      />
                     )}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <span className="inline-flex items-center gap-1.5 text-xs">
                       <span className={`h-1.5 w-1.5 rounded-full ${statusDot[u.status]}`} />
                       {u.status}
                     </span>
                   </td>
-                  <td className="px-3 py-3">
-                    <div className="flex flex-wrap gap-1">
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <div className="flex items-center gap-1">
                       {u.teams.map((t) => (
                         <span
                           key={t}
@@ -1099,7 +1107,7 @@ function UserManagementPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground text-xs">{u.joinedOn}</td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">{u.joinedOn}</td>
                 </tr>
               ))}
               {filtered.length === 0 && (
@@ -1155,34 +1163,6 @@ function Checkbox({
     >
       {checked && !disabled && <Check className="h-3 w-3" />}
     </button>
-  );
-}
-
-function FilterSelect({
-  value,
-  onChange,
-  options,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  label: string;
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 appearance-none rounded-md border border-border bg-background/60 pl-3 pr-8 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-        aria-label={label}
-      >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-    </div>
   );
 }
 
