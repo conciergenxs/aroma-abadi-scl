@@ -684,14 +684,21 @@ const invoiceDateOptions = [
   { value: "apr-2026", label: "April 2026" },
 ];
 
-const subscriptionInvoices = [
-  { date: "31 May 2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription" },
-  { date: "30 Apr 2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription" },
+const invoiceStatusOptions = [
+  { value: "all", label: "All statuses" },
+  { value: "paid", label: "Paid" },
+  { value: "pending", label: "Pending" },
+  { value: "failed", label: "Failed" },
 ];
 
-const addonInvoices = [
-  { date: "12 Jun 2026", amount: "Rp149,000", description: "Additional User Account" },
-  { date: "05 Jun 2026", amount: "Rp299,000", description: "Additional 5,000 Contacts" },
+const subscriptionInvoices: InvoiceRow[] = [
+  { date: "31 May 2026", dateKey: "may-2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription", status: "Paid" },
+  { date: "30 Apr 2026", dateKey: "apr-2026", amount: "Rp2,445,000", description: "Premium Monthly Subscription", status: "Paid" },
+];
+
+const addonInvoices: InvoiceRow[] = [
+  { date: "12 Jun 2026", dateKey: "jun-2026", amount: "Rp149,000", description: "Additional User Account", status: "Paid" },
+  { date: "05 Jun 2026", dateKey: "jun-2026", amount: "Rp299,000", description: "Additional 5,000 Contacts", status: "Paid" },
 ];
 
 const plans = [
