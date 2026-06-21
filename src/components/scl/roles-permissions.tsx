@@ -1,5 +1,15 @@
-import { useMemo, useState } from "react";
-import { ArrowLeft, Plus, Trash2, Search, Check, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Check,
+  ChevronRight,
+  MoreHorizontal,
+  Pencil,
+  X,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
@@ -287,15 +297,44 @@ export type Role = {
   id: string;
   name: string;
   description: string;
-  assignedUsers: number;
   state: PermState;
+  /** System roles cannot be deleted or renamed. */
+  system?: boolean;
 };
 
 const SEED_ROLES: Role[] = [
-  { id: "r-super", name: "Super Admin", description: "Full unrestricted access to all workspace features and settings.", assignedUsers: 3, state: buildDefaultState() },
-  { id: "r-admin", name: "Admin", description: "Manages workspace operations, members, and most configuration.", assignedUsers: 2, state: buildDefaultState() },
-  { id: "r-team-admin", name: "Team Admin", description: "Manages a single team's members, conversations, and assignments.", assignedUsers: 2, state: buildDefaultState() },
-  { id: "r-staff", name: "Staff", description: "Day-to-day agent access to inbox, contacts, and broadcasts.", assignedUsers: 5, state: buildDefaultState() },
+  { id: "r-super", name: "Super Admin", description: "Full unrestricted access to all workspace features and settings.", state: buildDefaultState(), system: true },
+  { id: "r-admin", name: "Admin", description: "Manages workspace operations, members, and most configuration.", state: buildDefaultState() },
+  { id: "r-team-admin", name: "Team Admin", description: "Manages a single team's members, conversations, and assignments.", state: buildDefaultState() },
+  { id: "r-staff", name: "Staff", description: "Day-to-day agent access to inbox, contacts, and broadcasts.", state: buildDefaultState() },
+];
+
+// ----- Assigned-users seed (module-local) -----
+
+export type AssignedUser = {
+  id: string;
+  name: string;
+  email: string;
+  jobTitle: string;
+  team: string;
+  assignedDate: string;
+  /** Role name; matched against Role.name. */
+  role: string;
+};
+
+const SEED_USERS: AssignedUser[] = [
+  { id: "u-aria", name: "Aria Kapoor", email: "aria.kapoor@northstar.co", jobTitle: "Workspace Owner", team: "Customer Support", assignedDate: "Jan 12, 2024", role: "Super Admin" },
+  { id: "u-jonas", name: "Jonas Weber", email: "jonas.weber@northstar.co", jobTitle: "CTO", team: "Operations", assignedDate: "Jan 14, 2024", role: "Super Admin" },
+  { id: "u-ines", name: "Ines Carvalho", email: "ines.c@northstar.co", jobTitle: "VP Customer", team: "Customer Support", assignedDate: "Jan 20, 2024", role: "Super Admin" },
+  { id: "u-tom", name: "Tomas Bergstrom", email: "tomas.b@northstar.co", jobTitle: "Head of Support", team: "Customer Support", assignedDate: "Feb 02, 2024", role: "Admin" },
+  { id: "u-priya", name: "Priya Shah", email: "priya.shah@northstar.co", jobTitle: "Operations Manager", team: "Operations", assignedDate: "Feb 18, 2024", role: "Admin" },
+  { id: "u-mei", name: "Mei Tanaka", email: "mei.tanaka@northstar.co", jobTitle: "Sales Lead", team: "Sales", assignedDate: "Mar 18, 2024", role: "Team Admin" },
+  { id: "u-luca", name: "Luca Romano", email: "luca.romano@northstar.co", jobTitle: "Marketing Manager", team: "Marketing", assignedDate: "Apr 04, 2024", role: "Team Admin" },
+  { id: "u-sara", name: "Sara Iqbal", email: "sara.iqbal@northstar.co", jobTitle: "Support Specialist", team: "Customer Support", assignedDate: "May 22, 2024", role: "Staff" },
+  { id: "u-dimas", name: "Dimas Pratama", email: "dimas.p@northstar.co", jobTitle: "Operations Analyst", team: "Operations", assignedDate: "Jun 09, 2024", role: "Staff" },
+  { id: "u-hana", name: "Hana Wijaya", email: "hana.wijaya@northstar.co", jobTitle: "Sales Associate", team: "Sales", assignedDate: "Jul 03, 2024", role: "Staff" },
+  { id: "u-marco", name: "Marco Silva", email: "marco.silva@northstar.co", jobTitle: "Support Agent", team: "Customer Support", assignedDate: "Aug 15, 2024", role: "Staff" },
+  { id: "u-noor", name: "Noor Hassan", email: "noor.h@northstar.co", jobTitle: "Customer Insights", team: "Marketing", assignedDate: "Sep 01, 2024", role: "Staff" },
 ];
 
 // ----- UI atoms -----
