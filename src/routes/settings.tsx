@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { SclSelect } from "@/components/scl/scl-select";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -89,11 +90,11 @@ function SettingsPage() {
               <div key={section.id} className="mb-1">
                 <button
                   onClick={() => setOpen((o) => ({ ...o, [section.id]: !o[section.id] }))}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-md text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80"
                 >
                   <span>{section.label}</span>
                   <ChevronDown
-                    className={`h-3.5 w-3.5 transition-transform ${isOpen ? "" : "-rotate-90"}`}
+                    className={`h-3 w-3 transition-transform opacity-60 ${isOpen ? "" : "-rotate-90"}`}
                   />
                 </button>
                 {isOpen && (
