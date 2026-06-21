@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
-import { conversations, contacts, volumeSeries, channelPerf, recentActivity } from "@/components/scl/mock-data";
+import { conversations, contacts, volumeSeries, recentActivity } from "@/components/scl/mock-data";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, ArrowDownRight, MessageSquare, Send, Users, Megaphone } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, MessageSquare, Users, Megaphone, Reply, Radio } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   BarChart, Bar,
@@ -21,10 +21,16 @@ export const Route = createFileRoute("/")({
 });
 
 const metrics = [
-  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. last 7 days" },
-  { label: "Messages Sent", value: "212,884", delta: "+8.1%", up: true, icon: Send, sub: "across both channels" },
   { label: "Active Contacts", value: "29,841", delta: "+4.2%", up: true, icon: Users, sub: "7-day rolling" },
+  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. last 7 days" },
+  { label: "Messages Replied", value: "168,492", delta: "+9.7%", up: true, icon: Reply, sub: "91.5% reply rate" },
+  { label: "Broadcast Sent", value: "38", delta: "+5.6%", up: true, icon: Radio, sub: "campaigns this month" },
   { label: "Broadcast Reach", value: "1.42M", delta: "−1.6%", up: false, icon: Megaphone, sub: "vs. previous campaign" },
+];
+
+const channelEngagement = [
+  { name: "WhatsApp", value: 7.4 },
+  { name: "Instagram", value: 4.2 },
 ];
 
 function Dashboard() {
@@ -56,7 +62,7 @@ function Dashboard() {
         </div>
 
         {/* Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
           {metrics.map((m) => {
             const Icon = m.icon;
             return (
@@ -120,12 +126,12 @@ function Dashboard() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Channel performance" description="Share of replied conversations">
+          <SectionCard title="Channel performance" description="Average messages per contact by channel">
             <div className="h-72 p-4">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={channelPerf} layout="vertical" margin={{ top: 10, right: 16, left: 16, bottom: 0 }}>
+                <BarChart data={channelEngagement} layout="vertical" margin={{ top: 10, right: 16, left: 16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 6%)" horizontal={false} />
-                  <XAxis type="number" stroke="oklch(0.7 0 0)" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 100]} />
+                  <XAxis type="number" stroke="oklch(0.7 0 0)" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 10]} />
                   <YAxis type="category" dataKey="name" stroke="oklch(0.7 0 0)" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={70} />
                   <Tooltip cursor={{ fill: "oklch(1 0 0 / 4%)" }} contentStyle={{ background: "oklch(0.18 0 0)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 8, fontSize: 12 }} />
                   <Bar dataKey="value" fill="oklch(0.62 0.17 40)" radius={[0, 6, 6, 0]} barSize={28} />
@@ -134,8 +140,8 @@ function Dashboard() {
             </div>
             <div className="grid grid-cols-2 border-t border-border">
               <div className="p-4">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg. response</div>
-                <div className="mt-1 text-lg font-semibold">3m 41s</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg. messages / contact</div>
+                <div className="mt-1 text-lg font-semibold">5.8</div>
               </div>
               <div className="p-4 border-l border-border">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">CSAT</div>
