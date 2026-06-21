@@ -724,13 +724,14 @@ type PropertyRow = {
   visible: boolean;
   editable: boolean;
   options?: string[];
+  system?: boolean;
 };
 
 const SEED_PROPERTIES: PropertyRow[] = [
-  { id: "p-1",  name: "Full Name",       key: "full_name",       type: "text",     usedIn: 12, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-10T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-2",  name: "Email",           key: "email",           type: "email",    usedIn: 18, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-12T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-3",  name: "Phone Number",    key: "phone_number",    type: "phone",    usedIn: 24, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-15T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-4",  name: "Company Name",    key: "company_name",    type: "text",     usedIn: 9,  createdAt: "2025-02-08T09:00:00Z", updatedAt: "2025-10-02T09:00:00Z", required: false, visible: true,  editable: true },
+  { id: "p-1",  name: "Full Name",       key: "full_name",       type: "text",     usedIn: 12, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-10T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-2",  name: "Email",           key: "email",           type: "email",    usedIn: 18, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-12T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-3",  name: "Phone Number",    key: "phone_number",    type: "phone",    usedIn: 24, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-15T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-4",  name: "Company Name",    key: "company_name",    type: "text",     usedIn: 9,  createdAt: "2025-02-08T09:00:00Z", updatedAt: "2025-10-02T09:00:00Z", required: false, visible: true,  editable: true, system: true },
   { id: "p-5",  name: "Industry",        key: "industry",        type: "dropdown", usedIn: 6,  createdAt: "2025-02-19T09:00:00Z", updatedAt: "2025-10-08T09:00:00Z", required: false, visible: true,  editable: true, options: ["Retail","Finance","Tech","Hospitality","Education","Healthcare"] },
   { id: "p-6",  name: "Annual Revenue",  key: "annual_revenue",  type: "currency", usedIn: 4,  createdAt: "2025-03-03T09:00:00Z", updatedAt: "2025-10-14T09:00:00Z", required: false, visible: true,  editable: true },
   { id: "p-7",  name: "Lead Source",     key: "lead_source",     type: "dropdown", usedIn: 11, createdAt: "2025-03-21T09:00:00Z", updatedAt: "2025-10-19T09:00:00Z", required: false, visible: true,  editable: true, options: ["Website","Referral","Ads","Event","Cold Outreach"] },
