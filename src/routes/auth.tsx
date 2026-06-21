@@ -81,15 +81,12 @@ function AuthPage() {
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex">
       {/* LEFT — Visual panel */}
-      <aside className="relative hidden lg:flex lg:w-[45%] p-3">
+      <aside className="relative hidden lg:flex lg:w-1/2 p-3">
         <div className="relative w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.14_0_0)]">
           {/* Glow blobs */}
           <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-primary/30 blur-[110px]" />
           <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.62_0.17_40)]/25 blur-[120px]" />
           <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-orange-500/15 blur-[100px]" />
-          {/* Geometric shapes */}
-          <div className="absolute top-24 right-16 h-40 w-40 rounded-3xl border border-white/10 rotate-12 backdrop-blur-sm bg-white/[0.02]" />
-          <div className="absolute bottom-32 left-20 h-24 w-24 rounded-full border border-primary/30 bg-primary/5" />
           {/* Grid + noise */}
           <div className="absolute inset-0 scl-grid-bg opacity-40 pointer-events-none" />
           <div
@@ -101,11 +98,7 @@ function AuthPage() {
           />
 
           {/* Content */}
-          <div className="relative z-10 flex h-full flex-col justify-between p-10">
-            <div className="flex items-center gap-2">
-              <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-8 rounded-md" />
-            </div>
-
+          <div className="relative z-10 flex h-full flex-col justify-center p-10">
             <div className="max-w-lg">
               <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05]">
                 Connect conversations.
@@ -117,17 +110,6 @@ function AuthPage() {
               <p className="mt-4 text-sm text-muted-foreground max-w-md leading-relaxed">
                 Manage WhatsApp, Instagram, and customer conversations in one workspace.
               </p>
-
-              {/* Floating stat cards */}
-              <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
-                <StatCard icon={<Users className="h-3.5 w-3.5" />} value="29,841" label="Active Contacts" />
-                <StatCard icon={<Send className="h-3.5 w-3.5" />} value="212,884" label="Messages Sent" />
-                <StatCard icon={<Sparkles className="h-3.5 w-3.5" />} value="92%" label="Response Rate" />
-              </div>
-            </div>
-
-            <div className="text-[11px] text-muted-foreground">
-              © {new Date().getFullYear()} Strategic Conversation Lab
             </div>
           </div>
         </div>
@@ -142,16 +124,9 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-          {/* Logo + title */}
-          <div className="flex flex-col items-start">
-            <img src={sclLogoAsset.url} alt="SCL" className="h-9 w-9 rounded-md mb-6 lg:hidden" />
-            {mode !== "forgot" && mode !== "forgot-sent" && (
-              <div className="inline-flex rounded-lg border border-border bg-card/60 p-1 mb-6">
-                <TabButton active={mode === "signin"} onClick={() => { setMode("signin"); setError(null); }}>Sign In</TabButton>
-                <TabButton active={mode === "signup"} onClick={() => { setMode("signup"); setError(null); }}>Create Account</TabButton>
-              </div>
-            )}
+          <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-auto rounded-md mb-6" />
 
+          <div className="flex flex-col items-start">
             {mode === "signin" && (
               <>
                 <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
@@ -371,42 +346,6 @@ function Field({
         {rightSlot}
       </div>
       {children}
-    </div>
-  );
-}
-
-function TabButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`px-4 py-1.5 text-xs font-medium rounded-md transition ${
-        active
-          ? "bg-primary text-primary-foreground shadow"
-          : "text-muted-foreground hover:text-foreground"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-white/[0.03] backdrop-blur-md p-3 glass">
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        {icon}
-        <span className="text-[10px] uppercase tracking-wider">{label}</span>
-      </div>
-      <div className="mt-1 text-base font-semibold tracking-tight">{value}</div>
     </div>
   );
 }
