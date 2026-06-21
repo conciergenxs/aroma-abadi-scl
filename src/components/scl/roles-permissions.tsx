@@ -401,9 +401,6 @@ export function RolesPermissionsModule() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4 px-1 pt-0.5">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
-            Company Settings
-          </div>
           <h2 className="text-xl font-semibold leading-tight m-0">Roles & Permissions</h2>
           <p className="text-xs text-muted-foreground mt-1 m-0">
             Create and manage custom roles and permission levels for workspace members.
@@ -524,9 +521,6 @@ function RoleEditor({
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
-            Company Settings · Roles & Permissions
-          </div>
           <h2 className="text-xl font-semibold leading-tight m-0">
             {initial ? `Edit Role` : "Create New Role"}
           </h2>
