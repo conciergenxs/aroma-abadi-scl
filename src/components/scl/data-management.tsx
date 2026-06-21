@@ -948,12 +948,10 @@ function PropertiesListPage({
                       <Checkbox checked={allOnPageChecked} onChange={togglePageAll} />
                     </th>
                     <th className="px-3 py-2.5 text-left font-medium">Property Name</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Internal Key</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Type</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Used In</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Property Type</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Visible</th>
                     <th className="px-3 py-2.5 text-left font-medium">Created</th>
                     <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
-                    <th className="w-24 px-5 py-2.5 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -966,42 +964,44 @@ function PropertiesListPage({
                         />
                       </td>
                       <td className="px-3 py-3">
-                        <div className="font-medium">{row.name}</div>
+                        <div className="font-medium inline-flex items-center gap-1.5">
+                          {row.name}
+                          {row.system && (
+                            <span
+                              title="System property"
+                              className="inline-flex items-center gap-1 rounded-sm border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground"
+                            >
+                              <Lock className="h-2.5 w-2.5" /> System
+                            </span>
+                          )}
+                        </div>
                         {row.description && (
                           <div className="text-[11px] text-muted-foreground">{row.description}</div>
                         )}
-                      </td>
-                      <td className="px-3 py-3">
-                        <code className="text-[11px] rounded bg-white/[0.04] border border-border px-1.5 py-0.5 text-muted-foreground">
-                          {row.key}
-                        </code>
                       </td>
                       <td className="px-3 py-3">
                         <span className="inline-flex items-center rounded-md border border-border bg-white/[0.03] px-2 py-0.5 text-[11px]">
                           {PROP_TYPE_LABELS[row.type]}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-xs text-muted-foreground">{row.usedIn} contacts</td>
+                      <td className="px-3 py-3">
+                        <button
+                          type="button"
+                          onClick={() => onToggleVisible(row.id, !row.visible)}
+                          aria-label={row.visible ? "Hide property" : "Show property"}
+                          className={`relative h-5 w-9 rounded-full transition ${
+                            row.visible ? "bg-primary" : "bg-white/[0.08]"
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
+                              row.visible ? "left-[18px]" : "left-0.5"
+                            }`}
+                          />
+                        </button>
+                      </td>
                       <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
                       <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.updatedAt)}</td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => onEdit(row.id)}
-                            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-foreground"
-                            aria-label="Edit"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteTarget(row)}
-                            className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                            aria-label="Delete"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1018,19 +1018,8 @@ function PropertiesListPage({
       </SectionCard>
 
       <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Property"
-        description={
-          <>Are you sure you want to delete this property? This action cannot be undone.</>
-        }
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) onDelete([deleteTarget.id]);
-        }}
-      />
-      <ConfirmDialog
         open={bulkDeleteOpen}
-        title="Delete Properties"
+        title={selected.size === 1 ? "Delete Property" : "Delete Properties"}
         description={
           <>
             Are you sure you want to delete {selected.size} propert
@@ -1041,6 +1030,7 @@ function PropertiesListPage({
         onConfirm={() => {
           onDelete(Array.from(selected));
           setSelected(new Set());
+          setBulkDeleteOpen(false);
         }}
       />
     </div>
