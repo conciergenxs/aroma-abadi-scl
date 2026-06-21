@@ -113,14 +113,12 @@ function TemplatesPage() {
   const clearSelection = () => setSelected([]);
 
   return (
-    <AppShell>
+    <AppShell
+      title="Message Templates"
+      subtitle="Reusable, brand-approved messages for WhatsApp & Instagram."
+    >
       <div className="space-y-6">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Message Templates</h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Reusable, brand-approved messages for WhatsApp & Instagram.
-          </p>
-        </div>
+
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
