@@ -27,6 +27,7 @@ import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { PlansBillingModule } from "@/components/scl/plans-billing";
+import { DataManagementModule } from "@/components/scl/data-management";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -67,10 +68,8 @@ const NAV: NavSection[] = [
     id: "data",
     label: "Data management",
     items: [
-      { id: "labels", label: "Labels" },
-      { id: "contact-properties", label: "Contact Properties" },
-      { id: "lifecycle", label: "Customer Lifecycle" },
-      { id: "deleted-contacts", label: "Recently Deleted Contacts" },
+      { id: "labels", label: "Labels", enabled: true },
+      { id: "contact-properties", label: "Contact Properties", enabled: true },
     ],
   },
 ];
@@ -145,6 +144,9 @@ function SettingsPage() {
               onNavigate={(s) => setActive(s)}
             />
           )}
+          {(active === "labels" || active === "contact-properties") && (
+            <DataManagementModule section={active} />
+          )}
           {active !== "general" &&
             active !== "company-details" &&
             active !== "user-management" &&
@@ -152,7 +154,9 @@ function SettingsPage() {
             active !== "roles" &&
             active !== "subscription" &&
             active !== "payment-methods" &&
-            active !== "invoice" && <ComingSoonPanel id={active} />}
+            active !== "invoice" &&
+            active !== "labels" &&
+            active !== "contact-properties" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
