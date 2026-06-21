@@ -47,6 +47,7 @@ function AuthPage() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 700));
       setLoading(false);
+      if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
       toast.success("Welcome back, Aria.");
       navigate({ to: "/" });
       return;
@@ -61,6 +62,7 @@ function AuthPage() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 900));
       setLoading(false);
+      if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
       toast.success("Workspace created. Welcome to SCL.");
       navigate({ to: "/" });
       return;
