@@ -48,8 +48,6 @@ const NAV: NavSection[] = [
       { id: "user-management", label: "User Management", enabled: true },
       { id: "team-management", label: "Team Management" },
       { id: "roles", label: "Roles & Permissions" },
-      { id: "inbox-settings", label: "Inbox Settings" },
-      { id: "feature-previews", label: "Feature Previews" },
     ],
   },
   {
