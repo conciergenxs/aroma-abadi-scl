@@ -132,9 +132,11 @@ function SettingsPage() {
           {active === "general" && <GeneralPage />}
           {active === "company-details" && <CompanyDetailsPage />}
           {active === "user-management" && <UserManagementPage />}
+          {active === "team-management" && <TeamManagementPage />}
           {active !== "general" &&
             active !== "company-details" &&
-            active !== "user-management" && <ComingSoonPanel id={active} />}
+            active !== "user-management" &&
+            active !== "team-management" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
