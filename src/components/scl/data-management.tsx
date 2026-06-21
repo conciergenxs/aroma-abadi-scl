@@ -162,6 +162,612 @@ function SearchInput({
   );
 }
 
+// =========================================================
+// CUSTOMER LIFECYCLE PAGE
+//
+// Reads & writes the SAME `state.lifecycleStages` list used by
+// Contacts Kanban, Inbox lifecycle filters, and Contact Detail.
+// There is only one lifecycle configuration in the application.
+// =========================================================
+
+const LIFECYCLE_COLOR_KEYS = Object.keys(LIFECYCLE_COLORS) as LifecycleColorKey[];
+
+function CustomerLifecyclePage() {
+  const { lifecycleStages } = useContactsStore();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [createGroup, setCreateGroup] = useState<LifecycleGroup | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<LifecycleStageDef | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  const active = lifecycleStages.filter((s) => s.group === "active");
+  const lost = lifecycleStages.filter((s) => s.group === "lost");
+
+  const handleDrop = (targetId: string) => {
+    if (!dragId || dragId === targetId) return setDragId(null);
+    const ids = lifecycleStages.map((s) => s.id);
+    const from = ids.indexOf(dragId);
+    const to = ids.indexOf(targetId);
+    if (from < 0 || to < 0) return setDragId(null);
+    const next = [...ids];
+    next.splice(from, 1);
+    next.splice(to, 0, dragId);
+    contactsStore.reorderLifecycleStages(next);
+    setDragId(null);
+  };
+
+  return (
+    <div className="space-y-5">
+      <PageHeader
+        title="Customer Lifecycle"
+        description="Manage the lifecycle stages used across Contacts Kanban, Inbox, and Contact records."
+      />
+
+      <SectionCard>
+        <LifecycleGroupSection
+          title="Active Stages"
+          stages={active}
+          editingId={editingId}
+          dragId={dragId}
+          setDragId={setDragId}
+          onDropTarget={handleDrop}
+          onEdit={(id) => setEditingId(id)}
+          onCancelEdit={() => setEditingId(null)}
+          onDelete={(s) => setDeleteTarget(s)}
+          onCreate={() => setCreateGroup("active")}
+        />
+        <div className="h-px bg-border" />
+        <LifecycleGroupSection
+          title="Lost Stages"
+          stages={lost}
+          editingId={editingId}
+          dragId={dragId}
+          setDragId={setDragId}
+          onDropTarget={handleDrop}
+          onEdit={(id) => setEditingId(id)}
+          onCancelEdit={() => setEditingId(null)}
+          onDelete={(s) => setDeleteTarget(s)}
+          onCreate={() => setCreateGroup("lost")}
+        />
+      </SectionCard>
+
+      <LifecycleStageModal
+        open={createGroup !== null}
+        mode="create"
+        group={createGroup ?? "active"}
+        onClose={() => setCreateGroup(null)}
+        onSubmit={(name, color) => {
+          if (!createGroup) return;
+          contactsStore.addLifecycleStage({ name, color, group: createGroup });
+          toast.success("Stage created");
+          setCreateGroup(null);
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Stage"
+        description={
+          <>
+            Delete stage <span className="font-semibold">{deleteTarget?.name}</span>? Contacts
+            currently in this stage will have their lifecycle cleared. This cannot be undone.
+          </>
+        }
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            contactsStore.deleteLifecycleStage(deleteTarget.id);
+            toast.success("Stage deleted");
+          }
+          setDeleteTarget(null);
+        }}
+      />
+    </div>
+  );
+}
+
+function LifecycleGroupSection({
+  title, stages, editingId, dragId, setDragId, onDropTarget,
+  onEdit, onCancelEdit, onDelete, onCreate,
+}: {
+  title: string;
+  stages: LifecycleStageDef[];
+  editingId: string | null;
+  dragId: string | null;
+  setDragId: (id: string | null) => void;
+  onDropTarget: (id: string) => void;
+  onEdit: (id: string) => void;
+  onCancelEdit: () => void;
+  onDelete: (s: LifecycleStageDef) => void;
+  onCreate: () => void;
+}) {
+  return (
+    <div className="px-5 py-4">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-3">
+        {title}
+      </div>
+      <div className="space-y-2">
+        {stages.map((s) =>
+          editingId === s.id ? (
+            <LifecycleStageEditor
+              key={s.id}
+              stage={s}
+              onCancel={onCancelEdit}
+              onSave={(name, color) => {
+                contactsStore.updateLifecycleStage(s.id, { name, color });
+                toast.success("Stage updated");
+                onCancelEdit();
+              }}
+            />
+          ) : (
+            <LifecycleStageRow
+              key={s.id}
+              stage={s}
+              dragging={dragId === s.id}
+              onDragStart={() => setDragId(s.id)}
+              onDragEnd={() => setDragId(null)}
+              onDropTarget={() => onDropTarget(s.id)}
+              onEdit={() => onEdit(s.id)}
+              onDelete={() => onDelete(s)}
+            />
+          ),
+        )}
+        {stages.length === 0 && (
+          <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md py-6 text-center">
+            No stages yet
+          </div>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onCreate}
+        className="mt-3 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+      >
+        <Plus className="h-3.5 w-3.5" /> Create
+      </button>
+    </div>
+  );
+}
+
+function LifecycleStageRow({
+  stage, dragging, onDragStart, onDragEnd, onDropTarget, onEdit, onDelete,
+}: {
+  stage: LifecycleStageDef;
+  dragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDropTarget: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const c = LIFECYCLE_COLORS[stage.color];
+  return (
+    <div
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        onDragStart();
+      }}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        onDropTarget();
+      }}
+      className={`group flex items-center gap-2 rounded-md border border-border bg-card/40 px-2.5 py-2 transition ${
+        dragging ? "opacity-50" : "hover:bg-card/70"
+      }`}
+    >
+      <span className="text-muted-foreground/60 cursor-grab active:cursor-grabbing">
+        <GripVertical className="h-4 w-4" />
+      </span>
+      <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
+      <span className="text-sm flex-1 truncate">{stage.name}</span>
+      {stage.system && (
+        <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+          <Lock className="h-2.5 w-2.5" /> Default
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={onEdit}
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+        aria-label="Edit stage"
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
+      {!stage.system && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          aria-label="Delete stage"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LifecycleStageEditor({
+  stage, onCancel, onSave,
+}: {
+  stage: LifecycleStageDef;
+  onCancel: () => void;
+  onSave: (name: string, color: LifecycleColorKey) => void;
+}) {
+  const [name, setName] = useState(stage.name);
+  const [color, setColor] = useState<LifecycleColorKey>(stage.color);
+  const canSave = name.trim().length > 0;
+  return (
+    <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-3 space-y-3">
+      <div>
+        <FieldLabel>Stage Name</FieldLabel>
+        <TextInput value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+      </div>
+      <div>
+        <FieldLabel>Stage Color</FieldLabel>
+        <LifecycleColorPicker value={color} onChange={setColor} />
+      </div>
+      <div className="flex items-center justify-end gap-2 pt-1">
+        <GhostButton onClick={onCancel}>Cancel</GhostButton>
+        <PrimaryButton disabled={!canSave} onClick={() => canSave && onSave(name.trim(), color)}>
+          Save Changes
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+function LifecycleStageModal({
+  open, mode, group, onClose, onSubmit,
+}: {
+  open: boolean;
+  mode: "create";
+  group: LifecycleGroup;
+  onClose: () => void;
+  onSubmit: (name: string, color: LifecycleColorKey) => void;
+}) {
+  const [name, setName] = useState("");
+  const [color, setColor] = useState<LifecycleColorKey>("blue");
+  useEffect(() => {
+    if (open) { setName(""); setColor("blue"); }
+  }, [open]);
+  const canSubmit = name.trim().length > 0;
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={mode === "create" ? `Create ${group === "active" ? "Active" : "Lost"} Stage` : "Edit Stage"}
+      footer={
+        <>
+          <GhostButton onClick={onClose}>Cancel</GhostButton>
+          <PrimaryButton disabled={!canSubmit} onClick={() => canSubmit && onSubmit(name.trim(), color)}>
+            Create Stage
+          </PrimaryButton>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <label className="block">
+          <FieldLabel>Stage Name</FieldLabel>
+          <TextInput value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="e.g. Negotiation" />
+        </label>
+        <div>
+          <FieldLabel>Stage Color</FieldLabel>
+          <LifecycleColorPicker value={color} onChange={setColor} />
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function LifecycleColorPicker({
+  value, onChange,
+}: {
+  value: LifecycleColorKey;
+  onChange: (c: LifecycleColorKey) => void;
+}) {
+  return (
+    <div className="mt-1 flex flex-wrap gap-2">
+      {LIFECYCLE_COLOR_KEYS.map((k) => {
+        const c = LIFECYCLE_COLORS[k];
+        const active = value === k;
+        return (
+          <button
+            key={k}
+            type="button"
+            onClick={() => onChange(k)}
+            className={`h-8 w-8 rounded-full grid place-items-center border-2 transition ${
+              active ? "border-foreground" : "border-transparent hover:border-border"
+            }`}
+            aria-label={c.name}
+          >
+            <span className={`h-5 w-5 rounded-full ${c.dot}`} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// =========================================================
+// RECENTLY DELETED CONTACTS PAGE
+//
+// Reads from the SAME `state.contacts` list. Filters where deleted=true.
+// Uses the same property visibility configuration so columns mirror the
+// Contacts module table.
+// =========================================================
+
+function RecentlyDeletedContactsPage() {
+  const { contacts, labels, lists, properties } = useContactsStore();
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+
+  const visibleProps = useMemo(
+    () => properties.filter((p) => p.visible),
+    [properties],
+  );
+
+  const deletedContacts = useMemo(() => {
+    const base = contacts.filter((c) => c.deleted);
+    if (!query.trim()) return base;
+    const q = query.toLowerCase();
+    return base.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.phone.toLowerCase().includes(q) ||
+        (c.instagram ?? "").toLowerCase().includes(q),
+    );
+  }, [contacts, query]);
+
+  const labelById = (id: string) => labels.find((l) => l.id === id);
+  const listById = (id: string) => lists.find((l) => l.id === id);
+
+  const allChecked = deletedContacts.length > 0 && deletedContacts.every((c) => selected.has(c.id));
+  const toggleAll = () => {
+    const next = new Set(selected);
+    if (allChecked) deletedContacts.forEach((c) => next.delete(c.id));
+    else deletedContacts.forEach((c) => next.add(c.id));
+    setSelected(next);
+  };
+  const toggleOne = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelected(next);
+  };
+
+  const restore = (ids: string[]) => {
+    contactsStore.restoreContacts(ids);
+    setSelected(new Set());
+    toast.success(
+      ids.length > 1 ? `${ids.length} contacts restored` : "Contact restored",
+    );
+  };
+  const hardDelete = (ids: string[]) => {
+    contactsStore.hardDeleteContacts(ids);
+    setSelected(new Set());
+    toast.success(
+      ids.length > 1 ? `${ids.length} contacts permanently deleted` : "Contact permanently deleted",
+    );
+  };
+
+  return (
+    <div className="space-y-5">
+      <PageHeader
+        title="Recently Deleted Contacts"
+        description="Contacts moved to this recycle bin. Restore them to the Contacts module or delete permanently."
+      />
+
+      <SectionCard>
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-border">
+          <SearchInput value={query} onChange={setQuery} placeholder="Search deleted contacts" />
+          <div className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5" /> {deletedContacts.length} deleted
+          </div>
+        </div>
+
+        {selected.size > 0 && (
+          <div className="flex items-center justify-between px-5 py-2.5 bg-primary/10 border-b border-border">
+            <div className="text-xs">
+              <span className="font-semibold">{selected.size}</span> selected
+            </div>
+            <div className="flex items-center gap-2">
+              <GhostButton onClick={() => setBulkRestoreOpen(true)}>
+                <RotateCcw className="h-3.5 w-3.5" />{" "}
+                {selected.size === 1 ? "Restore" : "Restore Selected"}
+              </GhostButton>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
+              >
+                <Trash2 className="h-3.5 w-3.5" />{" "}
+                {selected.size === 1 ? "Permanently Delete" : "Permanently Delete Selected"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {deletedContacts.length === 0 ? (
+          <EmptyState
+            title="No Deleted Contacts"
+            description="Contacts you delete from the Contacts module will appear here. Restore them anytime."
+            action={null}
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                <tr className="border-b border-border">
+                  <th className="w-10 px-5 py-2.5 text-left">
+                    <Checkbox checked={allChecked} onChange={toggleAll} />
+                  </th>
+                  {visibleProps.map((p) => (
+                    <th key={p.id} className="px-3 py-2.5 text-left font-medium whitespace-nowrap">
+                      {p.name}
+                    </th>
+                  ))}
+                  <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">
+                    Deleted
+                  </th>
+                  <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {deletedContacts.map((c) => (
+                  <tr key={c.id} className="hover:bg-white/[0.02]">
+                    <td className="px-5 py-3">
+                      <Checkbox
+                        checked={selected.has(c.id)}
+                        onChange={() => toggleOne(c.id)}
+                      />
+                    </td>
+                    {visibleProps.map((p) => (
+                      <td key={p.id} className="px-3 py-3 whitespace-nowrap align-middle">
+                        {renderContactCell(p, c, labelById, listById)}
+                      </td>
+                    ))}
+                    <td className="px-3 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      {c.deletedAt ? fmtDate(c.deletedAt) : "—"}
+                    </td>
+                    <td className="px-3 py-3 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => restore([c.id])}
+                          className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 py-1 text-[11px]"
+                        >
+                          <RotateCcw className="h-3 w-3" /> Restore
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelected(new Set([c.id]));
+                            setBulkDeleteOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-2 py-1 text-[11px]"
+                        >
+                          <Trash2 className="h-3 w-3" /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </SectionCard>
+
+      <ConfirmDialog
+        open={bulkRestoreOpen}
+        title={selected.size === 1 ? "Restore Contact" : "Restore Contacts"}
+        description={
+          <>
+            Restore {selected.size} contact{selected.size === 1 ? "" : "s"} to the Contacts module?
+          </>
+        }
+        confirmLabel="Restore"
+        onClose={() => setBulkRestoreOpen(false)}
+        onConfirm={() => {
+          restore(Array.from(selected));
+          setBulkRestoreOpen(false);
+        }}
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title="Delete Permanently"
+        description={
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 text-destructive">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div>
+                Permanently delete {selected.size} contact{selected.size === 1 ? "" : "s"}?
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              This action cannot be undone. All contact data will be removed.
+            </div>
+          </div>
+        }
+        confirmLabel="Delete Permanently"
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={() => {
+          hardDelete(Array.from(selected));
+          setBulkDeleteOpen(false);
+        }}
+      />
+    </div>
+  );
+}
+
+function renderContactCell(
+  p: ContactProperty,
+  c: Contact,
+  labelById: (id: string) => ContactLabel | undefined,
+  listById: (id: string) => ContactList | undefined,
+) {
+  switch (p.key) {
+    case "name":
+      return <span className="text-sm font-medium">{c.name}</span>;
+    case "phone":
+      return <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>;
+    case "channel":
+      return <ChannelDot channel={c.channel} />;
+    case "labels": {
+      const ids = c.labelIds;
+      const shown = ids.slice(0, 2);
+      const extra = ids.length - shown.length;
+      return (
+        <div className="flex items-center gap-1 flex-nowrap">
+          {shown.map((id) => {
+            const l = labelById(id);
+            return l ? <LabelChip key={id} label={l} /> : null;
+          })}
+          {extra > 0 && (
+            <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+              +{extra}
+            </span>
+          )}
+          {ids.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+        </div>
+      );
+    }
+    case "lists": {
+      const ids = c.listIds;
+      const shown = ids.slice(0, 2);
+      const extra = ids.length - shown.length;
+      return (
+        <div className="flex items-center gap-1 flex-nowrap">
+          {shown.map((id) => {
+            const l = listById(id);
+            return l ? <ListChip key={id} name={l.name} /> : null;
+          })}
+          {extra > 0 && (
+            <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+              +{extra}
+            </span>
+          )}
+          {ids.length === 0 && <span className="text-[11px] text-muted-foreground">—</span>}
+        </div>
+      );
+    }
+    case "lastInteraction":
+      return <span className="text-xs text-muted-foreground">{c.lastInteraction}</span>;
+    case "status":
+      return (
+        <span className="text-xs text-muted-foreground">{c.status}</span>
+      );
+    default:
+      return <span className="text-[11px] text-muted-foreground">—</span>;
+  }
+}
 function Modal({
   open,
   onClose,
