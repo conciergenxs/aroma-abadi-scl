@@ -1010,3 +1010,360 @@ function BreakdownTile({
     </div>
   );
 }
+
+// ============================================================
+// Role Detail Page
+// ============================================================
+
+function RoleDetailPage({
+  role,
+  roles,
+  users,
+  onBack,
+  onEdit,
+  onDelete,
+  onChangeUserRole,
+  onRemoveUsers,
+}: {
+  role: Role;
+  roles: Role[];
+  users: AssignedUser[];
+  onBack: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onChangeUserRole: (userId: string, newRoleName: string) => void;
+  onRemoveUsers: (userIds: string[]) => void;
+}) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [confirmDeleteRole, setConfirmDeleteRole] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [pendingRowRemove, setPendingRowRemove] = useState<AssignedUser | null>(null);
+  const [changeRoleFor, setChangeRoleFor] = useState<AssignedUser | null>(null);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+
+  const allSelected = users.length > 0 && users.every((u) => selected.includes(u.id));
+  const toggleAll = () => setSelected(allSelected ? [] : users.map((u) => u.id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const canDeleteRole = !role.system && users.length === 0;
+
+  return (
+    <div className="space-y-5">
+      <div className="px-1 pt-0.5">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Roles & Permissions
+        </button>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-semibold leading-tight m-0">{role.name}</h2>
+              {role.system && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 text-primary px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                  <ShieldCheck className="h-3 w-3" /> System
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 m-0 max-w-2xl">
+              {role.description || "No description provided."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={onEdit}
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
+            >
+              <Pencil className="h-3.5 w-3.5" /> Edit Role
+            </button>
+            {!role.system && (
+              <button
+                onClick={() => canDeleteRole && setConfirmDeleteRole(true)}
+                disabled={!canDeleteRole}
+                title={
+                  !canDeleteRole
+                    ? "Reassign all users before deleting this role"
+                    : "Delete role"
+                }
+                className="h-9 inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 text-xs font-medium hover:bg-destructive/20 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete Role
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <SectionCard
+        title="Assigned users"
+        description={`${users.length} user${users.length === 1 ? "" : "s"} currently assigned to this role`}
+      >
+        {selected.length > 0 && (
+          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
+            <span className="font-medium">{selected.length} selected</span>
+            <button
+              onClick={() => setConfirmRemove(true)}
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Remove Role
+            </button>
+          </div>
+        )}
+        <div className="overflow-x-auto scl-scroll">
+          <table className="w-full text-sm min-w-[900px]">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-4 py-2.5 text-left w-8">
+                  <Checkbox checked={allSelected} onChange={toggleAll} />
+                </th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
+                <th className="px-4 py-2.5 text-left w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                  <td className="px-4 py-3 align-middle">
+                    <Checkbox
+                      checked={selected.includes(u.id)}
+                      onChange={() => toggleOne(u.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
+                        {u.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")}
+                      </div>
+                      <span className="font-medium">{u.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.email}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.jobTitle}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/40 px-2 py-0.5 text-[10px]">
+                      {u.team}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
+                    {u.assignedDate}
+                  </td>
+                  <td className="px-4 py-3 align-middle">
+                    <RowActionsMenu
+                      open={menuFor === u.id}
+                      onOpenChange={(o) => setMenuFor(o ? u.id : null)}
+                      onChangeRole={() => {
+                        setMenuFor(null);
+                        setChangeRoleFor(u);
+                      }}
+                      onRemoveRole={() => {
+                        setMenuFor(null);
+                        setPendingRowRemove(u);
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No users assigned to this role.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      <ConfirmDialog
+        open={confirmDeleteRole}
+        onClose={() => setConfirmDeleteRole(false)}
+        onConfirm={onDelete}
+        title="Delete role?"
+        description="This role will be permanently removed. This action cannot be undone."
+        confirmLabel="Delete Role"
+      />
+
+      <ConfirmDialog
+        open={confirmRemove}
+        onClose={() => setConfirmRemove(false)}
+        onConfirm={() => {
+          onRemoveUsers(selected);
+          setSelected([]);
+        }}
+        title="Remove role from selected users?"
+        description="Selected users will lose access associated with this role. You can assign a new role afterwards."
+        confirmLabel="Remove Role"
+      />
+
+      <ConfirmDialog
+        open={!!pendingRowRemove}
+        onClose={() => setPendingRowRemove(null)}
+        onConfirm={() => {
+          if (pendingRowRemove) onRemoveUsers([pendingRowRemove.id]);
+          setPendingRowRemove(null);
+        }}
+        title="Remove role from this user?"
+        description="The user will lose access associated with this role. You can assign a new role afterwards."
+        confirmLabel="Remove Role"
+      />
+
+      {changeRoleFor && (
+        <ChangeRoleModal
+          user={changeRoleFor}
+          roles={roles}
+          onClose={() => setChangeRoleFor(null)}
+          onSubmit={(newRoleName) => {
+            onChangeUserRole(changeRoleFor.id, newRoleName);
+            setChangeRoleFor(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function RowActionsMenu({
+  open,
+  onOpenChange,
+  onChangeRole,
+  onRemoveRole,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onChangeRole: () => void;
+  onRemoveRole: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onOpenChange(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open, onOpenChange]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => onOpenChange(!open)}
+        className="h-7 w-7 grid place-items-center rounded-md border border-transparent hover:border-border hover:bg-white/[0.04] text-muted-foreground"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-1 z-30 min-w-[160px] rounded-md border border-border bg-card shadow-xl py-1 text-xs">
+          <button
+            onClick={onChangeRole}
+            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05]"
+          >
+            Change Role
+          </button>
+          <button
+            onClick={onRemoveRole}
+            className="w-full text-left px-3 py-1.5 hover:bg-white/[0.05] text-destructive"
+          >
+            Remove Role
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChangeRoleModal({
+  user,
+  roles,
+  onClose,
+  onSubmit,
+}: {
+  user: AssignedUser;
+  roles: Role[];
+  onClose: () => void;
+  onSubmit: (newRoleName: string) => void;
+}) {
+  const options = roles.map((r) => ({ value: r.name, label: r.name }));
+  const [newRole, setNewRole] = useState<string>(
+    roles.find((r) => r.name !== user.role)?.name ?? user.role,
+  );
+  const unchanged = newRole === user.role;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+      >
+        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">Change Role</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Update the role assigned to {user.name}.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-4 border-t border-border">
+          <div>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Current Role
+            </span>
+            <div className="mt-1 h-9 w-full rounded-md border border-border bg-background/30 px-3 text-sm flex items-center text-muted-foreground">
+              {user.role}
+            </div>
+          </div>
+          <div>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              New Role <span className="text-destructive">*</span>
+            </span>
+            <div className="mt-1">
+              <SclSelect value={newRole} onChange={setNewRole} options={options} />
+            </div>
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={unchanged}
+            onClick={() => onSubmit(newRole)}
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
