@@ -5,10 +5,11 @@ import {
   Trash2,
   Check,
   ChevronRight,
-  MoreHorizontal,
   Pencil,
   X,
   ShieldCheck,
+  Search,
+  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
@@ -453,6 +454,7 @@ export function RolesPermissionsModule() {
         role={role}
         roles={roles}
         users={usersByRole(role.name)}
+        allUsers={users}
         onBack={() => setView({ mode: "list" })}
         onEdit={() => setView({ mode: "edit", roleId: role.id })}
         onDelete={() => {
@@ -460,14 +462,16 @@ export function RolesPermissionsModule() {
           toast.success(`Role "${role.name}" deleted`);
           setView({ mode: "list" });
         }}
-        onChangeUserRole={(userId, newRoleName) => {
-          setUsers((s) => s.map((u) => (u.id === userId ? { ...u, role: newRoleName } : u)));
-          toast.success("Role updated");
-        }}
         onRemoveUsers={(ids) => {
           // "Remove role" = unassign — for the prototype, we drop them from this role list.
           setUsers((s) => s.filter((u) => !ids.includes(u.id)));
           toast.success(`${ids.length} user(s) removed from role`);
+        }}
+        onAssignUsers={(ids) => {
+          setUsers((s) =>
+            s.map((u) => (ids.includes(u.id) ? { ...u, role: role.name, assignedDate: todayLabel() } : u)),
+          );
+          toast.success("Users assigned successfully.");
         }}
       />
     );
