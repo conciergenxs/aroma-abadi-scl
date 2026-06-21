@@ -691,47 +691,6 @@ function LabelFormModal({
   );
 }
 
-function BulkEditColorModal({
-  open,
-  onClose,
-  onApply,
-  count,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onApply: (c: LabelColorKey) => void;
-  count: number;
-}) {
-  const [color, setColor] = useState<LabelColorKey>("blue");
-  useEffect(() => {
-    if (open) setColor("blue");
-  }, [open]);
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={`Edit ${count} Label${count === 1 ? "" : "s"}`}
-      footer={
-        <>
-          <GhostButton onClick={onClose}>Cancel</GhostButton>
-          <PrimaryButton onClick={() => onApply(color)}>Apply Color</PrimaryButton>
-        </>
-      }
-    >
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          Update the color applied to the selected labels.
-        </p>
-        <div>
-          <FieldLabel>Color</FieldLabel>
-          <ColorPicker value={color} onChange={setColor} />
-        </div>
-      </div>
-    </Modal>
-  );
-}
-
 // =========================================================
 // CONTACT PROPERTIES PAGE (+ Add/Edit pages)
 // =========================================================
