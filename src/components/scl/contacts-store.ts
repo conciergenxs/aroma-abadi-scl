@@ -4,6 +4,7 @@ import {
   initialLabels,
   initialLists,
   LIFECYCLE_STAGES,
+  STAGE_COLORS,
   type Contact,
   type ContactLabel,
   type ContactList,
@@ -67,6 +68,57 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
   { id: "p-instagram-username", key: "instagram_username", name: "Instagram Username", type: "text", visible: false },
 ];
 
+// =========================================================
+// LIFECYCLE STAGES — single source of truth
+//
+// Settings → Customer Lifecycle is just another management UI for the
+// same list. Contacts Kanban, Inbox, Contact Detail, and the lifecycle
+// dropdown all read from `state.lifecycleStages` via `useContactsStore`.
+// Use `getStageStyle(name)` for color lookup.
+// =========================================================
+
+export type LifecycleColorKey =
+  | "orange" | "blue" | "purple" | "yellow" | "green"
+  | "red" | "gray" | "pink" | "sky" | "violet" | "emerald";
+
+export const LIFECYCLE_COLORS: Record<
+  LifecycleColorKey,
+  { name: string; bar: string; dot: string; badge: string }
+> = {
+  orange:  { name: "Orange",  bar: "bg-orange-500",  dot: "bg-orange-500",  badge: "border-orange-500/30 bg-orange-500/10 text-orange-300" },
+  blue:    { name: "Blue",    bar: "bg-blue-500",    dot: "bg-blue-500",    badge: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
+  purple:  { name: "Purple",  bar: "bg-purple-500",  dot: "bg-purple-500",  badge: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
+  yellow:  { name: "Yellow",  bar: "bg-yellow-500",  dot: "bg-yellow-500",  badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" },
+  green:   { name: "Green",   bar: "bg-green-500",   dot: "bg-green-500",   badge: "border-green-500/30 bg-green-500/10 text-green-300" },
+  red:     { name: "Red",     bar: "bg-red-500",     dot: "bg-red-500",     badge: "border-red-500/30 bg-red-500/10 text-red-300" },
+  gray:    { name: "Gray",    bar: "bg-gray-500",    dot: "bg-gray-500",    badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" },
+  pink:    { name: "Pink",    bar: "bg-pink-500",    dot: "bg-pink-500",    badge: "border-pink-500/30 bg-pink-500/10 text-pink-300" },
+  sky:     { name: "Sky",     bar: "bg-sky-500",     dot: "bg-sky-500",     badge: "border-sky-500/30 bg-sky-500/10 text-sky-300" },
+  violet:  { name: "Violet",  bar: "bg-violet-500",  dot: "bg-violet-500",  badge: "border-violet-500/30 bg-violet-500/10 text-violet-300" },
+  emerald: { name: "Emerald", bar: "bg-emerald-500", dot: "bg-emerald-500", badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" },
+};
+
+export type LifecycleGroup = "active" | "lost";
+
+export type LifecycleStageDef = {
+  id: string;
+  name: string;
+  color: LifecycleColorKey;
+  group: LifecycleGroup;
+  /** Default/system stages cannot be deleted. */
+  system?: boolean;
+};
+
+export const DEFAULT_LIFECYCLE_STAGES: LifecycleStageDef[] = [
+  { id: "lcs-new-lead",        name: "New Lead",        color: "orange", group: "active", system: true },
+  { id: "lcs-contacted",       name: "Contacted",       color: "blue",   group: "active", system: true },
+  { id: "lcs-qualified",       name: "Qualified",       color: "purple", group: "active", system: true },
+  { id: "lcs-pending-payment", name: "Pending Payment", color: "yellow", group: "active", system: true },
+  { id: "lcs-customer",        name: "Customer",        color: "green",  group: "active", system: true },
+  { id: "lcs-lost",            name: "Lost",            color: "red",    group: "lost",   system: true },
+  { id: "lcs-no-reply",        name: "No Reply",        color: "gray",   group: "lost",   system: true },
+];
+
 const initialContacts: Contact[] = seedContacts.map((c, idx) => {
   if (c.lifecycleStage) return c;
   // Leave roughly every 5th contact without a lifecycle stage — they appear
@@ -83,6 +135,7 @@ type State = {
   labels: ContactLabel[];
   lists: ContactList[];
   properties: ContactProperty[];
+  lifecycleStages: LifecycleStageDef[];
   activities: Record<string, ContactActivity[]>;
   remarks: Record<string, ContactRemark[]>;
 };
@@ -117,6 +170,7 @@ let state: State = {
   labels: initialLabels,
   lists: initialLists,
   properties: DEFAULT_PROPERTIES,
+  lifecycleStages: DEFAULT_LIFECYCLE_STAGES,
   activities: {},
   remarks: {},
 };
@@ -153,6 +207,77 @@ export const contactsStore = {
   },
   setProperties(u: Updater<ContactProperty[]>) {
     state = { ...state, properties: resolve(u, state.properties) };
+    emit();
+  },
+  setLifecycleStages(u: Updater<LifecycleStageDef[]>) {
+    state = { ...state, lifecycleStages: resolve(u, state.lifecycleStages) };
+    emit();
+  },
+  addLifecycleStage(stage: Omit<LifecycleStageDef, "id"> & { id?: string }) {
+    const id = stage.id ?? `lcs-${Date.now()}`;
+    state = { ...state, lifecycleStages: [...state.lifecycleStages, { ...stage, id }] };
+    emit();
+  },
+  updateLifecycleStage(id: string, patch: Partial<Omit<LifecycleStageDef, "id">>) {
+    const old = state.lifecycleStages.find((s) => s.id === id);
+    if (!old) return;
+    const nextStages = state.lifecycleStages.map((s) =>
+      s.id === id ? { ...s, ...patch } : s,
+    );
+    let nextContacts = state.contacts;
+    if (patch.name && patch.name !== old.name) {
+      nextContacts = state.contacts.map((c) =>
+        c.lifecycleStage === old.name ? { ...c, lifecycleStage: patch.name } : c,
+      );
+    }
+    state = { ...state, lifecycleStages: nextStages, contacts: nextContacts };
+    emit();
+  },
+  deleteLifecycleStage(id: string) {
+    const stage = state.lifecycleStages.find((s) => s.id === id);
+    if (!stage || stage.system) return;
+    const nextStages = state.lifecycleStages.filter((s) => s.id !== id);
+    const nextContacts = state.contacts.map((c) =>
+      c.lifecycleStage === stage.name
+        ? { ...c, lifecycleStage: undefined, stageEnteredAt: undefined }
+        : c,
+    );
+    state = { ...state, lifecycleStages: nextStages, contacts: nextContacts };
+    emit();
+  },
+  reorderLifecycleStages(orderedIds: string[]) {
+    const map = new Map(state.lifecycleStages.map((s) => [s.id, s]));
+    const next: LifecycleStageDef[] = [];
+    for (const id of orderedIds) {
+      const s = map.get(id);
+      if (s) next.push(s);
+    }
+    // Append any stage that wasn't included to keep data safe
+    for (const s of state.lifecycleStages) if (!orderedIds.includes(s.id)) next.push(s);
+    state = { ...state, lifecycleStages: next };
+    emit();
+  },
+  softDeleteContacts(ids: string[]) {
+    const now = new Date().toISOString();
+    state = {
+      ...state,
+      contacts: state.contacts.map((c) =>
+        ids.includes(c.id) ? { ...c, deleted: true, deletedAt: now } : c,
+      ),
+    };
+    emit();
+  },
+  restoreContacts(ids: string[]) {
+    state = {
+      ...state,
+      contacts: state.contacts.map((c) =>
+        ids.includes(c.id) ? { ...c, deleted: false, deletedAt: undefined } : c,
+      ),
+    };
+    emit();
+  },
+  hardDeleteContacts(ids: string[]) {
+    state = { ...state, contacts: state.contacts.filter((c) => !ids.includes(c.id)) };
     emit();
   },
   addActivity(contactId: string, type: ContactActivity["type"], message: string) {
@@ -205,4 +330,19 @@ export const contactsStore = {
 
 export function useContactsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
+const FALLBACK_STAGE_STYLE = { bar: "bg-gray-500", dot: "bg-gray-500", badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" };
+
+/**
+ * Lookup the color/style for a stage name. Reads the live contacts-store
+ * lifecycleStages list, falling back to legacy STAGE_COLORS for safety.
+ * Components that render stage colors should also subscribe via
+ * `useContactsStore()` so they re-render when stages change.
+ */
+export function getStageStyle(name?: string | null) {
+  if (!name) return FALLBACK_STAGE_STYLE;
+  const def = state.lifecycleStages.find((s) => s.name === name);
+  if (def) return LIFECYCLE_COLORS[def.color];
+  return STAGE_COLORS[name] ?? FALLBACK_STAGE_STYLE;
 }

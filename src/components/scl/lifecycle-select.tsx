@@ -1,11 +1,7 @@
 import { useRef, useState } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
-import {
-  PROGRESSING_STAGES,
-  LOST_STAGES,
-  STAGE_COLORS,
-  type LifecycleStage,
-} from "./mock-data";
+import type { LifecycleStage } from "./mock-data";
+import { useContactsStore, LIFECYCLE_COLORS, type LifecycleStageDef } from "./contacts-store";
 import { FloatingMenu } from "./floating-menu";
 
 type Props = {
@@ -23,9 +19,14 @@ type Props = {
 export function LifecycleSelect({ value, onChange, size = "md", className = "" }: Props) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const { lifecycleStages } = useContactsStore();
 
   const current = value ?? null;
-  const color = current ? STAGE_COLORS[current] : null;
+  const currentDef = current ? lifecycleStages.find((s) => s.name === current) : null;
+  const color = currentDef ? LIFECYCLE_COLORS[currentDef.color] : null;
+
+  const active = lifecycleStages.filter((s) => s.group === "active");
+  const lost = lifecycleStages.filter((s) => s.group === "lost");
 
   const hClass = size === "sm" ? "h-7 text-[11px] px-2" : "h-9 text-xs px-2.5";
 
@@ -58,13 +59,13 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
       >
         <div className="rounded-md border border-border bg-popover shadow-xl p-1 max-h-[320px] overflow-auto scl-scroll">
           <Group label="PROGRESSING STAGE">
-            {PROGRESSING_STAGES.map((s) => (
+            {active.map((s) => (
               <Row
-                key={s}
+                key={s.id}
                 stage={s}
-                active={current === s}
+                active={current === s.name}
                 onPick={() => {
-                  onChange(s);
+                  onChange(s.name);
                   setOpen(false);
                 }}
               />
@@ -72,13 +73,13 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
           </Group>
           <div className="my-1 h-px bg-border" />
           <Group label="LOST STAGE">
-            {LOST_STAGES.map((s) => (
+            {lost.map((s) => (
               <Row
-                key={s}
+                key={s.id}
                 stage={s}
-                active={current === s}
+                active={current === s.name}
                 onPick={() => {
-                  onChange(s);
+                  onChange(s.name);
                   setOpen(false);
                 }}
               />
@@ -119,11 +120,11 @@ function Row({
   active,
   onPick,
 }: {
-  stage: LifecycleStage;
+  stage: LifecycleStageDef;
   active: boolean;
   onPick: () => void;
 }) {
-  const c = STAGE_COLORS[stage];
+  const c = LIFECYCLE_COLORS[stage.color];
   return (
     <button
       type="button"
@@ -135,7 +136,7 @@ function Row({
       <span className="flex items-center gap-2 min-w-0">
         <span className={`h-2 w-2 rounded-full ${c.dot}`} />
         <span className={`truncate inline-flex items-center rounded px-1.5 py-0.5 border text-[10px] ${c.badge}`}>
-          {stage}
+          {stage.name}
         </span>
       </span>
       {active && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}

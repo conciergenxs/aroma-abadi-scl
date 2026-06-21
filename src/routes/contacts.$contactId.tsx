@@ -28,8 +28,8 @@ import {
   type ContactLabel,
   type LabelColor,
   type LifecycleStage,
-  STAGE_COLORS,
 } from "@/components/scl/mock-data";
+import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 
 const SYSTEM_KEYS = new Set([
@@ -117,9 +117,9 @@ function ContactDetailPage() {
   }, [contact, contactActivities, contactLabels, contactLists]);
 
   const handleDelete = () => {
-    if (!confirm(`Delete ${contact.name}? This cannot be undone.`)) return;
-    contactsStore.setContacts((cs) => cs.filter((c) => c.id !== contact.id));
-    toast.success("Contact deleted");
+    if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
+    contactsStore.softDeleteContacts([contact.id]);
+    toast.success("Contact moved to Recently Deleted");
     navigate({ to: "/contacts" });
   };
 
@@ -259,11 +259,11 @@ function ContactDetailPage() {
             {contact.lifecycleStage && (
               <span
                 className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] ${
-                  STAGE_COLORS[contact.lifecycleStage].badge
+                  getStageStyle(contact.lifecycleStage).badge
                 }`}
               >
                 <span
-                  className={`h-1.5 w-1.5 rounded-full ${STAGE_COLORS[contact.lifecycleStage].dot}`}
+                  className={`h-1.5 w-1.5 rounded-full ${getStageStyle(contact.lifecycleStage).dot}`}
                 />
                 {contact.lifecycleStage}
               </span>

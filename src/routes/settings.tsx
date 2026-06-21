@@ -70,6 +70,8 @@ const NAV: NavSection[] = [
     items: [
       { id: "labels", label: "Labels", enabled: true },
       { id: "contact-properties", label: "Contact Properties", enabled: true },
+      { id: "customer-lifecycle", label: "Customer Lifecycle", enabled: true },
+      { id: "recently-deleted", label: "Recently Deleted Contacts", enabled: true },
     ],
   },
 ];
@@ -144,7 +146,10 @@ function SettingsPage() {
               onNavigate={(s) => setActive(s)}
             />
           )}
-          {(active === "labels" || active === "contact-properties") && (
+          {(active === "labels" ||
+            active === "contact-properties" ||
+            active === "customer-lifecycle" ||
+            active === "recently-deleted") && (
             <DataManagementModule section={active} />
           )}
           {active !== "general" &&
@@ -156,7 +161,9 @@ function SettingsPage() {
             active !== "payment-methods" &&
             active !== "invoice" &&
             active !== "labels" &&
-            active !== "contact-properties" && <ComingSoonPanel id={active} />}
+            active !== "contact-properties" &&
+            active !== "customer-lifecycle" &&
+            active !== "recently-deleted" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>

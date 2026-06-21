@@ -11,12 +11,14 @@ import {
   type LifecycleStage,
   connectedChannels,
 } from "@/components/scl/mock-data";
-import { LIFECYCLE_STAGES, STAGE_COLORS } from "@/components/scl/mock-data";
 import {
   contactsStore,
   useContactsStore,
   PROPERTY_TYPE_LABELS,
   type ContactProperty,
+  type LifecycleStageDef,
+  LIFECYCLE_COLORS,
+  getStageStyle,
 } from "@/components/scl/contacts-store";
 import { toast } from "sonner";
 import {
@@ -40,6 +42,7 @@ function ContactsPage() {
   const isChildRoute = pathname !== "/contacts";
 
   const { contacts, labels, lists, properties } = useContactsStore();
+  const lifecycleStages = useContactsStore().lifecycleStages;
   const setContacts = contactsStore.setContacts;
   const setLabels = contactsStore.setLabels;
   const setLists = contactsStore.setLists;
@@ -74,9 +77,10 @@ function ContactsPage() {
 
   const visibleContacts = useMemo(() => {
     let base: Contact[];
-    if (activeView === "all") base = contacts;
-    else if (activeView === "mine") base = contacts.filter((c) => c.ownerId === "me");
-    else base = contacts.filter((c) => c.listIds.includes(activeView));
+    const live = contacts.filter((c) => !c.deleted);
+    if (activeView === "all") base = live;
+    else if (activeView === "mine") base = live.filter((c) => c.ownerId === "me");
+    else base = live.filter((c) => c.listIds.includes(activeView));
     if (channelFilter !== "all") {
       base = base.filter((c) => c.channel === channelFilter);
     }
@@ -130,9 +134,11 @@ function ContactsPage() {
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
   const bulkDelete = () => {
     const count = selected.length;
-    setContacts((cs) => cs.filter((c) => !selected.includes(c.id)));
+    contactsStore.softDeleteContacts(selected);
     setSelected([]);
-    toast.success(`Deleted ${count} contact${count === 1 ? "" : "s"}`);
+    toast.success(
+      `Moved ${count} contact${count === 1 ? "" : "s"} to Recently Deleted`,
+    );
   };
 
   const createList = () => {
@@ -363,6 +369,7 @@ function ContactsPage() {
             {viewMode === "kanban" ? (
               <KanbanBoard
                 contacts={visibleContacts}
+                stages={lifecycleStages}
                 onMove={moveToStage}
                 onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
               />
@@ -1201,10 +1208,12 @@ function formatInStage(iso?: string): string {
 
 function KanbanBoard({
   contacts,
+  stages,
   onMove,
   onOpen,
 }: {
   contacts: Contact[];
+  stages: LifecycleStageDef[];
   onMove: (id: string, stage: LifecycleStage) => void;
   onOpen: (id: string) => void;
 }) {
@@ -1213,22 +1222,23 @@ function KanbanBoard({
 
   const byStage = useMemo(() => {
     const map = new Map<LifecycleStage, Contact[]>();
-    LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
+    stages.forEach((s) => map.set(s.name, []));
     for (const c of contacts) {
       // Kanban only includes contacts with an assigned lifecycle stage.
       if (!c.lifecycleStage) continue;
       map.get(c.lifecycleStage as LifecycleStage)?.push(c);
     }
     return map;
-  }, [contacts]);
+  }, [contacts, stages]);
 
   return (
     <div className="h-full overflow-auto [overscroll-behavior:contain] scl-scroll">
       <div className="flex gap-4 min-w-max min-h-full items-stretch pb-2">
-        {LIFECYCLE_STAGES.map((stage) => {
+        {stages.map((stageDef) => {
+          const stage = stageDef.name;
           const items = byStage.get(stage) ?? [];
           const isOver = overStage === stage;
-          const c = STAGE_COLORS[stage as LifecycleStage];
+          const c = LIFECYCLE_COLORS[stageDef.color];
           return (
             <div
               key={stage}
