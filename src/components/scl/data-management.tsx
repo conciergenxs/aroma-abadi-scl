@@ -374,8 +374,6 @@ function LabelsPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<LabelRow | null>(null);
-  const [bulkEditOpen, setBulkEditOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<LabelRow | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -422,16 +420,6 @@ function LabelsPage() {
       prev.map((l) => (l.id === id ? { ...l, name, color, updatedAt: now } : l)),
     );
     toast.success("Label updated");
-  };
-
-  const bulkUpdateColor = (color: LabelColorKey) => {
-    const now = new Date().toISOString();
-    setLabels((prev) =>
-      prev.map((l) => (selected.has(l.id) ? { ...l, color, updatedAt: now } : l)),
-    );
-    setBulkEditOpen(false);
-    setSelected(new Set());
-    toast.success("Labels updated");
   };
 
   const del = (ids: string[]) => {
@@ -579,28 +567,14 @@ function LabelsPage() {
         onSubmit={(name, color) => {
           if (editTarget) update(editTarget.id, name, color);
           setEditTarget(null);
+          setSelected(new Set());
         }}
         initial={editTarget ?? undefined}
         mode="edit"
       />
-      <BulkEditColorModal
-        open={bulkEditOpen}
-        onClose={() => setBulkEditOpen(false)}
-        onApply={bulkUpdateColor}
-        count={selected.size}
-      />
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Label"
-        description={
-          <>Are you sure you want to delete this label? This action cannot be undone.</>
-        }
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && del([deleteTarget.id])}
-      />
       <ConfirmDialog
         open={bulkDeleteOpen}
-        title="Delete Labels"
+        title={selected.size === 1 ? "Delete Label" : "Delete Labels"}
         description={
           <>
             Are you sure you want to delete {selected.size} label
@@ -608,7 +582,10 @@ function LabelsPage() {
           </>
         }
         onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={() => del(Array.from(selected))}
+        onConfirm={() => {
+          del(Array.from(selected));
+          setBulkDeleteOpen(false);
+        }}
       />
     </div>
   );
