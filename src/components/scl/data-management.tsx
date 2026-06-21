@@ -700,6 +700,288 @@ function LabelFormModal({
 }
 
 
+// =========================================================
+// CONTACT PROPERTIES PAGE
+//
+// IMPORTANT: This page is only an alternate management entry point
+// for the SAME contact-property data shown in Contacts → Manage
+// Properties. It reads from and writes to `contactsStore` directly
+// and reuses the shared `PropertyFormModal`. There is no separate
+// data source, schema, or CRUD logic.
+// =========================================================
+
+const PROP_TYPE_FILTER_OPTIONS = [
+  { value: "all", label: "All Types" },
+  ...(Object.keys(PROPERTY_TYPE_LABELS) as PropertyType[]).map((t) => ({
+    value: t,
+    label: PROPERTY_TYPE_LABELS[t],
+  })),
+];
+
+function ContactPropertiesRouter() {
+  const { properties } = useContactsStore();
+  const setProperties = contactsStore.setProperties;
+
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<ContactProperty | null>(null);
+
+  const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return properties.filter(
+      (p) =>
+        (typeFilter === "all" || p.type === typeFilter) &&
+        (!q ||
+          p.name.toLowerCase().includes(q) ||
+          p.key.toLowerCase().includes(q)),
+    );
+  }, [properties, query, typeFilter]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const paged = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const allOnPageChecked = paged.length > 0 && paged.every((r) => selected.has(r.id));
+  const togglePageAll = () => {
+    const next = new Set(selected);
+    if (allOnPageChecked) paged.forEach((r) => next.delete(r.id));
+    else paged.forEach((r) => next.add(r.id));
+    setSelected(next);
+  };
+  const toggleOne = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelected(next);
+  };
+
+  const upsertProperty = (prop: ContactProperty) => {
+    const exists = properties.some((p) => p.id === prop.id);
+    setProperties(
+      exists
+        ? properties.map((p) => (p.id === prop.id ? prop : p))
+        : [...properties, prop],
+    );
+    toast.success(exists ? "Property updated" : "Property created");
+  };
+
+  const handleBulkDelete = () => {
+    const ids = Array.from(selected);
+    const blocked = properties.filter((p) => ids.includes(p.id) && p.system);
+    const deletableIds = ids.filter(
+      (id) => !properties.find((p) => p.id === id)?.system,
+    );
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} system propert${blocked.length === 1 ? "y" : "ies"} cannot be deleted`,
+      );
+    }
+    if (deletableIds.length > 0) {
+      setProperties(properties.filter((p) => !deletableIds.includes(p.id)));
+      toast.success(deletableIds.length > 1 ? "Properties deleted" : "Property deleted");
+    }
+    setSelected(new Set());
+    setBulkDeleteOpen(false);
+  };
+
+  const toggleVisible = (id: string) => {
+    setProperties(properties.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
+  };
+
+  const selectedIds = Array.from(selected);
+  const singleSelectedId = selectedIds.length === 1 ? selectedIds[0] : null;
+  const anySystemSelected = selectedIds.some(
+    (id) => properties.find((p) => p.id === id)?.system,
+  );
+
+  return (
+    <div className="space-y-5">
+      <PageHeader
+        title="Contact Properties"
+        description="Manage the contact fields used across your workspace. Synced with Contacts → Manage Properties."
+        action={
+          <PrimaryButton
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Property
+          </PrimaryButton>
+        }
+      />
+
+      <SectionCard>
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-border">
+          <SearchInput value={query} onChange={setQuery} placeholder="Search properties" />
+          <div className="w-48">
+            <SclSelect
+              value={typeFilter}
+              onChange={setTypeFilter}
+              options={PROP_TYPE_FILTER_OPTIONS}
+            />
+          </div>
+          <div className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5" /> {filtered.length} properties
+          </div>
+        </div>
+
+        {selected.size > 0 && (
+          <div className="flex items-center justify-between px-5 py-2.5 bg-primary/10 border-b border-border">
+            <div className="text-xs">
+              <span className="font-semibold">{selected.size}</span> selected
+            </div>
+            <div className="flex items-center gap-2">
+              {singleSelectedId && (
+                <GhostButton
+                  onClick={() => {
+                    const target = properties.find((p) => p.id === singleSelectedId) ?? null;
+                    setEditing(target);
+                    setShowForm(true);
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Edit Property
+                </GhostButton>
+              )}
+              {!anySystemSelected && (
+                <button
+                  onClick={() => setBulkDeleteOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />{" "}
+                  {selected.size === 1 ? "Delete Property" : "Delete Properties"}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {filtered.length === 0 ? (
+          <EmptyState
+            title="No Contact Properties Found"
+            description="Create your first property to customize contact data."
+            action={
+              <PrimaryButton
+                onClick={() => {
+                  setEditing(null);
+                  setShowForm(true);
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" /> Create Property
+              </PrimaryButton>
+            }
+          />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-card/80 backdrop-blur">
+                  <tr className="border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <th className="w-10 px-5 py-2.5 text-left">
+                      <Checkbox checked={allOnPageChecked} onChange={togglePageAll} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left font-medium">Property Name</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Property Key</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Property Type</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Visible</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paged.map((row) => (
+                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-white/[0.02]">
+                      <td className="px-5 py-3">
+                        <Checkbox
+                          checked={selected.has(row.id)}
+                          onChange={() => toggleOne(row.id)}
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="font-medium inline-flex items-center gap-1.5">
+                          {row.name}
+                          {row.system && (
+                            <span
+                              title="System property"
+                              className="inline-flex items-center gap-1 rounded-sm border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground"
+                            >
+                              <Lock className="h-2.5 w-2.5" /> System
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-xs font-mono text-muted-foreground">{row.key}</td>
+                      <td className="px-3 py-3">
+                        <span className="inline-flex items-center rounded-md border border-border bg-white/[0.03] px-2 py-0.5 text-[11px]">
+                          {PROPERTY_TYPE_LABELS[row.type]}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleVisible(row.id)}
+                          aria-label={row.visible ? "Hide property" : "Show property"}
+                          className={`relative h-5 w-9 rounded-full transition ${
+                            row.visible ? "bg-primary" : "bg-white/[0.08]"
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
+                              row.visible ? "left-[18px]" : "left-0.5"
+                            }`}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination
+              page={currentPage}
+              pageCount={pageCount}
+              onPage={setPage}
+              total={filtered.length}
+            />
+          </>
+        )}
+      </SectionCard>
+
+      {showForm && (
+        <PropertyFormModal
+          initial={editing}
+          onClose={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
+          onSave={(prop) => {
+            upsertProperty(prop);
+            setShowForm(false);
+            setEditing(null);
+          }}
+        />
+      )}
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title={selected.size === 1 ? "Delete Property" : "Delete Properties"}
+        description={
+          <>
+            Are you sure you want to delete {selected.size} propert
+            {selected.size === 1 ? "y" : "ies"}? This action cannot be undone.
+          </>
+        }
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={handleBulkDelete}
+      />
+    </div>
+  );
+}
+
 // Silence unused-import warning when ChevronDown isn't directly used elsewhere.
-const _unused = ChevronDown;
+const _unused = [ChevronDown, useEffect, useRef, Check];
 void _unused;
