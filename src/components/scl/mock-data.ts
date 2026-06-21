@@ -10,27 +10,29 @@ export const LIFECYCLE_STAGES = [
   "Lost",
   "No Reply",
 ] as const;
-export type LifecycleStage = (typeof LIFECYCLE_STAGES)[number];
+/**
+ * Lifecycle stage names are user-configurable in Settings → Customer Lifecycle.
+ * The default stages above are seeded into the contacts store; consumers should
+ * read the live stage list from `useContactsStore().lifecycleStages`.
+ */
+export type LifecycleStage = string;
 
 /** Grouped lifecycle stages used by the lifecycle dropdown. */
-export const PROGRESSING_STAGES: LifecycleStage[] = [
+export const PROGRESSING_STAGES: string[] = [
   "New Lead",
   "Contacted",
   "Qualified",
   "Pending Payment",
   "Customer",
 ];
-export const LOST_STAGES: LifecycleStage[] = ["Lost", "No Reply"];
+export const LOST_STAGES: string[] = ["Lost", "No Reply"];
 
 /**
  * Canonical lifecycle colors — Kanban is the source of truth.
  * Reused across the lifecycle dropdown, contact detail header,
  * contact cards and badges. Do not introduce new lifecycle colors.
  */
-export const STAGE_COLORS: Record<
-  LifecycleStage,
-  { bar: string; dot: string; badge: string }
-> = {
+export const STAGE_COLORS: Record<string, { bar: string; dot: string; badge: string }> = {
   "New Lead":        { bar: "bg-orange-500", dot: "bg-orange-500", badge: "border-orange-500/30 bg-orange-500/10 text-orange-300" },
   "Contacted":       { bar: "bg-blue-500",   dot: "bg-blue-500",   badge: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
   "Qualified":       { bar: "bg-purple-500", dot: "bg-purple-500", badge: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
