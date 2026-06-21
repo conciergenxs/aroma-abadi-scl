@@ -10,9 +10,18 @@ import {
   Download,
   Copy,
   QrCode,
+  Search,
+  Plus,
+  Trash2,
+  Bot,
+  UserPlus,
+  Shield,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
+import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -34,10 +43,12 @@ const NAV: NavSection[] = [
     id: "company",
     label: "Company settings",
     items: [
-      { id: "company-details", label: "Company Details" },
-      { id: "user-management", label: "User Management" },
+      { id: "company-details", label: "Company Details", enabled: true },
+      { id: "user-management", label: "User Management", enabled: true },
       { id: "team-management", label: "Team Management" },
       { id: "roles", label: "Roles & Permissions" },
+      { id: "inbox-settings", label: "Inbox Settings" },
+      { id: "feature-previews", label: "Feature Previews" },
     ],
   },
   {
@@ -119,7 +130,12 @@ function SettingsPage() {
         </aside>
 
         <div className="space-y-6 min-w-0 self-start">
-          {active === "general" ? <GeneralPage /> : <ComingSoonPanel id={active} />}
+          {active === "general" && <GeneralPage />}
+          {active === "company-details" && <CompanyDetailsPage />}
+          {active === "user-management" && <UserManagementPage />}
+          {active !== "general" &&
+            active !== "company-details" &&
+            active !== "user-management" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
