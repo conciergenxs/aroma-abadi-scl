@@ -50,12 +50,10 @@ export function DataManagementModule({ section }: Props) {
 // =========================================================
 
 function PageHeader({
-  eyebrow,
   title,
   description,
   action,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
   action?: ReactNode;
@@ -63,10 +61,7 @@ function PageHeader({
   return (
     <div className="flex items-start justify-between gap-4 px-1 pt-0.5">
       <div>
-        <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground/60">
-          {eyebrow}
-        </div>
-        <h2 className="text-xl font-semibold leading-tight m-0 mt-1">{title}</h2>
+        <h2 className="text-xl font-semibold leading-tight m-0">{title}</h2>
         <p className="text-xs text-muted-foreground mt-1 m-0">{description}</p>
       </div>
       {action}
@@ -452,7 +447,6 @@ function LabelsPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Data Management"
         title="Labels"
         description="Create and manage labels used to organize contacts."
         action={
@@ -953,7 +947,6 @@ function PropertiesListPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Data Management"
         title="Contact Properties"
         description="Manage custom contact fields used throughout the workspace."
         action={
