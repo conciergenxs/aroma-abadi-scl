@@ -135,6 +135,7 @@ type State = {
   labels: ContactLabel[];
   lists: ContactList[];
   properties: ContactProperty[];
+  lifecycleStages: LifecycleStageDef[];
   activities: Record<string, ContactActivity[]>;
   remarks: Record<string, ContactRemark[]>;
 };
@@ -169,6 +170,7 @@ let state: State = {
   labels: initialLabels,
   lists: initialLists,
   properties: DEFAULT_PROPERTIES,
+  lifecycleStages: DEFAULT_LIFECYCLE_STAGES,
   activities: {},
   remarks: {},
 };
@@ -205,6 +207,77 @@ export const contactsStore = {
   },
   setProperties(u: Updater<ContactProperty[]>) {
     state = { ...state, properties: resolve(u, state.properties) };
+    emit();
+  },
+  setLifecycleStages(u: Updater<LifecycleStageDef[]>) {
+    state = { ...state, lifecycleStages: resolve(u, state.lifecycleStages) };
+    emit();
+  },
+  addLifecycleStage(stage: Omit<LifecycleStageDef, "id"> & { id?: string }) {
+    const id = stage.id ?? `lcs-${Date.now()}`;
+    state = { ...state, lifecycleStages: [...state.lifecycleStages, { ...stage, id }] };
+    emit();
+  },
+  updateLifecycleStage(id: string, patch: Partial<Omit<LifecycleStageDef, "id">>) {
+    const old = state.lifecycleStages.find((s) => s.id === id);
+    if (!old) return;
+    const nextStages = state.lifecycleStages.map((s) =>
+      s.id === id ? { ...s, ...patch } : s,
+    );
+    let nextContacts = state.contacts;
+    if (patch.name && patch.name !== old.name) {
+      nextContacts = state.contacts.map((c) =>
+        c.lifecycleStage === old.name ? { ...c, lifecycleStage: patch.name } : c,
+      );
+    }
+    state = { ...state, lifecycleStages: nextStages, contacts: nextContacts };
+    emit();
+  },
+  deleteLifecycleStage(id: string) {
+    const stage = state.lifecycleStages.find((s) => s.id === id);
+    if (!stage || stage.system) return;
+    const nextStages = state.lifecycleStages.filter((s) => s.id !== id);
+    const nextContacts = state.contacts.map((c) =>
+      c.lifecycleStage === stage.name
+        ? { ...c, lifecycleStage: undefined, stageEnteredAt: undefined }
+        : c,
+    );
+    state = { ...state, lifecycleStages: nextStages, contacts: nextContacts };
+    emit();
+  },
+  reorderLifecycleStages(orderedIds: string[]) {
+    const map = new Map(state.lifecycleStages.map((s) => [s.id, s]));
+    const next: LifecycleStageDef[] = [];
+    for (const id of orderedIds) {
+      const s = map.get(id);
+      if (s) next.push(s);
+    }
+    // Append any stage that wasn't included to keep data safe
+    for (const s of state.lifecycleStages) if (!orderedIds.includes(s.id)) next.push(s);
+    state = { ...state, lifecycleStages: next };
+    emit();
+  },
+  softDeleteContacts(ids: string[]) {
+    const now = new Date().toISOString();
+    state = {
+      ...state,
+      contacts: state.contacts.map((c) =>
+        ids.includes(c.id) ? { ...c, deleted: true, deletedAt: now } : c,
+      ),
+    };
+    emit();
+  },
+  restoreContacts(ids: string[]) {
+    state = {
+      ...state,
+      contacts: state.contacts.map((c) =>
+        ids.includes(c.id) ? { ...c, deleted: false, deletedAt: undefined } : c,
+      ),
+    };
+    emit();
+  },
+  hardDeleteContacts(ids: string[]) {
+    state = { ...state, contacts: state.contacts.filter((c) => !ids.includes(c.id)) };
     emit();
   },
   addActivity(contactId: string, type: ContactActivity["type"], message: string) {
