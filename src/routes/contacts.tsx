@@ -42,6 +42,7 @@ function ContactsPage() {
   const isChildRoute = pathname !== "/contacts";
 
   const { contacts, labels, lists, properties } = useContactsStore();
+  const lifecycleStages = useContactsStore().lifecycleStages;
   const setContacts = contactsStore.setContacts;
   const setLabels = contactsStore.setLabels;
   const setLists = contactsStore.setLists;
@@ -368,6 +369,7 @@ function ContactsPage() {
             {viewMode === "kanban" ? (
               <KanbanBoard
                 contacts={visibleContacts}
+                stages={lifecycleStages}
                 onMove={moveToStage}
                 onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
               />
@@ -1206,10 +1208,12 @@ function formatInStage(iso?: string): string {
 
 function KanbanBoard({
   contacts,
+  stages,
   onMove,
   onOpen,
 }: {
   contacts: Contact[];
+  stages: LifecycleStageDef[];
   onMove: (id: string, stage: LifecycleStage) => void;
   onOpen: (id: string) => void;
 }) {
@@ -1218,22 +1222,23 @@ function KanbanBoard({
 
   const byStage = useMemo(() => {
     const map = new Map<LifecycleStage, Contact[]>();
-    LIFECYCLE_STAGES.forEach((s) => map.set(s, []));
+    stages.forEach((s) => map.set(s.name, []));
     for (const c of contacts) {
       // Kanban only includes contacts with an assigned lifecycle stage.
       if (!c.lifecycleStage) continue;
       map.get(c.lifecycleStage as LifecycleStage)?.push(c);
     }
     return map;
-  }, [contacts]);
+  }, [contacts, stages]);
 
   return (
     <div className="h-full overflow-auto [overscroll-behavior:contain] scl-scroll">
       <div className="flex gap-4 min-w-max min-h-full items-stretch pb-2">
-        {LIFECYCLE_STAGES.map((stage) => {
+        {stages.map((stageDef) => {
+          const stage = stageDef.name;
           const items = byStage.get(stage) ?? [];
           const isOver = overStage === stage;
-          const c = STAGE_COLORS[stage as LifecycleStage];
+          const c = LIFECYCLE_COLORS[stageDef.color];
           return (
             <div
               key={stage}
