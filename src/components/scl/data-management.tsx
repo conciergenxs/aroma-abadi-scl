@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react";
-import { Search, Plus, Trash2, Pencil, X, ArrowLeft, Check, ChevronDown, GripVertical, Filter } from "lucide-react";
+import { Search, Plus, Trash2, Pencil, X, ArrowLeft, Check, ChevronDown, GripVertical, Filter, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -374,8 +374,6 @@ function LabelsPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<LabelRow | null>(null);
-  const [bulkEditOpen, setBulkEditOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<LabelRow | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -424,16 +422,6 @@ function LabelsPage() {
     toast.success("Label updated");
   };
 
-  const bulkUpdateColor = (color: LabelColorKey) => {
-    const now = new Date().toISOString();
-    setLabels((prev) =>
-      prev.map((l) => (selected.has(l.id) ? { ...l, color, updatedAt: now } : l)),
-    );
-    setBulkEditOpen(false);
-    setSelected(new Set());
-    toast.success("Labels updated");
-  };
-
   const del = (ids: string[]) => {
     setLabels((prev) => prev.filter((l) => !ids.includes(l.id)));
     setSelected((prev) => {
@@ -477,14 +465,22 @@ function LabelsPage() {
               <span className="font-semibold">{selected.size}</span> selected
             </div>
             <div className="flex items-center gap-2">
-              <GhostButton onClick={() => setBulkEditOpen(true)}>
-                <Pencil className="h-3.5 w-3.5" /> Edit Label
-              </GhostButton>
+              {selected.size === 1 && (
+                <GhostButton
+                  onClick={() => {
+                    const id = Array.from(selected)[0];
+                    const row = labels.find((l) => l.id === id) ?? null;
+                    setEditTarget(row);
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Edit Label
+                </GhostButton>
+              )}
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Delete Label
+                <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Label" : "Delete Labels"}
               </button>
             </div>
           </div>
@@ -513,7 +509,6 @@ function LabelsPage() {
                     <th className="px-3 py-2.5 text-left font-medium">Color</th>
                     <th className="px-3 py-2.5 text-left font-medium">Created</th>
                     <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
-                    <th className="w-24 px-5 py-2.5 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -541,24 +536,6 @@ function LabelsPage() {
                         </td>
                         <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
                         <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.updatedAt)}</td>
-                        <td className="px-5 py-3">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => setEditTarget(row)}
-                              className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-foreground"
-                              aria-label="Edit"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget(row)}
-                              className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                              aria-label="Delete"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </td>
                       </tr>
                     );
                   })}
@@ -590,28 +567,14 @@ function LabelsPage() {
         onSubmit={(name, color) => {
           if (editTarget) update(editTarget.id, name, color);
           setEditTarget(null);
+          setSelected(new Set());
         }}
         initial={editTarget ?? undefined}
         mode="edit"
       />
-      <BulkEditColorModal
-        open={bulkEditOpen}
-        onClose={() => setBulkEditOpen(false)}
-        onApply={bulkUpdateColor}
-        count={selected.size}
-      />
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Label"
-        description={
-          <>Are you sure you want to delete this label? This action cannot be undone.</>
-        }
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && del([deleteTarget.id])}
-      />
       <ConfirmDialog
         open={bulkDeleteOpen}
-        title="Delete Labels"
+        title={selected.size === 1 ? "Delete Label" : "Delete Labels"}
         description={
           <>
             Are you sure you want to delete {selected.size} label
@@ -619,7 +582,10 @@ function LabelsPage() {
           </>
         }
         onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={() => del(Array.from(selected))}
+        onConfirm={() => {
+          del(Array.from(selected));
+          setBulkDeleteOpen(false);
+        }}
       />
     </div>
   );
@@ -725,47 +691,6 @@ function LabelFormModal({
   );
 }
 
-function BulkEditColorModal({
-  open,
-  onClose,
-  onApply,
-  count,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onApply: (c: LabelColorKey) => void;
-  count: number;
-}) {
-  const [color, setColor] = useState<LabelColorKey>("blue");
-  useEffect(() => {
-    if (open) setColor("blue");
-  }, [open]);
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={`Edit ${count} Label${count === 1 ? "" : "s"}`}
-      footer={
-        <>
-          <GhostButton onClick={onClose}>Cancel</GhostButton>
-          <PrimaryButton onClick={() => onApply(color)}>Apply Color</PrimaryButton>
-        </>
-      }
-    >
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          Update the color applied to the selected labels.
-        </p>
-        <div>
-          <FieldLabel>Color</FieldLabel>
-          <ColorPicker value={color} onChange={setColor} />
-        </div>
-      </div>
-    </Modal>
-  );
-}
-
 // =========================================================
 // CONTACT PROPERTIES PAGE (+ Add/Edit pages)
 // =========================================================
@@ -799,13 +724,14 @@ type PropertyRow = {
   visible: boolean;
   editable: boolean;
   options?: string[];
+  system?: boolean;
 };
 
 const SEED_PROPERTIES: PropertyRow[] = [
-  { id: "p-1",  name: "Full Name",       key: "full_name",       type: "text",     usedIn: 12, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-10T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-2",  name: "Email",           key: "email",           type: "email",    usedIn: 18, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-12T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-3",  name: "Phone Number",    key: "phone_number",    type: "phone",    usedIn: 24, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-15T09:00:00Z", required: true,  visible: true,  editable: true },
-  { id: "p-4",  name: "Company Name",    key: "company_name",    type: "text",     usedIn: 9,  createdAt: "2025-02-08T09:00:00Z", updatedAt: "2025-10-02T09:00:00Z", required: false, visible: true,  editable: true },
+  { id: "p-1",  name: "Full Name",       key: "full_name",       type: "text",     usedIn: 12, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-10T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-2",  name: "Email",           key: "email",           type: "email",    usedIn: 18, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-12T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-3",  name: "Phone Number",    key: "phone_number",    type: "phone",    usedIn: 24, createdAt: "2025-01-04T09:00:00Z", updatedAt: "2025-09-15T09:00:00Z", required: true,  visible: true,  editable: true, system: true },
+  { id: "p-4",  name: "Company Name",    key: "company_name",    type: "text",     usedIn: 9,  createdAt: "2025-02-08T09:00:00Z", updatedAt: "2025-10-02T09:00:00Z", required: false, visible: true,  editable: true, system: true },
   { id: "p-5",  name: "Industry",        key: "industry",        type: "dropdown", usedIn: 6,  createdAt: "2025-02-19T09:00:00Z", updatedAt: "2025-10-08T09:00:00Z", required: false, visible: true,  editable: true, options: ["Retail","Finance","Tech","Hospitality","Education","Healthcare"] },
   { id: "p-6",  name: "Annual Revenue",  key: "annual_revenue",  type: "currency", usedIn: 4,  createdAt: "2025-03-03T09:00:00Z", updatedAt: "2025-10-14T09:00:00Z", required: false, visible: true,  editable: true },
   { id: "p-7",  name: "Lead Source",     key: "lead_source",     type: "dropdown", usedIn: 11, createdAt: "2025-03-21T09:00:00Z", updatedAt: "2025-10-19T09:00:00Z", required: false, visible: true,  editable: true, options: ["Website","Referral","Ads","Event","Cold Outreach"] },
@@ -880,8 +806,25 @@ function ContactPropertiesRouter() {
       onAdd={() => setView({ kind: "add" })}
       onEdit={(id) => setView({ kind: "edit", id })}
       onDelete={(ids) => {
-        setProperties((prev) => prev.filter((p) => !ids.includes(p.id)));
-        toast.success(ids.length > 1 ? "Properties deleted" : "Property deleted");
+        const blocked = properties.filter((p) => ids.includes(p.id) && p.system);
+        const deletable = ids.filter(
+          (id) => !properties.find((p) => p.id === id)?.system,
+        );
+        if (blocked.length > 0) {
+          toast.error(
+            `${blocked.length} system propert${blocked.length === 1 ? "y" : "ies"} cannot be deleted`,
+          );
+        }
+        if (deletable.length > 0) {
+          setProperties((prev) => prev.filter((p) => !deletable.includes(p.id)));
+          toast.success(deletable.length > 1 ? "Properties deleted" : "Property deleted");
+        }
+      }}
+      onToggleVisible={(id, v) => {
+        const now = new Date().toISOString();
+        setProperties((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, visible: v, updatedAt: now } : p)),
+        );
       }}
     />
   );
@@ -892,11 +835,13 @@ function PropertiesListPage({
   onAdd,
   onEdit,
   onDelete,
+  onToggleVisible,
 }: {
   properties: PropertyRow[];
   onAdd: () => void;
   onEdit: (id: string) => void;
   onDelete: (ids: string[]) => void;
+  onToggleVisible: (id: string, v: boolean) => void;
 }) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -904,7 +849,6 @@ function PropertiesListPage({
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const [deleteTarget, setDeleteTarget] = useState<PropertyRow | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -934,14 +878,6 @@ function PropertiesListPage({
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setSelected(next);
-  };
-
-  const bulkEdit = () => {
-    if (selected.size === 1) {
-      onEdit(Array.from(selected)[0]);
-    } else {
-      toast.info("Select a single property to edit");
-    }
   };
 
   return (
@@ -977,14 +913,16 @@ function PropertiesListPage({
               <span className="font-semibold">{selected.size}</span> selected
             </div>
             <div className="flex items-center gap-2">
-              <GhostButton onClick={bulkEdit}>
-                <Pencil className="h-3.5 w-3.5" /> Edit Property
-              </GhostButton>
+              {selected.size === 1 && (
+                <GhostButton onClick={() => onEdit(Array.from(selected)[0])}>
+                  <Pencil className="h-3.5 w-3.5" /> Edit Property
+                </GhostButton>
+              )}
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Delete Property
+                <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Property" : "Delete Properties"}
               </button>
             </div>
           </div>
@@ -1010,12 +948,10 @@ function PropertiesListPage({
                       <Checkbox checked={allOnPageChecked} onChange={togglePageAll} />
                     </th>
                     <th className="px-3 py-2.5 text-left font-medium">Property Name</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Internal Key</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Type</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Used In</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Property Type</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Visible</th>
                     <th className="px-3 py-2.5 text-left font-medium">Created</th>
                     <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
-                    <th className="w-24 px-5 py-2.5 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1028,42 +964,44 @@ function PropertiesListPage({
                         />
                       </td>
                       <td className="px-3 py-3">
-                        <div className="font-medium">{row.name}</div>
+                        <div className="font-medium inline-flex items-center gap-1.5">
+                          {row.name}
+                          {row.system && (
+                            <span
+                              title="System property"
+                              className="inline-flex items-center gap-1 rounded-sm border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground"
+                            >
+                              <Lock className="h-2.5 w-2.5" /> System
+                            </span>
+                          )}
+                        </div>
                         {row.description && (
                           <div className="text-[11px] text-muted-foreground">{row.description}</div>
                         )}
-                      </td>
-                      <td className="px-3 py-3">
-                        <code className="text-[11px] rounded bg-white/[0.04] border border-border px-1.5 py-0.5 text-muted-foreground">
-                          {row.key}
-                        </code>
                       </td>
                       <td className="px-3 py-3">
                         <span className="inline-flex items-center rounded-md border border-border bg-white/[0.03] px-2 py-0.5 text-[11px]">
                           {PROP_TYPE_LABELS[row.type]}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-xs text-muted-foreground">{row.usedIn} contacts</td>
+                      <td className="px-3 py-3">
+                        <button
+                          type="button"
+                          onClick={() => onToggleVisible(row.id, !row.visible)}
+                          aria-label={row.visible ? "Hide property" : "Show property"}
+                          className={`relative h-5 w-9 rounded-full transition ${
+                            row.visible ? "bg-primary" : "bg-white/[0.08]"
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
+                              row.visible ? "left-[18px]" : "left-0.5"
+                            }`}
+                          />
+                        </button>
+                      </td>
                       <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
                       <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.updatedAt)}</td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => onEdit(row.id)}
-                            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-foreground"
-                            aria-label="Edit"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteTarget(row)}
-                            className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                            aria-label="Delete"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1080,19 +1018,8 @@ function PropertiesListPage({
       </SectionCard>
 
       <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Property"
-        description={
-          <>Are you sure you want to delete this property? This action cannot be undone.</>
-        }
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) onDelete([deleteTarget.id]);
-        }}
-      />
-      <ConfirmDialog
         open={bulkDeleteOpen}
-        title="Delete Properties"
+        title={selected.size === 1 ? "Delete Property" : "Delete Properties"}
         description={
           <>
             Are you sure you want to delete {selected.size} propert
@@ -1103,6 +1030,7 @@ function PropertiesListPage({
         onConfirm={() => {
           onDelete(Array.from(selected));
           setSelected(new Set());
+          setBulkDeleteOpen(false);
         }}
       />
     </div>
@@ -1132,6 +1060,7 @@ function PropertyFormPage({
   const [editable, setEditable] = useState(initial?.editable ?? true);
   const [options, setOptions] = useState<string[]>(initial?.options ?? []);
   const [newOption, setNewOption] = useState("");
+  const isSystem = !!initial?.system;
 
   // Auto-generate internal key from name until user edits it manually.
   useEffect(() => {
@@ -1158,6 +1087,7 @@ function PropertyFormPage({
       visible,
       editable,
       options: type === "dropdown" ? options : undefined,
+      system: isSystem,
     });
   };
 
@@ -1208,12 +1138,19 @@ function PropertyFormPage({
 
       <SectionCard title="Property Details">
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {isSystem && (
+            <div className="md:col-span-2 inline-flex items-center gap-2 rounded-md border border-border bg-white/[0.03] px-3 py-2 text-[11px] text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              System property — name and type cannot be changed.
+            </div>
+          )}
           <label className="block">
             <FieldLabel>Property Name</FieldLabel>
             <TextInput
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Annual Revenue"
+              disabled={isSystem}
             />
           </label>
           <label className="block">
@@ -1225,6 +1162,7 @@ function PropertyFormPage({
                 setKeyDirty(true);
               }}
               placeholder="annual_revenue"
+              disabled={isSystem}
             />
           </label>
           <label className="block md:col-span-2">
@@ -1238,7 +1176,7 @@ function PropertyFormPage({
           </label>
           <label className="block">
             <FieldLabel>Property Type</FieldLabel>
-            <div className="mt-1">
+            <div className={`mt-1 ${isSystem ? "pointer-events-none opacity-60" : ""}`}>
               <SclSelect
                 value={type}
                 onChange={(v) => setType(v as PropType)}
