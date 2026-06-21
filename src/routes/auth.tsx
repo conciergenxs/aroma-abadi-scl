@@ -104,7 +104,6 @@ function AuthPage() {
           <div className="relative z-10 flex h-full flex-col justify-between p-10">
             <div className="flex items-center gap-2">
               <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-8 rounded-md" />
-              <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">SCL</span>
             </div>
 
             <div className="max-w-lg">
