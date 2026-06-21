@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react";
-import { Search, Plus, Trash2, Pencil, X, ArrowLeft, Check, ChevronDown, GripVertical, Filter } from "lucide-react";
+import { Search, Plus, Trash2, Pencil, X, ArrowLeft, Check, ChevronDown, GripVertical, Filter, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -477,14 +477,22 @@ function LabelsPage() {
               <span className="font-semibold">{selected.size}</span> selected
             </div>
             <div className="flex items-center gap-2">
-              <GhostButton onClick={() => setBulkEditOpen(true)}>
-                <Pencil className="h-3.5 w-3.5" /> Edit Label
-              </GhostButton>
+              {selected.size === 1 && (
+                <GhostButton
+                  onClick={() => {
+                    const id = Array.from(selected)[0];
+                    const row = labels.find((l) => l.id === id) ?? null;
+                    setEditTarget(row);
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Edit Label
+                </GhostButton>
+              )}
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Delete Label
+                <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Label" : "Delete Labels"}
               </button>
             </div>
           </div>
@@ -513,7 +521,6 @@ function LabelsPage() {
                     <th className="px-3 py-2.5 text-left font-medium">Color</th>
                     <th className="px-3 py-2.5 text-left font-medium">Created</th>
                     <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
-                    <th className="w-24 px-5 py-2.5 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -541,24 +548,6 @@ function LabelsPage() {
                         </td>
                         <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
                         <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.updatedAt)}</td>
-                        <td className="px-5 py-3">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => setEditTarget(row)}
-                              className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-foreground"
-                              aria-label="Edit"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget(row)}
-                              className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                              aria-label="Delete"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </td>
                       </tr>
                     );
                   })}
