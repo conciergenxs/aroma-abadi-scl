@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
+import sandLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
 import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -82,15 +83,15 @@ function AuthPage() {
     <div className="min-h-screen w-full bg-background text-foreground flex">
       {/* LEFT — Visual panel */}
       <aside className="relative hidden lg:flex lg:w-1/2 p-3">
-        <div className="relative w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.14_0_0)]">
-          {/* Glow blobs */}
-          <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-primary/30 blur-[110px]" />
-          <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.62_0.17_40)]/25 blur-[120px]" />
-          <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-orange-500/15 blur-[100px]" />
+        <div className="relative w-full overflow-hidden rounded-2xl border border-sidebar-border bg-sidebar text-sidebar-foreground">
+          {/* Aroma Abadi warm glow blobs */}
+          <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-sidebar-primary/30 blur-[110px]" />
+          <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.55_0.14_30)]/40 blur-[120px]" />
+          <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-[oklch(0.78_0.07_70)]/20 blur-[100px]" />
           {/* Grid + noise */}
           <div className="absolute inset-0 scl-grid-bg opacity-40 pointer-events-none" />
           <div
-            className="absolute inset-0 opacity-[0.06] pointer-events-none mix-blend-overlay"
+            className="absolute inset-0 opacity-[0.07] pointer-events-none mix-blend-overlay"
             style={{
               backgroundImage:
                 "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>\")",
@@ -98,19 +99,21 @@ function AuthPage() {
           />
 
           {/* Content */}
-          <div className="relative z-10 flex h-full flex-col justify-center p-10">
+          <div className="relative z-10 flex h-full flex-col justify-between p-10">
+            <img src={sandLogoAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
             <div className="max-w-lg">
-              <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05]">
+              <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05] text-sidebar-foreground">
                 Connect conversations.
                 <br />
-                <span className="bg-gradient-to-r from-primary via-orange-400 to-amber-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-sidebar-primary via-[oklch(0.82_0.08_70)] to-[oklch(0.88_0.06_80)] bg-clip-text text-transparent">
                   Grow relationships.
                 </span>
               </h1>
-              <p className="mt-4 text-sm text-muted-foreground max-w-md leading-relaxed">
+              <p className="mt-4 text-sm text-sidebar-foreground/70 max-w-md leading-relaxed">
                 Manage WhatsApp, Instagram, and customer conversations in one workspace.
               </p>
             </div>
+            <div />
           </div>
         </div>
       </aside>
