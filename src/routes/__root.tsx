@@ -142,7 +142,7 @@ function RootComponent() {
         closeButton
         expand
         duration={3500}
-        theme="dark"
+        theme="light"
       />
     </QueryClientProvider>
   );
