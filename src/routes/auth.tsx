@@ -1,16 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
 import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Strategic Conversation Lab" },
-      { name: "description", content: "Sign in or create your SCL workspace to manage WhatsApp and Instagram conversations." },
-      { property: "og:title", content: "Sign in — Strategic Conversation Lab" },
-      { property: "og:description", content: "Access your SCL workspace." },
+      { title: "Sign in — Aroma Abadi" },
+      { name: "description", content: "Sign in or create your Aroma Abadi workspace to manage WhatsApp and Instagram conversations." },
+      { property: "og:title", content: "Sign in — Aroma Abadi" },
+      { property: "og:description", content: "Access your Aroma Abadi workspace." },
     ],
   }),
   component: AuthPage,
@@ -124,7 +124,7 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-          <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-auto rounded-md mb-6" />
+          <img src={sclLogoAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6" />
 
           <div className="flex flex-col items-start">
             {mode === "signin" && (
@@ -139,7 +139,7 @@ function AuthPage() {
               <>
                 <h2 className="text-2xl font-semibold tracking-tight">Create your workspace</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Get started with SCL and manage customer conversations from one place.
+                  Get started with Aroma Abadi and manage customer conversations from one place.
                 </p>
               </>
             )}
