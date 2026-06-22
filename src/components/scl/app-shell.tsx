@@ -191,18 +191,18 @@ function SidebarIconLink({
         aria-label={label}
         className={`relative grid h-11 w-11 place-items-center rounded-lg transition-colors ${
           active
-            ? "bg-primary/15 text-foreground border border-primary/30"
-            : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+            ? "bg-sidebar-accent text-sidebar-accent-foreground border border-white/10"
+            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
         }`}
       >
-        <Icon className={`h-[18px] w-[18px] ${active ? "text-primary" : ""}`} />
+        <Icon className={`h-[18px] w-[18px] ${active ? "text-sidebar-primary" : ""}`} />
         {badge ? (
-          <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-primary text-[9px] font-semibold text-primary-foreground grid place-items-center">
+          <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground grid place-items-center">
             {badge}
           </span>
         ) : null}
         {active && (
-          <span className="absolute left-0 -ml-2 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-primary" />
+          <span className="absolute left-0 -ml-2 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-sidebar-primary" />
         )}
       </Link>
       <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
@@ -227,7 +227,7 @@ function SidebarIconButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
       >
         <Icon className="h-[18px] w-[18px]" />
       </button>
