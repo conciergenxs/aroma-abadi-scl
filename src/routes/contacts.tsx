@@ -195,7 +195,7 @@ function ContactsPage() {
     >
       <div className="grid grid-cols-[240px_1fr] h-[calc(100vh-64px)] min-h-0">
         {/* Left sidebar: All Contacts + Lists */}
-        <aside className="border-r border-border bg-sidebar/40 overflow-y-auto">
+        <aside className="border-r border-border bg-background scl-grid-bg overflow-y-auto">
           <div className="p-3 space-y-1">
             <button
               onClick={() => { setActiveView("all"); setSelected([]); }}
@@ -463,9 +463,9 @@ function renderPropertyCell(
 ) {
   switch (p.key) {
     case "name":
-      return <span className="text-sm font-medium">{c.name}</span>;
+      return <span className="font-sans text-sm font-medium text-foreground">{c.name}</span>;
     case "phone":
-      return <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>;
+      return <span className="font-sans text-sm text-muted-foreground tabular-nums">{c.phone}</span>;
     case "channel":
       return <ChannelDot channel={c.channel} />;
     case "labels":
