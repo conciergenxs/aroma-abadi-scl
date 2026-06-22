@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
 import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
