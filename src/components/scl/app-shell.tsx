@@ -1,4 +1,4 @@
-import sclLogoAsset from "@/assets/scl-logo.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
