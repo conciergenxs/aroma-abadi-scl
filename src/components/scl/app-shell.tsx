@@ -1,4 +1,4 @@
-import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -287,13 +287,13 @@ import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 
 export const labelColorClass: Record<LabelColor, string> = {
-  indigo: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30",
-  pink: "bg-pink-500/10 text-pink-300 border-pink-500/30",
-  emerald: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
-  amber: "bg-amber-500/10 text-amber-300 border-amber-500/30",
-  sky: "bg-sky-500/10 text-sky-300 border-sky-500/30",
-  violet: "bg-violet-500/10 text-violet-300 border-violet-500/30",
-  slate: "bg-slate-500/10 text-slate-300 border-slate-500/30",
+  indigo: "bg-indigo-500/10 text-indigo-700 border-indigo-500/30",
+  pink: "bg-pink-500/10 text-pink-700 border-pink-500/30",
+  emerald: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+  amber: "bg-amber-500/15 text-amber-800 border-amber-500/30",
+  sky: "bg-sky-500/10 text-sky-700 border-sky-500/30",
+  violet: "bg-violet-500/10 text-violet-700 border-violet-500/30",
+  slate: "bg-slate-500/10 text-slate-700 border-slate-500/30",
 };
 
 export const labelColorDot: Record<LabelColor, string> = {

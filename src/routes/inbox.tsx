@@ -526,7 +526,7 @@ function InboxPage() {
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
       <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="shrink-0 w-[252px] border-r border-border/60 bg-sidebar/25 overflow-y-auto py-1.5">
+        <aside className="shrink-0 w-[252px] border-r border-border/60 bg-background scl-grid-bg overflow-y-auto py-1.5">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
