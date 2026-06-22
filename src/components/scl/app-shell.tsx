@@ -227,7 +227,7 @@ function SidebarIconButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
+        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
       >
         <Icon className="h-[18px] w-[18px]" />
       </button>
