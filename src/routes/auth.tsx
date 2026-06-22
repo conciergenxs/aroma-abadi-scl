@@ -7,10 +7,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Strategic Conversation Lab" },
-      { name: "description", content: "Sign in or create your SCL workspace to manage WhatsApp and Instagram conversations." },
-      { property: "og:title", content: "Sign in — Strategic Conversation Lab" },
-      { property: "og:description", content: "Access your SCL workspace." },
+      { title: "Sign in — Aroma Abadi" },
+      { name: "description", content: "Sign in or create your Aroma Abadi workspace to manage WhatsApp and Instagram conversations." },
+      { property: "og:title", content: "Sign in — Aroma Abadi" },
+      { property: "og:description", content: "Access your Aroma Abadi workspace." },
     ],
   }),
   component: AuthPage,
