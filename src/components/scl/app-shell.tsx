@@ -67,9 +67,9 @@ export function AppShell({
         <div className="flex items-center justify-center h-16 w-full border-b border-sidebar-border">
           <img
             src={sclLogoAsset.url}
-            alt="SCL — Strategic Conversation Lab"
-            className="h-10 w-10 object-contain"
-            title="SCL — Strategic Conversation Lab"
+            alt="Aroma Abadi"
+            className="h-9 w-auto object-contain"
+            title="Aroma Abadi"
           />
         </div>
 
