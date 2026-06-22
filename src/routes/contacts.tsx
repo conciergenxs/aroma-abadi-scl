@@ -463,9 +463,9 @@ function renderPropertyCell(
 ) {
   switch (p.key) {
     case "name":
-      return <span className="font-sans text-sm font-medium text-foreground">{c.name}</span>;
+      return <span className="font-sans text-sm font-normal text-foreground">{c.name}</span>;
     case "phone":
-      return <span className="font-sans text-sm text-muted-foreground tabular-nums">{c.phone}</span>;
+      return <span className="font-sans text-sm font-normal text-muted-foreground tabular-nums">{c.phone}</span>;
     case "channel":
       return <ChannelDot channel={c.channel} />;
     case "labels":
