@@ -139,7 +139,7 @@ function AuthPage() {
               <>
                 <h2 className="text-2xl font-semibold tracking-tight">Create your workspace</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Get started with SCL and manage customer conversations from one place.
+                  Get started with Aroma Abadi and manage customer conversations from one place.
                 </p>
               </>
             )}
