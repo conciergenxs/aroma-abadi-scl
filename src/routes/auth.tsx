@@ -124,7 +124,7 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-          <img src={sclLogoAsset.url} alt="SCL" className="h-8 w-auto rounded-md mb-6" />
+          <img src={sclLogoAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6" />
 
           <div className="flex flex-col items-start">
             {mode === "signin" && (
