@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "d7f63b6b-b552-4571-a81c-71d6dfb40646",
-  "project_id": "18aae0dc-7724-43b7-a7e6-4600a28df4a5",
-  "url": "/__l5e/assets-v1/d7f63b6b-b552-4571-a81c-71d6dfb40646/scl-logo.png",
-  "r2_key": "a/v1/18aae0dc-7724-43b7-a7e6-4600a28df4a5/d7f63b6b-b552-4571-a81c-71d6dfb40646/scl-logo.png",
-  "original_filename": "scl-logo.png",
-  "size": 30271,
   "content_type": "image/png",
-  "created_at": "2026-06-16T03:10:48Z"
+  "created_at": "2026-06-16T03:10:48Z",
+  "original_filename": "scl-logo.png",
+  "project_id": "b1a33c15-f60c-43c4-9443-b75de039fff2",
+  "r2_key": "a/v1/b1a33c15-f60c-43c4-9443-b75de039fff2/d7f63b6b-b552-4571-a81c-71d6dfb40646/scl-logo.png",
+  "size": 30271,
+  "url": "/__l5e/assets-v1/d7f63b6b-b552-4571-a81c-71d6dfb40646/scl-logo.png",
+  "version": 1
 }
