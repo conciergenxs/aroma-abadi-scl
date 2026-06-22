@@ -1,4 +1,4 @@
-import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -68,7 +68,7 @@ export function AppShell({
           <img
             src={sclLogoAsset.url}
             alt="Aroma Abadi"
-            className="h-6 w-auto object-contain"
+            className="h-8 w-auto object-contain"
             title="Aroma Abadi"
           />
         </div>
