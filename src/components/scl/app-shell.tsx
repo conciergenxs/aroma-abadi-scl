@@ -1,4 +1,4 @@
-import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-sand.svg.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -191,11 +191,11 @@ function SidebarIconLink({
         aria-label={label}
         className={`relative grid h-11 w-11 place-items-center rounded-lg transition-colors ${
           active
-            ? "bg-sidebar-accent text-sidebar-accent-foreground border border-white/10"
+            ? "bg-white text-primary border border-white shadow-sm"
             : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
         }`}
       >
-        <Icon className={`h-[18px] w-[18px] ${active ? "text-sidebar-primary" : ""}`} />
+        <Icon className={`h-[18px] w-[18px] ${active ? "text-primary" : ""}`} />
         {badge ? (
           <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground grid place-items-center">
             {badge}
