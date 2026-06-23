@@ -68,7 +68,7 @@ export function AppShell({
           <img
             src={sclLogoAsset.url}
             alt="Aroma Abadi"
-            className="h-6 w-auto object-contain"
+            className="h-8 w-auto object-contain"
             title="Aroma Abadi"
           />
         </div>
