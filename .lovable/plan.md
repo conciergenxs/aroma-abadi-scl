@@ -1,94 +1,103 @@
-# Aroma Abadi Overhaul Plan
+## 1. Reseed brand & SKU data (mockup)
 
-Big consolidated plan covering: WhatsApp-only rebrand, Aroma Abadi (kosmetik & kecantikan) context, Transaction Records page, BA login via WhatsApp number, and SKU knowledge module.
+Update `src/components/scl/sku-store.ts` `seed()` to ship 5 brands with covers, knowledge, and example items:
 
-## 1. WhatsApp-only + Aroma Abadi context (all pages)
+- **Dolce & Gabbana** — Lip · Caviar Hydra-Crème Lipstick 42g
+- **Sisley** — Foundation · Real Flawless Foundation; Powder · Real Flawless Feather Matte Powder Foundation
+- **Rimmel** — Powder · Translucent Loose Setting Powder; Spray · Translucent Hydrating Setting Spray Ultra-Blur
+- **Laura Mercier** — Powder · Translucent Loose Setting Powder
+- **BareMinerals** — Blush · Blush Color Infusion
 
-Remove every Instagram and TikTok mention/asset/option from the app. WhatsApp jadi satu-satunya channel.
+Each brand: `logoUrl` (generated logo image), 1–2 pre-uploaded `brandKnowledge` PDF mock attachments (fake `url` + filename), 1–2 categories each with 1 pre-uploaded `categoryKnowledge` file, SKUs with `photoUrl` (generated product images) + 2 `knowledgeCards` each (cover image + title + text). Use IDR prices.
 
-- `src/components/scl/mock-data.ts`
-  - `Channel` type → `"whatsapp"` saja.
-  - Hapus semua kontak/conversation/template/broadcast yang `channel: "instagram"`; sisanya jadi WhatsApp.
-  - `connectedChannels`: keep `wa-main` & `wa-eu` saja (di-rename ke konteks Aroma Abadi, mis. "Aroma Abadi HQ", "Aroma Abadi Bandung").
-  - Rewrite copy preview/body/template/broadcast/recent activity ke konteks makeup & beauty (mis. "Lipstick Velvet Rouge restock", "BA Tunjungan Plaza", "Promo Ramadhan Glow Set"), nama Indonesia.
-- `src/components/scl/channel-badge.tsx`: hapus mapping `instagram`, simplifikasi tipe.
-- `src/components/scl/app-shell.tsx`: `ChannelDot` jadi WA-only.
-- `src/routes/channels.tsx`, `broadcasts.*`, `templates.*`, `contacts*`, `inbox.tsx`, `index.tsx`, `auth.tsx`: hapus pilihan/icon/filter IG, hapus tab/segment IG, semua label copy diganti ke Aroma Abadi (brand makeup & kecantikan). Dashboard charts & metrics jadi WA-only (hapus seri Instagram).
-- `templates.tsx` channel selector & badges: WA-only.
-- Ganti judul tab/meta head di tiap route ke "Aroma Abadi — …".
+Bump `STORAGE_KEY` to `aroma_sku_store_v2` so existing local data is replaced. Also bump `aroma_tx_store_v2` and re-map transactions to the new brand/SKU names.
 
-## 2. Transaction Records page (baru)
+## 2. SKU page restructured into 3 levels
 
-Halaman baru `/transactions` (`src/routes/transactions.tsx`) dengan sidebar entry baru (icon `Receipt`).
+Rewrite `src/routes/sku.tsx` so it is no longer a 3-column split, but a drill-down driven by local state (`view: "brands" | "brand" | "category"`):
 
-Konten:
-- Header: filter tanggal, brand, store/kota, BA, status pembayaran, search invoice.
-- Tabel transaksi (mock data Aroma Abadi): kolom `Invoice`, `Tanggal`, `Customer` (link ke contact), `BA`, `Store`, `Brand`, `Items` (chips SKU + qty), `Total (IDR)`, `Metode Bayar`, `Status` (Paid / Pending / Refunded).
-- Stat cards atas: total revenue hari ini, jumlah transaksi, AOV, top SKU.
-- Row click → drawer detail transaksi (line items + catatan BA).
-- Store baru `src/components/scl/transactions-store.ts` (Zustand) berisi mock 30–40 transaksi yang konsisten dgn contacts, BA, dan SKU.
+### Level 1 — Brands overview
+- Grid: max 3 rows × 4 columns = 12 brand cards.
+- Each card shows logo, brand name, `{categories.length} Categories`, `{totalSkus} SKUs`. Click → enter brand detail.
+- "Add New Brand" button top-right.
 
-## 3. Login Brand Ambassador via No. WA + password generated (mock)
+### Level 2 — Brand detail (horizontal)
+- Back button + brand header (logo, name).
+- Two columns side-by-side:
+  - Left: **Brand Knowledge** (MultiFileUploader, existing component).
+  - Right: **Product Categories** — list/grid of category cards (name, SKU count, knowledge count). Click → enter category detail.
 
-Frontend-only, no backend.
+### Level 3 — Category detail (horizontal)
+- Back button + breadcrumb (Brand › Category).
+- Two columns:
+  - Left: **Category Knowledge** (MultiFileUploader).
+  - Right: **SKUs** list. Each SKU row shows photo, name, code, price. SKU **Knowledge Cards** become a shadcn `Accordion` per SKU (collapsed by default) that reveals knowledge card grid + Add Card button.
 
-- `src/components/scl/ba-store.ts` (baru, Zustand + persist `localStorage`): list BA dengan field:
-  - `id`, `name`, `gender` (`"Wanita" | "Pria" | "Lainnya"`), `username`, `password` (auto-generated 10-char), `waNumber` (+62…), `brandIds[]`, `city`, `store`, `position` (`Supervisor | Senior BA | BA | Trainee` + free-text).
-  - Actions: `addBA`, `updateBA`, `deleteBA`, `regeneratePassword`, `login(waNumber, password)`, `logout`, `currentBA`.
-- `src/routes/auth.tsx`:
-  - Tab "Admin" (existing) + tab baru "Brand Ambassador" → form No. WA + password.
-  - Login BA set `currentBA` di store & redirect ke `/` (atau `/inbox`).
-- Admin page "BA Management" `src/routes/ba.tsx` (sidebar entry, icon `BadgeCheck`):
-  - Tabel BA + tombol "Add BA" (modal: semua field, password auto-generate dengan tombol regenerate + copy).
-  - Setiap BA bisa di-attach ke 1+ Brand (multi-select dari SKU store).
-- Catatan: belum ada role-gate nyata (frontend mock); cukup state lokal.
+Reuse existing `BrandFormModal`, `SkuFormModal`, `KnowledgeCardForm`, and `MultiFileUploader`.
 
-## 4. Modul SKU & Knowledge (Brand → Category → SKU → Knowledge Card)
+## 3. BA page & form
 
-Tambah entry sidebar "SKU" (icon `Package`) → route `/sku` dgn sub-routes.
+In `src/routes/ba.tsx`:
+- Remove the "Adra" field (column + form input) and drop `adraName` references.
+- Replace the brand chip-toggle with a real dropdown (shadcn `Select`, single-brand) and position it directly after the "Nama Lengkap" field, before the WhatsApp field. Store as `brandIds: [selected]` (keep array for type compatibility).
+- Update placeholders: "Masukkan nama lengkap..", "Masukkan no. WhatsApp..", "Masukkan username..", etc.
+- Use `text-sm` (14px) for inputs, labels, and table cell content for consistency.
 
-Data store: `src/components/scl/sku-store.ts` (Zustand + persist) — semua mock di localStorage, attachment di-simpan sebagai object URL + nama file (no real upload).
+In `src/components/scl/ba-store.ts`: keep `adraName` as deprecated optional (no UI), update seed BA records to reference the new brand IDs from step 1 and remove Adra values.
 
-Schema:
+## 4. Transaction Records — items column vertical
+
+In `src/routes/transactions.tsx`, change the `Items` table cell to render each line on its own row with format `[Item Name] · [XX pcs]`:
+
 ```
-Brand { id, logoUrl, name, brandKnowledge: Attachment[], categories: Category[] }
-Category { id, brandId, name, categoryKnowledge: Attachment[], skus: SKU[] }
-SKU { id, categoryId, name, code, price, photoUrl, description, knowledgeCards: KnowledgeCard[] }
-KnowledgeCard { id, skuId, coverUrl, title, text }
-Attachment { id, fileName, fileType, size, url } // multi-file
+Real Flawless Foundation · 2 pcs
+Caviar Hydra-Crème Lipstick 42g · 1 pcs
 ```
 
-Routes (file-based):
-- `src/routes/sku.tsx` — layout `<Outlet/>`.
-- `src/routes/sku.index.tsx` — list semua Brand (grid card: logo + nama + jumlah kategori/SKU) + tombol **Add New Brand**.
-- `src/routes/sku.$brandId.tsx` — detail Brand: header (logo + nama, edit), section **Brand Knowledge** (multi-file uploader, list file dgn download/remove), section **Product Categories** (list + add).
-- `src/routes/sku.$brandId.$categoryId.tsx` — detail Category: **Category Knowledge** (multi-file uploader) + grid SKU + tombol Add SKU.
-- `src/routes/sku.$brandId.$categoryId.$skuId.tsx` — detail SKU: form (code, name, price, photo, description) + section **Knowledge Cards** (list card; tiap card: cover image, title, text; add/edit/delete).
+Allow the cell to wrap (remove `truncate` + `max-w`). Drawer item list keeps current detailed layout but uses the same `· XX pcs` wording.
 
-UI pieces baru:
-- `src/components/scl/multi-file-uploader.tsx` — drag-drop + click, list file (icon, nama, size, hapus). Untuk knowledge level Brand & Category.
-- `src/components/scl/knowledge-card-editor.tsx` — modal add/edit knowledge card (upload cover, judul, textarea isi).
-- `src/components/scl/brand-form-modal.tsx`, `category-form-modal.tsx`, `sku-form-modal.tsx`.
+## 5. Sidebar expandable + logo padding
 
-Seed: 2 brand contoh ("Aroma Abadi Glow", "Aroma Velvet"), masing-masing 2 kategori (Lip, Face), tiap kategori 2–3 SKU, 1–2 knowledge card per SKU.
+Refactor `src/components/scl/app-shell.tsx` sidebar:
+- Add local `expanded` state (default `false`); collapsed width stays `w-[68px]`, expanded becomes `w-56` with label text shown next to icons.
+- Add a chevron toggle button at the top/bottom to expand/collapse; keep tooltips for the collapsed state.
+- Logo container: add `py-[15px]` padding (top + bottom) and keep aspect ratio. When expanded, show full `aroma-abadi-logo-sand` wordmark; when collapsed, show the icon variant currently used.
+- Nav items become `flex` rows with icon + label when expanded; only icon when collapsed.
 
-## 5. Sidebar & navigation updates
+## 6. Typography consistency (14px / text-sm)
 
-Tambah ke `topNav` di `src/components/scl/app-shell.tsx`:
-- `Inbox`, `Contacts`, `Broadcast`, `Templates`, `Channels`, **`SKU`** (`/sku`, icon `Package`), **`Transactions`** (`/transactions`, icon `Receipt`), **`Brand Ambassadors`** (`/ba`, icon `BadgeCheck`).
-- Sesuaikan `NavItem.to` union.
+Sweep these files to standardize body text to `text-sm` and form placeholders to "Masukkan ...":
+- `src/routes/ba.tsx`, `src/routes/transactions.tsx`, `src/routes/sku.tsx`, `src/routes/contacts.tsx`, `src/routes/contacts.new.tsx`, `src/routes/templates.index.tsx`, `src/routes/templates.new.tsx`, `src/routes/broadcasts.index.tsx`, `src/routes/broadcasts.new.tsx`, `src/routes/channels.tsx`.
+
+Rules:
+- Form `<input>`/`<select>`/`<textarea>`: `text-sm` (14px), placeholders use the "Masukkan …" pattern in Indonesian where the existing copy is Indonesian (keep English screens English).
+- Table body cells: bump from `text-xs` (12px) to `text-sm` (14px); keep small uppercase column headers as-is.
+- Card body text and list item descriptions also `text-sm`.
+
+## 7. Image assets needed
+
+Generate via `imagegen` (fast tier) at small sizes and save under `src/assets/`:
+- 5 brand logos (`brand-dolce-gabbana.png`, `brand-sisley.png`, `brand-rimmel.png`, `brand-laura-mercier.png`, `brand-baremineral.png`) — transparent PNG on white.
+- 6 product photos for the SKUs above (JPG).
+- 4–6 knowledge card cover photos (JPG, generic beauty editorial shots).
+
+Import these via the asset JSON pattern already used (`*.png.asset.json`) and reference `.url` in seed data.
 
 ## Technical notes
 
-- Semua persistence pakai Zustand + `persist` middleware (`localStorage`). File attachments disimpan sebagai `URL.createObjectURL` + metadata; tidak diupload ke server.
-- Tidak mengaktifkan Lovable Cloud (sesuai pilihan "Mock dulu").
-- Hapus asset Instagram (`src/assets/instagram.png.asset.json`) jika sudah tidak direferensikan.
-- Pastikan font tetap Inter, color tokens Aroma Abadi (existing).
-- Tiap route baru kasih `head()` meta (title, description) sesuai Aroma Abadi.
-- Setiap route dgn loader (kalau ada) wajib `errorComponent` + `notFoundComponent`.
+- All store changes bump `STORAGE_KEY` versions so the existing localStorage state in the user's browser is reset to the new mockup.
+- No backend changes; everything stays client-side in the existing stores.
+- The "Adra" field is removed from UI but kept as optional in the `BA` type to avoid breaking serialized data already in localStorage.
+- Accordion uses the existing `src/components/ui/accordion.tsx` shadcn primitive.
 
-## Out of scope
+## Files touched
 
-- Real auth/role enforcement.
-- Real file storage / backend.
-- Editing existing visual theme di luar yang dibutuhkan rebrand WA-only.
+- `src/components/scl/sku-store.ts` (reseed + version bump)
+- `src/components/scl/ba-store.ts` (reseed, brand IDs)
+- `src/components/scl/transactions-store.ts` (reseed with new SKU/brand names + version bump)
+- `src/routes/sku.tsx` (full rewrite — 3-level drill-down)
+- `src/routes/ba.tsx` (remove Adra, brand dropdown, placeholders, text sizes)
+- `src/routes/transactions.tsx` (items vertical column)
+- `src/components/scl/app-shell.tsx` (expandable sidebar, logo padding)
+- `src/routes/contacts.tsx`, `contacts.new.tsx`, `templates.index.tsx`, `templates.new.tsx`, `broadcasts.index.tsx`, `broadcasts.new.tsx`, `channels.tsx` (typography sweep)
+- `src/assets/` (new generated brand logos + product/knowledge images + matching `.asset.json` entries)

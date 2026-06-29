@@ -4,7 +4,8 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useSkuStore, skuStore, type Brand, type Category, type SKU, type KnowledgeCard } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
-import { Plus, Trash2, ChevronRight, Package, FolderOpen, BookOpen, X, ImageIcon, Pencil } from "lucide-react";
+import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/sku")({
@@ -17,136 +18,59 @@ export const Route = createFileRoute("/sku")({
   component: SkuPage,
 });
 
+type View =
+  | { kind: "brands" }
+  | { kind: "brand"; brandId: string }
+  | { kind: "category"; brandId: string; categoryId: string };
+
 function SkuPage() {
   const { brands } = useSkuStore();
-  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(brands[0]?.id || null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(brands[0]?.categories[0]?.id || null);
+  const [view, setView] = useState<View>({ kind: "brands" });
   const [showBrandForm, setShowBrandForm] = useState(false);
-  const [editingSku, setEditingSku] = useState<{ sku?: SKU; categoryId: string } | null>(null);
+  const [editingSku, setEditingSku] = useState<{ sku?: SKU; brandId: string; categoryId: string } | null>(null);
 
-  const brand = useMemo(() => brands.find((b) => b.id === selectedBrandId) || null, [brands, selectedBrandId]);
-  const category = useMemo(() => brand?.categories.find((c) => c.id === selectedCategoryId) || null, [brand, selectedCategoryId]);
+  const brand = useMemo(
+    () => (view.kind !== "brands" ? brands.find((b) => b.id === view.brandId) || null : null),
+    [brands, view],
+  );
+  const category = useMemo(
+    () => (view.kind === "category" && brand ? brand.categories.find((c) => c.id === view.categoryId) || null : null),
+    [brand, view],
+  );
 
   return (
     <AppShell title="SKU & Knowledge" subtitle="Brand → Category → SKU → Knowledge Card untuk seluruh produk Aroma Abadi.">
-      <div className="grid grid-cols-12 gap-4">
-        {/* Brand sidebar */}
-        <div className="col-span-12 md:col-span-3">
-          <SectionCard>
-            <div className="p-3 border-b border-border flex items-center justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wide">Brands</div>
-              <button onClick={() => setShowBrandForm(true)} className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2 h-7 text-[11px] font-medium hover:opacity-90">
-                <Plus className="h-3 w-3" /> Brand
-              </button>
-            </div>
-            <ul className="p-2 space-y-1">
-              {brands.map((b) => (
-                <li key={b.id}>
-                  <button
-                    onClick={() => { setSelectedBrandId(b.id); setSelectedCategoryId(b.categories[0]?.id || null); }}
-                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs ${selectedBrandId === b.id ? "bg-primary/10 text-primary border border-primary/30" : "hover:bg-white/[0.04] border border-transparent"}`}
-                  >
-                    <div className="h-7 w-7 rounded-md bg-primary/10 grid place-items-center overflow-hidden">
-                      {b.logoUrl ? <img src={b.logoUrl} alt="" className="h-full w-full object-cover" /> : <Package className="h-3.5 w-3.5 text-primary" />}
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="font-medium truncate">{b.name}</div>
-                      <div className="text-[10px] text-muted-foreground">{b.categories.length} kategori · {b.categories.reduce((a, c) => a + c.skus.length, 0)} SKU</div>
-                    </div>
-                    <ChevronRight className="h-3 w-3 opacity-50" />
-                  </button>
-                </li>
-              ))}
-              {brands.length === 0 && <li className="px-3 py-6 text-center text-[11px] text-muted-foreground">Belum ada brand.</li>}
-            </ul>
-          </SectionCard>
-        </div>
+      {view.kind === "brands" && (
+        <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
+      )}
 
-        {/* Brand detail + categories list */}
-        <div className="col-span-12 md:col-span-4">
-          {brand ? (
-            <SectionCard>
-              <div className="p-4 border-b border-border">
-                <div className="flex items-start gap-3">
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 grid place-items-center overflow-hidden">
-                    {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="h-full w-full object-cover" /> : <Package className="h-5 w-5 text-primary" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold">{brand.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{brand.brandKnowledge.length} dokumen brand knowledge</div>
-                  </div>
-                  <button
-                    onClick={() => { if (confirm(`Hapus brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); setSelectedBrandId(null); toast.success("Brand dihapus"); } }}
-                    className="grid h-7 w-7 place-items-center rounded text-rose-400 hover:bg-rose-500/10" title="Hapus brand"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
+      {view.kind === "brand" && brand && (
+        <BrandDetail
+          brand={brand}
+          onBack={() => setView({ kind: "brands" })}
+          onOpenCategory={(c) => setView({ kind: "category", brandId: brand.id, categoryId: c.id })}
+        />
+      )}
 
-              <div className="p-4 border-b border-border">
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
-                  <BookOpen className="h-3 w-3" /> Brand Knowledge
-                </div>
-                <MultiFileUploader
-                  files={brand.brandKnowledge}
-                  onAdd={(atts) => skuStore.addBrandKnowledge(brand.id, atts)}
-                  onRemove={(id) => skuStore.removeBrandKnowledge(brand.id, id)}
-                  label="Upload Brand Knowledge"
-                />
-              </div>
+      {view.kind === "category" && brand && category && (
+        <CategoryDetail
+          brand={brand}
+          category={category}
+          onBack={() => setView({ kind: "brand", brandId: brand.id })}
+          onAddSku={() => setEditingSku({ brandId: brand.id, categoryId: category.id })}
+          onEditSku={(sku) => setEditingSku({ sku, brandId: brand.id, categoryId: category.id })}
+        />
+      )}
 
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-[11px] uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                    <FolderOpen className="h-3 w-3" /> Product Categories
-                  </div>
-                  <AddCategoryButton brandId={brand.id} onAdded={(c) => setSelectedCategoryId(c.id)} />
-                </div>
-                <ul className="space-y-1">
-                  {brand.categories.map((c) => (
-                    <li key={c.id}>
-                      <button
-                        onClick={() => setSelectedCategoryId(c.id)}
-                        className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs ${selectedCategoryId === c.id ? "bg-primary/10 text-primary border border-primary/30" : "hover:bg-white/[0.04] border border-transparent"}`}
-                      >
-                        <FolderOpen className="h-3.5 w-3.5" />
-                        <div className="flex-1 text-left">
-                          <div className="font-medium">{c.name}</div>
-                          <div className="text-[10px] text-muted-foreground">{c.skus.length} SKU · {c.categoryKnowledge.length} dokumen</div>
-                        </div>
-                        <ChevronRight className="h-3 w-3 opacity-50" />
-                      </button>
-                    </li>
-                  ))}
-                  {brand.categories.length === 0 && <li className="px-3 py-6 text-center text-[11px] text-muted-foreground">Belum ada category.</li>}
-                </ul>
-              </div>
-            </SectionCard>
-          ) : (
-            <SectionCard><div className="p-10 text-center text-xs text-muted-foreground">Pilih brand di sebelah kiri.</div></SectionCard>
-          )}
-        </div>
-
-        {/* Category detail (knowledge + SKUs) */}
-        <div className="col-span-12 md:col-span-5">
-          {brand && category ? (
-            <CategoryDetail
-              brand={brand}
-              category={category}
-              onAddSku={() => setEditingSku({ categoryId: category.id })}
-              onEditSku={(sku) => setEditingSku({ sku, categoryId: category.id })}
-            />
-          ) : (
-            <SectionCard><div className="p-10 text-center text-xs text-muted-foreground">Pilih category untuk melihat SKU.</div></SectionCard>
-          )}
-        </div>
-      </div>
-
-      {showBrandForm && <BrandFormModal onClose={() => setShowBrandForm(false)} onCreated={(b) => { setSelectedBrandId(b.id); setSelectedCategoryId(null); setShowBrandForm(false); }} />}
-      {editingSku && brand && (
+      {showBrandForm && (
+        <BrandFormModal
+          onClose={() => setShowBrandForm(false)}
+          onCreated={(b) => { setView({ kind: "brand", brandId: b.id }); setShowBrandForm(false); }}
+        />
+      )}
+      {editingSku && (
         <SkuFormModal
-          brandId={brand.id}
+          brandId={editingSku.brandId}
           categoryId={editingSku.categoryId}
           initial={editingSku.sku}
           onClose={() => setEditingSku(null)}
@@ -156,90 +80,238 @@ function SkuPage() {
   );
 }
 
-function AddCategoryButton({ brandId, onAdded }: { brandId: string; onAdded: (c: Category) => void }) {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  if (!open) {
-    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-[11px] hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Category</button>;
-  }
+/* ---------------- Level 1: Brands Overview ---------------- */
+
+function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b: Brand) => void; onAdd: () => void }) {
+  const visible = brands.slice(0, 12);
   return (
-    <div className="flex items-center gap-1">
-      <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama category" className="h-7 rounded-md border border-border bg-card/60 px-2 text-[11px]" />
-      <button onClick={() => { if (!name.trim()) return; const c = skuStore.addCategory(brandId, name.trim()); onAdded(c); setName(""); setOpen(false); toast.success("Category ditambahkan"); }}
-        className="h-7 rounded-md bg-primary text-primary-foreground px-2 text-[11px] font-medium">Tambah</button>
-      <button onClick={() => { setOpen(false); setName(""); }} className="h-7 w-7 grid place-items-center rounded-md border border-border"><X className="h-3 w-3" /></button>
+    <SectionCard>
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold">Brands</div>
+          <div className="text-xs text-muted-foreground">Maksimal 12 brand ditampilkan di overview (3 baris × 4 kolom).</div>
+        </div>
+        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
+          <Plus className="h-4 w-4" /> Add New Brand
+        </button>
+      </div>
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {visible.map((b) => {
+          const skuCount = b.categories.reduce((a, c) => a + c.skus.length, 0);
+          return (
+            <button
+              key={b.id}
+              onClick={() => onOpen(b)}
+              className="group text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
+            >
+              <div className="h-24 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
+                {b.logoUrl ? (
+                  <img src={b.logoUrl} alt={b.name} className="max-h-16 max-w-[80%] object-contain" loading="lazy" />
+                ) : (
+                  <Package className="h-8 w-8 text-primary" />
+                )}
+              </div>
+              <div>
+                <div className="text-sm font-semibold truncate">{b.name}</div>
+                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span><span className="font-medium text-foreground">{b.categories.length}</span> Categories</span>
+                  <span>·</span>
+                  <span><span className="font-medium text-foreground">{skuCount}</span> SKUs</span>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+        {visible.length === 0 && (
+          <div className="col-span-full text-center py-10 text-sm text-muted-foreground">Belum ada brand.</div>
+        )}
+      </div>
+    </SectionCard>
+  );
+}
+
+/* ---------------- Level 2: Brand Detail ---------------- */
+
+function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: () => void; onOpenCategory: (c: Category) => void }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="h-4 w-4" /> Back to Brands
+        </button>
+        <button
+          onClick={() => { if (confirm(`Hapus brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand dihapus"); onBack(); } }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus brand"
+        >
+          <Trash2 className="h-4 w-4" /> Hapus Brand
+        </button>
+      </div>
+
+      <SectionCard>
+        <div className="p-5 flex items-center gap-4">
+          <div className="h-16 w-16 rounded-lg bg-white border border-border grid place-items-center overflow-hidden">
+            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-12 max-w-[80%] object-contain" /> : <Package className="h-6 w-6 text-primary" />}
+          </div>
+          <div>
+            <div className="text-lg font-semibold">{brand.name}</div>
+            <div className="text-sm text-muted-foreground">{brand.categories.length} kategori · {brand.brandKnowledge.length} dokumen brand knowledge</div>
+          </div>
+        </div>
+      </SectionCard>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionCard title="Brand Knowledge" description="Dokumen panduan brand, manifesto, tone of voice.">
+          <div className="p-4">
+            <MultiFileUploader
+              files={brand.brandKnowledge}
+              onAdd={(atts) => skuStore.addBrandKnowledge(brand.id, atts)}
+              onRemove={(id) => skuStore.removeBrandKnowledge(brand.id, id)}
+              label="Upload Brand Knowledge"
+            />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Product Categories"
+          description="Klik category untuk melihat SKU & Knowledge Card."
+          action={<AddCategoryButton brandId={brand.id} />}
+        >
+          <ul className="p-3 space-y-2">
+            {brand.categories.map((c) => (
+              <li key={c.id}>
+                <button
+                  onClick={() => onOpenCategory(c)}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-card/40 hover:bg-card transition-colors text-left"
+                >
+                  <div className="h-10 w-10 rounded-md bg-primary/10 grid place-items-center">
+                    <FolderOpen className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium">{c.name}</div>
+                    <div className="text-xs text-muted-foreground">{c.skus.length} SKU · {c.categoryKnowledge.length} dokumen</div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </li>
+            ))}
+            {brand.categories.length === 0 && (
+              <li className="text-center py-6 text-sm text-muted-foreground">Belum ada category.</li>
+            )}
+          </ul>
+        </SectionCard>
+      </div>
     </div>
   );
 }
 
-function CategoryDetail({ brand, category, onAddSku, onEditSku }: { brand: Brand; category: Category; onAddSku: () => void; onEditSku: (sku: SKU) => void }) {
+function AddCategoryButton({ brandId }: { brandId: string }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  if (!open) {
+    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 text-sm hover:bg-white/[0.04]"><Plus className="h-3.5 w-3.5" /> Category</button>;
+  }
+  return (
+    <div className="flex items-center gap-1">
+      <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama category.." className="h-8 rounded-md border border-border bg-card/60 px-2 text-sm" />
+      <button onClick={() => { if (!name.trim()) return; skuStore.addCategory(brandId, name.trim()); setName(""); setOpen(false); toast.success("Category ditambahkan"); }}
+        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-sm font-medium">Tambah</button>
+      <button onClick={() => { setOpen(false); setName(""); }} className="h-8 w-8 grid place-items-center rounded-md border border-border"><X className="h-3.5 w-3.5" /></button>
+    </div>
+  );
+}
+
+/* ---------------- Level 3: Category Detail ---------------- */
+
+function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku }: {
+  brand: Brand; category: Category; onBack: () => void; onAddSku: () => void; onEditSku: (sku: SKU) => void;
+}) {
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="h-4 w-4" /> Back to {brand.name}
+        </button>
+        <button
+          onClick={() => { if (confirm(`Hapus category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category dihapus"); onBack(); } }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus"
+        >
+          <Trash2 className="h-4 w-4" /> Hapus Category
+        </button>
+      </div>
+
       <SectionCard>
-        <div className="p-4 border-b border-border flex items-start justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">{brand.name}</div>
-            <div className="text-sm font-semibold">{category.name}</div>
-          </div>
-          <button
-            onClick={() => { if (confirm(`Hapus category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category dihapus"); } }}
-            className="grid h-7 w-7 place-items-center rounded text-rose-400 hover:bg-rose-500/10" title="Hapus"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
-        <div className="p-4">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
-            <BookOpen className="h-3 w-3" /> Category Knowledge
-          </div>
-          <MultiFileUploader
-            files={category.categoryKnowledge}
-            onAdd={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
-            onRemove={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
-            label="Upload Category Knowledge"
-          />
+        <div className="p-5">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">{brand.name}</div>
+          <div className="text-lg font-semibold">{category.name}</div>
         </div>
       </SectionCard>
 
-      <SectionCard>
-        <div className="p-3 border-b border-border flex items-center justify-between">
-          <div className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5"><Package className="h-3 w-3" /> SKUs</div>
-          <button onClick={onAddSku} className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2 h-7 text-[11px] font-medium hover:opacity-90"><Plus className="h-3 w-3" /> SKU</button>
-        </div>
-        <ul className="divide-y divide-border">
-          {category.skus.map((s) => (
-            <li key={s.id} className="p-3">
-              <div className="flex items-start gap-3">
-                <div className="h-12 w-12 rounded-md bg-primary/10 grid place-items-center overflow-hidden">
-                  {s.photoUrl ? <img src={s.photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-4 w-4 text-primary" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm font-medium truncate">{s.name}</div>
-                    <span className="text-[10px] text-muted-foreground">{s.code}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionCard title="Category Knowledge" description="Playbook & panduan untuk kategori produk ini.">
+          <div className="p-4">
+            <MultiFileUploader
+              files={category.categoryKnowledge}
+              onAdd={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
+              onRemove={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
+              label="Upload Category Knowledge"
+            />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="SKUs"
+          description="Klik knowledge cards untuk expand."
+          action={
+            <button onClick={onAddSku} className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium hover:opacity-90">
+              <Plus className="h-3.5 w-3.5" /> SKU
+            </button>
+          }
+        >
+          <ul className="divide-y divide-border">
+            {category.skus.map((s) => (
+              <li key={s.id} className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                    {s.photoUrl ? <img src={s.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{s.description}</div>
-                  <div className="mt-1 flex items-center gap-3 text-[11px]">
-                    <span className="font-semibold">{formatIDR(s.price)}</span>
-                    <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="text-sm font-medium">{s.name}</div>
+                      <span className="text-xs text-muted-foreground">{s.code}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{s.description}</div>
+                    <div className="mt-2 flex items-center gap-3 text-sm">
+                      <span className="font-semibold">{formatIDR(s.price)}</span>
+                      <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04] inline-flex items-center gap-1"><Pencil className="h-3.5 w-3.5" /> Edit</button>
+                    <button
+                      onClick={() => { if (confirm(`Hapus SKU "${s.name}"?`)) { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); } }}
+                      className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10" title="Hapus"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <button onClick={() => onEditSku(s)} className="rounded px-2 h-7 text-[11px] border border-border hover:bg-white/[0.04] inline-flex items-center gap-1"><Pencil className="h-3 w-3" /> Edit</button>
-                  <button
-                    onClick={() => { if (confirm(`Hapus SKU "${s.name}"?`)) { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); } }}
-                    className="grid h-7 w-7 place-items-center rounded text-rose-400 hover:bg-rose-500/10" title="Hapus"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-              <KnowledgeCards brandId={brand.id} categoryId={category.id} sku={s} />
-            </li>
-          ))}
-          {category.skus.length === 0 && <li className="p-6 text-center text-[11px] text-muted-foreground">Belum ada SKU.</li>}
-        </ul>
-      </SectionCard>
+
+                <Accordion type="single" collapsible className="mt-3">
+                  <AccordionItem value={s.id} className="border-border">
+                    <AccordionTrigger className="text-sm hover:no-underline py-2">
+                      <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({s.knowledgeCards.length})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <KnowledgeCards brandId={brand.id} categoryId={category.id} sku={s} />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </li>
+            ))}
+            {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">Belum ada SKU.</li>}
+          </ul>
+        </SectionCard>
+      </div>
     </div>
   );
 }
@@ -248,27 +320,26 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   return (
-    <div className="mt-3 ml-15 pl-3 border-l border-border">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> Knowledge Cards</div>
-        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-6 text-[10px] hover:bg-white/[0.04]"><Plus className="h-2.5 w-2.5" /> Card</button>
+    <div>
+      <div className="flex items-center justify-end mb-2">
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Card</button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {sku.knowledgeCards.map((k) => (
           <div key={k.id} className="rounded-md border border-border bg-card/40 overflow-hidden">
-            {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-20 object-cover" />}
-            <div className="p-2.5">
-              <div className="text-xs font-medium">{k.title}</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-3">{k.text}</div>
-              <div className="mt-2 flex items-center justify-end gap-1">
-                <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-[10px] text-muted-foreground hover:text-foreground">Edit</button>
-                <span className="text-[10px] text-muted-foreground">·</span>
-                <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card dihapus"); }} className="text-[10px] text-rose-400">Hapus</button>
+            {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />}
+            <div className="p-3">
+              <div className="text-sm font-medium">{k.title}</div>
+              <div className="text-sm text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
+              <div className="mt-2 flex items-center justify-end gap-2">
+                <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground">Edit</button>
+                <span className="text-xs text-muted-foreground">·</span>
+                <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card dihapus"); }} className="text-xs text-rose-500">Hapus</button>
               </div>
             </div>
           </div>
         ))}
-        {sku.knowledgeCards.length === 0 && <div className="text-[11px] text-muted-foreground italic">Belum ada knowledge card.</div>}
+        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic col-span-full">Belum ada knowledge card.</div>}
       </div>
       {showForm && (
         <KnowledgeCardForm
@@ -286,13 +357,15 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
   );
 }
 
+/* ---------------- Modals (reused) ---------------- */
+
 function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeCard | null; onClose: () => void; onSubmit: (data: { title: string; text: string; coverUrl?: string }) => void }) {
   const [title, setTitle] = useState(initial?.title || "");
   const [text, setText] = useState(initial?.text || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  async function pickCover(file: File) {
+  function pickCover(file: File) {
     const reader = new FileReader();
     reader.onload = () => setCoverUrl(String(reader.result));
     reader.readAsDataURL(file);
@@ -307,26 +380,26 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
         </div>
         <div className="p-4 space-y-3">
           <div>
-            <div className="text-[11px] text-muted-foreground mb-1">Cover</div>
+            <div className="text-xs text-muted-foreground mb-1">Cover</div>
             {coverUrl && <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickCover(f); }} />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-xs">Pilih Gambar</button>
-              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-2 h-8 text-xs text-rose-400">Hapus Cover</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-sm">Pilih Gambar</button>
+              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-2 h-8 text-sm text-rose-500">Hapus Cover</button>}
             </div>
           </div>
           <label className="block">
-            <span className="block text-[11px] text-muted-foreground mb-1">Title</span>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Title</span>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Masukkan judul card.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
           <label className="block">
-            <span className="block text-[11px] text-muted-foreground mb-1">Teks</span>
-            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Teks</span>
+            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Masukkan isi knowledge.." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-8 text-xs">Batal</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-medium">Simpan</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Simpan</button>
         </div>
       </form>
     </div>
@@ -356,25 +429,25 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
         </div>
         <div className="p-4 space-y-3">
           <div>
-            <div className="text-[11px] text-muted-foreground mb-1">Logo</div>
+            <div className="text-xs text-muted-foreground mb-1">Logo</div>
             <div className="flex items-center gap-3">
-              <div className="h-14 w-14 rounded-md bg-primary/10 grid place-items-center overflow-hidden">
+              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
                 {logoUrl ? <img src={logoUrl} alt="" className="h-full w-full object-cover" /> : <Package className="h-5 w-5 text-primary" />}
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickLogo(f); }} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-xs">Upload Logo</button>
-              {logoUrl && <button type="button" onClick={() => setLogoUrl("")} className="text-xs text-rose-400">Hapus</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-sm">Upload Logo</button>
+              {logoUrl && <button type="button" onClick={() => setLogoUrl("")} className="text-sm text-rose-500">Hapus</button>}
             </div>
           </div>
           <label className="block">
-            <span className="block text-[11px] text-muted-foreground mb-1">Brand Name</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Brand Name</span>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama brand.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
-          <p className="text-[11px] text-muted-foreground">Brand Knowledge & Product Category bisa di-setup setelah brand dibuat.</p>
+          <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category bisa di-setup setelah brand dibuat.</p>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-8 text-xs">Batal</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-medium">Tambah Brand</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Tambah Brand</button>
         </div>
       </form>
     </div>
@@ -418,38 +491,38 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
         </div>
         <div className="p-4 space-y-3">
           <div>
-            <div className="text-[11px] text-muted-foreground mb-1">Foto Produk</div>
+            <div className="text-xs text-muted-foreground mb-1">Foto Produk</div>
             <div className="flex items-center gap-3">
-              <div className="h-14 w-14 rounded-md bg-primary/10 grid place-items-center overflow-hidden">
+              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
                 {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 text-primary" />}
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickPhoto(f); }} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-xs">Upload</button>
-              {photoUrl && <button type="button" onClick={() => setPhotoUrl("")} className="text-xs text-rose-400">Hapus</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-sm">Upload</button>
+              {photoUrl && <button type="button" onClick={() => setPhotoUrl("")} className="text-sm text-rose-500">Hapus</button>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="block text-[11px] text-muted-foreground mb-1">Nama</span>
-              <input value={name} onChange={(e) => setName(e.target.value)} className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+              <span className="block text-xs text-muted-foreground mb-1">Nama</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama SKU.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
             </label>
             <label className="block">
-              <span className="block text-[11px] text-muted-foreground mb-1">Code</span>
-              <input value={code} onChange={(e) => setCode(e.target.value)} className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+              <span className="block text-xs text-muted-foreground mb-1">Code</span>
+              <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Masukkan kode SKU.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
             </label>
           </div>
           <label className="block">
-            <span className="block text-[11px] text-muted-foreground mb-1">Harga (Rp)</span>
-            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Harga (Rp)</span>
+            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} placeholder="Masukkan harga.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
           <label className="block">
-            <span className="block text-[11px] text-muted-foreground mb-1">Deskripsi</span>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Deskripsi</span>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Masukkan deskripsi produk.." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-8 text-xs">Batal</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-medium">{initial ? "Simpan" : "Tambah"}</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Simpan" : "Tambah"}</button>
         </div>
       </form>
     </div>

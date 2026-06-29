@@ -13,7 +13,7 @@ export type TxLine = {
 export type Transaction = {
   id: string;
   invoice: string;
-  date: string; // ISO
+  date: string;
   customerId?: string;
   customerName: string;
   baName: string;
@@ -30,7 +30,7 @@ export type Transaction = {
 function seed(): Transaction[] {
   const items: Transaction[] = [];
   const stores: { city: string; store: string }[] = [
-    { city: "Jakarta", store: "Tunjungan Plaza" },
+    { city: "Jakarta", store: "Plaza Indonesia" },
     { city: "Jakarta", store: "Pondok Indah Mall" },
     { city: "Bandung", store: "Paris van Java" },
     { city: "Bandung", store: "Trans Studio Mall" },
@@ -39,11 +39,13 @@ function seed(): Transaction[] {
   const bas = ["Putri Anggraini", "Dewi Lestari", "Reza Wijaya", "Indah Permata", "Bagus Pratama"];
   const customers = ["Sari Wulandari", "Linda Hartono", "Maya Kusuma", "Andini Pertiwi", "Rina Susilo", "Bayu Hartanto", "Citra Halim", "Nadya Salsabila"];
   const skus = [
-    { skuId: "sku-glow-velvet-03", skuCode: "AG-VR-03", skuName: "Velvet Rouge 03 Mauve", price: 189000, brand: "Aroma Glow" },
-    { skuId: "sku-glow-velvet-05", skuCode: "AG-VR-05", skuName: "Velvet Rouge 05 Berry", price: 189000, brand: "Aroma Glow" },
-    { skuId: "sku-glow-serum",     skuCode: "AG-GS-30", skuName: "Glow Serum 30ml",       price: 285000, brand: "Aroma Glow" },
-    { skuId: "sku-velvet-cushion-01", skuCode: "AV-CC-01", skuName: "Velvet Cushion 01 Ivory", price: 245000, brand: "Aroma Velvet" },
-    { skuId: "sku-velvet-cushion-02", skuCode: "AV-CC-02", skuName: "Velvet Cushion 02 Beige", price: 245000, brand: "Aroma Velvet" },
+    { skuId: "sku-dg-caviar-42", skuCode: "DG-CHC-42", skuName: "Caviar Hydra-Crème Lipstick 42g", price: 685000, brand: "Dolce & Gabbana" },
+    { skuId: "sku-sisley-real-flawless", skuCode: "SIS-RFF-30", skuName: "Real Flawless Foundation", price: 2450000, brand: "Sisley" },
+    { skuId: "sku-sisley-feather", skuCode: "SIS-FMP-10", skuName: "Real Flawless Feather Matte Powder Foundation", price: 1850000, brand: "Sisley" },
+    { skuId: "sku-rimmel-translucent-powder", skuCode: "RIM-TLS-25", skuName: "Translucent Loose Setting Powder", price: 189000, brand: "Rimmel" },
+    { skuId: "sku-rimmel-spray", skuCode: "RIM-THS-100", skuName: "Translucent Hydrating Setting Spray Ultra-Blur", price: 215000, brand: "Rimmel" },
+    { skuId: "sku-laura-translucent", skuCode: "LM-TLS-29", skuName: "Translucent Loose Setting Powder", price: 745000, brand: "Laura Mercier" },
+    { skuId: "sku-bm-color-infusion", skuCode: "BM-BCI-06", skuName: "Blush Color Infusion", price: 425000, brand: "BareMinerals" },
   ];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Cash", "Transfer"];
   const statuses: TxStatus[] = ["Paid", "Paid", "Paid", "Pending", "Refunded"];
@@ -84,7 +86,7 @@ function seed(): Transaction[] {
   return items;
 }
 
-const STORAGE_KEY = "aroma_tx_store_v1";
+const STORAGE_KEY = "aroma_tx_store_v2";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
