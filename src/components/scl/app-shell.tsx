@@ -88,13 +88,23 @@ export function AppShell({
           expanded ? "w-56" : "w-[68px]"
         }`}
       >
-        <div className={`flex items-center justify-center w-full border-b border-sidebar-border py-[15px] ${expanded ? "px-4" : "px-2"}`}>
+        <div className={`flex items-center w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4 justify-between" : "px-2 justify-center"}`}>
           <img
             src={expanded ? sclLogoAsset.url : sclIconAsset.url}
             alt="Aroma Abadi"
             className={`w-auto object-contain ${expanded ? "h-7" : "h-[22px]"}`}
             title="Aroma Abadi"
           />
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
+            title={expanded ? "Collapse sidebar" : "Expand sidebar"}
+            className={`grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] ${expanded ? "" : "absolute"}`}
+            style={expanded ? undefined : { position: "absolute", left: "50%", bottom: -14, transform: "translateX(-50%)" }}
+          >
+            {expanded ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
+          </button>
         </div>
 
         <nav className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}>
@@ -153,7 +163,7 @@ export function AppShell({
               <h1 className="text-base font-semibold tracking-tight">{title}</h1>
             ) : null}
             {subtitle ? (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
+              <p className="text-sm text-muted-foreground">{subtitle}</p>
             ) : null}
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -161,7 +171,7 @@ export function AppShell({
               <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 placeholder="Search conversations, contacts…"
-                className="h-9 w-72 rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-9 w-72 rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm placeholder:text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
             <button className="relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card">
@@ -331,7 +341,7 @@ export function SectionCard({
           <div>
             {title && <h3 className="text-sm font-medium">{title}</h3>}
             {description && (
-              <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
             )}
           </div>
           {action}

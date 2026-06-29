@@ -216,10 +216,10 @@ function BroadcastListPage() {
                     <td className="px-4 py-3 text-right tabular-nums">{b.clicks.toLocaleString()}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">{b.sentAt}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
-                        b.status === "Sent" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" :
-                        b.status === "Scheduled" ? "border-amber-500/30 bg-amber-500/10 text-amber-300" :
-                        "border-border bg-white/[0.04] text-muted-foreground"
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
+                        b.status === "Sent" ? "border-emerald-700 bg-emerald-600 text-white" :
+                        b.status === "Scheduled" ? "border-amber-700 bg-amber-600 text-white" :
+                        "border-slate-600 bg-slate-500 text-white"
                       }`}>{b.status}</span>
                     </td>
                   </tr>
