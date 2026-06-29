@@ -94,7 +94,7 @@ function TransactionsPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full text-xs">
+            <table className="min-w-full text-sm">
               <thead className="text-muted-foreground">
                 <tr className="border-b border-border">
                   <Th>Invoice</Th>
@@ -111,23 +111,32 @@ function TransactionsPage() {
               </thead>
               <tbody>
                 {filtered.map((t) => (
-                  <tr key={t.id} className="border-b border-border hover:bg-white/[0.02] cursor-pointer" onClick={() => setOpen(t)}>
+                  <tr key={t.id} className="border-b border-border hover:bg-white/[0.02] cursor-pointer align-top" onClick={() => setOpen(t)}>
                     <Td className="font-medium text-foreground">{t.invoice}</Td>
                     <Td>{new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</Td>
                     <Td>{t.customerName}</Td>
                     <Td>{t.baName}</Td>
                     <Td>{t.store} · <span className="text-muted-foreground">{t.city}</span></Td>
                     <Td>{t.brandName}</Td>
-                    <Td className="max-w-[200px] truncate">{t.items.map((i) => `${i.skuCode}×${i.qty}`).join(", ")}</Td>
-                    <Td className="text-right font-medium text-foreground">{formatIDR(t.total)}</Td>
+                    <Td>
+                      <ul className="space-y-1">
+                        {t.items.map((i, idx) => (
+                          <li key={idx} className="leading-tight">
+                            <span className="text-foreground">{i.skuName}</span>
+                            <span className="text-muted-foreground"> · {i.qty} pcs</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Td>
+                    <Td className="text-right font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</Td>
                     <Td>{t.paymentMethod}</Td>
                     <Td>
-                      <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${statusBadge(t.status)}`}>{t.status}</span>
+                      <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(t.status)}`}>{t.status}</span>
                     </Td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={10} className="text-center py-10 text-muted-foreground">Tidak ada transaksi</td></tr>
+                  <tr><td colSpan={10} className="text-center py-10 text-muted-foreground text-sm">Tidak ada transaksi</td></tr>
                 )}
               </tbody>
             </table>
@@ -141,10 +150,10 @@ function TransactionsPage() {
 }
 
 function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <th className={`text-left font-medium px-3 py-2.5 text-[11px] uppercase tracking-wide ${className}`}>{children}</th>;
+  return <th className={`text-left font-medium px-3 py-2.5 text-xs uppercase tracking-wide ${className}`}>{children}</th>;
 }
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`px-3 py-2.5 ${className}`}>{children}</td>;
+  return <td className={`px-3 py-3 ${className}`}>{children}</td>;
 }
 
 function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Receipt }) {
@@ -190,13 +199,13 @@ function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
           {tx.note && <Row label="Catatan BA" value={tx.note} />}
 
           <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Items</div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
             <ul className="divide-y divide-border rounded-md border border-border">
               {tx.items.map((i, idx) => (
-                <li key={idx} className="px-3 py-2 flex items-center gap-2 text-xs">
+                <li key={idx} className="px-3 py-2 flex items-center gap-2 text-sm">
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{i.skuName}</div>
-                    <div className="text-[10px] text-muted-foreground">{i.skuCode} · {formatIDR(i.unitPrice)} × {i.qty}</div>
+                    <div className="font-medium">{i.skuName} · {i.qty} pcs</div>
+                    <div className="text-xs text-muted-foreground">{i.skuCode} · {formatIDR(i.unitPrice)}</div>
                   </div>
                   <div className="text-right font-medium">{formatIDR(i.unitPrice * i.qty)}</div>
                 </li>
