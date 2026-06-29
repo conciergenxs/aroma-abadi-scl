@@ -26,7 +26,7 @@ export const Route = createFileRoute("/channels")({
   component: ChannelsPage,
 });
 
-type ChannelKey = "whatsapp" | "instagram" | "tiktok";
+type ChannelKey = "whatsapp";
 
 const CHANNELS: {
   key: ChannelKey;
@@ -35,8 +35,6 @@ const CHANNELS: {
   enabled: boolean;
 }[] = [
   { key: "whatsapp", label: "WhatsApp Business API", sublabel: "Cloud API", enabled: true },
-  { key: "instagram", label: "Instagram", sublabel: "Direct Messaging", enabled: false },
-  { key: "tiktok", label: "TikTok Business Messaging", sublabel: "Coming soon", enabled: false },
 ];
 
 function ChannelsPage() {
