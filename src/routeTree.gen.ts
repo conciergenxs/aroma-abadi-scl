@@ -11,8 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SkuRouteImport } from './routes/sku'
-import { Route as BaRouteImport } from './routes/ba'
-import { Route as SkuRouteImport } from './routes/sku'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -31,6 +29,16 @@ import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuRoute = SkuRouteImport.update({
+  id: '/sku',
+  path: '/sku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BaRoute = BaRouteImport.update({
+  id: '/ba',
+  path: '/ba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkuRoute = SkuRouteImport.update({
