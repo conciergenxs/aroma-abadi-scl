@@ -69,7 +69,7 @@ function ContactsPage() {
       { value: "all", label: "All Channels" },
       ...unique.map((ch) => ({
         value: ch,
-        label: ch === "whatsapp" ? "WhatsApp" : "Instagram",
+        label: "WhatsApp",
         icon: <ChannelIcon channel={ch as Channel} className="h-4 w-4" />,
       })),
     ];

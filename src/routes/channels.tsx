@@ -11,7 +11,7 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
-  Music2,
+  
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/channels")({
   component: ChannelsPage,
 });
 
-type ChannelKey = "whatsapp" | "instagram" | "tiktok";
+type ChannelKey = "whatsapp";
 
 const CHANNELS: {
   key: ChannelKey;
@@ -35,8 +35,6 @@ const CHANNELS: {
   enabled: boolean;
 }[] = [
   { key: "whatsapp", label: "WhatsApp Business API", sublabel: "Cloud API", enabled: true },
-  { key: "instagram", label: "Instagram", sublabel: "Direct Messaging", enabled: false },
-  { key: "tiktok", label: "TikTok Business Messaging", sublabel: "Coming soon", enabled: false },
 ];
 
 function ChannelsPage() {
@@ -70,13 +68,7 @@ function ChannelsPage() {
                         : "border border-transparent hover:bg-white/[0.04]"
                   }`}
                 >
-                  {c.key === "tiktok" ? (
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-white/10">
-                      <Music2 className="h-4 w-4 text-muted-foreground" />
-                    </span>
-                  ) : (
-                    <ChannelIcon channel={c.key} className="h-8 w-8" />
-                  )}
+                  <ChannelIcon channel={c.key} className="h-8 w-8" />
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium truncate">{c.label}</div>
                     <div className="text-[10px] text-muted-foreground truncate">{c.sublabel}</div>
@@ -172,7 +164,7 @@ function AccountsTab() {
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Meta Business Account
             </div>
-            <div className="mt-1 text-sm font-semibold">Northstar Commerce</div>
+            <div className="mt-1 text-sm font-semibold">Aroma Abadi</div>
             <div className="mt-3 flex items-center gap-3 text-[11px]">
               <button className="text-primary hover:underline">Get verified</button>
               <span className="text-border">•</span>
@@ -197,30 +189,10 @@ function AccountsTab() {
           Connected WhatsApp Numbers
         </h3>
         <div className="space-y-3">
-          <ConnectedNumberCard
-            businessAccount="Northstar Support"
-            phone="+62 811 9001 2233"
-            displayName="Northstar Support"
-            accountId="waba_northstar_support"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Sales"
-            phone="+62 811 9001 4455"
-            displayName="Northstar Sales"
-            accountId="waba_northstar_sales"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Marketing"
-            phone="+62 811 9001 6677"
-            displayName="Northstar Marketing"
-            accountId="waba_northstar_marketing"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Loyalty"
-            phone="+62 811 9001 8899"
-            displayName="Northstar Loyalty"
-            accountId="waba_northstar_loyalty"
-          />
+          <ConnectedNumberCard businessAccount="Aroma Abadi HQ" phone="+62 811 9001 2233" displayName="Aroma Abadi HQ" accountId="waba_aroma_hq" />
+          <ConnectedNumberCard businessAccount="Aroma Abadi Jakarta" phone="+62 811 9001 4455" displayName="Aroma Abadi Jakarta" accountId="waba_aroma_jakarta" />
+          <ConnectedNumberCard businessAccount="Aroma Abadi Bandung" phone="+62 811 9001 6677" displayName="Aroma Abadi Bandung" accountId="waba_aroma_bandung" />
+          <ConnectedNumberCard businessAccount="Aroma Beauty Club" phone="+62 811 9001 8899" displayName="Aroma Beauty Club" accountId="waba_aroma_loyalty" />
         </div>
       </div>
     </div>
@@ -321,8 +293,8 @@ function ConnectedNumberCard({
 function BillingTab() {
   const [filter, setFilter] = useState<"all" | "mba" | "waba">("all");
   const cards = [
-    { name: "Northstar Commerce", balance: "US$18.42", source: "mba" as const },
-    { name: "Aurora Retail Group", balance: "US$27.65", source: "waba" as const },
+    { name: "Aroma Abadi", balance: "Rp 4.250.000", source: "mba" as const },
+    { name: "Aroma Beauty Group", balance: "Rp 6.180.000", source: "waba" as const },
   ];
   const filtered = cards.filter((c) => filter === "all" || c.source === filter);
 
@@ -418,10 +390,10 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
 }
 
 export const WHATSAPP_CHANNELS = [
-  { id: "northstar-support", name: "Northstar Support", phone: "+62 811 9001 2233" },
-  { id: "northstar-sales", name: "Northstar Sales", phone: "+62 811 9001 4455" },
-  { id: "northstar-marketing", name: "Northstar Marketing", phone: "+62 811 9001 6677" },
-  { id: "northstar-loyalty", name: "Northstar Loyalty", phone: "+62 811 9001 8899" },
+  { id: "aroma-hq", name: "Aroma Abadi HQ", phone: "+62 811 9001 2233" },
+  { id: "aroma-jakarta", name: "Aroma Abadi Jakarta", phone: "+62 811 9001 4455" },
+  { id: "aroma-bandung", name: "Aroma Abadi Bandung", phone: "+62 811 9001 6677" },
+  { id: "aroma-loyalty", name: "Aroma Beauty Club", phone: "+62 811 9001 8899" },
 ];
 
 function OptInTab() {
@@ -445,7 +417,7 @@ function OptInTab() {
                 type="button"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-card/60 hover:bg-card px-3 py-1.5 text-xs"
               >
-                Northstar Commerce
+                Aroma Abadi
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>

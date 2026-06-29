@@ -225,7 +225,7 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
               <span className="text-sm font-medium">Preview</span>
             </div>
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {broadcast.channel === "whatsapp" ? "WhatsApp" : "Instagram"}
+              WhatsApp
             </span>
           </div>
           <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
@@ -430,7 +430,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                         <ChannelIcon channel={contact.channel} className="h-4 w-4" />
-                        {contact.channel === "whatsapp" ? "WhatsApp" : "Instagram"}
+                        WhatsApp
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -614,7 +614,7 @@ function PhoneFrame({
           <ChannelIcon channel={channel} className="h-5 w-5" />
           <div className="min-w-0">
             <div className="text-[12px] font-semibold truncate">{senderName}</div>
-            <div className="text-[10px] text-muted-foreground">{isWa ? "WhatsApp Business" : "Instagram DM"}</div>
+            <div className="text-[10px] text-muted-foreground">{"WhatsApp Business"}</div>
           </div>
         </div>
         <div className="min-h-[180px] p-3 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]">

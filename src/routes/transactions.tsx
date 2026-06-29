@@ -1,0 +1,223 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { useTransactionsStore, formatIDR, type Transaction, type TxStatus } from "@/components/scl/transactions-store";
+import { Search, Receipt, TrendingUp, Wallet, Package } from "lucide-react";
+
+export const Route = createFileRoute("/transactions")({
+  head: () => ({
+    meta: [
+      { title: "Transaction Records — Aroma Abadi" },
+      { name: "description", content: "Catatan transaksi penjualan Aroma Abadi per store, BA, dan brand." },
+      { property: "og:title", content: "Transaction Records — Aroma Abadi" },
+      { property: "og:description", content: "Pantau transaksi WhatsApp & in-store Aroma Abadi." },
+    ],
+  }),
+  component: TransactionsPage,
+});
+
+function statusBadge(s: TxStatus) {
+  if (s === "Paid") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700";
+  if (s === "Pending") return "border-amber-500/30 bg-amber-500/10 text-amber-700";
+  return "border-rose-500/30 bg-rose-500/10 text-rose-700";
+}
+
+function TransactionsPage() {
+  const { transactions } = useTransactionsStore();
+  const [search, setSearch] = useState("");
+  const [city, setCity] = useState<string>("all");
+  const [brand, setBrand] = useState<string>("all");
+  const [status, setStatus] = useState<string>("all");
+  const [open, setOpen] = useState<Transaction | null>(null);
+
+  const cities = useMemo(() => Array.from(new Set(transactions.map((t) => t.city))), [transactions]);
+  const brands = useMemo(() => Array.from(new Set(transactions.map((t) => t.brandName))), [transactions]);
+
+  const filtered = transactions.filter((t) => {
+    if (city !== "all" && t.city !== city) return false;
+    if (brand !== "all" && t.brandName !== brand) return false;
+    if (status !== "all" && t.status !== status) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !t.invoice.toLowerCase().includes(q) &&
+        !t.customerName.toLowerCase().includes(q) &&
+        !t.baName.toLowerCase().includes(q) &&
+        !t.store.toLowerCase().includes(q)
+      ) return false;
+    }
+    return true;
+  });
+
+  const today = new Date().toDateString();
+  const todayTx = transactions.filter((t) => new Date(t.date).toDateString() === today);
+  const revenue = todayTx.reduce((acc, t) => acc + (t.status === "Paid" ? t.total : 0), 0);
+  const aov = todayTx.length ? Math.round(revenue / Math.max(1, todayTx.length)) : 0;
+  const topSku = (() => {
+    const map = new Map<string, number>();
+    transactions.forEach((t) => t.items.forEach((i) => map.set(i.skuName, (map.get(i.skuName) || 0) + i.qty)));
+    return Array.from(map.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
+  })();
+
+  return (
+    <AppShell title="Transaction Records" subtitle="Catatan transaksi penjualan Aroma Abadi">
+      <div className="space-y-5">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <StatCard label="Revenue Hari Ini" value={formatIDR(revenue)} icon={Wallet} />
+          <StatCard label="Transaksi Hari Ini" value={todayTx.length.toLocaleString("id-ID")} icon={Receipt} />
+          <StatCard label="AOV Hari Ini" value={formatIDR(aov)} icon={TrendingUp} />
+          <StatCard label="Top SKU" value={topSku} icon={Package} />
+        </div>
+
+        {/* Toolbar */}
+        <SectionCard>
+          <div className="p-3 flex flex-wrap items-center gap-2 border-b border-border">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari invoice, customer, BA, store…"
+                className="h-8 w-72 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+            <Select value={city} onChange={setCity} options={[{ value: "all", label: "Semua Kota" }, ...cities.map((c) => ({ value: c, label: c }))]} />
+            <Select value={brand} onChange={setBrand} options={[{ value: "all", label: "Semua Brand" }, ...brands.map((c) => ({ value: c, label: c }))]} />
+            <Select value={status} onChange={setStatus} options={[
+              { value: "all", label: "Semua Status" },
+              { value: "Paid", label: "Paid" },
+              { value: "Pending", label: "Pending" },
+              { value: "Refunded", label: "Refunded" },
+            ]} />
+            <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} transaksi</div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead className="text-muted-foreground">
+                <tr className="border-b border-border">
+                  <Th>Invoice</Th>
+                  <Th>Tanggal</Th>
+                  <Th>Customer</Th>
+                  <Th>BA</Th>
+                  <Th>Store / Kota</Th>
+                  <Th>Brand</Th>
+                  <Th>Items</Th>
+                  <Th className="text-right">Total</Th>
+                  <Th>Bayar</Th>
+                  <Th>Status</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((t) => (
+                  <tr key={t.id} className="border-b border-border hover:bg-white/[0.02] cursor-pointer" onClick={() => setOpen(t)}>
+                    <Td className="font-medium text-foreground">{t.invoice}</Td>
+                    <Td>{new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</Td>
+                    <Td>{t.customerName}</Td>
+                    <Td>{t.baName}</Td>
+                    <Td>{t.store} · <span className="text-muted-foreground">{t.city}</span></Td>
+                    <Td>{t.brandName}</Td>
+                    <Td className="max-w-[200px] truncate">{t.items.map((i) => `${i.skuCode}×${i.qty}`).join(", ")}</Td>
+                    <Td className="text-right font-medium text-foreground">{formatIDR(t.total)}</Td>
+                    <Td>{t.paymentMethod}</Td>
+                    <Td>
+                      <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${statusBadge(t.status)}`}>{t.status}</span>
+                    </Td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={10} className="text-center py-10 text-muted-foreground">Tidak ada transaksi</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </div>
+
+      {open && <TxDrawer tx={open} onClose={() => setOpen(null)} />}
+    </AppShell>
+  );
+}
+
+function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <th className={`text-left font-medium px-3 py-2.5 text-[11px] uppercase tracking-wide ${className}`}>{children}</th>;
+}
+function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <td className={`px-3 py-2.5 ${className}`}>{children}</td>;
+}
+
+function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Receipt }) {
+  return (
+    <div className="rounded-xl border border-border bg-card/60 glass p-4 flex items-start gap-3">
+      <div className="h-9 w-9 rounded-md bg-primary/10 grid place-items-center"><Icon className="h-4 w-4 text-primary" /></div>
+      <div className="min-w-0">
+        <div className="text-[11px] text-muted-foreground">{label}</div>
+        <div className="text-base font-semibold mt-0.5 truncate">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="h-8 rounded-md border border-border bg-card/60 px-2 text-xs">
+      {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  );
+}
+
+function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex">
+      <div className="flex-1 bg-black/40" onClick={onClose} />
+      <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto">
+        <div className="p-5 border-b border-border flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
+            <div className="text-base font-semibold">{tx.invoice}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">{new Date(tx.date).toLocaleString("id-ID")}</div>
+          </div>
+          <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Tutup</button>
+        </div>
+        <div className="p-5 space-y-4 text-sm">
+          <Row label="Customer" value={tx.customerName} />
+          <Row label="BA" value={tx.baName} />
+          <Row label="Store" value={`${tx.store} · ${tx.city}`} />
+          <Row label="Brand" value={tx.brandName} />
+          <Row label="Metode Bayar" value={tx.paymentMethod} />
+          <Row label="Status" value={tx.status} />
+          {tx.note && <Row label="Catatan BA" value={tx.note} />}
+
+          <div>
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Items</div>
+            <ul className="divide-y divide-border rounded-md border border-border">
+              {tx.items.map((i, idx) => (
+                <li key={idx} className="px-3 py-2 flex items-center gap-2 text-xs">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{i.skuName}</div>
+                    <div className="text-[10px] text-muted-foreground">{i.skuCode} · {formatIDR(i.unitPrice)} × {i.qty}</div>
+                  </div>
+                  <div className="text-right font-medium">{formatIDR(i.unitPrice * i.qty)}</div>
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-between mt-3 text-sm font-semibold">
+              <span>Total</span>
+              <span>{formatIDR(tx.total)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium text-right">{value}</span>
+    </div>
+  );
+}

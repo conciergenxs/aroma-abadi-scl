@@ -15,6 +15,9 @@ import {
   ChevronDown,
   UserPlus,
   Radio,
+  Receipt,
+  Package,
+  BadgeCheck,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,7 +29,17 @@ import {
 import { InviteModal } from "@/components/scl/invite-modal";
 
 type NavItem = {
-  to: "/" | "/inbox" | "/contacts" | "/broadcasts" | "/templates" | "/channels" | "/settings";
+  to:
+    | "/"
+    | "/inbox"
+    | "/contacts"
+    | "/broadcasts"
+    | "/templates"
+    | "/channels"
+    | "/transactions"
+    | "/sku"
+    | "/ba"
+    | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -38,6 +51,9 @@ const topNav: NavItem[] = [
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
+  { to: "/sku", label: "SKU & Knowledge", icon: Package },
+  { to: "/transactions", label: "Transactions", icon: Receipt },
+  { to: "/ba", label: "Brand Ambassadors", icon: BadgeCheck },
   { to: "/channels", label: "Channels", icon: Radio },
 ];
 const bottomNav: NavItem[] = [
@@ -273,12 +289,12 @@ export function SectionCard({
 
 import { ChannelIcon } from "./channel-badge";
 
-export function ChannelDot({ channel }: { channel: "whatsapp" | "instagram" }) {
-  const label = channel === "whatsapp" ? "WhatsApp" : "Instagram";
+export function ChannelDot({ channel }: { channel: "whatsapp" }) {
+  void channel;
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-      <ChannelIcon channel={channel} className="h-4 w-4" />
-      {label}
+      <ChannelIcon channel="whatsapp" className="h-4 w-4" />
+      WhatsApp
     </span>
   );
 }

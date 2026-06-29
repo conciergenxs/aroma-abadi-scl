@@ -67,7 +67,6 @@ const CATEGORY_OPTIONS = [
 const CHANNEL_OPTIONS = [
   { value: "all", label: "All Channels" },
   { value: "whatsapp", label: "WhatsApp", icon: <ChannelIcon channel="whatsapp" className="h-3.5 w-3.5" /> },
-  { value: "instagram", label: "Instagram", icon: <ChannelIcon channel="instagram" className="h-3.5 w-3.5" /> },
 ];
 
 const STATUS_OPTIONS = [
@@ -115,7 +114,7 @@ function TemplatesPage() {
   return (
     <AppShell
       title="Message Templates"
-      subtitle="Reusable, brand-approved messages for WhatsApp & Instagram."
+      subtitle="Pesan terstandarisasi & brand-approved untuk WhatsApp Aroma Abadi."
     >
       <div className="space-y-6">
 
@@ -537,7 +536,7 @@ function TemplateDetailModal({
     template.language ??
     "English (US)";
 
-  const channelLabel = template.channel === "whatsapp" ? "WhatsApp" : "Instagram";
+  const channelLabel = "WhatsApp";
 
   // Derived metadata (deterministic placeholders so the demo feels complete)
   const reviewers = ["Priya Tan", "Marcus Lee", "Saanvi Patel", "Joaquín Ruiz"];
@@ -891,7 +890,7 @@ function DetailPhoneFrame({
           <div className="min-w-0">
             <div className="text-[12px] font-semibold truncate">{senderName}</div>
             <div className="text-[10px] text-muted-foreground">
-              {isWa ? "WhatsApp Business" : "Instagram DM"}
+              {"WhatsApp Business"}
             </div>
           </div>
         </div>

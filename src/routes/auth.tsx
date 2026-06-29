@@ -9,15 +9,15 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Aroma Abadi" },
-      { name: "description", content: "Sign in or create your Aroma Abadi workspace to manage WhatsApp and Instagram conversations." },
+      { name: "description", content: "Masuk ke workspace Aroma Abadi untuk mengelola percakapan WhatsApp pelanggan." },
       { property: "og:title", content: "Sign in — Aroma Abadi" },
-      { property: "og:description", content: "Access your Aroma Abadi workspace." },
+      { property: "og:description", content: "Akses workspace Aroma Abadi kamu." },
     ],
   }),
   component: AuthPage,
 });
 
-type Mode = "signin" | "signup" | "forgot" | "forgot-sent";
+type Mode = "signin" | "signup" | "forgot" | "forgot-sent" | "ba";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -110,7 +110,7 @@ function AuthPage() {
                 </span>
               </h1>
               <p className="mt-4 text-sm text-sidebar-foreground/70 max-w-md leading-relaxed">
-                Manage WhatsApp, Instagram, and customer conversations in one workspace.
+                Kelola percakapan WhatsApp pelanggan Aroma Abadi dalam satu workspace.
               </p>
             </div>
             <div />
