@@ -180,14 +180,15 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
 
       <SectionCard>
         <div className="p-5 flex items-center gap-4">
-          <div className="h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden">
-            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-16 max-w-[85%] object-contain" /> : <Package className="h-8 w-8 text-primary" />}
+          <div className="h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" /> : <Package className="h-10 w-10 text-primary" />}
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
             <div className="text-sm text-muted-foreground">{brand.categories.length} kategori · {brand.brandKnowledge.length} dokumen brand knowledge</div>
           </div>
         </div>
+
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
