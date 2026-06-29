@@ -1,4 +1,5 @@
-import sclLogoAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
+import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
+import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -18,6 +19,8 @@ import {
   Receipt,
   Package,
   BadgeCheck,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -75,56 +78,70 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Sidebar */}
-      <aside className="hidden md:flex h-full w-[68px] shrink-0 flex-col items-center border-r border-border bg-sidebar">
-        <div className="flex items-center justify-center h-16 w-full border-b border-sidebar-border">
+      <aside
+        className={`hidden md:flex h-full shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 ${
+          expanded ? "w-56" : "w-[68px]"
+        }`}
+      >
+        <div className={`flex items-center justify-center w-full border-b border-sidebar-border py-[15px] ${expanded ? "px-4" : "px-2"}`}>
           <img
-            src={sclLogoAsset.url}
+            src={expanded ? sclLogoAsset.url : sclIconAsset.url}
             alt="Aroma Abadi"
-            className="h-[22px] w-auto object-contain"
+            className={`w-auto object-contain ${expanded ? "h-7" : "h-[22px]"}`}
             title="Aroma Abadi"
           />
         </div>
 
-        <nav className="flex-1 w-full py-5 flex flex-col items-center gap-2.5">
+        <nav className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}>
           {topNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
-              <SidebarIconLink
+              <SidebarLink
                 key={item.to}
                 to={item.to}
                 label={item.label}
                 active={active}
                 badge={item.badge}
                 Icon={Icon}
+                expanded={expanded}
               />
             );
           })}
         </nav>
-        <nav className="w-full pb-5 pt-2 flex flex-col items-center gap-2.5 border-t border-sidebar-border">
-          <SidebarIconButton
+        <nav className={`w-full pb-3 pt-2 flex flex-col gap-1.5 border-t border-sidebar-border ${expanded ? "px-2" : "items-center"}`}>
+          <SidebarButton
             label="Invite Members"
             Icon={UserPlus}
             onClick={() => setInviteOpen(true)}
+            expanded={expanded}
           />
           {bottomNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
-              <SidebarIconLink
+              <SidebarLink
                 key={item.to}
                 to={item.to}
                 label={item.label}
                 active={active}
                 badge={item.badge}
                 Icon={Icon}
+                expanded={expanded}
               />
             );
           })}
+          <SidebarButton
+            label={expanded ? "Collapse" : "Expand"}
+            Icon={expanded ? ChevronsLeft : ChevronsRight}
+            onClick={() => setExpanded((v) => !v)}
+            expanded={expanded}
+          />
         </nav>
       </aside>
 
@@ -144,7 +161,7 @@ export function AppShell({
               <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 placeholder="Search conversations, contacts…"
-                className="h-9 w-72 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-9 w-72 rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
             <button className="relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card">
@@ -159,7 +176,7 @@ export function AppShell({
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
                     AK
                   </div>
-                  <span className="text-xs font-medium text-foreground hidden lg:block">Aria Kapoor</span>
+                  <span className="text-sm font-medium text-foreground hidden lg:block">Aria Kapoor</span>
                   <ChevronDown className="h-3 w-3 text-muted-foreground hidden lg:block" />
                 </button>
               </DropdownMenuTrigger>
@@ -187,19 +204,42 @@ export function AppShell({
   );
 }
 
-function SidebarIconLink({
+function SidebarLink({
   to,
   label,
   active,
   badge,
   Icon,
+  expanded,
 }: {
   to: NavItem["to"];
   label: string;
   active: boolean;
   badge?: number;
   Icon: typeof LayoutDashboard;
+  expanded: boolean;
 }) {
+  if (expanded) {
+    return (
+      <Link
+        to={to}
+        aria-label={label}
+        className={`relative flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm ${
+          active
+            ? "bg-sidebar-accent text-sidebar-accent-foreground border border-white/10"
+            : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+        }`}
+      >
+        <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-sidebar-primary" : ""}`} />
+        <span className="flex-1 truncate">{label}</span>
+        {badge ? (
+          <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-sidebar-primary text-[10px] font-semibold text-sidebar-primary-foreground grid place-items-center">
+            {badge}
+          </span>
+        ) : null}
+      </Link>
+    );
+  }
   return (
     <div className="group/nav relative">
       <Link
@@ -221,22 +261,37 @@ function SidebarIconLink({
           <span className="absolute left-0 -ml-2 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-sidebar-primary" />
         )}
       </Link>
-      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
+      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-xs font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
         {label}
       </span>
     </div>
   );
 }
 
-function SidebarIconButton({
+function SidebarButton({
   label,
   Icon,
   onClick,
+  expanded,
 }: {
   label: string;
   Icon: typeof LayoutDashboard;
   onClick: () => void;
+  expanded: boolean;
 }) {
+  if (expanded) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+      >
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        <span className="flex-1 truncate text-left">{label}</span>
+      </button>
+    );
+  }
   return (
     <div className="group/nav relative">
       <button
@@ -247,7 +302,7 @@ function SidebarIconButton({
       >
         <Icon className="h-[18px] w-[18px]" />
       </button>
-      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
+      <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-xs font-medium text-foreground shadow-lg opacity-0 translate-x-[-4px] transition-all group-hover/nav:opacity-100 group-hover/nav:translate-x-0 z-50">
         {label}
       </span>
     </div>
@@ -292,7 +347,7 @@ import { ChannelIcon } from "./channel-badge";
 export function ChannelDot({ channel }: { channel: "whatsapp" }) {
   void channel;
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
       <ChannelIcon channel="whatsapp" className="h-4 w-4" />
       WhatsApp
     </span>
