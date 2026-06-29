@@ -1,17 +1,13 @@
 import whatsappAsset from "@/assets/whatsapp.png.asset.json";
-import instagramAsset from "@/assets/instagram.png.asset.json";
 
-export type ChannelKey = "whatsapp" | "instagram";
+export type ChannelKey = "whatsapp";
 
-const CHANNEL_MAP: Record<ChannelKey, { src: string; label: string }> = {
+const CHANNEL_MAP: Record<string, { src: string; label: string }> = {
   whatsapp: { src: whatsappAsset.url, label: "WhatsApp" },
-  instagram: { src: instagramAsset.url, label: "Instagram" },
 };
 
 /**
- * Single source of truth for channel branding.
- * Renders the official brand asset as a circular badge.
- * Use everywhere a channel needs to be visually indicated.
+ * Single source of truth for channel branding (Aroma Abadi: WhatsApp only).
  */
 export function ChannelIcon({
   channel,
@@ -22,8 +18,9 @@ export function ChannelIcon({
   className?: string;
   size?: number;
 }) {
-  const c = CHANNEL_MAP[channel as ChannelKey];
-  if (!c) return null;
+  // Aroma Abadi only supports WhatsApp — always render WA badge.
+  const c = CHANNEL_MAP.whatsapp;
+  void channel;
   const style = size ? { width: size, height: size } : undefined;
   return (
     <img
@@ -37,5 +34,4 @@ export function ChannelIcon({
   );
 }
 
-/** Backwards-compatible alias for the avatar-attached badge. */
 export const ChannelBadge = ChannelIcon;
