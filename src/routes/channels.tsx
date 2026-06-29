@@ -164,7 +164,7 @@ function AccountsTab() {
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Meta Business Account
             </div>
-            <div className="mt-1 text-sm font-semibold">Northstar Commerce</div>
+            <div className="mt-1 text-sm font-semibold">Aroma Abadi</div>
             <div className="mt-3 flex items-center gap-3 text-[11px]">
               <button className="text-primary hover:underline">Get verified</button>
               <span className="text-border">•</span>
@@ -189,30 +189,10 @@ function AccountsTab() {
           Connected WhatsApp Numbers
         </h3>
         <div className="space-y-3">
-          <ConnectedNumberCard
-            businessAccount="Northstar Support"
-            phone="+62 811 9001 2233"
-            displayName="Northstar Support"
-            accountId="waba_northstar_support"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Sales"
-            phone="+62 811 9001 4455"
-            displayName="Northstar Sales"
-            accountId="waba_northstar_sales"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Marketing"
-            phone="+62 811 9001 6677"
-            displayName="Northstar Marketing"
-            accountId="waba_northstar_marketing"
-          />
-          <ConnectedNumberCard
-            businessAccount="Northstar Loyalty"
-            phone="+62 811 9001 8899"
-            displayName="Northstar Loyalty"
-            accountId="waba_northstar_loyalty"
-          />
+          <ConnectedNumberCard businessAccount="Aroma Abadi HQ" phone="+62 811 9001 2233" displayName="Aroma Abadi HQ" accountId="waba_aroma_hq" />
+          <ConnectedNumberCard businessAccount="Aroma Abadi Jakarta" phone="+62 811 9001 4455" displayName="Aroma Abadi Jakarta" accountId="waba_aroma_jakarta" />
+          <ConnectedNumberCard businessAccount="Aroma Abadi Bandung" phone="+62 811 9001 6677" displayName="Aroma Abadi Bandung" accountId="waba_aroma_bandung" />
+          <ConnectedNumberCard businessAccount="Aroma Beauty Club" phone="+62 811 9001 8899" displayName="Aroma Beauty Club" accountId="waba_aroma_loyalty" />
         </div>
       </div>
     </div>
