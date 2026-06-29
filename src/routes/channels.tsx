@@ -11,7 +11,7 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
-  Music2,
+  
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -293,8 +293,8 @@ function ConnectedNumberCard({
 function BillingTab() {
   const [filter, setFilter] = useState<"all" | "mba" | "waba">("all");
   const cards = [
-    { name: "Northstar Commerce", balance: "US$18.42", source: "mba" as const },
-    { name: "Aurora Retail Group", balance: "US$27.65", source: "waba" as const },
+    { name: "Aroma Abadi", balance: "Rp 4.250.000", source: "mba" as const },
+    { name: "Aroma Beauty Group", balance: "Rp 6.180.000", source: "waba" as const },
   ];
   const filtered = cards.filter((c) => filter === "all" || c.source === filter);
 
@@ -390,10 +390,10 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
 }
 
 export const WHATSAPP_CHANNELS = [
-  { id: "northstar-support", name: "Northstar Support", phone: "+62 811 9001 2233" },
-  { id: "northstar-sales", name: "Northstar Sales", phone: "+62 811 9001 4455" },
-  { id: "northstar-marketing", name: "Northstar Marketing", phone: "+62 811 9001 6677" },
-  { id: "northstar-loyalty", name: "Northstar Loyalty", phone: "+62 811 9001 8899" },
+  { id: "aroma-hq", name: "Aroma Abadi HQ", phone: "+62 811 9001 2233" },
+  { id: "aroma-jakarta", name: "Aroma Abadi Jakarta", phone: "+62 811 9001 4455" },
+  { id: "aroma-bandung", name: "Aroma Abadi Bandung", phone: "+62 811 9001 6677" },
+  { id: "aroma-loyalty", name: "Aroma Beauty Club", phone: "+62 811 9001 8899" },
 ];
 
 function OptInTab() {
