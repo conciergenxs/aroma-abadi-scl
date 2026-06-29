@@ -73,21 +73,13 @@ export const initialLabels: ContactLabel[] = [
   { id: "lb-team", name: "Internal Team", color: "slate" },
 ];
 
-export const initialLists: ContactLabel[] = [] as never;
-export const initialListsData: ContactList[] = [
+export const initialLists: ContactList[] = [
   { id: "ls-vip", name: "VIP Customers", description: "Top loyalty tier members" },
   { id: "ls-jakarta", name: "Customers — Jakarta", description: "Tunjungan Plaza & PIM stores" },
   { id: "ls-bandung", name: "Customers — Bandung", description: "Paris van Java & TSM stores" },
   { id: "ls-launch", name: "Product Launch Audience", description: "Opted-in to new SKU launches" },
   { id: "ls-community", name: "Aroma Beauty Club", description: "WhatsApp loyalty community" },
 ];
-// Backwards-compatible alias (some imports use `initialLists`).
-export { initialListsData as initialListsExport };
-// @ts-expect-error - re-export with original name for legacy imports
-export const initialLists2 = initialListsData;
-
-// Restore the original symbol expected by the app.
-export const initialLists_ALIAS = initialListsData;
 
 export const contacts: Contact[] = [
   { id: "c1", name: "Putri Anggraini", phone: "+62 812 3456 7890", channel: "whatsapp", labelIds: ["lb-vip", "lb-beauty-club"], listIds: ["ls-vip", "ls-launch"], lastInteraction: "2m ago", status: "Active", avatar: avatars[0], ownerId: "me" },
