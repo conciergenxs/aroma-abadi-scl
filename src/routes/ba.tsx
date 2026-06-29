@@ -57,15 +57,15 @@ function BAPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari BA, WA, store, kota…"
-              className="h-8 w-72 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+              placeholder="Cari BA, WA, store, kota.."
+              className="h-9 w-72 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-[11px] text-muted-foreground">{filtered.length} BA</span>
+            <span className="text-sm text-muted-foreground">{filtered.length} BA</span>
             <button
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-medium hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90"
             >
               <Plus className="h-3.5 w-3.5" /> Tambah BA
             </button>
@@ -73,18 +73,17 @@ function BAPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full text-xs">
+          <table className="min-w-full text-sm">
             <thead className="text-muted-foreground">
               <tr className="border-b border-border">
                 <Th>Nama</Th>
+                <Th>Brand</Th>
                 <Th>Gender</Th>
                 <Th>WA (Login)</Th>
                 <Th>Username</Th>
                 <Th>Password</Th>
-                <Th>Brand</Th>
                 <Th>Posisi</Th>
                 <Th>Store · Kota</Th>
-                <Th>Adra</Th>
                 <Th>&nbsp;</Th>
               </tr>
             </thead>
@@ -95,45 +94,44 @@ function BAPage() {
                   <tr key={b.id} className="border-b border-border hover:bg-white/[0.02]">
                     <Td className="font-medium text-foreground">
                       <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary grid place-items-center text-[10px] font-semibold">
+                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary grid place-items-center text-xs font-semibold">
                           {b.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
                         </div>
                         {b.name}
                       </div>
                     </Td>
+                    <Td>{brandNames(b.brandIds)}</Td>
                     <Td>{b.gender}</Td>
                     <Td>{b.waNumber}</Td>
                     <Td>{b.username}</Td>
                     <Td>
                       <div className="flex items-center gap-1.5">
-                        <code className="font-mono text-[11px]">{shown ? b.password : "••••••••"}</code>
+                        <code className="font-mono text-sm">{shown ? b.password : "••••••••"}</code>
                         <button onClick={() => toggleReveal(b.id)} className="text-muted-foreground hover:text-foreground" title={shown ? "Sembunyikan" : "Tampilkan"}>
-                          {shown ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          {shown ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </button>
                         <button
                           onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password disalin"); }}
                           className="text-muted-foreground hover:text-foreground" title="Salin"
                         >
-                          <Copy className="h-3 w-3" />
+                          <Copy className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => { const pw = baStore.regeneratePassword(b.id); toast.success(`Password baru: ${pw}`); }}
                           className="text-muted-foreground hover:text-foreground" title="Generate ulang"
                         >
-                          <KeyRound className="h-3 w-3" />
+                          <KeyRound className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </Td>
-                    <Td>{brandNames(b.brandIds)}</Td>
                     <Td>{b.position}</Td>
                     <Td>{b.store} · <span className="text-muted-foreground">{b.city}</span></Td>
-                    <Td>{b.adraName || "—"}</Td>
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
-                        <button onClick={() => setEditing(b)} className="rounded px-2 h-7 text-[11px] border border-border hover:bg-white/[0.04]">Edit</button>
+                        <button onClick={() => setEditing(b)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04]">Edit</button>
                         <button
                           onClick={() => { if (confirm(`Hapus BA "${b.name}"?`)) { baStore.remove(b.id); toast.success("BA dihapus"); } }}
-                          className="grid h-7 w-7 place-items-center rounded text-rose-400 hover:bg-rose-500/10"
+                          className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10"
                           title="Hapus"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -144,7 +142,7 @@ function BAPage() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={10} className="text-center py-10 text-muted-foreground">Belum ada BA</td></tr>
+                <tr><td colSpan={9} className="text-center py-10 text-muted-foreground text-sm">Belum ada BA</td></tr>
               )}
             </tbody>
           </table>
@@ -167,7 +165,7 @@ function BAPage() {
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="text-left font-medium px-3 py-2.5 text-[11px] uppercase tracking-wide">{children}</th>;
+  return <th className="text-left font-medium px-3 py-2.5 text-xs uppercase tracking-wide">{children}</th>;
 }
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-3 py-2.5 ${className}`}>{children}</td>;
@@ -176,24 +174,29 @@ function Td({ children, className = "" }: { children: React.ReactNode; className
 function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: () => void; onSubmit: (input: Omit<BA, "id">, id?: string) => void }) {
   const { brands } = useSkuStore();
   const [name, setName] = useState(initial?.name || "");
+  const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
   const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Wanita");
   const [username, setUsername] = useState(initial?.username || "");
   const [password, setPassword] = useState(initial?.password || baStore.generatePassword());
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
-  const [brandIds, setBrandIds] = useState<string[]>(initial?.brandIds || []);
   const [city, setCity] = useState(initial?.city || "");
   const [store, setStore] = useState(initial?.store || "");
-  const [adraName, setAdraName] = useState(initial?.adraName || "");
   const [position, setPosition] = useState(initial?.position || "BA");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !waNumber.trim()) { toast.error("Nama dan No. WhatsApp wajib"); return; }
-    onSubmit({ name, gender, username: username || name.toLowerCase().replace(/\s+/g, "."), password, waNumber, brandIds, city, store, adraName: adraName || undefined, position }, initial?.id);
-  }
-
-  function toggleBrand(id: string) {
-    setBrandIds((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
+    onSubmit({
+      name,
+      gender,
+      username: username || name.toLowerCase().replace(/\s+/g, "."),
+      password,
+      waNumber,
+      brandIds: brandId ? [brandId] : [],
+      city,
+      store,
+      position,
+    }, initial?.id);
   }
 
   return (
@@ -202,53 +205,53 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
       <form onSubmit={submit} className="w-full max-w-md bg-background border-l border-border overflow-y-auto">
         <div className="p-5 border-b border-border flex items-start justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 text-xs text-primary mb-1"><BadgeCheck className="h-3.5 w-3.5" /> Brand Ambassador</div>
+            <div className="inline-flex items-center gap-2 text-sm text-primary mb-1"><BadgeCheck className="h-3.5 w-3.5" /> Brand Ambassador</div>
             <div className="text-base font-semibold">{initial ? "Edit BA" : "Tambah BA Baru"}</div>
           </div>
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5 space-y-3">
-          <Field label="Nama Lengkap"><input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Nama Lengkap">
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama lengkap.." className={inputCls} />
+            </Field>
+            <Field label="Brand">
+              <select value={brandId} onChange={(e) => setBrandId(e.target.value)} className={inputCls}>
+                <option value="">Pilih brand..</option>
+                {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </Field>
+          </div>
           <Field label="Gender">
             <select value={gender} onChange={(e) => setGender(e.target.value as BA["gender"])} className={inputCls}>
               <option>Wanita</option><option>Pria</option><option>Lainnya</option>
             </select>
           </Field>
-          <Field label="No. WhatsApp (untuk login)"><input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="+62 812 ..." className={inputCls} /></Field>
-          <Field label="Username"><input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="auto dari nama jika kosong" className={inputCls} /></Field>
+          <Field label="No. WhatsApp (untuk login)">
+            <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Masukkan no. WhatsApp.." className={inputCls} />
+          </Field>
+          <Field label="Username">
+            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Masukkan username (auto dari nama jika kosong).." className={inputCls} />
+          </Field>
           <Field label="Password (generated)">
             <div className="flex gap-2">
-              <input value={password} onChange={(e) => setPassword(e.target.value)} className={`${inputCls} font-mono`} />
-              <button type="button" onClick={() => setPassword(baStore.generatePassword())} className="rounded-md border border-border px-2 text-xs hover:bg-white/[0.04]">Generate</button>
-            </div>
-          </Field>
-          <Field label="Brand yang Dipegang">
-            <div className="flex flex-wrap gap-1.5">
-              {brands.map((b) => (
-                <button type="button" key={b.id} onClick={() => toggleBrand(b.id)}
-                  className={`px-2 h-7 rounded-md border text-[11px] ${brandIds.includes(b.id) ? "border-primary bg-primary/10 text-primary" : "border-border bg-card/60 text-muted-foreground"}`}>
-                  {b.name}
-                </button>
-              ))}
-              {brands.length === 0 && <span className="text-[11px] text-muted-foreground">Belum ada brand. Tambahkan di menu SKU.</span>}
+              <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Masukkan password.." className={`${inputCls} font-mono`} />
+              <button type="button" onClick={() => setPassword(baStore.generatePassword())} className="rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]">Generate</button>
             </div>
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Kota"><input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} /></Field>
-            <Field label="Store"><input value={store} onChange={(e) => setStore(e.target.value)} className={inputCls} /></Field>
+            <Field label="Kota"><input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Masukkan kota.." className={inputCls} /></Field>
+            <Field label="Store"><input value={store} onChange={(e) => setStore(e.target.value)} placeholder="Masukkan nama store.." className={inputCls} /></Field>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Posisi">
-              <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
-                <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
-              </select>
-            </Field>
-            <Field label="Adra (opsional)"><input value={adraName} onChange={(e) => setAdraName(e.target.value)} placeholder="Nama Adra" className={inputCls} /></Field>
-          </div>
+          <Field label="Posisi">
+            <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
+              <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
+            </select>
+          </Field>
         </div>
         <div className="p-5 border-t border-border flex items-center justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-8 text-xs">Batal</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-medium">{initial ? "Simpan" : "Tambah BA"}</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Simpan" : "Tambah BA"}</button>
         </div>
       </form>
     </div>
@@ -260,7 +263,7 @@ const inputCls = "h-9 w-full rounded-md border border-border bg-card/60 px-2.5 t
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-[11px] text-muted-foreground mb-1">{label}</span>
+      <span className="block text-xs text-muted-foreground mb-1">{label}</span>
       {children}
     </label>
   );
