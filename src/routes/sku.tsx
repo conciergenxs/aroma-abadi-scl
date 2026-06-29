@@ -39,7 +39,7 @@ function SkuPage() {
   );
 
   return (
-    <AppShell title="SKU & Knowledge" subtitle="Kelola hierarki produk dari brand, kategori, SKU, hingga knowledge card untuk seluruh tim Aroma Abadi.">
+    <AppShell title="SKU & Knowledge" subtitle="Kelola brand, kategori, SKU, dan knowledge card produk Aroma Abadi.">
       {view.kind === "brands" && (
         <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
       )}
@@ -95,7 +95,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Brands</div>
-          <div className="text-sm text-muted-foreground">Kumpulan brand yang dikelola Aroma Abadi. Klik brand untuk melihat kategori dan SKU.</div>
+          <div className="text-sm text-muted-foreground">Klik brand untuk melihat kategori dan SKU.</div>
         </div>
         <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
           <Plus className="h-4 w-4" /> Add New Brand
@@ -110,13 +110,14 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
               onClick={() => onOpen(b)}
               className="group text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
             >
-              <div className="h-36 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
+              <div className="h-48 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
                 {b.logoUrl ? (
-                  <img src={b.logoUrl} alt={b.name} className="max-h-24 max-w-[85%] object-contain" loading="lazy" />
+                  <img src={b.logoUrl} alt={b.name} className="max-h-36 max-w-[90%] object-contain" loading="lazy" />
                 ) : (
-                  <Package className="h-10 w-10 text-primary" />
+                  <Package className="h-12 w-12 text-primary" />
                 )}
               </div>
+
               <div>
                 <div className="text-sm font-semibold truncate">{b.name}</div>
                 <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
@@ -179,14 +180,15 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
 
       <SectionCard>
         <div className="p-5 flex items-center gap-4">
-          <div className="h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden">
-            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-16 max-w-[85%] object-contain" /> : <Package className="h-8 w-8 text-primary" />}
+          <div className="h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" /> : <Package className="h-10 w-10 text-primary" />}
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
             <div className="text-sm text-muted-foreground">{brand.categories.length} kategori · {brand.brandKnowledge.length} dokumen brand knowledge</div>
           </div>
         </div>
+
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

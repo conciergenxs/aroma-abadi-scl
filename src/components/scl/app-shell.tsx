@@ -88,24 +88,39 @@ export function AppShell({
           expanded ? "w-56" : "w-[68px]"
         }`}
       >
-        <div className={`flex items-center w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4 justify-between" : "px-2 justify-center"}`}>
-          <img
-            src={expanded ? sclLogoAsset.url : sclIconAsset.url}
-            alt="Aroma Abadi"
-            className={`w-auto object-contain ${expanded ? "h-7" : "h-[22px]"}`}
-            title="Aroma Abadi"
-          />
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
-            title={expanded ? "Collapse sidebar" : "Expand sidebar"}
-            className={`grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] ${expanded ? "" : "absolute"}`}
-            style={expanded ? undefined : { position: "absolute", left: "50%", bottom: -14, transform: "translateX(-50%)" }}
-          >
-            {expanded ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
-          </button>
+        <div className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}>
+          <div className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}>
+            <img
+              src={expanded ? sclLogoAsset.url : sclIconAsset.url}
+              alt="Aroma Abadi"
+              className={`w-auto object-contain ${expanded ? "h-7" : "h-[22px]"}`}
+              title="Aroma Abadi"
+            />
+            {expanded && (
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                aria-label="Collapse sidebar"
+                title="Collapse sidebar"
+                className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08]"
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          {!expanded && (
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
+              className="grid h-7 w-11 place-items-center rounded-md border border-sidebar-border/60 bg-white/[0.06] text-sidebar-foreground hover:bg-white/[0.12]"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </button>
+          )}
         </div>
+
 
         <nav className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}>
           {topNav.map((item) => {
