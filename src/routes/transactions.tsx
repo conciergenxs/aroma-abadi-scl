@@ -17,9 +17,9 @@ export const Route = createFileRoute("/transactions")({
 });
 
 function statusBadge(s: TxStatus) {
-  if (s === "Paid") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700";
-  if (s === "Pending") return "border-amber-500/30 bg-amber-500/10 text-amber-700";
-  return "border-rose-500/30 bg-rose-500/10 text-rose-700";
+  if (s === "Paid") return "border-emerald-700 bg-emerald-600 text-white";
+  if (s === "Pending") return "border-amber-700 bg-amber-600 text-white";
+  return "border-rose-700 bg-rose-600 text-white";
 }
 
 function TransactionsPage() {

@@ -43,17 +43,17 @@ export const Route = createFileRoute("/templates/")({
 });
 
 const statusTone: Record<string, string> = {
-  Approved: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-  Pending: "border-amber-500/30 bg-amber-500/10 text-amber-300",
-  Rejected: "border-red-500/30 bg-red-500/10 text-red-300",
-  Draft: "border-border bg-white/[0.04] text-muted-foreground",
+  Approved: "border-emerald-700 bg-emerald-600 text-white",
+  Pending: "border-amber-700 bg-amber-600 text-white",
+  Rejected: "border-red-700 bg-red-600 text-white",
+  Draft: "border-slate-600 bg-slate-500 text-white",
 };
 
 const categoryTone: Record<string, string> = {
-  Marketing: "border-primary/30 bg-primary/10 text-primary",
-  Utility: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-  Service: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-  Reminder: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+  Marketing: "border-primary bg-primary text-primary-foreground",
+  Utility: "border-sky-700 bg-sky-600 text-white",
+  Service: "border-violet-700 bg-violet-600 text-white",
+  Reminder: "border-amber-700 bg-amber-600 text-white",
 };
 
 const CATEGORY_OPTIONS = [

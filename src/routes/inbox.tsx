@@ -378,7 +378,34 @@ function InboxPage() {
 
   const active = sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
-  const thread = threadsByContact[contact.id] ?? [];
+  const thread: Message[] = useMemo(() => {
+    const existing = threadsByContact[contact.id];
+    if (existing && existing.length) return existing;
+    // Fallback: synthesize a small thread from the conversation preview so
+    // the chat panel never shows an empty state.
+    const greet: Message = {
+      id: `gen-${contact.id}-1`,
+      from: "them",
+      text: `Halo, saya ${contact.name.split(" ")[0]}. Saya tertarik dengan produk Aroma Abadi.`,
+      time: "09:12",
+      status: "read",
+    };
+    const reply: Message = {
+      id: `gen-${contact.id}-2`,
+      from: "me",
+      text: `Halo ${contact.name.split(" ")[0]}, terima kasih sudah menghubungi Aroma Abadi. Ada yang bisa kami bantu?`,
+      time: "09:14",
+      status: "read",
+    };
+    const follow: Message = {
+      id: `gen-${contact.id}-3`,
+      from: "them",
+      text: active.preview || "Mohon info lebih lanjut ya.",
+      time: active.time || "09:20",
+      status: "delivered",
+    };
+    return [greet, reply, follow];
+  }, [contact.id, contact.name, active.preview, active.time]);
 
   // Combined message list (mock thread + locally-sent messages)
   const combinedThread: SentMsg[] = useMemo(
@@ -877,9 +904,6 @@ function InboxPage() {
                 isActiveMatch={activeMatchId === m.id}
               />
             ))}
-            {combinedThread.length === 0 && (
-              <div className="text-center text-xs text-muted-foreground py-10">No messages yet.</div>
-            )}
             {(notesByConvo[active.id] ?? []).map((n) => (
               <div key={n.id} data-search-id={n.id} className="flex justify-center">
                 <div className={`max-w-[80%] w-full rounded-xl border px-4 py-3 shadow-sm transition ${activeMatchId === n.id ? "border-amber-300/70 bg-amber-300/[0.12] ring-2 ring-amber-300/40" : "border-amber-300/30 bg-amber-300/[0.06]"}`}>
