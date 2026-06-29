@@ -68,13 +68,7 @@ function ChannelsPage() {
                         : "border border-transparent hover:bg-white/[0.04]"
                   }`}
                 >
-                  {c.key === "tiktok" ? (
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-white/10">
-                      <Music2 className="h-4 w-4 text-muted-foreground" />
-                    </span>
-                  ) : (
-                    <ChannelIcon channel={c.key} className="h-8 w-8" />
-                  )}
+                  <ChannelIcon channel={c.key} className="h-8 w-8" />
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium truncate">{c.label}</div>
                     <div className="text-[10px] text-muted-foreground truncate">{c.sublabel}</div>
