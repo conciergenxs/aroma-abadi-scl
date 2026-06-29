@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -23,6 +24,11 @@ import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contac
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
     | '/contacts/$contactId'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
     | '/contacts/$contactId'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
     | '/contacts/$contactId'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
   SettingsRoute: typeof SettingsRoute
+  TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
@@ -199,6 +212,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -314,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   SettingsRoute: SettingsRoute,
+  TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
   TemplatesNewRoute: TemplatesNewRoute,
