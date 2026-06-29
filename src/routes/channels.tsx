@@ -417,7 +417,7 @@ function OptInTab() {
                 type="button"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-card/60 hover:bg-card px-3 py-1.5 text-xs"
               >
-                Northstar Commerce
+                Aroma Abadi
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
