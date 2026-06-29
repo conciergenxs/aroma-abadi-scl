@@ -91,9 +91,9 @@ export function AppShell({
         <div className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}>
           <div className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}>
             <img
-              src={expanded ? sclLogoAsset.url : sclIconAsset.url}
+              src={sclIconAsset.url}
               alt="Aroma Abadi"
-              className={`w-auto object-contain ${expanded ? "h-7" : "h-[22px]"}`}
+              className="h-[22px] w-auto object-contain"
               title="Aroma Abadi"
             />
             {expanded && (
