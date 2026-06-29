@@ -39,7 +39,7 @@ function SkuPage() {
   );
 
   return (
-    <AppShell title="SKU & Knowledge" subtitle="Kelola hierarki produk dari brand, kategori, SKU, hingga knowledge card untuk seluruh tim Aroma Abadi.">
+    <AppShell title="SKU & Knowledge" subtitle="Kelola brand, kategori, SKU, dan knowledge card produk Aroma Abadi.">
       {view.kind === "brands" && (
         <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
       )}
