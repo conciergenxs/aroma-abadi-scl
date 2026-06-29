@@ -290,6 +290,3 @@ export const connectedChannels: ConnectedChannel[] = [
   { id: "wa-bdg", channel: "whatsapp", name: "Aroma Abadi Bandung", handle: "+62 811 9001 6677", status: "connected" },
   { id: "wa-loyalty", channel: "whatsapp", name: "Aroma Beauty Club", handle: "+62 811 9001 8899", status: "connected" },
 ];
-
-// Canonical `initialLists` export expected across the app.
-export const initialLists = initialListsData;
