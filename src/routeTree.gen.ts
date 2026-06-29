@@ -36,16 +36,6 @@ const SkuRoute = SkuRouteImport.update({
   path: '/sku',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BaRoute = BaRouteImport.update({
-  id: '/ba',
-  path: '/ba',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SkuRoute = SkuRouteImport.update({
-  id: '/sku',
-  path: '/sku',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
