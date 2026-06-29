@@ -142,7 +142,7 @@ function InboxPage() {
     }
     return out;
   }, []);
-  const channelLabel = (c: Channel) => (c === "whatsapp" ? "WhatsApp" : "Instagram");
+  const channelLabel = (c: Channel) => ("WhatsApp");
 
   const ownerOptions = useMemo(
     () => [
@@ -968,7 +968,7 @@ function InboxPage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitReply(); }
                   }}
-                  placeholder={`Reply on ${active.channel === "whatsapp" ? "WhatsApp" : "Instagram"}…`}
+                  placeholder={`Reply on $WhatsApp…`}
                   className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
                 />
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
@@ -1168,7 +1168,7 @@ function InboxPage() {
             <Section title="Contact Information">
               <InfoRow icon={<Mail className="h-3 w-3" />} label="Email" value={contact.email ?? "—"} />
               <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
-              <InfoRow icon={<MessageSquare className="h-3 w-3" />} label="Channel" value={contact.channel === "whatsapp" ? "WhatsApp" : "Instagram"} />
+              <InfoRow icon={<MessageSquare className="h-3 w-3" />} label="Channel" value=WhatsApp />
               <InfoRow icon={<User2 className="h-3 w-3" />} label="Owner" value={contact.ownerId ? (contact.ownerId === "me" ? "Me" : userLabel(contact.ownerId)) : "Unassigned"} />
               <InfoRow icon={<span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>} label="Last interaction" value={contact.lastInteraction} />
             </Section>
@@ -2188,7 +2188,7 @@ function ForwardModal({
                 <div className="min-w-0 flex-1">
                   <div className="text-[13px] text-foreground truncate">{c.name}</div>
                   <div className="text-[11px] text-muted-foreground truncate">
-                    {c.channel === "whatsapp" ? "WhatsApp" : "Instagram"} · {c.lastInteraction}
+                    WhatsApp · {c.lastInteraction}
                   </div>
                 </div>
               </button>

@@ -536,7 +536,7 @@ function TemplateDetailModal({
     template.language ??
     "English (US)";
 
-  const channelLabel = template.channel === "whatsapp" ? "WhatsApp" : "Instagram";
+  const channelLabel = "WhatsApp";
 
   // Derived metadata (deterministic placeholders so the demo feels complete)
   const reviewers = ["Priya Tan", "Marcus Lee", "Saanvi Patel", "Joaquín Ruiz"];
@@ -890,7 +890,7 @@ function DetailPhoneFrame({
           <div className="min-w-0">
             <div className="text-[12px] font-semibold truncate">{senderName}</div>
             <div className="text-[10px] text-muted-foreground">
-              {isWa ? "WhatsApp Business" : "Instagram DM"}
+              {"WhatsApp Business"}
             </div>
           </div>
         </div>

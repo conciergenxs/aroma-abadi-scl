@@ -388,7 +388,7 @@ function CreateTemplatePage() {
                 <span className="text-sm font-medium">Live preview</span>
               </div>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {channelKind === "whatsapp" ? "WhatsApp" : "Instagram"}
+                WhatsApp
               </span>
             </div>
             <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
@@ -535,7 +535,7 @@ function PhoneFrame({
           <div className="min-w-0">
             <div className="text-[12px] font-semibold truncate">{senderName}</div>
             <div className="text-[10px] text-muted-foreground">
-              {isWa ? "WhatsApp Business" : "Instagram DM"}
+              {"WhatsApp Business"}
             </div>
           </div>
         </div>
