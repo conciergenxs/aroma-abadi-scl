@@ -85,7 +85,7 @@ function BAPage() {
                 <Th>Posisi</Th>
                 <Th>Store · Kota</Th>
                 <Th>Adra</Th>
-                <Th></Th>
+                <Th>&nbsp;</Th>
               </tr>
             </thead>
             <tbody>

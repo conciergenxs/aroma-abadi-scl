@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as SkuRouteImport } from './routes/sku'
+import { Route as BaRouteImport } from './routes/ba'
+import { Route as SkuRouteImport } from './routes/sku'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as ChannelsRouteImport } from './routes/channels'
+import { Route as BaRouteImport } from './routes/ba'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
@@ -27,6 +31,11 @@ import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuRoute = SkuRouteImport.update({
+  id: '/sku',
+  path: '/sku',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -47,6 +56,11 @@ const ContactsRoute = ContactsRouteImport.update({
 const ChannelsRoute = ChannelsRouteImport.update({
   id: '/channels',
   path: '/channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BaRoute = BaRouteImport.update({
+  id: '/ba',
+  path: '/ba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -98,10 +112,12 @@ const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/sku': typeof SkuRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -114,10 +130,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/sku': typeof SkuRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -131,10 +149,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
+  '/sku': typeof SkuRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -149,10 +169,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/ba'
     | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/sku'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -165,10 +187,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/ba'
     | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/sku'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -181,10 +205,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/ba'
     | '/channels'
     | '/contacts'
     | '/inbox'
     | '/settings'
+    | '/sku'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -198,10 +224,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  BaRoute: typeof BaRoute
   ChannelsRoute: typeof ChannelsRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
   SettingsRoute: typeof SettingsRoute
+  SkuRoute: typeof SkuRoute
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
@@ -217,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/transactions'
       preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sku': {
+      id: '/sku'
+      path: '/sku'
+      fullPath: '/sku'
+      preLoaderRoute: typeof SkuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -245,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/channels'
       fullPath: '/channels'
       preLoaderRoute: typeof ChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ba': {
+      id: '/ba'
+      path: '/ba'
+      fullPath: '/ba'
+      preLoaderRoute: typeof BaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -330,10 +372,12 @@ const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  BaRoute: BaRoute,
   ChannelsRoute: ChannelsRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   SettingsRoute: SettingsRoute,
+  SkuRoute: SkuRoute,
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
