@@ -39,7 +39,7 @@ function SkuPage() {
   );
 
   return (
-    <AppShell title="SKU & Knowledge" subtitle="Brand → Category → SKU → Knowledge Card untuk seluruh produk Aroma Abadi.">
+    <AppShell title="SKU & Knowledge" subtitle="Kelola hierarki produk dari brand, kategori, SKU, hingga knowledge card untuk seluruh tim Aroma Abadi.">
       {view.kind === "brands" && (
         <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
       )}
@@ -83,19 +83,25 @@ function SkuPage() {
 /* ---------------- Level 1: Brands Overview ---------------- */
 
 function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b: Brand) => void; onAdd: () => void }) {
-  const visible = brands.slice(0, 12);
+  const PAGE_SIZE = 12;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const start = safePage * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, brands.length);
+  const visible = brands.slice(start, end);
   return (
     <SectionCard>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Brands</div>
-          <div className="text-xs text-muted-foreground">Maksimal 12 brand ditampilkan di overview (3 baris × 4 kolom).</div>
+          <div className="text-sm text-muted-foreground">Kumpulan brand yang dikelola Aroma Abadi. Klik brand untuk melihat kategori dan SKU.</div>
         </div>
         <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
       </div>
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {visible.map((b) => {
           const skuCount = b.categories.reduce((a, c) => a + c.skus.length, 0);
           return (
@@ -104,16 +110,16 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
               onClick={() => onOpen(b)}
               className="group text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
             >
-              <div className="h-24 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
+              <div className="h-36 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
                 {b.logoUrl ? (
-                  <img src={b.logoUrl} alt={b.name} className="max-h-16 max-w-[80%] object-contain" loading="lazy" />
+                  <img src={b.logoUrl} alt={b.name} className="max-h-24 max-w-[85%] object-contain" loading="lazy" />
                 ) : (
-                  <Package className="h-8 w-8 text-primary" />
+                  <Package className="h-10 w-10 text-primary" />
                 )}
               </div>
               <div>
                 <div className="text-sm font-semibold truncate">{b.name}</div>
-                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                   <span><span className="font-medium text-foreground">{b.categories.length}</span> Categories</span>
                   <span>·</span>
                   <span><span className="font-medium text-foreground">{skuCount}</span> SKUs</span>
@@ -126,6 +132,30 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
           <div className="col-span-full text-center py-10 text-sm text-muted-foreground">Belum ada brand.</div>
         )}
       </div>
+      {brands.length > 0 && (
+        <div className="px-4 py-3 border-t border-border flex items-center justify-between text-sm">
+          <div className="text-muted-foreground">
+            Menampilkan <span className="text-foreground font-medium">{start + 1}–{end}</span> dari <span className="text-foreground font-medium">{brands.length}</span> brand
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={safePage === 0}
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-white/[0.04] disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Prev
+            </button>
+            <span className="px-2 text-muted-foreground">Hal. {safePage + 1} / {totalPages}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={safePage >= totalPages - 1}
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-white/[0.04] disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </SectionCard>
   );
 }
@@ -149,8 +179,8 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
 
       <SectionCard>
         <div className="p-5 flex items-center gap-4">
-          <div className="h-16 w-16 rounded-lg bg-white border border-border grid place-items-center overflow-hidden">
-            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-12 max-w-[80%] object-contain" /> : <Package className="h-6 w-6 text-primary" />}
+          <div className="h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden">
+            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-16 max-w-[85%] object-contain" /> : <Package className="h-8 w-8 text-primary" />}
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
