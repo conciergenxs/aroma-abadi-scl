@@ -11,10 +11,10 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Strategic Conversation Lab" },
-      { name: "description", content: "Premium conversational engagement platform for WhatsApp and Instagram." },
-      { property: "og:title", content: "Strategic Conversation Lab" },
-      { property: "og:description", content: "Manage WhatsApp and Instagram conversations at enterprise scale." },
+      { title: "Dashboard — Aroma Abadi" },
+      { name: "description", content: "Platform engagement WhatsApp untuk Aroma Abadi — makeup & beauty." },
+      { property: "og:title", content: "Aroma Abadi — SCL" },
+      { property: "og:description", content: "Kelola percakapan WhatsApp pelanggan Aroma Abadi dalam satu workspace." },
     ],
   }),
   component: Dashboard,
@@ -22,21 +22,20 @@ export const Route = createFileRoute("/")({
 
 const metrics = [
   { label: "Active Contacts", value: "29,841", delta: "+4.2%", up: true, icon: Users, sub: "7-day rolling" },
-  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. last 7 days" },
+  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. 7 hari lalu" },
   { label: "Messages Replied", value: "168,492", delta: "+9.7%", up: true, icon: Reply, sub: "91.5% reply rate" },
-  { label: "Broadcast Sent", value: "38", delta: "+5.6%", up: true, icon: Radio, sub: "campaigns this month" },
-  { label: "Broadcast Reach", value: "1.42M", delta: "−1.6%", up: false, icon: Megaphone, sub: "vs. previous campaign" },
+  { label: "Broadcast Sent", value: "38", delta: "+5.6%", up: true, icon: Radio, sub: "campaign bulan ini" },
+  { label: "Broadcast Reach", value: "1.42M", delta: "−1.6%", up: false, icon: Megaphone, sub: "vs. campaign sebelumnya" },
 ];
 
 const channelEngagement = [
   { name: "WhatsApp", value: 7.4 },
-  { name: "Instagram", value: 4.2 },
 ];
 
 function Dashboard() {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   return (
-    <AppShell title="Dashboard" subtitle={`${today} · Acme Brands workspace`}>
+    <AppShell title="Dashboard" subtitle={`${today} · Aroma Abadi workspace`}>
       <div className="space-y-6">
         {/* Welcome */}
         <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card/80 to-card/30 p-6 glass">
@@ -44,10 +43,10 @@ function Dashboard() {
           <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
           <div className="relative flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs text-muted-foreground">Welcome back</p>
-              <h2 className="text-2xl font-semibold tracking-tight mt-1">Good morning, Aria.</h2>
+              <p className="text-xs text-muted-foreground">Selamat datang kembali</p>
+              <h2 className="text-2xl font-semibold tracking-tight mt-1">Halo, Aria.</h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                Your team handled 8,212 conversations this week — 92% replied under 4 minutes.
+                Tim kamu menangani 8,212 percakapan minggu ini — 92% terbalas di bawah 4 menit.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -90,12 +89,11 @@ function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <SectionCard
             title="Message volume"
-            description="WhatsApp vs. Instagram · last 7 days"
+            description="WhatsApp · 7 hari terakhir"
             className="lg:col-span-2"
             action={
               <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-emerald-500" /> WhatsApp</span>
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-pink-500" /> Instagram</span>
               </div>
             }
           >
@@ -107,10 +105,6 @@ function Dashboard() {
                       <stop offset="0%" stopColor="oklch(0.72 0.14 160)" stopOpacity={0.5} />
                       <stop offset="100%" stopColor="oklch(0.72 0.14 160)" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient id="ig" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.66 0.2 350)" stopOpacity={0.5} />
-                      <stop offset="100%" stopColor="oklch(0.66 0.2 350)" stopOpacity={0} />
-                    </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 6%)" vertical={false} />
                   <XAxis dataKey="d" stroke="oklch(0.7 0 0)" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -120,7 +114,6 @@ function Dashboard() {
                     labelStyle={{ color: "oklch(0.8 0 0)" }}
                   />
                   <Area type="monotone" dataKey="whatsapp" stroke="oklch(0.72 0.14 160)" fill="url(#wa)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="instagram" stroke="oklch(0.66 0.2 350)" fill="url(#ig)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
