@@ -211,9 +211,45 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5 space-y-3">
+          <Field label="Nama Lengkap">
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama lengkap.." className={inputCls} />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Nama Lengkap">
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama lengkap.." className={inputCls} />
+            <Field label="Gender">
+              <select value={gender} onChange={(e) => setGender(e.target.value as BA["gender"])} className={inputCls}>
+                <option>Wanita</option><option>Pria</option><option>Lainnya</option>
+              </select>
+            </Field>
+            <Field label="No. WhatsApp (untuk login)">
+              <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Masukkan no. WhatsApp.." className={inputCls} />
+            </Field>
+          </div>
+          <Field label="Username">
+            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Masukkan username (auto dari nama jika kosong).." className={inputCls} />
+          </Field>
+          <Field label="Password (generated)">
+            <div className="flex gap-2">
+              <input value={password} readOnly placeholder="Password otomatis dibuat.." className={`${inputCls} font-mono bg-muted/40 cursor-not-allowed`} />
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard.writeText(password); toast.success("Password disalin"); }}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]"
+                title="Salin password"
+              >
+                <Copy className="h-3.5 w-3.5" /> Copy
+              </button>
+              <button type="button" onClick={() => setPassword(baStore.generatePassword())} className="rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]">Generate</button>
+            </div>
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Kota"><input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Masukkan kota.." className={inputCls} /></Field>
+            <Field label="Store"><input value={store} onChange={(e) => setStore(e.target.value)} placeholder="Masukkan nama store.." className={inputCls} /></Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Posisi">
+              <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
+                <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
+              </select>
             </Field>
             <Field label="Brand">
               <select value={brandId} onChange={(e) => setBrandId(e.target.value)} className={inputCls}>
@@ -222,32 +258,6 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
               </select>
             </Field>
           </div>
-          <Field label="Gender">
-            <select value={gender} onChange={(e) => setGender(e.target.value as BA["gender"])} className={inputCls}>
-              <option>Wanita</option><option>Pria</option><option>Lainnya</option>
-            </select>
-          </Field>
-          <Field label="No. WhatsApp (untuk login)">
-            <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Masukkan no. WhatsApp.." className={inputCls} />
-          </Field>
-          <Field label="Username">
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Masukkan username (auto dari nama jika kosong).." className={inputCls} />
-          </Field>
-          <Field label="Password (generated)">
-            <div className="flex gap-2">
-              <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Masukkan password.." className={`${inputCls} font-mono`} />
-              <button type="button" onClick={() => setPassword(baStore.generatePassword())} className="rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]">Generate</button>
-            </div>
-          </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Kota"><input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Masukkan kota.." className={inputCls} /></Field>
-            <Field label="Store"><input value={store} onChange={(e) => setStore(e.target.value)} placeholder="Masukkan nama store.." className={inputCls} /></Field>
-          </div>
-          <Field label="Posisi">
-            <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
-              <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
-            </select>
-          </Field>
         </div>
         <div className="p-5 border-t border-border flex items-center justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
