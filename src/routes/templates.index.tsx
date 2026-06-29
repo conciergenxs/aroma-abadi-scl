@@ -67,7 +67,6 @@ const CATEGORY_OPTIONS = [
 const CHANNEL_OPTIONS = [
   { value: "all", label: "All Channels" },
   { value: "whatsapp", label: "WhatsApp", icon: <ChannelIcon channel="whatsapp" className="h-3.5 w-3.5" /> },
-  { value: "instagram", label: "Instagram", icon: <ChannelIcon channel="instagram" className="h-3.5 w-3.5" /> },
 ];
 
 const STATUS_OPTIONS = [
@@ -115,7 +114,7 @@ function TemplatesPage() {
   return (
     <AppShell
       title="Message Templates"
-      subtitle="Reusable, brand-approved messages for WhatsApp & Instagram."
+      subtitle="Pesan terstandarisasi & brand-approved untuk WhatsApp Aroma Abadi."
     >
       <div className="space-y-6">
 
