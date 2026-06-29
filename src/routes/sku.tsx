@@ -95,7 +95,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Brands</div>
-          <div className="text-sm text-muted-foreground">Kumpulan brand yang dikelola Aroma Abadi. Klik brand untuk melihat kategori dan SKU.</div>
+          <div className="text-sm text-muted-foreground">Klik brand untuk melihat kategori dan SKU.</div>
         </div>
         <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
           <Plus className="h-4 w-4" /> Add New Brand
@@ -110,13 +110,14 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
               onClick={() => onOpen(b)}
               className="group text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
             >
-              <div className="h-36 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
+              <div className="h-48 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
                 {b.logoUrl ? (
-                  <img src={b.logoUrl} alt={b.name} className="max-h-24 max-w-[85%] object-contain" loading="lazy" />
+                  <img src={b.logoUrl} alt={b.name} className="max-h-36 max-w-[90%] object-contain" loading="lazy" />
                 ) : (
-                  <Package className="h-10 w-10 text-primary" />
+                  <Package className="h-12 w-12 text-primary" />
                 )}
               </div>
+
               <div>
                 <div className="text-sm font-semibold truncate">{b.name}</div>
                 <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
