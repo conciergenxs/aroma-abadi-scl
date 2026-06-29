@@ -65,7 +65,7 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
   { id: "p-business-type", key: "business_type", name: "Business Type", type: "select", visible: false, options: ["B2B", "B2C", "B2B2C"] },
   { id: "p-business-industry", key: "business_industry", name: "Business Industry", type: "select", visible: false, options: ["Retail", "Finance", "Tech", "Hospitality", "Education", "Healthcare", "Other"] },
   { id: "p-company-name", key: "company_name", name: "Company Name", type: "text", visible: false },
-  { id: "p-instagram-username", key: "instagram_username", name: "Instagram Username", type: "text", visible: false },
+  
 ];
 
 // =========================================================
