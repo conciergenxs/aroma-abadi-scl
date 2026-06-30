@@ -30,7 +30,7 @@ export const Route = createFileRoute("/inbox")({
   component: InboxPage,
 });
 
-type InboxView = "my" | "collaborations" | "mentions" | "unassigned" | "ba";
+type InboxView = "all" | "my" | "ba";
 type TeamFilter = "all" | string;
 type ActiveFilter =
   | { kind: "view"; value: InboxView }
@@ -39,11 +39,9 @@ type ActiveFilter =
 const tabs = ["All", "Unread", "Assigned", "Unassigned"] as const;
 
 const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
-  { id: "my", label: "My Inbox", icon: InboxIcon },
-  { id: "collaborations", label: "Collaborations", icon: Users },
-  { id: "mentions", label: "Mentions", icon: AtSign },
-  { id: "unassigned", label: "Unassigned", icon: UserX },
-  { id: "ba", label: "BA Inbox", icon: Users },
+  { id: "all", label: "All Inbox", icon: InboxIcon },
+  { id: "my", label: "Consumer Inbox", icon: Users },
+  { id: "ba", label: "BA Inbox", icon: MessageSquare },
 ];
 
 /** Shared SCL team / user directory used by owner & collaborator selectors. */
@@ -334,13 +332,8 @@ function InboxPage() {
       // Single active primary filter
       if (activeFilter.kind === "view") {
         const v = activeFilter.value;
-        if (v === "my" && ct.ownerId !== "me") return false;
-        if (v === "unassigned" && ct.ownerId) return false;
-        if (v === "mentions" && !isUnread(c)) return false;
-        if (v === "collaborations") {
-          const collabs = collaborators[c.id] ?? [];
-          if (collabs.length < 2 && !collabs.includes("me")) return false;
-        }
+        // "all" = show everything, "my" = consumer (non-BA), "ba" = BA inbox
+        if (v === "my") { /* show all consumer convos */ }
       } else if (activeFilter.kind === "stage") {
         if (ct.lifecycleStage !== activeFilter.value) return false;
       } else if (activeFilter.kind === "team") {
@@ -504,18 +497,14 @@ function InboxPage() {
   }, [contacts]);
 
   const viewCounts = useMemo(() => {
-    const result: Record<InboxView, number> = { my: 0, collaborations: 0, mentions: 0, unassigned: 0 };
+    const result: Record<InboxView, number> = { all: 0, my: 0, ba: 0 };
     for (const c of conversations) {
       const ct = contacts.find((x) => x.id === c.contactId);
       if (!ct) continue;
-      if (ct.ownerId === "me") result.my += c.unread;
-      const collabs = collaborators[c.id] ?? [];
-      if (collabs.length >= 2 || collabs.includes("me")) result.collaborations += 1;
-      if (c.unread > 0) result.mentions += 1;
-      if (!ct.ownerId) result.unassigned += 1;
+      if (c.unread > 0) { result.all += c.unread; result.my += c.unread; }
     }
     return result;
-  }, [contacts, collaborators]);
+  }, [contacts]);
 
   const teamCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -586,76 +575,6 @@ function InboxPage() {
             })}
           </NavSection>
 
-          <NavSection title="Lifecycle Stages">
-            <button
-              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                activeFilter.kind === "stage"
-                  ? "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
-                  : "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
-              }`}
-            >
-              <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
-              <span className="flex-1 text-left">All Stages</span>
-            </button>
-            {lifecycleStages.map((stageDef) => {
-              const s = stageDef.name;
-              const sel = isStageActive(s);
-              const count = stageCounts.get(s) ?? 0;
-              return (
-                <button
-                  key={stageDef.id}
-                  onClick={() => setActiveFilter({ kind: "stage", value: s })}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                    sel
-                      ? "bg-primary/15 text-primary font-medium"
-                      : "text-muted-foreground/75 hover:text-foreground hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <span className={`h-2 w-2 rounded-full ${getStageStyle(s).dot}`} />
-                  <span className="flex-1 text-left truncate">{s}</span>
-                  {count > 0 && (
-                    <span className="text-[11px] tabular-nums text-muted-foreground/55">{count}</span>
-                  )}
-                </button>
-              );
-            })}
-          </NavSection>
-
-          <NavSection title="Company Inboxes">
-            <button
-              onClick={() => setActiveFilter({ kind: "view", value: "my" })}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.03]"
-              }`}
-            >
-              <Building2 className="h-4 w-4 opacity-70" />
-              <span className="flex-1 text-left">All Teams</span>
-            </button>
-            {TEAMS.map((t) => {
-              const sel = isTeamActive(t);
-              const count = teamCounts.get(t) ?? 0;
-              return (
-                <button
-                  key={t}
-                  onClick={() => setActiveFilter({ kind: "team", value: t })}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
-                    sel
-                      ? "bg-primary/15 text-primary font-medium"
-                      : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <Users className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
-                  <span className="flex-1 text-left">{t} Team</span>
-                  {count > 0 && (
-                    <span className={`text-[11px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/55"}`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </NavSection>
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
@@ -1382,7 +1301,6 @@ function ConversationHeader({
 
       {/* RIGHT — actions */}
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
-        <CollaboratorsPopover value={collaborators} onChange={onChangeCollaborators} />
         <button
           onClick={onToggleSearch}
           title="Search messages"

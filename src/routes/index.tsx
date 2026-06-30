@@ -38,13 +38,16 @@ function Dashboard() {
     <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
       <div className="space-y-6">
         {/* Quick actions */}
-        <div className="flex items-center gap-2">
-          <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
-            Open Inbox
-          </Link>
-          <Link to="/broadcasts" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
-            New Broadcast
-          </Link>
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-lg font-semibold">Halo, Aria 👋</div>
+          <div className="flex items-center gap-2">
+            <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
+              Open Inbox
+            </Link>
+            <Link to="/broadcasts" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
+              New Broadcast
+            </Link>
+          </div>
         </div>
 
         {/* Metrics */}

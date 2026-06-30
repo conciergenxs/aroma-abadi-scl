@@ -104,7 +104,7 @@ function TransactionsPage() {
                   <Th>Store / Kota</Th>
                   <Th>Brand</Th>
                   <Th>Items</Th>
-                  <Th className="text-right">Total</Th>
+                  <Th>Total</Th>
                   <Th>Bayar</Th>
                   <Th>Status</Th>
                 </tr>
@@ -128,7 +128,7 @@ function TransactionsPage() {
                         ))}
                       </ul>
                     </Td>
-                    <Td className="text-right font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</Td>
+                    <Td className="font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</Td>
                     <Td>{t.paymentMethod}</Td>
                     <Td>
                       <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(t.status)}`}>{t.status}</span>

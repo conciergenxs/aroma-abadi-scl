@@ -4,7 +4,7 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useSkuStore, skuStore, type Brand, type Category, type SKU, type KnowledgeCard } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
-import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen } from "lucide-react";
+import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen, Home } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
@@ -57,6 +57,7 @@ function SkuPage() {
           brand={brand}
           category={category}
           onBack={() => setView({ kind: "brand", brandId: brand.id })}
+          onBackToBrands={() => setView({ kind: "brands" })}
           onAddSku={() => setEditingSku({ brandId: brand.id, categoryId: category.id })}
           onEditSku={(sku) => setEditingSku({ sku, brandId: brand.id, categoryId: category.id })}
         />
@@ -167,9 +168,13 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Back to Brands
-        </button>
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+          <button onClick={onBack} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+            <Home className="h-3.5 w-3.5" /> Brands
+          </button>
+          <ChevronRight className="h-3.5 w-3.5 opacity-50" />
+          <span className="text-foreground font-medium">{brand.name}</span>
+        </nav>
         <button
           onClick={() => { if (confirm(`Hapus brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand dihapus"); onBack(); } }}
           className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus brand"
@@ -254,15 +259,21 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
 
 /* ---------------- Level 3: Category Detail ---------------- */
 
-function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku }: {
-  brand: Brand; category: Category; onBack: () => void; onAddSku: () => void; onEditSku: (sku: SKU) => void;
+function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackToBrands }: {
+  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onAddSku: () => void; onEditSku: (sku: SKU) => void;
 }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Back to {brand.name}
-        </button>
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+          <button onClick={onBackToBrands} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+            <Home className="h-3.5 w-3.5" /> Brands
+          </button>
+          <ChevronRight className="h-3.5 w-3.5 opacity-50" />
+          <button onClick={onBack} className="hover:text-foreground transition-colors">{brand.name}</button>
+          <ChevronRight className="h-3.5 w-3.5 opacity-50" />
+          <span className="text-foreground font-medium">{category.name}</span>
+        </nav>
         <button
           onClick={() => { if (confirm(`Hapus category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category dihapus"); onBack(); } }}
           className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus"
@@ -270,13 +281,6 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku }: {
           <Trash2 className="h-4 w-4" /> Hapus Category
         </button>
       </div>
-
-      <SectionCard>
-        <div className="p-5">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">{brand.name}</div>
-          <div className="text-lg font-semibold">{category.name}</div>
-        </div>
-      </SectionCard>
 
       {/* 30% / 70% layout */}
       <div className="flex gap-4 min-h-0">

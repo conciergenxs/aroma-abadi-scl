@@ -9,6 +9,15 @@ export type AIAgent = {
 
 export const AI_AGENTS: AIAgent[] = [
   {
+    id: "arma",
+    name: "Arma",
+    description:
+      "WhatsApp AI for Aroma Abadi — handles customer conversations automatically.",
+    status: "Connected",
+    webhookUrl: "https://agents.scl.app/webhooks/arma",
+    authType: "Bearer Token",
+  },
+  {
     id: "support-ai",
     name: "Support AI",
     description:

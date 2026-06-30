@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useBaStore, baStore, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { Search, Plus, KeyRound, Copy, Trash2, Eye, EyeOff, BadgeCheck, X, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Search, Plus, KeyRound, Copy, Trash2, Eye, EyeOff, BadgeCheck, X, ChevronLeft, ChevronRight, Filter, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
@@ -30,6 +30,7 @@ function BAPage() {
   const [editing, setEditing] = useState<BA | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
+  const [resetConfirm, setResetConfirm] = useState<BA | null>(null);
 
   // Unique filter options
   const allStores = useMemo(() => [...new Set(bas.map((b) => b.store).filter(Boolean))].sort(), [bas]);
@@ -141,14 +142,7 @@ function BAPage() {
                 const shown = revealed.has(b.id);
                 return (
                   <tr key={b.id} className="border-b border-border hover:bg-white/[0.02] transition-colors">
-                    <Td className="font-medium text-foreground">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary grid place-items-center text-xs font-semibold shrink-0">
-                          {b.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
-                        </div>
-                        {b.name}
-                      </div>
-                    </Td>
+                    <Td className="font-medium text-foreground">{b.name}</Td>
                     <Td>{brandNames(b.brandIds)}</Td>
                     <Td>{b.gender}</Td>
                     <Td>{b.waNumber}</Td>
@@ -161,7 +155,7 @@ function BAPage() {
                         <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password disalin"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Salin">
                           <Copy className="h-3.5 w-3.5" />
                         </button>
-                        <button onClick={() => { const pw = baStore.regeneratePassword(b.id); toast.success(`Password baru: ${pw}`); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Generate ulang">
+                        <button onClick={() => setResetConfirm(b)} className="text-muted-foreground hover:text-foreground transition-colors" title="Reset password">
                           <KeyRound className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -225,6 +219,32 @@ function BAPage() {
         </div>
       </SectionCard>
 
+      {resetConfirm && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
+          <div className="w-full max-w-sm bg-background border border-border rounded-xl overflow-hidden">
+            <div className="p-5 border-b border-border">
+              <div className="text-sm font-semibold">Reset Password</div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Reset password untuk <span className="text-foreground font-medium">{resetConfirm.name}</span>? Password baru akan di-generate otomatis.
+              </p>
+            </div>
+            <div className="p-4 flex justify-end gap-2">
+              <button onClick={() => setResetConfirm(null)} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+              <button
+                onClick={() => {
+                  const pw = baStore.regeneratePassword(resetConfirm.id);
+                  toast.success(`Password baru: ${pw}`);
+                  setResetConfirm(null);
+                }}
+                className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {(showCreate || editing) && (
         <BAForm
           initial={editing}
@@ -254,7 +274,6 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
   const [name, setName] = useState(initial?.name || "");
   const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
   const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Wanita");
-  const [username, setUsername] = useState(initial?.username || "");
   const [password, setPassword] = useState(initial?.password || baStore.generatePassword());
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
   const [city, setCity] = useState(initial?.city || "");
@@ -267,7 +286,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
     onSubmit({
       name,
       gender,
-      username: username || name.toLowerCase().replace(/\s+/g, "."),
+      username: name.toLowerCase().replace(/\s+/g, "."),
       password,
       waNumber,
       brandIds: brandId ? [brandId] : [],
@@ -302,21 +321,27 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
               <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Masukkan no. WhatsApp.." className={inputCls} />
             </Field>
           </div>
-          <Field label="Username">
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Masukkan username (auto dari nama jika kosong).." className={inputCls} />
-          </Field>
           <Field label="Password (generated)">
-            <div className="flex gap-2">
-              <input value={password} readOnly placeholder="Password otomatis dibuat.." className={`${inputCls} font-mono bg-muted/40 cursor-not-allowed`} />
-              <button
-                type="button"
-                onClick={() => { navigator.clipboard.writeText(password); toast.success("Password disalin"); }}
-                className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]"
-                title="Salin password"
-              >
-                <Copy className="h-3.5 w-3.5" /> Copy
-              </button>
-              <button type="button" onClick={() => setPassword(baStore.generatePassword())} className="rounded-md border border-border px-2.5 text-sm hover:bg-white/[0.04]">Generate</button>
+            <div className="relative flex items-center">
+              <input value={password} readOnly placeholder="Password otomatis dibuat.." className={`${inputCls} font-mono bg-muted/40 cursor-not-allowed pr-16`} />
+              <div className="absolute right-1 flex items-center gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard.writeText(password); toast.success("Password disalin"); }}
+                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                  title="Salin password"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPassword(baStore.generatePassword())}
+                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                  title="Generate ulang"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
           </Field>
           <div className="grid grid-cols-2 gap-3">
