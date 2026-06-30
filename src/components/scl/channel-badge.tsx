@@ -1,9 +1,9 @@
-import whatsappAsset from "@/assets/whatsapp.png.asset.json";
+import whatsappAsset from "@/assets/whatsapp.png";
 
 export type ChannelKey = "whatsapp";
 
 const CHANNEL_MAP: Record<string, { src: string; label: string }> = {
-  whatsapp: { src: whatsappAsset.url, label: "WhatsApp" },
+  whatsapp: { src: whatsappAsset, label: "WhatsApp" },
 };
 
 /**

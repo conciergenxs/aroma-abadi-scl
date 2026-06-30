@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
-import sandLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
+import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
+import sandLogoAsset from "@/assets/aroma-abadi-logo-sand.png";
 import { Eye, EyeOff, Loader2, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -100,7 +100,7 @@ function AuthPage() {
 
           {/* Content */}
           <div className="relative z-10 flex h-full flex-col justify-between p-10">
-            <img src={sandLogoAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
+            <img src={sandLogoAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
             <div className="max-w-lg">
               <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05] text-sidebar-foreground">
                 Connect conversations.
@@ -128,7 +128,7 @@ function AuthPage() {
 
         <div className="relative w-full max-w-[440px]">
           {/* Logo — flower icon, top left */}
-          <img src={sclIconAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6 self-start" />
+          <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6 self-start" />
 
           {/* Tab switcher: SCL Admin vs Beauty Ambassador */}
           <div className="flex rounded-lg border border-border bg-card/40 p-1 mb-6 gap-1">

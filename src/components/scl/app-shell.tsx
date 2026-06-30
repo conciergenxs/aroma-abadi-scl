@@ -1,5 +1,5 @@
-import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
-import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
+import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
+import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -101,7 +101,7 @@ export function AppShell({
         <div className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}>
           <div className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}>
             <img
-              src={sclIconAsset.url}
+              src={sclIconAsset}
               alt="Aroma Abadi"
               className="h-[22px] w-auto object-contain"
               title="Aroma Abadi"
