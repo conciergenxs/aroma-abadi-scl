@@ -100,12 +100,22 @@ export function AppShell({
       >
         <div className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}>
           <div className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}>
-            <img
-              src={sclIconAsset}
-              alt="Aroma Abadi"
-              className="h-[22px] w-auto object-contain"
-              title="Aroma Abadi"
-            />
+            {expanded && (
+              <img
+                src={sclIconAsset}
+                alt="Aroma Abadi"
+                className="h-[22px] w-auto object-contain"
+                title="Aroma Abadi"
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
+              className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] transition-colors"
+            >
+              {expanded ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
+            </button>
           </div>
         </div>
 
