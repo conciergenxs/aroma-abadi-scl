@@ -87,7 +87,7 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const expanded = true;
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
@@ -106,29 +106,7 @@ export function AppShell({
               className="h-[22px] w-auto object-contain"
               title="Aroma Abadi"
             />
-            {expanded && (
-              <button
-                type="button"
-                onClick={() => setExpanded(false)}
-                aria-label="Collapse sidebar"
-                title="Collapse sidebar"
-                className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08]"
-              >
-                <ChevronsLeft className="h-4 w-4" />
-              </button>
-            )}
           </div>
-          {!expanded && (
-            <button
-              type="button"
-              onClick={() => setExpanded(true)}
-              aria-label="Expand sidebar"
-              title="Expand sidebar"
-              className="grid h-7 w-11 place-items-center rounded-md border border-sidebar-border/60 bg-white/[0.06] text-sidebar-foreground hover:bg-white/[0.12]"
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </button>
-          )}
         </div>
 
 
@@ -171,12 +149,6 @@ export function AppShell({
               />
             );
           })}
-          <SidebarButton
-            label={expanded ? "Collapse" : "Expand"}
-            Icon={expanded ? ChevronsLeft : ChevronsRight}
-            onClick={() => setExpanded((v) => !v)}
-            expanded={expanded}
-          />
         </nav>
       </aside>
 
