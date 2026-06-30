@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
-import sandLogoAsset from "@/assets/aroma-abadi-logo-sand.png";
 import { Eye, EyeOff, Loader2, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -100,7 +99,9 @@ function AuthPage() {
 
           {/* Content */}
           <div className="relative z-10 flex h-full flex-col justify-between p-10">
-            <img src={sandLogoAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
+            <div className="flex justify-end">
+              <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
+            </div>
             <div className="max-w-lg">
               <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05] text-sidebar-foreground">
                 Connect conversations.
@@ -127,26 +128,6 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-          {/* Logo — flower icon, top left */}
-          <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6 self-start" />
-
-          {/* Tab switcher: SCL Admin vs Beauty Ambassador */}
-          <div className="flex rounded-lg border border-border bg-card/40 p-1 mb-6 gap-1">
-            <button
-              type="button"
-              onClick={() => { setMode("signin"); setError(null); }}
-              className={`flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors ${mode !== "ba" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              SCL Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => { setMode("ba"); setError(null); }}
-              className={`flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors ${mode === "ba" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              Beauty Ambassador
-            </button>
-          </div>
 
           <div className="flex flex-col items-start">
             {mode === "signin" && (
