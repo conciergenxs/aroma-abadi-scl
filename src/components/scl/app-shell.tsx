@@ -87,7 +87,7 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const expanded = true;
+  const [expanded, setExpanded] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
