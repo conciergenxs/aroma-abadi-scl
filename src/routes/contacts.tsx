@@ -183,7 +183,7 @@ function ContactsPage() {
 
   return (
     <AppShell
-      title={activeList ? activeList.name : activeView === "mine" ? "My Contacts" : "Contacts"}
+      title={activeView === "mine" ? "Customer Contacts" : activeView === "ba" ? "BA Contacts" : activeList ? activeList.name : "All Contacts"}
       subtitle={
         activeList
           ? `${visibleContacts.length} contacts in this list`
@@ -204,7 +204,7 @@ function ContactsPage() {
               }`}
             >
               <span className="inline-flex items-center gap-2">
-                <Users className="h-3.5 w-3.5" /> All contacts
+                <Users className="h-3.5 w-3.5" /> All Contacts
               </span>
               <span className="text-[10px] text-muted-foreground">{contacts.length}</span>
             </button>
@@ -215,82 +215,48 @@ function ContactsPage() {
               }`}
             >
               <span className="inline-flex items-center gap-2">
-                <UserCircle2 className="h-3.5 w-3.5" /> My contacts
+                <UserCircle2 className="h-3.5 w-3.5" /> Customer Contacts
               </span>
               <span className="text-[10px] text-muted-foreground">{myCount}</span>
+            </button>
+            <button
+              onClick={() => { setActiveView("ba"); setSelected([]); }}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                activeView === "ba" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <UserCircle2 className="h-3.5 w-3.5" /> BA Contacts
+              </span>
             </button>
           </div>
 
           <div className="px-3 pt-2 pb-1 flex items-center justify-between">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Contact lists</div>
-            <button
-              onClick={() => setShowNewList((v) => !v)}
-              className="h-5 w-5 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
-              title="New list"
-            >
-              <Plus className="h-3 w-3" />
-            </button>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Brands</div>
           </div>
 
-          {showNewList && (
-            <div className="px-3 pb-2 flex items-center gap-1">
-              <input
-                autoFocus
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") createList(); if (e.key === "Escape") setShowNewList(false); }}
-                placeholder="List name"
-                className="h-7 flex-1 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-              />
-              <button onClick={createList} className="h-7 w-7 grid place-items-center rounded bg-primary text-primary-foreground hover:bg-primary/90">
-                <Check className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
-
           <div className="px-3 pb-3 space-y-0.5">
-            {lists.map((ls) => {
-              const count = contacts.filter((c) => c.listIds.includes(ls.id)).length;
-              const active = activeView === ls.id;
+            {["Sisley", "Rimmel", "Dolce&Gabbana", "Laura Mercier", "bareMinerals"].map((brandName) => {
+              const active = activeView === brandName;
               return (
-                <ListSidebarRow
-                  key={ls.id}
-                  list={ls}
-                  count={count}
-                  active={active}
-                  onSelect={() => { setActiveView(ls.id); setSelected([]); }}
-                  onRename={(name) => renameList(ls.id, name)}
-                  onDelete={() => deleteList(ls.id)}
-                />
+                <button
+                  key={brandName}
+                  onClick={() => { setActiveView(brandName); setSelected([]); }}
+                  className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                    active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-sm bg-primary/70 shrink-0" />
+                  {brandName}
+                </button>
               );
             })}
-            {lists.length === 0 && (
-              <div className="px-2 py-4 text-[11px] text-muted-foreground">No lists yet. Create one to group contacts for broadcasts.</div>
-            )}
           </div>
         </aside>
 
         {/* Main content */}
         <div className="flex flex-col min-h-0 overflow-hidden">
           <div className="p-5 pb-3 flex flex-wrap items-center gap-2 border-b border-border">
-            <div className="inline-flex items-center rounded-md border border-border bg-card/60 p-0.5">
-              <button
-                onClick={() => setViewMode("list")}
-                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
-                  viewMode === "list" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Rows3 className="h-3.5 w-3.5" /> List
-              </button>
-              <button
-                onClick={() => setViewMode("kanban")}
-                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs transition ${
-                  viewMode === "kanban" ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <LayoutGrid className="h-3.5 w-3.5" /> Kanban
-              </button>
-            </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input

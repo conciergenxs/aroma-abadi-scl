@@ -150,12 +150,12 @@ export const TEMPLATE_GROUP_DOT: Record<TemplateGroup["color"], string> = {
 };
 
 export const TEMPLATE_GROUP_BADGE: Record<TemplateGroup["color"], string> = {
-  indigo: "border-indigo-500/30 bg-indigo-500/10 text-indigo-300",
-  pink: "border-pink-500/30 bg-pink-500/10 text-pink-300",
-  emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-  amber: "border-amber-500/30 bg-amber-500/10 text-amber-300",
-  sky: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-  violet: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-  slate: "border-slate-500/30 bg-slate-500/10 text-slate-300",
-  rose: "border-rose-500/30 bg-rose-500/10 text-rose-300",
+  indigo: "border-indigo-500/60 bg-indigo-600/30 text-indigo-200 font-semibold",
+  pink: "border-pink-500/60 bg-pink-600/30 text-pink-200 font-semibold",
+  emerald: "border-emerald-500/60 bg-emerald-600/30 text-emerald-200 font-semibold",
+  amber: "border-amber-500/60 bg-amber-600/30 text-amber-200 font-semibold",
+  sky: "border-sky-500/60 bg-sky-600/30 text-sky-200 font-semibold",
+  violet: "border-violet-500/60 bg-violet-600/30 text-violet-200 font-semibold",
+  slate: "border-slate-400/60 bg-slate-500/30 text-slate-200 font-semibold",
+  rose: "border-rose-500/60 bg-rose-600/30 text-rose-200 font-semibold",
 };

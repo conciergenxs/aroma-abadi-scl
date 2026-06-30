@@ -108,7 +108,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               key={b.id}
               onClick={() => onOpen(b)}
-              className="group text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
+              className="group card-hover text-left rounded-xl border border-border bg-card/60 hover:bg-card transition-colors p-4 flex flex-col gap-3"
             >
               <div className="h-48 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
                 {b.logoUrl ? (
@@ -278,72 +278,154 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku }: {
         </div>
       </SectionCard>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title="Category Knowledge" description="Playbook & panduan untuk kategori produk ini.">
-          <div className="p-4">
-            <MultiFileUploader
-              files={category.categoryKnowledge}
-              onAdd={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
-              onRemove={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
-              label="Upload Category Knowledge"
+      {/* 30% / 70% layout */}
+      <div className="flex gap-4 min-h-0">
+        {/* LEFT 30% — Category Knowledge */}
+        <div className="w-[30%] shrink-0">
+          <SectionCard title="Category Knowledge" description="Playbook & panduan kategori.">
+            <div className="p-4">
+              <MultiFileUploader
+                files={category.categoryKnowledge}
+                onAdd={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
+                onRemove={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
+                label="Upload Category Knowledge"
+              />
+            </div>
+          </SectionCard>
+        </div>
+
+        {/* RIGHT 70% — SKUs */}
+        <div className="flex-1 min-w-0">
+          <SectionCard
+            title="SKUs"
+            description="Pilih SKU dari database atau tambah baru."
+            action={<SkuSearchSelect brandId={brand.id} categoryId={category.id} onSelect={onEditSku} onAdd={onAddSku} />}
+          >
+            <ul className="divide-y divide-border">
+              {category.skus.map((s) => (
+                <li key={s.id} className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                      {s.photoUrl ? <img src={s.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="text-sm font-medium">{s.name}</div>
+                        <span className="text-xs text-muted-foreground">{s.code}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{s.description}</div>
+                      <div className="mt-2 flex items-center gap-3 text-sm">
+                        <span className="font-semibold">{formatIDR(s.price)}</span>
+                        <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04] inline-flex items-center gap-1"><Pencil className="h-3.5 w-3.5" /> Edit</button>
+                      <button
+                        onClick={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
+                        className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10" title="Hapus"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <Accordion type="single" collapsible className="mt-3">
+                    <AccordionItem value={s.id} className="border-border">
+                      <AccordionTrigger className="text-sm hover:no-underline py-2">
+                        <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({s.knowledgeCards.length})</span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <KnowledgeCards brandId={brand.id} categoryId={category.id} sku={s} />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </li>
+              ))}
+              {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">Belum ada SKU. Gunakan tombol di atas untuk menambah.</li>}
+            </ul>
+          </SectionCard>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Searchable SKU select (search from existing + add new) */
+function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: string; categoryId: string; onSelect: (sku: SKU) => void; onAdd: () => void }) {
+  void brandId; void categoryId; void onSelect;
+  const { brands } = useSkuStore();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  // Collect all SKUs across all brands/categories as searchable pool
+  const allSkus = useMemo(() => {
+    const list: { sku: SKU; brandName: string; catName: string }[] = [];
+    for (const b of brands) {
+      for (const c of b.categories) {
+        for (const s of c.skus) {
+          list.push({ sku: s, brandName: b.name, catName: c.name });
+        }
+      }
+    }
+    return list;
+  }, [brands]);
+
+  const filtered = query
+    ? allSkus.filter((x) => x.sku.name.toLowerCase().includes(query.toLowerCase()) || x.sku.code.toLowerCase().includes(query.toLowerCase()))
+    : allSkus.slice(0, 8);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium hover:opacity-90"
+      >
+        <Plus className="h-3.5 w-3.5" /> Tambah SKU
+      </button>
+      {open && (
+        <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden">
+          <div className="p-2 border-b border-border">
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Cari SKU dari database..."
+              className="w-full h-8 rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
-        </SectionCard>
-
-        <SectionCard
-          title="SKUs"
-          description="Klik knowledge cards untuk expand."
-          action={
-            <button onClick={onAddSku} className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium hover:opacity-90">
-              <Plus className="h-3.5 w-3.5" /> SKU
-            </button>
-          }
-        >
-          <ul className="divide-y divide-border">
-            {category.skus.map((s) => (
-              <li key={s.id} className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                    {s.photoUrl ? <img src={s.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
+          <ul className="max-h-52 overflow-y-auto py-1">
+            {filtered.map(({ sku, brandName, catName }) => (
+              <li key={sku.id}>
+                <button
+                  type="button"
+                  onClick={() => { onSelect(sku); setOpen(false); setQuery(""); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/[0.06] text-sm"
+                >
+                  <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                    {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-4 w-4 text-primary" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="text-sm font-medium">{s.name}</div>
-                      <span className="text-xs text-muted-foreground">{s.code}</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{s.description}</div>
-                    <div className="mt-2 flex items-center gap-3 text-sm">
-                      <span className="font-semibold">{formatIDR(s.price)}</span>
-                      <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
-                    </div>
+                    <div className="truncate font-medium">{sku.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{brandName} · {catName}</div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04] inline-flex items-center gap-1"><Pencil className="h-3.5 w-3.5" /> Edit</button>
-                    <button
-                      onClick={() => { if (confirm(`Hapus SKU "${s.name}"?`)) { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); } }}
-                      className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10" title="Hapus"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <Accordion type="single" collapsible className="mt-3">
-                  <AccordionItem value={s.id} className="border-border">
-                    <AccordionTrigger className="text-sm hover:no-underline py-2">
-                      <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({s.knowledgeCards.length})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <KnowledgeCards brandId={brand.id} categoryId={category.id} sku={s} />
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+                </button>
               </li>
             ))}
-            {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">Belum ada SKU.</li>}
+            {filtered.length === 0 && <li className="px-3 py-4 text-center text-sm text-muted-foreground">Tidak ditemukan</li>}
           </ul>
-        </SectionCard>
-      </div>
+          <div className="border-t border-border p-2">
+            <button
+              type="button"
+              onClick={() => { onAdd(); setOpen(false); }}
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-dashed border-primary/50 text-primary px-2.5 h-8 text-sm hover:bg-primary/5"
+            >
+              <Plus className="h-3.5 w-3.5" /> Buat SKU Baru
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -356,13 +438,15 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
       <div className="flex items-center justify-end mb-2">
         <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Card</button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {sku.knowledgeCards.map((k) => (
-          <div key={k.id} className="rounded-md border border-border bg-card/40 overflow-hidden">
+      {/* Horizontal scroll knowledge cards with numbered labels */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+        {sku.knowledgeCards.map((k, idx) => (
+          <div key={k.id} className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden">
             {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />}
             <div className="p-3">
-              <div className="text-sm font-medium">{k.title}</div>
-              <div className="text-sm text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Knowledge {idx + 1}</div>
+              <div className="text-sm font-medium line-clamp-2">{k.title}</div>
+              <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
               <div className="mt-2 flex items-center justify-end gap-2">
                 <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground">Edit</button>
                 <span className="text-xs text-muted-foreground">·</span>
@@ -371,7 +455,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
             </div>
           </div>
         ))}
-        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic col-span-full">Belum ada knowledge card.</div>}
+        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">Belum ada knowledge card.</div>}
       </div>
       {showForm && (
         <KnowledgeCardForm

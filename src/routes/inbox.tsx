@@ -30,7 +30,7 @@ export const Route = createFileRoute("/inbox")({
   component: InboxPage,
 });
 
-type InboxView = "my" | "collaborations" | "mentions" | "unassigned";
+type InboxView = "my" | "collaborations" | "mentions" | "unassigned" | "ba";
 type TeamFilter = "all" | string;
 type ActiveFilter =
   | { kind: "view"; value: InboxView }
@@ -43,6 +43,7 @@ const VIEWS: { id: InboxView; label: string; icon: typeof InboxIcon }[] = [
   { id: "collaborations", label: "Collaborations", icon: Users },
   { id: "mentions", label: "Mentions", icon: AtSign },
   { id: "unassigned", label: "Unassigned", icon: UserX },
+  { id: "ba", label: "BA Inbox", icon: Users },
 ];
 
 /** Shared SCL team / user directory used by owner & collaborator selectors. */
@@ -205,6 +206,10 @@ function InboxPage() {
   };
   const [composerMode, setComposerMode] = useState<"reply" | "note">("reply");
   const [replyText, setReplyText] = useState("");
+  // Autopilot state: per conversation
+  const [autopilotByConvo, setAutopilotByConvo] = useState<Record<string, boolean>>({});
+  const isAutopilot = (id: string) => autopilotByConvo[id] !== false; // default = autopilot ON
+  const setAutopilot = (id: string, v: boolean) => setAutopilotByConvo((p) => ({ ...p, [id]: v }));
   const [noteText, setNoteText] = useState("");
   const [notesByConvo, setNotesByConvo] = useState<Record<string, InternalNote[]>>({});
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
@@ -960,6 +965,21 @@ function InboxPage() {
                   </button>
                 </div>
               </div>
+            ) : isAutopilot(active.id) ? (
+              /* Autopilot mode: show Takeover button instead of composer */
+              <div className="rounded-xl border border-border bg-card/30 px-4 py-3 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Bot className="h-4 w-4 text-primary" />
+                  <span>Arma sedang membalas percakapan ini secara otomatis.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAutopilot(active.id, false)}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-semibold hover:bg-primary/90 transition shrink-0"
+                >
+                  Takeover
+                </button>
+              </div>
             ) : composerMode === "reply" ? (
               <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
                 {replyTarget && (
@@ -992,7 +1012,7 @@ function InboxPage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitReply(); }
                   }}
-                  placeholder={`Reply on $WhatsApp…`}
+                  placeholder="Reply as Arma.."
                   className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
                 />
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
@@ -1012,13 +1032,22 @@ function InboxPage() {
                       <StickyNote className="h-3.5 w-3.5" /> Internal note
                     </button>
                   </div>
-                  <button
-                    onClick={submitReply}
-                    disabled={!replyText.trim()}
-                    className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"
-                  >
-                    <Send className="h-3.5 w-3.5" /> Send
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAutopilot(active.id, true)}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition"
+                    >
+                      <Bot className="h-3.5 w-3.5" /> Back to Autopilot
+                    </button>
+                    <button
+                      onClick={submitReply}
+                      disabled={!replyText.trim()}
+                      className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shadow-sm"
+                    >
+                      <Send className="h-3.5 w-3.5" /> Send
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

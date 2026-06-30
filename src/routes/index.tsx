@@ -11,7 +11,7 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Aroma Abadi" },
+      { title: "Overview — Aroma Abadi" },
       { name: "description", content: "Platform engagement WhatsApp untuk Aroma Abadi — makeup & beauty." },
       { property: "og:title", content: "Aroma Abadi — SCL" },
       { property: "og:description", content: "Kelola percakapan WhatsApp pelanggan Aroma Abadi dalam satu workspace." },
@@ -35,37 +35,24 @@ const channelEngagement = [
 function Dashboard() {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   return (
-    <AppShell title="Dashboard" subtitle={`${today} · Aroma Abadi workspace`}>
+    <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
       <div className="space-y-6">
-        {/* Welcome */}
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card/80 to-card/30 p-6 glass">
-          <div className="absolute inset-0 scl-grid-bg opacity-50 pointer-events-none" />
-          <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-          <div className="relative flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Selamat datang kembali</p>
-              <h2 className="text-2xl font-semibold tracking-tight mt-1">Halo, Aria.</h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                Tim kamu menangani 8,212 percakapan minggu ini — 92% terbalas di bawah 4 menit.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
-                Open Inbox
-              </Link>
-              <Link to="/broadcasts" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
-                New Broadcast
-              </Link>
-            </div>
-          </div>
+        {/* Quick actions */}
+        <div className="flex items-center gap-2">
+          <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
+            Open Inbox
+          </Link>
+          <Link to="/broadcasts" className="rounded-md border border-border bg-card/60 px-3 py-2 text-xs font-medium hover:bg-card transition">
+            New Broadcast
+          </Link>
         </div>
 
         {/* Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 stagger">
           {metrics.map((m) => {
             const Icon = m.icon;
             return (
-              <div key={m.label} className="rounded-xl border border-border bg-card/60 p-5 glass relative overflow-hidden">
+              <div key={m.label} className="card-hover rounded-xl border border-border bg-card/60 p-5 glass relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{m.label}</span>
                   <div className="h-7 w-7 grid place-items-center rounded-md bg-white/[0.04] border border-border">

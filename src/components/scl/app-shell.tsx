@@ -1,7 +1,17 @@
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
 import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   LayoutDashboard,
   Inbox,
@@ -38,7 +48,6 @@ type NavItem = {
     | "/contacts"
     | "/broadcasts"
     | "/templates"
-    | "/channels"
     | "/transactions"
     | "/sku"
     | "/ba"
@@ -49,15 +58,14 @@ type NavItem = {
   badge?: number;
 };
 const topNav: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: 12 },
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/sku", label: "SKU & Knowledge", icon: Package },
   { to: "/transactions", label: "Transactions", icon: Receipt },
-  { to: "/ba", label: "Brand Ambassadors", icon: BadgeCheck },
-  { to: "/channels", label: "Channels", icon: Radio },
+  { to: "/ba", label: "Beauty Ambassadors", icon: BadgeCheck },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings },
@@ -77,8 +85,10 @@ export function AppShell({
   noPadding?: boolean;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
@@ -213,7 +223,10 @@ export function AppShell({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  onClick={() => setLogoutOpen(true)}
+                >
                   <LogOut className="h-4 w-4" />
                   Logout
                 </DropdownMenuItem>
@@ -222,9 +235,32 @@ export function AppShell({
           </div>
         </header>
 
-        <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto" : "flex-1 p-6 overflow-y-auto"}>{children}</main>
+        <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto page-enter" : "flex-1 p-6 overflow-y-auto page-enter"}>{children}</main>
       </div>
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
+
+      <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Keluar dari workspace?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Kamu akan logout dari Aroma Abadi SCL. Pastikan semua pekerjaan sudah tersimpan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (typeof window !== "undefined") window.localStorage.removeItem("scl_authed");
+                navigate({ to: "/auth" });
+              }}
+            >
+              Ya, Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

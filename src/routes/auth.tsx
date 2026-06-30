@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import sclLogoAsset from "@/assets/aroma-abadi-logo.png.asset.json";
+import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png.asset.json";
 import sandLogoAsset from "@/assets/aroma-abadi-logo-sand.png.asset.json";
-import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -127,7 +127,26 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-          <img src={sclLogoAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6" />
+          {/* Logo — flower icon, top left */}
+          <img src={sclIconAsset.url} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-6 self-start" />
+
+          {/* Tab switcher: SCL Admin vs Beauty Ambassador */}
+          <div className="flex rounded-lg border border-border bg-card/40 p-1 mb-6 gap-1">
+            <button
+              type="button"
+              onClick={() => { setMode("signin"); setError(null); }}
+              className={`flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors ${mode !== "ba" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              SCL Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode("ba"); setError(null); }}
+              className={`flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors ${mode === "ba" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Beauty Ambassador
+            </button>
+          </div>
 
           <div className="flex flex-col items-start">
             {mode === "signin" && (
@@ -135,6 +154,14 @@ function AuthPage() {
                 <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Sign in to continue managing your customer conversations.
+                </p>
+              </>
+            )}
+            {mode === "ba" && (
+              <>
+                <h2 className="text-2xl font-semibold tracking-tight">Beauty Ambassador Login</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Masuk menggunakan nomor WhatsApp dan password kamu.
                 </p>
               </>
             )}
@@ -180,8 +207,74 @@ function AuthPage() {
             )}
           </div>
 
-          {/* Forms */}
-          {mode !== "forgot-sent" && (
+          {/* BA Login Form */}
+          {mode === "ba" && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setError(null);
+                if (!email.trim()) return setError("Masukkan nomor WhatsApp.");
+                if (password.length < 4) return setError("Password minimal 4 karakter.");
+                setLoading(true);
+                await new Promise((r) => setTimeout(r, 700));
+                setLoading(false);
+                if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
+                toast.success("Selamat datang, Beauty Ambassador!");
+                navigate({ to: "/" });
+              }}
+              className="mt-6 space-y-4"
+            >
+              <Field label="Nomor WhatsApp">
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="tel"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="+62 812 3456 7890"
+                    className={`${inputCls} pl-9`}
+                    autoComplete="tel"
+                  />
+                </div>
+              </Field>
+              <Field label="Password">
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className={`${inputCls} pr-10`}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </Field>
+              {error && (
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                  {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Masuk…" : "Masuk"}
+              </button>
+            </form>
+          )}
+
+          {/* SCL Admin Forms */}
+          {mode !== "forgot-sent" && mode !== "ba" && (
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               {mode === "signup" && (
                 <>
@@ -210,7 +303,7 @@ function AuthPage() {
 
               <Field label="Email Address">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     type="email"
                     value={email}
