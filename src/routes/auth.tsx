@@ -99,9 +99,7 @@ function AuthPage() {
 
           {/* Content */}
           <div className="relative z-10 flex h-full flex-col justify-between p-10">
-            <div className="flex justify-end">
-              <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
-            </div>
+            <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
             <div className="max-w-lg">
               <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05] text-sidebar-foreground">
                 Connect conversations.
