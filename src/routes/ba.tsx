@@ -220,8 +220,8 @@ function BAPage() {
       </SectionCard>
 
       {resetConfirm && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
-          <div className="w-full max-w-sm bg-background border border-border rounded-xl overflow-hidden">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 modal-backdrop">
+          <div className="w-full max-w-sm bg-background border border-border rounded-xl overflow-hidden modal-content">
             <div className="p-5 border-b border-border">
               <div className="text-sm font-semibold">Reset Password</div>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -275,6 +275,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
   const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
   const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Wanita");
   const [password, setPassword] = useState(initial?.password || baStore.generatePassword());
+  const [spinning, setSpinning] = useState(false);
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
   const [city, setCity] = useState(initial?.city || "");
   const [store, setStore] = useState(initial?.store || "");
@@ -297,9 +298,9 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-50 flex modal-backdrop">
       <div className="flex-1 bg-black/40" onClick={onClose} />
-      <form onSubmit={submit} className="w-full max-w-md bg-background border-l border-border overflow-y-auto">
+      <form onSubmit={submit} className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right">
         <div className="p-5 border-b border-border flex items-start justify-between">
           <div>
             <div className="inline-flex items-center gap-2 text-sm text-primary mb-1"><BadgeCheck className="h-3.5 w-3.5" /> Beauty Ambassador</div>
@@ -335,11 +336,15 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPassword(baStore.generatePassword())}
+                  onClick={() => {
+                    setSpinning(true);
+                    setPassword(baStore.generatePassword());
+                    setTimeout(() => setSpinning(false), 420);
+                  }}
                   className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
                   title="Generate ulang"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" />
+                  <RefreshCw className={`h-3.5 w-3.5 ${spinning ? "animate-spin-once" : ""}`} />
                 </button>
               </div>
             </div>

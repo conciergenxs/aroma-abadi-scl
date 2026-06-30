@@ -667,7 +667,7 @@ function InboxPage() {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto stagger">
             {sortedVisible.length === 0 && (
               <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
                 No conversations match the current filters.
@@ -685,10 +685,10 @@ function InboxPage() {
                 <button
                   key={c.id}
                   onClick={() => setActiveId(c.id)}
-                  className={`w-full text-left flex gap-3 px-3.5 py-3 border-b border-border/40 transition ${
+                  className={`conv-item w-full text-left flex gap-3 px-3.5 py-3 border-b border-border/40 transition-all duration-150 ${
                     sel
-                      ? "bg-primary/10 border-l-2 border-l-primary"
-                      : "border-l-2 border-l-transparent hover:bg-white/[0.02]"
+                      ? "active-conv bg-primary/10 border-l-2 border-l-primary"
+                      : "border-l-2 border-l-transparent hover:bg-white/[0.03]"
                   }`}
                 >
                   <div className="relative shrink-0 h-10 w-10 self-start">

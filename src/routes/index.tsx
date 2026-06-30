@@ -62,7 +62,7 @@ function Dashboard() {
                     <Icon className="h-3.5 w-3.5 text-muted-foreground" />
                   </div>
                 </div>
-                <div className="mt-3 text-2xl font-semibold tracking-tight">{m.value}</div>
+                <div className="mt-3 text-2xl font-semibold tracking-tight stat-value">{m.value}</div>
                 <div className="mt-1 flex items-center gap-1 text-[11px]">
                   <span className={`inline-flex items-center gap-0.5 ${m.up ? "text-emerald-400" : "text-rose-400"}`}>
                     {m.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}

@@ -222,7 +222,7 @@ function TemplatesPage() {
                   <th className="px-4 py-3 text-left font-medium">Last updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="stagger divide-y divide-border">
                 {filtered.map((t) => {
                   const group = groups.find((g) => g.id === t.groupId);
                   const isStar = starred.includes(t.id);
@@ -231,7 +231,7 @@ function TemplatesPage() {
                     <tr
                       key={t.id}
                       onClick={() => setDetail(t)}
-                      className="hover:bg-white/[0.02] cursor-pointer"
+                      className="hover:bg-white/[0.025] cursor-pointer transition-colors"
                     >
                       <td
                         className="px-4 py-3"

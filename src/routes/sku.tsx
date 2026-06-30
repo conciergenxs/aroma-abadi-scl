@@ -102,7 +102,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
       </div>
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger">
         {visible.map((b) => {
           const skuCount = b.categories.reduce((a, c) => a + c.skus.length, 0);
           return (
@@ -168,7 +168,7 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
           <button onClick={onBack} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
             <Home className="h-3.5 w-3.5" /> Brands
           </button>
@@ -265,7 +265,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
           <button onClick={onBackToBrands} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
             <Home className="h-3.5 w-3.5" /> Brands
           </button>

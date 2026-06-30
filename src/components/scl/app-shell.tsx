@@ -285,10 +285,10 @@ function SidebarLink({
       <Link
         to={to}
         aria-label={label}
-        className={`relative flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm ${
+        className={`relative flex items-center gap-3 h-10 px-2.5 rounded-lg text-sm nav-item ${active ? "active" : ""} transition-all duration-150 ${
           active
-            ? "bg-sidebar-accent text-sidebar-accent-foreground border border-white/10"
-            : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+            ? "bg-sidebar-accent text-sidebar-accent-foreground border border-white/10 shadow-[inset_0_1px_0_oklch(1_0_0/10%)]"
+            : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent hover:translate-x-0.5"
         }`}
       >
         <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-sidebar-primary" : ""}`} />

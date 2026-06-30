@@ -109,9 +109,9 @@ function TransactionsPage() {
                   <Th>Status</Th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="stagger">
                 {filtered.map((t) => (
-                  <tr key={t.id} className="border-b border-border hover:bg-white/[0.02] cursor-pointer align-top" onClick={() => setOpen(t)}>
+                  <tr key={t.id} className="border-b border-border hover:bg-white/[0.025] cursor-pointer align-top transition-colors" onClick={() => setOpen(t)}>
                     <Td className="font-medium text-foreground">{t.invoice}</Td>
                     <Td>{new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</Td>
                     <Td>{t.customerName}</Td>
@@ -180,7 +180,7 @@ function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40" onClick={onClose} />
-      <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto">
+      <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right">
         <div className="p-5 border-b border-border flex items-start justify-between gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
