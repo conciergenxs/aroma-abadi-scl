@@ -393,8 +393,8 @@ function AuthPage() {
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
             By continuing you agree to our{" "}
-            <Link to="/" className="hover:text-foreground">Terms</Link> &{" "}
-            <Link to="/" className="hover:text-foreground">Privacy Policy</Link>.
+            <a href="https://aroma-abadi-scl.vercel.app/" className="text-primary hover:underline">Terms</a> &{" "}
+            <a href="https://aroma-abadi-scl.vercel.app/" className="text-[oklch(0.62_0.17_40)] hover:underline">Privacy Policy</a>.
           </p>
         </div>
       </main>
