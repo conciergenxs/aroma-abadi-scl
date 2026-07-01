@@ -91,7 +91,8 @@ function TransactionsPage() {
                 className="h-8 w-72 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            <Select value={city} onChange={setCity} options={[{ value: "all", label: "Semua Kota" }, ...cities.map((c) => ({ value: c, label: c }))]} />
+            <Select value={city} onChange={handleCityChange} options={[{ value: "all", label: "Semua Kota" }, ...cities.map((c) => ({ value: c, label: c }))]} />
+            <Select value={store} onChange={setStore} options={[{ value: "all", label: "Semua Store" }, ...stores.map((s) => ({ value: s, label: s }))]} />
             <Select value={brand} onChange={setBrand} options={[{ value: "all", label: "Semua Brand" }, ...brands.map((c) => ({ value: c, label: c }))]} />
             <Select value={status} onChange={setStatus} options={[
               { value: "all", label: "Semua Status" },
