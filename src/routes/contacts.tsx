@@ -490,11 +490,13 @@ function ContactsTable({
               <td className={`${tdCls} font-medium text-foreground`}>{c.name}</td>
               <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
               <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
-              <td className={`${tdCls} tabular-nums`}>
-                {c.pointBalance != null && c.pointBalance > 0
-                  ? <span className="text-foreground font-medium">{c.pointBalance.toLocaleString("id-ID")} pts</span>
-                  : <span className="text-muted-foreground">—</span>}
-              </td>
+              {!isBaView && (
+                <td className={`${tdCls} tabular-nums`}>
+                  {c.pointBalance != null && c.pointBalance > 0
+                    ? <span className="text-foreground font-medium">{c.pointBalance.toLocaleString("id-ID")} pts</span>
+                    : <span className="text-muted-foreground">—</span>}
+                </td>
+              )}
               {isBaView && <>
                 <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>
                 <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
