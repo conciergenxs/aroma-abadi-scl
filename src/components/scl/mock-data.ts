@@ -143,6 +143,30 @@ export const threadsByContact: Record<string, Message[]> = {
     { id: "m2", from: "me", text: "Siap! Aku kirim katalog corporate + harga bulk sekarang.", time: "Yesterday", status: "read" },
     { id: "m3", from: "them", text: "Oke, aku loop in tim procurement kami.", time: "Yesterday" },
   ],
+  // BA Inbox threads
+  c4: [
+    { id: "m1", from: "them", text: "Halo Arma! Gimana cara handle customer yang tanya perbedaan Sisley vs Rimmel?", time: "13:10" },
+    { id: "m2", from: "me", text: "Halo Dewi! Sisley lebih premium & fokus ke skincare-makeup hybrid, cocok untuk kulit mature. Rimmel lebih playful & terjangkau, target younger crowd. Kalau customernya 25–35 tahun, sarankan Sisley untuk daily luxury. Mau script lengkapnya?", time: "13:12", status: "read" },
+    { id: "m3", from: "them", text: "Mau dong Arma, makasih banyak!", time: "13:13" },
+  ],
+  c8: [
+    { id: "m1", from: "them", text: "Arma tolong jelasin kandungan Glow Serum buat aku presentasiin ke customer.", time: "Yesterday" },
+    { id: "m2", from: "me", text: "Glow Serum mengandung: Niacinamide 5% (pori-pori & cerah), Hyaluronic Acid (hidrasi), Vitamin C stabilized (antioksidan), dan Peptide Complex (anti-aging). Key selling point: cocok untuk semua skin type, non-comedogenic, hasil terlihat dalam 2 minggu.", time: "Yesterday", status: "read" },
+  ],
+  c23: [
+    { id: "m1", from: "them", text: "Arma, shade berapa yang paling laris bulan ini?", time: "14:30" },
+    { id: "m2", from: "me", text: "Bulan ini top seller: Velvet Rouge Shade 03 (Rosewood), Shade 07 (Burgundy), dan Shade 11 (Nude Mauve). Shade 03 paling cepat habis, stok di gudang tinggal 48 pcs.", time: "14:31", status: "read" },
+    { id: "m3", from: "them", text: "Oke noted! Aku rekomendasi yang itu dulu ke customer.", time: "14:32" },
+  ],
+  c24: [
+    { id: "m1", from: "them", text: "Cara jelasin benefit Laura Mercier ke customer baru gimana Arma?", time: "13:45" },
+    { id: "m2", from: "me", text: "Untuk customer baru Laura Mercier: fokus pada 3 hal — (1) iconic Translucent Setting Powder yang viral, (2) Kaviar Stick untuk on-the-go touch up, (3) Flawless Lumiere Foundation yang buildable. Opening yang works: 'Kalau mau tampilan natural tapi tahan lama, Laura Mercier adalah jawabannya.'", time: "13:47", status: "delivered" },
+  ],
+  c27: [
+    { id: "m1", from: "them", text: "Diskon event 12.12 berlaku untuk produk apa aja Arma?", time: "Yesterday" },
+    { id: "m2", from: "me", text: "12.12 berlaku untuk semua SKU kecuali limited edition & new arrival (< 30 hari). Diskon: 20% untuk single item, 30% untuk bundle 3 produk. Kode promo: ARMA1212. Valid 12 Des 00:00–23:59.", time: "Yesterday", status: "read" },
+    { id: "m3", from: "them", text: "Siap Arma! Aku info ke semua customer aku.", time: "Yesterday" },
+  ],
 };
 
 export type Conversation = {
