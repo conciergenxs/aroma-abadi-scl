@@ -498,8 +498,8 @@ function ContactsTable({
                 <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={selected.includes(c.id)} onChange={() => onToggle(c.id)} />
               </td>
               <td className={`${tdCls} font-medium text-foreground`}>{c.name}</td>
-              {isAllOrBrand && (
-                <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
+              {(isAllOrBrand || isMineView) && (
+                <td className={tdCls}>{c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
               )}
               <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
               <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
