@@ -333,7 +333,8 @@ function InboxPage() {
       if (activeFilter.kind === "view") {
         const v = activeFilter.value;
         // "all" = show everything, "my" = consumer (non-BA), "ba" = BA inbox
-        if (v === "my") { /* show all consumer convos */ }
+        if (v === "my" && ct.labelIds.includes("lb-ba")) return false;
+        if (v === "ba" && !ct.labelIds.includes("lb-ba")) return false;
       } else if (activeFilter.kind === "stage") {
         if (ct.lifecycleStage !== activeFilter.value) return false;
       } else if (activeFilter.kind === "team") {
