@@ -78,46 +78,69 @@ function ContactDetailPage() {
   const contactLists = lists.filter((l) => contact.listIds.includes(l.id));
   const contactActivities = activities[contact.id] ?? [];
 
-  const derivedActivities = useMemo<ContactActivity[]>(() => {
-    if (contactActivities.length > 0) return contactActivities;
-    const base = contact.stageEnteredAt ?? new Date().toISOString();
-    const out: ContactActivity[] = [];
-    if (contact.lifecycleStage) {
-      out.push({
-        id: `d-stage-${contact.id}`,
+  // Transactions linked to this contact
+  const contactTransactions = useMemo(
+    () => transactions.filter((t) => t.customerId === contact.id),
+    [transactions, contact.id],
+  );
+
+  // Transaction activities — one entry per transaction
+  const txActivities = useMemo<ContactActivity[]>(
+    () =>
+      contactTransactions.map((t) => ({
+        id: `tx-act-${t.id}`,
         contactId: contact.id,
-        type: "lifecycle",
-        message: `Lifecycle set to ${contact.lifecycleStage}`,
+        type: "transaction" as const,
+        message: `Transaksi ${t.invoice} · ${t.brandName} · ${formatIDR(t.total)} · ${t.status}\n${t.items.map((i) => `${i.skuName} ×${i.qty}`).join(", ")}`,
+        at: t.date,
+      })),
+    [contactTransactions, contact.id],
+  );
+
+  const derivedActivities = useMemo<ContactActivity[]>(() => {
+    const base = contact.stageEnteredAt ?? new Date().toISOString();
+    const out: ContactActivity[] = [...contactActivities];
+    if (out.length === 0) {
+      if (contact.lifecycleStage) {
+        out.push({
+          id: `d-stage-${contact.id}`,
+          contactId: contact.id,
+          type: "lifecycle",
+          message: `Lifecycle set to ${contact.lifecycleStage}`,
+          at: base,
+        });
+      }
+      contactLabels.forEach((l, i) =>
+        out.push({
+          id: `d-lb-${contact.id}-${i}`,
+          contactId: contact.id,
+          type: "label_added",
+          message: `Added label "${l.name}"`,
+          at: base,
+        }),
+      );
+      contactLists.forEach((l, i) =>
+        out.push({
+          id: `d-ls-${contact.id}-${i}`,
+          contactId: contact.id,
+          type: "list_added",
+          message: `Added to list "${l.name}"`,
+          at: base,
+        }),
+      );
+      out.push({
+        id: `d-created-${contact.id}`,
+        contactId: contact.id,
+        type: "created",
+        message: "Contact created",
         at: base,
       });
     }
-    contactLabels.forEach((l, i) =>
-      out.push({
-        id: `d-lb-${contact.id}-${i}`,
-        contactId: contact.id,
-        type: "label_added",
-        message: `Added label "${l.name}"`,
-        at: base,
-      }),
-    );
-    contactLists.forEach((l, i) =>
-      out.push({
-        id: `d-ls-${contact.id}-${i}`,
-        contactId: contact.id,
-        type: "list_added",
-        message: `Added to list "${l.name}"`,
-        at: base,
-      }),
-    );
-    out.push({
-      id: `d-created-${contact.id}`,
-      contactId: contact.id,
-      type: "created",
-      message: "Contact created",
-      at: base,
-    });
-    return out;
-  }, [contact, contactActivities, contactLabels, contactLists]);
+    // Merge transaction history
+    const merged = [...out, ...txActivities];
+    merged.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+    return merged;
+  }, [contact, contactActivities, contactLabels, contactLists, txActivities]);
 
   const handleDelete = () => {
     if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
