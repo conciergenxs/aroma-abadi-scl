@@ -466,7 +466,7 @@ function ContactsTable({
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
 
   // colSpan for empty state
-  const colSpan = isBaView ? 9 : isMineView ? 5 : 5; // all/brand: checkbox+name+gender+wa+type = 5
+  const colSpan = isBaView ? 9 : isMineView ? 6 : 5; // mine: checkbox+name+gender+wa+type+pts = 6
 
   return (
     <table className="min-w-full text-sm">
@@ -476,7 +476,7 @@ function ContactsTable({
             <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={allSelected} onChange={onSelectAll} />
           </th>
           <th className={thCls}>Name</th>
-          {isAllOrBrand && <th className={thCls}>Gender</th>}
+          {(isAllOrBrand || isMineView) && <th className={thCls}>Gender</th>}
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
           {isMineView && <th className={thCls}>Point Balance</th>}
