@@ -65,7 +65,7 @@ export type Contact = {
   pointBalance?: number;
 };
 
-const avatars = ["PA", "BP", "SR", "DL", "RM", "IP", "AS", "MK", "CH", "RW", "BH", "NS", "AF", "YP", "TH", "LW", "GS", "NK", "FR", "ZA", "MR", "DP", "HS", "IA", "WS", "KN", "SB", "RP", "OL", "EM"];
+const avatars = ["PA", "BP", "SR", "DL", "RM", "IP", "AS", "MK", "CH", "RW", "BH", "NS", "AF", "YP", "TH", "LW", "GS", "NK", "FR", "ZA", "MR", "DP", "HS", "IA", "WS", "KN", "SB", "RP", "OL", "EM", "MH", "FA", "NP", "BR", "CS", "AW", "FN", "DK"];
 
 export const initialLabels: ContactLabel[] = [
   { id: "lb-vip", name: "VIP Customer", color: "amber" },
