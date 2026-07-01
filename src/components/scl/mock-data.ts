@@ -69,7 +69,7 @@ export const initialLabels: ContactLabel[] = [
   { id: "lb-vip", name: "VIP Customer", color: "amber" },
   { id: "lb-beauty-club", name: "Beauty Club", color: "pink" },
   { id: "lb-reseller", name: "Reseller", color: "indigo" },
-  { id: "lb-ba", name: "Brand Ambassador", color: "violet" },
+  { id: "lb-ba", name: "Beauty Ambassador", color: "violet" },
   { id: "lb-team", name: "Internal Team", color: "slate" },
 ];
 
