@@ -176,6 +176,41 @@ export const threadsByContact: Record<string, Message[]> = {
     { id: "m2", from: "me", text: "12.12 berlaku untuk semua SKU kecuali limited edition & new arrival (< 30 hari). Diskon: 20% untuk single item, 30% untuk bundle 3 produk. Kode promo: ARMA1212. Valid 12 Des 00:00–23:59.", time: "Yesterday", status: "read" },
     { id: "m3", from: "them", text: "Siap Arma! Aku info ke semua customer aku.", time: "Yesterday" },
   ],
+  c31: [
+    { id: "m1", from: "them", text: "Arma, ada tips untuk upsell ke customer yang udah beli foundation?", time: "45m" },
+    { id: "m2", from: "me", text: "Teknik upsell paling efektif: tawarkan setting powder + brush set sebagai 'completing the look'. Bundle harga juga works — kalau customer udah beli foundation Sisley, tawarkan Sisley Skincare untuk prep sebelum makeup.", time: "43m", status: "delivered" },
+  ],
+  c32: [
+    { id: "m1", from: "them", text: "Gimana cara jelasin perbedaan Rimmel Stay Matte vs Lasting Finish ke customer?", time: "2h" },
+    { id: "m2", from: "me", text: "Stay Matte: matte finish, cocok kulit berminyak, coverage medium. Lasting Finish: lebih buildable, semi-matte, tahan 25 jam. Customer dengan kombinasi skin → Lasting Finish. Kulit oily → Stay Matte.", time: "1h 58m", status: "read" },
+    { id: "m3", from: "them", text: "Oke thanks Arma! Berguna banget.", time: "1h 55m" },
+  ],
+  c33: [
+    { id: "m1", from: "them", text: "Arma, stok Laura Mercier Translucent Powder kapan restocknya?", time: "3h" },
+    { id: "m2", from: "me", text: "Restock dijadwalkan minggu depan. Aku sudah masukkan nama kamu di waitlist notif. Untuk customer yang minta, bisa tawarkan Laura Mercier Loose Setting Powder sebagai alternatif sementara.", time: "2h 58m", status: "read" },
+  ],
+  c34: [
+    { id: "m1", from: "them", text: "Script untuk handle customer yang complain warna bareMinerals tidak sesuai foto?", time: "Yesterday" },
+    { id: "m2", from: "me", text: "Gunakan script ini: 'Terima kasih feedbacknya! Warna mineral makeup memang bisa terlihat berbeda tergantung pencahayaan & undertone kulit. Boleh saya bantu carikan shade yang lebih pas dengan skin tone kamu?' Tawarkan swatch test jika di store.", time: "Yesterday", status: "read" },
+    { id: "m3", from: "them", text: "Perfect, aku save dulu ya Arma.", time: "Yesterday" },
+  ],
+  c35: [
+    { id: "m1", from: "them", text: "Cara presentasi Dior Beauty ke customer baru yang belum familiar gimana Arma?", time: "Yesterday" },
+    { id: "m2", from: "me", text: "Opening yang works: 'Dior Beauty bukan sekedar makeup — ini adalah art. Setiap produk dirancang oleh creative director Dior untuk menonjolkan keindahan natural kamu.' Fokus pada 3 hero product: Rouge Dior Lipstick, Backstage Foundation, Airflash Setting Spray.", time: "Yesterday", status: "delivered" },
+  ],
+  c36: [
+    { id: "m1", from: "them", text: "Arma ada SOP untuk handling retur produk Sisley di store?", time: "2d" },
+    { id: "m2", from: "me", text: "SOP retur Sisley: (1) Cek struk & kondisi produk, (2) Jika < 7 hari & sealed → full refund, (3) Jika sudah dibuka → exchange atau store credit, (4) Foto kondisi produk sebelum proses. Lapor ke supervisor jika nilai > 500rb.", time: "2d", status: "read" },
+  ],
+  c37: [
+    { id: "m1", from: "them", text: "Berapa target penjualan per bulan untuk BA level junior Arma?", time: "2d" },
+    { id: "m2", from: "me", text: "Target BA Junior: Rp 15–20 juta/bulan. Target BA Regular: Rp 25–35 juta/bulan. Senior BA: Rp 40–60 juta/bulan. Supervisor: Rp 75 juta+/bulan. Bonus berlaku jika melebihi target 10%.", time: "2d", status: "read" },
+    { id: "m3", from: "them", text: "Noted Arma, makasih infonya!", time: "2d" },
+  ],
+  c38: [
+    { id: "m1", from: "them", text: "Cara demo aplikasi bareMinerals yang bener ke customer gimana?", time: "3d" },
+    { id: "m2", from: "me", text: "Demo bareMinerals: (1) Mulai dengan Prep Step Primer, (2) Swirl-tap-buff foundation dengan kabuki brush gerakan melingkar, (3) Highlight dengan Luminizer, (4) Set dengan Mineral Veil. Key message: bebas paraben, cocok untuk sensitive skin.", time: "3d", status: "read" },
+  ],
 };
 
 export type Conversation = {
