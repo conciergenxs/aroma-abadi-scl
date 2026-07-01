@@ -431,7 +431,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
   return (
     <div>
       <div className="flex items-center justify-end mb-2">
-        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Card</button>
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Knowledge Card</button>
       </div>
       {/* Horizontal scroll knowledge cards with numbered labels */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
