@@ -65,7 +65,6 @@ const topNav: NavItem[] = [
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/sku", label: "SKU & Knowledge", icon: Package },
   { to: "/transactions", label: "Transactions", icon: Receipt },
-  { to: "/ba", label: "Beauty Ambassadors", icon: BadgeCheck },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings },
