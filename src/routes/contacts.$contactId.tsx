@@ -339,12 +339,8 @@ function ContactDetailPage() {
             <div className="border-b border-border bg-background/60 px-4 lg:px-6">
               <div className="flex items-center gap-1">
                 <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={derivedActivities.length} />
+                <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={contactTransactions.length} />
                 <TabButton active={tab === "media"} onClick={() => setTab("media")} icon={<ImageIcon className="h-3.5 w-3.5" />} label="Media" />
-                {contactTransactions.length > 0 && (
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-emerald-600/20 border border-emerald-600/30 px-2 py-0.5 text-[10px] text-emerald-400">
-                    <ShoppingBag className="h-3 w-3" /> {contactTransactions.length} transaksi
-                  </span>
-                )}
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 lg:p-6">
