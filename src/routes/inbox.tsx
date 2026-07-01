@@ -730,8 +730,8 @@ function InboxPage() {
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {stageColor && ct.lifecycleStage && (
-                        <span className="inline-flex items-center rounded-sm bg-white/[0.06] px-1.5 py-px text-[10px] font-medium text-foreground/80">
-                          <span className={`mr-1 h-1.5 w-1.5 rounded-full ${stageColor.dot}`} />
+                        <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${stageColor.badge}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full bg-white/70`} />
                           {ct.lifecycleStage}
                         </span>
                       )}
