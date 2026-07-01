@@ -387,6 +387,107 @@ function ContactsPage() {
   );
 }
 
+// ── Contact Type Chip ──────────────────────────────────────────────────────
+function ContactTypeChip({ isBA }: { isBA: boolean }) {
+  return isBA ? (
+    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-violet-600 text-white border border-violet-700">
+      BA
+    </span>
+  ) : (
+    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-sky-600 text-white border border-sky-700">
+      Consumer
+    </span>
+  );
+}
+
+// ── Contacts Table (fixed columns per view) ────────────────────────────────
+function ContactsTable({
+  contacts,
+  view,
+  selected,
+  allSelected,
+  onSelectAll,
+  onToggle,
+  onOpen,
+}: {
+  contacts: Contact[];
+  view: string;
+  selected: string[];
+  allSelected: boolean;
+  onSelectAll: () => void;
+  onToggle: (id: string) => void;
+  onOpen: (id: string) => void;
+}) {
+  const { bas } = useBaStore();
+
+  const thCls = "sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]";
+  const tdCls = "px-4 py-3 whitespace-nowrap align-middle text-xs";
+
+  const isBA = (c: Contact) => c.labelIds.includes("lb-ba");
+  const getBA = (c: Contact) => bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
+
+  const isBaView = view === "ba";
+
+  return (
+    <table className="min-w-full text-sm">
+      <thead>
+        <tr>
+          <th className={`${thCls} w-10`}>
+            <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={allSelected} onChange={onSelectAll} />
+          </th>
+          <th className={thCls}>Name</th>
+          <th className={thCls}>WA Number</th>
+          <th className={thCls}>Contact Type</th>
+          <th className={thCls}>Point Balance</th>
+          {isBaView && <>
+            <th className={thCls}>Brand</th>
+            <th className={thCls}>Gender</th>
+            <th className={thCls}>Posisi</th>
+            <th className={thCls}>Store</th>
+            <th className={thCls}>Kota</th>
+          </>}
+        </tr>
+      </thead>
+      <tbody className="stagger divide-y divide-border">
+        {contacts.map((c) => {
+          const ba = isBA(c) ? getBA(c) : undefined;
+          return (
+            <tr key={c.id} className="hover:bg-white/[0.025] cursor-pointer transition-colors" onClick={() => onOpen(c.id)}>
+              <td className={tdCls} onClick={(e) => e.stopPropagation()}>
+                <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={selected.includes(c.id)} onChange={() => onToggle(c.id)} />
+              </td>
+              <td className={`${tdCls} font-medium text-foreground`}>{c.name}</td>
+              <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
+              <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
+              <td className={`${tdCls} tabular-nums`}>
+                {c.pointBalance != null && c.pointBalance > 0
+                  ? <span className="text-foreground font-medium">{c.pointBalance.toLocaleString("id-ID")} pts</span>
+                  : <span className="text-muted-foreground">—</span>}
+              </td>
+              {isBaView && <>
+                <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.join(", ").replace(/brand-/g, "").replace(/-/g, " ") : <span className="text-muted-foreground">—</span>}</td>
+                <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
+                <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>
+                <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>
+                <td className={tdCls}>{ba?.city ?? <span className="text-muted-foreground">—</span>}</td>
+              </>}
+            </tr>
+          );
+        })}
+        {contacts.length === 0 && (
+          <tr>
+            <td colSpan={isBaView ? 10 : 5} className="px-4 py-16 text-center text-xs text-muted-foreground">
+              <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
+              <div className="font-medium text-foreground">No contacts found</div>
+              <div className="mt-1">Try selecting another channel or clearing filters.</div>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
 function renderPropertyCell(
   p: ContactProperty,
   c: Contact,
