@@ -499,6 +499,95 @@ function activityDot(type: ContactActivity["type"]) {
   }
 }
 
+function TransactionsTab({ transactions }: { transactions: import("@/components/scl/transactions-store").Transaction[] }) {
+  if (transactions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
+        <div className="h-12 w-12 rounded-full bg-white/[0.04] border border-border grid place-items-center">
+          <ShoppingBag className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="text-sm text-foreground">Belum ada transaksi.</div>
+        <div className="text-[11px] text-muted-foreground">Transaksi dari kontak ini akan muncul di sini.</div>
+      </div>
+    );
+  }
+
+  const totalSpend = transactions.filter((t) => t.status === "Paid").reduce((sum, t) => sum + t.total, 0);
+  const paidCount = transactions.filter((t) => t.status === "Paid").length;
+
+  function statusBadge(s: string) {
+    if (s === "Paid") return "border-emerald-700 bg-emerald-600 text-white";
+    if (s === "Pending") return "border-amber-700 bg-amber-600 text-white";
+    return "border-rose-700 bg-rose-600 text-white";
+  }
+
+  return (
+    <div className="max-w-3xl space-y-4">
+      {/* Summary */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Transaksi</div>
+          <div className="text-lg font-semibold mt-1">{transactions.length}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Belanja</div>
+          <div className="text-lg font-semibold mt-1">{formatIDR(totalSpend)}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Paid</div>
+          <div className="text-lg font-semibold mt-1">{paidCount} <span className="text-xs font-normal text-muted-foreground">/ {transactions.length}</span></div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-lg border border-border overflow-hidden">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="border-b border-border bg-card/40">
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Invoice</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Tanggal</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Brand</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Items</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Total</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {transactions
+              .slice()
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((t) => (
+              <tr key={t.id} className="hover:bg-white/[0.025] transition-colors">
+                <td className="px-4 py-3 font-medium text-foreground text-xs">{t.invoice}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">
+                  {new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
+                </td>
+                <td className="px-4 py-3 text-xs">{t.brandName}</td>
+                <td className="px-4 py-3 text-xs">
+                  <ul className="space-y-0.5">
+                    {t.items.map((i, idx) => (
+                      <li key={idx} className="text-foreground leading-snug">
+                        {i.skuName}
+                        <span className="text-muted-foreground"> ×{i.qty}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+                <td className="px-4 py-3 text-xs font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}>
+                    {t.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function TransactionActivityCard({ message, at }: { message: string; at: string }) {
   // Parse: "Transaksi {invoice} · {brand} · {total} · {status}\n{items}"
   const [header, items] = message.split("\n");
