@@ -245,6 +245,14 @@ export const conversations: Conversation[] = [
   { id: "t25", contactId: "c25", channel: "whatsapp", preview: "Arma ada template follow-up untuk customer yang belum checkout?", time: "2h", unread: 0 },
   { id: "t27", contactId: "c27", channel: "whatsapp", preview: "Diskon event 12.12 berlaku untuk produk apa aja Arma?", time: "Yesterday", unread: 2 },
   { id: "t29", contactId: "c29", channel: "whatsapp", preview: "Arma, minimum stok di store berapa buat bareMinerals?", time: "2d", unread: 0 },
+  { id: "t31", contactId: "c31", channel: "whatsapp", preview: "Arma, ada tips untuk upsell ke customer yang udah beli foundation?", time: "45m", unread: 1 },
+  { id: "t32", contactId: "c32", channel: "whatsapp", preview: "Oke thanks Arma! Berguna banget.", time: "2h", unread: 0 },
+  { id: "t33", contactId: "c33", channel: "whatsapp", preview: "Arma, stok Laura Mercier Translucent Powder kapan restocknya?", time: "3h", unread: 1 },
+  { id: "t34", contactId: "c34", channel: "whatsapp", preview: "Perfect, aku save dulu ya Arma.", time: "Yesterday", unread: 0 },
+  { id: "t35", contactId: "c35", channel: "whatsapp", preview: "Cara presentasi Dior Beauty ke customer baru yang belum familiar gimana?", time: "Yesterday", unread: 2 },
+  { id: "t36", contactId: "c36", channel: "whatsapp", preview: "Arma ada SOP untuk handling retur produk Sisley di store?", time: "2d", unread: 0 },
+  { id: "t37", contactId: "c37", channel: "whatsapp", preview: "Noted Arma, makasih infonya!", time: "2d", unread: 0 },
+  { id: "t38", contactId: "c38", channel: "whatsapp", preview: "Cara demo aplikasi bareMinerals yang bener ke customer gimana?", time: "3d", unread: 0 },
 ];
 
 export type Template = {
