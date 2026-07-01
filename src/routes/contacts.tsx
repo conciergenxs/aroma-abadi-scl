@@ -79,7 +79,8 @@ function ContactsPage() {
     let base: Contact[];
     const live = contacts.filter((c) => !c.deleted);
     if (activeView === "all") base = live;
-    else if (activeView === "mine") base = live.filter((c) => c.ownerId === "me");
+    else if (activeView === "mine") base = live.filter((c) => !c.labelIds.includes("lb-ba"));
+    else if (activeView === "ba") base = live.filter((c) => c.labelIds.includes("lb-ba"));
     else base = live.filter((c) => c.listIds.includes(activeView));
     if (channelFilter !== "all") {
       base = base.filter((c) => c.channel === channelFilter);
