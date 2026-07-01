@@ -234,27 +234,7 @@ function ContactsPage() {
             </button>
           </div>
 
-          <div className="px-3 pt-2 pb-1 flex items-center justify-between">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Brands</div>
-          </div>
-
-          <div className="px-3 pb-3 space-y-0.5">
-            {["Sisley", "Rimmel", "Dolce&Gabbana", "Laura Mercier", "bareMinerals"].map((brandName) => {
-              const active = activeView === brandName;
-              return (
-                <button
-                  key={brandName}
-                  onClick={() => { setActiveView(brandName); setSelected([]); }}
-                  className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                    active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
-                  }`}
-                >
-                  <span className="h-1.5 w-1.5 rounded-sm bg-primary/70 shrink-0" />
-                  {brandName}
-                </button>
-              );
-            })}
-          </div>
+          <BrandsNav activeView={activeView} setActiveView={setActiveView} setSelected={setSelected} />
         </aside>
 
         {/* Main content */}
