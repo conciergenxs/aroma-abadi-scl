@@ -156,14 +156,27 @@ export type Conversation = {
 };
 
 export const conversations: Conversation[] = [
-  { id: "t1", contactId: "c1", channel: "whatsapp", preview: "Makasih banyak! Aku checkout sekarang ya.", time: "10:26", unread: 2, pinned: true },
-  { id: "t2", contactId: "c2", channel: "whatsapp", preview: "Min, untuk reseller Glow Serum minimum order…", time: "09:48", unread: 1 },
-  { id: "t3", contactId: "c3", channel: "whatsapp", preview: "Oke, aku loop in tim procurement kami.", time: "Yesterday", unread: 0 },
-  { id: "t4", contactId: "c4", channel: "whatsapp", preview: "Suka banget shade barunya! Restock dong kak.", time: "Yesterday", unread: 0 },
-  { id: "t5", contactId: "c5", channel: "whatsapp", preview: "Paket order #AA-82201 sudah sampai, makasih!", time: "2d", unread: 0 },
-  { id: "t6", contactId: "c6", channel: "whatsapp", preview: "Ada diskon bundle Glow Set ga?", time: "2d", unread: 3 },
-  { id: "t7", contactId: "c7", channel: "whatsapp", preview: "Besok aku kirim PO yang sudah ditandatangani.", time: "3d", unread: 0 },
-  { id: "t8", contactId: "c8", channel: "whatsapp", preview: "Velvet Rouge shade 05 ready di Bandung?", time: "4d", unread: 0 },
+  // Consumer Inbox — transaksi & pembelian produk
+  { id: "t1",  contactId: "c1",  channel: "whatsapp", preview: "Makasih banyak! Aku checkout sekarang ya.", time: "10:26", unread: 2, pinned: true },
+  { id: "t2",  contactId: "c2",  channel: "whatsapp", preview: "Min, untuk reseller Glow Serum minimum order…", time: "09:48", unread: 1 },
+  { id: "t3",  contactId: "c3",  channel: "whatsapp", preview: "Oke, aku loop in tim procurement kami.", time: "Yesterday", unread: 0 },
+  { id: "t5",  contactId: "c5",  channel: "whatsapp", preview: "Paket order #AA-82201 sudah sampai, makasih!", time: "2d", unread: 0 },
+  { id: "t6",  contactId: "c6",  channel: "whatsapp", preview: "Ada diskon bundle Glow Set ga?", time: "2d", unread: 3 },
+  { id: "t7",  contactId: "c7",  channel: "whatsapp", preview: "Besok aku kirim PO yang sudah ditandatangani.", time: "3d", unread: 0 },
+  { id: "t13", contactId: "c13", channel: "whatsapp", preview: "Bisa COD kak untuk area Jakarta Selatan?", time: "1h", unread: 1 },
+  { id: "t15", contactId: "c15", channel: "whatsapp", preview: "Mau order Glow Serum 3 botol, ada promo ga?", time: "5h", unread: 0 },
+  { id: "t16", contactId: "c16", channel: "whatsapp", preview: "Sudah transfer ya kak, buktinya aku kirim.", time: "Yesterday", unread: 2 },
+  { id: "t20", contactId: "c20", channel: "whatsapp", preview: "Velvet Rouge shade 07 ada stoknya kak?", time: "3d", unread: 0 },
+
+  // BA Inbox — Beauty Ambassador bertanya tentang produk ke Arma
+  { id: "t4",  contactId: "c4",  channel: "whatsapp", preview: "Arma, gimana cara handle customer yang tanya perbedaan Sisley vs Rimmel?", time: "1h", unread: 2 },
+  { id: "t8",  contactId: "c8",  channel: "whatsapp", preview: "Arma tolong jelasin kandungan Glow Serum buat aku presentasiin ke customer.", time: "Yesterday", unread: 1 },
+  { id: "t10", contactId: "c10", channel: "whatsapp", preview: "Script untuk closing customer yang masih ragu-ragu ada ga Arma?", time: "2d", unread: 0 },
+  { id: "t23", contactId: "c23", channel: "whatsapp", preview: "Arma, shade berapa yang paling laris bulan ini?", time: "30m", unread: 3 },
+  { id: "t24", contactId: "c24", channel: "whatsapp", preview: "Cara jelasin benefit Laura Mercier ke customer baru gimana?", time: "1h", unread: 1 },
+  { id: "t25", contactId: "c25", channel: "whatsapp", preview: "Arma ada template follow-up untuk customer yang belum checkout?", time: "2h", unread: 0 },
+  { id: "t27", contactId: "c27", channel: "whatsapp", preview: "Diskon event 12.12 berlaku untuk produk apa aja Arma?", time: "Yesterday", unread: 2 },
+  { id: "t29", contactId: "c29", channel: "whatsapp", preview: "Arma, minimum stok di store berapa buat bareMinerals?", time: "2d", unread: 0 },
 ];
 
 export type Template = {
