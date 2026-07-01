@@ -16,7 +16,7 @@ export type BA = {
 
 type State = { bas: BA[]; currentBaId: string | null };
 
-const STORAGE_KEY = "aroma_ba_store_v3";
+const STORAGE_KEY = "aroma_ba_store_v4";
 
 function genPassword(len = 10) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
