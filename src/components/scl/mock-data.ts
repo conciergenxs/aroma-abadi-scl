@@ -91,7 +91,7 @@ export const contacts: Contact[] = [
   { id: "c7", name: "Andika Saputra", phone: "+62 818 4422 1133", channel: "whatsapp", labelIds: ["lb-reseller"], listIds: ["ls-jakarta"], lastInteraction: "5h ago", status: "Active", avatar: avatars[6], ownerId: "arma" },
   { id: "c8", name: "Maya Kusuma", phone: "+62 819 6655 2244", channel: "whatsapp", labelIds: ["lb-team"], listIds: [], lastInteraction: "Yesterday", status: "Inactive", avatar: avatars[7] },
   { id: "c9", name: "Citra Halim", phone: "+62 856 1122 3344", channel: "whatsapp", labelIds: [], listIds: ["ls-launch", "ls-community"], lastInteraction: "Yesterday", status: "Active", avatar: avatars[8], ownerId: "arma" },
-  { id: "c10", name: "Reza Wijaya", phone: "+62 857 8899 0011", channel: "whatsapp", labelIds: ["lb-ba"], listIds: ["ls-bandung"], lastInteraction: "2d ago", status: "Active", avatar: avatars[9] },
+  { id: "c10", name: "Reza Wijaya", phone: "+62 857 8899 0011", channel: "whatsapp", labelIds: ["lb-ba"], listIds: [], lastInteraction: "2d ago", status: "Active", avatar: avatars[9], ownerId: "arma" },
   { id: "c11", name: "Bayu Hartanto", phone: "+62 858 5544 3322", channel: "whatsapp", labelIds: ["lb-vip", "lb-reseller"], listIds: ["ls-vip", "ls-jakarta"], lastInteraction: "3d ago", status: "Active", avatar: avatars[10], ownerId: "arma" },
   { id: "c12", name: "Nadya Salsabila", phone: "+62 877 2211 4455", channel: "whatsapp", labelIds: ["lb-beauty-club"], listIds: ["ls-bandung", "ls-launch"], lastInteraction: "4d ago", status: "Active", avatar: avatars[11] },
 
