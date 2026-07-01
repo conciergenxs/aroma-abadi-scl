@@ -377,6 +377,45 @@ function ContactsPage() {
   );
 }
 
+// ── Brands Nav ────────────────────────────────────────────────────────────
+function BrandsNav({ activeView, setActiveView, setSelected }: {
+  activeView: string;
+  setActiveView: (v: string) => void;
+  setSelected: (s: string[]) => void;
+}) {
+  const { brands } = useSkuStore();
+  const { bas } = useBaStore();
+
+  return (
+    <>
+      <div className="px-3 pt-2 pb-1 flex items-center justify-between">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Brands</div>
+      </div>
+      <div className="px-3 pb-3 space-y-0.5">
+        {brands.map((brand) => {
+          const count = bas.filter((b) => b.brandIds.includes(brand.id)).length;
+          const active = activeView === `brand:${brand.id}`;
+          return (
+            <button
+              key={brand.id}
+              onClick={() => { setActiveView(`brand:${brand.id}`); setSelected([]); }}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-sm bg-primary/70 shrink-0" />
+                {brand.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 // ── Contact Type Chip ──────────────────────────────────────────────────────
 function ContactTypeChip({ isBA }: { isBA: boolean }) {
   return isBA ? (
