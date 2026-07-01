@@ -122,7 +122,9 @@ function ContactsPage() {
   const labelById = (id: string) => labels.find((l) => l.id === id);
   const listById = (id: string) => lists.find((l) => l.id === id);
   const activeList = activeView !== "all" && activeView !== "mine" ? listById(activeView) ?? null : null;
-  const myCount = contacts.filter((c) => c.ownerId === "me").length;
+  const liveContacts = contacts.filter((c) => !c.deleted);
+  const myCount = liveContacts.filter((c) => !c.labelIds.includes("lb-ba")).length;
+  const baCount = liveContacts.filter((c) => c.labelIds.includes("lb-ba")).length;
 
   const updateContact = (id: string, patch: Partial<Contact>) =>
     setContacts((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
