@@ -242,6 +242,17 @@ function ContactsPage() {
               <span className="inline-flex items-center gap-2">
                 <UserCircle2 className="h-3.5 w-3.5" /> BA Contacts
               </span>
+              <span className="text-[10px] text-muted-foreground">{baCount}</span>
+            </button>
+            <button
+              onClick={() => { setActiveView("ba"); setSelected([]); }}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                activeView === "ba" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <UserCircle2 className="h-3.5 w-3.5" /> BA Contacts
+              </span>
             </button>
           </div>
 
