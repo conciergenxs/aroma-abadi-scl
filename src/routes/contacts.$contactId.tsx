@@ -32,6 +32,7 @@ import {
 } from "@/components/scl/mock-data";
 import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
+import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
 
 const SYSTEM_KEYS = new Set([
   "name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email",
