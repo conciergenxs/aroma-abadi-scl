@@ -85,17 +85,17 @@ export const LIFECYCLE_COLORS: Record<
   LifecycleColorKey,
   { name: string; bar: string; dot: string; badge: string }
 > = {
-  orange:  { name: "Orange",  bar: "bg-orange-500",  dot: "bg-orange-500",  badge: "border-orange-500/30 bg-orange-500/10 text-orange-300" },
-  blue:    { name: "Blue",    bar: "bg-blue-500",    dot: "bg-blue-500",    badge: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
-  purple:  { name: "Purple",  bar: "bg-purple-500",  dot: "bg-purple-500",  badge: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
-  yellow:  { name: "Yellow",  bar: "bg-yellow-500",  dot: "bg-yellow-500",  badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" },
-  green:   { name: "Green",   bar: "bg-green-500",   dot: "bg-green-500",   badge: "border-green-500/30 bg-green-500/10 text-green-300" },
-  red:     { name: "Red",     bar: "bg-red-500",     dot: "bg-red-500",     badge: "border-red-500/30 bg-red-500/10 text-red-300" },
-  gray:    { name: "Gray",    bar: "bg-gray-500",    dot: "bg-gray-500",    badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" },
-  pink:    { name: "Pink",    bar: "bg-pink-500",    dot: "bg-pink-500",    badge: "border-pink-500/30 bg-pink-500/10 text-pink-300" },
-  sky:     { name: "Sky",     bar: "bg-sky-500",     dot: "bg-sky-500",     badge: "border-sky-500/30 bg-sky-500/10 text-sky-300" },
-  violet:  { name: "Violet",  bar: "bg-violet-500",  dot: "bg-violet-500",  badge: "border-violet-500/30 bg-violet-500/10 text-violet-300" },
-  emerald: { name: "Emerald", bar: "bg-emerald-500", dot: "bg-emerald-500", badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" },
+  orange:  { name: "Orange",  bar: "bg-orange-500",  dot: "bg-orange-500",  badge: "border-orange-600 bg-orange-500 text-white font-semibold" },
+  blue:    { name: "Blue",    bar: "bg-blue-500",    dot: "bg-blue-500",    badge: "border-blue-600 bg-blue-600 text-white font-semibold" },
+  purple:  { name: "Purple",  bar: "bg-purple-500",  dot: "bg-purple-500",  badge: "border-purple-700 bg-purple-600 text-white font-semibold" },
+  yellow:  { name: "Yellow",  bar: "bg-yellow-400",  dot: "bg-yellow-400",  badge: "border-yellow-600 bg-yellow-500 text-white font-semibold" },
+  green:   { name: "Green",   bar: "bg-green-500",   dot: "bg-green-500",   badge: "border-green-700 bg-green-600 text-white font-semibold" },
+  red:     { name: "Red",     bar: "bg-red-500",     dot: "bg-red-500",     badge: "border-red-700 bg-red-600 text-white font-semibold" },
+  gray:    { name: "Gray",    bar: "bg-slate-500",   dot: "bg-slate-500",   badge: "border-slate-600 bg-slate-500 text-white font-semibold" },
+  pink:    { name: "Pink",    bar: "bg-pink-500",    dot: "bg-pink-500",    badge: "border-pink-700 bg-pink-600 text-white font-semibold" },
+  sky:     { name: "Sky",     bar: "bg-sky-500",     dot: "bg-sky-500",     badge: "border-sky-700 bg-sky-500 text-white font-semibold" },
+  violet:  { name: "Violet",  bar: "bg-violet-500",  dot: "bg-violet-500",  badge: "border-violet-700 bg-violet-600 text-white font-semibold" },
+  emerald: { name: "Emerald", bar: "bg-emerald-500", dot: "bg-emerald-500", badge: "border-emerald-700 bg-emerald-600 text-white font-semibold" },
 };
 
 export type LifecycleGroup = "active" | "lost";
