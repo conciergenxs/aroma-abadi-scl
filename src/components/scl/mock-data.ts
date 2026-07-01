@@ -61,6 +61,7 @@ export type Contact = {
   customFields?: Record<string, unknown>;
   deleted?: boolean;
   deletedAt?: string;
+  pointBalance?: number;
 };
 
 const avatars = ["PA", "BP", "SR", "DL", "RM", "IP", "AS", "MK", "CH", "RW", "BH", "NS", "AF", "YP", "TH", "LW", "GS", "NK", "FR", "ZA", "MR", "DP", "HS", "IA", "WS", "KN", "SB", "RP", "OL", "EM"];
