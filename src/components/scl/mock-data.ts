@@ -63,7 +63,7 @@ export type Contact = {
   deletedAt?: string;
 };
 
-const avatars = ["PA", "BP", "SR", "DL", "RM", "IP", "AS", "MK", "CH", "RW", "BH", "NS"];
+const avatars = ["PA", "BP", "SR", "DL", "RM", "IP", "AS", "MK", "CH", "RW", "BH", "NS", "AF", "YP", "TH", "LW", "GS", "NK", "FR", "ZA", "MR", "DP", "HS", "IA", "WS", "KN", "SB", "RP", "OL", "EM"];
 
 export const initialLabels: ContactLabel[] = [
   { id: "lb-vip", name: "VIP Customer", color: "amber" },
