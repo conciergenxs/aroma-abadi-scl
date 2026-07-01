@@ -502,6 +502,36 @@ function activityDot(type: ContactActivity["type"]) {
   }
 }
 
+function TransactionActivityCard({ message, at }: { message: string; at: string }) {
+  // Parse: "Transaksi {invoice} · {brand} · {total} · {status}\n{items}"
+  const [header, items] = message.split("\n");
+  const parts = header.replace("Transaksi ", "").split(" · ");
+  const [invoice, brand, total, status] = parts;
+  const statusColor =
+    status === "Paid"
+      ? "border-emerald-700 bg-emerald-600 text-white"
+      : status === "Pending"
+      ? "border-amber-700 bg-amber-600 text-white"
+      : "border-rose-700 bg-rose-600 text-white";
+  return (
+    <div className="rounded-md border border-border bg-card/60 px-3 py-2.5 mt-1 mb-1 space-y-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <ShoppingBag className="h-3 w-3 text-emerald-400 shrink-0" />
+          <span className="text-xs font-medium text-foreground">{invoice}</span>
+          <span className="text-[10px] text-muted-foreground">· {brand}</span>
+        </div>
+        <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium border ${statusColor}`}>{status}</span>
+      </div>
+      <div className="text-[11px] text-muted-foreground">{items}</div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-foreground">{total}</span>
+        <span className="text-[10px] text-muted-foreground">{formatTime(at)}</span>
+      </div>
+    </div>
+  );
+}
+
 function MediaTab() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
