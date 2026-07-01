@@ -83,6 +83,14 @@ function ContactsPage() {
     if (activeView === "all") base = live;
     else if (activeView === "mine") base = live.filter((c) => !c.labelIds.includes("lb-ba"));
     else if (activeView === "ba") base = live.filter((c) => c.labelIds.includes("lb-ba"));
+    else if (activeView.startsWith("brand:")) {
+      // brand view: show BA contacts assigned to this brand
+      const brandId = activeView.slice(6);
+      const baPhones = new Set(
+        bas.filter((b) => b.brandIds.includes(brandId)).map((b) => b.waNumber.replace(/\s/g, ""))
+      );
+      base = live.filter((c) => c.labelIds.includes("lb-ba") && baPhones.has(c.phone.replace(/\s/g, "")));
+    }
     else base = live.filter((c) => c.listIds.includes(activeView));
     if (channelFilter !== "all") {
       base = base.filter((c) => c.channel === channelFilter);
