@@ -460,7 +460,13 @@ function ContactsTable({
   const isBA = (c: Contact) => c.labelIds.includes("lb-ba");
   const getBA = (c: Contact) => bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
 
-  const isBaView = view === "ba";
+  // Column layout per view
+  const isBaView    = view === "ba";
+  const isMineView  = view === "mine";
+  const isAllOrBrand = view === "all" || view.startsWith("brand:");
+
+  // colSpan for empty state
+  const colSpan = isBaView ? 9 : isMineView ? 5 : 5; // all/brand: checkbox+name+gender+wa+type = 5
 
   return (
     <table className="min-w-full text-sm">
@@ -470,9 +476,10 @@ function ContactsTable({
             <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={allSelected} onChange={onSelectAll} />
           </th>
           <th className={thCls}>Name</th>
+          {isAllOrBrand && <th className={thCls}>Gender</th>}
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
-          {!isBaView && <th className={thCls}>Point Balance</th>}
+          {isMineView && <th className={thCls}>Point Balance</th>}
           {isBaView && <>
             <th className={thCls}>Brand</th>
             <th className={thCls}>Gender</th>
@@ -484,16 +491,19 @@ function ContactsTable({
       </thead>
       <tbody className="stagger divide-y divide-border">
         {contacts.map((c) => {
-          const ba = isBA(c) ? getBA(c) : undefined;
+          const ba = getBA(c);
           return (
             <tr key={c.id} className="hover:bg-white/[0.025] cursor-pointer transition-colors" onClick={() => onOpen(c.id)}>
               <td className={tdCls} onClick={(e) => e.stopPropagation()}>
                 <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={selected.includes(c.id)} onChange={() => onToggle(c.id)} />
               </td>
               <td className={`${tdCls} font-medium text-foreground`}>{c.name}</td>
+              {isAllOrBrand && (
+                <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
+              )}
               <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
               <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
-              {!isBaView && (
+              {isMineView && (
                 <td className={`${tdCls} tabular-nums`}>
                   {c.pointBalance != null && c.pointBalance > 0
                     ? <span className="text-foreground font-medium">{c.pointBalance.toLocaleString("id-ID")} pts</span>
@@ -512,7 +522,7 @@ function ContactsTable({
         })}
         {contacts.length === 0 && (
           <tr>
-            <td colSpan={isBaView ? 9 : 5} className="px-4 py-16 text-center text-xs text-muted-foreground">
+            <td colSpan={colSpan} className="px-4 py-16 text-center text-xs text-muted-foreground">
               <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
               <div className="font-medium text-foreground">No contacts found</div>
               <div className="mt-1">Try selecting another channel or clearing filters.</div>
