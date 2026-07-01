@@ -65,6 +65,7 @@ function seed(): Transaction[] {
     const s = stores[i % stores.length];
     const ba = bas[i % bas.length];
     const cust = customers[i % customers.length];
+
     const lineCount = 1 + (i % 3);
     const lines: TxLine[] = [];
     let total = 0;
