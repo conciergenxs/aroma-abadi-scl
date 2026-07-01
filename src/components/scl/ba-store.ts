@@ -26,12 +26,19 @@ function genPassword(len = 10) {
 }
 
 function seed(): BA[] {
+  // Phone numbers MUST match BA contacts in mock-data.ts (c4, c8, c10, c23-c30)
   return [
-    { id: "ba1", name: "Putri Anggraini", gender: "Wanita", username: "putri.a", password: "Putri12345", waNumber: "+62 812 3456 7890", brandIds: ["brand-dg"], city: "Jakarta", store: "Plaza Indonesia", position: "Supervisor" },
-    { id: "ba2", name: "Dewi Lestari", gender: "Wanita", username: "dewi.l", password: "Dewi67890A", waNumber: "+62 811 5566 1122", brandIds: ["brand-sisley"], city: "Bandung", store: "Paris van Java", position: "Senior BA" },
-    { id: "ba3", name: "Reza Wijaya", gender: "Pria", username: "reza.w", password: "Reza54321X", waNumber: "+62 857 8899 0011", brandIds: ["brand-rimmel"], city: "Bandung", store: "Trans Studio Mall", position: "BA" },
-    { id: "ba4", name: "Indah Permata", gender: "Wanita", username: "indah.p", password: "IndahPm99K", waNumber: "+62 813 7766 5544", brandIds: ["brand-laura"], city: "Surabaya", store: "Pakuwon Mall", position: "BA" },
-    { id: "ba5", name: "Bagus Pratama", gender: "Pria", username: "bagus.p", password: "BagusP4321", waNumber: "+62 821 2233 4455", brandIds: ["brand-bm"], city: "Jakarta", store: "Pondok Indah Mall", position: "Senior BA" },
+    { id: "ba1",  name: "Dewi Lestari",   gender: "Wanita",  username: "dewi.l",   password: "Dewi67890A", waNumber: "+62 811 5566 1122", brandIds: ["brand-sisley"],               city: "Bandung",  store: "Paris van Java",    position: "Senior BA" },
+    { id: "ba2",  name: "Maya Kusuma",    gender: "Wanita",  username: "maya.k",   password: "MayaK12345", waNumber: "+62 819 6655 2244", brandIds: ["brand-dg"],                   city: "Jakarta",  store: "Plaza Indonesia",   position: "BA" },
+    { id: "ba3",  name: "Reza Wijaya",    gender: "Pria",    username: "reza.w",   password: "Reza54321X", waNumber: "+62 857 8899 0011", brandIds: ["brand-rimmel"],               city: "Bandung",  store: "Trans Studio Mall", position: "BA" },
+    { id: "ba4",  name: "Hesti Andriani", gender: "Wanita",  username: "hesti.a",  password: "HestiA8899", waNumber: "+62 811 2233 4455", brandIds: ["brand-laura"],                city: "Surabaya", store: "Pakuwon Mall",      position: "BA" },
+    { id: "ba5",  name: "Indra Wahyudi",  gender: "Pria",    username: "indra.w",  password: "IndraW4321", waNumber: "+62 821 8877 6655", brandIds: ["brand-bm"],                   city: "Jakarta",  store: "Pondok Indah Mall", position: "Senior BA" },
+    { id: "ba6",  name: "Wulan Sari",     gender: "Wanita",  username: "wulan.s",  password: "WulanS5678", waNumber: "+62 857 3344 5566", brandIds: ["brand-dg"],                   city: "Jakarta",  store: "Plaza Indonesia",   position: "BA" },
+    { id: "ba7",  name: "Kevin Nugroho",  gender: "Pria",    username: "kevin.n",  password: "KevinN7890", waNumber: "+62 812 9900 8877", brandIds: ["brand-sisley"],               city: "Bandung",  store: "Paris van Java",    position: "BA" },
+    { id: "ba8",  name: "Sinta Bella",    gender: "Wanita",  username: "sinta.b",  password: "SintaB1234", waNumber: "+62 819 1122 7788", brandIds: ["brand-rimmel"],               city: "Surabaya", store: "Pakuwon Mall",      position: "Senior BA" },
+    { id: "ba9",  name: "Rizal Pratama",  gender: "Pria",    username: "rizal.p",  password: "RizalP5678", waNumber: "+62 878 5566 4433", brandIds: ["brand-laura"],                city: "Bandung",  store: "Trans Studio Mall", position: "Supervisor" },
+    { id: "ba10", name: "Olivia Lim",     gender: "Wanita",  username: "olivia.l", password: "OliviaL789", waNumber: "+62 813 3344 9900", brandIds: ["brand-bm"],                   city: "Jakarta",  store: "Pondok Indah Mall", position: "BA" },
+    { id: "ba11", name: "Eka Marlinda",   gender: "Wanita",  username: "eka.m",    password: "EkaM12345",  waNumber: "+62 856 7788 1122", brandIds: ["brand-dg", "brand-sisley"],   city: "Surabaya", store: "Pakuwon Mall",      position: "BA" },
   ];
 }
 
