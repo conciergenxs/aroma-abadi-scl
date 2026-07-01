@@ -345,6 +345,7 @@ function ContactDetailPage() {
             </div>
             <div className="flex-1 overflow-y-auto p-4 lg:p-6">
               {tab === "activity" && <ActivityTab activities={derivedActivities} />}
+              {tab === "transactions" && <TransactionsTab transactions={contactTransactions} />}
               {tab === "media" && <MediaTab />}
             </div>
           </section>
