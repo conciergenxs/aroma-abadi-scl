@@ -37,7 +37,16 @@ function seed(): Transaction[] {
     { city: "Surabaya", store: "Pakuwon Mall" },
   ];
   const bas = ["Putri Anggraini", "Dewi Lestari", "Reza Wijaya", "Indah Permata", "Bagus Pratama"];
-  const customers = ["Sari Wulandari", "Linda Hartono", "Maya Kusuma", "Andini Pertiwi", "Rina Susilo", "Bayu Hartanto", "Citra Halim", "Nadya Salsabila"];
+  const customers: { id: string; name: string }[] = [
+    { id: "c1",  name: "Putri Anggraini" },
+    { id: "c9",  name: "Citra Halim" },
+    { id: "c11", name: "Bayu Hartanto" },
+    { id: "c12", name: "Nadya Salsabila" },
+    { id: "c3",  name: "Siti Rahmawati" },
+    { id: "c6",  name: "Indah Permata" },
+    { id: "c16", name: "Lina Wulandari" },
+    { id: "c20", name: "Zahra Aulia" },
+  ];
   const skus = [
     { skuId: "sku-dg-caviar-42", skuCode: "DG-CHC-42", skuName: "Caviar Hydra-Crème Lipstick 42g", price: 685000, brand: "Dolce & Gabbana" },
     { skuId: "sku-sisley-real-flawless", skuCode: "SIS-RFF-30", skuName: "Real Flawless Foundation", price: 2450000, brand: "Sisley" },
