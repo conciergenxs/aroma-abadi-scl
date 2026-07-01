@@ -468,7 +468,7 @@ function ContactsTable({
                   : <span className="text-muted-foreground">—</span>}
               </td>
               {isBaView && <>
-                <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.join(", ").replace(/brand-/g, "").replace(/-/g, " ") : <span className="text-muted-foreground">—</span>}</td>
+                <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>
                 <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
                 <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>
                 <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>
