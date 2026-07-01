@@ -55,6 +55,7 @@ export type Contact = {
   lastInteraction: string;
   status: "Active" | "Inactive" | "Blocked";
   avatar: string;
+  gender?: "Wanita" | "Pria" | "Lainnya";
   ownerId?: string;
   lifecycleStage?: string;
   stageEnteredAt?: string;
