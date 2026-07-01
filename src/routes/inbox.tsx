@@ -499,12 +499,14 @@ function InboxPage() {
   const viewCounts = useMemo(() => {
     const result: Record<InboxView, number> = { all: 0, my: 0, ba: 0 };
     for (const c of conversations) {
+      if (c.unread <= 0) continue;
       const ct = contacts.find((x) => x.id === c.contactId);
-      if (!ct) continue;
-      if (c.unread > 0) { result.all += c.unread; result.my += c.unread; }
+      result.all += c.unread;
+      if (ct?.labelIds.includes("lb-ba")) result.ba += c.unread;
+      else result.my += c.unread;
     }
     return result;
-  }, [contacts]);
+  }, [contacts, conversations]);
 
   const teamCounts = useMemo(() => {
     const map = new Map<string, number>();
