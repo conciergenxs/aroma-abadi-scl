@@ -45,6 +45,7 @@ function ContactsPage() {
 
   const { contacts, labels, lists, properties } = useContactsStore();
   const lifecycleStages = useContactsStore().lifecycleStages;
+  const { bas } = useBaStore();
   const setContacts = contactsStore.setContacts;
   const setLabels = contactsStore.setLabels;
   const setLists = contactsStore.setLists;
