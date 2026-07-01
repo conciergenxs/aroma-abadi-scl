@@ -21,6 +21,7 @@ import {
   getStageStyle,
 } from "@/components/scl/contacts-store";
 import { useBaStore } from "@/components/scl/ba-store";
+import { useSkuStore } from "@/components/scl/sku-store";
 import { toast } from "sonner";
 import {
   Search, Plus, MoreHorizontal,
