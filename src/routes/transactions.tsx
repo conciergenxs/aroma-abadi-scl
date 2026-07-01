@@ -26,15 +26,24 @@ function TransactionsPage() {
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
+  const [store, setStore] = useState<string>("all");
   const [brand, setBrand] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [open, setOpen] = useState<Transaction | null>(null);
 
-  const cities = useMemo(() => Array.from(new Set(transactions.map((t) => t.city))), [transactions]);
-  const brands = useMemo(() => Array.from(new Set(transactions.map((t) => t.brandName))), [transactions]);
+  const cities = useMemo(() => Array.from(new Set(transactions.map((t) => t.city))).sort(), [transactions]);
+  const stores = useMemo(() => {
+    const src = city === "all" ? transactions : transactions.filter((t) => t.city === city);
+    return Array.from(new Set(src.map((t) => t.store))).sort();
+  }, [transactions, city]);
+  const brands = useMemo(() => Array.from(new Set(transactions.map((t) => t.brandName))).sort(), [transactions]);
+
+  // Reset store when city changes
+  const handleCityChange = (v: string) => { setCity(v); setStore("all"); };
 
   const filtered = transactions.filter((t) => {
     if (city !== "all" && t.city !== city) return false;
+    if (store !== "all" && t.store !== store) return false;
     if (brand !== "all" && t.brandName !== brand) return false;
     if (status !== "all" && t.status !== status) return false;
     if (search) {
