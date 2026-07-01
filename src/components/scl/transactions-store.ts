@@ -100,7 +100,7 @@ function seed(): Transaction[] {
   return items;
 }
 
-const STORAGE_KEY = "aroma_tx_store_v3";
+const STORAGE_KEY = "aroma_tx_store_v4";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
