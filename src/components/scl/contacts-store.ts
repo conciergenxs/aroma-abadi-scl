@@ -151,7 +151,8 @@ export type ContactActivity = {
     | "list_added"
     | "list_removed"
     | "updated"
-    | "note";
+    | "note"
+    | "transaction";
   message: string;
   at: string; // ISO
 };
