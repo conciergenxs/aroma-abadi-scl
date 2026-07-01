@@ -20,6 +20,7 @@ import {
   LIFECYCLE_COLORS,
   getStageStyle,
 } from "@/components/scl/contacts-store";
+import { useBaStore } from "@/components/scl/ba-store";
 import { toast } from "sonner";
 import {
   Search, Plus, MoreHorizontal,
