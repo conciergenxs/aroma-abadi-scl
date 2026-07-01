@@ -46,6 +46,10 @@ function seed(): Transaction[] {
     { id: "c6",  name: "Indah Permata" },
     { id: "c16", name: "Lina Wulandari" },
     { id: "c20", name: "Zahra Aulia" },
+    { id: "c2",  name: "Bagus Pratama" },
+    { id: "c13", name: "Ayu Fitriani" },
+    { id: "c15", name: "Tiara Hapsari" },
+    { id: "c22", name: "Dian Puspita" },
   ];
   const skus = [
     { skuId: "sku-dg-caviar-42", skuCode: "DG-CHC-42", skuName: "Caviar Hydra-Crème Lipstick 42g", price: 685000, brand: "Dolce & Gabbana" },
