@@ -203,7 +203,7 @@ function ContactsPage() {
           ? `${visibleContacts.length} contacts in this list`
           : activeView === "mine"
             ? `${visibleContacts.length} contacts assigned to you`
-            : `${contacts.length} contacts · ${lists.length} lists`
+            : `${liveContacts.length} contacts · ${lists.length} lists`
       }
       noPadding
     >
