@@ -491,6 +491,7 @@ function activityDot(type: ContactActivity["type"]) {
     case "list_added":
     case "list_removed": return "bg-sky-400";
     case "note": return "bg-amber-400";
+    case "transaction": return "bg-emerald-500";
     default: return "bg-muted-foreground";
   }
 }
