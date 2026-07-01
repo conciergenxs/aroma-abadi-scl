@@ -469,7 +469,7 @@ function ContactsTable({
           <th className={thCls}>Name</th>
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
-          <th className={thCls}>Point Balance</th>
+          {!isBaView && <th className={thCls}>Point Balance</th>}
           {isBaView && <>
             <th className={thCls}>Brand</th>
             <th className={thCls}>Gender</th>
