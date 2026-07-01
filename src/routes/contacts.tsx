@@ -220,7 +220,7 @@ function ContactsPage() {
               <span className="inline-flex items-center gap-2">
                 <Users className="h-3.5 w-3.5" /> All Contacts
               </span>
-              <span className="text-[10px] text-muted-foreground">{contacts.length}</span>
+              <span className="text-[10px] text-muted-foreground">{liveContacts.length}</span>
             </button>
             <button
               onClick={() => { setActiveView("mine"); setSelected([]); }}
