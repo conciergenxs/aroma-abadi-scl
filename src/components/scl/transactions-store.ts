@@ -36,7 +36,7 @@ function seed(): Transaction[] {
     { city: "Bandung", store: "Trans Studio Mall" },
     { city: "Surabaya", store: "Pakuwon Mall" },
   ];
-  const bas = ["Putri Anggraini", "Dewi Lestari", "Reza Wijaya", "Indah Permata", "Bagus Pratama"];
+  const bas = ["Dewi Lestari", "Maya Kusuma", "Reza Wijaya", "Hesti Andriani", "Indra Wahyudi", "Wulan Sari", "Kevin Nugroho"];
   const customers: { id: string; name: string }[] = [
     { id: "c1",  name: "Putri Anggraini" },
     { id: "c9",  name: "Citra Halim" },
