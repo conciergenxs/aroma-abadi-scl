@@ -39,6 +39,14 @@ function seed(): BA[] {
     { id: "ba9",  name: "Rizal Pratama",  gender: "Pria",    username: "rizal.p",  password: "RizalP5678", waNumber: "+62 878 5566 4433", brandIds: ["brand-laura"],                city: "Bandung",  store: "Trans Studio Mall", position: "Supervisor" },
     { id: "ba10", name: "Olivia Lim",     gender: "Wanita",  username: "olivia.l", password: "OliviaL789", waNumber: "+62 813 3344 9900", brandIds: ["brand-bm"],                   city: "Jakarta",  store: "Pondok Indah Mall", position: "BA" },
     { id: "ba11", name: "Eka Marlinda",   gender: "Wanita",  username: "eka.m",    password: "EkaM12345",  waNumber: "+62 856 7788 1122", brandIds: ["brand-dg", "brand-sisley"],   city: "Surabaya", store: "Pakuwon Mall",      position: "BA" },
+    { id: "ba12", name: "Mia Hartanti",   gender: "Wanita",  username: "mia.h",    password: "MiaH23456",  waNumber: "+62 812 1100 2233", brandIds: ["brand-sisley"],               city: "Jakarta",  store: "Grand Indonesia",   position: "BA" },
+    { id: "ba13", name: "Fauzan Akbar",   gender: "Pria",    username: "fauzan.a", password: "FauzA34567", waNumber: "+62 821 4455 6677", brandIds: ["brand-rimmel"],               city: "Bandung",  store: "Ciwalk",            position: "BA" },
+    { id: "ba14", name: "Nadia Pramesti", gender: "Wanita",  username: "nadia.p",  password: "NadiaP4567", waNumber: "+62 857 9988 1100", brandIds: ["brand-laura"],                city: "Jakarta",  store: "Grand Indonesia",   position: "Senior BA" },
+    { id: "ba15", name: "Bintang Ramadan",gender: "Pria",    username: "bintang.r",password: "BintR56789", waNumber: "+62 813 5544 7788", brandIds: ["brand-bm"],                   city: "Surabaya", store: "Tunjungan Plaza",   position: "BA" },
+    { id: "ba16", name: "Clara Santika",  gender: "Wanita",  username: "clara.s",  password: "ClaraS6789", waNumber: "+62 878 2211 3344", brandIds: ["brand-dg"],                   city: "Bandung",  store: "Ciwalk",            position: "BA" },
+    { id: "ba17", name: "Ariel Wijaya",   gender: "Pria",    username: "ariel.w",  password: "ArielW7890", waNumber: "+62 812 6677 8899", brandIds: ["brand-sisley"],               city: "Jakarta",  store: "Plaza Indonesia",   position: "Supervisor" },
+    { id: "ba18", name: "Fina Rahayu",    gender: "Wanita",  username: "fina.r",   password: "FinaR89012", waNumber: "+62 819 3322 5566", brandIds: ["brand-rimmel","brand-laura"], city: "Surabaya", store: "Tunjungan Plaza",   position: "BA" },
+    { id: "ba19", name: "Dodi Kurnia",    gender: "Pria",    username: "dodi.k",   password: "DodiK90123", waNumber: "+62 856 4433 9900", brandIds: ["brand-bm"],                   city: "Bandung",  store: "Trans Studio Mall", position: "BA" },
   ];
 }
 
