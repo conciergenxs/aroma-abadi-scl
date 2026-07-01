@@ -419,15 +419,6 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
             ))}
             {filtered.length === 0 && <li className="px-3 py-4 text-center text-sm text-muted-foreground">Tidak ditemukan</li>}
           </ul>
-          <div className="border-t border-border p-2">
-            <button
-              type="button"
-              onClick={() => { onAdd(); setOpen(false); }}
-              className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-dashed border-primary/50 text-primary px-2.5 h-8 text-sm hover:bg-primary/5"
-            >
-              <Plus className="h-3.5 w-3.5" /> Buat SKU Baru
-            </button>
-          </div>
         </div>
       )}
     </div>
