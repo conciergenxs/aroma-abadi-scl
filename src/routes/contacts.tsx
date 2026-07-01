@@ -344,51 +344,15 @@ function ContactsPage() {
             ) : (
             <SectionCard className="h-full flex flex-col">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
-                <table className="min-w-full text-sm">
-                  <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    <tr>
-                      <th className="sticky top-0 z-10 w-10 px-4 py-3 whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">
-                        <input
-                          type="checkbox"
-                          className="accent-[oklch(0.62_0.17_40)]"
-                          checked={allSelected}
-                          onChange={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
-                        />
-                      </th>
-                      {properties.filter((p) => p.visible).map((p) => (
-                        <th key={p.id} className="sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]">{p.name}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {pageContacts.map((c) => (
-                      <tr key={c.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => navigate({ to: "/contacts/$contactId", params: { contactId: c.id } })}>
-                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="checkbox"
-                            className="accent-[oklch(0.62_0.17_40)]"
-                            checked={selected.includes(c.id)}
-                            onChange={() => toggle(c.id)}
-                          />
-                        </td>
-                        {properties.filter((p) => p.visible).map((p) => (
-                          <td key={p.id} className="px-4 py-3 whitespace-nowrap align-middle">
-                            {renderPropertyCell(p, c, labelById, listById)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                    {pageContacts.length === 0 && (
-                      <tr>
-                        <td colSpan={properties.filter((p) => p.visible).length + 1} className="px-4 py-16 text-center text-xs text-muted-foreground">
-                          <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
-                          <div className="font-medium text-foreground">No contacts found</div>
-                          <div className="mt-1">Try selecting another channel or clearing filters.</div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                <ContactsTable
+                  contacts={pageContacts}
+                  view={activeView}
+                  selected={selected}
+                  allSelected={allSelected}
+                  onSelectAll={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
+                  onToggle={toggle}
+                  onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
+                />
               </div>
               <TablePagination
                 total={visibleContacts.length}
