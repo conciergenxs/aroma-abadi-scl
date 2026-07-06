@@ -216,11 +216,12 @@ function ContactDetailPage() {
   };
 
   const toggleBrand = (brandId: string) => {
-    const has = contact.brandIds.includes(brandId);
+    const ids = contact.brandIds ?? [];
+    const has = ids.includes(brandId);
     contactsStore.setContacts((cs) =>
       cs.map((c) =>
         c.id === contact.id
-          ? { ...c, brandIds: has ? c.brandIds.filter((x) => x !== brandId) : [...c.brandIds, brandId] }
+          ? { ...c, brandIds: has ? (c.brandIds ?? []).filter((x) => x !== brandId) : [...(c.brandIds ?? []), brandId] }
           : c,
       ),
     );
