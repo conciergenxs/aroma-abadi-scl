@@ -104,7 +104,7 @@ function BAPage() {
               {allPosisi.map((p) => <option key={p}>{p}</option>)}
             </select>
             <select value={filterStore} onChange={(e) => { setFilterStore(e.target.value); setPage(1); }} className={filterSelectCls}>
-              <option value="">Semua Store</option>
+              <option value="">All Stores</option>
               {allStores.map((s) => <option key={s}>{s}</option>)}
             </select>
             {hasFilters && (
