@@ -149,12 +149,14 @@ export function AppShell({
   subtitle,
   actions,
   noPadding,
+  backTo,
 }: {
   children: ReactNode;
   title?: string;
   subtitle?: string;
   actions?: ReactNode;
   noPadding?: boolean;
+  backTo?: string;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
