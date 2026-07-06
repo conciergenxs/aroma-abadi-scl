@@ -134,21 +134,21 @@ function TemplatesPage() {
             value={category}
             onChange={setCategory}
             options={CATEGORY_OPTIONS}
-            className="w-44"
+            className="w-36"
             ariaLabel="Filter by category"
           />
           <SclSelect
             value={channel}
             onChange={setChannel}
             options={CHANNEL_OPTIONS}
-            className="w-44"
+            className="w-36"
             ariaLabel="Filter by channel"
           />
           <SclSelect
             value={status}
             onChange={setStatus}
             options={STATUS_OPTIONS}
-            className="w-44"
+            className="w-32"
             ariaLabel="Filter by status"
           />
           <div className="ml-auto flex items-center gap-2">
