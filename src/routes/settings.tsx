@@ -26,7 +26,6 @@ import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
-import { PlansBillingModule } from "@/components/scl/plans-billing";
 import { DataManagementModule } from "@/components/scl/data-management";
 
 export const Route = createFileRoute("/settings")({
