@@ -189,10 +189,7 @@ function AccountsTab() {
           Connected WhatsApp Numbers
         </h3>
         <div className="space-y-3">
-          <ConnectedNumberCard businessAccount="Aroma Abadi HQ" phone="+62 811 9001 2233" displayName="Aroma Abadi HQ" accountId="waba_aroma_hq" />
-          <ConnectedNumberCard businessAccount="Aroma Abadi Jakarta" phone="+62 811 9001 4455" displayName="Aroma Abadi Jakarta" accountId="waba_aroma_jakarta" />
-          <ConnectedNumberCard businessAccount="Aroma Abadi Bandung" phone="+62 811 9001 6677" displayName="Aroma Abadi Bandung" accountId="waba_aroma_bandung" />
-          <ConnectedNumberCard businessAccount="Aroma Beauty Club" phone="+62 811 9001 8899" displayName="Aroma Beauty Club" accountId="waba_aroma_loyalty" />
+          <ConnectedNumberCard businessAccount="Arma by Aroma Abadi" phone="+62 811 9001 2233" displayName="Arma by Aroma Abadi" accountId="waba_arma_aroma" />
         </div>
       </div>
     </div>
