@@ -228,7 +228,7 @@ function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: (
           </button>
           <div className="border-t border-border my-1" />
           <button
-            onClick={(e) => { e.stopPropagation(); setOpen(false); toast.error("Hapus promo (coming soon)"); }}
+            onClick={(e) => { e.stopPropagation(); setOpen(false); toast.error("Delete promo (coming soon)"); }}
             className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left"
           >
             <Trash2 className="h-3.5 w-3.5" /> Delete
