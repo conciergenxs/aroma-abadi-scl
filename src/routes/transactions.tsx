@@ -234,7 +234,12 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: string; 
 
 function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
-    <select value={value} onChange={(e) => onChange(e.target.value)} className="h-8 rounded-md border border-border bg-card/60 px-2 text-xs">
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-8 rounded-md border border-border bg-card/60 pl-2 pr-6 text-xs appearance-none"
+      style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.35rem center", backgroundSize: "1.2em 1.2em" }}
+    >
       {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
