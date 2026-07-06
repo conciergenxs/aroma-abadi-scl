@@ -306,25 +306,21 @@ function ContactDetailPage() {
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-card/80 backdrop-blur px-4 lg:px-6 py-3">
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-sm font-medium truncate">{contact.name}</h1>
-            {contact.lifecycleStage && (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] ${
-                  getStageStyle(contact.lifecycleStage).badge
-                }`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${getStageStyle(contact.lifecycleStage).dot}`}
-                />
-                {contact.lifecycleStage}
-              </span>
-            )}
           </div>
-          <button
-            onClick={handleDelete}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/inbox"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs font-medium hover:bg-card transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" /> See Inbox
+            </Link>
+            <button
+              onClick={handleDelete}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Delete
+            </button>
+          </div>
         </header>
 
         {/* 2-panel workspace */}
