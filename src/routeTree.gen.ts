@@ -435,6 +435,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   PromoCodesRoute: PromoCodesRoute,
+  PromoCodesNewRoute: PromoCodesNewRoute,
+  PromoCodesPromoIdRoute: PromoCodesPromoIdRoute,
   SettingsRoute: SettingsRoute,
   SkuRoute: SkuRoute,
   TransactionsRoute: TransactionsRoute,
