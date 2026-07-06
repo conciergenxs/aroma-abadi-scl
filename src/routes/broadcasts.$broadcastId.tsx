@@ -7,7 +7,7 @@ import { useTemplatesStore, TEMPLATE_GROUP_BADGE } from "@/components/scl/templa
 import { connectedChannels, type Broadcast } from "@/components/scl/mock-data";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft,
+  ChevronLeft,
   Users,
   ListPlus,
   ListMinus,
