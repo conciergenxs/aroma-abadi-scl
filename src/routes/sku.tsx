@@ -275,10 +275,10 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
           <span className="text-foreground font-medium">{category.name}</span>
         </nav>
         <button
-          onClick={() => { if (confirm(`Hapus category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category dihapus"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus"
+          onClick={() => { if (confirm(`Delete category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category deleted"); onBack(); } }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Delete"
         >
-          <Trash2 className="h-4 w-4" /> Hapus Category
+          <Trash2 className="h-4 w-4" /> Delete Category
         </button>
       </div>
 
