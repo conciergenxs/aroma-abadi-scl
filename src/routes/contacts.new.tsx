@@ -150,7 +150,7 @@ function NewContactPage() {
   // ── Step 1: type selector ────────────────────────────────────────────────
   if (!contactType) {
     return (
-      <AppShell title="Buat Kontak Baru" backTo="/contacts" noPadding>
+      <AppShell title="New Contact" backTo="/contacts" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
 
           <div className="flex-1 flex items-center justify-center p-6">
