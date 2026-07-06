@@ -168,7 +168,7 @@ function BAPage() {
                         <button
                           onClick={() => { baStore.remove(b.id); toast.success("BA dihapus"); }}
                           className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors"
-                          title="Hapus"
+                          title="Delete"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
