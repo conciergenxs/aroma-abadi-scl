@@ -717,8 +717,10 @@ function RightPanel({
   onCreateLabel: (name: string) => void;
   onToggleList: (id: string) => void;
   onCreateList: (name: string) => void;
+  onToggleBrand: (brandId: string) => void;
   onSetCustomProperty: (key: string, value: unknown, displayName: string) => void;
 }) {
+  const { brands } = useSkuStore();
   return (
     <div className="p-4 space-y-6">
       <RightSection title="Contact Information">
