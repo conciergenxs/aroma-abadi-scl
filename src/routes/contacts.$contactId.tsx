@@ -34,6 +34,8 @@ import {
 import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
+import { useBaStore } from "@/components/scl/ba-store";
+import { useSkuStore } from "@/components/scl/sku-store";
 
 const SYSTEM_KEYS = new Set([
   "name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email",
