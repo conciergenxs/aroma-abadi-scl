@@ -749,7 +749,7 @@ function RightPanel({
         />
       </RightSection>
 
-      <RightSection title="Lists">
+      <RightSection title="Audience">
         <ListSelector
           lists={lists}
           selectedIds={contact.listIds}
