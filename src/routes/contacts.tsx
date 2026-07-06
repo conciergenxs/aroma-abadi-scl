@@ -481,7 +481,8 @@ function ContactsTable({
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
 
   // colSpan for empty state
-  const colSpan = isBaView ? 9 : isMineView ? 6 : 5; // mine: checkbox+name+gender+wa+type+pts = 6
+  // mine: checkbox+name+gender+wa+type+pts+brands+last_tx = 8
+  const colSpan = isBaView ? 9 : isMineView ? 8 : 5;
 
   return (
     <table className="min-w-full text-sm">
@@ -495,6 +496,8 @@ function ContactsTable({
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
           {isMineView && <th className={thCls}>Point Balance</th>}
+          {isMineView && <th className={thCls}>Brands</th>}
+          {isMineView && <th className={thCls}>Last Transaction</th>}
           {isBaView && <>
             <th className={thCls}>Brand</th>
             <th className={thCls}>Gender</th>
