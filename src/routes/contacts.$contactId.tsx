@@ -640,6 +640,15 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
                     {t.status}
                   </span>
                 </td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => setPeekTx(t)}
+                    className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                    title="View details"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
