@@ -582,6 +582,18 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Paid</div>
           <div className="text-lg font-semibold mt-1">{paidCount} <span className="text-xs font-normal text-muted-foreground">/ {transactions.length}</span></div>
         </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Favorite Brand</div>
+          <div className="text-sm font-semibold mt-1 truncate">{favoriteBrand}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Favorite Product</div>
+          <div className="text-sm font-semibold mt-1 truncate">{favoriteProduct}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Est. Purchase Time</div>
+          <div className="text-sm font-semibold mt-1">{estPurchaseTime}</div>
+        </div>
       </div>
 
       {/* Table */}
