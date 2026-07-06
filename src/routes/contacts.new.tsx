@@ -127,7 +127,7 @@ function NewContactPage() {
       name: name.trim(),
       phone: phone.trim(),
       channel: "whatsapp",
-      gender: (gender as "Wanita" | "Pria" | "Lainnya") || undefined,
+      gender: (gender as "Female" | "Male" | "Other") || undefined,
       labelIds,
       listIds: [],
       lastInteraction: "Just now",
