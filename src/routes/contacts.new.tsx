@@ -209,9 +209,9 @@ function NewContactPage() {
               <button
                 type="button"
                 onClick={() => setContactType(null)}
-                className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                className="inline-flex items-center gap-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] px-2 h-7 text-xs font-medium transition-colors"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
               <h1 className="text-sm font-medium">Buat Beauty Ambassador</h1>
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
