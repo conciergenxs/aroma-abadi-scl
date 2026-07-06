@@ -850,7 +850,7 @@ function AudienceModal({
         <div className="flex items-center justify-between px-5 py-3 border-t border-border">
           <div className="text-[11px] text-muted-foreground">
             {tab === "list"
-              ? `${localLists.size} list(s) selected`
+              ? `${localLists.size} audience(s) selected`
               : `${localConds.length} condition(s) defined`}
           </div>
           <div className="flex items-center gap-2">
