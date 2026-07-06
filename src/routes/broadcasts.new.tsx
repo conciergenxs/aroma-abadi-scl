@@ -117,16 +117,8 @@ function CreateBroadcastPage() {
   }, [lists, selectedLists, conditions]);
 
   return (
-    <AppShell>
+    <AppShell backTo="/broadcasts" title="Add New Broadcast">
       <div className="mb-8">
-        <Link
-          to="/broadcasts"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
-        </Link>
-        <h1 className="text-xl font-semibold tracking-tight mt-2">Add New Broadcast</h1>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
         {/* Left — form */}
