@@ -391,14 +391,16 @@ function PromoCodesPage() {
                       <div className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px] truncate">{promo.description}</div>
                     </td>
 
-                    {/* Discount */}
-                    <td className="px-4 py-3 text-[13px]">
-                      {promo.discountType === "percentage"
-                        ? <span className="font-semibold text-primary">{promo.discountValue}%</span>
-                        : <span className="font-semibold text-primary">{formatIDR(promo.discountValue)}</span>
-                      }
-                      {promo.minPurchase > 0 && (
-                        <div className="text-[10px] text-muted-foreground mt-0.5">min. {formatIDR(promo.minPurchase)}</div>
+                    {/* Usage Type */}
+                    <td className="px-4 py-3">
+                      {promo.usageType === "one-to-one" ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 text-[10px] font-medium text-sky-300">
+                          1-to-1
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-[10px] font-medium text-violet-300">
+                          1-to-Many
+                        </span>
                       )}
                     </td>
 
