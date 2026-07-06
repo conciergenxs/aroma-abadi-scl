@@ -584,6 +584,69 @@ function InboxPage() {
             })}
           </NavSection>
 
+          {/* Labels filter section */}
+          <div className="border-t border-border pt-3 mt-2 px-2">
+            <div className="flex items-center justify-between mb-1.5 px-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Labels</span>
+              <button
+                onClick={() => setLabelModalOpen(true)}
+                className="h-5 w-5 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+            {labels.map((lbl) => {
+              const count = contacts.filter((c) => c.labelIds.includes(lbl.id)).length;
+              const active = labelFilter === lbl.id;
+              return (
+                <button
+                  key={lbl.id}
+                  onClick={() => setLabelFilter(active ? null : lbl.id)}
+                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-[12px] transition-colors ${active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"}`}
+                >
+                  <span className={`h-2 w-2 rounded-full ${labelColorDot[lbl.color]}`} />
+                  <span className="flex-1 text-left truncate">{lbl.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{count}</span>
+                </button>
+              );
+            })}
+            {labelModalOpen && (
+              <div className="px-1 py-2 space-y-2">
+                <input
+                  autoFocus
+                  value={newLabelName}
+                  onChange={(e) => setNewLabelName(e.target.value)}
+                  placeholder="Label name..."
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                />
+                <select
+                  value={newLabelColor}
+                  onChange={(e) => setNewLabelColor(e.target.value as import("@/components/scl/mock-data").LabelColor)}
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                >
+                  {(["indigo","pink","emerald","amber","sky","violet","slate"] as const).map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => {
+                      if (!newLabelName.trim()) return;
+                      contactsStore.setLabels((l) => [...l, { id: `lb-${Date.now()}`, name: newLabelName.trim(), color: newLabelColor }]);
+                      setNewLabelName("");
+                      setLabelModalOpen(false);
+                    }}
+                    className="flex-1 h-7 rounded bg-primary text-primary-foreground text-xs font-medium"
+                  >Save</button>
+                  <button
+                    onClick={() => { setNewLabelName(""); setLabelModalOpen(false); }}
+                    className="flex-1 h-7 rounded border border-border text-xs text-muted-foreground"
+                  >Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
