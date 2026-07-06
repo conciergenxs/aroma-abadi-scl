@@ -127,18 +127,18 @@ const SCHEMA: CategorySection[] = [
           },
           {
             id: "list-mgmt",
-            label: "List Management",
+            label: "Audience Management",
             items: [
-              { id: "add-remove-list", label: "Add / Remove Contacts To Lists", defaultChecked: true },
+              { id: "add-remove-list", label: "Add / Remove Contacts To Audience", defaultChecked: true },
               { id: "export-contacts", label: "Export Contacts" },
               {
                 id: "view-lists",
-                label: "View Contact Lists",
+                label: "View Contact Audiences",
                 defaultChecked: true,
                 children: [
-                  { id: "create-list", label: "Create Contact Lists", defaultChecked: true },
-                  { id: "edit-list", label: "Edit Contact Lists", defaultChecked: true },
-                  { id: "delete-list", label: "Delete Contact Lists" },
+                  { id: "create-list", label: "Create Contact Audiences", defaultChecked: true },
+                  { id: "edit-list", label: "Edit Contact Audiences", defaultChecked: true },
+                  { id: "delete-list", label: "Delete Contact Audiences" },
                 ],
               },
             ],
