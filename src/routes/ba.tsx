@@ -273,7 +273,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
   const { brands } = useSkuStore();
   const [name, setName] = useState(initial?.name || "");
   const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
-  const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Wanita");
+  const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Female");
   const [password, setPassword] = useState(initial?.password || baStore.generatePassword());
   const [spinning, setSpinning] = useState(false);
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
