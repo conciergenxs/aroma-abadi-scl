@@ -172,6 +172,39 @@ function TransactionsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {pageSize > 0 && totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border text-[11px] text-muted-foreground">
+              <span>
+                {((safePage - 1) * safePageSize) + 1}–{Math.min(safePage * safePageSize, filtered.length)} dari {filtered.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={safePage <= 1}
+                  className="h-7 w-7 grid place-items-center rounded border border-border bg-card/40 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </button>
+                {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                  const p = totalPages <= 7 ? i + 1 : safePage <= 4 ? i + 1 : safePage >= totalPages - 3 ? totalPages - 6 + i : safePage - 3 + i;
+                  return (
+                    <button key={p} onClick={() => setPage(p)}
+                      className={`h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card text-muted-foreground"}`}
+                    >{p}</button>
+                  );
+                })}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={safePage >= totalPages}
+                  className="h-7 w-7 grid place-items-center rounded border border-border bg-card/40 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </SectionCard>
       </div>
 
