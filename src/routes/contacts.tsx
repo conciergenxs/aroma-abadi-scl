@@ -457,6 +457,7 @@ function ContactsTable({
   const { transactions } = useTransactionsStore();
   const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
 
+
   // Last transaction per contact
   const lastTxByContact = useMemo(() => {
     const map = new Map<string, { date: string; invoice: string }>();
