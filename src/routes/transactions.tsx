@@ -107,7 +107,21 @@ function TransactionsPage() {
               { value: "Pending", label: "Pending" },
               { value: "Refunded", label: "Refunded" },
             ]} />
-            <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} transaksi</div>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground">{filtered.length} transaksi</span>
+              <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <span>Tampil</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                  className="h-7 rounded-md border border-border bg-card/60 px-2 pr-6 text-xs appearance-none"
+                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.35rem center", backgroundSize: "1.2em 1.2em" }}
+                >
+                  {[5, 10, 20, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                  <option value={0}>Semua</option>
+                </select>
+              </label>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
