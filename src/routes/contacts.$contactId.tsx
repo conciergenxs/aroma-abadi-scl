@@ -215,6 +215,23 @@ function ContactDetailPage() {
     }
   };
 
+  const toggleBrand = (brandId: string) => {
+    const has = contact.brandIds.includes(brandId);
+    contactsStore.setContacts((cs) =>
+      cs.map((c) =>
+        c.id === contact.id
+          ? { ...c, brandIds: has ? c.brandIds.filter((x) => x !== brandId) : [...c.brandIds, brandId] }
+          : c,
+      ),
+    );
+    contactsStore.addActivity(
+      contact.id,
+      "updated",
+      has ? `Removed brand association` : `Added brand association`,
+    );
+    toast.success("Brands updated");
+  };
+
   const createLabel = (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) return;
