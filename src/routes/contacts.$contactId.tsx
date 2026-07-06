@@ -603,7 +603,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <div className="text-lg font-semibold mt-1">{transactions.length}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Belanja</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Spend</div>
           <div className="text-lg font-semibold mt-1">{formatIDR(totalSpend)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
