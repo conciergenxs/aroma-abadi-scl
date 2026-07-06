@@ -2,15 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useTransactionsStore, formatIDR, type Transaction, type TxStatus } from "@/components/scl/transactions-store";
-import { Search, Receipt, TrendingUp, Wallet, Package, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Receipt, TrendingUp, Wallet, Package, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
     meta: [
       { title: "Transaction Records — Aroma Abadi" },
-      { name: "description", content: "Catatan transaksi penjualan Aroma Abadi per store, BA, dan brand." },
       { property: "og:title", content: "Transaction Records — Aroma Abadi" },
-      { property: "og:description", content: "Pantau transaksi WhatsApp & in-store Aroma Abadi." },
     ],
   }),
   component: TransactionsPage,
@@ -29,6 +27,8 @@ function TransactionsPage() {
   const [store, setStore] = useState<string>("all");
   const [brand, setBrand] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [open, setOpen] = useState<Transaction | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -40,14 +40,23 @@ function TransactionsPage() {
   }, [transactions, city]);
   const brands = useMemo(() => Array.from(new Set(transactions.map((t) => t.brandName))).sort(), [transactions]);
 
-  // Reset store when city changes
   const handleCityChange = (v: string) => { setCity(v); setStore("all"); };
 
-  const filtered = transactions.filter((t) => {
+  const filtered = useMemo(() => transactions.filter((t) => {
     if (city !== "all" && t.city !== city) return false;
     if (store !== "all" && t.store !== store) return false;
     if (brand !== "all" && t.brandName !== brand) return false;
     if (status !== "all" && t.status !== status) return false;
+    if (dateFrom) {
+      const txDate = new Date(t.date); txDate.setHours(0, 0, 0, 0);
+      const from = new Date(dateFrom); from.setHours(0, 0, 0, 0);
+      if (txDate < from) return false;
+    }
+    if (dateTo) {
+      const txDate = new Date(t.date); txDate.setHours(23, 59, 59, 999);
+      const to = new Date(dateTo); to.setHours(23, 59, 59, 999);
+      if (txDate > to) return false;
+    }
     if (search) {
       const q = search.toLowerCase();
       if (
@@ -58,11 +67,11 @@ function TransactionsPage() {
       ) return false;
     }
     return true;
-  });
+  }), [transactions, city, store, brand, status, dateFrom, dateTo, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const safePageSize = pageSize === 0 ? filtered.length : pageSize;
-  const safePage = Math.min(page, Math.max(1, Math.ceil(filtered.length / safePageSize)));
+  const safePageSize = pageSize === 0 ? filtered.length || 1 : pageSize;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / safePageSize));
+  const safePage = Math.min(page, totalPages);
   const paginated = pageSize === 0 ? filtered : filtered.slice((safePage - 1) * safePageSize, safePage * safePageSize);
 
   const today = new Date().toDateString();
@@ -75,52 +84,70 @@ function TransactionsPage() {
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
   })();
 
+  const showPagination = pageSize > 0;
+  const from = filtered.length === 0 ? 0 : (safePage - 1) * safePageSize + 1;
+  const to = Math.min(safePage * safePageSize, filtered.length);
+
   return (
-    <AppShell title="Transaction Records" subtitle="Catatan transaksi penjualan Aroma Abadi">
+    <AppShell title="Transaction Records" subtitle="Sales transactions per store, BA, and brand">
       <div className="space-y-5">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-          <StatCard label="Revenue Hari Ini" value={formatIDR(revenue)} icon={Wallet} />
-          <StatCard label="Transaksi Hari Ini" value={todayTx.length.toLocaleString("id-ID")} icon={Receipt} />
-          <StatCard label="AOV Hari Ini" value={formatIDR(aov)} icon={TrendingUp} />
+          <StatCard label="Today's Revenue" value={formatIDR(revenue)} icon={Wallet} />
+          <StatCard label="Today's Transactions" value={todayTx.length.toLocaleString()} icon={Receipt} />
+          <StatCard label="Today's AOV" value={formatIDR(aov)} icon={TrendingUp} />
           <StatCard label="Top SKU" value={topSku} icon={Package} />
         </div>
 
         {/* Toolbar */}
         <SectionCard>
           <div className="p-3 flex flex-wrap items-center gap-2 border-b border-border">
+            {/* Left: search + filters */}
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari invoice, customer, BA, store…"
-                className="h-8 w-72 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                placeholder="Search invoice, customer, BA, store…"
+                className="h-8 w-64 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            <Select value={city} onChange={handleCityChange} options={[{ value: "all", label: "Semua Kota" }, ...cities.map((c) => ({ value: c, label: c }))]} />
-            <Select value={store} onChange={setStore} options={[{ value: "all", label: "Semua Store" }, ...stores.map((s) => ({ value: s, label: s }))]} />
-            <Select value={brand} onChange={setBrand} options={[{ value: "all", label: "Semua Brand" }, ...brands.map((c) => ({ value: c, label: c }))]} />
-            <Select value={status} onChange={setStatus} options={[
-              { value: "all", label: "Semua Status" },
+            <Select value={city} onChange={(v) => { handleCityChange(v); setPage(1); }} options={[{ value: "all", label: "All Cities" }, ...cities.map((c) => ({ value: c, label: c }))]} />
+            <Select value={store} onChange={(v) => { setStore(v); setPage(1); }} options={[{ value: "all", label: "All Stores" }, ...stores.map((s) => ({ value: s, label: s }))]} />
+            <Select value={brand} onChange={(v) => { setBrand(v); setPage(1); }} options={[{ value: "all", label: "All Brands" }, ...brands.map((c) => ({ value: c, label: c }))]} />
+            <Select value={status} onChange={(v) => { setStatus(v); setPage(1); }} options={[
+              { value: "all", label: "All Statuses" },
               { value: "Paid", label: "Paid" },
               { value: "Pending", label: "Pending" },
               { value: "Refunded", label: "Refunded" },
             ]} />
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-[11px] text-muted-foreground">{filtered.length} transaksi</span>
-              <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                <span>Tampil</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-                  className="h-7 rounded-md border border-border bg-card/60 px-2 pr-6 text-xs appearance-none"
-                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.35rem center", backgroundSize: "1.2em 1.2em" }}
+
+            {/* Right: date range */}
+            <div className="ml-auto flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+                className="h-8 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                title="From date"
+              />
+              <span className="text-[11px] text-muted-foreground">–</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+                className="h-8 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                title="To date"
+              />
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
+                  className="h-8 rounded-md border border-border bg-card/60 px-2 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
                 >
-                  {[5, 10, 20, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
-                  <option value={0}>Semua</option>
-                </select>
-              </label>
+                  Clear
+                </button>
+              )}
             </div>
           </div>
 
@@ -129,14 +156,14 @@ function TransactionsPage() {
               <thead className="text-muted-foreground">
                 <tr className="border-b border-border">
                   <Th>Invoice</Th>
-                  <Th>Tanggal</Th>
+                  <Th>Date</Th>
                   <Th>Customer</Th>
                   <Th>BA</Th>
-                  <Th>Store / Kota</Th>
+                  <Th>Store / City</Th>
                   <Th>Brand</Th>
                   <Th>Items</Th>
                   <Th>Total</Th>
-                  <Th>Bayar</Th>
+                  <Th>Payment</Th>
                   <Th>Status</Th>
                 </tr>
               </thead>
@@ -144,7 +171,7 @@ function TransactionsPage() {
                 {paginated.map((t) => (
                   <tr key={t.id} className="border-b border-border hover:bg-white/[0.025] cursor-pointer align-top transition-colors" onClick={() => setOpen(t)}>
                     <Td className="font-medium text-foreground">{t.invoice}</Td>
-                    <Td>{new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</Td>
+                    <Td>{new Date(t.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</Td>
                     <Td>{t.customerName}</Td>
                     <Td>{t.baName}</Td>
                     <Td>{t.store} · <span className="text-muted-foreground">{t.city}</span></Td>
@@ -167,18 +194,33 @@ function TransactionsPage() {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={10} className="text-center py-10 text-muted-foreground text-sm">Tidak ada transaksi</td></tr>
+                  <tr><td colSpan={10} className="text-center py-10 text-muted-foreground text-sm">No transactions found</td></tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination */}
-          {pageSize > 0 && totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-border text-[11px] text-muted-foreground">
-              <span>
-                {((safePage - 1) * safePageSize) + 1}–{Math.min(safePage * safePageSize, filtered.length)} dari {filtered.length}
-              </span>
+          {/* Pagination row — always visible, shows count + nav */}
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 border-t border-border text-[11px] text-muted-foreground">
+            {/* Left: count + rows per page */}
+            <div className="flex items-center gap-3">
+              <span>{filtered.length === 0 ? "0" : `${from}–${to}`} of {filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</span>
+              <label className="flex items-center gap-1">
+                <span>Rows</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                  className="h-7 rounded-md border border-border bg-card/60 pl-2 pr-6 text-xs appearance-none"
+                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.35rem center", backgroundSize: "1.2em 1.2em" }}
+                >
+                  {[5, 10, 20, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                  <option value={0}>All</option>
+                </select>
+              </label>
+            </div>
+
+            {/* Right: prev/pages/next */}
+            {showPagination && totalPages > 1 && (
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -203,8 +245,8 @@ function TransactionsPage() {
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </SectionCard>
       </div>
 
