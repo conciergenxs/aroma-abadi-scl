@@ -495,9 +495,7 @@ function ContactsTable({
           {(isAllOrBrand || isMineView) && <th className={thCls}>Gender</th>}
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
-          {isAllOrBrand && <th className={thCls}>Brands</th>}
           {isMineView && <th className={thCls}>Point Balance</th>}
-          {isMineView && <th className={thCls}>Brands</th>}
           {isMineView && <th className={thCls}>Last Transaction</th>}
           {isBaView && <>
             <th className={thCls}>Brand</th>
