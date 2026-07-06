@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PromoCodesRouteImport } from './routes/promo-codes'
+import { Route as PromoCodesNewRouteImport } from './routes/promo-codes.new'
+import { Route as PromoCodesPromoIdRouteImport } from './routes/promo-codes.$promoId'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SkuRouteImport } from './routes/sku'
 import { Route as SettingsRouteImport } from './routes/settings'
