@@ -282,9 +282,8 @@ function PromoCodesPage() {
             {filtered.map((promo) => {
               const isExpanded = expandedId === promo.id;
               return (
-                <>
+                <Fragment key={promo.id}>
                   <tr
-                    key={promo.id}
                     onClick={() => setExpandedId(isExpanded ? null : promo.id)}
                     className="cursor-pointer hover:bg-white/[0.025] transition-colors"
                   >
