@@ -241,7 +241,7 @@ function NewContactPage() {
                       <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
                     </Field>
                     <Field label="Posisi" required>
-                      <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Pilih posisi…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
+                      <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Select position…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
                     </Field>
                   </FormGrid>
                 </FormSection>
