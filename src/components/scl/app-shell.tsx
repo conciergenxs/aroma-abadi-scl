@@ -92,6 +92,24 @@ export function AppShell({
   const [inviteOpen, setInviteOpen] = useState(false);
   const [expanded, setExpanded] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const notifRef = useRef<HTMLDivElement>(null);
+  const notifBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const handler = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (notifRef.current?.contains(t) || notifBtnRef.current?.contains(t)) return;
+      setNotifOpen(false);
+    };
+    window.addEventListener("mousedown", handler);
+    return () => window.removeEventListener("mousedown", handler);
+  }, [notifOpen]);
+
+  const markAllRead = () => setReadIds(new Set(MOCK_NOTIFS.map((n) => n.id)));
+  const unreadCount = MOCK_NOTIFS.filter((n) => !readIds.has(n.id)).length;
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
