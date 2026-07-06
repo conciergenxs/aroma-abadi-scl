@@ -16,7 +16,7 @@ export const Route = createFileRoute("/contacts/new")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 const POSITIONS = ["BA", "Senior BA", "Supervisor"];
-const GENDERS = ["Wanita", "Pria", "Lainnya"] as const;
+const GENDERS = ["Female", "Male", "Other"] as const;
 const CITIES = ["Jakarta", "Bandung", "Surabaya", "Medan", "Makassar", "Bali", "Yogyakarta"];
 const STORES_BY_CITY: Record<string, string[]> = {
   Jakarta: ["Plaza Indonesia", "Grand Indonesia", "Pondok Indah Mall", "Central Park"],
@@ -88,7 +88,7 @@ function NewContactPage() {
       name: name.trim(),
       phone: phone.trim(),
       channel: "whatsapp",
-      gender: gender as "Wanita" | "Pria" | "Lainnya",
+      gender: gender as "Female" | "Male" | "Other",
       labelIds: ["lb-ba"],
       listIds: [],
       lastInteraction: "Just now",
@@ -104,7 +104,7 @@ function NewContactPage() {
     const username = name.trim().toLowerCase().replace(/\s+/g, ".").replace(/[^a-z.]/g, "");
     baStore.add({
       name: name.trim(),
-      gender: gender as "Wanita" | "Pria" | "Lainnya",
+      gender: gender as "Female" | "Male" | "Other",
       username,
       waNumber: phone.trim(),
       brandIds,
