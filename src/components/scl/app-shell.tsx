@@ -257,13 +257,20 @@ export function AppShell({
       {/* Main */}
       <div className="flex h-full flex-col flex-1 min-w-0 overflow-hidden">
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-6">
-          <div className="flex flex-col">
-            {title ? (
-              <h1 className="text-base font-semibold tracking-tight">{title}</h1>
-            ) : null}
-            {subtitle ? (
-              <p className="text-sm text-muted-foreground">{subtitle}</p>
-            ) : null}
+          <div className="flex items-center gap-2">
+            {backTo && (
+              <Link to={backTo as Parameters<typeof Link>[0]["to"]} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors">
+                <ChevronLeft className="h-4 w-4" />
+              </Link>
+            )}
+            <div className="flex flex-col">
+              {title ? (
+                <h1 className="text-base font-semibold tracking-tight">{title}</h1>
+              ) : null}
+              {subtitle ? (
+                <p className="text-sm text-muted-foreground">{subtitle}</p>
+              ) : null}
+            </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {/* Notification Bell */}
