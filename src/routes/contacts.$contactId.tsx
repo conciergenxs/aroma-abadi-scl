@@ -579,8 +579,8 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
         <div className="h-12 w-12 rounded-full bg-white/[0.04] border border-border grid place-items-center">
           <ShoppingBag className="h-5 w-5 text-muted-foreground" />
         </div>
-        <div className="text-sm text-foreground">Belum ada transaksi.</div>
-        <div className="text-[11px] text-muted-foreground">Transaksi dari kontak ini akan muncul di sini.</div>
+        <div className="text-sm text-foreground">No transactions yet.</div>
+        <div className="text-[11px] text-muted-foreground">Transactions from this contact will appear here.</div>
       </div>
     );
   }
@@ -599,7 +599,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Transaksi</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Transactions</div>
           <div className="text-lg font-semibold mt-1">{transactions.length}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">

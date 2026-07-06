@@ -305,9 +305,9 @@ function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
           <Row label="BA" value={tx.baName} />
           <Row label="Store" value={`${tx.store} · ${tx.city}`} />
           <Row label="Brand" value={tx.brandName} />
-          <Row label="Metode Bayar" value={tx.paymentMethod} />
+          <Row label="Payment Method" value={tx.paymentMethod} />
           <Row label="Status" value={tx.status} />
-          {tx.note && <Row label="Catatan BA" value={tx.note} />}
+          {tx.note && <Row label="BA Note" value={tx.note} />}
 
           <div>
             <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
@@ -315,7 +315,7 @@ function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
               {tx.items.map((i, idx) => (
                 <li key={idx} className="px-3 py-2 flex items-center gap-2 text-sm">
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium">{i.skuName} · {i.qty} pcs</div>
+                    <div className="font-medium">{i.skuName} · {i.qty} {i.qty === 1 ? "pc" : "pcs"}</div>
                     <div className="text-xs text-muted-foreground">{i.skuCode} · {formatIDR(i.unitPrice)}</div>
                   </div>
                   <div className="text-right font-medium">{formatIDR(i.unitPrice * i.qty)}</div>
