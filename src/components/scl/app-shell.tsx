@@ -19,7 +19,6 @@ import {
   Megaphone,
   FileText,
   Settings,
-  Search,
   Bell,
   User,
   LogOut,
@@ -31,6 +30,11 @@ import {
   BadgeCheck,
   ChevronsLeft,
   ChevronsRight,
+  MessageCircle,
+  ShoppingBag,
+  Megaphone as MegaphoneIcon,
+  CheckCheck,
+  X as XIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
