@@ -315,7 +315,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           <div className="grid grid-cols-2 gap-3">
             <Field label="Gender">
               <select value={gender} onChange={(e) => setGender(e.target.value as BA["gender"])} className={inputCls}>
-                <option>Wanita</option><option>Pria</option><option>Lainnya</option>
+                <option>Female</option><option>Male</option><option>Other</option>
               </select>
             </Field>
             <Field label="No. WhatsApp (untuk login)">
