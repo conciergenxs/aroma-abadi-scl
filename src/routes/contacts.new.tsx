@@ -339,7 +339,7 @@ function NewContactPage() {
 
               <FormSection title="Brands">
                 <div className="space-y-2">
-                  <p className="text-[11px] text-muted-foreground">Brand produk yang relevan untuk customer ini (opsional).</p>
+                  <p className="text-[11px] text-muted-foreground">Relevant product brands for this customer (optional).</p>
                   <div className="flex flex-wrap gap-2">
                     {brands.map((b) => {
                       const on = customerBrandIds.includes(b.id);
