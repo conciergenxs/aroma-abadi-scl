@@ -388,10 +388,10 @@ function PromoCodesPage() {
                           onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(promo.code);
-                            toast.success("Kode disalin");
+                            toast.success("Code copied");
                           }}
                           className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
-                          title="Salin kode"
+                          title="Copy code"
                         >
                           <Copy className="h-3 w-3" />
                         </button>
