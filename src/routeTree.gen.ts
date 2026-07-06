@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PromoCodesRouteImport } from './routes/promo-codes'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SkuRouteImport } from './routes/sku'
 import { Route as SettingsRouteImport } from './routes/settings'
