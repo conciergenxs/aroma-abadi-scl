@@ -35,9 +35,7 @@ type PromoCode = {
   code: string;
   name: string;
   description: string;
-  discountType: "percentage" | "fixed";
-  discountValue: number;
-  minPurchase: number;
+  usageType: "one-to-one" | "one-to-many";
   maxUsage: number | null;
   startDate: string;
   endDate: string;
