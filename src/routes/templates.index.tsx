@@ -323,7 +323,7 @@ function TemplatesPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-xs text-muted-foreground">
+                    <td colSpan={9} className="px-4 py-10 text-center text-xs text-muted-foreground">
                       No templates match your filters.
                     </td>
                   </tr>
