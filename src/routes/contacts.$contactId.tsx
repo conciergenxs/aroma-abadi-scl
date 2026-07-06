@@ -654,6 +654,32 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           </tbody>
         </table>
       </div>
+
+      {peekTx && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setPeekTx(null)} />
+          <aside className="relative w-80 bg-background border-l border-border h-full overflow-y-auto p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold">{peekTx.invoice}</h2>
+              <button onClick={() => setPeekTx(null)}><X className="h-4 w-4" /></button>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Date</span><div className="mt-0.5">{new Date(peekTx.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</div></div>
+              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Brand</span><div className="mt-0.5">{peekTx.brandName}</div></div>
+              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</span><div className="mt-0.5 font-semibold">{formatIDR(peekTx.total)}</div></div>
+              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Status</span><div className="mt-0.5">{peekTx.status}</div></div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Items</span>
+                <ul className="mt-1 space-y-1">
+                  {peekTx.items.map((item, idx) => (
+                    <li key={idx} className="text-xs">{item.skuName} <span className="text-muted-foreground">×{item.qty}</span> — {formatIDR(item.price * item.qty)}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
