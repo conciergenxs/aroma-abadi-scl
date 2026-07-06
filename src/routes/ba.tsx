@@ -382,8 +382,8 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           </div>
         </div>
         <div className="p-5 border-t border-border flex items-center justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Simpan" : "Tambah BA"}</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Save" : "Add BA"}</button>
         </div>
       </form>
     </div>
