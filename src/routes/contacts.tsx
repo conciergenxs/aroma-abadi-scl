@@ -9,7 +9,6 @@ import {
   type ContactList,
   type LabelColor,
   type LifecycleStage,
-  connectedChannels,
 } from "@/components/scl/mock-data";
 import {
   contactsStore,
