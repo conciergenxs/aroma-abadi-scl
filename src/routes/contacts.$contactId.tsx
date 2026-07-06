@@ -769,6 +769,45 @@ function RightPanel({
         />
       </RightSection>
 
+      <RightSection title="Brands">
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {contact.brandIds.length === 0 && (
+            <span className="text-[11px] text-muted-foreground">No brands assigned</span>
+          )}
+          {contact.brandIds.map((bid) => {
+            const brand = brands.find((b) => b.id === bid);
+            return brand ? (
+              <span
+                key={bid}
+                className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
+              >
+                {brand.name}
+                <button
+                  onClick={() => onToggleBrand(bid)}
+                  className="ml-0.5 h-3 w-3 rounded-full grid place-items-center hover:bg-primary/20 text-primary/60 hover:text-primary"
+                  aria-label={`Remove ${brand.name}`}
+                >
+                  ×
+                </button>
+              </span>
+            ) : null;
+          })}
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {brands
+            .filter((b) => !contact.brandIds.includes(b.id))
+            .map((b) => (
+              <button
+                key={b.id}
+                onClick={() => onToggleBrand(b.id)}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-card/40 px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors"
+              >
+                + {b.name}
+              </button>
+            ))}
+        </div>
+      </RightSection>
+
       <RightSection title="Audience">
         <ListSelector
           lists={lists}
