@@ -331,64 +331,6 @@ function ContactDetailPage() {
         <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-0">
           {/* LEFT: primary content */}
           <section className="flex flex-col min-w-0 min-h-0">
-            {/* Contact header card */}
-            <div className="border-b border-border px-4 lg:px-6 py-5 flex items-center gap-4">
-              <div className="relative h-14 w-14 shrink-0">
-                <div className="h-14 w-14 rounded-full bg-primary/15 text-primary grid place-items-center text-base font-semibold">
-                  {contact.avatar || contact.name.slice(0, 2).toUpperCase()}
-                </div>
-                <ChannelIcon
-                  channel={contact.channel}
-                  className="absolute -bottom-0.5 -right-0.5 h-[20px] w-[20px] ring-2 ring-background shadow-sm"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <InlineText
-                  value={contact.name}
-                  onCommit={(v) => v && v !== contact.name && updateField("name", v, "name")}
-                  className="text-base font-semibold"
-                  placeholder="Contact name"
-                />
-                <div className="mt-1.5 flex items-center flex-wrap gap-2">
-                  {isBA ? (
-                    /* BA: brand chips + See Inbox */
-                    <>
-                      {baRecord?.brandIds?.length ? (
-                        baRecord.brandIds.map((bid) => (
-                          <span key={bid} className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
-                            {brandName(bid)}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-[11px] text-muted-foreground italic">No brands assigned</span>
-                      )}
-                      <Link
-                        to="/inbox"
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium hover:bg-card transition-colors"
-                      >
-                        <ExternalLink className="h-3 w-3" /> See Inbox
-                      </Link>
-                    </>
-                  ) : (
-                    /* Customer: lifecycle select + See Inbox */
-                    <>
-                      <LifecycleSelect
-                        value={contact.lifecycleStage ?? null}
-                        onChange={setLifecycle}
-                        size="sm"
-                      />
-                      <Link
-                        to="/inbox"
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium hover:bg-card transition-colors"
-                      >
-                        <ExternalLink className="h-3 w-3" /> See Inbox
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
             {/* Tabs — hanya untuk Customer, BA langsung show activity log */}
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
