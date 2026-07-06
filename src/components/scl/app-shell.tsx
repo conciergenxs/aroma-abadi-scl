@@ -267,10 +267,10 @@ export function AppShell({
             )}
             <div className="flex flex-col">
               {title ? (
-                <h1 className="text-base font-semibold tracking-tight">{title}</h1>
+                <h1 className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}>{title}</h1>
               ) : null}
               {subtitle ? (
-                <p className="text-sm text-muted-foreground">{subtitle}</p>
+                <p className="text-xs text-muted-foreground">{subtitle}</p>
               ) : null}
             </div>
           </div>
