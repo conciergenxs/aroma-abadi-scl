@@ -75,7 +75,7 @@ function ContactDetailPage() {
 
   if (!contact) {
     return (
-      <AppShell title="Contact" noPadding>
+      <AppShell backTo="/contacts" title="Contact" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center text-sm text-muted-foreground gap-3">
           <div>Contact not found.</div>
           <Link to="/contacts" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
