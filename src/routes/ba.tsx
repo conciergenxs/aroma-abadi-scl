@@ -76,7 +76,7 @@ function BAPage() {
   }
 
   return (
-    <AppShell title="Beauty Ambassadors" subtitle="Profil dan akun login WhatsApp untuk seluruh Beauty Ambassador Aroma Abadi.">
+    <AppShell title="Beauty Ambassadors" subtitle="Profiles and WhatsApp login accounts for all Beauty Ambassadors.">
       <SectionCard>
         <div className="p-3 flex flex-wrap items-center gap-2 border-b border-border">
           <div className="relative">
