@@ -1060,9 +1060,9 @@ function ContactDrawer({
           />
         </DrawerSection>
 
-        <DrawerSection title="Lists">
+        <DrawerSection title="Audience">
           <div className="flex flex-wrap gap-1 mb-2">
-            {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any list</span>}
+            {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any audience</span>}
             {contact.listIds.map((id) => {
               const l = lists.find((x) => x.id === id);
               return l ? <ListChip key={id} name={l.name} onRemove={() => onToggleList(id)} /> : null;
