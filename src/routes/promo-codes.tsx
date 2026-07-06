@@ -371,7 +371,7 @@ function PromoCodesPage() {
 
                   {/* Expanded: usage history */}
                   {isExpanded && (
-                    <tr key={`${promo.id}-detail`}>
+                    <tr>
                       <td colSpan={7} className="px-4 pb-4 pt-0 bg-white/[0.015]">
                         <div className="rounded-lg border border-border bg-card/40 p-4">
                           <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
