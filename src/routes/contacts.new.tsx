@@ -271,7 +271,7 @@ function NewContactPage() {
                 <FormSection title="Lokasi">
                   <FormGrid>
                     <Field label="Kota" required>
-                      <SimpleSelect value={city} onChange={(v) => { setCity(v); setStore(""); }} options={[{ value: "", label: "Pilih kota…" }, ...CITIES.map((c) => ({ value: c, label: c }))]} />
+                      <SimpleSelect value={city} onChange={(v) => { setCity(v); setStore(""); }} options={[{ value: "", label: "Select city…" }, ...CITIES.map((c) => ({ value: c, label: c }))]} />
                     </Field>
                     <Field label="Store" required>
                       <SimpleSelect
