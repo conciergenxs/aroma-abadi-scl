@@ -516,7 +516,19 @@ function ContactsTable({
               <td className={tdCls} onClick={(e) => e.stopPropagation()}>
                 <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={selected.includes(c.id)} onChange={() => onToggle(c.id)} />
               </td>
-              <td className={`${tdCls} font-medium text-foreground`}>{c.name}</td>
+              <td className={tdCls}>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-foreground">{c.name}</span>
+                  {(isAllOrBrand || isMineView) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onOpen(c.id); }}
+                      className="inline-flex items-center gap-1 rounded-md bg-primary/15 border border-primary/25 px-2 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/25 transition-colors shrink-0"
+                    >
+                      See Inbox
+                    </button>
+                  )}
+                </div>
+              </td>
               {(isAllOrBrand || isMineView) && (
                 <td className={tdCls}>{c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
               )}
