@@ -312,18 +312,18 @@ function PromoCodesPage() {
       {/* Bulk action bar */}
       {selected.length > 0 && (
         <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg border border-border bg-primary/5 text-[11px]">
-          <span className="text-muted-foreground">{selected.length} dipilih</span>
+          <span className="text-muted-foreground">{selected.length} selected</span>
           <button
-            onClick={() => { toast.error(`Hapus ${selected.length} promo (coming soon)`); }}
+            onClick={() => { toast.error(`Delete ${selected.length} promo (coming soon)`); }}
             className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
           >
-            <Trash2 className="h-3 w-3" /> Hapus
+            <Trash2 className="h-3 w-3" /> Delete
           </button>
           <button
             onClick={() => setSelected([])}
             className="ml-auto text-muted-foreground hover:text-foreground"
           >
-            Batal
+            Cancel
           </button>
         </div>
       )}
