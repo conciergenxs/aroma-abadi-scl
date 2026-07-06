@@ -328,7 +328,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
               <div className="absolute right-1 flex items-center gap-0.5">
                 <button
                   type="button"
-                  onClick={() => { navigator.clipboard.writeText(password); toast.success("Password disalin"); }}
+                  onClick={() => { navigator.clipboard.writeText(password); toast.success("Password copied"); }}
                   className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
                   title="Copy password"
                 >
