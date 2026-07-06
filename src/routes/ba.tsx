@@ -96,11 +96,11 @@ function BAPage() {
               {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
             <select value={filterGender} onChange={(e) => { setFilterGender(e.target.value); setPage(1); }} className={filterSelectCls}>
-              <option value="">Semua Gender</option>
-              <option>Wanita</option><option>Pria</option><option>Lainnya</option>
+              <option value="">All Genders</option>
+              <option>Female</option><option>Male</option><option>Other</option>
             </select>
             <select value={filterPosisi} onChange={(e) => { setFilterPosisi(e.target.value); setPage(1); }} className={filterSelectCls}>
-              <option value="">Semua Posisi</option>
+              <option value="">All Positions</option>
               {allPosisi.map((p) => <option key={p}>{p}</option>)}
             </select>
             <select value={filterStore} onChange={(e) => { setFilterStore(e.target.value); setPage(1); }} className={filterSelectCls}>
