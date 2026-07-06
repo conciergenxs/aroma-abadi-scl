@@ -152,9 +152,6 @@ function NewContactPage() {
     return (
       <AppShell title="Buat Kontak Baru" backTo="/contacts" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
-          <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-card/80 backdrop-blur px-6 py-3">
-            <h1 className="text-sm font-medium">Buat Kontak Baru</h1>
-          </header>
 
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="w-full max-w-lg">
