@@ -59,6 +59,8 @@ function ContactDetailPage() {
 
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
   const [tab, setTab] = useState<Tab>("activity");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const { bas } = useBaStore();
   const { brands } = useSkuStore();
 
