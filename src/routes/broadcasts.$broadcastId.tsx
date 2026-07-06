@@ -39,9 +39,6 @@ function BroadcastDetailPage() {
     return (
       <AppShell>
         <div className="max-w-xl">
-          <Link to="/broadcasts" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
-          </Link>
           <h1 className="mt-4 text-lg font-semibold">Broadcast not found</h1>
           <p className="text-xs text-muted-foreground mt-1">It may have been deleted.</p>
         </div>
