@@ -22,7 +22,7 @@ export type Transaction = {
   brandName: string;
   items: TxLine[];
   total: number;
-  paymentMethod: "QRIS" | "Debit" | "Credit Card" | "Cash" | "Transfer";
+  paymentMethod: "QRIS" | "Debit" | "Credit Card" | "Transfer";
   status: TxStatus;
   note?: string;
 };
