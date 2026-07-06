@@ -342,7 +342,7 @@ function CreateBroadcastPage() {
               {name ? <span className="font-medium text-foreground">{name}</span> : "Untitled broadcast"}
               {" · "}
               {audienceSummary
-                ? `${audienceSummary.listNames.length} list${audienceSummary.listNames.length === 1 ? "" : "s"}${
+                ? `${audienceSummary.listNames.length} audience${audienceSummary.listNames.length === 1 ? "" : "s"}${
                     audienceSummary.conditionCount ? ` · ${audienceSummary.conditionCount} condition(s)` : ""
                   }`
                 : "No audience selected"}
