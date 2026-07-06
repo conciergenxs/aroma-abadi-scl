@@ -282,7 +282,7 @@ function ContactDetailPage() {
   };
 
   return (
-    <AppShell title={contact.name} backTo="/contacts" noPadding>
+    <AppShell backTo="/contacts" noPadding>
       <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
         {/* Sticky header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-card/80 backdrop-blur px-4 lg:px-6 py-3">
