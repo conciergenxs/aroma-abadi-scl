@@ -172,7 +172,7 @@ function StatusBadge({ status }: { status: PromoStatus }) {
 
 // ── Three-dot action menu ─────────────────────────────────────────────────────
 
-function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: () => void }) {
+function ActionMenu({ promo, onSeeDetails, onNavigateDetails }: { promo: PromoCode; onSeeDetails: () => void; onNavigateDetails: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -203,7 +203,7 @@ function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: (
             <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setOpen(false); onSeeDetails(); }}
+            onClick={(e) => { e.stopPropagation(); setOpen(false); onNavigateDetails(); }}
             className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-white/[0.05] text-left"
           >
             <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
@@ -247,7 +247,11 @@ function PromoCodesPage() {
     return list;
   }, [search, filterStatus]);
 
-  const visibleIds = filtered.map((p) => p.id);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const pageStart = (page - 1) * pageSize;
+  const paged = filtered.slice(pageStart, pageStart + pageSize);
+
+  const visibleIds = paged.map((p) => p.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
   const toggleAll = () => {
     if (allSelected) setSelected((prev) => prev.filter((id) => !visibleIds.includes(id)));
@@ -288,7 +292,7 @@ function PromoCodesPage() {
 
         <button
           className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          onClick={() => toast.info("Create promo (coming soon)")}
+          onClick={() => navigate({ to: "/promo-codes/new" })}
         >
           <Plus className="h-3.5 w-3.5" /> Create Promo
         </button>
@@ -344,7 +348,7 @@ function PromoCodesPage() {
                 </td>
               </tr>
             )}
-            {filtered.map((promo) => {
+            {paged.map((promo) => {
               const isExpanded = expandedId === promo.id;
               return (
                 <Fragment key={promo.id}>
@@ -427,6 +431,7 @@ function PromoCodesPage() {
                         <ActionMenu
                           promo={promo}
                           onSeeDetails={() => setExpandedId(isExpanded ? null : promo.id)}
+                          onNavigateDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
                         />
                       </div>
                     </td>
