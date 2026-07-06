@@ -796,7 +796,7 @@ function RightPanel({
         </div>
         <div className="flex flex-wrap gap-1">
           {brands
-            .filter((b) => !contact.brandIds.includes(b.id))
+            .filter((b) => !(contact.brandIds ?? []).includes(b.id))
             .map((b) => (
               <button
                 key={b.id}
