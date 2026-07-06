@@ -161,16 +161,8 @@ function CreateTemplatePage() {
   };
 
   return (
-    <AppShell>
+    <AppShell backTo="/templates" title="Create New Template">
       <div className="mb-8">
-        <Link
-          to="/templates"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
-        </Link>
-        <h1 className="text-xl font-semibold tracking-tight mt-2">Create New Template</h1>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         {/* Left — form */}
