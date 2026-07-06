@@ -475,8 +475,36 @@ function PromoCodesPage() {
         </table>
       </div>
 
-      <div className="mt-3 text-[11px] text-muted-foreground">
-        Showing {filtered.length} of {MOCK_PROMOS.length} promo codes
+      <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <span>Showing {filtered.length === 0 ? 0 : pageStart + 1}–{Math.min(pageStart + pageSize, filtered.length)} of {filtered.length} promo codes</span>
+          <select
+            value={pageSize}
+            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+            className="h-7 rounded border border-border bg-card/40 px-1.5 text-[11px] focus:outline-none"
+          >
+            {[5, 10, 25].map((n) => <option key={n} value={n}>{n} rows</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card"
+          >‹</button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`h-7 w-7 rounded border text-[11px] ${p === page ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card"}`}
+            >{p}</button>
+          ))}
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card"
+          >›</button>
+        </div>
       </div>
     </AppShell>
   );
