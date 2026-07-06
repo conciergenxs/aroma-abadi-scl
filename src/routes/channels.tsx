@@ -390,10 +390,7 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
 }
 
 export const WHATSAPP_CHANNELS = [
-  { id: "aroma-hq", name: "Aroma Abadi HQ", phone: "+62 811 9001 2233" },
-  { id: "aroma-jakarta", name: "Aroma Abadi Jakarta", phone: "+62 811 9001 4455" },
-  { id: "aroma-bandung", name: "Aroma Abadi Bandung", phone: "+62 811 9001 6677" },
-  { id: "aroma-loyalty", name: "Aroma Beauty Club", phone: "+62 811 9001 8899" },
+  { id: "arma-aroma", name: "Arma by Aroma Abadi", phone: "+62 811 9001 2233" },
 ];
 
 function OptInTab() {
