@@ -482,8 +482,7 @@ function ContactsTable({
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
 
   // colSpan for empty state
-  // mine: checkbox+name+gender+wa+type+pts+brands+last_tx = 8
-  const colSpan = isBaView ? 9 : isMineView ? 8 : 5;
+  const colSpan = isBaView ? 9 : isMineView ? 8 : isAllOrBrand ? 6 : 5;
 
   return (
     <table className="min-w-full text-sm">
