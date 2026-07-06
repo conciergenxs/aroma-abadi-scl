@@ -1,18 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo, Fragment, useRef, useEffect } from "react";
 import {
-  Tag,
   Plus,
   Search,
   Copy,
-  Pencil,
   Trash2,
-  ChevronDown,
-  ChevronUp,
   CheckCircle2,
   Clock,
   XCircle,
+  MoreVertical,
+  Pencil,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,7 +27,7 @@ type PromoStatus = "active" | "expired" | "inactive";
 type PromoUsage = {
   sourceType: "template" | "broadcast";
   sourceName: string;
-  usedAt: string; // ISO date
+  usedAt: string;
 };
 
 type PromoCode = {
@@ -47,7 +46,7 @@ type PromoCode = {
   odooId: string;
 };
 
-// ── Mock data (simulating Odoo sync) ─────────────────────────────────────────
+// ── Mock data ─────────────────────────────────────────────────────────────────
 
 const MOCK_PROMOS: PromoCode[] = [
   {
@@ -189,13 +188,64 @@ function StatusBadge({ status }: { status: PromoStatus }) {
   );
 }
 
+// ── Three-dot action menu ─────────────────────────────────────────────────────
+
+function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: () => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+        className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
+        title="Aksi"
+      >
+        <MoreVertical className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-8 z-50 min-w-[140px] rounded-lg border border-border bg-card shadow-xl py-1">
+          <button
+            onClick={(e) => { e.stopPropagation(); setOpen(false); toast.info("Edit promo (coming soon)"); }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-white/[0.05] text-left"
+          >
+            <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setOpen(false); onSeeDetails(); }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-white/[0.05] text-left"
+          >
+            <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
+          </button>
+          <div className="border-t border-border my-1" />
+          <button
+            onClick={(e) => { e.stopPropagation(); setOpen(false); toast.error("Hapus promo (coming soon)"); }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 function PromoCodesPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [lastSync] = useState("6 Jul 2026, 09:15");
+  const [selected, setSelected] = useState<string[]>([]);
 
   const filtered = useMemo(() => {
     let list = MOCK_PROMOS;
@@ -212,29 +262,35 @@ function PromoCodesPage() {
     return list;
   }, [search, filterStatus]);
 
+  const visibleIds = filtered.map((p) => p.id);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const toggleAll = () => {
+    if (allSelected) setSelected((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    else setSelected((prev) => Array.from(new Set([...prev, ...visibleIds])));
+  };
+  const toggleOne = (id: string) =>
+    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
+
   return (
-    <AppShell
-      title="Promo Codes"
-      subtitle="Kelola dan lacak kode promo yang tersinkron dari Odoo"
-      actions={
-        <button className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-          <Plus className="h-3.5 w-3.5" /> Buat Promo
-        </button>
-      }
-    >
-      {/* Sync info */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="inline-flex items-center gap-2 rounded-md border border-border bg-card/40 px-3 py-1.5 text-[11px] text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          Tersinkron dari Odoo · {lastSync}
+    <AppShell title="Promo Codes">
+      {/* Toolbar: search + filter chips + create button — all one row */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari kode atau nama promo..."
+            className="h-9 w-56 rounded-md border border-border bg-card/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+          />
         </div>
-        <div className="flex items-center gap-2">
-          {/* Status filter */}
+
+        <div className="flex items-center gap-1">
           {(["all", "active", "inactive", "expired"] as const).map((s) => (
             <button
               key={s}
               onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium border transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
                 filterStatus === s
                   ? "border-primary/40 bg-primary/15 text-foreground"
                   : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
@@ -244,37 +300,61 @@ function PromoCodesPage() {
             </button>
           ))}
         </div>
+
+        <button
+          className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          onClick={() => toast.info("Buat promo (coming soon)")}
+        >
+          <Plus className="h-3.5 w-3.5" /> Buat Promo
+        </button>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari kode, nama, atau deskripsi promo..."
-          className="w-full h-9 rounded-md border border-border bg-card/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-        />
-      </div>
+      {/* Bulk action bar */}
+      {selected.length > 0 && (
+        <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg border border-border bg-primary/5 text-[11px]">
+          <span className="text-muted-foreground">{selected.length} dipilih</span>
+          <button
+            onClick={() => { toast.error(`Hapus ${selected.length} promo (coming soon)`); }}
+            className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3 w-3" /> Hapus
+          </button>
+          <button
+            onClick={() => setSelected([])}
+            className="ml-auto text-muted-foreground hover:text-foreground"
+          >
+            Batal
+          </button>
+        </div>
+      )}
 
       {/* Table */}
       <div className="rounded-xl border border-border bg-card/40 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-card/60">
+              <th className="w-10 px-4 py-3">
+                <input
+                  type="checkbox"
+                  className="accent-[oklch(0.62_0.17_40)]"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  aria-label="Pilih semua"
+                />
+              </th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Kode</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Nama Promo</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Diskon</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Periode</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
               <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Dipakai</th>
-              <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
+              <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td colSpan={8} className="px-4 py-12 text-center text-sm text-muted-foreground">
                   Tidak ada promo code yang ditemukan.
                 </td>
               </tr>
@@ -283,9 +363,21 @@ function PromoCodesPage() {
               const isExpanded = expandedId === promo.id;
               return (
                 <Fragment key={promo.id}>
-                  <tr onClick={() => setExpandedId(isExpanded ? null : promo.id)}
+                  <tr
+                    onClick={() => setExpandedId(isExpanded ? null : promo.id)}
                     className="cursor-pointer hover:bg-white/[0.025] transition-colors"
                   >
+                    {/* Checkbox */}
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        className="accent-[oklch(0.62_0.17_40)]"
+                        checked={selected.includes(promo.id)}
+                        onChange={() => toggleOne(promo.id)}
+                        aria-label={`Pilih ${promo.code}`}
+                      />
+                    </td>
+
                     {/* Code */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -342,29 +434,13 @@ function PromoCodesPage() {
                       )}
                     </td>
 
-                    {/* Actions */}
+                    {/* Three-dot action */}
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          title="Edit"
-                          onClick={() => toast.info("Edit promo (coming soon)")}
-                          className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          title="Hapus"
-                          onClick={() => toast.error("Hapus promo (coming soon)")}
-                          className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
-                          title={isExpanded ? "Tutup" : "Lihat detail pemakaian"}
-                        >
-                          {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                        </button>
+                      <div className="flex justify-end">
+                        <ActionMenu
+                          promo={promo}
+                          onSeeDetails={() => setExpandedId(isExpanded ? null : promo.id)}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -372,7 +448,7 @@ function PromoCodesPage() {
                   {/* Expanded: usage history */}
                   {isExpanded && (
                     <tr>
-                      <td colSpan={7} className="px-4 pb-4 pt-0 bg-white/[0.015]">
+                      <td colSpan={8} className="px-4 pb-4 pt-0 bg-white/[0.015]">
                         <div className="rounded-lg border border-border bg-card/40 p-4">
                           <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
                             Riwayat Pemakaian ({promo.usages.length})
