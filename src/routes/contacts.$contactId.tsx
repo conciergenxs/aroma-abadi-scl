@@ -775,7 +775,7 @@ function RightPanel({
           {(contact.brandIds ?? []).length === 0 && (
             <span className="text-[11px] text-muted-foreground">No brands assigned</span>
           )}
-          {contact.brandIds.map((bid) => {
+          {(contact.brandIds ?? []).map((bid) => {
             const brand = brands.find((b) => b.id === bid);
             return brand ? (
               <span
