@@ -1141,7 +1141,6 @@ function InboxPage() {
               <InfoRow icon={<Mail className="h-3 w-3" />} label="Email" value={contact.email ?? "—"} />
               <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
               <InfoRow icon={<MessageSquare className="h-3 w-3" />} label="Channel" value="WhatsApp" />
-              <InfoRow icon={<User2 className="h-3 w-3" />} label="Owner" value={contact.ownerId ? (contact.ownerId === "me" ? "Me" : userLabel(contact.ownerId)) : "Unassigned"} />
               <InfoRow icon={<span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>} label="Last interaction" value={contact.lastInteraction} />
             </Section>
 
