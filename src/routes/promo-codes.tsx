@@ -153,18 +153,18 @@ function formatDate(iso: string) {
 function StatusBadge({ status }: { status: PromoStatus }) {
   if (status === "active")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white">
         <CheckCircle2 className="h-2.5 w-2.5" /> Active
       </span>
     );
   if (status === "expired")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-300">
+      <span className="inline-flex items-center gap-1 rounded-full border border-rose-700 bg-rose-600 px-2 py-0.5 text-[10px] font-medium text-white">
         <XCircle className="h-2.5 w-2.5" /> Expired
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-600 px-2 py-0.5 text-[10px] font-medium text-white">
       <Clock className="h-2.5 w-2.5" /> Inactive
     </span>
   );
