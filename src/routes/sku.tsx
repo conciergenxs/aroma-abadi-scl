@@ -509,7 +509,7 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
           <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Simpan</button>
         </div>
       </form>
@@ -557,7 +557,7 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
           <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category bisa di-setup setelah brand dibuat.</p>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
           <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Tambah Brand</button>
         </div>
       </form>
@@ -632,7 +632,7 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Batal</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
           <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Simpan" : "Tambah"}</button>
         </div>
       </form>
