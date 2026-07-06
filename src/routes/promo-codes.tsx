@@ -208,7 +208,7 @@ function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: (
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
         className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
-        title="Aksi"
+        title="Actions"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
