@@ -150,12 +150,9 @@ function NewContactPage() {
   // ── Step 1: type selector ────────────────────────────────────────────────
   if (!contactType) {
     return (
-      <AppShell title="Buat Kontak Baru" noPadding>
+      <AppShell title="Buat Kontak Baru" backTo="/contacts" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
           <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-card/80 backdrop-blur px-6 py-3">
-            <Link to="/contacts" className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs hover:bg-card">
-              <ArrowLeft className="h-3.5 w-3.5" /> Back
-            </Link>
             <h1 className="text-sm font-medium">Buat Kontak Baru</h1>
           </header>
 
