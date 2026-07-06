@@ -12,7 +12,6 @@ import {
   Check,
   ChevronDown,
   Activity as ActivityIcon,
-  Image as ImageIcon,
   User2,
   ShoppingBag,
   ExternalLink,
