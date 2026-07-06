@@ -270,6 +270,7 @@ function ContactsPage() {
                 className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card"
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
+                <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">{properties.length}</span>
               </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
