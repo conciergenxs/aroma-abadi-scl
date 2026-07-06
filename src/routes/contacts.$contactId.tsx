@@ -425,6 +425,7 @@ function ContactDetailPage() {
               onCreateLabel={createLabel}
               onToggleList={toggleList}
               onCreateList={createList}
+              onToggleBrand={toggleBrand}
               onSetCustomProperty={setCustomProperty}
             />
           </aside>
