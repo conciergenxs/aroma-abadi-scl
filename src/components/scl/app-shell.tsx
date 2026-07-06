@@ -133,7 +133,7 @@ type NavItem = {
 };
 const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/inbox", label: "Inbox", icon: Inbox, badge: 12 },
+  { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/contacts", label: "Contacts", icon: Users },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: FileText },
