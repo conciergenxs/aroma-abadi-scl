@@ -454,7 +454,7 @@ function PromoCodesPage() {
                             Usage History ({promo.usages.length})
                           </div>
                           {promo.usages.length === 0 ? (
-                            <p className="text-[12px] text-muted-foreground italic">Belum digunakan di template atau broadcast manapun.</p>
+                            <p className="text-[12px] text-muted-foreground italic">Not yet used in any template or broadcast.</p>
                           ) : (
                             <div className="space-y-2">
                               {promo.usages.map((u, i) => (
@@ -484,7 +484,7 @@ function PromoCodesPage() {
       </div>
 
       <div className="mt-3 text-[11px] text-muted-foreground">
-        Menampilkan {filtered.length} dari {MOCK_PROMOS.length} promo code
+        Showing {filtered.length} of {MOCK_PROMOS.length} promo codes
       </div>
     </AppShell>
   );
