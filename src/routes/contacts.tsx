@@ -389,6 +389,16 @@ function BrandsNav({ activeView, setActiveView, setSelected }: {
 }) {
   const { brands } = useSkuStore();
   const { bas } = useBaStore();
+  const { contacts } = useContactsStore();
+  const liveContacts = useMemo(() => contacts.filter((c) => !c.deleted), [contacts]);
+
+  // Count per brand = BA contacts assigned to brand + customers (all non-deleted for now)
+  const countForBrand = (brandId: string) => {
+    const baPhones = new Set(
+      bas.filter((b) => b.brandIds.includes(brandId)).map((b) => b.waNumber.replace(/\s/g, ""))
+    );
+    return liveContacts.filter((c) => baPhones.has(c.phone.replace(/\s/g, ""))).length;
+  };
 
   return (
     <>
@@ -397,7 +407,7 @@ function BrandsNav({ activeView, setActiveView, setSelected }: {
       </div>
       <div className="px-3 pb-3 space-y-0.5">
         {brands.map((brand) => {
-          const count = bas.filter((b) => b.brandIds.includes(brand.id)).length;
+          const count = countForBrand(brand.id);
           const active = activeView === `brand:${brand.id}`;
           return (
             <button
