@@ -16,6 +16,7 @@ import {
   User2,
   ShoppingBag,
   ExternalLink,
+  Eye,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
