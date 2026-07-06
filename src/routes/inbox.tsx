@@ -361,6 +361,8 @@ function InboxPage() {
         if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
       }
       if (filters.unreadOnly && !isUnread(c)) return false;
+      // Label filter (left nav)
+      if (labelFilter && !ct.labelIds.includes(labelFilter)) return false;
       // Search
       if (search) {
         const q = search.toLowerCase();
