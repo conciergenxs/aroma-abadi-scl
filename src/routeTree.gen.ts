@@ -27,6 +27,11 @@ import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contac
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 
+const PromoCodesRoute = PromoCodesRouteImport.update({
+  id: '/promo-codes',
+  path: '/promo-codes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
