@@ -514,6 +514,8 @@ function activityDot(type: ContactActivity["type"]) {
 }
 
 function TransactionsTab({ transactions }: { transactions: import("@/components/scl/transactions-store").Transaction[] }) {
+  const [peekTx, setPeekTx] = useState<typeof transactions[0] | null>(null);
+
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
