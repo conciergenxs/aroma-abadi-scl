@@ -535,7 +535,7 @@ function ContactsTable({
               <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
               {isAllOrBrand && (
                 <td className={tdCls}>
-                  {c.brandIds.length > 0
+                  {(c.brandIds ?? []).length > 0
                     ? <div className="flex flex-wrap gap-1">{(c.brandIds ?? []).map((bid) => <span key={bid} className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">{brandName(bid)}</span>)}</div>
                     : <span className="text-muted-foreground">—</span>}
                 </td>
@@ -549,7 +549,7 @@ function ContactsTable({
               )}
               {isMineView && (
                 <td className={tdCls}>
-                  {c.brandIds.length > 0
+                  {(c.brandIds ?? []).length > 0
                     ? <div className="flex flex-wrap gap-1">{(c.brandIds ?? []).map((bid) => <span key={bid} className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">{brandName(bid)}</span>)}</div>
                     : <span className="text-muted-foreground">—</span>}
                 </td>
