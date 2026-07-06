@@ -783,7 +783,7 @@ function AudienceModal({
                   );
                 })}
                 {filtered.length === 0 && (
-                  <div className="px-3 py-8 text-center text-xs text-muted-foreground">No lists match.</div>
+                  <div className="px-3 py-8 text-center text-xs text-muted-foreground">No audience match.</div>
                 )}
               </div>
               <div className="text-[11px] text-muted-foreground">
