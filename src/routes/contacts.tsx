@@ -56,7 +56,6 @@ function ContactsPage() {
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
-  const [channelFilter, setChannelFilter] = useState<string>("all");
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [page, setPage] = useState(1);
