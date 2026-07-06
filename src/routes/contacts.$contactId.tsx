@@ -282,17 +282,11 @@ function ContactDetailPage() {
   };
 
   return (
-    <AppShell title={contact.name} noPadding>
+    <AppShell title={contact.name} backTo="/contacts" noPadding>
       <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
         {/* Sticky header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-card/80 backdrop-blur px-4 lg:px-6 py-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Link
-              to="/contacts"
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs hover:bg-card"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back
-            </Link>
             <h1 className="text-sm font-medium truncate">{contact.name}</h1>
             {contact.lifecycleStage && (
               <span
