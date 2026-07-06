@@ -221,6 +221,7 @@ function TemplatesPage() {
                   <th className="px-4 py-3 text-left font-medium">Channel</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
                   <th className="px-4 py-3 text-left font-medium">Last updated</th>
+                  <th className="px-4 py-3 text-right font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="stagger divide-y divide-border">
