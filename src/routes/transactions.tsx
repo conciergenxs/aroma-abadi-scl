@@ -298,7 +298,7 @@ function TxDrawer({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
             <div className="text-base font-semibold">{tx.invoice}</div>
             <div className="text-[11px] text-muted-foreground mt-1">{new Date(tx.date).toLocaleString("id-ID")}</div>
           </div>
-          <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Tutup</button>
+          <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Close</button>
         </div>
         <div className="p-5 space-y-4 text-sm">
           <Row label="Customer" value={tx.customerName} />
