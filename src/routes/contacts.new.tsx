@@ -213,7 +213,7 @@ function NewContactPage() {
               >
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
-              <h1 className="text-sm font-medium">Buat Beauty Ambassador</h1>
+              <h1 className="text-sm font-medium">Create Beauty Ambassador</h1>
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
             </div>
             <div className="flex items-center gap-2">
