@@ -339,7 +339,7 @@ function PromoCodesPage() {
                   className="accent-[oklch(0.62_0.17_40)]"
                   checked={allSelected}
                   onChange={toggleAll}
-                  aria-label="Pilih semua"
+                  aria-label="Select all"
                 />
               </th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Kode</th>
