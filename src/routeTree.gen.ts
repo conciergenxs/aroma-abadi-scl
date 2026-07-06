@@ -133,6 +133,8 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/promo-codes': typeof PromoCodesRoute
+  '/promo-codes/new': typeof PromoCodesNewRoute
+  '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
   '/transactions': typeof TransactionsRoute
