@@ -318,19 +318,19 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                 <option>Female</option><option>Male</option><option>Other</option>
               </select>
             </Field>
-            <Field label="No. WhatsApp (untuk login)">
-              <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Masukkan no. WhatsApp.." className={inputCls} />
+            <Field label="WhatsApp Number (login)">
+              <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="Enter WhatsApp number…" className={inputCls} />
             </Field>
           </div>
           <Field label="Password (generated)">
             <div className="relative flex items-center">
-              <input value={password} readOnly placeholder="Password otomatis dibuat.." className={`${inputCls} font-mono bg-muted/40 cursor-not-allowed pr-16`} />
+              <input value={password} readOnly placeholder="Auto-generated…" className={`${inputCls} font-mono bg-muted/40 cursor-not-allowed pr-16`} />
               <div className="absolute right-1 flex items-center gap-0.5">
                 <button
                   type="button"
                   onClick={() => { navigator.clipboard.writeText(password); toast.success("Password disalin"); }}
                   className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
-                  title="Salin password"
+                  title="Copy password"
                 >
                   <Copy className="h-3.5 w-3.5" />
                 </button>
@@ -342,7 +342,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                     setTimeout(() => setSpinning(false), 420);
                   }}
                   className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
-                  title="Generate ulang"
+                  title="Regenerate"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${spinning ? "animate-spin-once" : ""}`} />
                 </button>
@@ -350,11 +350,11 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
             </div>
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Kota">
+            <Field label="City">
               <SearchableSelect
                 value={city}
                 onChange={setCity}
-                placeholder="Cari kota.."
+                placeholder="Search city…"
                 options={KOTA_LIST}
               />
             </Field>
@@ -362,7 +362,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
               <SearchableSelect
                 value={store}
                 onChange={setStore}
-                placeholder="Cari store.."
+                placeholder="Search store…"
                 options={STORE_LIST}
               />
             </Field>
