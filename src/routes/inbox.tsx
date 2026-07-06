@@ -73,6 +73,10 @@ function InboxPage() {
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null);
+  const [labelModalOpen, setLabelModalOpen] = useState(false);
+  const [newLabelName, setNewLabelName] = useState("");
+  const [newLabelColor, setNewLabelColor] = useState<import("@/components/scl/mock-data").LabelColor>("indigo");
 
   // ============== INBOX FILTER PANEL ==============
   type FilterCategory = "channels" | "labels" | "owner" | "lifecycle" | "unread";
