@@ -288,14 +288,14 @@ function ContactsPage() {
             <div className="px-5 py-2.5 border-b border-border bg-primary/5 flex flex-wrap items-center gap-2 text-[11px]">
               <span className="text-muted-foreground">{selected.length} selected</span>
               <PickerPopover
-                label="Add to list"
+                label="Add to audience"
                 icon={<ListPlus className="h-3 w-3" />}
                 items={lists.map((l) => ({ id: l.id, name: l.name }))}
                 onPick={(id) => bulkAddList(id)}
               />
               {selectedHaveAnyList && (
                 <PickerPopover
-                  label="Remove from list"
+                  label="Remove from audience"
                   icon={<X className="h-3 w-3" />}
                   items={lists
                     .filter((l) => selectedContacts.some((c) => c.listIds.includes(l.id)))
