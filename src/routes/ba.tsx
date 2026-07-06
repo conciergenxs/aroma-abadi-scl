@@ -127,13 +127,13 @@ function BAPage() {
           <table className="min-w-full text-sm">
             <thead className="text-muted-foreground">
               <tr className="border-b border-border">
-                <Th>Nama</Th>
+                <Th>Name</Th>
                 <Th>Brand</Th>
                 <Th>Gender</Th>
                 <Th>WA (Login)</Th>
                 <Th>Password</Th>
-                <Th>Posisi</Th>
-                <Th>Store · Kota</Th>
+                <Th>Position</Th>
+                <Th>Store · City</Th>
                 <Th>&nbsp;</Th>
               </tr>
             </thead>
