@@ -55,7 +55,7 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
   { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
   { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
   { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
-  { id: "p-lists", key: "lists", name: "Lists", type: "multiselect", visible: true, system: true },
+  { id: "p-lists", key: "lists", name: "Audience", type: "multiselect", visible: true, system: true },
   { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
   { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
   // Custom defaults used in the "Additional Information" section of New Contact.
