@@ -445,7 +445,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
               <div className="mt-2 flex items-center justify-end gap-2">
                 <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground">Edit</button>
                 <span className="text-xs text-muted-foreground">·</span>
-                <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card dihapus"); }} className="text-xs text-rose-500">Hapus</button>
+                <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card deleted"); }} className="text-xs text-rose-500">Delete</button>
               </div>
             </div>
           </div>
