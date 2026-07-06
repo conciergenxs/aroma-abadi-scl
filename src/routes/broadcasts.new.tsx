@@ -738,7 +738,7 @@ function AudienceModal({
                     sel ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {t === "list" ? "By List" : "By Condition"}
+                  {t === "list" ? "By Audience" : "By Condition"}
                 </button>
               );
             })}
