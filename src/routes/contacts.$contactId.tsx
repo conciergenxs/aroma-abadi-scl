@@ -58,6 +58,15 @@ function ContactDetailPage() {
 
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
   const [tab, setTab] = useState<Tab>("activity");
+  const { bas } = useBaStore();
+  const { brands } = useSkuStore();
+
+  const isBA = contact?.labelIds.includes("lb-ba") ?? false;
+  const baRecord = useMemo(
+    () => contact ? bas.find((b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, "")) : undefined,
+    [bas, contact],
+  );
+  const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
 
   const customProps = useMemo(
     () => properties.filter((p) => !SYSTEM_KEYS.has(p.key) && !p.system),
