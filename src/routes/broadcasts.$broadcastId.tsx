@@ -47,16 +47,9 @@ function BroadcastDetailPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell backTo="/broadcasts" title={broadcast.name}>
       <div className="mb-6">
-        <Link
-          to="/broadcasts"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
-        </Link>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-semibold tracking-tight">{broadcast.name}</h1>
+        <div className="flex flex-wrap items-center gap-3">
           <StatusBadge status={broadcast.status} />
         </div>
       </div>
