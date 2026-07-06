@@ -60,6 +60,11 @@ function TransactionsPage() {
     return true;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePageSize = pageSize === 0 ? filtered.length : pageSize;
+  const safePage = Math.min(page, Math.max(1, Math.ceil(filtered.length / safePageSize)));
+  const paginated = pageSize === 0 ? filtered : filtered.slice((safePage - 1) * safePageSize, safePage * safePageSize);
+
   const today = new Date().toDateString();
   const todayTx = transactions.filter((t) => new Date(t.date).toDateString() === today);
   const revenue = todayTx.reduce((acc, t) => acc + (t.status === "Paid" ? t.total : 0), 0);
