@@ -75,7 +75,9 @@ function seed(): Transaction[] {
     let total = 0;
     let brand = skus[0].brand;
     for (let l = 0; l < lineCount; l++) {
-      const sku = skus[(i + l) % skus.length];
+      // Pick SKU from this customer's allowed brand SKUs
+      const allowedIdx = cust.skuIndices[(i + l) % cust.skuIndices.length];
+      const sku = skus[allowedIdx];
       const qty = 1 + ((i + l) % 2);
       lines.push({ skuId: sku.skuId, skuCode: sku.skuCode, skuName: sku.skuName, qty, unitPrice: sku.price });
       total += sku.price * qty;
