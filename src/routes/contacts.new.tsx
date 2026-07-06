@@ -74,13 +74,13 @@ function NewContactPage() {
   };
 
   const submitBA = () => {
-    if (!name.trim()) { toast.error("Nama wajib diisi"); return; }
-    if (!phone.trim()) { toast.error("WA Number wajib diisi"); return; }
-    if (!gender) { toast.error("Gender wajib dipilih"); return; }
-    if (brandIds.length === 0) { toast.error("Pilih minimal satu brand"); return; }
-    if (!position) { toast.error("Posisi wajib dipilih"); return; }
-    if (!city) { toast.error("Kota wajib dipilih"); return; }
-    if (!store) { toast.error("Store wajib dipilih"); return; }
+    if (!name.trim()) { toast.error("Name is required"); return; }
+    if (!phone.trim()) { toast.error("WA Number is required"); return; }
+    if (!gender) { toast.error("Gender is required"); return; }
+    if (brandIds.length === 0) { toast.error("Select at least one brand"); return; }
+    if (!position) { toast.error("Position is required"); return; }
+    if (!city) { toast.error("City is required"); return; }
+    if (!store) { toast.error("Store is required"); return; }
 
     const initials = name.trim().split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
     const contact: Contact = {
