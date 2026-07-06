@@ -618,7 +618,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <thead>
             <tr className="border-b border-border bg-card/40">
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Invoice</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Tanggal</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Date</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Brand</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Items</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Total</th>
