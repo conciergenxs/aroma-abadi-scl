@@ -89,6 +89,7 @@ function TemplatesPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
   const [removeGroupOpen, setRemoveGroupOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Template | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
