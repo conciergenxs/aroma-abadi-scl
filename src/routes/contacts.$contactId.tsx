@@ -47,7 +47,7 @@ export const Route = createFileRoute("/contacts/$contactId")({
   component: ContactDetailPage,
 });
 
-type Tab = "activity" | "transactions" | "media";
+type Tab = "activity" | "transactions";
 
 function ContactDetailPage() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
