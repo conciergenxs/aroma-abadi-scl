@@ -202,7 +202,7 @@ function BroadcastListPage() {
                     </td>
                     <td className="px-4 py-3 font-medium">{b.name}</td>
                     <td className="px-4 py-3"><ChannelDot channel={b.channel} /></td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{b.audience}</td>
+                    <td className="px-4 py-3">{b.audience}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{b.reach.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{b.delivered.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{b.read.toLocaleString()}</td>
