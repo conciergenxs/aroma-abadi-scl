@@ -238,6 +238,7 @@ export interface RootRouteChildren {
   ChannelsRoute: typeof ChannelsRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
+  PromoCodesRoute: typeof PromoCodesRoute
   SettingsRoute: typeof SettingsRoute
   SkuRoute: typeof SkuRoute
   TransactionsRoute: typeof TransactionsRoute
