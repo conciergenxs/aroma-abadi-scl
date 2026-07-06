@@ -212,6 +212,29 @@ export const threadsByContact: Record<string, Message[]> = {
     { id: "m1", from: "them", text: "Cara demo aplikasi bareMinerals yang bener ke customer gimana?", time: "3d" },
     { id: "m2", from: "me", text: "Demo bareMinerals: (1) Mulai dengan Prep Step Primer, (2) Swirl-tap-buff foundation dengan kabuki brush gerakan melingkar, (3) Highlight dengan Luminizer, (4) Set dengan Mineral Veil. Key message: bebas paraben, cocok untuk sensitive skin.", time: "3d", status: "read" },
   ],
+  c10: [
+    { id: "m1", from: "them", text: "Script untuk closing customer yang masih ragu-ragu ada ga Arma?", time: "2d" },
+    { id: "m2", from: "me", text: "Coba script ini: 'Saya paham kamu masih pertimbangkan. Rimmel Stay Matte ini best seller kami karena hasil matte-nya tahan seharian bahkan di cuaca panas. Kalau mau, aku bisa bantu pilih shade yang paling cocok untuk skin tone kamu.' Fokus pada social proof + personalisasi.", time: "2d", status: "read" },
+    { id: "m3", from: "them", text: "Oke mantap, aku coba script itu!", time: "2d" },
+  ],
+  c25: [
+    { id: "m1", from: "them", text: "Arma ada template follow-up untuk customer yang belum checkout?", time: "2h" },
+    { id: "m2", from: "me", text: "Pakai template ini: 'Halo [nama]! Kamu sempat lihat [produk DG/Dolce & Gabbana] kemarin. Stoknya terbatas nih — mau aku reserve dulu? Berlaku 24 jam 😊.' Kirim H+1 setelah mereka browse, open rate-nya tinggi banget.", time: "2h", status: "delivered" },
+  ],
+  c28: [
+    { id: "m1", from: "them", text: "Arma, bedanya Laura Mercier Loose vs Pressed Setting Powder apa ya?", time: "Yesterday" },
+    { id: "m2", from: "me", text: "Loose Powder: lebih ringan, airbrush finish, ideal untuk bake technique & full coverage look. Pressed Powder: lebih travel-friendly, touch-up on-the-go, finish lebih natural. Customer yang aktif di luar → sarankan Pressed. Home/studio use → Loose.", time: "Yesterday", status: "read" },
+    { id: "m3", from: "them", text: "Ngerti Arma, makasih penjelasannya!", time: "Yesterday" },
+  ],
+  c29: [
+    { id: "m1", from: "them", text: "Arma, minimum stok di store berapa buat bareMinerals?", time: "2d" },
+    { id: "m2", from: "me", text: "Minimum stok bareMinerals per store: Original Foundation 6 SKU (masing-masing 3 pcs), Blush Color Infusion 4 variant (2 pcs each), Prep Step Primer 5 pcs, Mineral Veil 4 pcs. Total sekitar 30–35 pcs. Kalau stok < 50% trigger reorder ya.", time: "2d", status: "read" },
+  ],
+  c30: [
+    { id: "m1", from: "them", text: "Arma, ada promo bundling Dior x Sisley ga bulan ini?", time: "2d" },
+    { id: "m2", from: "me", text: "Bulan ini belum ada bundling lintas brand. Yang ada: Sisley bundle — beli foundation + setting powder hemat 15%. Dior bundle — Rouge Dior + Backstage Foundation paket launch harga spesial. Kalau customer minta kombinasi keduanya, bisa custom quote ya.", time: "2d", status: "read" },
+    { id: "m3", from: "them", text: "Oke Arma siap, makasih!", time: "2d" },
+  ],
 };
 
 export type Conversation = {
