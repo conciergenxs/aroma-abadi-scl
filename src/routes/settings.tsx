@@ -141,9 +141,6 @@ function SettingsPage() {
             active !== "user-management" &&
             active !== "team-management" &&
             active !== "roles" &&
-            active !== "subscription" &&
-            active !== "payment-methods" &&
-            active !== "invoice" &&
             active !== "labels" &&
             active !== "contact-properties" &&
             active !== "customer-lifecycle" &&
