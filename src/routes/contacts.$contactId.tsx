@@ -360,7 +360,7 @@ function ContactDetailPage() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-[11px] text-muted-foreground italic">Belum ada brand</span>
+                        <span className="text-[11px] text-muted-foreground italic">No brands assigned</span>
                       )}
                       <Link
                         to="/inbox"
