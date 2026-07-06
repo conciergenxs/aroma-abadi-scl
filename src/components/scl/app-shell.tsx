@@ -195,17 +195,74 @@ export function AppShell({
             ) : null}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <div className="relative hidden sm:flex items-center">
-              <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
-              <input
-                placeholder="Search conversations, contacts…"
-                className="h-9 w-72 rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm placeholder:text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40"
-              />
+            {/* Notification Bell */}
+            <div className="relative">
+              <button
+                ref={notifBtnRef}
+                onClick={() => setNotifOpen((v) => !v)}
+                className={`relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card transition-colors ${notifOpen ? "border-primary/40 bg-primary/10" : ""}`}
+                aria-label="Notifikasi"
+              >
+                <Bell className={`h-4 w-4 ${notifOpen ? "text-primary" : "text-muted-foreground"}`} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground grid place-items-center tabular-nums">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <div
+                  ref={notifRef}
+                  className="absolute right-0 top-full mt-2 w-[360px] rounded-xl border border-border bg-popover shadow-2xl z-50 overflow-hidden animate-fade-in"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                    <span className="text-sm font-semibold">Notifikasi</span>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllRead}
+                          className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          <CheckCheck className="h-3 w-3" /> Tandai semua dibaca
+                        </button>
+                      )}
+                      <button onClick={() => setNotifOpen(false)} className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]">
+                        <XIcon className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  {/* List */}
+                  <div className="max-h-[420px] overflow-y-auto divide-y divide-border/60">
+                    {MOCK_NOTIFS.map((n) => {
+                      const isRead = readIds.has(n.id);
+                      const Icon = n.icon;
+                      return (
+                        <button
+                          key={n.id}
+                          onClick={() => setReadIds((prev) => new Set([...prev, n.id]))}
+                          className={`w-full flex items-start gap-3 px-4 py-3.5 text-left hover:bg-white/[0.04] transition-colors ${!isRead ? "bg-primary/[0.04]" : ""}`}
+                        >
+                          <div className={`mt-0.5 h-8 w-8 shrink-0 rounded-full grid place-items-center ${n.iconBg}`}>
+                            <Icon className={`h-3.5 w-3.5 ${n.iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[13px] leading-snug ${isRead ? "text-foreground/70" : "text-foreground font-medium"}`}>
+                              {n.title}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.body}</p>
+                            <p className="text-[10px] text-muted-foreground/60 mt-1">{n.time}</p>
+                          </div>
+                          {!isRead && <span className="mt-2 h-2 w-2 rounded-full bg-primary shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
-            <button className="relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card">
-              <Bell className="h-4 w-4 text-muted-foreground" />
-              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
-            </button>
+
             {actions}
 
             <DropdownMenu>
