@@ -129,8 +129,7 @@ function CreateTemplatePage() {
 
   const valid = name.trim().length > 0 && body.trim().length > 0;
 
-  const insertVariable = (key: string) => {
-    const token = `{{${key}}}`;
+  const insertVariable = (token: string) => {
     const el = bodyRef.current;
     if (!el) {
       setBody((b) => b + token);
@@ -144,6 +143,16 @@ function CreateTemplatePage() {
       el.focus();
       el.setSelectionRange(start + token.length, start + token.length);
     });
+  };
+
+  const insertBrand = (brandName: string) => {
+    insertVariable(`{{brands-${brandName}}}`);
+    setVarPopup(null);
+  };
+
+  const insertPromo = (code: string) => {
+    insertVariable(`{{promo-${code}}}`);
+    setVarPopup(null);
   };
 
   const createGroupInline = () => {
