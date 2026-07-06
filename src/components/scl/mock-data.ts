@@ -422,8 +422,5 @@ export type ConnectedChannel = {
 };
 
 export const connectedChannels: ConnectedChannel[] = [
-  { id: "wa-main", channel: "whatsapp", name: "Aroma Abadi HQ", handle: "+62 811 9001 2233", status: "connected" },
-  { id: "wa-jkt", channel: "whatsapp", name: "Aroma Abadi Jakarta", handle: "+62 811 9001 4455", status: "connected" },
-  { id: "wa-bdg", channel: "whatsapp", name: "Aroma Abadi Bandung", handle: "+62 811 9001 6677", status: "connected" },
-  { id: "wa-loyalty", channel: "whatsapp", name: "Aroma Beauty Club", handle: "+62 811 9001 8899", status: "connected" },
+  { id: "wa-main", channel: "whatsapp", name: "Arma by Aroma Abadi", handle: "+62 811 9001 2233", status: "connected" },
 ];

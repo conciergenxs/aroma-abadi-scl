@@ -65,7 +65,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 const CHANNEL_OPTIONS = [
-  { value: "all", label: "All Channels" },
+  { value: "all", label: "All Group" },
   { value: "whatsapp", label: "WhatsApp", icon: <ChannelIcon channel="whatsapp" className="h-3.5 w-3.5" /> },
 ];
 
