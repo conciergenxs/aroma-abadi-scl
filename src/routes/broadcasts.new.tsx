@@ -753,7 +753,7 @@ function AudienceModal({
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search lists…"
+                  placeholder="Search audience…"
                   className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                 />
               </div>
