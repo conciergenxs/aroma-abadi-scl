@@ -34,6 +34,16 @@ const PromoCodesRoute = PromoCodesRouteImport.update({
   path: '/promo-codes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
+  id: '/promo-codes/new',
+  path: '/promo-codes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromoCodesPromoIdRoute = PromoCodesPromoIdRouteImport.update({
+  id: '/promo-codes/$promoId',
+  path: '/promo-codes/$promoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
