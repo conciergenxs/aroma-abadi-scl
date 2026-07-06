@@ -149,10 +149,10 @@ function BAPage() {
                     <Td>
                       <div className="flex items-center gap-1.5">
                         <code className="font-mono text-sm">{shown ? b.password : "••••••••"}</code>
-                        <button onClick={() => toggleReveal(b.id)} className="text-muted-foreground hover:text-foreground transition-colors" title={shown ? "Sembunyikan" : "Tampilkan"}>
+                        <button onClick={() => toggleReveal(b.id)} className="text-muted-foreground hover:text-foreground transition-colors" title={shown ? "Hide" : "Show"}>
                           {shown ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </button>
-                        <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password disalin"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Salin">
+                        <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
                           <Copy className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={() => setResetConfirm(b)} className="text-muted-foreground hover:text-foreground transition-colors" title="Reset password">
