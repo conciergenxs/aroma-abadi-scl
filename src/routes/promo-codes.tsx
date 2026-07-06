@@ -172,7 +172,7 @@ function StatusBadge({ status }: { status: PromoStatus }) {
   if (status === "active")
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
-        <CheckCircle2 className="h-2.5 w-2.5" /> Aktif
+        <CheckCircle2 className="h-2.5 w-2.5" /> Active
       </span>
     );
   if (status === "expired")
