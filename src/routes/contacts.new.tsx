@@ -452,7 +452,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
         onClick={() => setOpen((v) => !v)}
         className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5 text-xs hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors"
       >
-        {selectedIds.length === 0 && <span className="text-muted-foreground">Pilih label…</span>}
+        {selectedIds.length === 0 && <span className="text-muted-foreground">Select labels…</span>}
         {selectedIds.map((id) => {
           const l = labels.find((x) => x.id === id);
           if (!l) return null;
