@@ -528,6 +528,27 @@ function ContactsTable({
                     : <span className="text-muted-foreground">—</span>}
                 </td>
               )}
+              {isMineView && (
+                <td className={tdCls}>
+                  {/* Brands — dari ba-store jika BA, atau placeholder untuk customer */}
+                  <span className="text-muted-foreground text-[11px]">—</span>
+                </td>
+              )}
+              {isMineView && (() => {
+                const tx = lastTxByContact.get(c.id);
+                return (
+                  <td className={`${tdCls} text-[11px]`}>
+                    {tx ? (
+                      <div>
+                        <div className="text-foreground font-medium">{tx.invoice}</div>
+                        <div className="text-muted-foreground">{new Date(tx.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                );
+              })()}
               {isBaView && <>
                 <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>
                 <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
