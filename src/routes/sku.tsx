@@ -176,10 +176,10 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
           <span className="text-foreground font-medium">{brand.name}</span>
         </nav>
         <button
-          onClick={() => { if (confirm(`Hapus brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand dihapus"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Hapus brand"
+          onClick={() => { if (confirm(`Delete brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand deleted"); onBack(); } }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Delete brand"
         >
-          <Trash2 className="h-4 w-4" /> Hapus Brand
+          <Trash2 className="h-4 w-4" /> Delete Brand
         </button>
       </div>
 
