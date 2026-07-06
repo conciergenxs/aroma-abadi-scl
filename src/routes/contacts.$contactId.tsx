@@ -715,6 +715,7 @@ function RightPanel({
   onCreateLabel,
   onToggleList,
   onCreateList,
+  onToggleBrand,
   onSetCustomProperty,
 }: {
   contact: Contact;
