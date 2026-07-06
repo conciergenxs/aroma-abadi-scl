@@ -437,7 +437,7 @@ function SearchableSelect({ value, onChange, placeholder, options }: {
             </li>
           ))}
           {filtered.length === 0 && (
-            <li className="px-3 py-2 text-sm text-muted-foreground">Tidak ditemukan — ketik untuk tambah manual</li>
+            <li className="px-3 py-2 text-sm text-muted-foreground">Not found — type to add manually</li>
           )}
         </ul>
       )}
