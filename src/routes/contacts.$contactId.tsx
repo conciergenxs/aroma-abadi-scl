@@ -528,6 +528,38 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   const totalSpend = transactions.filter((t) => t.status === "Paid").reduce((sum, t) => sum + t.total, 0);
   const paidCount = transactions.filter((t) => t.status === "Paid").length;
 
+  // Favorite Brand
+  const favoriteBrand = (() => {
+    const counts: Record<string, number> = {};
+    for (const t of transactions) { counts[t.brandName] = (counts[t.brandName] ?? 0) + 1; }
+    let best = "N/A", bestCount = 0;
+    for (const [b, c] of Object.entries(counts)) { if (c > bestCount) { best = b; bestCount = c; } }
+    return best;
+  })();
+
+  // Favorite Product
+  const favoriteProduct = (() => {
+    const counts: Record<string, number> = {};
+    for (const t of transactions) {
+      for (const item of t.items) { counts[item.skuName] = (counts[item.skuName] ?? 0) + item.qty; }
+    }
+    let best = "N/A", bestCount = 0;
+    for (const [p, c] of Object.entries(counts)) { if (c > bestCount) { best = p; bestCount = c; } }
+    return best;
+  })();
+
+  // Est. Purchase Time
+  const estPurchaseTime = (() => {
+    if (transactions.length < 2) return "N/A";
+    const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    let totalGap = 0;
+    for (let i = 1; i < sorted.length; i++) {
+      totalGap += (new Date(sorted[i].date).getTime() - new Date(sorted[i - 1].date).getTime()) / (1000 * 60 * 60 * 24);
+    }
+    const avg = Math.round(totalGap / (sorted.length - 1));
+    return `Per ${avg} Days`;
+  })();
+
   function statusBadge(s: string) {
     if (s === "Paid") return "border-emerald-700 bg-emerald-600 text-white";
     if (s === "Pending") return "border-amber-700 bg-amber-600 text-white";
