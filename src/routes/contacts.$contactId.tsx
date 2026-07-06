@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-r
 import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
-  ArrowLeft,
+  ChevronLeft,
   Mail,
   Phone,
   MessageCircle,
