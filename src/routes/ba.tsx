@@ -92,7 +92,7 @@ function BAPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <select value={filterBrand} onChange={(e) => { setFilterBrand(e.target.value); setPage(1); }} className={filterSelectCls}>
-              <option value="">Semua Brand</option>
+              <option value="">All Brands</option>
               {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
             <select value={filterGender} onChange={(e) => { setFilterGender(e.target.value); setPage(1); }} className={filterSelectCls}>
