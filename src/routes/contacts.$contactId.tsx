@@ -11,6 +11,7 @@ import {
   X,
   Check,
   ChevronDown,
+  ChevronLeft as _ChevronLeft,
   Activity as ActivityIcon,
   Image as ImageIcon,
   User2,
