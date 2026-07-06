@@ -283,8 +283,7 @@ function PromoCodesPage() {
               const isExpanded = expandedId === promo.id;
               return (
                 <Fragment key={promo.id}>
-                  <tr
-                    onClick={() => setExpandedId(isExpanded ? null : promo.id)}
+                  <tr onClick={() => setExpandedId(isExpanded ? null : promo.id)}
                     className="cursor-pointer hover:bg-white/[0.025] transition-colors"
                   >
                     {/* Code */}
