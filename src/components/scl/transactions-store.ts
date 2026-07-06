@@ -37,19 +37,20 @@ function seed(): Transaction[] {
     { city: "Surabaya", store: "Pakuwon Mall" },
   ];
   const bas = ["Dewi Lestari", "Maya Kusuma", "Reza Wijaya", "Hesti Andriani", "Indra Wahyudi", "Wulan Sari", "Kevin Nugroho"];
-  const customers: { id: string; name: string }[] = [
-    { id: "c1",  name: "Putri Anggraini" },
-    { id: "c9",  name: "Citra Halim" },
-    { id: "c11", name: "Bayu Hartanto" },
-    { id: "c12", name: "Nadya Salsabila" },
-    { id: "c3",  name: "Siti Rahmawati" },
-    { id: "c6",  name: "Indah Permata" },
-    { id: "c16", name: "Lina Wulandari" },
-    { id: "c20", name: "Zahra Aulia" },
-    { id: "c2",  name: "Bagus Pratama" },
-    { id: "c13", name: "Ayu Fitriani" },
-    { id: "c15", name: "Tiara Hapsari" },
-    { id: "c22", name: "Dian Puspita" },
+  // skuIndices: indices into skus[] that match each customer's brand(s)
+  const customers: { id: string; name: string; skuIndices: number[] }[] = [
+    { id: "c1",  name: "Putri Anggraini", skuIndices: [1, 2, 0] },    // sisley + dg
+    { id: "c9",  name: "Citra Halim",     skuIndices: [5] },           // laura
+    { id: "c11", name: "Bayu Hartanto",   skuIndices: [1, 2, 3, 4] }, // sisley + rimmel
+    { id: "c12", name: "Nadya Salsabila", skuIndices: [5] },           // laura
+    { id: "c3",  name: "Siti Rahmawati",  skuIndices: [1, 2] },        // sisley
+    { id: "c6",  name: "Indah Permata",   skuIndices: [0, 1, 2] },     // dg + sisley
+    { id: "c16", name: "Lina Wulandari",  skuIndices: [0, 5] },        // dg + laura
+    { id: "c20", name: "Zahra Aulia",     skuIndices: [0] },           // dg
+    { id: "c2",  name: "Bagus Pratama",   skuIndices: [3, 4] },        // rimmel
+    { id: "c13", name: "Ayu Fitriani",    skuIndices: [0] },           // dg
+    { id: "c15", name: "Tiara Hapsari",   skuIndices: [1, 2] },        // sisley
+    { id: "c22", name: "Dian Puspita",    skuIndices: [1, 2] },        // sisley
   ];
   const skus = [
     { skuId: "sku-dg-caviar-42", skuCode: "DG-CHC-42", skuName: "Caviar Hydra-Crème Lipstick 42g", price: 685000, brand: "Dolce & Gabbana" },
