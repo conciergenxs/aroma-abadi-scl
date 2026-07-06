@@ -609,7 +609,7 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickPhoto(f); }} />
               <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-sm">Upload</button>
-              {photoUrl && <button type="button" onClick={() => setPhotoUrl("")} className="text-sm text-rose-500">Hapus</button>}
+              {photoUrl && <button type="button" onClick={() => setPhotoUrl("")} className="text-sm text-rose-500">Remove</button>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
