@@ -22,6 +22,7 @@ import {
 } from "@/components/scl/contacts-store";
 import { useBaStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
+import { useTransactionsStore } from "@/components/scl/transactions-store";
 import { toast } from "sonner";
 import {
   Search, Plus, MoreHorizontal,
