@@ -1350,6 +1350,7 @@ function ConversationHeader({
           </button>
         </FloatingMenu>
       </div>
+      </div>
     </div>
   );
 }
