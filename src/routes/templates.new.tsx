@@ -15,7 +15,6 @@ import {
 } from "@/components/scl/mock-data";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import {
-  ArrowLeft,
   Save,
   Send,
   Plus,
