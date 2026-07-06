@@ -1263,20 +1263,21 @@ function ConversationHeader({
   return (
     <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
-      <div className="flex items-center gap-5 min-w-0">
-        <span className="text-[20px] font-semibold leading-tight truncate text-foreground tracking-tight">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="text-[13px] font-medium text-foreground truncate">
           {contact.name}
         </span>
-        <LifecycleSelect
-          size="sm"
-          value={contact.lifecycleStage ?? null}
-          onChange={onChangeLifecycle}
-        />
+        {!contact.labelIds.includes("lb-ba") && (
+          <LifecycleSelect
+            size="sm"
+            value={contact.lifecycleStage ?? null}
+            onChange={onChangeLifecycle}
+          />
+        )}
       </div>
 
-      {/* RIGHT — WA name + actions */}
+      {/* RIGHT — actions */}
       <div className="ml-auto flex items-center gap-3">
-        <span className="text-[13px] font-medium text-foreground/80 truncate max-w-[180px]">{contact.name}</span>
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <button
           onClick={onToggleSearch}
