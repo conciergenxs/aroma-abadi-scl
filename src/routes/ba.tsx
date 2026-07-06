@@ -187,7 +187,7 @@ function BAPage() {
         {/* Pagination */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <span className="text-xs text-muted-foreground">
-            {filtered.length} Beauty Ambassador{filtered.length !== 1 ? "s" : ""} · Halaman {page} dari {totalPages}
+            {filtered.length} Beauty Ambassador{filtered.length !== 1 ? "s" : ""} · Page {page} of {totalPages}
           </span>
           <div className="flex items-center gap-1">
             <button
