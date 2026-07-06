@@ -277,6 +277,8 @@ export const conversations: Conversation[] = [
   { id: "t36", contactId: "c36", channel: "whatsapp", preview: "Arma ada SOP untuk handling retur produk Sisley di store?", time: "2d", unread: 0 },
   { id: "t37", contactId: "c37", channel: "whatsapp", preview: "Noted Arma, makasih infonya!", time: "2d", unread: 0 },
   { id: "t38", contactId: "c38", channel: "whatsapp", preview: "Cara demo aplikasi bareMinerals yang bener ke customer gimana?", time: "3d", unread: 0 },
+  { id: "t28", contactId: "c28", channel: "whatsapp", preview: "Arma, bedanya Laura Mercier Loose vs Pressed Setting Powder apa ya?", time: "Yesterday", unread: 1 },
+  { id: "t30", contactId: "c30", channel: "whatsapp", preview: "Arma, ada promo bundling Dior x Sisley ga bulan ini?", time: "2d", unread: 0 },
 ];
 
 export type Template = {
