@@ -1293,13 +1293,9 @@ function ConversationHeader({
         />
       </div>
 
-      {/* CENTER — owner / assignee */}
-      <div className="ml-auto flex items-center gap-2">
-        <span className="text-[11px] text-muted-foreground/70">Assigned to</span>
-        <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
-      </div>
-
-      {/* RIGHT — actions */}
+      {/* RIGHT — WA name + actions */}
+      <div className="ml-auto flex items-center gap-3">
+        <span className="text-[13px] font-medium text-foreground/80 truncate max-w-[180px]">{contact.name}</span>
       <div className="flex items-center gap-0.5 text-muted-foreground/70">
         <button
           onClick={onToggleSearch}
