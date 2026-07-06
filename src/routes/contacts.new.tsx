@@ -202,7 +202,7 @@ function NewContactPage() {
   // ── Step 2: BA form ──────────────────────────────────────────────────────
   if (contactType === "ba") {
     return (
-      <AppShell title="Buat BA Baru" noPadding>
+      <AppShell title="New BA" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
           <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-card/80 backdrop-blur px-6 py-3">
             <div className="flex items-center gap-3">
