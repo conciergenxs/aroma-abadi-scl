@@ -304,7 +304,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
         <div className="p-5 border-b border-border flex items-start justify-between">
           <div>
             <div className="inline-flex items-center gap-2 text-sm text-primary mb-1"><BadgeCheck className="h-3.5 w-3.5" /> Beauty Ambassador</div>
-            <div className="text-base font-semibold">{initial ? "Edit Beauty Ambassador" : "Tambah Beauty Ambassador Baru"}</div>
+            <div className="text-base font-semibold">{initial ? "Edit Beauty Ambassador" : "Add New Beauty Ambassador"}</div>
           </div>
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
