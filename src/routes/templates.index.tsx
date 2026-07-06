@@ -338,6 +338,21 @@ function TemplatesPage() {
       {detail && <TemplateDetailModal template={detail} onClose={() => setDetail(null)} />}
 
       <ConfirmDialog
+        open={!!deleteTarget}
+        title={`Hapus template "${deleteTarget?.name}"?`}
+        description="Template yang dihapus tidak bisa dikembalikan."
+        confirmLabel="Hapus"
+        onConfirm={() => {
+          if (deleteTarget) {
+            templatesStore.deleteTemplates([deleteTarget.id]);
+            toast.success(`Template "${deleteTarget.name}" dihapus`);
+            setDeleteTarget(null);
+          }
+        }}
+        onClose={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} template${selected.length === 1 ? "" : "s"}?`}
         description="This action cannot be undone."
