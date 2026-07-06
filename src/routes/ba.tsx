@@ -250,8 +250,8 @@ function BAPage() {
           initial={editing}
           onClose={() => { setShowCreate(false); setEditing(null); }}
           onSubmit={(input, id) => {
-            if (id) { baStore.update(id, input); toast.success("BA diperbarui"); }
-            else { const created = baStore.add(input); toast.success(`BA ditambahkan. Password: ${created.password}`); }
+            if (id) { baStore.update(id, input); toast.success("BA updated"); }
+            else { const created = baStore.add(input); toast.success(`BA added. Password: ${created.password}`); }
             setShowCreate(false); setEditing(null);
           }}
         />
