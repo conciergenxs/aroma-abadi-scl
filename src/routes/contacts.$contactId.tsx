@@ -337,7 +337,6 @@ function ContactDetailPage() {
                 <div className="flex items-center gap-1">
                   <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={derivedActivities.length} />
                   <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={contactTransactions.length} />
-                  <TabButton active={tab === "media"} onClick={() => setTab("media")} icon={<ImageIcon className="h-3.5 w-3.5" />} label="Media" />
                 </div>
               </div>
             )}
