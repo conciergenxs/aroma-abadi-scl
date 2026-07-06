@@ -733,24 +733,6 @@ function InboxPage() {
                       {stageColor && ct.lifecycleStage && (
                         <span title={ct.lifecycleStage} className={`inline-block h-2.5 w-2.5 rounded-full ${stageColor.dot}`} />
                       )}
-                      {ct.ownerId && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60">
-                          {isAgentId(ct.ownerId) ? (
-                            <Bot className="h-2.5 w-2.5 text-primary" />
-                          ) : (
-                            <User2 className="h-2.5 w-2.5" />
-                          )}
-                          {ct.ownerId === "me" ? "Me" : userLabel(ct.ownerId)}
-                          {isAgentId(ct.ownerId) && (
-                            <span className="ml-0.5 rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
-                              AI
-                            </span>
-                          )}
-                        </span>
-                      )}
-                      {!ct.ownerId && (
-                        <span className="text-[10px] text-amber-300/70">Unassigned</span>
-                      )}
                     </div>
                   </div>
                 </button>
