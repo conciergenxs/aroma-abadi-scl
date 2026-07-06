@@ -183,7 +183,7 @@ function StatusBadge({ status }: { status: PromoStatus }) {
     );
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-      <Clock className="h-2.5 w-2.5" /> Belum Aktif
+      <Clock className="h-2.5 w-2.5" /> Inactive
     </span>
   );
 }
