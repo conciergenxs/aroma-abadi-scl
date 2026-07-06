@@ -300,6 +300,24 @@ function TemplatesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{t.updated}</td>
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-1">
+                          <Link
+                            to="/templates/new"
+                            title="Edit template"
+                            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Link>
+                          <button
+                            title="Delete template"
+                            onClick={() => setDeleteTarget(t)}
+                            className="h-7 w-7 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
