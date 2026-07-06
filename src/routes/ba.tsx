@@ -368,7 +368,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Posisi">
+            <Field label="Position">
               <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
                 <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
               </select>
