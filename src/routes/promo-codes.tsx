@@ -303,9 +303,9 @@ function PromoCodesPage() {
 
         <button
           className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          onClick={() => toast.info("Buat promo (coming soon)")}
+          onClick={() => toast.info("Create promo (coming soon)")}
         >
-          <Plus className="h-3.5 w-3.5" /> Buat Promo
+          <Plus className="h-3.5 w-3.5" /> Create Promo
         </button>
       </div>
 
