@@ -610,6 +610,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Items</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Total</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Status</th>
+              <th className="px-4 py-2.5 w-10"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
