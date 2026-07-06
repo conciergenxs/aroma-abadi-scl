@@ -358,8 +358,28 @@ function ContactDetailPage() {
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
                 <div className="flex items-center gap-1">
-                  <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={derivedActivities.length} />
-                  <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={contactTransactions.length} />
+                  <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={filteredActivities.length} />
+                  <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={filteredTransactions.length} />
+                  <div className="ml-auto flex items-center gap-1.5 py-1.5">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      className="h-7 rounded border border-border bg-card/40 px-2 text-[11px] focus:outline-none"
+                      title="From date"
+                    />
+                    <span className="text-[10px] text-muted-foreground">—</span>
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      className="h-7 rounded border border-border bg-card/40 px-2 text-[11px] focus:outline-none"
+                      title="To date"
+                    />
+                    {(dateFrom || dateTo) && (
+                      <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-muted-foreground hover:text-foreground">Clear</button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -374,12 +394,12 @@ function ContactDetailPage() {
                       <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-muted-foreground">{derivedActivities.length}</span>
                     )}
                   </div>
-                  <ActivityTab activities={derivedActivities} />
+                  <ActivityTab activities={filteredActivities} />
                 </>
               ) : (
                 <>
-                  {tab === "activity" && <ActivityTab activities={derivedActivities} />}
-                  {tab === "transactions" && <TransactionsTab transactions={contactTransactions} />}
+                  {tab === "activity" && <ActivityTab activities={filteredActivities} />}
+                  {tab === "transactions" && <TransactionsTab transactions={filteredTransactions} />}
                 </>
               )}
             </div>
