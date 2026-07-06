@@ -12,9 +12,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Overview — Aroma Abadi" },
-      { name: "description", content: "Platform engagement WhatsApp untuk Aroma Abadi — makeup & beauty." },
+      { name: "description", content: "WhatsApp engagement platform for Aroma Abadi — makeup & beauty." },
       { property: "og:title", content: "Aroma Abadi — SCL" },
-      { property: "og:description", content: "Kelola percakapan WhatsApp pelanggan Aroma Abadi dalam satu workspace." },
+      { property: "og:description", content: "Manage WhatsApp conversations for Aroma Abadi in one workspace." },
     ],
   }),
   component: Dashboard,
