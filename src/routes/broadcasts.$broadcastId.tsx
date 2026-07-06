@@ -138,9 +138,9 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
 
         <Section title="Audience">
           <ReadGrid>
-            <ReadField label="Selected Lists" span={2}>
+            <ReadField label="Selected Audience" span={2}>
               {selectedLists.length === 0 ? (
-                <span className="text-muted-foreground">No lists</span>
+                <span className="text-muted-foreground">No audience selected</span>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {selectedLists.map((l) => (
