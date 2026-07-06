@@ -306,6 +306,9 @@ function ContactDetailPage() {
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-card/80 backdrop-blur px-4 lg:px-6 py-3">
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-sm font-medium truncate">{contact.name}</h1>
+            {!isBA && (
+              <LifecycleSelect value={contact.lifecycleStage ?? null} onChange={setLifecycle} size="sm" />
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Link
