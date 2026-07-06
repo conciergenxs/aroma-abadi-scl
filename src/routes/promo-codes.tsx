@@ -355,7 +355,7 @@ function PromoCodesPage() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                  Tidak ada promo code yang ditemukan.
+                  No promo codes found.
                 </td>
               </tr>
             )}
