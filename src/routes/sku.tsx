@@ -417,7 +417,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
                 </button>
               </li>
             ))}
-            {filtered.length === 0 && <li className="px-3 py-4 text-center text-sm text-muted-foreground">Tidak ditemukan</li>}
+            {filtered.length === 0 && <li className="px-3 py-4 text-center text-sm text-muted-foreground">Not found</li>}
           </ul>
         </div>
       )}
