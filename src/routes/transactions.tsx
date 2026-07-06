@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useTransactionsStore, formatIDR, type Transaction, type TxStatus } from "@/components/scl/transactions-store";
-import { Search, Receipt, TrendingUp, Wallet, Package } from "lucide-react";
+import { Search, Receipt, TrendingUp, Wallet, Package, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
