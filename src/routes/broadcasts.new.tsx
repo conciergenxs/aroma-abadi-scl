@@ -6,7 +6,6 @@ import { connectedChannels, templates, type Template } from "@/components/scl/mo
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft,
   ChevronDown,
   CalendarClock,
   Users,
