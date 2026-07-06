@@ -141,7 +141,7 @@ function TransactionsPage() {
                 </tr>
               </thead>
               <tbody className="stagger">
-                {filtered.map((t) => (
+                {paginated.map((t) => (
                   <tr key={t.id} className="border-b border-border hover:bg-white/[0.025] cursor-pointer align-top transition-colors" onClick={() => setOpen(t)}>
                     <Td className="font-medium text-foreground">{t.invoice}</Td>
                     <Td>{new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</Td>
