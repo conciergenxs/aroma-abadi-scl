@@ -159,6 +159,7 @@ export interface FileRoutesById {
   '/channels': typeof ChannelsRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/promo-codes': typeof PromoCodesRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
   '/transactions': typeof TransactionsRoute
