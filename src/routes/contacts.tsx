@@ -241,12 +241,6 @@ function ContactsPage() {
                 className="h-9 w-80 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            <SclSelect
-              value={channelFilter}
-              onChange={setChannelFilter}
-              options={channelOptions}
-              className="w-44"
-            />
             <div className="ml-auto flex items-center gap-2">
               <button
                 onClick={() => setShowManageProps(true)}
