@@ -30,6 +30,8 @@ function TransactionsPage() {
   const [brand, setBrand] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [open, setOpen] = useState<Transaction | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const cities = useMemo(() => Array.from(new Set(transactions.map((t) => t.city))).sort(), [transactions]);
   const stores = useMemo(() => {
