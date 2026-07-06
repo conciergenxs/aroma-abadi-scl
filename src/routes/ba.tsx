@@ -375,7 +375,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
             </Field>
             <Field label="Brand">
               <select value={brandId} onChange={(e) => setBrandId(e.target.value)} className={inputCls}>
-                <option value="">Pilih brand..</option>
+                <option value="">Select brand…</option>
                 {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </Field>
