@@ -248,7 +248,7 @@ function NewContactPage() {
 
                 <FormSection title="Brand">
                   <div className="space-y-2">
-                    <p className="text-[11px] text-muted-foreground">Pilih satu atau lebih brand yang ditangani BA ini.</p>
+                    <p className="text-[11px] text-muted-foreground">Select one or more brands handled by this BA.</p>
                     <div className="flex flex-wrap gap-2">
                       {brands.map((b) => {
                         const on = brandIds.includes(b.id);
