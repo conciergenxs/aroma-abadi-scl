@@ -199,6 +199,7 @@ export interface FileRouteTypes {
     | '/channels'
     | '/contacts'
     | '/inbox'
+    | '/promo-codes'
     | '/settings'
     | '/sku'
     | '/transactions'
