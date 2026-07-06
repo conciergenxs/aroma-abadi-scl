@@ -118,8 +118,8 @@ function NewContactPage() {
   };
 
   const submitCustomer = () => {
-    if (!name.trim()) { toast.error("Nama wajib diisi"); return; }
-    if (!phone.trim()) { toast.error("WA Number wajib diisi"); return; }
+    if (!name.trim()) { toast.error("Name is required"); return; }
+    if (!phone.trim()) { toast.error("WA Number is required"); return; }
 
     const initials = name.trim().split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
     const contact: Contact = {
