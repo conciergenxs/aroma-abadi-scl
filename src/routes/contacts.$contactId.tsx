@@ -157,6 +157,26 @@ function ContactDetailPage() {
     return merged;
   }, [contact, contactActivities, contactLabels, contactLists, txActivities]);
 
+  const filteredActivities = useMemo(() => {
+    if (!dateFrom && !dateTo) return derivedActivities;
+    return derivedActivities.filter((a) => {
+      const d = a.at.slice(0, 10);
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+      return true;
+    });
+  }, [derivedActivities, dateFrom, dateTo]);
+
+  const filteredTransactions = useMemo(() => {
+    if (!dateFrom && !dateTo) return contactTransactions;
+    return contactTransactions.filter((t) => {
+      const d = t.date.slice(0, 10);
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+      return true;
+    });
+  }, [contactTransactions, dateFrom, dateTo]);
+
   const handleDelete = () => {
     if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
     contactsStore.softDeleteContacts([contact.id]);
