@@ -55,15 +55,6 @@ const NAV: NavSection[] = [
     ],
   },
   {
-    id: "billing",
-    label: "Plans & billing",
-    items: [
-      { id: "subscription", label: "Subscription", enabled: true },
-      { id: "payment-methods", label: "Payment Methods", enabled: true },
-      { id: "invoice", label: "Invoice", enabled: true },
-    ],
-  },
-  {
     id: "data",
     label: "Data management",
     items: [
@@ -139,12 +130,6 @@ function SettingsPage() {
           {active === "user-management" && <UserManagementPage />}
           {active === "team-management" && <TeamManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
-          {(active === "subscription" || active === "payment-methods" || active === "invoice") && (
-            <PlansBillingModule
-              section={active}
-              onNavigate={(s) => setActive(s)}
-            />
-          )}
           {(active === "labels" ||
             active === "contact-properties" ||
             active === "customer-lifecycle" ||
