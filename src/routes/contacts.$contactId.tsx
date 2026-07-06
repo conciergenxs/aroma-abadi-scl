@@ -357,7 +357,6 @@ function ContactDetailPage() {
                 <>
                   {tab === "activity" && <ActivityTab activities={derivedActivities} />}
                   {tab === "transactions" && <TransactionsTab transactions={contactTransactions} />}
-                  {tab === "media" && <MediaTab />}
                 </>
               )}
             </div>
