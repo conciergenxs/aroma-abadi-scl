@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { useState, useMemo, Fragment, useRef, useEffect } from "react";
 import {
