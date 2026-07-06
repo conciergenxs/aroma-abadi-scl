@@ -370,7 +370,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides, labelFilter]);
 
   // Pinned conversations float to the top while preserving original order.
   const sortedVisible = useMemo(() => {
