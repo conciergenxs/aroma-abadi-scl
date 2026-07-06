@@ -137,7 +137,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
       {brands.length > 0 && (
         <div className="px-4 py-3 border-t border-border flex items-center justify-between text-sm">
           <div className="text-muted-foreground">
-            Menampilkan <span className="text-foreground font-medium">{start + 1}–{end}</span> dari <span className="text-foreground font-medium">{brands.length}</span> brand
+            Showing <span className="text-foreground font-medium">{start + 1}–{end}</span> of <span className="text-foreground font-medium">{brands.length}</span> brands
           </div>
           <div className="flex items-center gap-1">
             <button
