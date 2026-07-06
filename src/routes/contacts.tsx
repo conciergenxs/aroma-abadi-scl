@@ -1069,7 +1069,7 @@ function ContactDrawer({
             })}
           </div>
           <Dropdown
-            placeholder="Add to list…"
+            placeholder="Add to audience…"
             icon={<ListPlus className="h-3 w-3" />}
             items={lists.map((l) => ({ id: l.id, name: l.name, selected: contact.listIds.includes(l.id) }))}
             onPick={onToggleList}
