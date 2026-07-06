@@ -306,6 +306,31 @@ function ContactDetailPage() {
         <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-0">
           {/* LEFT: primary content */}
           <section className="flex flex-col min-w-0 min-h-0">
+            {/* Contact header bar */}
+            <div className="px-4 lg:px-6 py-3 flex items-center justify-between gap-3 border-b border-border">
+              <div className="flex items-center gap-3 min-w-0">
+                <h1 className="text-base font-semibold truncate">{contact.name}</h1>
+                {!isBA && (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {(["New Lead","Contacted","Qualified","Pending Payment","Customer","Lost","No Reply"] as LifecycleStage[]).map((s) => (
+                      <button key={s} type="button"
+                        onClick={() => setLifecycle(contact.lifecycleStage === s ? null : s)}
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${contact.lifecycleStage === s ? "bg-primary border-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"}`}
+                      >{s}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link to="/inbox" className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs font-medium hover:bg-card transition-colors">
+                  <ExternalLink className="h-3.5 w-3.5" /> See Inbox
+                </Link>
+                <button onClick={handleDelete} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10">
+                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                </button>
+              </div>
+            </div>
+
             {/* Tabs — hanya untuk Customer, BA langsung show activity log */}
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
