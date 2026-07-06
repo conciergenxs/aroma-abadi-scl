@@ -15,6 +15,7 @@ import {
   Image as ImageIcon,
   User2,
   ShoppingBag,
+  ExternalLink,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
