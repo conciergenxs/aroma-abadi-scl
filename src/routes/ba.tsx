@@ -309,8 +309,8 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5 space-y-3">
-          <Field label="Nama Lengkap">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama lengkap.." className={inputCls} />
+          <Field label="Full Name">
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter full name…" className={inputCls} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Gender">
