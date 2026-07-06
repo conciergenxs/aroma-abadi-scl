@@ -385,17 +385,11 @@ function BrandsNav({ activeView, setActiveView, setSelected }: {
   setSelected: (s: string[]) => void;
 }) {
   const { brands } = useSkuStore();
-  const { bas } = useBaStore();
   const { contacts } = useContactsStore();
   const liveContacts = useMemo(() => contacts.filter((c) => !c.deleted), [contacts]);
 
-  // Count per brand = BA contacts assigned to brand + customers (all non-deleted for now)
-  const countForBrand = (brandId: string) => {
-    const baPhones = new Set(
-      bas.filter((b) => b.brandIds.includes(brandId)).map((b) => b.waNumber.replace(/\s/g, ""))
-    );
-    return liveContacts.filter((c) => baPhones.has(c.phone.replace(/\s/g, ""))).length;
-  };
+  const countForBrand = (brandId: string) =>
+    liveContacts.filter((c) => c.brandIds.includes(brandId)).length;
 
   return (
     <>
