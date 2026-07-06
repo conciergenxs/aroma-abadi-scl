@@ -146,10 +146,6 @@ const MOCK_PROMOS: PromoCode[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatIDR(n: number) {
-  return "Rp " + n.toLocaleString("id-ID");
-}
-
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 }
