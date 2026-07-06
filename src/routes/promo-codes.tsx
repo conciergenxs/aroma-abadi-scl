@@ -280,7 +280,7 @@ function PromoCodesPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari kode atau nama promo..."
+            placeholder="Search by code or promo name..."
             className="h-9 w-56 rounded-md border border-border bg-card/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
           />
         </div>
