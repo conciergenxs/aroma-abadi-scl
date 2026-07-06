@@ -312,7 +312,7 @@ function NewContactPage() {
               Batal
             </button>
             <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
-              <Plus className="h-3.5 w-3.5" /> Buat Customer
+              <Plus className="h-3.5 w-3.5" /> Create Customer
             </button>
           </div>
         </header>
