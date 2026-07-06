@@ -787,7 +787,7 @@ function AudienceModal({
                 )}
               </div>
               <div className="text-[11px] text-muted-foreground">
-                {localLists.size} list{localLists.size === 1 ? "" : "s"} selected
+                {localLists.size} audience{localLists.size === 1 ? "" : "s"} selected
               </div>
             </div>
           ) : (
