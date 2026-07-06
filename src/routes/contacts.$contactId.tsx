@@ -370,12 +370,20 @@ function ContactDetailPage() {
                       </Link>
                     </>
                   ) : (
-                    /* Customer: lifecycle select as-is */
-                    <LifecycleSelect
-                      value={contact.lifecycleStage ?? null}
-                      onChange={setLifecycle}
-                      size="sm"
-                    />
+                    /* Customer: lifecycle select + See Inbox */
+                    <>
+                      <LifecycleSelect
+                        value={contact.lifecycleStage ?? null}
+                        onChange={setLifecycle}
+                        size="sm"
+                      />
+                      <Link
+                        to="/inbox"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium hover:bg-card transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" /> See Inbox
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>
