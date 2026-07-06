@@ -756,17 +756,6 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
   );
 }
 
-function MediaTab() {
-  return (
-    <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
-      <div className="h-12 w-12 rounded-full bg-white/[0.04] border border-border grid place-items-center">
-        <ImageIcon className="h-5 w-5 text-muted-foreground" />
-      </div>
-      <div className="text-sm text-foreground">No media available.</div>
-      <div className="text-[11px] text-muted-foreground">Upload functionality coming soon.</div>
-    </div>
-  );
-}
 
 /* ============================== RIGHT PANEL ============================== */
 
