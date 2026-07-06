@@ -78,8 +78,8 @@ function ContactDetailPage() {
       <AppShell title="Contact" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center text-sm text-muted-foreground gap-3">
           <div>Contact not found.</div>
-          <Link to="/contacts" className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card">
-            Back to Contacts
+          <Link to="/contacts" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ChevronLeft className="h-4 w-4" /> Contacts
           </Link>
         </div>
       </AppShell>
