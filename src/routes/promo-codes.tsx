@@ -374,7 +374,7 @@ function PromoCodesPage() {
                         className="accent-[oklch(0.62_0.17_40)]"
                         checked={selected.includes(promo.id)}
                         onChange={() => toggleOne(promo.id)}
-                        aria-label={`Pilih ${promo.code}`}
+                        aria-label={`Select ${promo.code}`}
                       />
                     </td>
 
