@@ -482,7 +482,7 @@ function ContactsTable({
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
 
   // colSpan for empty state
-  const colSpan = isBaView ? 9 : isMineView ? 8 : isAllOrBrand ? 6 : 5;
+  const colSpan = isBaView ? 9 : isMineView ? 7 : 5;
 
   return (
     <table className="min-w-full text-sm">
