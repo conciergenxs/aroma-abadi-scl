@@ -241,6 +241,8 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/inbox'
     | '/promo-codes'
+    | '/promo-codes/new'
+    | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
     | '/transactions'
