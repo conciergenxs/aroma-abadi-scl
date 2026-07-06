@@ -229,6 +229,47 @@ function ContactsPage() {
           </div>
 
           <BrandsNav activeView={activeView} setActiveView={setActiveView} setSelected={setSelected} />
+
+          {/* Audience section */}
+          <div className="pt-3 border-t border-border mt-3 px-0">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Audience</span>
+              <button
+                onClick={() => setNewAudienceOpen(true)}
+                className="h-5 w-5 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-foreground"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+            {lists.map((l) => (
+              <button
+                key={l.id}
+                onClick={() => { setActiveView(l.id); setSelected([]); }}
+                className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-white/[0.04] flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                <Users className="h-3 w-3 shrink-0" /> <span className="truncate">{l.name}</span>
+              </button>
+            ))}
+            {newAudienceOpen && (
+              <div className="px-3 py-2">
+                <input
+                  autoFocus
+                  value={newAudienceName}
+                  onChange={(e) => setNewAudienceName(e.target.value)}
+                  placeholder="Audience name..."
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newAudienceName.trim()) {
+                      setLists((l) => [...l, { id: `ls-${Date.now()}`, name: newAudienceName.trim() }]);
+                      setNewAudienceName("");
+                      setNewAudienceOpen(false);
+                    }
+                    if (e.key === "Escape") setNewAudienceOpen(false);
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </aside>
 
         {/* Main content */}
