@@ -60,7 +60,7 @@ function seed(): Transaction[] {
     { skuId: "sku-laura-translucent", skuCode: "LM-TLS-29", skuName: "Translucent Loose Setting Powder", price: 745000, brand: "Laura Mercier" },
     { skuId: "sku-bm-color-infusion", skuCode: "BM-BCI-06", skuName: "Blush Color Infusion", price: 425000, brand: "BareMinerals" },
   ];
-  const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Cash", "Transfer"];
+  const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
   const statuses: TxStatus[] = ["Paid", "Paid", "Paid", "Pending", "Refunded"];
 
   const today = new Date();
