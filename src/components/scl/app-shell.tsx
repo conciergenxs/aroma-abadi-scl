@@ -124,6 +124,7 @@ type NavItem = {
     | "/transactions"
     | "/sku"
     | "/ba"
+    | "/promo-codes"
     | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
