@@ -45,6 +45,73 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InviteModal } from "@/components/scl/invite-modal";
 
+// ── Mock Notifications ───────────────────────────────────────────────────────
+type MockNotif = {
+  id: string;
+  title: string;
+  body: string;
+  time: string;
+  icon: typeof Bell;
+  iconBg: string;
+  iconColor: string;
+};
+const MOCK_NOTIFS: MockNotif[] = [
+  {
+    id: "n1",
+    title: "Pesan baru dari Dewi Lestari",
+    body: "Halo Arma! Ada customer nanya soal promo 12.12, gimana cara jelasinnya?",
+    time: "2 menit lalu",
+    icon: MessageCircle,
+    iconBg: "bg-sky-500/15",
+    iconColor: "text-sky-400",
+  },
+  {
+    id: "n2",
+    title: "Transaksi baru — INV-2024-0089",
+    body: "Putri Anggraini baru saja checkout Velvet Rouge Shade 03 · Rp 485.000",
+    time: "15 menit lalu",
+    icon: ShoppingBag,
+    iconBg: "bg-emerald-500/15",
+    iconColor: "text-emerald-400",
+  },
+  {
+    id: "n3",
+    title: "Broadcast 'Promo Harbolnas' terkirim",
+    body: "Berhasil dikirim ke 248 kontak. Delivery rate 96.4%.",
+    time: "1 jam lalu",
+    icon: MegaphoneIcon,
+    iconBg: "bg-primary/15",
+    iconColor: "text-primary",
+  },
+  {
+    id: "n4",
+    title: "Pesan baru dari Hesti Andriani",
+    body: "Arma, shade berapa yang paling laris di Pakuwon bulan ini?",
+    time: "2 jam lalu",
+    icon: MessageCircle,
+    iconBg: "bg-sky-500/15",
+    iconColor: "text-sky-400",
+  },
+  {
+    id: "n5",
+    title: "Transaksi baru — INV-2024-0088",
+    body: "Bayu Hartanto checkout Glow Serum (3 pcs) + Vitamin C Serum · Rp 1.240.000",
+    time: "3 jam lalu",
+    icon: ShoppingBag,
+    iconBg: "bg-emerald-500/15",
+    iconColor: "text-emerald-400",
+  },
+  {
+    id: "n6",
+    title: "Template 'Cart Reminder' disetujui",
+    body: "Template pesan WhatsApp kamu sudah disetujui dan siap digunakan.",
+    time: "Kemarin",
+    icon: CheckCheck,
+    iconBg: "bg-violet-500/15",
+    iconColor: "text-violet-400",
+  },
+];
+
 type NavItem = {
   to:
     | "/"
