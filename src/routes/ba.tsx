@@ -283,7 +283,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !waNumber.trim()) { toast.error("Nama dan No. WhatsApp wajib"); return; }
+    if (!name.trim() || !waNumber.trim()) { toast.error("Name and WhatsApp number are required"); return; }
     onSubmit({
       name,
       gender,
