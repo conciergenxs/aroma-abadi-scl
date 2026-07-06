@@ -303,16 +303,67 @@ function CreateTemplatePage() {
                 placeholder={`Hi {{name}}, …`}
                 className="w-full min-h-[160px] rounded-md border border-border bg-background/40 p-3 text-[13px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary/40 resize-y"
               />
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                {properties.slice(0, 6).map((p) => (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 relative">
+                {/* Name — direct insert */}
+                <button
+                  onClick={() => insertVariable("{{name}}")}
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                >
+                  <AtSign className="h-3 w-3" /> Name
+                </button>
+                {/* Brands — popup */}
+                <div className="relative">
                   <button
-                    key={p.key}
-                    onClick={() => insertVariable(p.key)}
+                    onClick={() => setVarPopup(varPopup === "brands" ? null : "brands")}
                     className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
                   >
-                    <AtSign className="h-3 w-3" /> {p.name}
+                    <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                   </button>
-                ))}
+                  {varPopup === "brands" && (
+                    <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Pilih Brand</span>
+                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                      </div>
+                      <div className="max-h-44 overflow-y-auto py-1">
+                        {brands.map((b) => (
+                          <button key={b.id} onClick={() => insertBrand(b.name)}
+                            className="w-full text-left px-3 py-2 text-[12px] hover:bg-white/[0.05] transition-colors flex items-center gap-2">
+                            <Tag className="h-3 w-3 text-muted-foreground shrink-0" />
+                            <span className="truncate">{b.name}</span>
+                            <code className="ml-auto text-[10px] text-muted-foreground/60 font-mono truncate">{"{{brands-" + b.name + "}}"}</code>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Promo Code — popup */}
+                <div className="relative">
+                  <button
+                    onClick={() => setVarPopup(varPopup === "promo" ? null : "promo")}
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                  >
+                    <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
+                  </button>
+                  {varPopup === "promo" && (
+                    <div className="absolute top-full left-0 mt-1 w-60 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Pilih Promo Code</span>
+                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                      </div>
+                      <div className="max-h-44 overflow-y-auto py-1">
+                        {PROMO_CODES_LIST.map((p) => (
+                          <button key={p.id} onClick={() => insertPromo(p.code)}
+                            className="w-full text-left px-3 py-2 text-[12px] hover:bg-white/[0.05] transition-colors flex items-center gap-2">
+                            <span className="font-mono text-[10px] font-semibold bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 shrink-0">{p.code}</span>
+                            <span className="truncate text-muted-foreground">{p.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </Field>
 
