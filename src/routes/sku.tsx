@@ -495,8 +495,8 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
             {coverUrl && <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickCover(f); }} />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-sm">Pilih Gambar</button>
-              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-2 h-8 text-sm text-rose-500">Hapus Cover</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-sm">Choose Image</button>
+              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-2 h-8 text-sm text-rose-500">Remove Cover</button>}
             </div>
           </div>
           <label className="block">
