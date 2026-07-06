@@ -80,10 +80,7 @@ function BroadcastListPage() {
   };
 
   return (
-    <AppShell
-      title="Broadcasts"
-      subtitle="Compose, schedule and track outbound campaigns"
-    >
+    <AppShell title="Broadcasts">
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           {stats.map((s) => (
@@ -94,30 +91,18 @@ function BroadcastListPage() {
           ))}
         </div>
 
-        <SectionCard
-          title="All broadcasts"
-          description="Search, filter, and manage campaigns"
-          action={
-            <Link
-              to="/broadcasts/new"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              <Plus className="h-3.5 w-3.5" /> Create Broadcast
-            </Link>
-          }
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-border">
-            <div className="relative flex-1 max-w-md">
+        <SectionCard>
+          <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-b border-border">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search broadcasts…"
-                className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-9 w-52 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+            <div className="flex items-center gap-1 flex-wrap">
               {STATUSES.map((s) => {
                 const sel = status === s;
                 return (
@@ -134,6 +119,14 @@ function BroadcastListPage() {
                   </button>
                 );
               })}
+            </div>
+            <div className="ml-auto">
+              <Link
+                to="/broadcasts/new"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="h-3.5 w-3.5" /> Create Broadcast
+              </Link>
             </div>
           </div>
 
