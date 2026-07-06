@@ -178,7 +178,7 @@ function StatusBadge({ status }: { status: PromoStatus }) {
   if (status === "expired")
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-300">
-        <XCircle className="h-2.5 w-2.5" /> Kedaluwarsa
+        <XCircle className="h-2.5 w-2.5" /> Expired
       </span>
     );
   return (
