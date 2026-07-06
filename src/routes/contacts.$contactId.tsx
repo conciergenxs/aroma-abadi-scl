@@ -759,24 +759,6 @@ function RightPanel({
         />
       </RightSection>
 
-      <RightSection title="Contact Properties">
-        {customProps.length === 0 ? (
-          <div className="text-[11px] text-muted-foreground">
-            No custom properties. Create some in Manage Properties.
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {customProps.map((p) => (
-              <PropertyField
-                key={p.id}
-                property={p}
-                value={contact.customFields?.[p.key]}
-                onChange={(v) => onSetCustomProperty(p.key, v, p.name)}
-              />
-            ))}
-          </div>
-        )}
-      </RightSection>
     </div>
   );
 }
