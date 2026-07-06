@@ -229,7 +229,7 @@ function NewContactPage() {
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-2xl mx-auto">
               <div className="rounded-xl border border-border bg-card/40 divide-y divide-border">
-                <FormSection title="Informasi Dasar">
+                <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Nama Lengkap" required>
                       <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
@@ -238,7 +238,7 @@ function NewContactPage() {
                       <Input value={phone} onChange={setPhone} placeholder="+62 811 1234 5678" type="tel" />
                     </Field>
                     <Field label="Gender" required>
-                      <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Pilih gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
+                      <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
                     </Field>
                     <Field label="Posisi" required>
                       <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Pilih posisi…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
@@ -329,7 +329,7 @@ function NewContactPage() {
                     <Input value={phone} onChange={setPhone} placeholder="+62 812 3456 7890" type="tel" />
                   </Field>
                   <Field label="Gender">
-                    <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Pilih gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
+                    <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
                   </Field>
                   <Field label="Point Balance">
                     <Input value={pointBalance} onChange={setPointBalance} placeholder="0" type="number" />
