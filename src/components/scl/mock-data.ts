@@ -52,6 +52,7 @@ export type Contact = {
   channel: Channel;
   labelIds: string[];
   listIds: string[];
+  brandIds: string[];
   lastInteraction: string;
   status: "Active" | "Inactive" | "Blocked";
   avatar: string;
