@@ -127,7 +127,7 @@ function TemplatesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search Templates"
-              className="h-9 w-64 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+              className="h-9 w-48 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
           <SclSelect
