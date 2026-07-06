@@ -224,10 +224,13 @@ function ActionMenu({ promo, onSeeDetails }: { promo: PromoCode; onSeeDetails: (
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 function PromoCodesPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     let list = MOCK_PROMOS;
