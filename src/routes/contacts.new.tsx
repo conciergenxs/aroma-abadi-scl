@@ -156,7 +156,7 @@ function NewContactPage() {
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
-                <h2 className="text-lg font-semibold">Pilih Tipe Kontak</h2>
+                <h2 className="text-lg font-semibold">Select Contact Type</h2>
                 <p className="text-sm text-muted-foreground mt-1">Form yang muncul akan disesuaikan berdasarkan tipe yang dipilih.</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
