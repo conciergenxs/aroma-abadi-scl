@@ -76,9 +76,6 @@ function ContactsPage() {
       base = live.filter((c) => (c.brandIds ?? []).includes(brandId));
     }
     else base = live.filter((c) => c.listIds.includes(activeView));
-    if (channelFilter !== "all") {
-      base = base.filter((c) => c.channel === channelFilter);
-    }
     if (!query.trim()) return base;
     const q = query.toLowerCase();
     return base.filter(
@@ -87,7 +84,7 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeView, channelFilter, query]);
+  }, [contacts, activeView, query]);
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
