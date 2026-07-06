@@ -296,7 +296,7 @@ function PromoCodesPage() {
                   : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
               }`}
             >
-              {s === "all" ? "Semua" : s === "active" ? "Aktif" : s === "inactive" ? "Belum Aktif" : "Kedaluwarsa"}
+              {s === "all" ? "All" : s === "active" ? "Active" : s === "inactive" ? "Inactive" : "Expired"}
             </button>
           ))}
         </div>
