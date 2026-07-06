@@ -304,7 +304,7 @@ function NewContactPage() {
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
-            <h1 className="text-sm font-medium">Buat Customer Baru</h1>
+            <h1 className="text-sm font-medium">Create Customer</h1>
             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
           </div>
           <div className="flex items-center gap-2">
