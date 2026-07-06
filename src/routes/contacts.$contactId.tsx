@@ -701,14 +701,6 @@ function RightPanel({
               <span className="capitalize">{contact.channel}</span>
             </div>
           </FieldRow>
-          <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Owner">
-            <InlineText
-              value={contact.ownerId === "me" ? "Me" : contact.ownerId ?? ""}
-              onCommit={(v) => onUpdateField("ownerId", v as Contact["ownerId"], "owner")}
-              placeholder="Unassigned"
-              className="text-xs"
-            />
-          </FieldRow>
         </div>
       </RightSection>
 
