@@ -488,7 +488,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
             {canCreate && (
               <button type="button" onClick={() => { onCreate(search.trim()); setSearch(""); }} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-white/[0.05] inline-flex items-center gap-2 border-t border-border mt-1 pt-2">
                 <Plus className="h-3 w-3 text-primary" />
-                Buat <span className="font-medium text-foreground">"{search.trim()}"</span>
+                Create <span className="font-medium text-foreground">"{search.trim()}"</span>
               </button>
             )}
           </div>
