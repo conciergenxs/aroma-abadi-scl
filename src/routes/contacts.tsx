@@ -453,7 +453,21 @@ function ContactsTable({
 }) {
   const { bas } = useBaStore();
   const { brands } = useSkuStore();
+  const { transactions } = useTransactionsStore();
   const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
+
+  // Last transaction per contact
+  const lastTxByContact = useMemo(() => {
+    const map = new Map<string, { date: string; invoice: string }>();
+    for (const t of transactions) {
+      if (!t.customerId) continue;
+      const existing = map.get(t.customerId);
+      if (!existing || new Date(t.date) > new Date(existing.date)) {
+        map.set(t.customerId, { date: t.date, invoice: t.invoice });
+      }
+    }
+    return map;
+  }, [transactions]);
 
   const thCls = "sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]";
   const tdCls = "px-4 py-3 whitespace-nowrap align-middle text-xs";
