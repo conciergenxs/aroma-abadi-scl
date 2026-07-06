@@ -714,7 +714,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
                 <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Items</span>
                 <ul className="mt-1 space-y-1">
                   {peekTx.items.map((item, idx) => (
-                    <li key={idx} className="text-xs">{item.skuName} <span className="text-muted-foreground">×{item.qty}</span> — {formatIDR(item.price * item.qty)}</li>
+                    <li key={idx} className="text-xs">{item.skuName} <span className="text-muted-foreground">×{item.qty}</span> — {formatIDR(item.unitPrice * item.qty)}</li>
                   ))}
                 </ul>
               </div>
