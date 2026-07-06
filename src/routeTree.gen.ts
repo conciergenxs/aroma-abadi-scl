@@ -326,6 +326,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/promo-codes/new': {
+      id: '/promo-codes/new'
+      path: '/promo-codes/new'
+      fullPath: '/promo-codes/new'
+      preLoaderRoute: typeof PromoCodesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo-codes/$promoId': {
+      id: '/promo-codes/$promoId'
+      path: '/promo-codes/$promoId'
+      fullPath: '/promo-codes/$promoId'
+      preLoaderRoute: typeof PromoCodesPromoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ba': {
       id: '/ba'
       path: '/ba'
