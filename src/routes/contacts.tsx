@@ -64,19 +64,6 @@ function ContactsPage() {
 
   if (isChildRoute) return <Outlet />;
 
-  const channelOptions = useMemo(() => {
-    const connected = connectedChannels.filter((c) => c.status === "connected");
-    const unique = Array.from(new Set(connected.map((c) => c.channel)));
-    return [
-      { value: "all", label: "All Channels" },
-      ...unique.map((ch) => ({
-        value: ch,
-        label: "WhatsApp",
-        icon: <ChannelIcon channel={ch as Channel} className="h-4 w-4" />,
-      })),
-    ];
-  }, []);
-
   const visibleContacts = useMemo(() => {
     let base: Contact[];
     const live = contacts.filter((c) => !c.deleted);
