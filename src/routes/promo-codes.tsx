@@ -451,7 +451,7 @@ function PromoCodesPage() {
                       <td colSpan={8} className="px-4 pb-4 pt-0 bg-white/[0.015]">
                         <div className="rounded-lg border border-border bg-card/40 p-4">
                           <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                            Riwayat Pemakaian ({promo.usages.length})
+                            Usage History ({promo.usages.length})
                           </div>
                           {promo.usages.length === 0 ? (
                             <p className="text-[12px] text-muted-foreground italic">Belum digunakan di template atau broadcast manapun.</p>
