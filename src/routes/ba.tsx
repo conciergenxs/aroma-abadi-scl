@@ -225,7 +225,7 @@ function BAPage() {
             <div className="p-5 border-b border-border">
               <div className="text-sm font-semibold">Reset Password</div>
               <p className="mt-1 text-sm text-muted-foreground">
-                Reset password untuk <span className="text-foreground font-medium">{resetConfirm.name}</span>? Password baru akan di-generate otomatis.
+                Reset password for <span className="text-foreground font-medium">{resetConfirm.name}</span>? A new password will be auto-generated.
               </p>
             </div>
             <div className="p-4 flex justify-end gap-2">
