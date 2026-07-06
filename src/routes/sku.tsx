@@ -395,7 +395,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari SKU dari database..."
+              placeholder="Search SKU from database…"
               className="w-full h-8 rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
