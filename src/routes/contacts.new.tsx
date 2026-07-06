@@ -278,7 +278,7 @@ function NewContactPage() {
                         value={store}
                         onChange={setStore}
                         disabled={!city}
-                        options={[{ value: "", label: city ? "Pilih store…" : "Pilih kota dulu" }, ...availableStores.map((s) => ({ value: s, label: s }))]}
+                        options={[{ value: "", label: city ? "Select store…" : "Select city first" }, ...availableStores.map((s) => ({ value: s, label: s }))]}
                       />
                     </Field>
                   </FormGrid>
