@@ -13,7 +13,7 @@ import {
   TEMPLATE_LANGUAGES,
   type Template,
 } from "@/components/scl/mock-data";
-import { useContactsStore } from "@/components/scl/contacts-store";
+import { useSkuStore } from "@/components/scl/sku-store";
 import {
   Save,
   Send,
@@ -24,9 +24,11 @@ import {
   Image as ImageIcon,
   Video,
   FileText,
-  Phone,
   ExternalLink,
   MessageSquare,
+  ChevronRight,
+  X as XIcon,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 
