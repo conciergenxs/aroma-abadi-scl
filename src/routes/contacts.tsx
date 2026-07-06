@@ -88,7 +88,7 @@ function ContactsPage() {
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
-  useEffect(() => { setPage(1); }, [activeView, channelFilter, query, perPage]);
+  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
   const pageStart = (page - 1) * perPage;
   const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
 
