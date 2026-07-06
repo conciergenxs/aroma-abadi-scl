@@ -118,7 +118,7 @@ function BAPage() {
               onClick={() => setShowCreate(true)}
               className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90 transition-opacity"
             >
-              <Plus className="h-3.5 w-3.5" /> Tambah BA
+              <Plus className="h-3.5 w-3.5" /> Add BA
             </button>
           </div>
         </div>
