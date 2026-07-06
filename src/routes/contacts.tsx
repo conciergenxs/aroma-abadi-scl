@@ -201,10 +201,10 @@ function ContactsPage() {
       title={activeView === "mine" ? "Customer Contacts" : activeView === "ba" ? "BA Contacts" : activeList ? activeList.name : "All Contacts"}
       subtitle={
         activeList
-          ? `${visibleContacts.length} contacts in this list`
+          ? `${visibleContacts.length} contacts in this audience`
           : activeView === "mine"
             ? `${visibleContacts.length} contacts assigned to you`
-            : `${liveContacts.length} contacts · ${lists.length} lists`
+            : `${liveContacts.length} contacts · ${lists.length} audiences`
       }
       noPadding
     >
