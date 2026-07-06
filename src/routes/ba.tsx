@@ -84,7 +84,7 @@ function BAPage() {
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Cari nama, WA, store, kota.."
+              placeholder="Search name, WA, store, city…"
               className="h-9 w-64 max-w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
