@@ -401,7 +401,7 @@ function PromoCodesPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
           </tbody>
