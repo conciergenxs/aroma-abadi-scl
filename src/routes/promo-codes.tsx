@@ -390,11 +390,11 @@ function PromoCodesPage() {
                     {/* Usage Type */}
                     <td className="px-4 py-3">
                       {promo.usageType === "one-to-one" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 text-[10px] font-medium text-sky-300">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-700 bg-sky-600 px-2.5 py-0.5 text-[10px] font-medium text-white">
                           1-to-1
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-[10px] font-medium text-violet-300">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-violet-700 bg-violet-600 px-2.5 py-0.5 text-[10px] font-medium text-white">
                           1-to-Many
                         </span>
                       )}
