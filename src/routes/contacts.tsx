@@ -87,7 +87,7 @@ function ContactsPage() {
     else if (activeView.startsWith("brand:")) {
       // brand view: show all contacts (BA + customer) with this brand
       const brandId = activeView.slice(6);
-      base = live.filter((c) => c.brandIds.includes(brandId));
+      base = live.filter((c) => (c.brandIds ?? []).includes(brandId));
     }
     else base = live.filter((c) => c.listIds.includes(activeView));
     if (channelFilter !== "all") {
@@ -388,7 +388,7 @@ function BrandsNav({ activeView, setActiveView, setSelected }: {
   const liveContacts = useMemo(() => contacts.filter((c) => !c.deleted), [contacts]);
 
   const countForBrand = (brandId: string) =>
-    liveContacts.filter((c) => c.brandIds.includes(brandId)).length;
+    liveContacts.filter((c) => (c.brandIds ?? []).includes(brandId)).length;
 
   return (
     <>
