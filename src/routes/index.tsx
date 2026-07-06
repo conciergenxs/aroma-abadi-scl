@@ -22,10 +22,10 @@ export const Route = createFileRoute("/")({
 
 const metrics = [
   { label: "Active Contacts", value: "29,841", delta: "+4.2%", up: true, icon: Users, sub: "7-day rolling" },
-  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. 7 hari lalu" },
+  { label: "Messages Received", value: "184,220", delta: "+12.4%", up: true, icon: MessageSquare, sub: "vs. 7 days ago" },
   { label: "Messages Replied", value: "168,492", delta: "+9.7%", up: true, icon: Reply, sub: "91.5% reply rate" },
-  { label: "Broadcast Sent", value: "38", delta: "+5.6%", up: true, icon: Radio, sub: "campaign bulan ini" },
-  { label: "Broadcast Reach", value: "1.42M", delta: "−1.6%", up: false, icon: Megaphone, sub: "vs. campaign sebelumnya" },
+  { label: "Broadcast Sent", value: "38", delta: "+5.6%", up: true, icon: Radio, sub: "campaigns this month" },
+  { label: "Broadcast Reach", value: "1.42M", delta: "−1.6%", up: false, icon: Megaphone, sub: "vs. previous campaign" },
 ];
 
 const channelEngagement = [
@@ -39,7 +39,7 @@ function Dashboard() {
       <div className="space-y-6">
         {/* Quick actions */}
         <div className="flex items-center justify-between gap-4">
-          <div className="text-lg font-semibold">Halo, Aria 👋</div>
+          <div className="text-lg font-semibold">Hello, Aria 👋</div>
           <div className="flex items-center gap-2">
             <Link to="/inbox" className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition">
               Open Inbox
@@ -79,7 +79,7 @@ function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <SectionCard
             title="Message volume"
-            description="WhatsApp · 7 hari terakhir"
+            description="WhatsApp · last 7 days"
             className="lg:col-span-2"
             action={
               <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
