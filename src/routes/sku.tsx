@@ -326,10 +326,17 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04] inline-flex items-center gap-1"><Pencil className="h-3.5 w-3.5" /> Edit</button>
+                      <button
+                        onClick={() => navigate({ to: "/sku/$skuId", params: { skuId: s.id } })}
+                        className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 inline-flex items-center gap-1 transition-colors"
+                        title="View SKU details"
+                      >
+                        <Info className="h-3.5 w-3.5 text-primary" /> Details
+                      </button>
+                      <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 inline-flex items-center gap-1 transition-colors"><Pencil className="h-3.5 w-3.5" /> Edit</button>
                       <button
                         onClick={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
-                        className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10" title="Delete"
+                        className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors" title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
