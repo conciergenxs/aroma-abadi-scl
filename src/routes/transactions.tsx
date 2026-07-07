@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useTransactionsStore, formatIDR, type Transaction } from "@/components/scl/transactions-store";
+import { fmtDateEN, fmtDateTimeID, fmtNum } from "@/lib/fmt";
 import { Search, Receipt, TrendingUp, Wallet, Package, ChevronLeft, ChevronRight, CalendarDays, X } from "lucide-react";
 import { contacts } from "@/components/scl/mock-data";
 
