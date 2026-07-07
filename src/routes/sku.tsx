@@ -327,7 +327,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                     </div>
                     <SkuMenu
                       onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
-                      onEdit={() => onEditSku(s)}
+                      
                       onDelete={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
                     />
                   </div>
