@@ -569,7 +569,7 @@ function InboxPage() {
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition ${
                     sel
                       ? "bg-primary/15 text-primary font-medium"
-                      : "text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.03]"
+                      : "text-muted-foreground/80 hover:text-foreground hover:bg-gray-50"
                   }`}
                 >
                   <Icon className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
@@ -760,7 +760,7 @@ function InboxPage() {
                   className={`conv-item w-full text-left flex gap-3 px-3.5 py-3 border-b border-border/40 transition-all duration-150 ${
                     sel
                       ? "active-conv bg-primary/10 border-l-2 border-l-primary"
-                      : "border-l-2 border-l-transparent hover:bg-white/[0.03]"
+                      : "border-l-2 border-l-transparent hover:bg-gray-50"
                   }`}
                 >
                   <div className="relative shrink-0 h-10 w-10 self-start">
@@ -1837,7 +1837,7 @@ function FilterPanel(props: FilterPanelProps) {
               className={`w-full flex items-center justify-between px-3 py-2 text-[12px] transition ${
                 category === c.id
                   ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-gray-50"
               }`}
             >
               <span>{c.label}</span>
@@ -1965,7 +1965,7 @@ function FilterCheckList({
       {items.map((it) => (
         <label
           key={it.key}
-          className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-foreground hover:bg-white/[0.03] cursor-pointer"
+          className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-foreground hover:bg-gray-50 cursor-pointer"
         >
           <input
             type="checkbox"
@@ -2195,7 +2195,7 @@ function ForwardModal({
               <button
                 key={c.id}
                 onClick={() => toggle(c.id)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition ${checked ? "bg-primary/10" : "hover:bg-white/[0.03]"}`}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition ${checked ? "bg-primary/10" : "hover:bg-gray-50"}`}
               >
                 <span className={`h-5 w-5 shrink-0 rounded border grid place-items-center ${checked ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card/60"}`}>
                   {checked && <Check className="h-3.5 w-3.5" />}

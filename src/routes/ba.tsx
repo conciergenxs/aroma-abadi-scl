@@ -141,7 +141,7 @@ function BAPage() {
               {paginated.map((b) => {
                 const shown = revealed.has(b.id);
                 return (
-                  <tr key={b.id} className="border-b border-border hover:bg-white/[0.02] transition-colors">
+                  <tr key={b.id} className="border-b border-border hover:bg-gray-50 transition-colors">
                     <Td className="font-medium text-foreground">{b.name}</Td>
                     <Td>{brandNames(b.brandIds)}</Td>
                     <Td>{b.gender}</Td>
@@ -164,7 +164,7 @@ function BAPage() {
                     <Td>{b.store} · <span className="text-muted-foreground">{b.city}</span></Td>
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
-                        <button onClick={() => setEditing(b)} className="rounded px-2 h-8 text-sm border border-border hover:bg-white/[0.04] transition-colors">Edit</button>
+                        <button onClick={() => setEditing(b)} className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 transition-colors">Edit</button>
                         <button
                           onClick={() => { baStore.remove(b.id); toast.success("BA deleted"); }}
                           className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors"
@@ -193,7 +193,7 @@ function BAPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="grid h-8 w-8 place-items-center rounded-md border border-border disabled:opacity-40 hover:bg-white/[0.04] transition-colors"
+              className="grid h-8 w-8 place-items-center rounded-md border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -203,7 +203,7 @@ function BAPage() {
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`h-8 w-8 rounded-md text-xs font-medium transition-colors ${p === page ? "bg-primary text-primary-foreground" : "border border-border hover:bg-white/[0.04]"}`}
+                className={`h-8 w-8 rounded-md text-xs font-medium transition-colors ${p === page ? "bg-primary text-primary-foreground" : "border border-border hover:bg-gray-50"}`}
               >
                 {p}
               </button>
@@ -211,7 +211,7 @@ function BAPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="grid h-8 w-8 place-items-center rounded-md border border-border disabled:opacity-40 hover:bg-white/[0.04] transition-colors"
+              className="grid h-8 w-8 place-items-center rounded-md border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -329,7 +329,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                 <button
                   type="button"
                   onClick={() => { navigator.clipboard.writeText(password); toast.success("Password copied"); }}
-                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
                   title="Copy password"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -341,7 +341,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                     setPassword(baStore.generatePassword());
                     setTimeout(() => setSpinning(false), 420);
                   }}
-                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
                   title="Regenerate"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${spinning ? "animate-spin-once" : ""}`} />
@@ -430,7 +430,7 @@ function SearchableSelect({ value, onChange, placeholder, options }: {
               <button
                 type="button"
                 onMouseDown={() => { onChange(opt); setOpen(false); setQuery(""); }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.06] transition-colors ${value === opt ? "text-primary font-medium" : ""}`}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors ${value === opt ? "text-primary font-medium" : ""}`}
               >
                 {opt}
               </button>

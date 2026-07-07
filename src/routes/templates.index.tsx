@@ -1073,7 +1073,7 @@ function GroupPickerModal({
               return (
                 <label
                   key={g.id}
-                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-white/[0.03]"
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
                 >
                   <input
                     type="checkbox"

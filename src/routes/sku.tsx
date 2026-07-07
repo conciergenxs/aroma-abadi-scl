@@ -144,7 +144,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-white/[0.04] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Prev
             </button>
@@ -152,7 +152,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-white/[0.04] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -246,7 +246,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 text-sm hover:bg-white/[0.04]"><Plus className="h-3.5 w-3.5" /> Category</button>;
+    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 text-sm hover:bg-gray-50"><Plus className="h-3.5 w-3.5" /> Category</button>;
   }
   return (
     <div className="flex items-center gap-1">
@@ -442,7 +442,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
                 <button
                   type="button"
                   onClick={() => { onSelect(sku); setOpen(false); setQuery(""); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/[0.06] text-sm"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm"
                 >
                   <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                     {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-4 w-4 text-primary" />}
@@ -468,7 +468,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
   return (
     <div>
       <div className="flex items-center justify-end mb-2">
-        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-white/[0.04]"><Plus className="h-3 w-3" /> Knowledge Card</button>
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1 rounded-md border border-border px-2 h-7 text-sm hover:bg-gray-50"><Plus className="h-3 w-3" /> Knowledge Card</button>
       </div>
       {/* Horizontal scroll knowledge cards with numbered labels */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
