@@ -353,8 +353,8 @@ function PromoCodesPage() {
               return (
                 <Fragment key={promo.id}>
                   <tr
-                    onClick={() => setExpandedId(isExpanded ? null : promo.id)}
-                    className="cursor-pointer hover:bg-white/[0.025] transition-colors"
+                    onClick={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
                   >
                     {/* Checkbox */}
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
