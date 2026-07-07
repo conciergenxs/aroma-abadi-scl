@@ -206,7 +206,7 @@ function PromoDetailPage() {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Max Usage</div>
-              <div className="text-sm">{promo.maxUsage == null ? "Unlimited" : promo.maxUsage.toLocaleString()}</div>
+              <div className="text-sm">{promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Used</div>
