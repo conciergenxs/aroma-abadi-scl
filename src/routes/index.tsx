@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { fmtDateEN } from "@/lib/fmt";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { conversations, contacts, volumeSeries, recentActivity } from "@/components/scl/mock-data";
 import { Link } from "@tanstack/react-router";
@@ -33,7 +34,7 @@ const channelEngagement = [
 ];
 
 function Dashboard() {
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const today = fmtDateEN(new Date());
   return (
     <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
       <div className="space-y-6">
