@@ -57,6 +57,11 @@ const SkuRoute = SkuRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
+  id: '/sku/$skuId',
+  path: '/sku/$skuId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
   id: '/sku-detail/$skuId',
   path: '/sku-detail/$skuId',
   getParentRoute: () => rootRouteImport,
