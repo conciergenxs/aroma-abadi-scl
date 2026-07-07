@@ -761,7 +761,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
               <div>
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
                 <div className="text-base font-semibold">{peekTx.invoice}</div>
-                <div className="text-[11px] text-muted-foreground mt-1">{new Date(peekTx.date).toLocaleString("id-ID")}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">{fmtDateTimeID(peekTx.date)}</div>
               </div>
               <button onClick={() => setPeekTx(null)} className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors">
                 <X className="h-4 w-4" />
@@ -1344,15 +1344,11 @@ function ListSelector({
 /* ============================== UTIL ============================== */
 
 function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-  } catch { return iso; }
+  try { return fmtDateEN(iso); } catch { return iso; }
 }
 
 function formatTime(iso: string) {
-  try {
-    return new Date(iso).toLocaleString(undefined, { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" });
-  } catch { return iso; }
+  try { return fmtDateTimeID(iso); } catch { return iso; }
 }
 
 function groupByDay(activities: ContactActivity[]) {

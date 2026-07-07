@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { fmtNum } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useBroadcastsStore } from "@/components/scl/broadcasts-store";
