@@ -273,7 +273,7 @@ function SkuDetailPage() {
                           <td className="px-4 py-3">
                             <div className="text-[13px] font-medium">{t.invoice}</div>
                             <div className="text-[11px] text-muted-foreground">
-                              {new Date(t.date).toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"numeric" })}
+                              {formatDate(t.date)}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-[13px]">{t.customerName}</td>
