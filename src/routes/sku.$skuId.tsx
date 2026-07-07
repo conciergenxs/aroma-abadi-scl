@@ -152,9 +152,9 @@ function SkuDetailPage() {
                   {relatedTx.map((t) => {
                     const line = t.items.find((i) => i.skuId === skuId)!;
                     const statusColor =
-                      t.status === "Paid" ? "border-emerald-700 bg-emerald-600 text-white" :
-                      t.status === "Pending" ? "border-amber-700 bg-amber-600 text-white" :
-                      "border-rose-700 bg-rose-600 text-white";
+                      t.status === "Shipped" ? "border-emerald-700 bg-emerald-600 text-white" :
+                      t.status === "Cancelled" ? "border-rose-700 bg-rose-600 text-white" :
+                      "border-sky-700 bg-sky-600 text-white";
                     return (
                       <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
