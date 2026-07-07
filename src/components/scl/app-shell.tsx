@@ -281,7 +281,7 @@ export function AppShell({
                 ref={notifBtnRef}
                 onClick={() => setNotifOpen((v) => !v)}
                 className={`relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card transition-colors ${notifOpen ? "border-primary/40 bg-primary/10" : ""}`}
-                aria-label="Notifikasi"
+                aria-label="Notifications"
               >
                 <Bell className={`h-4 w-4 ${notifOpen ? "text-primary" : "text-muted-foreground"}`} />
                 {unreadCount > 0 && (
@@ -305,7 +305,7 @@ export function AppShell({
                           onClick={markAllRead}
                           className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
                         >
-                          <CheckCheck className="h-3 w-3" /> Tandai semua dibaca
+                          <CheckCheck className="h-3 w-3" /> Mark all as read
                         </button>
                       )}
                       <button onClick={() => setNotifOpen(false)} className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]">
@@ -382,13 +382,13 @@ export function AppShell({
       <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Keluar dari workspace?</AlertDialogTitle>
+            <AlertDialogTitle>Leave workspace?</AlertDialogTitle>
             <AlertDialogDescription>
-              Kamu akan logout dari Aroma Abadi SCL. Pastikan semua pekerjaan sudah tersimpan.
+              You will be logged out of Aroma Abadi SCL. Make sure all work is saved.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {

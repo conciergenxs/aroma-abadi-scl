@@ -368,13 +368,13 @@ function TemplatesPage() {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title={`Hapus template "${deleteTarget?.name}"?`}
-        description="Template yang dihapus tidak bisa dikembalikan."
-        confirmLabel="Hapus"
+        title={`Delete template "${deleteTarget?.name}"?`}
+        description="This action cannot be undone."
+        confirmLabel="Delete"
         onConfirm={() => {
           if (deleteTarget) {
             templatesStore.deleteTemplates([deleteTarget.id]);
-            toast.success(`Template "${deleteTarget.name}" dihapus`);
+            toast.success(`Template "${deleteTarget.name}" deleted`);
             setDeleteTarget(null);
           }
         }}

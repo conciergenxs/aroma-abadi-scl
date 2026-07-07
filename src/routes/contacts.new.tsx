@@ -474,7 +474,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
       {open && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
-            <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }} placeholder="Cari atau buat label…" className="h-7 w-full rounded border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
+            <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }} placeholder="Search or create label…" className="h-7 w-full rounded border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
           </div>
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.map((l) => {
