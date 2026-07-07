@@ -784,15 +784,6 @@ function RightPanel({
     <div className="p-4 space-y-6">
       <RightSection title="Contact Information">
         <div className="space-y-2.5">
-          <FieldRow icon={<Mail className="h-3.5 w-3.5" />} label="Email">
-            <InlineText
-              value={contact.email ?? ""}
-              onCommit={(v) => onUpdateField("email", v, "email")}
-              type="email"
-              placeholder="Add email"
-              className="text-xs"
-            />
-          </FieldRow>
           <FieldRow icon={<Phone className="h-3.5 w-3.5" />} label="Phone">
             <InlineText
               value={contact.phone}
