@@ -603,76 +603,59 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
 }
 
 function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: string; categoryId: string; initial?: SKU; onClose: () => void }) {
-  const [name, setName] = useState(initial?.name || "");
-  const [code, setCode] = useState(initial?.code || "");
-  const [price, setPrice] = useState<number>(initial?.price || 0);
-  const [description, setDescription] = useState(initial?.description || "");
-  const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl || "");
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [name] = useState(initial?.name || "");
+  const [code] = useState(initial?.code || "");
+  const [price] = useState<number>(initial?.price || 0);
+  const [description] = useState(initial?.description || "");
+  const [photoUrl] = useState(initial?.photoUrl || "");
 
-  function pickPhoto(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => setPhotoUrl(String(reader.result));
-    reader.readAsDataURL(file);
-  }
+  // Fields are read-only — data is synced from Odoo
+  const disabledInput = "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!name.trim() || !code.trim()) { toast.error("Nama & Code SKU wajib"); return; }
-          if (initial) {
-            skuStore.updateSku(brandId, categoryId, initial.id, { name, code, price, description, photoUrl: photoUrl || undefined });
-            toast.success("SKU diperbarui");
-          } else {
-            skuStore.addSku(brandId, categoryId, { name, code, price, description, photoUrl: photoUrl || undefined });
-            toast.success("SKU ditambahkan");
-          }
-          onClose();
-        }}
-        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden"
-      >
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 animate-fade-in">
+      <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">{initial ? "Edit SKU" : "Tambah SKU"}</div>
+          <div className="text-sm font-semibold">Add SKU</div>
           <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
         </div>
         <div className="p-4 space-y-3">
+          {/* Odoo sync notice */}
+          <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
+            <span className="shrink-0 mt-0.5">ℹ️</span>
+            <span>SKU data is synced from Odoo. Fields are read-only and cannot be edited here.</span>
+          </div>
           <div>
-            <div className="text-xs text-muted-foreground mb-1">Foto Produk</div>
+            <div className="text-xs text-muted-foreground mb-1">Product Photo</div>
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
-                {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 text-primary" />}
+                {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 text-primary/40" />}
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickPhoto(f); }} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-sm">Upload</button>
-              {photoUrl && <button type="button" onClick={() => setPhotoUrl("")} className="text-sm text-rose-500">Remove</button>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="block text-xs text-muted-foreground mb-1">Nama</span>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama SKU.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+              <span className="block text-xs text-muted-foreground mb-1">Name</span>
+              <input disabled value={name} placeholder="Synced from Odoo" className={disabledInput} />
             </label>
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Code</span>
-              <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Masukkan kode SKU.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+              <input disabled value={code} placeholder="Synced from Odoo" className={disabledInput} />
             </label>
           </div>
           <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Harga (Rp)</span>
-            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} placeholder="Masukkan harga.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Price (Rp)</span>
+            <input disabled type="number" value={price} placeholder="Synced from Odoo" className={disabledInput} />
           </label>
           <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Deskripsi</span>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Masukkan deskripsi produk.." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
+            <span className="block text-xs text-muted-foreground mb-1">Description</span>
+            <textarea disabled value={description} rows={4} placeholder="Synced from Odoo" className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none" />
           </label>
         </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">{initial ? "Simpan" : "Tambah"}</button>
+        <div className="p-4 border-t border-border flex justify-end">
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm hover:bg-gray-50 transition-colors">Close</button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
