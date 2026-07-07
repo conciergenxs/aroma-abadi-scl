@@ -45,7 +45,7 @@ type PaymentMethod = {
   isDefault: boolean;
 };
 
-const formatIdr = (amount: number) => `Rp${amount.toLocaleString("id-ID")}`;
+const formatIdr = (amount: number) => `Rp${fmtNum(amount)}`;
 const currentMonthlyTotal = 2445000;
 
 export function PlansBillingModule({ section, onNavigate }: PlansBillingModuleProps) {
