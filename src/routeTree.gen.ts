@@ -279,6 +279,7 @@ export interface RootRouteChildren {
   PromoCodesPromoIdRoute: typeof PromoCodesPromoIdRoute
   SettingsRoute: typeof SettingsRoute
   SkuRoute: typeof SkuRoute
+  SkuSkuIdRoute: typeof SkuSkuIdRoute
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
