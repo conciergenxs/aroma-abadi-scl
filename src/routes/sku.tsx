@@ -60,8 +60,7 @@ function SkuPage() {
           onBack={() => setView({ kind: "brand", brandId: brand.id })}
           onBackToBrands={() => setView({ kind: "brands" })}
           onAddSku={() => setEditingSku({ brandId: brand.id, categoryId: category.id })}
-          onEditSku={(sku) => setEditingSku({ sku, brandId: brand.id, categoryId: category.id })}
-        />
+          />
       )}
 
       {showBrandForm && (
@@ -260,8 +259,8 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
 
 /* ---------------- Level 3: Category Detail ---------------- */
 
-function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackToBrands }: {
-  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onAddSku: () => void; onEditSku: (sku: SKU) => void;
+function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
+  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onAddSku: () => void;
 }) {
   const navigate = useNavigate();
   return (
@@ -305,7 +304,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
           <SectionCard
             title="SKUs"
             description="Select SKUs from the database or add new ones."
-            action={<SkuSearchSelect brandId={brand.id} categoryId={category.id} onSelect={onEditSku} onAdd={onAddSku} />}
+            action={<SkuSearchSelect brandId={brand.id} categoryId={category.id} onSelect={onAddSku} onAdd={onAddSku} />}
           >
             <ul className="divide-y divide-border">
               {category.skus.map((s) => (
@@ -327,8 +326,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                     </div>
                     <SkuMenu
                       onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
-                      
-                      onDelete={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
+                      onDelete={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU deleted"); }}
                     />
                   </div>
 
