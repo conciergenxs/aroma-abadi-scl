@@ -365,9 +365,7 @@ function TxDrawer({ tx, onClose, navigate }: { tx: Transaction; onClose: () => v
           </Row>
           <Row label="Payment Method"><span className="font-medium">{tx.paymentMethod}</span></Row>
           <Row label="Status">
-            <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${
-              tx.status === "Shipped" ? "border-emerald-700 bg-emerald-600 text-white" : "border-sky-700 bg-sky-600 text-white"
-            }`}>{tx.status}</span>
+            <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(tx.status)}`}>{tx.status}</span>
           </Row>
           {tx.note && <Row label="BA Note"><span className="text-muted-foreground italic">{tx.note}</span></Row>}
 
