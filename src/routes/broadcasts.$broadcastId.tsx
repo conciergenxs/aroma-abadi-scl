@@ -401,7 +401,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                   .filter(Boolean)
                   .slice(0, 2) as { id: string; name: string }[];
                 return (
-                  <tr key={contact.id} className="hover:bg-white/[0.02]">
+                  <tr key={contact.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -675,7 +675,7 @@ function ListPickerModal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <XIcon className="h-4 w-4" />
           </button>
@@ -704,7 +704,7 @@ function ListPickerModal({
                 <label
                   key={l.id}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer ${
-                    sel ? "bg-primary/10" : "hover:bg-white/[0.03]"
+                    sel ? "bg-primary/10" : "hover:bg-gray-50"
                   }`}
                 >
                   <input
