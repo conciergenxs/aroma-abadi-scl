@@ -51,21 +51,26 @@ export type ContactProperty = {
 };
 
 export const DEFAULT_PROPERTIES: ContactProperty[] = [
-  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
-  { id: "p-phone", key: "phone", name: "Phone Number", type: "phone", visible: true, system: true },
-  { id: "p-channel", key: "channel", name: "Channel", type: "select", visible: true, system: true },
-  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
-  { id: "p-lists", key: "lists", name: "Audience", type: "multiselect", visible: true, system: true },
-  { id: "p-lastInteraction", key: "lastInteraction", name: "Last Interaction", type: "date", visible: true, system: true },
-  { id: "p-status", key: "status", name: "Status", type: "select", visible: true, system: true },
-  // Custom defaults used in the "Additional Information" section of New Contact.
-  { id: "p-pic", key: "pic", name: "PIC", type: "text", visible: false },
-  { id: "p-user-type", key: "user_type", name: "User Type", type: "select", visible: false, options: ["Customer", "Lead", "Partner", "Employee"] },
-  { id: "p-service-type", key: "service_type", name: "Service Type", type: "select", visible: false, options: ["Consulting", "One-off", "Support"] },
-  { id: "p-business-type", key: "business_type", name: "Business Type", type: "select", visible: false, options: ["B2B", "B2C", "B2B2C"] },
+  // ── Core columns shown in the contact table ─────────────────────────────
+  { id: "p-name",            key: "name",            name: "Name",             type: "text",        visible: true,  system: true },
+  { id: "p-phone",           key: "phone",            name: "WA Number",        type: "phone",       visible: true,  system: true },
+  { id: "p-contact-type",    key: "contact_type",     name: "Contact Type",     type: "select",      visible: true,  system: true, options: ["Consumer", "BA"] },
+  { id: "p-gender",          key: "gender",           name: "Gender",           type: "select",      visible: true,               options: ["Male", "Female"] },
+  { id: "p-brand",           key: "brand",            name: "Brand",            type: "select",      visible: true,               options: ["Dolce & Gabbana", "Sisley", "Rimmel", "Laura Mercier", "BareMinerals"] },
+  { id: "p-labels",          key: "labels",           name: "Labels",           type: "labels",      visible: true,  system: true },
+  { id: "p-lists",           key: "lists",            name: "Audience",         type: "multiselect", visible: true,  system: true },
+  { id: "p-lastInteraction", key: "lastInteraction",  name: "Last Interaction", type: "date",        visible: true,  system: true },
+  // ── Additional columns (toggleable) ────────────────────────────────────
+  { id: "p-point-balance",   key: "point_balance",    name: "Point Balance",    type: "number",      visible: false },
+  { id: "p-last-tx",         key: "last_transaction", name: "Last Transaction", type: "date",        visible: false },
+  { id: "p-store",           key: "store",            name: "Store",            type: "text",        visible: false },
+  { id: "p-city",            key: "city",             name: "City",             type: "text",        visible: false },
+  { id: "p-position",        key: "position",         name: "Position",         type: "select",      visible: false, options: ["BA", "Senior BA", "Team Leader"] },
+  { id: "p-status",          key: "status",           name: "Status",           type: "select",      visible: false, system: true },
+  // ── Extra fields for New Contact form ──────────────────────────────────
+  { id: "p-pic",             key: "pic",              name: "PIC",              type: "text",        visible: false },
+  { id: "p-company-name",    key: "company_name",     name: "Company Name",     type: "text",        visible: false },
   { id: "p-business-industry", key: "business_industry", name: "Business Industry", type: "select", visible: false, options: ["Retail", "Finance", "Tech", "Hospitality", "Education", "Healthcare", "Other"] },
-  { id: "p-company-name", key: "company_name", name: "Company Name", type: "text", visible: false },
-  
 ];
 
 // =========================================================
