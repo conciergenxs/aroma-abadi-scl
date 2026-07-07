@@ -721,7 +721,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
                 <td className="px-4 py-3">
                   <div className="font-medium text-foreground text-xs">{t.invoice}</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">
-                    {new Date(t.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                    {fmtDateEN(t.date)}
                   </div>
                 </td>
                 <td className="px-4 py-3">
