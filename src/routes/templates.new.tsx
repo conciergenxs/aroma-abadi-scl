@@ -83,9 +83,6 @@ function CreateTemplatePage() {
   const [language, setLanguage] = useState<string>("en_US");
   const [groupId, setGroupId] = useState<string>("none");
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
-  const [selectedPromoId, setSelectedPromoId] = useState<string>("none");
-  const [promoSearch, setPromoSearch] = useState("");
-  const [promoDropdownOpen, setPromoDropdownOpen] = useState(false);
   const selectedChannel = connectedChannels.find((c) => c.id === channelId) ?? null;
 
   // Optional groups: create inline
