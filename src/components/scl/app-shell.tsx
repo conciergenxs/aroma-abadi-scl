@@ -60,8 +60,8 @@ type MockNotif = {
 const MOCK_NOTIFS: MockNotif[] = [
   {
     id: "n1",
-    title: "Pesan baru dari Dewi Lestari",
-    body: "Halo Arma! Ada customer nanya soal promo 12.12, gimana cara jelasinnya?",
+    title: "New message from Dewi Lestari",
+    body: "Hi Arma! A customer is asking about the 12.12 promo, how should I explain it?",
     time: "2 menit lalu",
     icon: MessageCircle,
     iconBg: "bg-sky-500/15",
@@ -78,8 +78,8 @@ const MOCK_NOTIFS: MockNotif[] = [
   },
   {
     id: "n3",
-    title: "Broadcast 'Promo Harbolnas' terkirim",
-    body: "Berhasil dikirim ke 248 kontak. Delivery rate 96.4%.",
+    title: "Broadcast 'Promo Harbolnas' sent",
+    body: "Successfully sent to 248 contacts. Delivery rate 96.4%.",
     time: "1 jam lalu",
     icon: MegaphoneIcon,
     iconBg: "bg-primary/15",
@@ -87,8 +87,8 @@ const MOCK_NOTIFS: MockNotif[] = [
   },
   {
     id: "n4",
-    title: "Pesan baru dari Hesti Andriani",
-    body: "Arma, shade berapa yang paling laris di Pakuwon bulan ini?",
+    title: "New message from Hesti Andriani",
+    body: "Arma, which shade is best-selling at Pakuwon this month?",
     time: "2 jam lalu",
     icon: MessageCircle,
     iconBg: "bg-sky-500/15",
