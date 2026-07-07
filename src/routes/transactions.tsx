@@ -163,7 +163,7 @@ function TransactionsPage() {
                       <Td>
                         <div className="font-medium text-foreground">{t.invoice}</div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">
-                          {new Date(t.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                          {fmtDateEN(t.date)}
                         </div>
                       </Td>
 
@@ -327,7 +327,7 @@ function TxDrawer({ tx, onClose, navigate }: { tx: Transaction; onClose: () => v
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
             <div className="text-[14px] font-semibold">{tx.invoice}</div>
-            <div className="text-[11px] text-muted-foreground mt-1">{new Date(tx.date).toLocaleString("id-ID")}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">{fmtDateTimeID(tx.date)}</div>
           </div>
           <button onClick={onClose} className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors">
             <X className="h-4 w-4" />
