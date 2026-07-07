@@ -490,7 +490,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
           onSubmit={(data) => {
             if (editing) skuStore.updateKnowledgeCard(brandId, categoryId, sku.id, editing.id, data);
             else skuStore.addKnowledgeCard(brandId, categoryId, sku.id, data);
-            toast.success(editing ? "Card diperbarui" : "Card ditambahkan");
+            toast.success(editing ? "Card updated" : "Card added");
             setShowForm(false); setEditing(null);
           }}
         />
