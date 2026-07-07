@@ -106,6 +106,12 @@ function TemplatesPage() {
     });
   }, [templates, query, category, channel, status]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const toIdx = Math.min(safePage * pageSize, filtered.length);
+
   // Keep selection in sync with what's currently visible.
   const visibleIds = useMemo(() => filtered.map((t) => t.id), [filtered]);
   const allVisibleSelected =
