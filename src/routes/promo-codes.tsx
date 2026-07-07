@@ -348,7 +348,6 @@ const [selected, setSelected] = useState<string[]>([]);
               </tr>
             )}
             {paged.map((promo) => {
-              const isExpanded = expandedId === promo.id;
               return (
                 <Fragment key={promo.id}>
                   <tr
