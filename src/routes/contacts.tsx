@@ -52,6 +52,7 @@ function ContactsPage() {
   const [showManageProps, setShowManageProps] = useState(false);
   const [newAudienceOpen, setNewAudienceOpen] = useState(false);
   const [newAudienceName, setNewAudienceName] = useState("");
+  const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<string>("all"); // "all" | "mine" | listId
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
