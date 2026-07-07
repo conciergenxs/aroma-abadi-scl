@@ -197,7 +197,7 @@ function BroadcastListPage() {
                     onClick={() =>
                       navigate({ to: "/broadcasts/$broadcastId", params: { broadcastId: b.id } })
                     }
-                    className="hover:bg-white/[0.02] cursor-pointer"
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <input
