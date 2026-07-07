@@ -241,13 +241,23 @@ function ContactsPage() {
               </button>
             </div>
             {lists.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => { setActiveView(l.id); setSelected([]); }}
-                className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-white/[0.04] flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <Users className="h-3 w-3 shrink-0" /> <span className="truncate">{l.name}</span>
-              </button>
+              <div key={l.id} className="flex items-center gap-1">
+                <button
+                  onClick={() => { setActiveView(l.id); setSelected([]); }}
+                  className={`flex-1 text-left px-3 py-1.5 text-[12px] rounded hover:bg-white/[0.04] flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  <Users className="h-3 w-3 shrink-0" />
+                  <span className="truncate flex-1">{l.name}</span>
+                  <span className="text-[10px] text-muted-foreground/60">{contacts.filter(c => c.listIds.includes(l.id)).length}</span>
+                </button>
+                <button
+                  onClick={() => setAudienceModalId(l.id)}
+                  className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] shrink-0"
+                  title="Manage contacts"
+                >
+                  <Plus className="h-3 w-3" />
+                </button>
+              </div>
             ))}
             {newAudienceOpen && (
               <div className="px-3 py-2">
