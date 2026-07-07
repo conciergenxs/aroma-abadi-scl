@@ -2,13 +2,15 @@ import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router"
 import { AppShell } from "@/components/scl/app-shell";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
-import { useMemo } from "react";
-import { Package, TrendingUp, ShoppingCart, DollarSign, Hash, ImageIcon, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Package, TrendingUp, ShoppingCart, DollarSign, Hash, ImageIcon, ChevronRight, Calendar } from "lucide-react";
 
 export const Route = createFileRoute("/sku-detail/$skuId")({
   head: () => ({ meta: [{ title: "SKU Details — Aroma Abadi" }] }),
   component: SkuDetailPage,
 });
+
+type DatePreset = "7d" | "30d" | "90d" | "custom";
 
 function SkuDetailPage() {
   const { skuId } = useParams({ from: "/sku-detail/$skuId" });
@@ -16,7 +18,25 @@ function SkuDetailPage() {
   const { brands } = useSkuStore();
   const { transactions } = useTransactionsStore();
 
-  // Find SKU across all brands/categories
+  // ── Date filter state ──────────────────────────────────────────────────
+  const [preset, setPreset] = useState<DatePreset>("30d");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+    if (preset === "7d")  { const f = new Date(now); f.setDate(f.getDate() - 6);  return { from: f, to }; }
+    if (preset === "30d") { const f = new Date(now); f.setDate(f.getDate() - 29); return { from: f, to }; }
+    if (preset === "90d") { const f = new Date(now); f.setDate(f.getDate() - 89); return { from: f, to }; }
+    if (preset === "custom" && customFrom && customTo) {
+      return { from: new Date(customFrom + "T00:00:00"), to: new Date(customTo + "T23:59:59") };
+    }
+    return null;
+  }, [preset, customFrom, customTo]);
+
+  // ── Find SKU ───────────────────────────────────────────────────────────
   const found = useMemo(() => {
     for (const b of brands) {
       for (const c of b.categories) {
@@ -28,22 +48,28 @@ function SkuDetailPage() {
     return null;
   }, [brands, skuId]);
 
-  // Transactions that include this SKU
-  const relatedTx = useMemo(
+  // ── All transactions for this SKU ──────────────────────────────────────
+  const allRelatedTx = useMemo(
     () => transactions.filter((t) => t.items.some((i) => i.skuId === skuId)),
     [transactions, skuId]
   );
 
+  // ── Filtered by date range ─────────────────────────────────────────────
+  const relatedTx = useMemo(() => {
+    if (!dateRange) return allRelatedTx;
+    return allRelatedTx.filter((t) => {
+      const d = new Date(t.date);
+      return d >= dateRange.from && d <= dateRange.to;
+    });
+  }, [allRelatedTx, dateRange]);
+
+  // ── Metrics (filtered) ─────────────────────────────────────────────────
   const metrics = useMemo(() => {
-    let unitsSold = 0;
-    let revenue = 0;
+    let unitsSold = 0, revenue = 0;
     relatedTx.forEach((t) => {
       if (t.status !== "Cancelled") {
         t.items.forEach((i) => {
-          if (i.skuId === skuId) {
-            unitsSold += i.qty;
-            revenue += i.qty * i.unitPrice;
-          }
+          if (i.skuId === skuId) { unitsSold += i.qty; revenue += i.qty * i.unitPrice; }
         });
       }
     });
@@ -105,6 +131,47 @@ function SkuDetailPage() {
           </div>
         </div>
 
+        {/* ── Date Filter ── */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            <span className="font-medium">Period:</span>
+          </div>
+          <div className="flex items-center gap-1">
+            {(["7d", "30d", "90d", "custom"] as DatePreset[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPreset(p)}
+                className={`px-3 h-7 rounded-md text-[11px] font-medium border transition-colors ${
+                  preset === p
+                    ? "border-primary/40 bg-primary/15 text-foreground"
+                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
+                }`}
+              >
+                {p === "7d" ? "7 Days" : p === "30d" ? "30 Days" : p === "90d" ? "90 Days" : "Custom"}
+              </button>
+            ))}
+          </div>
+          {preset === "custom" && (
+            <div className="flex items-center gap-2 ml-1">
+              <input
+                type="date"
+                value={customFrom}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                className="h-7 rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+              <span className="text-[11px] text-muted-foreground">–</span>
+              <input
+                type="date"
+                value={customTo}
+                onChange={(e) => setCustomTo(e.target.value)}
+                className="h-7 rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+          )}
+        </div>
+
         {/* Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
@@ -127,13 +194,22 @@ function SkuDetailPage() {
 
         {/* Transaction History */}
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
-            <div className="text-sm font-semibold">Transaction History</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{relatedTx.length} transaction{relatedTx.length !== 1 ? "s" : ""} involving this SKU</div>
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold">Transaction History</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {relatedTx.length} transaction{relatedTx.length !== 1 ? "s" : ""}
+                {allRelatedTx.length !== relatedTx.length && (
+                  <span className="ml-1 text-muted-foreground/60">· {allRelatedTx.length} total</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {relatedTx.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">No transactions yet for this SKU.</div>
+            <div className="py-16 text-center text-sm text-muted-foreground">
+              No transactions in this period.
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -152,9 +228,9 @@ function SkuDetailPage() {
                   {relatedTx.map((t) => {
                     const line = t.items.find((i) => i.skuId === skuId)!;
                     const statusColor =
-                      t.status === "Shipped" ? "border-emerald-700 bg-emerald-600 text-white" :
+                      t.status === "Shipped"   ? "border-emerald-700 bg-emerald-600 text-white" :
                       t.status === "Cancelled" ? "border-rose-700 bg-rose-600 text-white" :
-                      "border-sky-700 bg-sky-600 text-white";
+                                                 "border-sky-700 bg-sky-600 text-white";
                     return (
                       <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
@@ -181,6 +257,7 @@ function SkuDetailPage() {
             </div>
           )}
         </div>
+
       </div>
     </AppShell>
   );
