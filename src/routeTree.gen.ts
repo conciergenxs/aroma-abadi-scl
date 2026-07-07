@@ -56,8 +56,8 @@ const SkuRoute = SkuRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
-  id: '/sku/$skuId',
-  path: '/sku/$skuId',
+  id: '/sku-detail/$skuId',
+  path: '/sku-detail/$skuId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -143,7 +143,7 @@ export interface FileRoutesByFullPath {
   '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
-  '/sku/$skuId': typeof SkuSkuIdRoute
+  '/sku-detail/$skuId': typeof SkuSkuIdRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -165,7 +165,7 @@ export interface FileRoutesByTo {
   '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
-  '/sku/$skuId': typeof SkuSkuIdRoute
+  '/sku-detail/$skuId': typeof SkuSkuIdRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -188,7 +188,7 @@ export interface FileRoutesById {
   '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
-  '/sku/$skuId': typeof SkuSkuIdRoute
+  '/sku-detail/$skuId': typeof SkuSkuIdRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -212,7 +212,7 @@ export interface FileRouteTypes {
     | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
-    | '/sku/$skuId'
+    | '/sku-detail/$skuId'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -234,7 +234,7 @@ export interface FileRouteTypes {
     | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
-    | '/sku/$skuId'
+    | '/sku-detail/$skuId'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -256,7 +256,7 @@ export interface FileRouteTypes {
     | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
-    | '/sku/$skuId'
+    | '/sku-detail/$skuId'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -304,10 +304,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SkuRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sku/$skuId': {
-      id: '/sku/$skuId'
-      path: '/sku/$skuId'
-      fullPath: '/sku/$skuId'
+    '/sku-detail/$skuId': {
+      id: '/sku-detail/$skuId'
+      path: '/sku-detail/$skuId'
+      fullPath: '/sku-detail/$skuId'
       preLoaderRoute: typeof SkuSkuIdRouteImport
       parentRoute: typeof rootRouteImport
     }
