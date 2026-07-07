@@ -180,7 +180,7 @@ function SkuDetailPage() {
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search invoice, customer, BA…"
+              placeholder="Cari invoice, customer, BA…"
               className="h-9 w-56 rounded-md border border-border bg-card/60 pl-9 pr-3 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
@@ -195,36 +195,37 @@ function SkuDetailPage() {
                     ? "border-primary/40 bg-primary/15 text-foreground"
                     : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
                 }`}>
-                {s === "all" ? "All Status" : s}
+                {s === "all" ? "Semua Status" : s}
               </button>
             ))}
           </div>
 
-          {/* Date preset */}
-          <div className="flex items-center gap-1 ml-auto">
+          {/* Date range picker */}
+          <div className="flex items-center gap-1.5 ml-auto">
             <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-            {(["7d","30d","90d","all","custom"] as DatePreset[]).map((p) => (
-              <button key={p} type="button"
-                onClick={() => { setPreset(p); setPage(1); }}
-                className={`px-3 h-9 rounded-md text-[11px] font-medium border transition-colors ${
-                  preset === p
-                    ? "border-primary/40 bg-primary/15 text-foreground"
-                    : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
-                }`}>
-                {p==="7d"?"7 Hari":p==="30d"?"30 Hari":p==="90d"?"90 Hari":p==="all"?"Semua":"Custom"}
-              </button>
-            ))}
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+            <span className="text-[11px] text-muted-foreground">–</span>
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom}
+              onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+            {(dateFrom || dateTo) && (
+              <button
+                type="button"
+                onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
+                className="h-7 w-7 grid place-items-center rounded border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-[10px]"
+                title="Clear date filter"
+              >✕</button>
+            )}
           </div>
-
-          {preset === "custom" && (
-            <div className="flex items-center gap-2">
-              <input type="date" value={customFrom} onChange={(e)=>{setCustomFrom(e.target.value);setPage(1);}}
-                className="h-9 rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40" />
-              <span className="text-[11px] text-muted-foreground">–</span>
-              <input type="date" value={customTo} onChange={(e)=>{setCustomTo(e.target.value);setPage(1);}}
-                className="h-9 rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40" />
-            </div>
-          )}
         </div>
 
         {/* Metrics — full width 4 cols */}
