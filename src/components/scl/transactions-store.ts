@@ -65,9 +65,10 @@ function seed(): Transaction[] {
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
   const statuses: TxStatus[] = ["Processed", "Shipped", "Shipped", "Processed", "Cancelled"];
 
-  const today = new Date();
+  // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
+  const BASE_EPOCH = 1751846400000; // 2025-07-07 00:00:00 UTC — fixed, never changes
   for (let i = 0; i < 36; i++) {
-    const d = new Date(today.getTime() - i * 8 * 3600 * 1000);
+    const d = new Date(BASE_EPOCH - i * 8 * 3600 * 1000);
     const s = stores[i % stores.length];
     const ba = bas[i % bas.length];
     const cust = customers[i % customers.length];
