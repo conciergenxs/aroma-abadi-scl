@@ -480,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SkuRoute: SkuRoute,
   SkuSkuIdRoute: SkuSkuIdRoute,
+  SkuDetailSkuIdRoute: SkuDetailSkuIdRoute,
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
