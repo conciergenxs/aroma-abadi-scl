@@ -328,9 +328,8 @@ function PromoCodesPage() {
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleDelete = (promo: PromoCode) => {
-    if (!window.confirm(`Delete "${promo.name}"? This cannot be undone.`)) return;
     promoStore.deletePromo(promo.id);
-    toast.success("Promo deleted");
+    toast.success(`"${promo.name}" deleted`);
   };
 
   return (
