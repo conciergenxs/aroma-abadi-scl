@@ -41,25 +41,21 @@ function SkuDetailPage() {
   const { transactions }  = useTransactionsStore();
 
   // ── Filters ────────────────────────────────────────────────────────────
-  const [search,     setSearch]     = useState("");
+  const [search,       setSearch]       = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "Processed" | "Shipped" | "Cancelled">("all");
-  const [preset,     setPreset]     = useState<DatePreset>("30d");
-  const [customFrom, setCustomFrom] = useState("");
-  const [customTo,   setCustomTo]   = useState("");
-  const [page,       setPage]       = useState(1);
+  const [dateFrom,     setDateFrom]     = useState(defaultFrom);
+  const [dateTo,       setDateTo]       = useState(defaultTo);
+  const [page,         setPage]         = useState(1);
   const PAGE_SIZE = 10;
 
   // ── Date range ─────────────────────────────────────────────────────────
   const dateRange = useMemo(() => {
-    const now = new Date(); const to = new Date(now); to.setHours(23,59,59,999);
-    if (preset === "7d")  { const f = new Date(now); f.setDate(f.getDate()-6);  return { from:f, to }; }
-    if (preset === "30d") { const f = new Date(now); f.setDate(f.getDate()-29); return { from:f, to }; }
-    if (preset === "90d") { const f = new Date(now); f.setDate(f.getDate()-89); return { from:f, to }; }
-    if (preset === "all") return null;
-    if (preset === "custom" && customFrom && customTo)
-      return { from: new Date(customFrom+"T00:00:00"), to: new Date(customTo+"T23:59:59") };
-    return null;
-  }, [preset, customFrom, customTo]);
+    if (!dateFrom && !dateTo) return null;
+    return {
+      from: dateFrom ? new Date(dateFrom + "T00:00:00") : new Date(0),
+      to:   dateTo   ? new Date(dateTo   + "T23:59:59") : new Date(),
+    };
+  }, [dateFrom, dateTo]);
 
   // ── Find SKU ───────────────────────────────────────────────────────────
   const found = useMemo(() => {
