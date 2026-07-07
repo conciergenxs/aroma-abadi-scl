@@ -106,13 +106,21 @@ function seed(): Transaction[] {
   return items;
 }
 
-const STORAGE_KEY = "aroma_tx_store_v6";
+const STORAGE_KEY = "aroma_tx_store_v7";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { transactions: Transaction[] };
+      // Migrate: ensure brandNames exists on every transaction
+      const migrated = parsed.transactions.map((t) => ({
+        ...t,
+        brandNames: t.brandNames ?? (t.brandName ? [t.brandName] : []),
+      }));
+      return { transactions: migrated };
+    }
   } catch { /* ignore */ }
   const initial = { transactions: seed() };
   try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial)); } catch { /* ignore */ }
