@@ -12,6 +12,7 @@ import {
   MoreVertical,
   Pencil,
   Info,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePromoStore, promoStore, type PromoCode, type PromoStatus } from "@/components/scl/promo-store";
