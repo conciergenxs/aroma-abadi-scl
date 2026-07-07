@@ -52,6 +52,12 @@ function BroadcastListPage() {
     ];
   }, [broadcasts]);
 
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const paged = rows.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const fromIdx = rows.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const toIdx = Math.min(safePage * pageSize, rows.length);
+
   const visibleIds = rows.map((r) => r.id);
   const allVisibleSelected =
     visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
