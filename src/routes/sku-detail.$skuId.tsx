@@ -15,6 +15,12 @@ export const Route = createFileRoute("/sku-detail/$skuId")({
 
 type DatePreset = "7d" | "30d" | "90d" | "all" | "custom";
 
+const MONTHS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${String(d.getDate()).padStart(2,"0")} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   Shipped:   "border-emerald-700 bg-emerald-600 text-white",
   Processed: "border-sky-700    bg-sky-500     text-white",
