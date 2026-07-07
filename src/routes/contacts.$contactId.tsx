@@ -3,7 +3,6 @@ import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-s
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   ChevronLeft,
-  Mail,
   Phone,
   MessageCircle,
   Trash2,
