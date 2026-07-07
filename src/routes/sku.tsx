@@ -13,7 +13,7 @@ export const Route = createFileRoute("/sku")({
   head: () => ({
     meta: [
       { title: "SKU & Knowledge — Aroma Abadi" },
-      { name: "description", content: "Kelola Brand, Product Category, SKU, dan Knowledge Card untuk seluruh produk Aroma Abadi." },
+      { name: "description", content: "Manage Brands, Product Categories, SKUs, and Knowledge Cards for all Aroma Abadi products." },
     ],
   }),
   component: SkuPage,
