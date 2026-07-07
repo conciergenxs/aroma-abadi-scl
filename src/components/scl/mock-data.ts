@@ -292,6 +292,7 @@ export type Template = {
   groupId?: string;
   language?: string;
   rejectionReason?: string;
+  promoCodeId?: string;
 };
 
 export type TemplateGroup = {
