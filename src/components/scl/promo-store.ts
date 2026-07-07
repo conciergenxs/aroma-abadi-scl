@@ -153,6 +153,9 @@ export const promoStore = {
   },
 };
 
+// Server snapshot returns empty list so SSR and client first-render always match
+const getServerSnapshot = () => ({ promos: [] as PromoCode[] });
+
 export function usePromoStore() {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
