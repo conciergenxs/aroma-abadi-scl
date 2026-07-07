@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { fmtDateID, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
