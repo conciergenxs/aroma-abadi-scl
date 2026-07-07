@@ -104,7 +104,7 @@ function SettingsPage() {
                             isActive
                               ? "bg-primary/15 text-foreground border border-primary/30"
                               : item.enabled
-                              ? "text-muted-foreground hover:text-foreground hover:bg-white/[0.03] border border-transparent"
+                              ? "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
                               : "text-muted-foreground/40 cursor-not-allowed border border-transparent"
                           }`}
                         >
@@ -235,7 +235,7 @@ function ProfileTab() {
             <div className="mt-3">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium hover:bg-white/[0.06]"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium hover:bg-gray-100"
               >
                 <Upload className="h-3.5 w-3.5" /> Upload avatar
               </button>
@@ -369,7 +369,7 @@ function TeamMultiSelect({
             <button
               key={t}
               onClick={() => toggle(t)}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-white/[0.04]"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-gray-50"
             >
               <span
                 className={`h-4 w-4 rounded border grid place-items-center ${
@@ -498,7 +498,7 @@ function WhatsAppQrTab() {
             <div className="flex items-center gap-2 pt-1 w-full">
               <button
                 onClick={download}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-xs font-medium hover:bg-white/[0.06]"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-xs font-medium hover:bg-gray-100"
               >
                 <Download className="h-3.5 w-3.5" /> Download QR
               </button>
@@ -734,7 +734,7 @@ function CompanySecurityTab() {
                     {ip}
                     <button
                       onClick={() => setIps((s) => s.filter((_, j) => j !== i))}
-                      className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+                      className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -1020,7 +1020,7 @@ function UserManagementPage() {
           />
           <button
             onClick={resetFilters}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs hover:bg-white/[0.06]"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs hover:bg-gray-100"
           >
             <Filter className="h-3.5 w-3.5" /> Reset
           </button>
@@ -1056,7 +1056,7 @@ function UserManagementPage() {
             </thead>
             <tbody>
               {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1242,7 +1242,7 @@ function ConnectedAgentsSection() {
                 connectedOn: "Today",
               };
               return (
-                <tr key={a.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                <tr key={a.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(a.id)}
@@ -1455,7 +1455,7 @@ function TeamManagementPage() {
                 <tr
                   key={t.id}
                   onClick={() => setOpenTeamId(t.id)}
-                  className="border-b border-border/60 hover:bg-white/[0.02] h-14 cursor-pointer"
+                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer"
                 >
                   <td
                     className="px-4 py-3 align-middle"
@@ -1577,7 +1577,7 @@ function TeamFormModal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1689,7 +1689,7 @@ function TeamDetailPage({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setEditOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100"
             >
               Edit Team
             </button>
@@ -1734,7 +1734,7 @@ function TeamDetailPage({
             </thead>
             <tbody>
               {members.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1850,7 +1850,7 @@ function AddMembersModal({
           <h2 className="text-sm font-semibold">Add Team Members</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1875,7 +1875,7 @@ function AddMembersModal({
                 <button
                   key={u.id}
                   onClick={() => toggle(u.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/[0.04]"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50"
                 >
                   <Checkbox checked={checked} onChange={() => toggle(u.id)} />
                   <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">

@@ -162,7 +162,7 @@ function Dashboard() {
               {conversations.slice(0, 5).map((c) => {
                 const contact = contacts.find((x) => x.id === c.contactId)!;
                 return (
-                  <li key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+                  <li key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
                     <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {contact.avatar}
                     </div>

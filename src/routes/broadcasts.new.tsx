@@ -501,7 +501,7 @@ function RadioCard({
     <button
       onClick={onClick}
       className={`flex-1 text-left rounded-lg border p-3 transition ${
-        selected ? "border-primary/40 bg-primary/10" : "border-border bg-background/30 hover:bg-white/[0.03]"
+        selected ? "border-primary/40 bg-primary/10" : "border-border bg-background/30 hover:bg-gray-50"
       }`}
     >
       <div className="flex items-center gap-2">
@@ -815,7 +815,7 @@ function AudienceModal({
                     <label
                       key={l.id}
                       className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer ${
-                        sel ? "bg-primary/5" : "hover:bg-white/[0.03]"
+                        sel ? "bg-primary/5" : "hover:bg-gray-50"
                       }`}
                     >
                       <input

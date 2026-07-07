@@ -65,7 +65,7 @@ function ChannelsPage() {
                       ? "bg-primary/15 border border-primary/30"
                       : disabled
                         ? "opacity-50 cursor-not-allowed border border-transparent"
-                        : "border border-transparent hover:bg-white/[0.04]"
+                        : "border border-transparent hover:bg-gray-50"
                   }`}
                 >
                   <ChannelIcon channel={c.key} className="h-8 w-8" />
@@ -253,7 +253,7 @@ function ConnectedNumberCard({
                   navigator.clipboard.writeText(accountId);
                   toast.success("Account ID copied");
                 }}
-                className="grid h-6 w-6 place-items-center rounded hover:bg-white/[0.06] text-muted-foreground"
+                className="grid h-6 w-6 place-items-center rounded hover:bg-gray-100 text-muted-foreground"
                 aria-label="Copy account ID"
               >
                 <Copy className="h-3 w-3" />
@@ -264,7 +264,7 @@ function ConnectedNumberCard({
             <button
               type="button"
               onClick={() => toast.success("Dataset created")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 text-[11px] font-medium"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.04] hover:bg-gray-100 px-3 py-1.5 text-[11px] font-medium"
             >
               <Database className="h-3.5 w-3.5" />
               Create dataset
@@ -275,7 +275,7 @@ function ConnectedNumberCard({
                 navigator.clipboard.writeText(accountId);
                 toast.success("Account ID copied");
               }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 text-[11px] font-medium"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.04] hover:bg-gray-100 px-3 py-1.5 text-[11px] font-medium"
             >
               <Copy className="h-3.5 w-3.5" />
               Copy account ID
@@ -356,7 +356,7 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white/[0.04] hover:bg-white/[0.08] text-muted-foreground"
+              className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white/[0.04] hover:bg-gray-100 text-muted-foreground"
               aria-label="More"
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -371,7 +371,7 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
         <button
           type="button"
           onClick={() => setOpen((s) => !s)}
-          className="grid h-8 w-8 place-items-center rounded-md hover:bg-white/[0.06] text-muted-foreground"
+          className="grid h-8 w-8 place-items-center rounded-md hover:bg-gray-100 text-muted-foreground"
           aria-label="Expand"
         >
           {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -462,7 +462,7 @@ function OptInRow({
 }) {
   const [on, setOn] = useState(false);
   return (
-    <tr className="border-b border-border last:border-0 hover:bg-white/[0.02]">
+    <tr className="border-b border-border last:border-0 hover:bg-gray-50">
       <td className="px-4 py-3">
         <div className="font-medium">{channel.name}</div>
         <div className="text-[10px] text-muted-foreground">{channel.phone}</div>
