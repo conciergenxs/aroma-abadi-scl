@@ -459,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   PromoCodesPromoIdRoute: PromoCodesPromoIdRoute,
   SettingsRoute: SettingsRoute,
   SkuRoute: SkuRoute,
+  SkuSkuIdRoute: SkuSkuIdRoute,
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
