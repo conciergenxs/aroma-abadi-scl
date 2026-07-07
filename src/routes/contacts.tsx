@@ -25,7 +25,8 @@ import { toast } from "sonner";
 import {
   Search, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3,
+  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3, Info,
+  Phone, Mail, Hash,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
