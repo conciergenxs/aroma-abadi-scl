@@ -5,13 +5,13 @@ import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-s
 import { useMemo } from "react";
 import { Package, TrendingUp, ShoppingCart, DollarSign, Hash, ImageIcon, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/sku/$skuId")({
+export const Route = createFileRoute("/sku-detail/$skuId")({
   head: () => ({ meta: [{ title: "SKU Details — Aroma Abadi" }] }),
   component: SkuDetailPage,
 });
 
 function SkuDetailPage() {
-  const { skuId } = useParams({ from: "/sku/$skuId" });
+  const { skuId } = useParams({ from: "/sku-detail/$skuId" });
   const navigate = useNavigate();
   const { brands } = useSkuStore();
   const { transactions } = useTransactionsStore();
