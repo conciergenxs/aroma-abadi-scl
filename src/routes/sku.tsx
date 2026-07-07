@@ -142,7 +142,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Prev
             </button>
@@ -150,7 +150,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -244,7 +244,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 text-sm hover:bg-gray-50"><Plus className="h-3.5 w-3.5" /> Category</button>;
+    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50"><Plus className="h-3.5 w-3.5" /> Category</button>;
   }
   return (
     <div className="flex items-center gap-1">
@@ -525,8 +525,8 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
             {coverUrl && <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickCover(f); }} />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2 h-8 text-sm">Choose Image</button>
-              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-2 h-8 text-sm text-rose-500">Remove Cover</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-3 h-8 text-[13px]">Choose Image</button>
+              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500">Remove Cover</button>}
             </div>
           </div>
           <label className="block">
