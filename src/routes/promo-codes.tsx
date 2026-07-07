@@ -14,6 +14,7 @@ import {
   Info,
 } from "lucide-react";
 import { toast } from "sonner";
+import { usePromoStore, promoStore, type PromoCode, type PromoStatus } from "@/components/scl/promo-store";
 
 export const Route = createFileRoute("/promo-codes")({
   head: () => ({ meta: [{ title: "Promo Codes — SCL" }] }),
@@ -225,14 +226,16 @@ function ActionMenu({ promo, onSeeDetails, onNavigateDetails }: { promo: PromoCo
 
 function PromoCodesPage() {
   const navigate = useNavigate();
+  const { promos } = usePromoStore();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
-const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
-    let list = MOCK_PROMOS;
+    let list = promos;
     if (filterStatus !== "all") list = list.filter((p) => p.status === filterStatus);
     if (search.trim()) {
       const q = search.toLowerCase();
