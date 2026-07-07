@@ -191,7 +191,7 @@ function BroadcastListPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {rows.map((b) => (
+                {paged.map((b) => (
                   <tr
                     key={b.id}
                     onClick={() =>
