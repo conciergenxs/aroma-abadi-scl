@@ -221,9 +221,9 @@ function SkuDetailPage() {
         {/* Metrics — full width 4 cols */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label:"Unit Terjual",    value: metrics.unitsSold.toLocaleString(), icon: ShoppingCart, color:"text-sky-600",     bg:"bg-sky-50" },
+            { label:"Unit Terjual",    value: String(metrics.unitsSold), icon: ShoppingCart, color:"text-sky-600",     bg:"bg-sky-50" },
             { label:"Total Revenue",   value: formatIDR(metrics.revenue),         icon: DollarSign,   color:"text-emerald-600", bg:"bg-emerald-50" },
-            { label:"Transaksi",       value: metrics.txCount.toLocaleString(),   icon: Hash,         color:"text-violet-600",  bg:"bg-violet-50" },
+            { label:"Transaksi",       value: String(metrics.txCount),   icon: Hash,         color:"text-violet-600",  bg:"bg-violet-50" },
             { label:"Rata-rata Order", value: formatIDR(metrics.avgOrderValue),   icon: TrendingUp,   color:"text-amber-600",   bg:"bg-amber-50" },
           ].map((m) => (
             <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 flex items-start gap-3 shadow-sm hover:shadow-md transition-shadow">
