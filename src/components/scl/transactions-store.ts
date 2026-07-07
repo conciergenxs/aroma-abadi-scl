@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type TxStatus = "Processed" | "Shipped" | "Cancelled";
+export type TxStatus = "Processed" | "Completed" | "Cancelled";
 
 export type TxLine = {
   skuId: string;
@@ -63,7 +63,7 @@ function seed(): Transaction[] {
     { skuId: "sku-bm-color-infusion", skuCode: "BM-BCI-06", skuName: "Blush Color Infusion", price: 425000, brand: "BareMinerals" },
   ];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
-  const statuses: TxStatus[] = ["Processed", "Shipped", "Shipped", "Processed", "Cancelled"];
+  const statuses: TxStatus[] = ["Processed", "Completed", "Completed", "Processed", "Cancelled"];
 
   // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
   const BASE_EPOCH = 1751846400000; // 2025-07-07 00:00:00 UTC — fixed, never changes
