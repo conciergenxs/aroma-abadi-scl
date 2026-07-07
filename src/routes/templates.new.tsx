@@ -212,88 +212,81 @@ function CreateTemplatePage() {
                   options={CATEGORY_OPTIONS}
                 />
               </Field>
-              <Field label="Language" required>
-                <SclSelect
-                  value={language}
-                  onChange={setLanguage}
-                  options={languageOptions}
-                  searchable
-                />
+              <Field label="Channel" required>
+                <SclSelect value={channelId} onChange={setChannelId} options={channelOptions} />
               </Field>
             </div>
 
-            <Field label="Channel" required>
-              <SclSelect value={channelId} onChange={setChannelId} options={channelOptions} />
-            </Field>
-
-            <Field label="Template Group (Optional)">
-              <div className="space-y-2">
-                <SclSelect
-                  value={groupId}
-                  onChange={setGroupId}
-                  options={groupOptions}
-                  searchable
-                />
-                {showNewGroupInput ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      autoFocus
-                      value={newGroupName}
-                      onChange={(e) => setNewGroupName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") createGroupInline();
-                        if (e.key === "Escape") {
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Template Group (Optional)">
+                <div className="space-y-2">
+                  <SclSelect
+                    value={groupId}
+                    onChange={setGroupId}
+                    options={groupOptions}
+                    searchable
+                  />
+                  {showNewGroupInput ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        autoFocus
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") createGroupInline();
+                          if (e.key === "Escape") {
+                            setShowNewGroupInput(false);
+                            setNewGroupName("");
+                          }
+                        }}
+                        placeholder="Group name…"
+                        className="flex-1 h-8 rounded-md border border-border bg-white px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                      />
+                      <button
+                        onClick={createGroupInline}
+                        disabled={!newGroupName.trim()}
+                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-8 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        Create
+                      </button>
+                      <button
+                        onClick={() => {
                           setShowNewGroupInput(false);
                           setNewGroupName("");
-                        }
-                      }}
-                      placeholder="Group name…"
-                      className="flex-1 h-8 rounded-md border border-border bg-white px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-                    />
+                        }}
+                        className="text-[11px] text-muted-foreground hover:text-foreground"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={createGroupInline}
-                      disabled={!newGroupName.trim()}
-                      className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-8 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      onClick={() => setShowNewGroupInput(true)}
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
                     >
-                      Create
+                      <Plus className="h-3 w-3" /> New group
                     </button>
-                    <button
-                      onClick={() => {
-                        setShowNewGroupInput(false);
-                        setNewGroupName("");
-                      }}
-                      className="text-[11px] text-muted-foreground hover:text-foreground"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowNewGroupInput(true)}
-                    className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
-                  >
-                    <Plus className="h-3 w-3" /> New group
-                  </button>
-                )}
-              </div>
-            </Field>
-
-            <Field label="Header Type (Optional)">
-              <SclSelect value={headerType} onChange={setHeaderType} options={HEADER_OPTIONS} />
-              {headerType === "text" && (
-                <input
-                  value={headerText}
-                  onChange={(e) => setHeaderText(e.target.value)}
-                  placeholder="Header text"
-                  className="mt-2 w-full h-9 rounded-md border border-border bg-white px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-                />
-              )}
-              {(headerType === "image" || headerType === "video") && (
-                <div className="mt-2 rounded-md border border-dashed border-border bg-background/30 p-3 text-[11px] text-muted-foreground text-center">
-                  {headerType === "image" ? "Image" : "Video"} upload available after the template is created.
+                  )}
                 </div>
-              )}
-            </Field>
+              </Field>
+
+              <Field label="Header Type (Optional)">
+                <SclSelect value={headerType} onChange={setHeaderType} options={HEADER_OPTIONS} />
+                {headerType === "text" && (
+                  <input
+                    value={headerText}
+                    onChange={(e) => setHeaderText(e.target.value)}
+                    placeholder="Header text"
+                    className="mt-2 w-full h-9 rounded-md border border-border bg-white px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  />
+                )}
+                {(headerType === "image" || headerType === "video") && (
+                  <div className="mt-2 rounded-md border border-dashed border-border bg-background/30 p-3 text-[11px] text-muted-foreground text-center">
+                    {headerType === "image" ? "Image" : "Video"} upload available after the template is created.
+                  </div>
+                )}
+              </Field>
+            </div>
           </FormCard>
 
           <FormCard step={2} title="Content" description="Write the body, add variables and optional footer or buttons.">
