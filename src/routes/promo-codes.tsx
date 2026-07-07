@@ -437,37 +437,6 @@ function PromoCodesPage() {
                     </td>
                   </tr>
 
-                  {/* Expanded: usage history */}
-                  {isExpanded && (
-                    <tr>
-                      <td colSpan={8} className="px-4 pb-4 pt-0 bg-white/[0.015]">
-                        <div className="rounded-lg border border-border bg-card/40 p-4">
-                          <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                            Usage History ({promo.usages.length})
-                          </div>
-                          {promo.usages.length === 0 ? (
-                            <p className="text-[12px] text-muted-foreground italic">Not yet used in any template or broadcast.</p>
-                          ) : (
-                            <div className="space-y-2">
-                              {promo.usages.map((u, i) => (
-                                <div key={i} className="flex items-center gap-3 text-[12px]">
-                                  <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${
-                                    u.sourceType === "template"
-                                      ? "border-sky-500/30 bg-sky-500/10 text-sky-300"
-                                      : "border-violet-500/30 bg-violet-500/10 text-violet-300"
-                                  }`}>
-                                    {u.sourceType === "template" ? "Template" : "Broadcast"}
-                                  </span>
-                                  <span className="font-medium">{u.sourceName}</span>
-                                  <span className="text-muted-foreground ml-auto">{formatDate(u.usedAt)}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                 </Fragment>
               );
             })}
