@@ -4,7 +4,8 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useSkuStore, skuStore, type Brand, type Category, type SKU, type KnowledgeCard } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
-import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen, Home } from "lucide-react";
+import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen, Home, Info } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
