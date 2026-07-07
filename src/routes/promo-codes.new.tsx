@@ -20,6 +20,8 @@ function NewPromoCodePage() {
   const navigate = useNavigate();
 
   const [code, setCode] = useState("");
+  const [codeFile, setCodeFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [usageType, setUsageType] = useState<"one-to-one" | "one-to-many">("one-to-many");
