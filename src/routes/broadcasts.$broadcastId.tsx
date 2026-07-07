@@ -156,7 +156,7 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
               )}
             </ReadField>
             <ReadField label="Total Audience">
-              {(broadcast.totalAudience ?? broadcast.reach).toLocaleString()}
+              {fmtNum(broadcast.totalAudience ?? broadcast.reach)}
             </ReadField>
           </ReadGrid>
         </Section>
@@ -329,7 +329,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                 <Icon className={`h-3.5 w-3.5 ${k.color}`} />
               </div>
               <div className="mt-2 text-2xl font-semibold tabular-nums">
-                {k.v.toLocaleString()}
+                {fmtNum(k.v)}
               </div>
             </div>
           );
@@ -345,7 +345,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
             </p>
           </div>
           <span className="text-[11px] text-muted-foreground">
-            {recipientRows.length} of {broadcast.reach.toLocaleString()} contacts
+            {recipientRows.length} of {fmtNum(broadcast.reach)} contacts
           </span>
         </div>
 
