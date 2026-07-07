@@ -152,7 +152,7 @@ function SkuDetailPage() {
                   {relatedTx.map((t) => {
                     const line = t.items.find((i) => i.skuId === skuId)!;
                     const statusColor =
-                      t.status === "Completed" ? "border-emerald-700 bg-emerald-600 text-white" :
+                      t.status === "Shipped" ? "border-emerald-700 bg-emerald-600 text-white" :
                       t.status === "Cancelled" ? "border-rose-700 bg-rose-600 text-white" :
                       "border-sky-700 bg-sky-600 text-white";
                     return (

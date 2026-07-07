@@ -822,7 +822,7 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
   const parts = header.replace("Transaksi ", "").split(" · ");
   const [invoice, brand, total, status] = parts;
   const statusColor =
-    status === "Completed"
+    status === "Shipped"
       ? "border-emerald-700 bg-emerald-600 text-white"
       : status === "Cancelled"
       ? "border-rose-700 bg-rose-600 text-white"

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type TxStatus = "Processed" | "Completed" | "Cancelled";
+export type TxStatus = "Processed" | "Shipped" | "Cancelled";
 
 export type TxLine = {
   skuId: string;
@@ -63,7 +63,7 @@ function seed(): Transaction[] {
     { skuId: "sku-bm-color-infusion", skuCode: "BM-BCI-06", skuName: "Blush Color Infusion", price: 425000, brand: "BareMinerals" },
   ];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
-  const statuses: TxStatus[] = ["Processed", "Completed", "Completed", "Processed", "Cancelled"];
+  const statuses: TxStatus[] = ["Processed", "Shipped", "Shipped", "Processed", "Cancelled"];
 
   // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
   const BASE_EPOCH = 1783382400000; // 2026-07-07 00:00:00 UTC — fixed, never changes
@@ -107,7 +107,7 @@ function seed(): Transaction[] {
   return items;
 }
 
-const STORAGE_KEY = "aroma_tx_store_v9";
+const STORAGE_KEY = "aroma_tx_store_v10";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
