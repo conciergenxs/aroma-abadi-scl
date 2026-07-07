@@ -480,7 +480,7 @@ function CreateTemplatePage() {
               </PhoneFrame>
               {(buttonType === "quick" || buttonType === "cta") && buttonLabel && (
                 <div className="mx-auto mt-2 w-full max-w-[300px] px-3">
-                  <button className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 h-8 text-[12px] text-primary">
+                  <button className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 h-9 text-sm text-primary">
                     {buttonType === "cta" ? <ExternalLink className="h-3 w-3" /> : <Phone className="h-3 w-3" />}
                     {buttonLabel}
                   </button>
