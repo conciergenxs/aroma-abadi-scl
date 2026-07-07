@@ -96,6 +96,7 @@ function TemplatesPage() {
   const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
+    setPage(1);
     const q = query.trim().toLowerCase();
     return templates.filter((t) => {
       if (q && !t.name.toLowerCase().includes(q) && !t.body.toLowerCase().includes(q)) return false;
@@ -104,6 +105,7 @@ function TemplatesPage() {
       if (status !== "all" && t.status !== status) return false;
       return true;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templates, query, category, channel, status]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
