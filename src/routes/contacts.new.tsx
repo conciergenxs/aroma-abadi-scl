@@ -217,10 +217,10 @@ function NewContactPage() {
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => navigate({ to: "/contacts" })} className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card">
+              <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">
                 Cancel
               </button>
-              <button onClick={submitBA} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+              <button onClick={submitBA} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
                 <Plus className="h-3.5 w-3.5" /> Create BA
               </button>
             </div>
@@ -308,10 +308,10 @@ function NewContactPage() {
             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate({ to: "/contacts" })} className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card">
+            <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">
               Cancel
             </button>
-            <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+            <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
               <Plus className="h-3.5 w-3.5" /> Create Customer
             </button>
           </div>
