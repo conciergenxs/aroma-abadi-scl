@@ -321,6 +321,23 @@ function CreateBroadcastPage() {
             )}
           </FormCard>
 
+          {/* Promo code validation banner */}
+          {promoValidation && (
+            <div className={`rounded-lg border px-4 py-3 text-[12px] flex items-start gap-3 ${promoValidation.ok ? "border-emerald-500/30 bg-emerald-500/8 text-emerald-700" : "border-rose-500/30 bg-rose-500/8 text-rose-700"}`}>
+              <span className="text-lg leading-none">{promoValidation.ok ? "✓" : "⚠"}</span>
+              <div>
+                <div className="font-semibold mb-0.5">
+                  {promoValidation.ok ? "Promo codes available" : "Not enough promo codes"}
+                </div>
+                <div className="text-[11px] opacity-80">
+                  Template uses <span className="font-mono font-semibold">{promoValidation.promo.code}</span> (1-to-1).{" "}
+                  {promoValidation.available} codes available · {promoValidation.audienceCount} recipients selected.
+                  {!promoValidation.ok && ` You need ${promoValidation.audienceCount - promoValidation.available} more unique codes.`}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Save actions */}
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button
@@ -332,7 +349,7 @@ function CreateBroadcastPage() {
             {sendMode === "schedule" ? (
               <button
                 onClick={() => submit("schedule")}
-                disabled={!valid}
+                disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
@@ -340,7 +357,7 @@ function CreateBroadcastPage() {
             ) : (
               <button
                 onClick={() => submit("send")}
-                disabled={!valid}
+                disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast
