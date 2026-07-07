@@ -20,6 +20,7 @@ export type Transaction = {
   store: string;
   city: string;
   brandName: string;
+  brandNames: string[];
   items: TxLine[];
   total: number;
   paymentMethod: "QRIS" | "Debit" | "Credit Card" | "Transfer";
