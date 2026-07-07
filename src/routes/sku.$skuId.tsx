@@ -3,7 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
 import { useMemo } from "react";
-import { Package, TrendingUp, ShoppingCart, DollarSign, Hash, ImageIcon, ArrowLeft, ChevronRight } from "lucide-react";
+import { Package, TrendingUp, ShoppingCart, DollarSign, Hash, ImageIcon, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/sku/$skuId")({
   head: () => ({ meta: [{ title: "SKU Details — Aroma Abadi" }] }),
