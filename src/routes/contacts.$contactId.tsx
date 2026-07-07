@@ -718,12 +718,20 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
               .slice()
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((t) => (
-              <tr key={t.id} className="hover:bg-white/[0.025] transition-colors">
-                <td className="px-4 py-3 font-medium text-foreground text-xs">{t.invoice}</td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {new Date(t.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
+              <tr key={t.id} onClick={() => setPeekTx(t)} className="hover:bg-gray-50 cursor-pointer transition-colors">
+                <td className="px-4 py-3">
+                  <div className="font-medium text-foreground text-xs">{t.invoice}</div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                    {new Date(t.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                  </div>
                 </td>
-                <td className="px-4 py-3 text-xs">{t.brandName}</td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap gap-1">
+                    {(t.brandNames ?? [t.brandName]).map((b) => (
+                      <span key={b} className="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-[10px] font-medium">{b}</span>
+                    ))}
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-xs">
                   <ul className="space-y-0.5">
                     {t.items.map((i, idx) => (
@@ -736,18 +744,9 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
                 </td>
                 <td className="px-4 py-3 text-xs font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}>
+                  <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}>
                     {t.status}
                   </span>
-                </td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => setPeekTx(t)}
-                    className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
-                    title="View details"
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                  </button>
                 </td>
               </tr>
             ))}
