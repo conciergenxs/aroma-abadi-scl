@@ -3,7 +3,7 @@ import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { useBroadcastsStore, broadcastsStore } from "@/components/scl/broadcasts-store";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Copy, Trash2 } from "lucide-react";
+import { Plus, Search, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
