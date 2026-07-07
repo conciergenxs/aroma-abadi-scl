@@ -532,11 +532,11 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Title</span>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Masukkan judul card.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Card title..." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Teks</span>
-            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Masukkan isi knowledge.." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
+            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Knowledge content..." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
@@ -562,7 +562,7 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
       <form
-        onSubmit={(e) => { e.preventDefault(); if (!name.trim()) return; const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined }); toast.success("Brand ditambahkan"); onCreated(b); }}
+        onSubmit={(e) => { e.preventDefault(); if (!name.trim()) return; const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined }); toast.success("Brand added"); onCreated(b); }}
         className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
@@ -583,7 +583,7 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Brand Name</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan nama brand.." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Brand name..." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
           <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category bisa di-setup setelah brand dibuat.</p>
         </div>
