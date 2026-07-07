@@ -753,28 +753,54 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
       </div>
 
       {peekTx && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setPeekTx(null)} />
-          <aside className="relative w-80 bg-background border-l border-border h-full overflow-y-auto p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">{peekTx.invoice}</h2>
-              <button onClick={() => setPeekTx(null)}><X className="h-4 w-4" /></button>
-            </div>
-            <div className="space-y-3 text-sm">
-              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Date</span><div className="mt-0.5">{new Date(peekTx.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</div></div>
-              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Brand</span><div className="mt-0.5">{peekTx.brandName}</div></div>
-              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</span><div className="mt-0.5 font-semibold">{formatIDR(peekTx.total)}</div></div>
-              <div><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Status</span><div className="mt-0.5">{peekTx.status}</div></div>
+        <div className="fixed inset-0 z-50 flex animate-fade-in">
+          <div className="flex-1 bg-black/40 backdrop-blur-[2px]" onClick={() => setPeekTx(null)} />
+          <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right shadow-2xl">
+            <div className="p-5 border-b border-border flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Items</span>
-                <ul className="mt-1 space-y-1">
-                  {peekTx.items.map((item, idx) => (
-                    <li key={idx} className="text-xs">{item.skuName} <span className="text-muted-foreground">×{item.qty}</span> — {formatIDR(item.unitPrice * item.qty)}</li>
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
+                <div className="text-base font-semibold">{peekTx.invoice}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">{new Date(peekTx.date).toLocaleString("id-ID")}</div>
+              </div>
+              <button onClick={() => setPeekTx(null)} className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4 text-sm">
+              <PeekRow label="Store"><span className="font-medium">{peekTx.store} · {peekTx.city}</span></PeekRow>
+              <PeekRow label="Brand">
+                <div className="flex flex-wrap gap-1">
+                  {(peekTx.brandNames ?? [peekTx.brandName]).map((b) => (
+                    <span key={b} className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium">{b}</span>
+                  ))}
+                </div>
+              </PeekRow>
+              <PeekRow label="BA"><span className="font-medium">{peekTx.baName}</span></PeekRow>
+              <PeekRow label="Payment Method"><span className="font-medium">{peekTx.paymentMethod}</span></PeekRow>
+              <PeekRow label="Status">
+                <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(peekTx.status)}`}>{peekTx.status}</span>
+              </PeekRow>
+              {peekTx.note && <PeekRow label="BA Note"><span className="text-muted-foreground italic">{peekTx.note}</span></PeekRow>}
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
+                <ul className="divide-y divide-border rounded-md border border-border overflow-hidden">
+                  {peekTx.items.map((i, idx) => (
+                    <li key={idx} className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-[13px]">{i.skuName}</div>
+                        <div className="text-xs text-muted-foreground">{i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}</div>
+                      </div>
+                      <div className="text-right font-medium tabular-nums text-sm">{formatIDR(i.unitPrice * i.qty)}</div>
+                    </li>
                   ))}
                 </ul>
+                <div className="flex justify-between mt-3 text-sm font-semibold border-t border-border pt-3">
+                  <span>Total</span>
+                  <span>{formatIDR(peekTx.total)}</span>
+                </div>
               </div>
             </div>
-          </aside>
+          </div>
         </div>
       )}
     </div>
