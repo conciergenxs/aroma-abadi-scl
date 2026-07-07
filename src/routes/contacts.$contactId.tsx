@@ -492,7 +492,7 @@ function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; 
         onClick={() => setOpen((o) => !o)}
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
           style
-            ? `${style.bg} ${style.text} ${style.border}`
+            ? style.badge
             : "border-border text-muted-foreground hover:border-foreground/30"
         }`}
       >
