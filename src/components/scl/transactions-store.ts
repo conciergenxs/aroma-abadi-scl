@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type TxStatus = "Paid" | "Pending" | "Refunded";
+export type TxStatus = "Processed" | "Shipped";
 
 export type TxLine = {
   skuId: string;
