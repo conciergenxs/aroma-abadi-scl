@@ -60,7 +60,7 @@ export function MultiFileUploader({
           <Upload className="h-5 w-5 text-primary" />
         </div>
         <div className="text-sm font-medium">{label}</div>
-        <div className="text-[11px] text-muted-foreground">Drag & drop atau klik untuk upload (multi-file)</div>
+        <div className="text-[11px] text-muted-foreground">Drag & drop or click to upload (multi-file)</div>
       </button>
       <input
         ref={inputRef}
