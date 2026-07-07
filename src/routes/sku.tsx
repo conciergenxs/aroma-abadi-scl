@@ -190,14 +190,14 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
-            <div className="text-sm text-muted-foreground">{brand.categories.length} kategori · {brand.brandKnowledge.length} dokumen brand knowledge</div>
+            <div className="text-sm text-muted-foreground">{brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"} · {brand.brandKnowledge.length} brand knowledge {brand.brandKnowledge.length === 1 ? "document" : "documents"}</div>
           </div>
         </div>
 
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title="Brand Knowledge" description="Dokumen panduan brand, manifesto, tone of voice.">
+        <SectionCard title="Brand Knowledge" description="Brand guidelines, manifesto, tone of voice documents.">
           <div className="p-4">
             <MultiFileUploader
               files={brand.brandKnowledge}
@@ -210,7 +210,7 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
 
         <SectionCard
           title="Product Categories"
-          description="Klik category untuk melihat SKU & Knowledge Card."
+          description="Click a category to view its SKUs & Knowledge Cards."
           action={<AddCategoryButton brandId={brand.id} />}
         >
           <ul className="p-3 space-y-2">
@@ -225,7 +225,7 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium">{c.name}</div>
-                    <div className="text-xs text-muted-foreground">{c.skus.length} SKU · {c.categoryKnowledge.length} dokumen</div>
+                    <div className="text-xs text-muted-foreground">{c.skus.length} SKU{c.skus.length !== 1 ? "s" : ""} · {c.categoryKnowledge.length} {c.categoryKnowledge.length === 1 ? "document" : "documents"}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -287,7 +287,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
       <div className="flex gap-4 min-h-0">
         {/* LEFT 30% — Category Knowledge */}
         <div className="w-[30%] shrink-0">
-          <SectionCard title="Category Knowledge" description="Playbook & panduan kategori.">
+          <SectionCard title="Category Knowledge" description="Playbook & category guidelines.">
             <div className="p-4">
               <MultiFileUploader
                 files={category.categoryKnowledge}
