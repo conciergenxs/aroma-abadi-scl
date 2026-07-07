@@ -325,22 +325,11 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                         <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <button
-                        onClick={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
-                        className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 inline-flex items-center gap-1 transition-colors"
-                        title="View SKU details"
-                      >
-                        <Info className="h-3.5 w-3.5 text-primary" /> Details
-                      </button>
-                      <button onClick={() => onEditSku(s)} className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 inline-flex items-center gap-1 transition-colors"><Pencil className="h-3.5 w-3.5" /> Edit</button>
-                      <button
-                        onClick={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
-                        className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors" title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <SkuMenu
+                      onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
+                      onEdit={() => onEditSku(s)}
+                      onDelete={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU dihapus"); }}
+                    />
                   </div>
 
                   <Accordion type="single" collapsible className="mt-3">
