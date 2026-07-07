@@ -655,7 +655,7 @@ function ContactsTable({
               {isMineView && (
                 <td className={`${tdCls} tabular-nums`}>
                   {c.pointBalance != null && c.pointBalance > 0
-                    ? <span className="text-foreground font-medium">{c.pointBalance.toLocaleString("id-ID")} pts</span>
+                    ? <span className="text-foreground font-medium">{fmtNum(c.pointBalance)} pts</span>
                     : <span className="text-muted-foreground">—</span>}
                 </td>
               )}
