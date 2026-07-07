@@ -147,5 +147,7 @@ export function useTransactionsStore() {
 }
 
 export function formatIDR(n: number) {
-  return "Rp " + n.toLocaleString("id-ID");
+  // Use regex-based formatter — locale-aware toLocaleString differs between
+  // Node (SSR) and browser, causing React hydration mismatches.
+  return "Rp " + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
