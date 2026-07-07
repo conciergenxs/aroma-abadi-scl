@@ -149,19 +149,6 @@ function NewPromoCodePage() {
           />
         </div>
 
-        {/* Usage Type */}
-        <div>
-          <label className={labelCls}>Usage Type</label>
-          <select
-            value={usageType}
-            onChange={(e) => setUsageType(e.target.value as "one-to-one" | "one-to-many")}
-            className={inputCls}
-          >
-            <option value="one-to-many">1-to-Many (shared code)</option>
-            <option value="one-to-one">1-to-1 (unique per customer)</option>
-          </select>
-        </div>
-
         {/* Max Usage */}
         <div>
           <label className={labelCls}>Max Usage <span className="normal-case text-muted-foreground/60">(leave blank for unlimited)</span></label>
