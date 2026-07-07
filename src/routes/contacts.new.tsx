@@ -377,10 +377,13 @@ function NewContactPage() {
 
 /* ── Layout helpers ───────────────────────────────────────────────────────── */
 
-function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
+function FormSection({ title, optional, children }: { title: string; optional?: boolean; children: React.ReactNode }) {
   return (
     <div className="p-5">
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">{title}</div>
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
+        {optional && <span className="text-[10px] text-muted-foreground/60 normal-case tracking-normal">(Optional)</span>}
+      </div>
       {children}
     </div>
   );
