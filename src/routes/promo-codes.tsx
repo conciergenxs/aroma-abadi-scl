@@ -430,7 +430,7 @@ function PromoCodesPage() {
                       <div className="flex justify-end">
                         <ActionMenu
                           promo={promo}
-                          onSeeDetails={() => setExpandedId(isExpanded ? null : promo.id)}
+                          onSeeDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
                           onNavigateDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
                         />
                       </div>
