@@ -367,7 +367,7 @@ function UsageCard({ title, current, max, unit }: { title: string; current: numb
         <div className="flex items-start justify-between gap-3">
           <div>
             <h4 className="m-0 text-sm font-medium">{title}</h4>
-            <p className="m-0 mt-1 text-xs text-muted-foreground">{current.toLocaleString()} / {max.toLocaleString()} {unit} used</p>
+            <p className="m-0 mt-1 text-xs text-muted-foreground">{fmtNum(current)} / {fmtNum(max)} {unit} used</p>
           </div>
           <span className="text-xs font-medium text-muted-foreground">{percent}%</span>
         </div>
