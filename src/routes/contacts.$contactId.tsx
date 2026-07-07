@@ -807,6 +807,15 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   );
 }
 
+function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">{label}</span>
+      <div className="text-sm text-right">{children}</div>
+    </div>
+  );
+}
+
 function TransactionActivityCard({ message, at }: { message: string; at: string }) {
   // Parse: "Transaksi {invoice} · {brand} · {total} · {status}\n{items}"
   const [header, items] = message.split("\n");
