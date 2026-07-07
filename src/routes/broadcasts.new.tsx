@@ -313,7 +313,7 @@ function CreateBroadcastPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={() => setManualBody((b) => b + " 🎉")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
                   >
                     <Smile className="h-3 w-3" /> Emoji
                   </button>
@@ -529,7 +529,7 @@ function ChannelDropdown({ value, onChange }: { value: string; onChange: (id: st
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full inline-flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-3 h-10 text-[13px]"
+        className="w-full inline-flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-3 h-10 text-[13px]"
       >
         {selected ? (
           <span className="inline-flex items-center gap-2">
@@ -553,7 +553,7 @@ function ChannelDropdown({ value, onChange }: { value: string; onChange: (id: st
                   onChange(c.id);
                   setOpen(false);
                 }}
-                className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-white/[0.04] ${
+                className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-gray-50 ${
                   value === c.id ? "bg-primary/10" : ""
                 }`}
               >
@@ -624,7 +624,7 @@ function VariablePicker({
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+        className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
       >
         <AtSign className="h-3 w-3" /> Insert variable
       </button>
@@ -639,7 +639,7 @@ function VariablePicker({
                   onPick(p.key);
                   setOpen(false);
                 }}
-                className="w-full text-left flex items-center justify-between gap-2 px-3 py-1.5 text-[12px] hover:bg-white/[0.04]"
+                className="w-full text-left flex items-center justify-between gap-2 px-3 py-1.5 text-[12px] hover:bg-gray-50"
               >
                 <span>{p.name}</span>
                 <code className="text-[10px] text-primary">{`{{${p.key}}}`}</code>
@@ -772,7 +772,7 @@ function AudienceModal({
             <Users className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Choose Audience</h2>
           </div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
             <XIcon className="h-4 w-4" />
           </button>
         </div>

@@ -252,7 +252,7 @@ function TemplatesPage() {
                       >
                         <button
                           onClick={() => templatesStore.toggleStar(t.id)}
-                          className={`h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] ${
+                          className={`h-7 w-7 grid place-items-center rounded hover:bg-gray-50 ${
                             isStar
                               ? "text-amber-300"
                               : "text-muted-foreground/50 hover:text-amber-300"
@@ -415,7 +415,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -467,7 +467,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                     />
                     <button
                       onClick={() => submitRename(g.id)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-emerald-300"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-emerald-300"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>
@@ -480,13 +480,13 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                         setEditingId(g.id);
                         setEditingName(g.name);
                       }}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => setPendingDelete(g)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground hover:text-destructive"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -629,7 +629,7 @@ function TemplateDetailModal({
           </div>
           <button
             onClick={onClose}
-            className="h-8 w-8 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground shrink-0"
+            className="h-8 w-8 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1004,7 +1004,7 @@ function GroupPickerModal({
           </h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>

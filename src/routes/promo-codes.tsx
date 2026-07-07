@@ -189,7 +189,7 @@ function ActionMenu({ promo, onSeeDetails, onNavigateDetails }: { promo: PromoCo
     <div ref={ref} className="relative">
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
-        className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.06] text-muted-foreground hover:text-foreground transition-colors"
+        className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors"
         title="Actions"
       >
         <MoreVertical className="h-4 w-4" />
@@ -198,13 +198,13 @@ function ActionMenu({ promo, onSeeDetails, onNavigateDetails }: { promo: PromoCo
         <div className="absolute right-0 top-8 z-50 min-w-[140px] rounded-lg border border-border bg-card shadow-xl py-1">
           <button
             onClick={(e) => { e.stopPropagation(); setOpen(false); toast.info("Edit promo (coming soon)"); }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-white/[0.05] text-left"
+            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-gray-50 text-left"
           >
             <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); setOpen(false); onNavigateDetails(); }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-white/[0.05] text-left"
+            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-gray-50 text-left"
           >
             <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
           </button>
@@ -379,7 +379,7 @@ function PromoCodesPage() {
                             navigator.clipboard.writeText(promo.code);
                             toast.success("Code copied");
                           }}
-                          className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+                          className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
                           title="Copy code"
                         >
                           <Copy className="h-3 w-3" />
