@@ -111,7 +111,7 @@ function SkuDetailPage() {
   const { sku, brand, category } = found;
 
   return (
-    <AppShell backTo="/sku" title={sku.name}>
+    <AppShell backTo="/sku" title="SKU Details" subtitle={sku.name}>
       <div className="space-y-5 animate-fade-in">
 
         {/* Breadcrumb — all clickable */}
