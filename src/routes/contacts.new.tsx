@@ -337,9 +337,9 @@ function NewContactPage() {
                 </FormGrid>
               </FormSection>
 
-              <FormSection title="Brands">
+              <FormSection title="Brands" optional>
                 <div className="space-y-2">
-                  <p className="text-[11px] text-muted-foreground">Relevant product brands for this customer (optional).</p>
+                  <p className="text-[11px] text-muted-foreground">Relevant product brands for this customer.</p>
                   <div className="flex flex-wrap gap-2">
                     {brands.map((b) => {
                       const on = customerBrandIds.includes(b.id);
