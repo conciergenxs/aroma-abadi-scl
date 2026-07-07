@@ -244,7 +244,7 @@ function TemplatesPage() {
                     <tr
                       key={t.id}
                       onClick={() => setDetail(t)}
-                      className="hover:bg-white/[0.025] cursor-pointer transition-colors"
+                      className="hover:bg-gray-50 cursor-pointer transition-colors"
                     >
                       <td
                         className="px-4 py-3"
