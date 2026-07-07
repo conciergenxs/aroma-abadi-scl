@@ -317,11 +317,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SkuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sku/$skuId': {
+      id: '/sku/$skuId'
+      path: '/sku/$skuId'
+      fullPath: '/sku/$skuId'
+      preLoaderRoute: typeof SkuSkuIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sku-detail/$skuId': {
       id: '/sku-detail/$skuId'
       path: '/sku-detail/$skuId'
       fullPath: '/sku-detail/$skuId'
-      preLoaderRoute: typeof SkuSkuIdRouteImport
+      preLoaderRoute: typeof SkuDetailSkuIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
