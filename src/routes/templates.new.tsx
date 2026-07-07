@@ -198,7 +198,7 @@ function CreateTemplatePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Winter Drop — VIP Early Access"
-                className="w-full h-10 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="w-full h-10 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </Field>
 
@@ -246,7 +246,7 @@ function CreateTemplatePage() {
                         }
                       }}
                       placeholder="Group name…"
-                      className="flex-1 h-8 rounded-md border border-border bg-background/40 px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                      className="flex-1 h-8 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                     />
                     <button
                       onClick={createGroupInline}
@@ -283,7 +283,7 @@ function CreateTemplatePage() {
                   value={headerText}
                   onChange={(e) => setHeaderText(e.target.value)}
                   placeholder="Header text"
-                  className="mt-2 w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  className="mt-2 w-full h-9 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                 />
               )}
               {(headerType === "image" || headerType === "video") && (
@@ -301,13 +301,13 @@ function CreateTemplatePage() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder={`Hi {{name}}, …`}
-                className="w-full min-h-[160px] rounded-md border border-border bg-background/40 p-3 text-[13px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary/40 resize-y"
+                className="w-full min-h-[160px] rounded-md border border-border bg-[oklch(0.17_0_0)] p-3 text-[13px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary/40 resize-y"
               />
               <div className="mt-2 flex flex-wrap items-center gap-1.5 relative">
                 {/* Name — direct insert */}
                 <button
                   onClick={() => insertVariable("{{name}}")}
-                  className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-[oklch(0.17_0_0)] hover:bg-[oklch(0.17_0_0)] px-2 h-7 text-[11px] text-muted-foreground"
                 >
                   <AtSign className="h-3 w-3" /> Name
                 </button>
@@ -315,7 +315,7 @@ function CreateTemplatePage() {
                 <div className="relative">
                   <button
                     onClick={() => setVarPopup(varPopup === "brands" ? null : "brands")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-[oklch(0.17_0_0)] hover:bg-[oklch(0.17_0_0)] px-2 h-7 text-[11px] text-muted-foreground"
                   >
                     <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                   </button>
@@ -342,7 +342,7 @@ function CreateTemplatePage() {
                 <div className="relative">
                   <button
                     onClick={() => setVarPopup(varPopup === "promo" ? null : "promo")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-white/[0.04] px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-[oklch(0.17_0_0)] hover:bg-[oklch(0.17_0_0)] px-2 h-7 text-[11px] text-muted-foreground"
                   >
                     <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                   </button>
@@ -372,7 +372,7 @@ function CreateTemplatePage() {
                 value={footer}
                 onChange={(e) => setFooter(e.target.value)}
                 placeholder="Footer text"
-                className="w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="w-full h-9 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </Field>
 
@@ -383,7 +383,7 @@ function CreateTemplatePage() {
                   value={buttonLabel}
                   onChange={(e) => setButtonLabel(e.target.value)}
                   placeholder="Quick reply label"
-                  className="mt-2 w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  className="mt-2 w-full h-9 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                 />
               )}
               {buttonType === "cta" && (
@@ -392,13 +392,13 @@ function CreateTemplatePage() {
                     value={buttonLabel}
                     onChange={(e) => setButtonLabel(e.target.value)}
                     placeholder="Button label"
-                    className="h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                    className="h-9 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                   />
                   <input
                     value={buttonUrl}
                     onChange={(e) => setButtonUrl(e.target.value)}
                     placeholder="https://…"
-                    className="h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                    className="h-9 rounded-md border border-border bg-[oklch(0.17_0_0)] px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                   />
                 </div>
               )}
