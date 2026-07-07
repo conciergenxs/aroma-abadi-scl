@@ -63,7 +63,7 @@ function seed(): Transaction[] {
     { skuId: "sku-bm-color-infusion", skuCode: "BM-BCI-06", skuName: "Blush Color Infusion", price: 425000, brand: "BareMinerals" },
   ];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
-  const statuses: TxStatus[] = ["Paid", "Paid", "Paid", "Pending", "Refunded"];
+  const statuses: TxStatus[] = ["Processed", "Processed", "Shipped", "Processed", "Shipped"];
 
   const today = new Date();
   for (let i = 0; i < 36; i++) {
