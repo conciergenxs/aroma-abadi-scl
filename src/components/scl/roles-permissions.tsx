@@ -543,7 +543,7 @@ export function RolesPermissionsModule() {
                 <tr
                   key={r.id}
                   onClick={() => setView({ mode: "detail", roleId: r.id })}
-                  className="border-b border-border/60 hover:bg-white/[0.02] h-14 cursor-pointer"
+                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer"
                 >
                   <td className="px-4 py-3 align-middle" onClick={(e) => e.stopPropagation()}>
                     <Checkbox checked={selected.includes(r.id)} onChange={() => toggleOne(r.id)} />
@@ -789,7 +789,7 @@ function PermissionsStep({
                     className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition flex items-center justify-between ${
                       isActive
                         ? "bg-primary/15 text-foreground border border-primary/30"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03] border border-transparent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
                     }`}
                   >
                     <span>{cat.label}</span>
@@ -1084,7 +1084,7 @@ function RoleDetailPage({
             </button>
             <button
               onClick={onEdit}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-white/[0.06]"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100"
             >
               <Pencil className="h-3.5 w-3.5" /> Edit Role
             </button>
@@ -1137,7 +1137,7 @@ function RoleDetailPage({
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-white/[0.02] h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1276,7 +1276,7 @@ function AssignUsersModal({
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1311,7 +1311,7 @@ function AssignUsersModal({
                   <tr
                     key={u.id}
                     className={`border-b border-border/60 h-12 ${
-                      already ? "opacity-50" : "hover:bg-white/[0.02] cursor-pointer"
+                      already ? "opacity-50" : "hover:bg-gray-50 cursor-pointer"
                     }`}
                     onClick={() => !already && toggle(u.id)}
                   >

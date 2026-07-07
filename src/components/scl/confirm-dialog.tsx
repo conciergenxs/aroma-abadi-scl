@@ -71,7 +71,7 @@ export function ConfirmDialog({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground shrink-0"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0"
           >
             <X className="h-4 w-4" />
           </button>

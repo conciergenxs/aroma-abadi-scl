@@ -60,7 +60,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
             <h3 className="text-sm font-semibold">Invite to workspace</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">Invite humans or connect an AI agent</p>
           </div>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded hover:bg-white/[0.06]">
+          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100">
             <XIcon className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
@@ -171,7 +171,7 @@ function EmailTab({ onClose }: { onClose: () => void }) {
         </select>
       </Field>
       <div className="flex justify-end gap-2 pt-2">
-        <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-xs hover:bg-white/[0.05]">
+        <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50">
           Cancel
         </button>
         <button
@@ -201,7 +201,7 @@ function LinkTab() {
               navigator.clipboard.writeText(link);
               toast.success("Link copied to clipboard");
             }}
-            className="h-9 px-3 rounded-md border border-border text-xs hover:bg-white/[0.05] inline-flex items-center gap-1.5"
+            className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5"
           >
             <CopyIcon className="h-3.5 w-3.5" /> Copy
           </button>
@@ -296,7 +296,7 @@ function AgentTab({
         <button
           onClick={handleTest}
           disabled={testing}
-          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-white/[0.05] inline-flex items-center gap-1.5 disabled:opacity-60"
+          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 disabled:opacity-60"
         >
           {testing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
           Test Connection

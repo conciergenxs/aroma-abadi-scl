@@ -425,9 +425,9 @@ function AddOnCard({ title, description, currentLabel, currentValue, price, chil
 function QuantityStepper({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   return (
     <div className="inline-flex items-center overflow-hidden rounded-md border border-border bg-card/70">
-      <button type="button" onClick={() => onChange(Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center hover:bg-white/[0.04]" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
+      <button type="button" onClick={() => onChange(Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center hover:bg-gray-50" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
       <div className="grid h-8 w-10 place-items-center border-x border-border text-sm font-medium">{value}</div>
-      <button type="button" onClick={() => onChange(value + 1)} className="grid h-8 w-8 place-items-center hover:bg-white/[0.04]" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
+      <button type="button" onClick={() => onChange(value + 1)} className="grid h-8 w-8 place-items-center hover:bg-gray-50" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
     </div>
   );
 }
@@ -508,7 +508,7 @@ function InvoiceTable({ rows }: { rows: InvoiceRow[] }) {
         </thead>
         <tbody className="divide-y divide-border">
           {rows.map((row) => (
-            <tr key={`${row.date}-${row.description}`} className="hover:bg-white/[0.03]">
+            <tr key={`${row.date}-${row.description}`} className="hover:bg-gray-50">
               <td className="px-5 py-3">{row.date}</td>
               <td className="px-5 py-3">{row.amount}</td>
               <td className="px-5 py-3 text-muted-foreground">{row.description}</td>
@@ -572,7 +572,7 @@ function PlanComparisonTable() {
         <table className="w-full min-w-[760px] text-sm">
           <thead className="border-b border-border bg-muted/20 text-xs text-muted-foreground"><tr><th className="px-5 py-3 text-left font-medium">Feature</th>{plans.map((plan) => <th key={plan.name} className="px-5 py-3 text-left font-medium">{plan.name}</th>)}</tr></thead>
           <tbody className="divide-y divide-border">
-            {comparisonRows.map((row) => <tr key={row.feature} className="hover:bg-white/[0.03]"><td className="px-5 py-3 font-medium">{row.feature}</td>{row.values.map((value, index) => <td key={`${row.feature}-${plans[index].name}`} className="px-5 py-3 text-muted-foreground">{value === "check" ? <Check className="h-4 w-4 text-primary" /> : value === "x" ? <X className="h-4 w-4 text-muted-foreground/50" /> : value}</td>)}</tr>)}
+            {comparisonRows.map((row) => <tr key={row.feature} className="hover:bg-gray-50"><td className="px-5 py-3 font-medium">{row.feature}</td>{row.values.map((value, index) => <td key={`${row.feature}-${plans[index].name}`} className="px-5 py-3 text-muted-foreground">{value === "check" ? <Check className="h-4 w-4 text-primary" /> : value === "x" ? <X className="h-4 w-4 text-muted-foreground/50" /> : value}</td>)}</tr>)}
           </tbody>
         </table>
       </div>
@@ -634,7 +634,7 @@ function PaymentMethodModal({ open, method, onClose, onSave }: { open: boolean; 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm" onMouseDown={onClose}>
       <div className="w-full max-w-xl rounded-xl border border-border bg-popover shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4"><h3 className="m-0 text-base font-semibold">{method ? "Edit Payment Method" : "Add Payment Method"}</h3><button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md hover:bg-white/[0.04]" aria-label="Close"><X className="h-4 w-4" /></button></div>
+        <div className="flex items-center justify-between border-b border-border px-5 py-4"><h3 className="m-0 text-base font-semibold">{method ? "Edit Payment Method" : "Add Payment Method"}</h3><button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md hover:bg-gray-50" aria-label="Close"><X className="h-4 w-4" /></button></div>
         <div className="grid gap-4 p-5 sm:grid-cols-2">
           <PaymentField label="Cardholder Name" value={holder} onChange={setHolder} />
           <PaymentField label="Card Number" value={cardNumber} onChange={setCardNumber} />

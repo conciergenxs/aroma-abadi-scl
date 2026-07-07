@@ -86,7 +86,7 @@ export function MultiFileUploader({
                 <a
                   href={f.url}
                   download={f.fileName}
-                  className="grid h-7 w-7 place-items-center rounded hover:bg-white/[0.06] text-muted-foreground"
+                  className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 text-muted-foreground"
                   title="Download"
                 >
                   <Download className="h-3.5 w-3.5" />

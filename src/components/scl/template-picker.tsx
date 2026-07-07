@@ -112,11 +112,11 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
           <div className="ml-auto flex items-center gap-1.5">
             <Link
               to="/templates"
-              className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1.5 rounded-md border border-border hover:bg-white/[0.04] text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1.5 rounded-md border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground"
             >
               Manage templates <ExternalLink className="h-3 w-3" />
             </Link>
-            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
               <XIcon className="h-4 w-4" />
             </button>
           </div>
@@ -144,7 +144,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                   className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium border transition ${
                     sel
                       ? "border-primary/40 bg-primary/15 text-primary"
-                      : "border-border bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+                      : "border-border bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-gray-50"
                   }`}
                 >
                   {c === "Starred" && <Star className="h-3 w-3 fill-current" />}
@@ -183,7 +183,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                               onClick={() => setSelectedId(t.id)}
                               onDoubleClick={() => { onInsert(t.body, t); onClose(); }}
                               className={`w-full text-left px-4 py-3 flex items-start gap-3 transition ${
-                                sel ? "bg-primary/10" : "hover:bg-white/[0.03]"
+                                sel ? "bg-primary/10" : "hover:bg-gray-50"
                               }`}
                             >
                               <ChannelIcon channel={t.channel} className="h-5 w-5 mt-0.5 shrink-0" />

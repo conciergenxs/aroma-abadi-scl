@@ -370,7 +370,7 @@ function LifecycleStageRow({
       <button
         type="button"
         onClick={onEdit}
-        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground"
         aria-label="Edit stage"
       >
         <Pencil className="h-3.5 w-3.5" />
@@ -620,7 +620,7 @@ function RecentlyDeletedContactsPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {deletedContacts.map((c) => (
-                  <tr key={c.id} className="hover:bg-white/[0.02]">
+                  <tr key={c.id} className="hover:bg-gray-50">
                     <td className="px-5 py-3">
                       <Checkbox
                         checked={selected.has(c.id)}
@@ -804,7 +804,7 @@ function Modal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1145,7 +1145,7 @@ function LabelsPage() {
                   {paged.map((row) => {
                     const c = colorMeta(row.color);
                     return (
-                      <tr key={row.id} className="border-b border-border last:border-0 hover:bg-white/[0.02]">
+                      <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50">
                         <td className="px-5 py-3">
                           <Checkbox
                             checked={selected.has(row.id)}
@@ -1516,7 +1516,7 @@ function ContactPropertiesRouter() {
                 </thead>
                 <tbody>
                   {paged.map((row) => (
-                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-white/[0.02]">
+                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50">
                       <td className="px-5 py-3">
                         <Checkbox
                           checked={selected.has(row.id)}

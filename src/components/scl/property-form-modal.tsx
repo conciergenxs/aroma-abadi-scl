@@ -51,7 +51,7 @@ export function PropertyFormModal({
       <div className="w-[440px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass" onClick={(e) => e.stopPropagation()}>
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-medium">{isEdit ? "Edit Property" : "Add Property"}</div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
             <X className="h-4 w-4" />
           </button>
         </div>
