@@ -1,8 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
-import { conversations, threadsByContact, connectedChannels } from "@/components/scl/mock-data";
-import { type LifecycleStage } from "@/components/scl/mock-data";
+import { conversations, threadsByContact, connectedChannels, type LifecycleStage } from "@/components/scl/mock-data";
 import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore, getStageStyle } from "@/components/scl/contacts-store";
