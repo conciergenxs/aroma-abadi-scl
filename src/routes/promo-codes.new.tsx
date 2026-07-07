@@ -60,16 +60,71 @@ function NewPromoCodePage() {
   return (
     <AppShell backTo="/promo-codes" title="New Promo Code">
       <div className="max-w-2xl space-y-5">
-        {/* Code */}
+        {/* Usage Type — moved up so code field can react */}
         <div>
-          <label className={labelCls}>Code</label>
-          <input
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="e.g. SUMMER20"
-            className={inputCls}
-          />
+          <label className={labelCls}>Usage Type</label>
+          <div className="inline-flex rounded-md border border-border bg-background/40 p-0.5 gap-0.5">
+            {(["one-to-many", "one-to-one"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => { setUsageType(t); setCode(""); setCodeFile(null); }}
+                className={`px-3 h-8 text-[12px] font-medium rounded transition-colors ${usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {t === "one-to-many" ? "1-to-Many (shared code)" : "1-to-1 (unique per customer)"}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5">
+            {usageType === "one-to-many"
+              ? "One code used by all recipients. Type the code below."
+              : "Each recipient gets a unique code. Upload a CSV file with one code per row."}
+          </p>
         </div>
+
+        {/* Code — text input for 1-to-many, file upload for 1-to-1 */}
+        {usageType === "one-to-many" ? (
+          <div>
+            <label className={labelCls}>Code</label>
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="e.g. SUMMER20"
+              className={inputCls}
+            />
+          </div>
+        ) : (
+          <div>
+            <label className={labelCls}>Upload Codes (CSV)</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.txt"
+              className="hidden"
+              onChange={(e) => setCodeFile(e.target.files?.[0] ?? null)}
+            />
+            {codeFile ? (
+              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-[oklch(0.17_0_0)] text-sm">
+                <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
+                <span className="flex-1 truncate text-foreground">{codeFile.name}</span>
+                <span className="text-[11px] text-muted-foreground shrink-0">{(codeFile.size / 1024).toFixed(1)} KB</span>
+                <button type="button" onClick={() => setCodeFile(null)} className="text-muted-foreground hover:text-destructive">
+                  <XIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-20 rounded-md border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 flex flex-col items-center justify-center gap-1.5 text-muted-foreground transition-colors"
+              >
+                <Upload className="h-5 w-5" />
+                <span className="text-xs font-medium">Click to upload CSV</span>
+                <span className="text-[11px] text-muted-foreground/60">One unique code per row</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Promo Name */}
         <div>
