@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { Upload, FileSpreadsheet, X as XIcon } from "lucide-react";
 
 export const Route = createFileRoute("/promo-codes/new")({
   head: () => ({ meta: [{ title: "New Promo Code — SCL" }] }),
