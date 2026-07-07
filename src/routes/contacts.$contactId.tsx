@@ -822,11 +822,11 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
   const parts = header.replace("Transaksi ", "").split(" · ");
   const [invoice, brand, total, status] = parts;
   const statusColor =
-    status === "Paid"
+    status === "Shipped"
       ? "border-emerald-700 bg-emerald-600 text-white"
-      : status === "Pending"
-      ? "border-amber-700 bg-amber-600 text-white"
-      : "border-rose-700 bg-rose-600 text-white";
+      : status === "Cancelled"
+      ? "border-rose-700 bg-rose-600 text-white"
+      : "border-sky-700 bg-sky-600 text-white"; // Processed
   return (
     <div className="rounded-md border border-border bg-card/60 px-3 py-2.5 mt-1 mb-1 space-y-1.5">
       <div className="flex items-center justify-between gap-2">
