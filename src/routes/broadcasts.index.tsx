@@ -22,6 +22,8 @@ function BroadcastListPage() {
   const [status, setStatus] = useState<StatusFilter>("All");
   const [selected, setSelected] = useState<string[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
