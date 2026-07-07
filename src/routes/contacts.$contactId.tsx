@@ -330,17 +330,13 @@ function ContactDetailPage() {
           <section className="flex flex-col min-w-0 min-h-0">
             {/* Contact header bar */}
             <div className="px-4 lg:px-6 py-3 flex items-center justify-between gap-3 border-b border-border">
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex flex-col gap-1 min-w-0">
                 <h1 className="text-base font-semibold truncate">{contact.name}</h1>
                 {!isBA && (
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {(["New Lead","Contacted","Qualified","Pending Payment","Customer","Lost","No Reply"] as LifecycleStage[]).map((s) => (
-                      <button key={s} type="button"
-                        onClick={() => setLifecycle(contact.lifecycleStage === s ? null : s)}
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${contact.lifecycleStage === s ? "bg-primary border-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"}`}
-                      >{s}</button>
-                    ))}
-                  </div>
+                  <LifecycleDropdown
+                    value={contact.lifecycleStage ?? null}
+                    onChange={setLifecycle}
+                  />
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
