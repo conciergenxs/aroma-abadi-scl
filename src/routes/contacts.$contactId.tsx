@@ -348,7 +348,7 @@ function ContactDetailPage() {
               </div>
             </div>
 
-            {/* Tabs — hanya untuk Customer, BA langsung show activity log */}
+            {/* Tabs */}
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
                 <div className="flex items-center gap-1">

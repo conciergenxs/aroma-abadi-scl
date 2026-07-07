@@ -36,7 +36,7 @@ export function MultiFileUploader({
     try {
       const atts = await Promise.all(Array.from(list).map(fileToAttachment));
       onAdd(atts);
-      toast.success(`${atts.length} file ditambahkan`);
+      toast.success(`${atts.length} file(s) added`);
     } catch {
       toast.error("Gagal memproses file");
     }
@@ -95,7 +95,7 @@ export function MultiFileUploader({
                   type="button"
                   onClick={() => onRemove(f.id)}
                   className="grid h-7 w-7 place-items-center rounded hover:bg-rose-500/10 text-rose-400"
-                  title="Hapus"
+                  title="Remove"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

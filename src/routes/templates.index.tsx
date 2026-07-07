@@ -127,7 +127,7 @@ function TemplatesPage() {
   return (
     <AppShell
       title="Message Templates"
-      subtitle="Pesan terstandarisasi & brand-approved untuk WhatsApp Aroma Abadi."
+      subtitle="Standardized & brand-approved messages for WhatsApp Aroma Abadi."
     >
       <div className="space-y-6">
 
