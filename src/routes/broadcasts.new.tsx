@@ -109,6 +109,10 @@ function CreateBroadcastPage() {
       toast.error("Please complete all required fields");
       return;
     }
+    if (kind !== "draft" && promoValidation && !promoValidation.ok) {
+      toast.error(`Not enough promo codes: ${promoValidation.available} available, ${promoValidation.audienceCount} recipients`);
+      return;
+    }
     const label =
       kind === "draft"
         ? "Draft saved"
