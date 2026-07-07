@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 
 export type PromoStatus = "active" | "expired" | "inactive";
 
@@ -106,56 +106,77 @@ function seed(): PromoCode[] {
   ];
 }
 
-const STORAGE_KEY = "aroma_promo_store_v2";
+const STORAGE_KEY = "aroma_promo_store_v3";
 
-function load(): { promos: PromoCode[] } {
-  if (typeof window === "undefined") return { promos: seed() };
+// ── In-memory state (module-level, never touches window during module init) ───
+
+let _promos: PromoCode[] = seed();
+let _loaded = false;
+const _listeners = new Set<() => void>();
+
+function _load() {
+  if (_loaded) return;
+  _loaded = true;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as { promos: PromoCode[] };
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.promos && Array.isArray(parsed.promos)) {
+        _promos = parsed.promos;
+      }
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
+    }
   } catch { /* ignore */ }
-  const initial = { promos: seed() };
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial)); } catch { /* ignore */ }
-  return initial;
 }
 
-let state = load();
-const listeners = new Set<() => void>();
+function _save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos })); } catch { /* ignore */ }
+  _listeners.forEach((l) => l());
+}
 
-const emit = () => {
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* ignore */ }
-  listeners.forEach((l) => l());
-};
-
-const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
-const getSnapshot = () => state;
+// ── Public store API ──────────────────────────────────────────────────────────
 
 export const promoStore = {
-  get state() { return state; },
+  getPromos(): PromoCode[] { return _promos; },
 
-  addPromo(data: Omit<PromoCode, "id" | "usages">) {
+  addPromo(data: Omit<PromoCode, "id" | "usages">): string {
     const id = `promo-${Date.now()}`;
-    state = { promos: [{ ...data, id, usages: [] }, ...state.promos] };
-    emit();
+    _promos = [{ ...data, id, usages: [] }, ..._promos];
+    _save();
     return id;
   },
 
   updatePromo(id: string, data: Partial<Omit<PromoCode, "id" | "usages">>) {
-    state = {
-      promos: state.promos.map((p) => p.id === id ? { ...p, ...data } : p),
-    };
-    emit();
+    _promos = _promos.map((p) => (p.id === id ? { ...p, ...data } : p));
+    _save();
   },
 
   deletePromo(id: string) {
-    state = { promos: state.promos.filter((p) => p.id !== id) };
-    emit();
+    _promos = _promos.filter((p) => p.id !== id);
+    _save();
+  },
+
+  subscribe(cb: () => void) {
+    _listeners.add(cb);
+    return () => _listeners.delete(cb);
   },
 };
 
-// Server snapshot returns empty list so SSR and client first-render always match
-const getServerSnapshot = () => ({ promos: [] as PromoCode[] });
+// ── React hook (client-only via useEffect) ────────────────────────────────────
 
 export function usePromoStore() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [promos, setPromos] = useState<PromoCode[]>(() => _promos);
+
+  useEffect(() => {
+    // Load from localStorage on first mount (client-only)
+    _load();
+    setPromos([..._promos]);
+
+    // Subscribe to future changes
+    const unsub = promoStore.subscribe(() => setPromos([..._promos]));
+    return unsub;
+  }, []);
+
+  return { promos };
 }
