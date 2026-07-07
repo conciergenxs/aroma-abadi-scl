@@ -1,140 +1,21 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
+import { useState } from "react";
 import {
   CheckCircle2,
   XCircle,
   Clock,
+  Pencil,
+  Trash2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { usePromoStore, promoStore, type PromoCode, type PromoStatus } from "@/components/scl/promo-store";
 
 export const Route = createFileRoute("/promo-codes/$promoId")({
-  head: () => ({ meta: [{ title: "Promo Code — SCL" }] }),
+  head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
   component: PromoDetailPage,
 });
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type PromoStatus = "active" | "expired" | "inactive";
-
-type PromoUsage = {
-  sourceType: "template" | "broadcast";
-  sourceName: string;
-  usedAt: string;
-};
-
-type PromoCode = {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  usageType: "one-to-one" | "one-to-many";
-  maxUsage: number | null;
-  startDate: string;
-  endDate: string;
-  status: PromoStatus;
-  usages: PromoUsage[];
-  odooId: string;
-};
-
-// ── Mock data (same as promo-codes.tsx) ──────────────────────────────────────
-
-const MOCK_PROMOS: PromoCode[] = [
-  {
-    id: "promo-1",
-    code: "AROMA20",
-    name: "20% Off All Brands",
-    description: "20% discount across all brands. Code shared via broadcast or template.",
-    usageType: "one-to-many",
-    maxUsage: 500,
-    startDate: "2026-06-01",
-    endDate: "2026-07-31",
-    status: "active",
-    odooId: "PC-2026-001",
-    usages: [
-      { sourceType: "template", sourceName: "June Flash Sale", usedAt: "2026-06-10T10:30:00Z" },
-      { sourceType: "broadcast", sourceName: "VIP Customer Blast", usedAt: "2026-06-15T14:00:00Z" },
-      { sourceType: "template", sourceName: "End of Month Promo", usedAt: "2026-06-28T09:00:00Z" },
-    ],
-  },
-  {
-    id: "promo-2",
-    code: "SISLEY150K",
-    name: "Sisley Rp150k Off",
-    description: "Rp150,000 off Sisley products. Single-use code issued per customer.",
-    usageType: "one-to-one",
-    maxUsage: 200,
-    startDate: "2026-07-01",
-    endDate: "2026-07-15",
-    status: "active",
-    odooId: "PC-2026-002",
-    usages: [
-      { sourceType: "broadcast", sourceName: "Sisley Summer Sale", usedAt: "2026-07-01T08:00:00Z" },
-      { sourceType: "template", sourceName: "Abandoned Cart Reminder", usedAt: "2026-07-03T12:00:00Z" },
-    ],
-  },
-  {
-    id: "promo-3",
-    code: "BEAUTY10",
-    name: "10% Off New Arrivals",
-    description: "10% discount on new arrival products. No minimum purchase required.",
-    usageType: "one-to-many",
-    maxUsage: null,
-    startDate: "2026-05-01",
-    endDate: "2026-05-31",
-    status: "expired",
-    odooId: "PC-2026-003",
-    usages: [
-      { sourceType: "template", sourceName: "New Arrival May", usedAt: "2026-05-03T09:30:00Z" },
-      { sourceType: "broadcast", sourceName: "All Contacts Blast", usedAt: "2026-05-07T10:00:00Z" },
-      { sourceType: "broadcast", sourceName: "Mid-May Reminder", usedAt: "2026-05-16T13:00:00Z" },
-      { sourceType: "template", sourceName: "May Closing Sale", usedAt: "2026-05-30T15:00:00Z" },
-    ],
-  },
-  {
-    id: "promo-4",
-    code: "RIMMEL50K",
-    name: "Rimmel Rp50k Cashback",
-    description: "Rp50,000 cashback on Rimmel London products.",
-    usageType: "one-to-one",
-    maxUsage: 1000,
-    startDate: "2026-08-01",
-    endDate: "2026-08-31",
-    status: "inactive",
-    odooId: "PC-2026-004",
-    usages: [],
-  },
-  {
-    id: "promo-5",
-    code: "DGVIP25",
-    name: "D&G VIP 25% Off",
-    description: "Exclusive 25% discount for VIP customers of Dolce & Gabbana Beauty.",
-    usageType: "one-to-one",
-    maxUsage: 100,
-    startDate: "2026-07-01",
-    endDate: "2026-07-31",
-    status: "active",
-    odooId: "PC-2026-005",
-    usages: [
-      { sourceType: "broadcast", sourceName: "D&G VIP Exclusive", usedAt: "2026-07-02T11:00:00Z" },
-    ],
-  },
-  {
-    id: "promo-6",
-    code: "BIRTHDAY30",
-    name: "Birthday Special 30%",
-    description: "30% discount for customers celebrating their birthday this month.",
-    usageType: "one-to-many",
-    maxUsage: null,
-    startDate: "2026-01-01",
-    endDate: "2026-12-31",
-    status: "active",
-    odooId: "PC-2026-006",
-    usages: [
-      { sourceType: "template", sourceName: "Happy Birthday Template", usedAt: "2026-06-12T07:00:00Z" },
-      { sourceType: "template", sourceName: "Happy Birthday Template", usedAt: "2026-07-01T07:00:00Z" },
-    ],
-  },
-];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -176,13 +57,104 @@ function UsageTypeBadge({ type }: { type: "one-to-one" | "one-to-many" }) {
   );
 }
 
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+
+function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => void }) {
+  const [name, setName] = useState(promo.name);
+  const [description, setDescription] = useState(promo.description);
+  const [code, setCode] = useState(promo.code);
+  const [maxUsage, setMaxUsage] = useState(promo.maxUsage?.toString() ?? "");
+  const [startDate, setStartDate] = useState(promo.startDate);
+  const [endDate, setEndDate] = useState(promo.endDate);
+  const [status, setStatus] = useState<PromoStatus>(promo.status);
+  const [odooId, setOdooId] = useState(promo.odooId);
+
+  const inputCls = "h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40";
+  const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
+
+  const handleSave = () => {
+    if (!name.trim()) { toast.error("Promo Name is required"); return; }
+    promoStore.updatePromo(promo.id, {
+      name: name.trim(),
+      description: description.trim(),
+      code: code.trim().toUpperCase(),
+      maxUsage: maxUsage ? Number(maxUsage) : null,
+      startDate,
+      endDate,
+      status,
+      odooId: odooId.trim(),
+    });
+    toast.success("Promo code updated");
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 animate-fade-in">
+      <div className="w-full max-w-lg bg-background border border-border rounded-xl overflow-hidden shadow-2xl">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <div className="text-sm font-semibold">Edit Promo Code</div>
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div>
+            <label className={labelCls}>Code</label>
+            <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Promo Name</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none" />
+          </div>
+          <div>
+            <label className={labelCls}>Max Usage <span className="normal-case text-muted-foreground/60">(blank = unlimited)</span></label>
+            <input type="number" value={maxUsage} onChange={(e) => setMaxUsage(e.target.value)} min={1} className={inputCls} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Start Date</label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>End Date</label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputCls} />
+            </div>
+          </div>
+          <div>
+            <label className={labelCls}>Status</label>
+            <select value={status} onChange={(e) => setStatus(e.target.value as PromoStatus)} className={inputCls}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Odoo ID</label>
+            <input value={odooId} onChange={(e) => setOdooId(e.target.value)} className={inputCls} />
+          </div>
+        </div>
+        <div className="p-4 border-t border-border flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm hover:bg-gray-50 transition-colors">Cancel</button>
+          <button onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 function PromoDetailPage() {
   const { promoId } = useParams({ from: "/promo-codes/$promoId" });
   const navigate = useNavigate();
+  const { promos } = usePromoStore();
+  const [editing, setEditing] = useState(false);
 
-  const promo = MOCK_PROMOS.find((p) => p.id === promoId);
+  const promo = promos.find((p) => p.id === promoId);
 
   if (!promo) {
     return (
@@ -193,6 +165,13 @@ function PromoDetailPage() {
       </AppShell>
     );
   }
+
+  const handleDelete = () => {
+    if (!confirm(`Delete "${promo.name}"? This cannot be undone.`)) return;
+    promoStore.deletePromo(promo.id);
+    toast.success("Promo deleted");
+    navigate({ to: "/promo-codes" });
+  };
 
   return (
     <AppShell backTo="/promo-codes" title={promo.name}>
@@ -206,7 +185,7 @@ function PromoDetailPage() {
                   {promo.code}
                 </code>
               </div>
-              <div className="text-[11px] text-muted-foreground">Odoo: {promo.odooId}</div>
+              <div className="text-[11px] text-muted-foreground">Odoo: {promo.odooId || "—"}</div>
             </div>
             <div className="flex items-center gap-2">
               <StatusBadge status={promo.status} />
@@ -222,7 +201,7 @@ function PromoDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Period</div>
-              <div className="text-sm">{formatDate(promo.startDate)} — {formatDate(promo.endDate)}</div>
+              <div className="text-sm">{promo.startDate ? formatDate(promo.startDate) : "—"} — {promo.endDate ? formatDate(promo.endDate) : "—"}</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Max Usage</div>
@@ -230,7 +209,10 @@ function PromoDetailPage() {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Used</div>
-              <div className="text-sm font-semibold">{promo.usages.length}{promo.maxUsage ? <span className="font-normal text-muted-foreground"> / {promo.maxUsage}</span> : ""}</div>
+              <div className="text-sm font-semibold">
+                {promo.usages.length}
+                {promo.maxUsage ? <span className="font-normal text-muted-foreground"> / {promo.maxUsage}</span> : ""}
+              </div>
             </div>
           </div>
         </div>
@@ -261,30 +243,24 @@ function PromoDetailPage() {
           )}
         </div>
 
-        {/* Attached Templates */}
-        <div className="rounded-xl border border-border bg-card/40 p-5">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Attached Templates
-          </div>
-          <p className="text-[12px] text-muted-foreground italic">Template attachment management coming soon.</p>
-        </div>
-
         {/* Actions */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => toast.info("Edit promo (coming soon)")}
+            onClick={() => setEditing(true)}
             className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Edit
+            <Pencil className="h-3.5 w-3.5" /> Edit
           </button>
           <button
-            onClick={() => { toast.error("Promo deleted (coming soon)"); navigate({ to: "/promo-codes" }); }}
+            onClick={handleDelete}
             className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-sm text-destructive hover:bg-destructive/10 transition-colors"
           >
-            Delete
+            <Trash2 className="h-3.5 w-3.5" /> Delete
           </button>
         </div>
       </div>
+
+      {editing && <EditPromoModal promo={promo} onClose={() => setEditing(false)} />}
     </AppShell>
   );
 }
