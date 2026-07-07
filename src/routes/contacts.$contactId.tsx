@@ -340,10 +340,10 @@ function ContactDetailPage() {
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <Link to="/inbox" className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs font-medium hover:bg-card transition-colors">
+                <Link to="/inbox" className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-sm font-medium hover:bg-card transition-colors">
                   <ExternalLink className="h-3.5 w-3.5" /> See Inbox
                 </Link>
-                <button onClick={handleDelete} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10">
+                <button onClick={handleDelete} className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-sm text-destructive hover:bg-destructive/10 transition-colors">
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>
               </div>
