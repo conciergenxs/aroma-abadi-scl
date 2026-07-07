@@ -234,7 +234,7 @@ function TemplatesPage() {
                 </tr>
               </thead>
               <tbody className="stagger divide-y divide-border">
-                {filtered.map((t) => {
+                {paged.map((t) => {
                   const group = groups.find((g) => g.id === t.groupId);
                   const isStar = starred.includes(t.id);
                   const isSel = selected.includes(t.id);
