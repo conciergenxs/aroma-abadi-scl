@@ -2,6 +2,7 @@ import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { useBroadcastsStore, broadcastsStore } from "@/components/scl/broadcasts-store";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
+import { fmtNum } from "@/lib/fmt";
 import { Plus, Search, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -44,7 +45,7 @@ function BroadcastListPage() {
     const totalRead = sent.reduce((a, b) => a + b.read, 0);
     const scheduled = broadcasts.filter((b) => b.status === "Scheduled").length;
     return [
-      { l: "Total reach (30d)", v: totalReach.toLocaleString() },
+      { l: "Total reach (30d)", v: fmtNum(totalReach) },
       { l: "Delivery rate", v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—" },
       { l: "Read rate", v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—" },
       { l: "Scheduled", v: String(scheduled) },
@@ -210,10 +211,10 @@ function BroadcastListPage() {
                     <td className="px-4 py-3 text-[13px] font-medium">{b.name}</td>
                     <td className="px-4 py-3"><ChannelDot channel={b.channel} /></td>
                     <td className="px-4 py-3 text-[13px]">{b.audience}</td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.reach.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.delivered.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.read.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.clicks.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{fmtNum(b.reach)}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{fmtNum(b.delivered)}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{fmtNum(b.read)}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{fmtNum(b.clicks)}</td>
                     <td className="px-4 py-3 text-[13px] text-muted-foreground">{b.sentAt}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
