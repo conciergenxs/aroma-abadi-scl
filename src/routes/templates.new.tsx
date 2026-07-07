@@ -317,7 +317,7 @@ function CreateTemplatePage() {
                   {varPopup === "brands" && (
                     <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                       <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Pilih Brand</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Brand</span>
                         <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
                       </div>
                       <div className="max-h-44 overflow-y-auto py-1">
@@ -344,7 +344,7 @@ function CreateTemplatePage() {
                   {varPopup === "promo" && (
                     <div className="absolute top-full left-0 mt-1 w-60 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                       <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Pilih Promo Code</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Promo Code</span>
                         <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
                       </div>
                       <div className="max-h-44 overflow-y-auto py-1">
