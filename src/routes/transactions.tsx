@@ -300,7 +300,7 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: string; 
       <div className="h-9 w-9 rounded-md bg-primary/10 grid place-items-center"><Icon className="h-4 w-4 text-primary" /></div>
       <div className="min-w-0">
         <div className="text-[11px] text-muted-foreground">{label}</div>
-        <div className="text-base font-semibold mt-0.5 truncate">{value}</div>
+        <div className="text-[14px] font-semibold mt-0.5 truncate">{value}</div>
       </div>
     </div>
   );
