@@ -32,7 +32,7 @@ function NewPromoCodePage() {
   const [odooId, setOdooId] = useState("");
   const [attachedTemplates, setAttachedTemplates] = useState<string[]>([]);
 
-  const inputCls = "h-9 w-full rounded-md border border-border bg-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40";
+  const inputCls = "h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40";
   const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
 
   const toggleTemplate = (t: string) =>
@@ -104,7 +104,7 @@ function NewPromoCodePage() {
               onChange={(e) => setCodeFile(e.target.files?.[0] ?? null)}
             />
             {codeFile ? (
-              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-white text-sm">
+              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-gray-200 bg-white text-sm">
                 <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
                 <span className="flex-1 truncate text-foreground">{codeFile.name}</span>
                 <span className="text-[11px] text-muted-foreground shrink-0">{(codeFile.size / 1024).toFixed(1)} KB</span>
