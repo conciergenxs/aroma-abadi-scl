@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
-import { connectedChannels, templates, type Template } from "@/components/scl/mock-data";
-import { useContactsStore } from "@/components/scl/contacts-store";
+import { connectedChannels, type Template } from "@/components/scl/mock-data";
+import { useTemplatesStore } from "@/components/scl/templates-store";
+import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 
 // Promo codes registry (mirrors promo-codes page + new page data)
 const PROMO_REGISTRY: Record<string, { code: string; name: string; usageType: "one-to-one" | "one-to-many"; availableCodes: number }> = {
