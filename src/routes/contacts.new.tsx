@@ -70,7 +70,7 @@ function NewContactPage() {
     const id = `lb-${Date.now()}`;
     contactsStore.setLabels((l) => [...l, { id, name: trimmed, color }]);
     setLabelIds((ids) => [...ids, id]);
-    toast.success(`Label "${trimmed}" dibuat`);
+    toast.success(`Label "${trimmed}" created`);
   };
 
   const submitBA = () => {
@@ -113,7 +113,7 @@ function NewContactPage() {
       position,
     });
 
-    toast.success("BA Contact berhasil dibuat");
+    toast.success("BA Contact created successfully");
     navigate({ to: "/contacts/$contactId", params: { contactId: contact.id } });
   };
 
@@ -143,7 +143,7 @@ function NewContactPage() {
       if (l) contactsStore.addActivity(contact.id, "label_added", `Added label "${l.name}"`);
     });
 
-    toast.success("Customer Contact berhasil dibuat");
+    toast.success("Customer Contact created successfully");
     navigate({ to: "/contacts/$contactId", params: { contactId: contact.id } });
   };
 
@@ -157,7 +157,7 @@ function NewContactPage() {
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
                 <h2 className="text-lg font-semibold">Select Contact Type</h2>
-                <p className="text-sm text-muted-foreground mt-1">Form yang muncul akan disesuaikan berdasarkan tipe yang dipilih.</p>
+                <p className="text-sm text-muted-foreground mt-1">The form will adapt based on the selected type.</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {/* Customer */}
@@ -171,7 +171,7 @@ function NewContactPage() {
                   </div>
                   <div className="text-center">
                     <div className="text-sm font-semibold">Customer</div>
-                    <div className="text-[11px] text-muted-foreground mt-1">Pelanggan yang membeli produk Aroma Abadi</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">Customer who purchases Aroma Abadi products</div>
                   </div>
                   <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
                 </button>
@@ -187,7 +187,7 @@ function NewContactPage() {
                   </div>
                   <div className="text-center">
                     <div className="text-sm font-semibold">Beauty Ambassador</div>
-                    <div className="text-[11px] text-muted-foreground mt-1">BA yang menjual dan mempromosikan produk di store</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">BA who sells and promotes products in-store</div>
                   </div>
                   <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
                 </button>
