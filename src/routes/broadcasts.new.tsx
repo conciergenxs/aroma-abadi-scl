@@ -53,6 +53,7 @@ type Condition = {
 function CreateBroadcastPage() {
   const navigate = useNavigate();
   const { lists, properties } = useContactsStore();
+  const { templates } = useTemplatesStore();
 
   // Section 1
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
