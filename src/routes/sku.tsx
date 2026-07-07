@@ -354,7 +354,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
 }
 
 /* 3-dot action menu for each SKU row */
-function SkuMenu({ onDetails, onEdit, onDelete }: { onDetails: () => void; onEdit: () => void; onDelete: () => void }) {
+function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -376,10 +376,6 @@ function SkuMenu({ onDetails, onEdit, onDelete }: { onDetails: () => void; onEdi
           <button onClick={() => { onDetails(); setOpen(false); }}
             className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground">
             <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
-          </button>
-          <button onClick={() => { onEdit(); setOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground">
-            <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
           </button>
           <div className="my-1 border-t border-border" />
           <button onClick={() => { onDelete(); setOpen(false); }}
