@@ -644,7 +644,7 @@ function TemplateDetailModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-border">
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold tracking-tight truncate">
+            <h2 className="text-[14px] font-semibold tracking-tight truncate">
               {template.name}
             </h2>
             <div className="flex flex-wrap items-center gap-2 mt-2">

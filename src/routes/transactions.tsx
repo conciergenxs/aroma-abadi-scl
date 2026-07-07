@@ -325,7 +325,7 @@ function TxDrawer({ tx, onClose, navigate }: { tx: Transaction; onClose: () => v
         <div className="p-5 border-b border-border flex items-start justify-between gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
-            <div className="text-base font-semibold">{tx.invoice}</div>
+            <div className="text-[14px] font-semibold">{tx.invoice}</div>
             <div className="text-[11px] text-muted-foreground mt-1">{new Date(tx.date).toLocaleString("id-ID")}</div>
           </div>
           <button onClick={onClose} className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors">
