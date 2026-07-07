@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
+import { fmtDateID, fmtNum } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import {

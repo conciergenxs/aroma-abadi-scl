@@ -21,7 +21,7 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-mut
 
 function formatDate(iso: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return fmtDateEN(iso);
 }
 
 function StatusBadge({ status }: { status: PromoStatus }) {
