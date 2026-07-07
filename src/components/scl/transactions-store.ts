@@ -74,7 +74,7 @@ function seed(): Transaction[] {
     const lineCount = 1 + (i % 3);
     const lines: TxLine[] = [];
     let total = 0;
-    let brand = skus[0].brand;
+    const brandSet = new Set<string>();
     for (let l = 0; l < lineCount; l++) {
       // Pick SKU from this customer's allowed brand SKUs
       const allowedIdx = cust.skuIndices[(i + l) % cust.skuIndices.length];
@@ -82,8 +82,9 @@ function seed(): Transaction[] {
       const qty = 1 + ((i + l) % 2);
       lines.push({ skuId: sku.skuId, skuCode: sku.skuCode, skuName: sku.skuName, qty, unitPrice: sku.price });
       total += sku.price * qty;
-      brand = sku.brand;
+      brandSet.add(sku.brand);
     }
+    const brandNames = Array.from(brandSet);
     items.push({
       id: `tx-${1000 + i}`,
       invoice: `AA-${String(82200 + i).padStart(5, "0")}`,
@@ -93,7 +94,8 @@ function seed(): Transaction[] {
       baName: ba,
       store: s.store,
       city: s.city,
-      brandName: brand,
+      brandName: brandNames[0],
+      brandNames,
       items: lines,
       total,
       paymentMethod: payments[i % payments.length],
