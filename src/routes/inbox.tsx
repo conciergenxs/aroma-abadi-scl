@@ -920,14 +920,14 @@ function InboxPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={exitForwardMode}
-                    className="h-8 px-3 rounded-md border border-border bg-card/60 text-xs hover:bg-gray-50"
+                    className="h-9 px-3 rounded-md border border-border bg-card/60 text-sm hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={openForwardModal}
                     disabled={selectedMsgIds.size === 0}
-                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ForwardIcon className="h-3.5 w-3.5" /> Forward
                   </button>
