@@ -180,7 +180,6 @@ function CreateTemplatePage() {
       body: body.trim(),
       groupId: groupId === "none" ? undefined : groupId,
       language,
-      promoCodeId: selectedPromoId === "none" ? undefined : selectedPromoId,
     });
     toast.success(kind === "draft" ? "Draft saved" : "Template submitted for review");
     navigate({ to: "/templates" });
