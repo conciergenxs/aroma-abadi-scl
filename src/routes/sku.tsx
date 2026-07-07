@@ -263,6 +263,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
 function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackToBrands }: {
   brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onAddSku: () => void; onEditSku: (sku: SKU) => void;
 }) {
+  const navigate = useNavigate();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
