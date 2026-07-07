@@ -418,11 +418,11 @@ function CreateBroadcastPage() {
       <TemplatePicker
         open={templatePickerOpen}
         onClose={() => setTemplatePickerOpen(false)}
-        onInsert={(body) => {
-          // Map body back to a template if matches; otherwise create a synthetic selection
-          const match = templates.find((t) => t.body === body);
-          if (match) setTemplateId(match.id);
-          else {
+        onInsert={(body, tpl) => {
+          if (tpl) {
+            setTemplateId(tpl.id);
+            setContentMode("template");
+          } else {
             setContentMode("manual");
             setManualBody(body);
           }
