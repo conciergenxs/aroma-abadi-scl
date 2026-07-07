@@ -885,15 +885,15 @@ function RightPanel({
             return brand ? (
               <span
                 key={bid}
-                className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
               >
                 {brand.name}
                 <button
                   onClick={() => onToggleBrand(bid)}
-                  className="ml-0.5 h-3 w-3 rounded-full grid place-items-center hover:bg-primary/20 text-primary/60 hover:text-primary"
+                  className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full hover:bg-primary/20 text-primary/60 hover:text-primary transition-colors"
                   aria-label={`Remove ${brand.name}`}
                 >
-                  ×
+                  <X className="h-2.5 w-2.5" />
                 </button>
               </span>
             ) : null;
