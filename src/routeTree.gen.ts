@@ -55,6 +55,11 @@ const SkuRoute = SkuRouteImport.update({
   path: '/sku',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
+  id: '/sku/$skuId',
+  path: '/sku/$skuId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -138,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
+  '/sku/$skuId': typeof SkuSkuIdRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
