@@ -228,7 +228,7 @@ function NewContactPage() {
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-2xl mx-auto">
-              <div className="rounded-xl border border-border bg-white divide-y divide-border">
+              <div className="rounded-xl border border-gray-200 bg-white divide-y divide-border">
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Nama Lengkap" required>
@@ -319,7 +319,7 @@ function NewContactPage() {
 
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-xl border border-border bg-white divide-y divide-border">
+            <div className="rounded-xl border border-gray-200 bg-white divide-y divide-border">
               <FormSection title="Informasi Dasar">
                 <FormGrid>
                   <Field label="Nama Lengkap" required>
@@ -457,7 +457,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
           const l = labels.find((x) => x.id === id);
           if (!l) return null;
           return (
-            <span key={id} className="inline-flex items-center gap-1 rounded border border-border bg-white px-1.5 py-0.5 text-[10px]">
+            <span key={id} className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]">
               <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
               {l.name}
               <span role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); onToggle(id); }} className="text-muted-foreground hover:text-foreground">
