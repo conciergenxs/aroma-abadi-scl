@@ -471,6 +471,70 @@ function InlineText({
 
 /* ============================== TABS ============================== */
 
+const LIFECYCLE_STAGES: LifecycleStage[] = ["New Lead","Contacted","Qualified","Pending Payment","Customer","Lost","No Reply"];
+
+function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; onChange: (s: LifecycleStage | null) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const style = value ? getStageStyle(value) : null;
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
+          style
+            ? `${style.bg} ${style.text} ${style.border}`
+            : "border-border text-muted-foreground hover:border-foreground/30"
+        }`}
+      >
+        {value ?? "Set stage"}
+        <ChevronDown className="h-3 w-3 opacity-60" />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-30 min-w-[160px] rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
+          {LIFECYCLE_STAGES.map((s) => {
+            const st = getStageStyle(s);
+            const active = value === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => { onChange(active ? null : s); setOpen(false); }}
+                className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-left hover:bg-gray-50 transition-colors ${active ? "font-semibold" : ""}`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+                {s}
+                {active && <Check className="h-3 w-3 ml-auto text-primary" />}
+              </button>
+            );
+          })}
+          {value && (
+            <>
+              <div className="my-1 border-t border-border" />
+              <button
+                type="button"
+                onClick={() => { onChange(null); setOpen(false); }}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-left text-muted-foreground hover:bg-gray-50 hover:text-destructive transition-colors"
+              >
+                <X className="h-3 w-3" /> Clear stage
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TabButton({
   active,
   onClick,
