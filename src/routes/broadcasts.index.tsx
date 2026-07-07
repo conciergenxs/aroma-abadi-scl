@@ -200,14 +200,14 @@ function BroadcastListPage() {
                         aria-label={`Select ${b.name}`}
                       />
                     </td>
-                    <td className="px-4 py-3 font-medium">{b.name}</td>
+                    <td className="px-4 py-3 text-[13px] font-medium">{b.name}</td>
                     <td className="px-4 py-3"><ChannelDot channel={b.channel} /></td>
-                    <td className="px-4 py-3">{b.audience}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{b.reach.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{b.delivered.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{b.read.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{b.clicks.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{b.sentAt}</td>
+                    <td className="px-4 py-3 text-[13px]">{b.audience}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.reach.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.delivered.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.read.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">{b.clicks.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[13px] text-muted-foreground">{b.sentAt}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
                         b.status === "Sent" ? "border-emerald-700 bg-emerald-600 text-white" :
