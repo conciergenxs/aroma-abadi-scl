@@ -125,6 +125,24 @@ function CreateBroadcastPage() {
     return { listNames, conditionCount: conditions.length };
   }, [lists, selectedLists, conditions]);
 
+  // Promo code validation
+  const promoValidation = useMemo(() => {
+    if (contentMode !== "template" || !template?.promoCodeId) return null;
+    const promo = PROMO_REGISTRY[template.promoCodeId];
+    if (!promo || promo.usageType !== "one-to-one") return null;
+    // Count unique contacts across selected lists
+    const allContacts = contactsStore.state.contacts;
+    const contactIds = new Set<string>();
+    allContacts.forEach(c => {
+      if (c.listIds.some(lid => selectedLists.has(lid))) contactIds.add(c.id);
+    });
+    const audienceCount = contactIds.size;
+    const available = promo.availableCodes;
+    if (audienceCount === 0) return null;
+    const ok = available >= audienceCount;
+    return { promo, audienceCount, available, ok };
+  }, [contentMode, template, selectedLists]);
+
   return (
     <AppShell backTo="/broadcasts">
       <div className="mb-8">
