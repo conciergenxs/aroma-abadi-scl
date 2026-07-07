@@ -32,6 +32,8 @@ import {
   Star,
   FolderPlus,
   FolderMinus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
