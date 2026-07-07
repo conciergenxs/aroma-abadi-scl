@@ -333,8 +333,8 @@ function InboxPage() {
     return conversations.filter((c) => {
       const ct = contacts.find((x) => x.id === c.contactId);
       if (!ct) return false;
-      // Single active primary filter
-      if (activeFilter.kind === "view") {
+      // Single active primary filter — skip inbox-view check when filtering by label
+      if (!labelFilter && activeFilter.kind === "view") {
         const v = activeFilter.value;
         // "all" = show everything, "my" = consumer (non-BA), "ba" = BA inbox
         if (v === "my" && ct.labelIds.includes("lb-ba")) return false;
