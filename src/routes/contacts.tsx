@@ -400,42 +400,95 @@ function ContactsPage() {
       {audienceModalId && (() => {
         const aud = lists.find(l => l.id === audienceModalId);
         if (!aud) return null;
-        const nonBA = contacts.filter(c => !c.labelIds.includes("lb-ba"));
+        const q = audienceSearch.toLowerCase();
+        const nonBA = contacts.filter(c => !c.labelIds.includes("lb-ba") && (
+          !q || c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)
+        ));
+        const inAudCount = contacts.filter(c => c.listIds.includes(audienceModalId)).length;
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setAudienceModalId(null)} />
-            <div className="relative w-full max-w-md rounded-xl border border-border bg-background shadow-2xl p-5 space-y-4">
+            <div className="absolute inset-0 bg-black/50" onClick={() => { setAudienceModalId(null); setInfoContact(null); }} />
+            <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-2xl p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-semibold">{aud.name}</h2>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Select contacts to include in this audience</p>
                 </div>
-                <button onClick={() => setAudienceModalId(null)} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="max-h-72 overflow-y-auto space-y-1 border border-border rounded-lg p-2 bg-[oklch(0.17_0_0)]">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  value={audienceSearch}
+                  onChange={e => setAudienceSearch(e.target.value)}
+                  placeholder="Search by name or phone..."
+                  className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                />
+              </div>
+              {/* Contact list */}
+              <div className="max-h-64 overflow-y-auto space-y-0.5 border border-border rounded-lg bg-background">
+                {nonBA.length === 0 && (
+                  <div className="px-3 py-6 text-center text-xs text-muted-foreground">No contacts found</div>
+                )}
                 {nonBA.map(c => {
                   const inList = c.listIds.includes(audienceModalId);
                   return (
-                    <button key={c.id} type="button"
-                      onClick={() => {
-                        setContacts(cs => cs.map(x => x.id === c.id
-                          ? { ...x, listIds: inList ? x.listIds.filter(id => id !== audienceModalId) : [...x.listIds, audienceModalId] }
-                          : x));
-                      }}
-                      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded text-[12px] transition-colors ${inList ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"}`}
-                    >
-                      <span className="h-6 w-6 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[9px] font-medium shrink-0">{c.avatar}</span>
-                      <span className="flex-1 text-left truncate">{c.name}</span>
-                      {inList && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
-                    </button>
+                    <div key={c.id} className={`flex items-center gap-2.5 px-2.5 py-2 transition-colors ${inList ? "bg-primary/8" : ""}`}>
+                      <button type="button"
+                        onClick={() => setContacts(cs => cs.map(x => x.id === c.id
+                          ? { ...x, listIds: inList ? x.listIds.filter(id => id !== audienceModalId) : [...x.listIds, audienceModalId!] }
+                          : x))}
+                        className={`flex items-center gap-2.5 flex-1 min-w-0 text-left text-[12px] ${inList ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        <span className={`h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 border ${inList ? "bg-primary/20 border-primary/40 text-primary" : "bg-muted border-border"}`}>{c.avatar}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{c.name}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">{c.phone}</div>
+                        </div>
+                        {inList && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setInfoContact(infoContact?.id === c.id ? null : c)}
+                        className={`h-6 w-6 grid place-items-center rounded shrink-0 transition-colors ${infoContact?.id === c.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                        title="Contact info"
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   );
                 })}
               </div>
+              {/* Inline contact info panel */}
+              {infoContact && (
+                <div className="rounded-lg border border-border bg-background p-3 space-y-2 text-[12px]">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <span className="h-7 w-7 rounded-full bg-muted border border-border flex items-center justify-center text-[10px] font-semibold">{infoContact.avatar}</span>
+                    {infoContact.name}
+                    {infoContact.lifecycleStage && (
+                      <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">{infoContact.lifecycleStage}</span>
+                    )}
+                  </div>
+                  <div className="space-y-1 text-muted-foreground">
+                    <div className="flex items-center gap-2"><Phone className="h-3 w-3 shrink-0" />{infoContact.phone}</div>
+                    {infoContact.email && <div className="flex items-center gap-2"><Mail className="h-3 w-3 shrink-0" />{infoContact.email}</div>}
+                    {infoContact.labelIds.length > 0 && (
+                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                        {infoContact.labelIds.map(lid => {
+                          const lbl = labels.find(l => l.id === lid);
+                          return lbl ? <span key={lid} className={`text-[10px] px-1.5 py-0.5 rounded-full border ${labelColorClass[lbl.color]}`}>{lbl.name}</span> : null;
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{contacts.filter(c => c.listIds.includes(audienceModalId)).length} contact{contacts.filter(c => c.listIds.includes(audienceModalId)).length !== 1 ? "s" : ""} in this audience</span>
-                <button onClick={() => setAudienceModalId(null)} className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90">Done</button>
+                <span>{inAudCount} contact{inAudCount !== 1 ? "s" : ""} in this audience</span>
+                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90">Done</button>
               </div>
             </div>
           </div>
