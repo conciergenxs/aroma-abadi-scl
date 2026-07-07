@@ -267,6 +267,7 @@ export interface FileRouteTypes {
     | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
+    | '/sku/$skuId'
     | '/sku-detail/$skuId'
     | '/transactions'
     | '/broadcasts/$broadcastId'
@@ -291,6 +292,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SkuRoute: typeof SkuRoute
   SkuSkuIdRoute: typeof SkuSkuIdRoute
+  SkuDetailSkuIdRoute: typeof SkuDetailSkuIdRoute
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
