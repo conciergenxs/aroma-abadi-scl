@@ -256,6 +256,7 @@ export interface FileRouteTypes {
     | '/promo-codes/$promoId'
     | '/settings'
     | '/sku'
+    | '/sku/$skuId'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
