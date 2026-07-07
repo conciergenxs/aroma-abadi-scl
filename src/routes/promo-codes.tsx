@@ -21,30 +21,6 @@ export const Route = createFileRoute("/promo-codes")({
   component: PromoCodesPage,
 });
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type PromoStatus = "active" | "expired" | "inactive";
-
-type PromoUsage = {
-  sourceType: "template" | "broadcast";
-  sourceName: string;
-  usedAt: string;
-};
-
-type PromoCode = {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  usageType: "one-to-one" | "one-to-many";
-  maxUsage: number | null;
-  startDate: string;
-  endDate: string;
-  status: PromoStatus;
-  usages: PromoUsage[];
-  odooId: string;
-};
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string) {
