@@ -164,7 +164,7 @@ function NewContactPage() {
                 <button
                   type="button"
                   onClick={() => setContactType("customer")}
-                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-[oklch(0.17_0_0)] p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] transition-all duration-150"
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-[oklch(0.97_0_0)] p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] transition-all duration-150"
                 >
                   <div className="h-14 w-14 rounded-full bg-sky-600/15 border border-sky-600/30 grid place-items-center group-hover:bg-sky-600/20 transition-colors">
                     <User className="h-6 w-6 text-sky-400" />
@@ -180,7 +180,7 @@ function NewContactPage() {
                 <button
                   type="button"
                   onClick={() => setContactType("ba")}
-                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-[oklch(0.17_0_0)] p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] transition-all duration-150"
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-[oklch(0.97_0_0)] p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] transition-all duration-150"
                 >
                   <div className="h-14 w-14 rounded-full bg-violet-600/15 border border-violet-600/30 grid place-items-center group-hover:bg-violet-600/20 transition-colors">
                     <BadgeCheck className="h-6 w-6 text-violet-400" />
@@ -228,7 +228,7 @@ function NewContactPage() {
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-2xl mx-auto">
-              <div className="rounded-xl border border-border bg-[oklch(0.17_0_0)] divide-y divide-border">
+              <div className="rounded-xl border border-border bg-[oklch(0.97_0_0)] divide-y divide-border">
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Nama Lengkap" required>
@@ -257,7 +257,7 @@ function NewContactPage() {
                             type="button"
                             key={b.id}
                             onClick={() => toggleBrand(b.id, brandIds, setBrandIds)}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-white/10 bg-[oklch(0.17_0_0)] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-white/10 bg-[oklch(0.97_0_0)] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"}`}
                           >
                             {on && <Check className="h-3 w-3 text-primary" />}
                             {b.name}
@@ -319,7 +319,7 @@ function NewContactPage() {
 
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-xl border border-border bg-[oklch(0.17_0_0)] divide-y divide-border">
+            <div className="rounded-xl border border-border bg-[oklch(0.97_0_0)] divide-y divide-border">
               <FormSection title="Informasi Dasar">
                 <FormGrid>
                   <Field label="Nama Lengkap" required>
@@ -348,7 +348,7 @@ function NewContactPage() {
                           type="button"
                           key={b.id}
                           onClick={() => toggleBrand(b.id, customerBrandIds, setCustomerBrandIds)}
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-white/10 bg-[oklch(0.17_0_0)] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-white/10 bg-[oklch(0.97_0_0)] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"}`}
                         >
                           {on && <Check className="h-3 w-3 text-primary" />}
                           {b.name}
@@ -408,7 +408,7 @@ function Input({ value, onChange, placeholder, type = "text" }: { value: string;
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="h-9 w-full rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2.5 text-xs text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
+      className="h-9 w-full rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2.5 text-xs text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors"
     />
   );
 }
@@ -419,7 +419,7 @@ function SimpleSelect({ value, onChange, options, disabled }: { value: string; o
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className="h-9 w-full rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors disabled:opacity-50"
+      className="h-9 w-full rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-white/[0.06] transition-colors disabled:opacity-50"
     >
       {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -450,14 +450,14 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 py-1.5 text-xs hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors"
+        className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 py-1.5 text-xs hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors"
       >
         {selectedIds.length === 0 && <span className="text-muted-foreground">Select labels…</span>}
         {selectedIds.map((id) => {
           const l = labels.find((x) => x.id === id);
           if (!l) return null;
           return (
-            <span key={id} className="inline-flex items-center gap-1 rounded border border-border bg-[oklch(0.17_0_0)] px-1.5 py-0.5 text-[10px]">
+            <span key={id} className="inline-flex items-center gap-1 rounded border border-border bg-[oklch(0.97_0_0)] px-1.5 py-0.5 text-[10px]">
               <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
               {l.name}
               <span role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); onToggle(id); }} className="text-muted-foreground hover:text-foreground">
@@ -471,7 +471,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
       {open && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
-            <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }} placeholder="Cari atau buat label…" className="h-7 w-full rounded border border-white/10 bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
+            <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }} placeholder="Cari atau buat label…" className="h-7 w-full rounded border border-white/10 bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
           </div>
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.map((l) => {

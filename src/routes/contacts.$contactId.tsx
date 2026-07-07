@@ -364,7 +364,7 @@ function ContactDetailPage() {
                       type="date"
                       value={dateFrom}
                       onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-[11px] focus:outline-none"
+                      className="h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-[11px] focus:outline-none"
                       title="From date"
                     />
                     <span className="text-[10px] text-muted-foreground">—</span>
@@ -372,7 +372,7 @@ function ContactDetailPage() {
                       type="date"
                       value={dateTo}
                       onChange={(e) => setDateTo(e.target.value)}
-                      className="h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-[11px] focus:outline-none"
+                      className="h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-[11px] focus:outline-none"
                       title="To date"
                     />
                     {(dateFrom || dateTo) && (
@@ -458,7 +458,7 @@ function InlineText({
           if (e.key === "Escape") { setDraft(value); setEditing(false); }
         }}
         placeholder={placeholder}
-        className={`w-full rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 ${className}`}
+        className={`w-full rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 ${className}`}
       />
     );
   }
@@ -466,7 +466,7 @@ function InlineText({
     <button
       type="button"
       onClick={() => setEditing(true)}
-      className={`w-full text-left truncate rounded-md px-2 py-1 border border-transparent hover:bg-[oklch(0.17_0_0)] hover:border-white/10 ${className}`}
+      className={`w-full text-left truncate rounded-md px-2 py-1 border border-transparent hover:bg-[oklch(0.97_0_0)] hover:border-white/10 ${className}`}
     >
       {value || <span className="text-muted-foreground">{placeholder ?? "—"}</span>}
     </button>
@@ -560,7 +560,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
-        <div className="h-12 w-12 rounded-full bg-[oklch(0.17_0_0)] border border-border grid place-items-center">
+        <div className="h-12 w-12 rounded-full bg-[oklch(0.97_0_0)] border border-border grid place-items-center">
           <ShoppingBag className="h-5 w-5 text-muted-foreground" />
         </div>
         <div className="text-sm text-foreground">No transactions yet.</div>
@@ -644,7 +644,7 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
       <div className="rounded-lg border border-border overflow-hidden">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-[oklch(0.17_0_0)]">
+            <tr className="border-b border-border bg-[oklch(0.97_0_0)]">
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Invoice</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Date</th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Brand</th>
@@ -855,7 +855,7 @@ function RightPanel({
               <button
                 key={b.id}
                 onClick={() => onToggleBrand(b.id)}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-[oklch(0.17_0_0)] px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-[oklch(0.97_0_0)] px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors"
               >
                 + {b.name}
               </button>
@@ -906,7 +906,7 @@ function PropertyField({
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
-  const inputCls = "h-8 w-full rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30";
+  const inputCls = "h-8 w-full rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30";
   return (
     <div>
       <div className="text-[10px] text-muted-foreground mb-1">{property.name}</div>
@@ -965,7 +965,7 @@ function PropertyField({
                       className={`rounded-md border px-1.5 py-0.5 text-[10px] ${
                         on
                           ? "border-primary/60 bg-primary/15 text-foreground"
-                          : "border-white/10 bg-[oklch(0.17_0_0)] text-muted-foreground hover:text-foreground"
+                          : "border-white/10 bg-[oklch(0.97_0_0)] text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {o}
@@ -1045,7 +1045,7 @@ function DraftTextarea({
         if (e.key === "Escape") { setDraft(value); (e.target as HTMLTextAreaElement).blur(); }
       }}
       rows={2}
-      className="w-full rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
+      className="w-full rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
     />
   );
 }
@@ -1102,7 +1102,7 @@ function LabelSelector({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-white/[0.06]"
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-white/[0.06]"
       >
         <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add label</span>
         <ChevronDown className="h-3 w-3" />
@@ -1116,7 +1116,7 @@ function LabelSelector({
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }}
               placeholder="Search or create label…"
-              className="h-7 w-full rounded border border-white/10 bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+              className="h-7 w-full rounded border border-white/10 bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
           </div>
           <div className="max-h-56 overflow-y-auto p-1">
@@ -1192,7 +1192,7 @@ function ListSelector({
         {selected.map((l) => (
           <span
             key={l.id}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-[oklch(0.17_0_0)] px-1.5 py-0.5 text-[10px] text-foreground/80"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-[oklch(0.97_0_0)] px-1.5 py-0.5 text-[10px] text-foreground/80"
           >
             <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
             {l.name}
@@ -1205,7 +1205,7 @@ function ListSelector({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-[oklch(0.17_0_0)] px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-white/[0.06]"
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-[oklch(0.97_0_0)] px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-white/[0.06]"
       >
         <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add to list</span>
         <ChevronDown className="h-3 w-3" />
@@ -1219,7 +1219,7 @@ function ListSelector({
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }}
               placeholder="Search or create list…"
-              className="h-7 w-full rounded border border-white/10 bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+              className="h-7 w-full rounded border border-white/10 bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
           </div>
           <div className="max-h-56 overflow-y-auto p-1">

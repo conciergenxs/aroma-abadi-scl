@@ -617,12 +617,12 @@ function InboxPage() {
                   value={newLabelName}
                   onChange={(e) => setNewLabelName(e.target.value)}
                   placeholder="Label name..."
-                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none"
                 />
                 <select
                   value={newLabelColor}
                   onChange={(e) => setNewLabelColor(e.target.value as import("@/components/scl/mock-data").LabelColor)}
-                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none"
                 >
                   {(["indigo","pink","emerald","amber","sky","violet","slate"] as const).map((c) => (
                     <option key={c} value={c}>{c}</option>

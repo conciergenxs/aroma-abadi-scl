@@ -268,7 +268,7 @@ function ContactsPage() {
                   value={newAudienceName}
                   onChange={(e) => setNewAudienceName(e.target.value)}
                   placeholder="Audience name..."
-                  className="w-full h-7 rounded border border-border bg-[oklch(0.17_0_0)] px-2 text-xs focus:outline-none"
+                  className="w-full h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && newAudienceName.trim()) {
                       setLists((l) => [...l, { id: `ls-${Date.now()}`, name: newAudienceName.trim() }]);
