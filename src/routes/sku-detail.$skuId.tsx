@@ -304,13 +304,13 @@ function SkuDetailPage() {
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
                     {Array.from({length:totalPages},(_,i)=>i+1).filter(p=> p===1||p===totalPages||Math.abs(p-page)<=1).map((p,idx,arr)=>(
-                      <>
-                        {idx>0 && arr[idx-1]!==p-1 && <span key={`e${p}`} className="px-1">…</span>}
-                        <button key={p} type="button" onClick={()=>setPage(p)}
+                      <Fragment key={p}>
+                        {idx>0 && arr[idx-1]!==p-1 && <span className="px-1 text-muted-foreground">…</span>}
+                        <button type="button" onClick={()=>setPage(p)}
                           className={`h-7 w-7 rounded border text-[11px] ${p===page?"border-primary/40 bg-primary/15 text-foreground":"border-gray-200 bg-white hover:bg-gray-50"}`}>
                           {p}
                         </button>
-                      </>
+                      </Fragment>
                     ))}
                     <button type="button" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page>=totalPages}
                       className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50">
