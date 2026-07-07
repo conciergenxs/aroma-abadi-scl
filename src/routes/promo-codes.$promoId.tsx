@@ -21,7 +21,7 @@ export const Route = createFileRoute("/promo-codes/$promoId")({
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+  return fmtDateID(iso);
 }
 
 function StatusBadge({ status }: { status: PromoStatus }) {
