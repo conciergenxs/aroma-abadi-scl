@@ -40,7 +40,7 @@ function SkuPage() {
   );
 
   return (
-    <AppShell title="SKU & Knowledge" subtitle="Kelola brand, kategori, SKU, dan knowledge card produk Aroma Abadi.">
+    <AppShell title="SKU & Knowledge" subtitle="Manage brands, categories, SKUs, and knowledge cards for Aroma Abadi products.">
       {view.kind === "brands" && (
         <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
       )}
@@ -97,7 +97,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Brands</div>
-          <div className="text-sm text-muted-foreground">Klik brand untuk melihat kategori dan SKU.</div>
+          <div className="text-sm text-muted-foreground">Click a brand to view its categories and SKUs.</div>
         </div>
         <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
           <Plus className="h-4 w-4" /> Add New Brand
@@ -132,7 +132,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
           );
         })}
         {visible.length === 0 && (
-          <div className="col-span-full text-center py-10 text-sm text-muted-foreground">Belum ada brand.</div>
+          <div className="col-span-full text-center py-10 text-sm text-muted-foreground">No brands yet.</div>
         )}
       </div>
       {brands.length > 0 && (
@@ -148,7 +148,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Prev
             </button>
-            <span className="px-2 text-muted-foreground">Hal. {safePage + 1} / {totalPages}</span>
+            <span className="px-2 text-muted-foreground">Page {safePage + 1} / {totalPages}</span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
@@ -233,7 +233,7 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
               </li>
             ))}
             {brand.categories.length === 0 && (
-              <li className="text-center py-6 text-sm text-muted-foreground">Belum ada category.</li>
+              <li className="text-center py-6 text-sm text-muted-foreground">No categories yet.</li>
             )}
           </ul>
         </SectionCard>
@@ -304,7 +304,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
         <div className="flex-1 min-w-0">
           <SectionCard
             title="SKUs"
-            description="Pilih SKU dari database atau tambah baru."
+            description="Select SKUs from the database or add new ones."
             action={<SkuSearchSelect brandId={brand.id} categoryId={category.id} onSelect={onEditSku} onAdd={onAddSku} />}
           >
             <ul className="divide-y divide-border">
@@ -344,7 +344,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                   </Accordion>
                 </li>
               ))}
-              {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">Belum ada SKU. Gunakan tombol di atas untuk menambah.</li>}
+              {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No SKUs yet. Use the button above to add.</li>}
             </ul>
           </SectionCard>
         </div>
@@ -419,7 +419,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
         onClick={() => setOpen((v) => !v)}
         className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium hover:opacity-90"
       >
-        <Plus className="h-3.5 w-3.5" /> Tambah SKU
+        <Plus className="h-3.5 w-3.5" /> Add SKU
       </button>
       {open && (
         <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden">
@@ -483,7 +483,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
             </div>
           </div>
         ))}
-        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">Belum ada knowledge card.</div>}
+        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>}
       </div>
       {showForm && (
         <KnowledgeCardForm
@@ -519,7 +519,7 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
       <form onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; onSubmit({ title, text, coverUrl: coverUrl || undefined }); }} className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">{initial ? "Edit Knowledge Card" : "Tambah Knowledge Card"}</div>
+          <div className="text-sm font-semibold">{initial ? "Edit Knowledge Card" : "Add Knowledge Card"}</div>
           <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
         </div>
         <div className="p-4 space-y-3">
@@ -543,7 +543,7 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Simpan</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Save</button>
         </div>
       </form>
     </div>
@@ -591,7 +591,7 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Tambah Brand</button>
+          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium">Add Brand</button>
         </div>
       </form>
     </div>
