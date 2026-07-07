@@ -395,6 +395,50 @@ function ContactsPage() {
           onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
         />
       )}
+      {audienceModalId && (() => {
+        const aud = lists.find(l => l.id === audienceModalId);
+        if (!aud) return null;
+        const nonBA = contacts.filter(c => !c.labelIds.includes("lb-ba"));
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setAudienceModalId(null)} />
+            <div className="relative w-full max-w-md rounded-xl border border-border bg-background shadow-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold">{aud.name}</h2>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Select contacts to include in this audience</p>
+                </div>
+                <button onClick={() => setAudienceModalId(null)} className="h-7 w-7 grid place-items-center rounded hover:bg-white/[0.05] text-muted-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="max-h-72 overflow-y-auto space-y-1 border border-border rounded-lg p-2 bg-[oklch(0.17_0_0)]">
+                {nonBA.map(c => {
+                  const inList = c.listIds.includes(audienceModalId);
+                  return (
+                    <button key={c.id} type="button"
+                      onClick={() => {
+                        setContacts(cs => cs.map(x => x.id === c.id
+                          ? { ...x, listIds: inList ? x.listIds.filter(id => id !== audienceModalId) : [...x.listIds, audienceModalId] }
+                          : x));
+                      }}
+                      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded text-[12px] transition-colors ${inList ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"}`}
+                    >
+                      <span className="h-6 w-6 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[9px] font-medium shrink-0">{c.avatar}</span>
+                      <span className="flex-1 text-left truncate">{c.name}</span>
+                      {inList && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>{contacts.filter(c => c.listIds.includes(audienceModalId)).length} contact{contacts.filter(c => c.listIds.includes(audienceModalId)).length !== 1 ? "s" : ""} in this audience</span>
+                <button onClick={() => setAudienceModalId(null)} className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90">Done</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
