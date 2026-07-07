@@ -4,10 +4,12 @@ import { Search, Star, X as XIcon, FileText, ExternalLink, Plus } from "lucide-r
 import { templatesStore, useTemplatesStore } from "@/components/scl/templates-store";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 
+import type { Template } from "@/components/scl/mock-data";
+
 type Props = {
   open: boolean;
   onClose: () => void;
-  onInsert: (body: string) => void;
+  onInsert: (body: string, template?: Template) => void;
 };
 
 const CATEGORIES = ["All", "Starred", "Marketing", "Utility", "Service", "Reminder"] as const;
