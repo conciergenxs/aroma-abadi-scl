@@ -3,6 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Upload, FileSpreadsheet, X as XIcon } from "lucide-react";
+import { promoStore } from "@/components/scl/promo-store";
 
 export const Route = createFileRoute("/promo-codes/new")({
   head: () => ({ meta: [{ title: "New Promo Code — SCL" }] }),
@@ -53,6 +54,17 @@ function NewPromoCodePage() {
       toast.error("Promo Name is required");
       return;
     }
+    promoStore.addPromo({
+      code: usageType === "one-to-many" ? code.trim().toUpperCase() : (codeFile?.name ?? "BULK"),
+      name: name.trim(),
+      description: description.trim(),
+      usageType,
+      maxUsage: maxUsage ? Number(maxUsage) : null,
+      startDate,
+      endDate,
+      status,
+      odooId: odooId.trim(),
+    });
     toast.success("Promo code created");
     navigate({ to: "/promo-codes" });
   };
