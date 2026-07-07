@@ -29,6 +29,8 @@ import {
   ChevronRight,
   X as XIcon,
   Tag,
+  Check,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 
