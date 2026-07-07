@@ -99,7 +99,7 @@ function TransactionsPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
           <StatCard label="Today's Revenue" value={formatIDR(revenue)} icon={Wallet} />
-          <StatCard label="Today's Transactions" value={todayTx.length.toLocaleString()} icon={Receipt} />
+          <StatCard label="Today's Transactions" value={fmtNum(todayTx.length)} icon={Receipt} />
           <StatCard label="Today's AOV" value={formatIDR(aov)} icon={TrendingUp} />
           <StatCard label="Top SKU" value={topSku} icon={Package} />
         </div>
