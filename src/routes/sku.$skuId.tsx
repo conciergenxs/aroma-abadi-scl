@@ -38,7 +38,7 @@ function SkuDetailPage() {
     let unitsSold = 0;
     let revenue = 0;
     relatedTx.forEach((t) => {
-      if (t.status !== "Refunded") {
+      if (t.status !== "Cancelled") {
         t.items.forEach((i) => {
           if (i.skuId === skuId) {
             unitsSold += i.qty;
