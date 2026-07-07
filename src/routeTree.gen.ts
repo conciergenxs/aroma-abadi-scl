@@ -188,6 +188,7 @@ export interface FileRoutesById {
   '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRoute
+  '/sku/$skuId': typeof SkuSkuIdRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
