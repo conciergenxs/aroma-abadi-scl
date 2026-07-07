@@ -13,7 +13,14 @@ export const Route = createFileRoute("/sku-detail/$skuId")({
   component: SkuDetailPage,
 });
 
-type DatePreset = "7d" | "30d" | "90d" | "all" | "custom";
+// Default date range: last 30 days
+function defaultFrom() {
+  const d = new Date(); d.setDate(d.getDate() - 29);
+  return d.toISOString().slice(0, 10);
+}
+function defaultTo() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 const MONTHS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 function formatDate(iso: string) {
