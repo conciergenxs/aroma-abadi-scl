@@ -353,6 +353,45 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
   );
 }
 
+/* 3-dot action menu for each SKU row */
+function SkuMenu({ onDetails, onEdit, onDelete }: { onDetails: () => void; onEdit: () => void; onDelete: () => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        className="h-8 w-8 grid place-items-center rounded border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors"
+        title="Actions"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 z-30 w-40 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
+          <button onClick={() => { onDetails(); setOpen(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground">
+            <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
+          </button>
+          <button onClick={() => { onEdit(); setOpen(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground">
+            <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
+          </button>
+          <div className="my-1 border-t border-border" />
+          <button onClick={() => { onDelete(); setOpen(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-rose-50 transition-colors text-rose-600">
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* Searchable SKU select (search from existing + add new) */
 function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: string; categoryId: string; onSelect: (sku: SKU) => void; onAdd: () => void }) {
   void brandId; void categoryId; void onSelect;
