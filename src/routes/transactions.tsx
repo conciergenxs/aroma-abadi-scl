@@ -17,7 +17,8 @@ export const Route = createFileRoute("/transactions")({
 
 function statusBadge(s: string) {
   if (s === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
-  return "border-sky-700 bg-sky-600 text-white";
+  if (s === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
+  return "border-sky-700 bg-sky-600 text-white"; // Processed
 }
 
 function TransactionsPage() {
