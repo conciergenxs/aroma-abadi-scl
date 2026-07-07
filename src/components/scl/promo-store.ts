@@ -106,7 +106,7 @@ function seed(): PromoCode[] {
   ];
 }
 
-const STORAGE_KEY = "aroma_promo_store_v1";
+const STORAGE_KEY = "aroma_promo_store_v2";
 
 function load(): { promos: PromoCode[] } {
   if (typeof window === "undefined") return { promos: seed() };
