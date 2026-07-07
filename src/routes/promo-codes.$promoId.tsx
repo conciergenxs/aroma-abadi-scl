@@ -248,8 +248,8 @@ function PromoDetailPage() {
                 <div key={i} className="flex items-center gap-3 text-[12px]">
                   <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${
                     u.sourceType === "template"
-                      ? "border-sky-500/30 bg-sky-500/10 text-sky-300"
-                      : "border-violet-500/30 bg-violet-500/10 text-violet-300"
+                      ? "border-sky-700 bg-sky-600 text-white"
+                      : "border-violet-700 bg-violet-600 text-white"
                   }`}>
                     {u.sourceType === "template" ? "Template" : "Broadcast"}
                   </span>
