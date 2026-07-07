@@ -214,7 +214,7 @@ function TransactionsPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  navigate({ to: "/sku/$skuId", params: { skuId: i.skuId } });
+                                  navigate({ to: "/sku-detail/$skuId", params: { skuId: i.skuId } });
                                 }}
                                 className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors text-foreground"
                               >
@@ -376,7 +376,7 @@ function TxDrawer({ tx, onClose, navigate }: { tx: Transaction; onClose: () => v
                 <li key={idx} className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors group/item">
                   <div className="flex-1 min-w-0">
                     <button
-                      onClick={() => { onClose(); navigate({ to: "/sku/$skuId", params: { skuId: i.skuId } }); }}
+                      onClick={() => { onClose(); navigate({ to: "/sku-detail/$skuId", params: { skuId: i.skuId } }); }}
                       className="font-medium text-left hover:text-primary hover:underline underline-offset-2 transition-colors"
                     >
                       {i.skuName}

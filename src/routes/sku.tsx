@@ -327,7 +327,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onEditSku, onBackTo
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <button
-                        onClick={() => navigate({ to: "/sku/$skuId", params: { skuId: s.id } })}
+                        onClick={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
                         className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 inline-flex items-center gap-1 transition-colors"
                         title="View SKU details"
                       >
