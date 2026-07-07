@@ -92,8 +92,8 @@ export function PropertyFormModal({
           </div>
         </div>
         <div className="px-5 py-3 border-t border-border flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs hover:bg-card">Cancel</button>
-          <button onClick={save} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+          <button onClick={onClose} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">Cancel</button>
+          <button onClick={save} className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
             {isEdit ? "Save Changes" : "Add Property"}
           </button>
         </div>
