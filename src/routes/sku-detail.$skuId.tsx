@@ -124,13 +124,13 @@ function SkuDetailPage() {
           <ChevronRight className="h-3 w-3 opacity-40 shrink-0" />
           <button
             type="button"
-            onClick={() => navigate({ to: "/sku", search: { brand: brand.id } as any })}
+            onClick={() => navigate({ to: "/sku" })}
             className="hover:text-foreground transition-colors hover:underline underline-offset-2"
           >{brand.name}</button>
           <ChevronRight className="h-3 w-3 opacity-40 shrink-0" />
           <button
             type="button"
-            onClick={() => navigate({ to: "/sku", search: { category: category.id } as any })}
+            onClick={() => navigate({ to: "/sku" })}
             className="hover:text-foreground transition-colors hover:underline underline-offset-2"
           >{category.name}</button>
           <ChevronRight className="h-3 w-3 opacity-40 shrink-0" />
