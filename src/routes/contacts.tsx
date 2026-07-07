@@ -666,7 +666,7 @@ function ContactsTable({
                     {tx ? (
                       <div>
                         <div className="text-foreground font-medium">{tx.invoice}</div>
-                        <div className="text-muted-foreground">{new Date(tx.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                        <div className="text-muted-foreground">{fmtDateID(tx.date)}</div>
                       </div>
                     ) : (
                       <span className="text-muted-foreground">—</span>
