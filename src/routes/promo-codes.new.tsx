@@ -41,8 +41,16 @@ function NewPromoCodePage() {
     );
 
   const handleSave = () => {
-    if (!code.trim() || !name.trim()) {
-      toast.error("Code and Promo Name are required");
+    if (usageType === "one-to-many" && !code.trim()) {
+      toast.error("Code is required for 1-to-Many promo");
+      return;
+    }
+    if (usageType === "one-to-one" && !codeFile) {
+      toast.error("Please upload a CSV file with unique codes");
+      return;
+    }
+    if (!name.trim()) {
+      toast.error("Promo Name is required");
       return;
     }
     toast.success("Promo code created");
