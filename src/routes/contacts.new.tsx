@@ -228,7 +228,7 @@ function NewContactPage() {
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-2xl mx-auto">
-              <div className="rounded-xl border border-gray-200 bg-white divide-y divide-border">
+              <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Nama Lengkap" required>
@@ -319,7 +319,7 @@ function NewContactPage() {
 
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-xl border border-gray-200 bg-white divide-y divide-border">
+            <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
               <FormSection title="Informasi Dasar">
                 <FormGrid>
                   <Field label="Nama Lengkap" required>
