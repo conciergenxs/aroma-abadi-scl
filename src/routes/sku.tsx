@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useSkuStore, skuStore, type Brand, type Category, type SKU, type KnowledgeCard } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
