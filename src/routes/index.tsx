@@ -220,7 +220,7 @@ function Dashboard() {
                     {m.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                     {m.delta}
                   </span>
-                  <span className="text-muted-foreground">{m.sub}</span>
+                  <span className="text-muted-foreground">{m.label === "Sleeping Consumers" ? sleepingSub : m.sub}</span>
                 </div>
               </div>
             );
