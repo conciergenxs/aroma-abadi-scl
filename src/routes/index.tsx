@@ -164,6 +164,19 @@ function Dashboard() {
     [period],
   );
 
+  const sleepingSub = useMemo(() => {
+    if (period === "30d") return "≥ 30 hari tanpa aktivitas";
+    if (period === "60d") return "≥ 60 hari tanpa aktivitas";
+    if (period === "90d") return "≥ 90 hari tanpa aktivitas";
+    if (period === "custom" && customFrom && customTo) {
+      const days = Math.round(
+        (new Date(customTo).getTime() - new Date(customFrom).getTime()) / 86_400_000,
+      );
+      return days > 0 ? `≥ ${days} hari tanpa aktivitas` : "≥ custom range";
+    }
+    return "≥ 30 hari tanpa aktivitas";
+  }, [period, customFrom, customTo]);
+
   return (
     <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
       <div className="space-y-6">
