@@ -1132,6 +1132,7 @@ function UserManagementPage() {
       </SectionCard>
 
       <ConnectedAgentsSection />
+      <ArmaConfigSection />
 
       <ConfirmDialog
         open={confirmDelete}
