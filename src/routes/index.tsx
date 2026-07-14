@@ -39,7 +39,7 @@ const METRICS: Record<Exclude<Period, "custom">, Array<{
     { label: "Messages Replied",      value: "168,492", delta: "+9.7%",  up: true,  icon: Reply,         sub: "91.5% reply rate" },
     { label: "Broadcast Sent",        value: "38",      delta: "+5.6%",  up: true,  icon: Radio,         sub: "campaigns this month" },
     { label: "Broadcast Reach",       value: "1.42M",   delta: "−1.6%",  up: false, icon: Megaphone,     sub: "vs. previous 30d" },
-    { label: "Sleeping Consumers",    value: "1,842",   delta: "+3.4%",  up: false, icon: MoonStar,      sub: "≥ 3 bln tanpa aktivitas" },
+    { label: "Sleeping Consumers",    value: "1,842",   delta: "+3.4%",  up: false, icon: MoonStar,      sub: "" },
   ],
   "60d": [
     { label: "Active Contacts",       value: "57,230",  delta: "+6.8%",  up: true,  icon: Users,         sub: "60-day rolling" },
@@ -47,7 +47,7 @@ const METRICS: Record<Exclude<Period, "custom">, Array<{
     { label: "Messages Replied",      value: "312,890", delta: "+11.2%", up: true,  icon: Reply,         sub: "91.7% reply rate" },
     { label: "Broadcast Sent",        value: "74",      delta: "+8.2%",  up: true,  icon: Radio,         sub: "campaigns 60 days" },
     { label: "Broadcast Reach",       value: "2.71M",   delta: "+2.3%",  up: true,  icon: Megaphone,     sub: "vs. previous 60d" },
-    { label: "Sleeping Consumers",    value: "2,104",   delta: "+6.1%",  up: false, icon: MoonStar,      sub: "≥ 3 bln tanpa aktivitas" },
+    { label: "Sleeping Consumers",    value: "2,104",   delta: "+6.1%",  up: false, icon: MoonStar,      sub: "" },
   ],
   "90d": [
     { label: "Active Contacts",       value: "83,410",  delta: "+9.1%",  up: true,  icon: Users,         sub: "90-day rolling" },
@@ -55,7 +55,7 @@ const METRICS: Record<Exclude<Period, "custom">, Array<{
     { label: "Messages Replied",      value: "459,110", delta: "+13.9%", up: true,  icon: Reply,         sub: "92.1% reply rate" },
     { label: "Broadcast Sent",        value: "112",     delta: "+11.4%", up: true,  icon: Radio,         sub: "campaigns 90 days" },
     { label: "Broadcast Reach",       value: "4.03M",   delta: "+4.8%",  up: true,  icon: Megaphone,     sub: "vs. previous 90d" },
-    { label: "Sleeping Consumers",    value: "2,571",   delta: "+8.3%",  up: false, icon: MoonStar,      sub: "≥ 3 bln tanpa aktivitas" },
+    { label: "Sleeping Consumers",    value: "2,571",   delta: "+8.3%",  up: false, icon: MoonStar,      sub: "" },
   ],
 };
 
