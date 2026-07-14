@@ -1299,6 +1299,134 @@ function ConnectedAgentsSection() {
   );
 }
 // ============================================================
+// Arma Configuration
+// ============================================================
+
+function ArmaConfigSection() {
+  const [active, setActive] = useState<ArmaPersona["id"]>("customer");
+  const [personas, setPersonas] = useState(ARMA_PERSONAS);
+  const persona = personas.find((p) => p.id === active)!;
+
+  const update = (id: ArmaPersona["id"], patch: Partial<ArmaPersona>) =>
+    setPersonas((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+
+  const COLORS: Record<ArmaPersona["id"], { tab: string; dot: string }> = {
+    customer:  { tab: "border-sky-400 text-sky-600",    dot: "bg-sky-400" },
+    ba:        { tab: "border-violet-400 text-violet-600", dot: "bg-violet-400" },
+    operation: { tab: "border-emerald-400 text-emerald-600", dot: "bg-emerald-400" },
+  };
+
+  return (
+    <SectionCard
+      title="Konfigurasi Arma"
+      description="Atur perilaku dan penerima Arma untuk setiap jenis pengguna."
+    >
+      {/* Tabs */}
+      <div className="border-b border-border px-4 flex items-center gap-1">
+        {personas.map((p) => {
+          const isActive = active === p.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setActive(p.id)}
+              className={`flex items-center gap-2 px-3 h-10 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                isActive
+                  ? `${COLORS[p.id].tab} border-current`
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${COLORS[p.id].dot} ${p.status === "inactive" ? "opacity-30" : ""}`} />
+              {p.label}
+              {p.status === "inactive" && (
+                <span className="text-[9px] bg-muted text-muted-foreground px-1 rounded">OFF</span>
+              )}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => update(active, { status: persona.status === "active" ? "inactive" : "active" })}
+          className={`ml-auto h-7 px-3 rounded-md text-[12px] font-medium border transition-colors ${
+            persona.status === "active"
+              ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+              : "border-border bg-card text-muted-foreground hover:bg-muted"
+          }`}
+        >
+          {persona.status === "active" ? "● Aktif" : "○ Nonaktif"}
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Left: identity + behavior */}
+        <div className="space-y-5">
+          <div className={`rounded-xl border p-4 ${persona.bgColor}`}>
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Jenis</div>
+            <div className={`text-base font-semibold ${persona.color}`}>{persona.label}</div>
+            <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{persona.description}</div>
+          </div>
+
+          {/* WA Number */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Nomor WhatsApp</label>
+            <input
+              value={persona.waNumber}
+              onChange={(e) => update(active, { waNumber: e.target.value })}
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+            <div className="text-[11px] text-muted-foreground">
+              Nama akun: <span className="text-foreground font-medium">{persona.waName}</span>
+            </div>
+          </div>
+
+          {/* Behavior */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Perilaku</label>
+            <textarea
+              value={persona.behavior}
+              onChange={(e) => update(active, { behavior: e.target.value })}
+              rows={3}
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => toast.success(`Konfigurasi ${persona.label} disimpan`)}
+            className="h-9 px-4 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Simpan Konfigurasi
+          </button>
+        </div>
+
+        {/* Right: example messages */}
+        <div className="space-y-3">
+          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Contoh Pesan</div>
+          <div className="space-y-2.5">
+            {persona.examples.map((ex, i) => (
+              <div key={i} className="rounded-lg border border-border bg-card/60 px-4 py-3">
+                <div className="flex items-start gap-2">
+                  <div className={`mt-0.5 h-5 w-5 rounded-full grid place-items-center text-[10px] font-bold text-white shrink-0 ${
+                    active === "customer" ? "bg-sky-500" : active === "ba" ? "bg-violet-500" : "bg-emerald-500"
+                  }`}>A</div>
+                  <p className="text-[13px] text-foreground leading-relaxed">{ex}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-lg border border-dashed border-border p-3 text-[11px] text-muted-foreground">
+            💡 Pesan di atas adalah contoh respons Arma untuk jenis <span className="font-medium text-foreground">{persona.label}</span>.
+            Perilaku sebenarnya ditentukan oleh konfigurasi di atas dan data yang terhubung.
+          </div>
+        </div>
+      </div>
+    </SectionCard>
+  );
+}
+
+// ============================================================
 // Team Management
 // ============================================================
 
