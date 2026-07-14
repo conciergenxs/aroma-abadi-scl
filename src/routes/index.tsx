@@ -184,7 +184,7 @@ function Dashboard() {
                   </div>
                   <div className="min-w-0">
                     <div className="text-[11px] text-muted-foreground">Tidak aktif ≥ {label}</div>
-                    <div className="text-xl font-semibold mt-0.5 tabular-nums">{s.count.toLocaleString()}</div>
+                    <div className="text-xl font-semibold mt-0.5 tabular-nums">{fmtNum(s.count)}</div>
                     <div className={`mt-0.5 inline-flex items-center gap-0.5 text-[11px] font-medium ${s.up ? "text-emerald-600" : "text-rose-500"}`}>
                       {s.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                       {s.delta} dari periode sebelumnya
