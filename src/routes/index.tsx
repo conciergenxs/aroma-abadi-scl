@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { fmtDateEN } from "@/lib/fmt";
+import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { conversations, contacts, volumeSeries, recentActivity } from "@/components/scl/mock-data";
 import { Link } from "@tanstack/react-router";
