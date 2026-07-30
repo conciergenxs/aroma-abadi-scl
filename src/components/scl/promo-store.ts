@@ -237,9 +237,8 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: null,
-      startDate: "2026-05-01",
-      endDate: "2026-05-31",
-      status: "expired",
+      startDate: "2026-05-01T00:00",
+      endDate: "2026-05-31T23:59",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
       createdAt: "2026-04-27T09:00:00Z",
       redemptions: [
