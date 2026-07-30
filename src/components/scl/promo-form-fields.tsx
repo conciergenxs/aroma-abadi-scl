@@ -170,7 +170,7 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
       {/* Promo Code + Max Usage */}
       <div className="grid grid-cols-2 gap-4">
         {form.usageType === "one-to-many" ? (
-          <div>
+          <div className="animate-fade-in">
             <label className={labelCls}>Promo Code</label>
             <div className="flex items-center gap-1.5">
               <input value={form.code} onChange={(e) => handleCodeChange(e.target.value)} placeholder="e.g. SUMMER20" className={inputCls} />
