@@ -67,7 +67,7 @@ function ActionMenu({ onSeeDetails, onEdit, onDelete }: { onSeeDetails: () => vo
         <MoreVertical className="h-4 w-4" />
       </button>
       {open && (
-        <div className="absolute right-0 top-8 z-50 min-w-[148px] rounded-lg border border-border bg-card shadow-xl py-1">
+        <div className="absolute right-0 top-8 z-50 min-w-[148px] rounded-lg border border-border bg-card shadow-xl py-1 animate-scale-in origin-top-right">
           <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
             className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
             <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
