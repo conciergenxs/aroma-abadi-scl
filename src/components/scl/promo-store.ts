@@ -221,7 +221,10 @@ function seed(): PromoCode[] {
       code: "BEAUTY10",
       name: "10% Off New Arrivals",
       description: "10% discount on new arrival products. No minimum purchase required.",
-      rule: { type: "discount-percent", discountPercent: 10, minAmount: null, scope: { kind: "any" } },
+      rule: {
+        condition: { kind: "any-purchase" },
+        reward: { kind: "percent-off", percent: 10, appliesTo: { kind: "any" }, maxDiscount: null },
+      },
       usageType: "one-to-many",
       maxUsage: null,
       startDate: "2026-05-01",
