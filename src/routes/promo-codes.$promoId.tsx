@@ -43,7 +43,7 @@ function StatusBadge({ status }: { status: PromoStatus }) {
     );
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-600 px-2.5 py-0.5 text-[11px] font-medium text-white">
-      <Clock className="h-3 w-3" /> Inactive
+      <Clock className="h-3 w-3" /> Scheduled
     </span>
   );
 }
