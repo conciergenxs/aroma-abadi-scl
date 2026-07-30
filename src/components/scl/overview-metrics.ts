@@ -134,7 +134,7 @@ export function computeOrdersAndSales(transactions: Transaction[]): OrdersAndSal
     .map(([brand, qty]) => ({ brand, qty }))
     .sort((a, b) => b.qty - a.qty);
 
-  const mostAddedToCart = Array.from(skuMap.values()).sort((a, b) => b.count - a.count);
+  const mostAddedToCart = Array.from(skuMap.values()).sort((a, b) => b.count - a.count).slice(0, 5);
 
   const dailySales = Array.from(salesByDay.entries())
     .map(([date, sales]) => ({ date, sales }))
