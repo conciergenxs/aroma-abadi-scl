@@ -129,6 +129,14 @@ export const mostUnfulfilledProducts: RankedProduct[] = [
   { name: "Real Flawless Feather Matte Powder Foundation", brand: "Sisley", count: 7 },
 ];
 
+export function scaledTotalConversations(scale: number): number {
+  return scaleStatic(totalConversations, scale);
+}
+
+export function scaleRankedProducts(items: RankedProduct[], scale: number): RankedProduct[] {
+  return items.map((item) => ({ ...item, count: scaleStatic(item.count, scale) }));
+}
+
 // ── D. Orders & Sales — fully derived from the real transactions[] seed ──
 export type OrdersAndSales = {
   totalOrders: number;
