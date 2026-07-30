@@ -1,5 +1,5 @@
 import type { Transaction } from "./transactions-store";
-import { broadcasts, conversations } from "./mock-data";
+import { broadcasts } from "./mock-data";
 
 // ── SKU code → brand lookup (transaction lines only carry skuCode/skuName) ──
 const BRAND_BY_SKU_PREFIX: Record<string, string> = {
