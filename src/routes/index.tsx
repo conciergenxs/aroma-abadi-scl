@@ -169,7 +169,7 @@ function StepFunnel({ stages }: { stages: FunnelStage[] }) {
                 {dropPct !== null && <span className="ml-1.5 text-muted-foreground/70">({dropPct.toFixed(1)}%)</span>}
               </span>
             </div>
-            <div className="h-3.5 rounded-md bg-muted overflow-hidden">
+            <div className="h-5 rounded-md bg-muted overflow-hidden">
               <div className="h-full rounded-md animate-grow-x" style={{ width: `${widthPct}%`, background: s.color }} />
             </div>
           </div>
