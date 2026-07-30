@@ -85,7 +85,7 @@ function StatTile({ label, value, icon: Icon }: { label: string; value: string; 
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
         <Icon className="h-3 w-3" /> {label}
       </div>
-      <div className="mt-1.5 text-lg font-semibold text-foreground">{value}</div>
+      <div className="mt-1.5 text-lg font-semibold text-foreground stat-value">{value}</div>
     </div>
   );
 }
