@@ -413,14 +413,15 @@ function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fu
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const isFull = range.start === fullRange.start && range.end === fullRange.end;
-  const label = isFull ? "Full Period" : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
-
+  // Presets can't reach further back than the real data actually goes.
+  const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
   const presets: { label: string; range: DateRange }[] = [
-    { label: "Full Period", range: fullRange },
-    { label: "Last 7 Days", range: { start: addDaysIso(fullRange.end, -6), end: fullRange.end } },
-    { label: "Last 3 Days", range: { start: addDaysIso(fullRange.end, -2), end: fullRange.end } },
+    { label: "Last 7 Days", range: { start: clampStart(addDaysIso(fullRange.end, -6)), end: fullRange.end } },
+    { label: "Last 30 Days", range: { start: clampStart(addDaysIso(fullRange.end, -29)), end: fullRange.end } },
+    { label: "Last 90 Days", range: { start: clampStart(addDaysIso(fullRange.end, -89)), end: fullRange.end } },
   ];
+  const matchedPreset = presets.find((p) => p.range.start === range.start && p.range.end === range.end);
+  const label = matchedPreset ? matchedPreset.label : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
 
   return (
     <div ref={ref} className="relative">
