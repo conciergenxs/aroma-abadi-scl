@@ -364,7 +364,7 @@ export const broadcasts: Broadcast[] = [
     channelId: "wa-main", listIds: ["ls-vip", "ls-launch"], totalAudience: 12408, sendMode: "now", createdBy: "Putri Anggraini", createdAt: "Hari ini · 08:42",
     contentMode: "template", templateId: "tp1", body: "Hi {{name}}, koleksi Velvet Rouge baru saja launching! VIP dapat akses 24 jam lebih awal.", footer: "Balas STOP untuk berhenti.",
     buttons: [{ label: "Belanja sekarang", kind: "url" }], replied: 824, failed: 28 },
-  { id: "b2", name: "Glow Serum — Reseller Promo", channel: "whatsapp", audience: "Reseller · 4,910", reach: 4910, delivered: 4880, read: 4112, clicks: 1342, sentAt: "Kemarin", sentAtDate: "2026-07-06", status: "Sent",
+  { id: "b2", name: "Glow Serum — Reseller Promo", channel: "whatsapp", audience: "Reseller · 4,910", reach: 4910, delivered: 4880, read: 4112, clicks: 1342, sentAt: "Kemarin", sentAtDate: "2026-07-29", status: "Sent",
     channelId: "wa-bdg", listIds: ["ls-launch"], totalAudience: 4910, sendMode: "now", createdBy: "Bagus Pratama", createdAt: "Kemarin · 17:10",
     contentMode: "template", templateId: "tp3", body: "Hi {{name}}, harga reseller Glow Serum bulan ini turun. Order minimum 24 pcs.", footer: "Aroma Abadi",
     buttons: [{ label: "Lihat katalog", kind: "url" }], replied: 312, failed: 30 },
