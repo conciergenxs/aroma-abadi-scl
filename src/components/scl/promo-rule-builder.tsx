@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Check, ArrowRight } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { useSkuStore } from "./sku-store";
 import {
   type PromoRule,
