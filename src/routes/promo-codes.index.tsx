@@ -17,7 +17,7 @@ import {
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 
-export const Route = createFileRoute("/promo-codes")({
+export const Route = createFileRoute("/promo-codes/")({
   head: () => ({ meta: [{ title: "Promo Codes — Aroma Abadi" }] }),
   component: PromoCodesPage,
 });
