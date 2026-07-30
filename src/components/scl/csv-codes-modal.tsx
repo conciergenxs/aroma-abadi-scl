@@ -35,7 +35,7 @@ export function CsvCodesModal({ fileName, codes, onClose }: { fileName: string; 
                   <th className="px-4 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Code</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody key={page} className="divide-y divide-border/60 stagger">
                 {paged.map((code, i) => (
                   <tr key={`${code}-${i}`}>
                     <td className="px-4 py-2 text-[11px] text-muted-foreground">{(page - 1) * PAGE_SIZE + i + 1}</td>
