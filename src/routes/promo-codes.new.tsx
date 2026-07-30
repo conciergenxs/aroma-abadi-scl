@@ -74,7 +74,7 @@ function NewPromoCodePage() {
 
   return (
     <AppShell backTo="/promo-codes" title="New Promo Code">
-      <div className="max-w-2xl space-y-5">
+      <div className="max-w-3xl space-y-5">
         {/* Usage Type — moved up so code field can react */}
         <div>
           <label className={labelCls}>Usage Type</label>
