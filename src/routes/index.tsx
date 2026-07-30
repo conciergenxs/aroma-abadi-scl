@@ -13,11 +13,11 @@ import {
 import { Link } from "@tanstack/react-router";
 import {
   Users, UserCheck, BadgeCheck, MoonStar, Sparkles,
-  Radio, Megaphone, MessageSquare, MessagesSquare,
+  Radio, Megaphone, MessageSquare,
   HelpCircle, ShoppingCart, PackageX,
   ClipboardList, Receipt, CircleDollarSign,
   Repeat, Wallet, Tags, ShoppingBasket,
-  TrendingUp, Calendar, Info,
+  Calendar, Info,
 } from "lucide-react";
 import {
   Tooltip as InfoTooltip, TooltipContent, TooltipProvider, TooltipTrigger,
