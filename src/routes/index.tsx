@@ -262,7 +262,7 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
 }
 
 // ── C. Conversation & Product Intelligence ───────────────────────────────
-function ConversationSection({ orders }: { orders: OrdersAndSales }) {
+function ConversationSection({ orders, scale, totalConversations }: { orders: OrdersAndSales; scale: number; totalConversations: number }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   return (
     <Reveal innerRef={ref} inView={inView}>
@@ -272,9 +272,9 @@ function ConversationSection({ orders }: { orders: OrdersAndSales }) {
       >
         {inView && (
           <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
-            <RankedListColumn title="Most Asked" icon={HelpCircle} items={mostAskedProducts} color="var(--chart-1)" />
+            <RankedListColumn title="Most Asked" icon={HelpCircle} items={scaleRankedProducts(mostAskedProducts, scale)} color="var(--chart-1)" />
             <RankedListColumn title="Most Added to Cart" icon={ShoppingCart} items={orders.mostAddedToCart} color="var(--chart-2)" />
-            <RankedListColumn title="Most Unfulfilled" icon={PackageX} items={mostUnfulfilledProducts} color="var(--chart-3)" />
+            <RankedListColumn title="Most Unfulfilled" icon={PackageX} items={scaleRankedProducts(mostUnfulfilledProducts, scale)} color="var(--chart-3)" />
           </div>
         )}
       </SectionCard>
