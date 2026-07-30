@@ -116,12 +116,24 @@ export type PromoCode = {
   maxUsage: number | null;
   startDate: string;
   endDate: string;
-  status: PromoStatus;
   createdBy: { name: string; jobTitle: string };
   createdAt: string;
   redemptions: PromoRedemption[];
   assignedCodes?: AssignedCode[];
 };
+
+// Status is never stored — it's always derived from the current time vs. the
+// promo's date range, so it can't drift out of sync with reality.
+export function getPromoStatus(promo: { startDate: string; endDate: string }): PromoStatus {
+  if (!promo.startDate || !promo.endDate) return "inactive";
+  const now = Date.now();
+  const start = new Date(promo.startDate).getTime();
+  const end = new Date(promo.endDate).getTime();
+  if (Number.isNaN(start) || Number.isNaN(end)) return "inactive";
+  if (now < start) return "inactive";
+  if (now > end) return "expired";
+  return "active";
+}
 
 // Cross-reference the transactions store so redemption logs point at real,
 // clickable-consistent invoices/customers instead of made-up references.
