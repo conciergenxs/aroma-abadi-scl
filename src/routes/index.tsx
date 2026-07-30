@@ -358,7 +358,7 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
 }
 
 // ── F. Funnel & Conversion ───────────────────────────────────────────────
-function ConversionSection({ broadcast, orders, funnelRates }: { broadcast: BroadcastMetrics; orders: OrdersAndSales; funnelRates: ReturnType<typeof computeFunnelRates> }) {
+function ConversionSection({ broadcast, orders, funnelRates, totalConversations }: { broadcast: BroadcastMetrics; orders: OrdersAndSales; funnelRates: ReturnType<typeof computeFunnelRates>; totalConversations: number }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   const stages: FunnelStage[] = [
     { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-1)" },
