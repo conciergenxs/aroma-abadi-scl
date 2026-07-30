@@ -481,12 +481,17 @@ function Dashboard() {
   const today = fmtDateEN(new Date());
   const txState = useTransactionsStore();
 
-  const orders = useMemo(() => computeOrdersAndSales(txState.transactions), [txState.transactions]);
-  const broadcast = useMemo(() => computeBroadcastMetrics(), []);
+  const fullRange = useMemo(() => getTransactionDateBounds(txState.transactions), [txState.transactions]);
+  const [range, setRange] = useState<DateRange>(fullRange);
+
+  const scale = useMemo(() => computeRangeScale(range, fullRange), [range, fullRange]);
+  const orders = useMemo(() => computeOrdersAndSales(txState.transactions, range), [txState.transactions, range]);
+  const broadcast = useMemo(() => computeBroadcastMetrics(range, scale), [range, scale]);
   const averages = useMemo(() => computeAverages(orders), [orders]);
+  const conversationsCount = useMemo(() => scaledTotalConversations(scale), [scale]);
   const funnelRates = useMemo(
-    () => computeFunnelRates(broadcast, totalConversations, orders.totalTransactions),
-    [broadcast, orders.totalTransactions],
+    () => computeFunnelRates(broadcast, conversationsCount, orders.totalTransactions),
+    [broadcast, conversationsCount, orders.totalTransactions],
   );
 
   return (
@@ -499,9 +504,7 @@ function Dashboard() {
             <div className="flex items-center gap-2.5">
               <div className="text-lg font-semibold">Hello, Aria 👋</div>
               <span className="text-muted-foreground/40 text-base select-none">|</span>
-              <span className="inline-flex items-center gap-1.5 h-7 rounded-md border border-border bg-card/60 px-2.5 text-[12px] text-muted-foreground">
-                <Calendar className="h-3 w-3 shrink-0" /> Jul 7 – Jul 31, 2026
-              </span>
+              <DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />
             </div>
             <div className="flex items-center gap-2">
               <Link to="/inbox" className="inline-flex items-center h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
@@ -513,12 +516,12 @@ function Dashboard() {
             </div>
           </div>
 
-          <AudienceSection />
+          <AudienceSection scale={scale} />
           <BroadcastSection broadcast={broadcast} />
-          <ConversationSection orders={orders} />
+          <ConversationSection orders={orders} scale={scale} totalConversations={conversationsCount} />
           <OrdersSection orders={orders} />
           <AveragesSection averages={averages} />
-          <ConversionSection broadcast={broadcast} orders={orders} funnelRates={funnelRates} />
+          <ConversionSection broadcast={broadcast} orders={orders} funnelRates={funnelRates} totalConversations={conversationsCount} />
 
           {/* Activity + Conversations */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
