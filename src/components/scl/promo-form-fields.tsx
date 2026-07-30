@@ -185,11 +185,11 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
             </div>
           </div>
         ) : (
-          <div>
+          <div className="animate-fade-in">
             <label className={labelCls}>Promo Code — Upload CSV</label>
             <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
             {form.codeFile ? (
-              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card text-sm">
+              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card text-sm animate-scale-in">
                 <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
                 <span className="flex-1 truncate">{form.codeFile.name}</span>
                 <button type="button" title="View codes" onClick={() => setViewingCsv(true)} className="text-muted-foreground hover:text-primary shrink-0">
