@@ -368,20 +368,16 @@ function ConversionSection({ broadcast, orders, funnelRates }: { broadcast: Broa
   ];
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <SectionCard
-        title="Funnel & Conversion"
-        description="How reach turns into conversations, and conversations into sales."
-        action={
-          <div className="flex items-center gap-4">
-            <CornerStat value={fmtPct(funnelRates.conversationRate)} label="Conversation Rate" info="Rate of conversations started since a broadcast was sent (Replies ÷ Broadcast Reach)." />
-            <div className="w-px h-8 bg-border" />
-            <CornerStat value={fmtPct(funnelRates.conversionRate)} label="Conversion Rate" info="Rate of transactions resulting from conversations (Transactions ÷ Conversations)." />
-          </div>
-        }
-      >
+      <SectionCard title="Funnel & Conversion">
         {inView && (
-          <div className="border-t border-border">
-            <StepFunnel stages={stages} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4">
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card/60 glass">
+              <StepFunnel stages={stages} />
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              <MetricStat icon={Reply} label="Conversation Rate" value={fmtPct(funnelRates.conversationRate)} info="Rate of conversations started since a broadcast was sent (Replies ÷ Broadcast Reach)." />
+              <MetricStat icon={TrendingUp} label="Conversion Rate" value={fmtPct(funnelRates.conversionRate)} info="Rate of transactions resulting from conversations (Transactions ÷ Conversations)." />
+            </div>
           </div>
         )}
       </SectionCard>
