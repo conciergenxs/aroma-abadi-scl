@@ -269,7 +269,6 @@ function ConversationSection({ orders }: { orders: OrdersAndSales }) {
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard
         title="Conversation & Product Intelligence"
-        description="What people are talking about, and what they want."
         action={<CornerStat value={fmtNum(totalConversations)} label="Total Conversations" info="Number of conversations that took place." />}
       >
         {inView && (
