@@ -56,7 +56,9 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
 
 export function validatePromoForm(form: PromoFormState): string | null {
   if (form.usageType === "one-to-many" && !form.code.trim()) return "Promo Code is required";
-  if (form.usageType === "one-to-one" && !form.codeFile) return "Please upload a CSV file";
+  // A CSV is only mandatory when there's no code assigned yet (brand-new 1-to-1
+  // promo). Editing an existing 1-to-1 promo shouldn't force a re-upload.
+  if (form.usageType === "one-to-one" && !form.codeFile && !form.code.trim()) return "Please upload a CSV file";
   if (!form.name.trim()) return "Promo Name is required";
   return null;
 }
@@ -66,7 +68,9 @@ export function promoFormToPayload(form: PromoFormState): Pick<
   "code" | "name" | "description" | "rule" | "usageType" | "maxUsage" | "startDate" | "endDate"
 > {
   return {
-    code: form.usageType === "one-to-many" ? form.code.trim().toUpperCase() : (form.codeFile?.name ?? "BULK"),
+    code: form.usageType === "one-to-many"
+      ? form.code.trim().toUpperCase()
+      : (form.codeFile?.name ?? form.code.trim() ?? "BULK"),
     name: form.name.trim(),
     description: form.description.trim(),
     rule: form.rule,
