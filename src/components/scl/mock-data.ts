@@ -407,6 +407,7 @@ export const contactGrowth = [
 ];
 
 export const recentActivity = [
+  { id: "a0", icon: "alert", text: "Event \"Aroma Abadi Beauty Class\" berhasil dijadwalkan — 87 kontak terdaftar", time: "Baru saja" },
   { id: "a1", icon: "send", text: "Broadcast Velvet Rouge — VIP Early Access terkirim ke 12,380 kontak", time: "2m lalu" },
   { id: "a2", icon: "user", text: "Siti Rahmawati ditandai VIP oleh Putri Anggraini", time: "14m lalu" },
   { id: "a3", icon: "msg", text: "Template Beauty Club Upgrade disubmit untuk review", time: "32m lalu" },
