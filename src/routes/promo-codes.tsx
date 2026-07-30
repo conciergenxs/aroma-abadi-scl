@@ -36,10 +36,10 @@ function Portal({ children }: { children: React.ReactNode }) {
 
 function StatusBadge({ status }: { status: PromoStatus }) {
   if (status === "active")
-    return <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white"><CheckCircle2 className="h-2.5 w-2.5" /> Active</span>;
+    return <span key={status} className="badge-animate inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white"><CheckCircle2 className="h-2.5 w-2.5" /> Active</span>;
   if (status === "expired")
-    return <span className="inline-flex items-center gap-1 rounded-full border border-rose-700 bg-rose-600 px-2 py-0.5 text-[10px] font-medium text-white"><XCircle className="h-2.5 w-2.5" /> Expired</span>;
-  return <span className="inline-flex items-center gap-1 rounded-full border border-slate-400 bg-slate-500 px-2 py-0.5 text-[10px] font-medium text-white"><Clock className="h-2.5 w-2.5" /> Scheduled</span>;
+    return <span key={status} className="badge-animate inline-flex items-center gap-1 rounded-full border border-rose-700 bg-rose-600 px-2 py-0.5 text-[10px] font-medium text-white"><XCircle className="h-2.5 w-2.5" /> Expired</span>;
+  return <span key={status} className="badge-animate inline-flex items-center gap-1 rounded-full border border-slate-400 bg-slate-500 px-2 py-0.5 text-[10px] font-medium text-white"><Clock className="h-2.5 w-2.5" /> Scheduled</span>;
 }
 
 // ── Three-dot action menu ─────────────────────────────────────────────────────
