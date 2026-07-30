@@ -70,7 +70,11 @@ export function computeBroadcastMetrics(): BroadcastMetrics {
 }
 
 // ── C. Conversation & Product Intelligence ──────────────────────────────
-export const totalConversations = conversations.length;
+// The seeded `conversations` list is just a handful of inbox-preview rows,
+// not a real conversation log — using its length here would make Conversion
+// Rate exceed 100% against the real transaction count. Kept illustrative,
+// consistent with the other volume metrics that have no real backing array.
+export const totalConversations = 1240;
 
 export type RankedProduct = { name: string; brand: string; count: number };
 
