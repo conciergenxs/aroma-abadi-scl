@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePromoStore, promoStore, describePromoRule, getPromoStatus, type PromoRedemption, type PromoStatus } from "@/components/scl/promo-store";
-import { EditPromoModal } from "@/routes/promo-codes";
+import { EditPromoModal } from "@/routes/promo-codes.index";
 
 export const Route = createFileRoute("/promo-codes/$promoId")({
   head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
