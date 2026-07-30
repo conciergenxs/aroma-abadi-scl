@@ -229,7 +229,7 @@ function PromoDetailPage() {
                     <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/60">
+                <tbody className="divide-y divide-border/60 stagger">
                   {redemptions.map((r) => (
                     <tr key={r.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-2.5">
@@ -266,7 +266,7 @@ function PromoDetailPage() {
                     <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/60">
+                <tbody className="divide-y divide-border/60 stagger">
                   {promo.assignedCodes.map((a) => (
                     <tr key={a.code} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-2.5">
