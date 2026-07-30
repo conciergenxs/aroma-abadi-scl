@@ -117,7 +117,7 @@ function ItemScopeEditor({
         <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
       </button>
       {open && (
-        <div className="absolute left-0 top-9 z-30 w-72 rounded-lg border border-border bg-popover shadow-xl p-2">
+        <div className="absolute left-0 top-9 z-30 w-72 rounded-lg border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
           <button
             type="button"
             onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
