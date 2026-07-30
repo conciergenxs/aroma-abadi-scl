@@ -83,8 +83,8 @@ export type BroadcastMetrics = {
   readRate: number;
 };
 
-export function computeBroadcastMetrics(): BroadcastMetrics {
-  const sent = broadcasts.filter((b) => b.status === "Sent");
+export function computeBroadcastMetrics(range?: DateRange, scale = 1): BroadcastMetrics {
+  const sent = broadcasts.filter((b) => b.status === "Sent" && (!range || inRange(b.sentAtDate ?? "", range)));
   const reach = sent.reduce((s, b) => s + b.reach, 0);
   const delivered = sent.reduce((s, b) => s + b.delivered, 0);
   const read = sent.reduce((s, b) => s + b.read, 0);
@@ -95,9 +95,10 @@ export function computeBroadcastMetrics(): BroadcastMetrics {
     delivered,
     read,
     replied,
-    // Inbound organic volume — kept above `replied` since replies are a
-    // subset of all customer-initiated messages received.
-    messageReceived: 2540,
+    // Inbound organic volume has no real per-record date to filter by —
+    // kept proportional to the selected range, and above `replied` since
+    // replies are a subset of all customer-initiated messages received.
+    messageReceived: scaleStatic(2540, scale),
     deliveryRate: reach ? delivered / reach : 0,
     readRate: delivered ? read / delivered : 0,
   };
