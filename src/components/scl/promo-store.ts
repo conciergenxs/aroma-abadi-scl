@@ -152,7 +152,10 @@ function seed(): PromoCode[] {
       code: "AROMA20",
       name: "20% Off All Brands",
       description: "20% discount across all brands. Code shared via broadcast or template.",
-      rule: { type: "discount-percent", discountPercent: 20, minAmount: null, scope: { kind: "any" } },
+      rule: {
+        condition: { kind: "any-purchase" },
+        reward: { kind: "percent-off", percent: 20, appliesTo: { kind: "any" }, maxDiscount: null },
+      },
       usageType: "one-to-many",
       maxUsage: 500,
       startDate: "2026-06-01",
