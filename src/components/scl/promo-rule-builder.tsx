@@ -1,16 +1,65 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Check, Gift, Wallet, Percent } from "lucide-react";
+import { ChevronDown, Check, ArrowRight } from "lucide-react";
 import { useSkuStore } from "./sku-store";
-import { type PromoRule, type PromoItemScope, defaultRuleForType, describePromoRule } from "./promo-store";
+import {
+  type PromoRule,
+  type PromoCondition,
+  type PromoReward,
+  type PromoItemScope,
+  defaultCondition,
+  defaultReward,
+  describePromoRule,
+} from "./promo-store";
 
-// ── Sentence-builder UI for promo rules — pick a template, fill the blanks ────
-// (X / Y / Z variables), see a live plain-language preview. Replaces the old
-// Odoo-sourced promo fields entirely; everything here is local/static.
+// ── Sentence-builder UI for promo rules ────────────────────────────────────────
+// A promo is "When [Condition] → Get [Reward]". Condition and Reward are each
+// picked independently and every slot inside them (item, qty, amount, percent,
+// cap, timing) is freely editable — so this single builder can express any
+// promo shape (Buy 1 Get 1, Buy 2 Get 1 of a different item, min-spend cashback,
+// item-specific % off with a cap, etc.) instead of being limited to a fixed
+// catalog of promo "types".
 
-const RULE_TEMPLATES: { type: PromoRule["type"]; title: string; example: string; icon: typeof Gift }[] = [
-  { type: "buy-x-get-y", title: "Buy X Get Y", example: "e.g. Buy 1 item, get 1 free", icon: Gift },
-  { type: "buy-x-get-discount", title: "Buy X Get Discount", example: "e.g. Bundle, cashback, or Rp off", icon: Wallet },
-  { type: "discount-percent", title: "Discount % on Total", example: "e.g. 20% off total purchase", icon: Percent },
+const CONDITION_OPTIONS: { kind: PromoCondition["kind"]; label: string }[] = [
+  { kind: "any-purchase", label: "Any Purchase" },
+  { kind: "buy-item", label: "Buy Item(s)" },
+  { kind: "min-spend", label: "Minimum Spend" },
+];
+
+const REWARD_OPTIONS: { kind: PromoReward["kind"]; label: string }[] = [
+  { kind: "free-item", label: "Free Item(s)" },
+  { kind: "percent-off", label: "% Discount" },
+  { kind: "amount-off", label: "Rp Discount" },
+];
+
+const PRESETS: { label: string; build: () => PromoRule }[] = [
+  {
+    label: "Buy 1 Get 1 Free",
+    build: () => ({
+      condition: { kind: "buy-item", qty: 1, item: { kind: "any" } },
+      reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
+    }),
+  },
+  {
+    label: "Buy 2 Get 1 Free",
+    build: () => ({
+      condition: { kind: "buy-item", qty: 2, item: { kind: "any" } },
+      reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
+    }),
+  },
+  {
+    label: "20% Off Total",
+    build: () => ({
+      condition: { kind: "any-purchase" },
+      reward: { kind: "percent-off", percent: 20, appliesTo: { kind: "any" }, maxDiscount: null },
+    }),
+  },
+  {
+    label: "Rp50,000 Cashback",
+    build: () => ({
+      condition: { kind: "any-purchase" },
+      reward: { kind: "amount-off", amount: 50000, timing: "next-purchase" },
+    }),
+  },
 ];
 
 function useSkuItemNames(): string[] {
@@ -123,100 +172,136 @@ function InlineCurrency({ value, onChange, placeholder }: { value: number; onCha
   );
 }
 
+function Segmented<T extends string>({ options, value, onChange }: { options: { kind: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <div className="inline-flex rounded-md border border-border bg-muted/40 p-0.5 gap-0.5">
+      {options.map((opt) => (
+        <button
+          key={opt.kind}
+          type="button"
+          onClick={() => { if (opt.kind !== value) onChange(opt.kind); }}
+          className={`px-2.5 h-7 text-[11px] font-medium rounded transition-colors ${value === opt.kind ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ConditionEditor({ condition, onChange, items }: { condition: PromoCondition; onChange: (c: PromoCondition) => void; items: string[] }) {
+  return (
+    <div className="space-y-2">
+      <Segmented options={CONDITION_OPTIONS} value={condition.kind} onChange={(kind) => onChange(defaultCondition(kind))} />
+      <div className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8">
+        <span className="text-muted-foreground">When</span>
+        {condition.kind === "any-purchase" && (
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes any purchase</span>
+        )}
+        {condition.kind === "buy-item" && (
+          <>
+            <span className="text-muted-foreground">customer buys</span>
+            <InlineNumber value={condition.qty} onChange={(v) => onChange({ ...condition, qty: v })} />
+            <ItemScopeEditor scope={condition.item} onChange={(s) => onChange({ ...condition, item: s })} items={items} />
+          </>
+        )}
+        {condition.kind === "min-spend" && (
+          <>
+            <span className="text-muted-foreground">customer spends at least</span>
+            <InlineCurrency value={condition.amount} onChange={(v) => onChange({ ...condition, amount: v })} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: string[] }) {
+  return (
+    <div className="space-y-2">
+      <Segmented options={REWARD_OPTIONS} value={reward.kind} onChange={(kind) => onChange(defaultReward(kind))} />
+      <div className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8">
+        <span className="text-muted-foreground">Get</span>
+        {reward.kind === "free-item" && (
+          <>
+            <InlineNumber value={reward.qty} onChange={(v) => onChange({ ...reward, qty: v })} />
+            {reward.sameAsPurchased ? (
+              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">Same Item</span>
+            ) : (
+              <ItemScopeEditor scope={reward.item} onChange={(s) => onChange({ ...reward, item: s })} items={items} />
+            )}
+            <span className="text-muted-foreground">free</span>
+            <button
+              type="button"
+              onClick={() => onChange({ ...reward, sameAsPurchased: !reward.sameAsPurchased })}
+              className="ml-1 text-[11px] text-primary hover:underline"
+            >
+              {reward.sameAsPurchased ? "use a different item instead" : "use the same item instead"}
+            </button>
+          </>
+        )}
+        {reward.kind === "percent-off" && (
+          <>
+            <InlineNumber value={reward.percent} onChange={(v) => onChange({ ...reward, percent: v })} suffix="%" />
+            <span className="text-muted-foreground">off</span>
+            <ItemScopeEditor scope={reward.appliesTo} onChange={(s) => onChange({ ...reward, appliesTo: s })} items={items} anyLabel="Total Purchase" />
+          </>
+        )}
+        {reward.kind === "amount-off" && (
+          <>
+            <InlineCurrency value={reward.amount} onChange={(v) => onChange({ ...reward, amount: v })} />
+            <select
+              value={reward.timing}
+              onChange={(e) => onChange({ ...reward, timing: e.target.value as PromoReward extends { kind: "amount-off" } ? never : never } as never)}
+              className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
+            >
+              <option value="immediate">off (this purchase)</option>
+              <option value="next-purchase">cashback (next purchase)</option>
+            </select>
+          </>
+        )}
+      </div>
+      {reward.kind === "percent-off" && (
+        <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+          <span>Max discount cap (optional):</span>
+          <InlineCurrency value={reward.maxDiscount ?? 0} onChange={(v) => onChange({ ...reward, maxDiscount: v || null })} placeholder="no cap" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange: (r: PromoRule) => void }) {
   const items = useSkuItemNames();
 
   return (
     <div className="space-y-3">
-      {/* Template picker */}
-      <div className="grid grid-cols-3 gap-2">
-        {RULE_TEMPLATES.map((tpl) => {
-          const Icon = tpl.icon;
-          const active = rule.type === tpl.type;
-          return (
-            <button
-              key={tpl.type}
-              type="button"
-              onClick={() => { if (rule.type !== tpl.type) onChange(defaultRuleForType(tpl.type)); }}
-              className={`text-left rounded-lg border p-3 transition-colors ${active ? "border-primary bg-primary/10" : "border-border bg-card/40 hover:bg-card"}`}
-            >
-              <Icon className={`h-4 w-4 mb-1.5 ${active ? "text-primary" : "text-muted-foreground"}`} />
-              <div className="text-[12px] font-semibold text-foreground">{tpl.title}</div>
-              <div className="text-[10.5px] text-muted-foreground mt-0.5 leading-snug">{tpl.example}</div>
-            </button>
-          );
-        })}
+      <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] p-3 space-y-3">
+        <ConditionEditor condition={rule.condition} onChange={(condition) => onChange({ ...rule, condition })} items={items} />
+        <div className="flex items-center gap-2 text-muted-foreground/50">
+          <div className="flex-1 border-t border-dashed border-primary/20" />
+          <ArrowRight className="h-3.5 w-3.5" />
+          <div className="flex-1 border-t border-dashed border-primary/20" />
+        </div>
+        <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} />
+        <div className="pt-2.5 border-t border-primary/20 text-[12px] text-muted-foreground">
+          Preview: <span className="text-foreground font-medium">{describePromoRule(rule)}</span>
+        </div>
       </div>
 
-      {/* Inline sentence editor */}
-      <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] p-3">
-        <div className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8">
-          {rule.type === "buy-x-get-y" && (
-            <>
-              <span className="text-muted-foreground">Buy</span>
-              <InlineNumber value={rule.buyQty} onChange={(v) => onChange({ ...rule, buyQty: v })} />
-              <ItemScopeEditor scope={rule.buyItem} onChange={(s) => onChange({ ...rule, buyItem: s })} items={items} />
-              <span className="text-muted-foreground">Get</span>
-              <InlineNumber value={rule.getQty} onChange={(v) => onChange({ ...rule, getQty: v })} />
-              {rule.sameAsPurchased ? (
-                <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">Same Item</span>
-              ) : (
-                <ItemScopeEditor scope={rule.getItem} onChange={(s) => onChange({ ...rule, getItem: s })} items={items} />
-              )}
-              <span className="text-muted-foreground">Free</span>
-              <button
-                type="button"
-                onClick={() => onChange({ ...rule, sameAsPurchased: !rule.sameAsPurchased })}
-                className="ml-1 text-[11px] text-primary hover:underline"
-              >
-                {rule.sameAsPurchased ? "use a different item instead" : "use the same item instead"}
-              </button>
-            </>
-          )}
-
-          {rule.type === "buy-x-get-discount" && (
-            <>
-              <span className="text-muted-foreground">Buy</span>
-              <ItemScopeEditor scope={rule.buyItem} onChange={(s) => onChange({ ...rule, buyItem: s })} items={items} />
-              <span className="text-muted-foreground">Get</span>
-              <InlineCurrency value={rule.discountAmount} onChange={(v) => onChange({ ...rule, discountAmount: v })} />
-              <select
-                value={rule.variant}
-                onChange={(e) => onChange({ ...rule, variant: e.target.value as typeof rule.variant })}
-                className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
-              >
-                <option value="immediate">off (this purchase)</option>
-                <option value="cashback-next-purchase">cashback (next purchase)</option>
-                <option value="bundle-price">as bundle price</option>
-              </select>
-            </>
-          )}
-
-          {rule.type === "discount-percent" && (
-            <>
-              <span className="text-muted-foreground">Get</span>
-              <InlineNumber value={rule.discountPercent} onChange={(v) => onChange({ ...rule, discountPercent: v })} suffix="%" />
-              <span className="text-muted-foreground">Off</span>
-              <ItemScopeEditor scope={rule.scope} onChange={(s) => onChange({ ...rule, scope: s })} items={items} anyLabel="Total Purchase" />
-            </>
-          )}
-        </div>
-
-        {rule.type === "discount-percent" && (
-          <div className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
-            <span>Minimum spend (optional):</span>
-            <InlineCurrency value={rule.minAmount ?? 0} onChange={(v) => onChange({ ...rule, minAmount: v || null })} placeholder="no minimum" />
-          </div>
-        )}
-        {rule.type === "buy-x-get-discount" && (
-          <div className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
-            <span>Minimum spend (optional):</span>
-            <InlineCurrency value={rule.minAmount ?? 0} onChange={(v) => onChange({ ...rule, minAmount: v || null })} placeholder="no minimum" />
-          </div>
-        )}
-
-        <div className="mt-2.5 pt-2.5 border-t border-primary/20 text-[12px] text-muted-foreground">
-          Preview: <span className="text-foreground font-medium">{describePromoRule(rule)}</span>
+      <div>
+        <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70 mb-1.5">Quick start</div>
+        <div className="flex flex-wrap gap-1.5">
+          {PRESETS.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => onChange(p.build())}
+              className="rounded-full border border-border bg-card/60 px-3 h-7 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+            >
+              {p.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
