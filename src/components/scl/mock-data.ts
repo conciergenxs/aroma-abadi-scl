@@ -407,12 +407,12 @@ export const contactGrowth = [
 ];
 
 export const recentActivity = [
-  { id: "a0", icon: "alert", text: "Event \"Aroma Abadi Beauty Class\" berhasil dijadwalkan — 87 kontak terdaftar", time: "Baru saja" },
-  { id: "a1", icon: "send", text: "Broadcast Velvet Rouge — VIP Early Access terkirim ke 12,380 kontak", time: "2m lalu" },
-  { id: "a2", icon: "user", text: "Siti Rahmawati ditandai VIP oleh Putri Anggraini", time: "14m lalu" },
-  { id: "a3", icon: "msg", text: "Template Beauty Club Upgrade disubmit untuk review", time: "32m lalu" },
-  { id: "a4", icon: "alert", text: "WhatsApp channel quality rating naik ke High", time: "1h lalu" },
-  { id: "a5", icon: "user", text: "47 kontak baru di-import dari sinkronisasi POS", time: "2h lalu" },
+  { id: "a0", icon: "alert", text: "Event \"Aroma Abadi Beauty Class\" successfully scheduled — 87 contacts registered", time: "Just now" },
+  { id: "a1", icon: "send", text: "Broadcast \"Velvet Rouge — VIP Early Access\" sent to 12,380 contacts", time: "2m ago" },
+  { id: "a2", icon: "user", text: "Siti Rahmawati tagged as VIP by Putri Anggraini", time: "14m ago" },
+  { id: "a3", icon: "msg", text: "Template \"Beauty Club Upgrade\" submitted for review", time: "32m ago" },
+  { id: "a4", icon: "alert", text: "WhatsApp channel quality rating increased to High", time: "1h ago" },
+  { id: "a5", icon: "user", text: "47 new contacts imported from POS sync", time: "2h ago" },
 ];
 
 export type ConnectedChannel = {
