@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  usePromoStore, promoStore, describePromoRule, defaultRuleForType,
+  usePromoStore, promoStore, describePromoRule, defaultRule,
   type PromoCode, type PromoStatus, type PromoRule,
 } from "@/components/scl/promo-store";
 import { PromoRuleBuilder } from "@/components/scl/promo-rule-builder";
