@@ -70,7 +70,7 @@ export function promoFormToPayload(form: PromoFormState): Pick<
   return {
     code: form.usageType === "one-to-many"
       ? form.code.trim().toUpperCase()
-      : (form.codeFile?.name ?? form.code.trim() ?? "BULK"),
+      : (form.codeFile?.name || form.code.trim() || "BULK"),
     name: form.name.trim(),
     description: form.description.trim(),
     rule: form.rule,
