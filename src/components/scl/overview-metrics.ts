@@ -91,6 +91,7 @@ export const mostUnfulfilledProducts: RankedProduct[] = [
   { name: "Laura Mercier Translucent Powder", brand: "Laura Mercier", count: 27 },
   { name: "Glow Serum — 3-bottle bundle", brand: "Limited restock", count: 19 },
   { name: "Vitamin C Serum", brand: "Limited restock", count: 11 },
+  { name: "Real Flawless Feather Matte Powder Foundation", brand: "Sisley", count: 7 },
 ];
 
 // ── D. Orders & Sales — fully derived from the real transactions[] seed ──
