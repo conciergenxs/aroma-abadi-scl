@@ -61,6 +61,16 @@ export const audienceSegmentation = {
   sleepingCustomers: 412,
 };
 
+export function scaledAudienceSegmentation(scale: number) {
+  return {
+    contacts: scaleStatic(audienceSegmentation.contacts, scale),
+    activeContacts: scaleStatic(audienceSegmentation.activeContacts, scale),
+    activeCustomers: scaleStatic(audienceSegmentation.activeCustomers, scale),
+    potentialCustomers: scaleStatic(audienceSegmentation.potentialCustomers, scale),
+    sleepingCustomers: scaleStatic(audienceSegmentation.sleepingCustomers, scale),
+  };
+}
+
 // ── B. Broadcast & Messaging — derived from the real broadcasts[] seed ──
 export type BroadcastMetrics = {
   broadcastSent: number;
