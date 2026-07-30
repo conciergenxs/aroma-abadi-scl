@@ -214,40 +214,13 @@ function AudienceSection() {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <SectionCard title="Audience & Segmentation" description="Who's in your contact base, and how engaged they are.">
+      <SectionCard title="Audience & Segmentation">
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
           <MetricStat icon={Users} label="Contacts" value={fmtNum(audienceSegmentation.contacts)} info="Total number of contacts you own (Total Users)." />
           <MetricStat icon={UserCheck} label="Active Contacts" value={fmtNum(audienceSegmentation.activeContacts)} info="Contacts who interacted with you in the last 6 months." />
           <MetricStat icon={BadgeCheck} label="Active Customers" value={fmtNum(audienceSegmentation.activeCustomers)} info="Contacts who made a transaction in the last 6 months." />
           <MetricStat icon={MoonStar} label="Sleeping Customers" value={fmtNum(audienceSegmentation.sleepingCustomers)} info="Contacts who transacted before, but not in the last 6 months." />
           <MetricStat icon={Sparkles} label="Potential Customers" value={fmtNum(audienceSegmentation.potentialCustomers)} info="Active Contacts who have never made a transaction." />
-        </div>
-        <div className="flex items-center gap-5 border-t border-border p-4">
-          {inView && (
-            <div className="relative w-28 h-28 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} />
-                  <Pie data={audienceDonutData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={54} paddingAngle={2} strokeWidth={0} isAnimationActive animationDuration={700}>
-                    {audienceDonutData.map((d) => <Cell key={d.name} fill={d.color} />)}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-sm font-semibold tabular-nums leading-none">{fmtNum(audienceSegmentation.contacts)}</span>
-                <span className="text-[9px] uppercase tracking-wide text-muted-foreground mt-0.5">Total</span>
-              </div>
-            </div>
-          )}
-          <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1.5">
-            {audienceDonutData.map((d) => (
-              <div key={d.name} className="flex items-center gap-1.5 text-xs">
-                <span className="h-2 w-2 rounded-sm shrink-0" style={{ background: d.color }} />
-                <span className="text-foreground/80 flex-1 truncate">{d.name}</span>
-                <span className="font-semibold tabular-nums">{fmtNum(d.value)}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </SectionCard>
     </Reveal>
