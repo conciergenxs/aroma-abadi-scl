@@ -264,7 +264,7 @@ function CreatePromoModal({ onClose }: { onClose: () => void }) {
 
 // ── Edit Modal ────────────────────────────────────────────────────────────────
 
-function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => void }) {
+export function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => void }) {
   const [form, setForm] = useState<PromoFormState>({
     code: promo.code,
     codeFile: null,
