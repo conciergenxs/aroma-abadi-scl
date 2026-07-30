@@ -155,7 +155,7 @@ type FunnelStage = { label: string; value: number; color: string };
 function StepFunnel({ stages }: { stages: FunnelStage[] }) {
   const max = stages[0]?.value || 1;
   return (
-    <div className="p-4 space-y-2.5">
+    <div className="p-4 space-y-2">
       {stages.map((s, i) => {
         const widthPct = Math.max((s.value / max) * 100, 10);
         const prev = i > 0 ? stages[i - 1] : null;
@@ -169,7 +169,7 @@ function StepFunnel({ stages }: { stages: FunnelStage[] }) {
                 {dropPct !== null && <span className="ml-1.5 text-muted-foreground/70">({dropPct.toFixed(1)}%)</span>}
               </span>
             </div>
-            <div className="h-6 rounded-md bg-muted overflow-hidden">
+            <div className="h-3.5 rounded-md bg-muted overflow-hidden">
               <div className="h-full rounded-md animate-grow-x" style={{ width: `${widthPct}%`, background: s.color }} />
             </div>
           </div>
