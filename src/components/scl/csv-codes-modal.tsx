@@ -12,8 +12,8 @@ export function CsvCodesModal({ fileName, codes, onClose }: { fileName: string; 
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 modal-backdrop">
+      <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-2xl overflow-hidden modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="min-w-0">
             <div className="text-sm font-semibold text-foreground truncate">{fileName}</div>
