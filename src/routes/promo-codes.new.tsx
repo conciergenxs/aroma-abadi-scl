@@ -198,15 +198,10 @@ function NewPromoCodePage() {
           </select>
         </div>
 
-        {/* Odoo ID */}
+        {/* Promo Rule */}
         <div>
-          <label className={labelCls}>Odoo ID</label>
-          <input
-            value={odooId}
-            onChange={(e) => setOdooId(e.target.value)}
-            placeholder="e.g. PC-2026-007"
-            className={inputCls}
-          />
+          <label className={labelCls}>Promo Rule</label>
+          <PromoRuleBuilder rule={rule} onChange={setRule} />
         </div>
 
         {/* Attach to Templates */}
