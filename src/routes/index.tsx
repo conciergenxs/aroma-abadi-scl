@@ -211,17 +211,18 @@ function RankedListColumn({ title, icon: Icon, items, color }: { title: string; 
 }
 
 // ── A. Audience & Segmentation ───────────────────────────────────────────
-function AudienceSection() {
+function AudienceSection({ scale }: { scale: number }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  const audience = scaledAudienceSegmentation(scale);
   return (
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard title="Audience & Segmentation">
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
-          <MetricStat icon={Users} label="Contacts" value={fmtNum(audienceSegmentation.contacts)} info="Total number of contacts you own (Total Users)." />
-          <MetricStat icon={UserCheck} label="Active Contacts" value={fmtNum(audienceSegmentation.activeContacts)} info="Contacts who interacted with you in the last 6 months." />
-          <MetricStat icon={BadgeCheck} label="Active Customers" value={fmtNum(audienceSegmentation.activeCustomers)} info="Contacts who made a transaction in the last 6 months." />
-          <MetricStat icon={MoonStar} label="Sleeping Customers" value={fmtNum(audienceSegmentation.sleepingCustomers)} info="Contacts who transacted before, but not in the last 6 months." />
-          <MetricStat icon={Sparkles} label="Potential Customers" value={fmtNum(audienceSegmentation.potentialCustomers)} info="Active Contacts who have never made a transaction." />
+          <MetricStat icon={Users} label="Contacts" value={fmtNum(audience.contacts)} info="Total number of contacts you own (Total Users)." />
+          <MetricStat icon={UserCheck} label="Active Contacts" value={fmtNum(audience.activeContacts)} info="Contacts who interacted with you in the last 6 months." />
+          <MetricStat icon={BadgeCheck} label="Active Customers" value={fmtNum(audience.activeCustomers)} info="Contacts who made a transaction in the last 6 months." />
+          <MetricStat icon={MoonStar} label="Sleeping Customers" value={fmtNum(audience.sleepingCustomers)} info="Contacts who transacted before, but not in the last 6 months." />
+          <MetricStat icon={Sparkles} label="Potential Customers" value={fmtNum(audience.potentialCustomers)} info="Active Contacts who have never made a transaction." />
         </div>
       </SectionCard>
     </Reveal>
