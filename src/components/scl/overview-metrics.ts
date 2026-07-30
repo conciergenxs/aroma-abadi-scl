@@ -14,6 +14,41 @@ function brandFromSkuCode(skuCode: string): string {
   return BRAND_BY_SKU_PREFIX[skuCode.split("-")[0]] ?? "Other";
 }
 
+// ── Date range filtering — drives the Overview page's date picker. ─────────
+// Only transactions and "Sent" broadcasts carry real dates in this seed data,
+// so those are filtered precisely; everything else (audience counts, total
+// conversations, static product rankings) has no per-record date to filter
+// by and is scaled proportionally to the selected range's share of the full
+// dataset window instead.
+export type DateRange = { start: string; end: string }; // inclusive, "YYYY-MM-DD"
+
+function inRange(iso: string, range?: DateRange): boolean {
+  if (!range) return true;
+  const day = iso.slice(0, 10);
+  return day >= range.start && day <= range.end;
+}
+
+export function getTransactionDateBounds(transactions: Transaction[]): DateRange {
+  if (transactions.length === 0) {
+    const today = new Date().toISOString().slice(0, 10);
+    return { start: today, end: today };
+  }
+  const days = transactions.map((t) => t.date.slice(0, 10)).sort();
+  return { start: days[0], end: days[days.length - 1] };
+}
+
+export function computeRangeScale(range: DateRange, fullRange: DateRange): number {
+  const dayCount = (r: DateRange) =>
+    Math.round((new Date(r.end).getTime() - new Date(r.start).getTime()) / 86_400_000) + 1;
+  const fullDays = dayCount(fullRange);
+  if (fullDays <= 0) return 1;
+  return Math.min(1, Math.max(0.02, dayCount(range) / fullDays));
+}
+
+function scaleStatic(baseline: number, scale: number): number {
+  return Math.max(0, Math.round(baseline * scale));
+}
+
 // ── A. Audience & Segmentation ──────────────────────────────────────────
 // The seeded contact list has no real interaction-recency history to compute
 // a 6-month window from, so these stay illustrative — but kept internally
