@@ -286,21 +286,26 @@ export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange
 
   return (
     <div className="space-y-3">
-      <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] p-3 space-y-3">
-        <ConditionEditor condition={rule.condition} onChange={(condition) => onChange({ ...rule, condition })} items={items} />
-        <div className="flex items-center gap-2 text-muted-foreground/50">
-          <div className="flex-1 border-t border-dashed border-primary/20" />
-          <ArrowRight className="h-3.5 w-3.5" />
-          <div className="flex-1 border-t border-dashed border-primary/20" />
+      <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] overflow-hidden">
+        {/* Big preview */}
+        <div className="px-4 py-4 text-center border-b border-dashed border-primary/20 bg-primary/[0.05]">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Preview</div>
+          <div className="text-base md:text-lg font-semibold text-foreground leading-snug">{describePromoRule(rule)}</div>
         </div>
-        <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} />
-        <div className="pt-2.5 border-t border-primary/20 text-[12px] text-muted-foreground">
-          Preview: <span className="text-foreground font-medium">{describePromoRule(rule)}</span>
+
+        {/* Condition (rule 1) + Reward (rule 2) side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dashed divide-primary/20">
+          <div className="p-3">
+            <ConditionEditor condition={rule.condition} onChange={(condition) => onChange({ ...rule, condition })} items={items} />
+          </div>
+          <div className="p-3">
+            <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} />
+          </div>
         </div>
       </div>
 
       <div>
-        <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70 mb-1.5">Quick start</div>
+        <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70 mb-1.5">Quick Template</div>
         <div className="flex flex-wrap gap-1.5">
           {PRESETS.map((p) => (
             <button
