@@ -31,6 +31,9 @@ const REWARD_OPTIONS: { kind: PromoReward["kind"]; label: string }[] = [
   { kind: "amount-off", label: "Rp Discount" },
 ];
 
+// One preset per genuinely distinct condition × reward pairing — not variations
+// on the same pairing (e.g. "Buy 2 Get 1" is just a qty tweak of "Buy 1 Get 1",
+// which the qty field already covers, so it isn't a separate preset).
 const PRESETS: { label: string; build: () => PromoRule }[] = [
   {
     label: "Buy 1 Get 1 Free",
@@ -40,24 +43,31 @@ const PRESETS: { label: string; build: () => PromoRule }[] = [
     }),
   },
   {
-    label: "Buy 2 Get 1 Free",
-    build: () => ({
-      condition: { kind: "buy-item", qty: 2, item: { kind: "any" } },
-      reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
-    }),
-  },
-  {
-    label: "20% Off Total",
+    label: "% Off Total Purchase",
     build: () => ({
       condition: { kind: "any-purchase" },
       reward: { kind: "percent-off", percent: 20, appliesTo: { kind: "any" }, maxDiscount: null },
     }),
   },
   {
-    label: "Rp50,000 Cashback",
+    label: "Rp Off This Purchase",
+    build: () => ({
+      condition: { kind: "buy-item", qty: 1, item: { kind: "any" } },
+      reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
+    }),
+  },
+  {
+    label: "Cashback Next Purchase",
     build: () => ({
       condition: { kind: "any-purchase" },
       reward: { kind: "amount-off", amount: 50000, timing: "next-purchase" },
+    }),
+  },
+  {
+    label: "Min. Spend → % Off",
+    build: () => ({
+      condition: { kind: "min-spend", amount: 500000 },
+      reward: { kind: "percent-off", percent: 15, appliesTo: { kind: "any" }, maxDiscount: null },
     }),
   },
 ];
