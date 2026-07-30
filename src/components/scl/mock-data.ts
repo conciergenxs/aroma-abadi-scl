@@ -373,7 +373,7 @@ export const broadcasts: Broadcast[] = [
     createdBy: "Putri Anggraini", createdAt: "2 hari lalu",
     contentMode: "manual", body: "Hi {{name}} — Promo Ramadhan Glow Set mulai Jumat jam 8 pagi. Akses awal untuk Beauty Club.", footer: "Balas STOP untuk berhenti.",
     buttons: [{ label: "Preview drop", kind: "url" }], replied: 0, failed: 0 },
-  { id: "b4", name: "Corporate Hampers Lebaran", channel: "whatsapp", audience: "Corporate · 612", reach: 612, delivered: 610, read: 588, clicks: 244, sentAt: "3 hari lalu", sentAtDate: "2026-07-04", status: "Sent",
+  { id: "b4", name: "Corporate Hampers Lebaran", channel: "whatsapp", audience: "Corporate · 612", reach: 612, delivered: 610, read: 588, clicks: 244, sentAt: "3 hari lalu", sentAtDate: "2026-07-27", status: "Sent",
     channelId: "wa-jkt", listIds: ["ls-vip"], totalAudience: 612, sendMode: "now", createdBy: "Siti Rahmawati", createdAt: "3 hari lalu",
     contentMode: "template", templateId: "tp2", body: "Hi {{name}}, katalog hampers Lebaran corporate kamu sudah siap. Harga bulk terlampir.",
     buttons: [{ label: "Download katalog", kind: "url" }], replied: 48, failed: 2 },
