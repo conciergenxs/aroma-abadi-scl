@@ -18,7 +18,7 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { usePromoStore, promoStore, describePromoRule, type PromoRedemption, type PromoStatus } from "@/components/scl/promo-store";
+import { usePromoStore, promoStore, describePromoRule, getPromoStatus, type PromoRedemption, type PromoStatus } from "@/components/scl/promo-store";
 import { EditPromoModal } from "@/routes/promo-codes";
 
 export const Route = createFileRoute("/promo-codes/$promoId")({
