@@ -4,81 +4,83 @@ import { transactionsStore } from "./transactions-store";
 
 export type PromoStatus = "active" | "expired" | "inactive";
 
-// ── Rule model — promos are built from plain-language X/Y/Z variables ─────────
-// instead of being sourced from Odoo. Three POS-aligned promo types:
-//   1. Buy X Get Y            (BOGO — same or different item)
-//   2. Buy X Get Discount     (fixed Rp off: bundling / cashback / straight discount)
-//   3. Discount % on Total    (percentage off cart or a specific item)
+// ── Rule model — a composable Condition × Reward engine ───────────────────────
+// Not a fixed catalog of promo "types" (that was the Odoo-style limitation).
+// Any Condition can pair with any Reward, and every X/Y/Z slot inside each one
+// (item, quantity, amount, percent, cap, timing) is independently editable —
+// so the same builder can express any promo shape: Buy 1 Get 1, Buy 2 Get 1
+// different item, min-spend cashback, item-specific % off with a cap, etc.
 
 export type PromoItemScope = { kind: "any" } | { kind: "specific"; items: string[] };
 
-export type PromoRule =
-  | {
-      type: "buy-x-get-y";
-      buyQty: number;
-      buyItem: PromoItemScope;
-      getQty: number;
-      getItem: PromoItemScope;
-      sameAsPurchased: boolean;
-    }
-  | {
-      type: "buy-x-get-discount";
-      buyItem: PromoItemScope;
-      minAmount: number | null;
-      discountAmount: number;
-      variant: "immediate" | "cashback-next-purchase" | "bundle-price";
-    }
-  | {
-      type: "discount-percent";
-      discountPercent: number;
-      minAmount: number | null;
-      scope: PromoItemScope;
-    };
+// X — what the customer must do to qualify
+export type PromoCondition =
+  | { kind: "any-purchase" }
+  | { kind: "buy-item"; qty: number; item: PromoItemScope }
+  | { kind: "min-spend"; amount: number };
 
-export function defaultRuleForType(type: PromoRule["type"]): PromoRule {
-  switch (type) {
-    case "buy-x-get-y":
-      return { type, buyQty: 1, buyItem: { kind: "any" }, getQty: 1, getItem: { kind: "any" }, sameAsPurchased: true };
-    case "buy-x-get-discount":
-      return { type, buyItem: { kind: "any" }, minAmount: null, discountAmount: 50000, variant: "immediate" };
-    case "discount-percent":
-      return { type, discountPercent: 10, minAmount: null, scope: { kind: "any" } };
+// Y — what the customer gets
+export type PromoReward =
+  | { kind: "free-item"; qty: number; sameAsPurchased: boolean; item: PromoItemScope }
+  | { kind: "percent-off"; percent: number; appliesTo: PromoItemScope; maxDiscount: number | null }
+  | { kind: "amount-off"; amount: number; timing: "immediate" | "next-purchase" };
+
+export type PromoRule = {
+  condition: PromoCondition;
+  reward: PromoReward;
+};
+
+export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
+  switch (kind) {
+    case "any-purchase": return { kind };
+    case "buy-item": return { kind, qty: 1, item: { kind: "any" } };
+    case "min-spend": return { kind, amount: 500000 };
   }
 }
 
-function scopeLabel(scope: PromoItemScope): string {
-  if (scope.kind === "any" || scope.items.length === 0) return "Any Item";
+export function defaultReward(kind: PromoReward["kind"]): PromoReward {
+  switch (kind) {
+    case "free-item": return { kind, qty: 1, sameAsPurchased: true, item: { kind: "any" } };
+    case "percent-off": return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
+    case "amount-off": return { kind, amount: 50000, timing: "immediate" };
+  }
+}
+
+export function defaultRule(): PromoRule {
+  return { condition: defaultCondition("any-purchase"), reward: defaultReward("percent-off") };
+}
+
+function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
+  if (scope.kind === "any" || scope.items.length === 0) return anyLabel;
   if (scope.items.length === 1) return scope.items[0];
   return `${scope.items[0]} +${scope.items.length - 1} more`;
 }
 
-export function describePromoRule(rule: PromoRule): string {
-  switch (rule.type) {
-    case "buy-x-get-y": {
-      const buy = `Buy ${rule.buyQty} ${scopeLabel(rule.buyItem)}`;
-      const get = rule.sameAsPurchased
-        ? `Get ${rule.getQty} Same Item Free`
-        : `Get ${rule.getQty} ${scopeLabel(rule.getItem)} Free`;
-      return `${buy} → ${get}`;
-    }
-    case "buy-x-get-discount": {
-      const buy = rule.minAmount
-        ? `Buy ${scopeLabel(rule.buyItem)} (min. ${fmtIDR(rule.minAmount)})`
-        : `Buy ${scopeLabel(rule.buyItem)}`;
-      const reward =
-        rule.variant === "cashback-next-purchase"
-          ? `Get ${fmtIDR(rule.discountAmount)} Cashback for Next Purchase`
-          : rule.variant === "bundle-price"
-            ? `Get ${fmtIDR(rule.discountAmount)} Off as Bundle`
-            : `Get ${fmtIDR(rule.discountAmount)} Off`;
-      return `${buy} → ${reward}`;
-    }
-    case "discount-percent": {
-      const scope = rule.scope.kind === "any" ? "Total Purchase" : scopeLabel(rule.scope);
-      const min = rule.minAmount ? ` (min. ${fmtIDR(rule.minAmount)})` : "";
-      return `Get ${rule.discountPercent}% Off ${scope}${min}`;
-    }
+function describeCondition(c: PromoCondition): string {
+  switch (c.kind) {
+    case "any-purchase": return "Any Purchase";
+    case "buy-item": return `Buy ${c.qty} ${scopeLabel(c.item)}`;
+    case "min-spend": return `Spend min. ${fmtIDR(c.amount)}`;
   }
+}
+
+function describeReward(r: PromoReward): string {
+  switch (r.kind) {
+    case "free-item":
+      return r.sameAsPurchased ? `Get ${r.qty} Same Item Free` : `Get ${r.qty} ${scopeLabel(r.item)} Free`;
+    case "percent-off": {
+      const cap = r.maxDiscount ? ` (max ${fmtIDR(r.maxDiscount)})` : "";
+      return `Get ${r.percent}% Off ${scopeLabel(r.appliesTo, "Total Purchase")}${cap}`;
+    }
+    case "amount-off":
+      return r.timing === "next-purchase"
+        ? `Get ${fmtIDR(r.amount)} Cashback for Next Purchase`
+        : `Get ${fmtIDR(r.amount)} Off`;
+  }
+}
+
+export function describePromoRule(rule: PromoRule): string {
+  return `${describeCondition(rule.condition)} → ${describeReward(rule.reward)}`;
 }
 
 // ── Redemption + ownership model ───────────────────────────────────────────────
