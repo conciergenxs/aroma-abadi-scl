@@ -59,12 +59,14 @@ function NewPromoCodePage() {
       code: usageType === "one-to-many" ? code.trim().toUpperCase() : (codeFile?.name ?? "BULK"),
       name: name.trim(),
       description: description.trim(),
+      rule,
       usageType,
       maxUsage: maxUsage ? Number(maxUsage) : null,
       startDate,
       endDate,
       status,
-      odooId: odooId.trim(),
+      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
+      createdAt: new Date().toISOString(),
     });
     toast.success("Promo code created");
     navigate({ to: "/promo-codes" });
