@@ -222,7 +222,7 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
               onChange={(e) => set("maxUsage", e.target.value)}
               placeholder="e.g. 500"
               min={1}
-              className={`${inputCls} disabled:opacity-40 disabled:cursor-not-allowed`}
+              className={`${inputCls} transition-opacity disabled:opacity-40 disabled:cursor-not-allowed`}
             />
             <label className="flex items-center gap-1 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
               <input
