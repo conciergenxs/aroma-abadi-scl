@@ -26,17 +26,6 @@ export const audienceSegmentation = {
   sleepingCustomers: 412,
 };
 
-export const audienceDonutData = [
-  { name: "Active Customers", value: audienceSegmentation.activeCustomers, color: "var(--chart-1)" },
-  { name: "Potential Customers", value: audienceSegmentation.potentialCustomers, color: "var(--chart-2)" },
-  { name: "Sleeping Customers", value: audienceSegmentation.sleepingCustomers, color: "var(--chart-3)" },
-  {
-    name: "Other Contacts",
-    value: audienceSegmentation.contacts - audienceSegmentation.activeContacts - audienceSegmentation.sleepingCustomers,
-    color: "var(--chart-4)",
-  },
-];
-
 // ── B. Broadcast & Messaging — derived from the real broadcasts[] seed ──
 export type BroadcastMetrics = {
   broadcastSent: number;
