@@ -383,6 +383,98 @@ function ConversionSection({ broadcast, orders, funnelRates }: { broadcast: Broa
   );
 }
 
+// ── Date range popover — filters every metric on the page down to the
+// selected window (presets or a custom from/to pair). ──────────────────────
+const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function fmtShortDate(iso: string) {
+  const d = new Date(`${iso}T00:00:00`);
+  return `${String(d.getDate()).padStart(2, "0")} ${MONTHS_SHORT[d.getMonth()]}`;
+}
+function addDaysIso(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fullRange: DateRange; onChange: (r: DateRange) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const isFull = range.start === fullRange.start && range.end === fullRange.end;
+  const label = isFull ? "Full Period" : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
+
+  const presets: { label: string; range: DateRange }[] = [
+    { label: "Full Period", range: fullRange },
+    { label: "Last 7 Days", range: { start: addDaysIso(fullRange.end, -6), end: fullRange.end } },
+    { label: "Last 3 Days", range: { start: addDaysIso(fullRange.end, -2), end: fullRange.end } },
+  ];
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1.5 h-7 rounded-md border border-border bg-card/60 px-2.5 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+      >
+        <Calendar className="h-3 w-3 shrink-0" />
+        <span className="max-w-[160px] truncate">{label}</span>
+        <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
+          <div className="space-y-0.5">
+            {presets.map((p) => {
+              const active = range.start === p.range.start && range.end === p.range.end;
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => { onChange(p.range); setOpen(false); }}
+                  className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
+                    active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="my-2 border-t border-border" />
+          <div className="px-1 pb-1 space-y-1.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">Custom Range</div>
+            <input
+              type="date"
+              value={range.start}
+              min={fullRange.start}
+              max={range.end}
+              onChange={(e) => e.target.value && onChange({ start: e.target.value, end: range.end })}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+            <input
+              type="date"
+              value={range.end}
+              min={range.start}
+              max={fullRange.end}
+              onChange={(e) => e.target.value && onChange({ start: range.start, end: e.target.value })}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────
 function Dashboard() {
   const today = fmtDateEN(new Date());
