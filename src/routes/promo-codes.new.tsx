@@ -31,7 +31,7 @@ function NewPromoCodePage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState<"active" | "inactive">("active");
-  const [odooId, setOdooId] = useState("");
+  const [rule, setRule] = useState<PromoRule>(() => defaultRuleForType("discount-percent"));
   const [attachedTemplates, setAttachedTemplates] = useState<string[]>([]);
 
   const inputCls = "h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40";
