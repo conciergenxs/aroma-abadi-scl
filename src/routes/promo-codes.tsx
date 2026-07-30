@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createPortal } from "react-dom";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { useState, useMemo, useRef, useEffect } from "react";
@@ -7,7 +8,11 @@ import {
   MoreVertical, Pencil, Info, X, Upload, FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
-import { usePromoStore, promoStore, type PromoCode, type PromoStatus } from "@/components/scl/promo-store";
+import {
+  usePromoStore, promoStore, describePromoRule, defaultRuleForType,
+  type PromoCode, type PromoStatus, type PromoRule,
+} from "@/components/scl/promo-store";
+import { PromoRuleBuilder } from "@/components/scl/promo-rule-builder";
 
 export const Route = createFileRoute("/promo-codes")({
   head: () => ({ meta: [{ title: "Promo Codes — Aroma Abadi" }] }),
@@ -22,6 +27,11 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-mut
 function formatDate(iso: string) {
   if (!iso) return "—";
   return fmtDateEN(iso);
+}
+
+function Portal({ children }: { children: React.ReactNode }) {
+  if (typeof document === "undefined") return null;
+  return createPortal(children, document.body);
 }
 
 function StatusBadge({ status }: { status: PromoStatus }) {
@@ -89,7 +99,7 @@ type PromoFormState = {
   startDate: string;
   endDate: string;
   status: "active" | "inactive" | "expired";
-  odooId: string;
+  rule: PromoRule;
 };
 
 function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f: PromoFormState) => void }) {
@@ -100,55 +110,69 @@ function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f:
 
   return (
     <div className="space-y-4">
-      {/* Usage Type */}
-      <div>
-        <label className={labelCls}>Usage Type</label>
-        <div className="inline-flex rounded-md border border-border bg-muted/40 p-0.5 gap-0.5">
-          {(["one-to-many", "one-to-one"] as const).map((t) => (
-            <button key={t} type="button"
-              onClick={() => setForm({ ...form, usageType: t, code: "", codeFile: null })}
-              className={`px-3 h-8 text-[12px] font-medium rounded transition-colors ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              {t === "one-to-many" ? "1-to-Many" : "1-to-1 (unique)"}
-            </button>
-          ))}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Usage Type */}
+        <div>
+          <label className={labelCls}>Usage Type</label>
+          <div className="inline-flex rounded-md border border-border bg-muted/40 p-0.5 gap-0.5">
+            {(["one-to-many", "one-to-one"] as const).map((t) => (
+              <button key={t} type="button"
+                onClick={() => setForm({ ...form, usageType: t, code: "", codeFile: null })}
+                className={`px-3 h-8 text-[12px] font-medium rounded transition-colors ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                {t === "one-to-many" ? "1-to-Many" : "1-to-1 (unique)"}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Code */}
+        {form.usageType === "one-to-many" ? (
+          <div>
+            <label className={labelCls}>Code</label>
+            <input value={form.code} onChange={(e) => set("code", e.target.value.toUpperCase())}
+              placeholder="e.g. SUMMER20" className={inputCls} />
+          </div>
+        ) : (
+          <div>
+            <label className={labelCls}>Upload Codes (CSV)</label>
+            <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden"
+              onChange={(e) => set("codeFile", e.target.files?.[0] ?? null)} />
+            {form.codeFile ? (
+              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card text-sm">
+                <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
+                <span className="flex-1 truncate">{form.codeFile.name}</span>
+                <button type="button" onClick={() => set("codeFile", null)} className="text-muted-foreground hover:text-destructive">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileInputRef.current?.click()}
+                className="w-full h-9 rounded-md border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-1.5 text-muted-foreground transition-colors">
+                <Upload className="h-3.5 w-3.5" />
+                <span className="text-xs">Click to upload CSV</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Code */}
-      {form.usageType === "one-to-many" ? (
+      <div className="grid grid-cols-2 gap-4">
+        {/* Name */}
         <div>
-          <label className={labelCls}>Code</label>
-          <input value={form.code} onChange={(e) => set("code", e.target.value.toUpperCase())}
-            placeholder="e.g. SUMMER20" className={inputCls} />
+          <label className={labelCls}>Promo Name</label>
+          <input value={form.name} onChange={(e) => set("name", e.target.value)}
+            placeholder="e.g. Summer 20% Off" className={inputCls} />
         </div>
-      ) : (
-        <div>
-          <label className={labelCls}>Upload Codes (CSV)</label>
-          <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden"
-            onChange={(e) => set("codeFile", e.target.files?.[0] ?? null)} />
-          {form.codeFile ? (
-            <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card text-sm">
-              <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
-              <span className="flex-1 truncate">{form.codeFile.name}</span>
-              <button type="button" onClick={() => set("codeFile", null)} className="text-muted-foreground hover:text-destructive">
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button type="button" onClick={() => fileInputRef.current?.click()}
-              className="w-full h-16 rounded-md border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 flex flex-col items-center justify-center gap-1 text-muted-foreground transition-colors">
-              <Upload className="h-4 w-4" />
-              <span className="text-xs">Click to upload CSV</span>
-            </button>
-          )}
-        </div>
-      )}
 
-      {/* Name */}
-      <div>
-        <label className={labelCls}>Promo Name</label>
-        <input value={form.name} onChange={(e) => set("name", e.target.value)}
-          placeholder="e.g. Summer 20% Off" className={inputCls} />
+        {/* Status */}
+        <div>
+          <label className={labelCls}>Status</label>
+          <select value={form.status} onChange={(e) => set("status", e.target.value as PromoFormState["status"])} className={inputCls}>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
       </div>
 
       {/* Description */}
@@ -159,15 +183,19 @@ function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f:
           className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none" />
       </div>
 
-      {/* Max Usage */}
+      {/* Rule builder */}
       <div>
-        <label className={labelCls}>Max Usage <span className="normal-case text-muted-foreground/60">(blank = unlimited)</span></label>
-        <input type="number" value={form.maxUsage} onChange={(e) => set("maxUsage", e.target.value)}
-          placeholder="e.g. 500" min={1} className={inputCls} />
+        <label className={labelCls}>Promo Rule</label>
+        <PromoRuleBuilder rule={form.rule} onChange={(r) => set("rule", r)} />
       </div>
 
-      {/* Dates */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-4">
+        {/* Max Usage */}
+        <div>
+          <label className={labelCls}>Max Usage <span className="normal-case text-muted-foreground/60">(blank = unlimited)</span></label>
+          <input type="number" value={form.maxUsage} onChange={(e) => set("maxUsage", e.target.value)}
+            placeholder="e.g. 500" min={1} className={inputCls} />
+        </div>
         <div>
           <label className={labelCls}>Start Date</label>
           <input type="date" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={inputCls} />
@@ -176,23 +204,6 @@ function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f:
           <label className={labelCls}>End Date</label>
           <input type="date" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} className={inputCls} />
         </div>
-      </div>
-
-      {/* Status */}
-      <div>
-        <label className={labelCls}>Status</label>
-        <select value={form.status} onChange={(e) => set("status", e.target.value as PromoFormState["status"])} className={inputCls}>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="expired">Expired</option>
-        </select>
-      </div>
-
-      {/* Odoo ID */}
-      <div>
-        <label className={labelCls}>Odoo ID</label>
-        <input value={form.odooId} onChange={(e) => set("odooId", e.target.value)}
-          placeholder="e.g. PC-2026-007" className={inputCls} />
       </div>
     </div>
   );
@@ -204,7 +215,7 @@ function CreatePromoModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<PromoFormState>({
     code: "", codeFile: null, name: "", description: "",
     usageType: "one-to-many", maxUsage: "", startDate: "", endDate: "",
-    status: "active", odooId: "",
+    status: "active", rule: defaultRuleForType("discount-percent"),
   });
 
   const handleSave = () => {
@@ -215,35 +226,39 @@ function CreatePromoModal({ onClose }: { onClose: () => void }) {
       code: form.usageType === "one-to-many" ? form.code.trim().toUpperCase() : (form.codeFile?.name ?? "BULK"),
       name: form.name.trim(),
       description: form.description.trim(),
+      rule: form.rule,
       usageType: form.usageType,
       maxUsage: form.maxUsage ? Number(form.maxUsage) : null,
       startDate: form.startDate,
       endDate: form.endDate,
       status: form.status,
-      odooId: form.odooId.trim(),
+      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
+      createdAt: new Date().toISOString(),
     });
     toast.success("Promo code created");
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-16 overflow-y-auto">
-      <div className="w-full max-w-lg bg-card border border-border rounded-xl shadow-2xl mb-8">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold text-foreground">Create Promo Code</div>
-          <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="p-5">
-          <PromoFormFields form={form} setForm={setForm} />
-        </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
-          <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Promo Code</button>
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto">
+        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8">
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <div className="text-sm font-semibold text-foreground">Create Promo Code</div>
+            <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="p-5 max-h-[75vh] overflow-y-auto">
+            <PromoFormFields form={form} setForm={setForm} />
+          </div>
+          <div className="p-4 border-t border-border flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
+            <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Promo Code</button>
+          </div>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 }
 
@@ -260,7 +275,7 @@ function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => v
     startDate: promo.startDate,
     endDate: promo.endDate,
     status: promo.status,
-    odooId: promo.odooId,
+    rule: promo.rule,
   });
 
   const handleSave = () => {
@@ -269,35 +284,37 @@ function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => v
       code: form.code.trim().toUpperCase(),
       name: form.name.trim(),
       description: form.description.trim(),
+      rule: form.rule,
       usageType: form.usageType,
       maxUsage: form.maxUsage ? Number(form.maxUsage) : null,
       startDate: form.startDate,
       endDate: form.endDate,
       status: form.status,
-      odooId: form.odooId.trim(),
     });
     toast.success("Promo code updated");
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-16 overflow-y-auto">
-      <div className="w-full max-w-lg bg-card border border-border rounded-xl shadow-2xl mb-8">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold text-foreground">Edit — {promo.code}</div>
-          <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="p-5">
-          <PromoFormFields form={form} setForm={setForm} />
-        </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
-          <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto">
+        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8">
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <div className="text-sm font-semibold text-foreground">Edit — {promo.code}</div>
+            <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="p-5 max-h-[75vh] overflow-y-auto">
+            <PromoFormFields form={form} setForm={setForm} />
+          </div>
+          <div className="p-4 border-t border-border flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
+            <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
+          </div>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 }
 
@@ -365,7 +382,7 @@ function PromoCodesPage() {
           <thead>
             <tr className="border-b border-border bg-card/60">
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Code</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Name</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Name &amp; Rule</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Type</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Period</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
@@ -389,11 +406,10 @@ function PromoCodesPage() {
                       <Copy className="h-3 w-3" />
                     </button>
                   </div>
-                  <div className="text-[10px] text-muted-foreground/60 mt-0.5">{promo.odooId}</div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 max-w-[200px] truncate">{promo.description}</div>
+                  <div className="text-[11px] text-primary/80 mt-0.5 max-w-[280px] truncate">{describePromoRule(promo.rule)}</div>
                 </td>
                 <td className="px-4 py-3">
                   {promo.usageType === "one-to-one"
@@ -405,7 +421,7 @@ function PromoCodesPage() {
                 </td>
                 <td className="px-4 py-3"><StatusBadge status={promo.status} /></td>
                 <td className="px-4 py-3 text-center">
-                  <span className="text-[13px] font-semibold text-foreground">{promo.usages.length}</span>
+                  <span className="text-[13px] font-semibold text-foreground">{promo.redemptions.length}</span>
                   {promo.maxUsage && <span className="text-[10px] text-muted-foreground"> / {promo.maxUsage}</span>}
                 </td>
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
