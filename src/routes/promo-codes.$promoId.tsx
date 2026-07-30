@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
-import { fmtDateID, fmtNum } from "@/lib/fmt";
-import { AppShell } from "@/components/scl/app-shell";
+import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
+import { fmtDateID, fmtDateTimeID, fmtNum, fmtIDR } from "@/lib/fmt";
+import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useState } from "react";
 import {
   CheckCircle2,
@@ -8,10 +8,18 @@ import {
   Clock,
   Pencil,
   Trash2,
-  X,
+  Users,
+  Wallet,
+  Percent,
+  Ticket,
+  FileText,
+  Megaphone,
+  ShoppingBag,
+  UserCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { usePromoStore, promoStore, type PromoCode, type PromoStatus } from "@/components/scl/promo-store";
+import { usePromoStore, promoStore, describePromoRule, type PromoRedemption, type PromoStatus } from "@/components/scl/promo-store";
+import { EditPromoModal } from "@/routes/promo-codes";
 
 export const Route = createFileRoute("/promo-codes/$promoId")({
   head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
@@ -19,10 +27,6 @@ export const Route = createFileRoute("/promo-codes/$promoId")({
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string) {
-  return fmtDateID(iso);
-}
 
 function StatusBadge({ status }: { status: PromoStatus }) {
   if (status === "active")
@@ -58,91 +62,30 @@ function UsageTypeBadge({ type }: { type: "one-to-one" | "one-to-many" }) {
   );
 }
 
-// ── Edit Modal ────────────────────────────────────────────────────────────────
+const CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string }> = {
+  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white" },
+  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white" },
+  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white" },
+  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white" },
+};
 
-function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => void }) {
-  const [name, setName] = useState(promo.name);
-  const [description, setDescription] = useState(promo.description);
-  const [code, setCode] = useState(promo.code);
-  const [maxUsage, setMaxUsage] = useState(promo.maxUsage?.toString() ?? "");
-  const [startDate, setStartDate] = useState(promo.startDate);
-  const [endDate, setEndDate] = useState(promo.endDate);
-  const [status, setStatus] = useState<PromoStatus>(promo.status);
-  const [odooId, setOdooId] = useState(promo.odooId);
-
-  const inputCls = "h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40";
-  const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
-
-  const handleSave = () => {
-    if (!name.trim()) { toast.error("Promo Name is required"); return; }
-    promoStore.updatePromo(promo.id, {
-      name: name.trim(),
-      description: description.trim(),
-      code: code.trim().toUpperCase(),
-      maxUsage: maxUsage ? Number(maxUsage) : null,
-      startDate,
-      endDate,
-      status,
-      odooId: odooId.trim(),
-    });
-    toast.success("Promo code updated");
-    onClose();
-  };
-
+function ChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
+  const meta = CHANNEL_META[channel];
+  const Icon = meta.icon;
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 animate-fade-in">
-      <div className="w-full max-w-lg bg-background border border-border rounded-xl overflow-hidden shadow-2xl">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">Edit Promo Code</div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-          <div>
-            <label className={labelCls}>Code</label>
-            <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} className={inputCls} />
-          </div>
-          <div>
-            <label className={labelCls}>Promo Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
-          </div>
-          <div>
-            <label className={labelCls}>Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none" />
-          </div>
-          <div>
-            <label className={labelCls}>Max Usage <span className="normal-case text-muted-foreground/60">(blank = unlimited)</span></label>
-            <input type="number" value={maxUsage} onChange={(e) => setMaxUsage(e.target.value)} min={1} className={inputCls} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelCls}>Start Date</label>
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>End Date</label>
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputCls} />
-            </div>
-          </div>
-          <div>
-            <label className={labelCls}>Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as PromoStatus)} className={inputCls}>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="expired">Expired</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelCls}>Odoo ID</label>
-            <input value={odooId} onChange={(e) => setOdooId(e.target.value)} className={inputCls} />
-          </div>
-        </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm hover:bg-gray-50 transition-colors">Cancel</button>
-          <button onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
-        </div>
+    <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}>
+      <Icon className="h-2.5 w-2.5" /> {meta.label}
+    </span>
+  );
+}
+
+function StatTile({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Users }) {
+  return (
+    <div className="rounded-xl border border-border bg-card/40 p-4">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <Icon className="h-3 w-3" /> {label}
       </div>
+      <div className="mt-1.5 text-lg font-semibold text-foreground">{value}</div>
     </div>
   );
 }
@@ -174,75 +117,187 @@ function PromoDetailPage() {
     navigate({ to: "/promo-codes" });
   };
 
+  const redemptions = [...promo.redemptions].sort((a, b) => +new Date(b.redeemedAt) - +new Date(a.redeemedAt));
+  const totalDiscountValue = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
+  const uniqueCustomers = new Set(redemptions.map((r) => r.contactId)).size;
+  const usageRate = promo.maxUsage ? Math.round((redemptions.length / promo.maxUsage) * 100) : null;
+
+  const channelCounts = redemptions.reduce<Record<string, number>>((acc, r) => {
+    acc[r.channel] = (acc[r.channel] ?? 0) + 1;
+    return acc;
+  }, {});
+  const maxChannelCount = Math.max(1, ...Object.values(channelCounts));
+
   return (
     <AppShell backTo="/promo-codes" title={promo.name}>
-      <div className="max-w-2xl space-y-6">
+      <div className="max-w-5xl space-y-6">
         {/* Header card */}
         <div className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <code className="font-mono text-base font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
-                  {promo.code}
-                </code>
-              </div>
-              <div className="text-[11px] text-muted-foreground">Odoo: {promo.odooId || "—"}</div>
-            </div>
             <div className="flex items-center gap-2">
-              <StatusBadge status={promo.status} />
+              <code className="font-mono text-base font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
+                {promo.code}
+              </code>
               <UsageTypeBadge type={promo.usageType} />
             </div>
+            <StatusBadge status={promo.status} />
           </div>
 
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Description</div>
-            <p className="text-sm text-foreground/90">{promo.description || "—"}</p>
+          <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] px-4 py-3">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Rule</div>
+            <div className="text-sm font-medium text-foreground">{describePromoRule(promo.rule)}</div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {promo.description && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Description</div>
+              <p className="text-sm text-foreground/90">{promo.description}</p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-4 gap-4 pt-1">
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Period</div>
-              <div className="text-sm">{promo.startDate ? formatDate(promo.startDate) : "—"} — {promo.endDate ? formatDate(promo.endDate) : "—"}</div>
+              <div className="text-[13px]">{promo.startDate ? fmtDateID(promo.startDate) : "—"} — {promo.endDate ? fmtDateID(promo.endDate) : "—"}</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Max Usage</div>
-              <div className="text-sm">{promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}</div>
+              <div className="text-[13px]">{promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Used</div>
-              <div className="text-sm font-semibold">
-                {promo.usages.length}
-                {promo.maxUsage ? <span className="font-normal text-muted-foreground"> / {promo.maxUsage}</span> : ""}
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Owner</div>
+              <div className="text-[13px] flex items-center gap-1.5">
+                <UserCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
+                {promo.createdBy.name}
+                <span className="text-muted-foreground">· {promo.createdBy.jobTitle}</span>
               </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Created</div>
+              <div className="text-[13px]">{fmtDateTimeID(promo.createdAt)}</div>
             </div>
           </div>
         </div>
 
-        {/* Usage History */}
-        <div className="rounded-xl border border-border bg-card/40 p-5">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Usage History ({promo.usages.length})
-          </div>
-          {promo.usages.length === 0 ? (
-            <p className="text-[12px] text-muted-foreground italic">Not yet used in any template or broadcast.</p>
+        {/* Insight tiles */}
+        <div className="grid grid-cols-4 gap-4">
+          <StatTile label="Redemptions" icon={Ticket} value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`} />
+          <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
+          <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
+          <StatTile label="Usage Rate" icon={Percent} value={usageRate == null ? "Unlimited" : `${usageRate}%`} />
+        </div>
+
+        {/* Channel breakdown */}
+        {redemptions.length > 0 && (
+          <SectionCard title="Redemptions by Channel">
+            <div className="p-5 space-y-2.5">
+              {(Object.keys(CHANNEL_META) as PromoRedemption["channel"][])
+                .filter((c) => channelCounts[c])
+                .map((c) => {
+                  const meta = CHANNEL_META[c];
+                  const Icon = meta.icon;
+                  const count = channelCounts[c];
+                  return (
+                    <div key={c} className="flex items-center gap-3">
+                      <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-[12px] w-24 shrink-0 text-foreground">{meta.label}</span>
+                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="h-full rounded-full bg-primary" style={{ width: `${(count / maxChannelCount) * 100}%` }} />
+                      </div>
+                      <span className="text-[12px] font-semibold text-foreground w-6 text-right shrink-0">{count}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </SectionCard>
+        )}
+
+        {/* Redemption Log */}
+        <SectionCard title={`Redemption Log (${redemptions.length})`} description="Who redeemed this code, and in which transaction">
+          {redemptions.length === 0 ? (
+            <p className="p-5 text-[12px] text-muted-foreground italic">Not yet redeemed by any customer.</p>
           ) : (
-            <div className="space-y-2">
-              {promo.usages.map((u, i) => (
-                <div key={i} className="flex items-center gap-3 text-[12px]">
-                  <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${
-                    u.sourceType === "template"
-                      ? "border-sky-700 bg-sky-600 text-white"
-                      : "border-violet-700 bg-violet-600 text-white"
-                  }`}>
-                    {u.sourceType === "template" ? "Template" : "Broadcast"}
-                  </span>
-                  <span className="font-medium">{u.sourceName}</span>
-                  <span className="text-muted-foreground ml-auto">{formatDate(u.usedAt)}</span>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Customer</th>
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Transaction</th>
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Store</th>
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Channel</th>
+                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Discount</th>
+                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {redemptions.map((r) => (
+                    <tr key={r.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-5 py-2.5">
+                        <Link to="/contacts/$contactId" params={{ contactId: r.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                          {r.contactName}
+                        </Link>
+                      </td>
+                      <td className="px-5 py-2.5">
+                        <div className="text-[12px] font-mono text-foreground/90">{r.invoice}</div>
+                        <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
+                      </td>
+                      <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
+                      <td className="px-5 py-2.5"><ChannelBadge channel={r.channel} /></td>
+                      <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">{fmtIDR(r.discountValue)}</td>
+                      <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeID(r.redeemedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-        </div>
+        </SectionCard>
+
+        {/* Assigned Codes — 1-to-1 promos only */}
+        {promo.usageType === "one-to-one" && promo.assignedCodes && promo.assignedCodes.length > 0 && (
+          <SectionCard title={`Individual Codes (${promo.assignedCodes.length})`} description="Each unique code and who it was issued to">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Code</th>
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Owner</th>
+                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
+                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {promo.assignedCodes.map((a) => (
+                    <tr key={a.code} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-5 py-2.5">
+                        <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{a.code}</code>
+                      </td>
+                      <td className="px-5 py-2.5">
+                        <Link to="/contacts/$contactId" params={{ contactId: a.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                          {a.contactName}
+                        </Link>
+                      </td>
+                      <td className="px-5 py-2.5">
+                        {a.redeemed ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                            <CheckCircle2 className="h-2.5 w-2.5" /> Redeemed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-400 bg-slate-500 px-2 py-0.5 text-[10px] font-medium text-white">
+                            <Clock className="h-2.5 w-2.5" /> Not yet
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">
+                        {a.redeemedAt ? fmtDateTimeID(a.redeemedAt) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        )}
 
         {/* Actions */}
         <div className="flex items-center gap-3">
