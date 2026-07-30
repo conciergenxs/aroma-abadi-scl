@@ -269,10 +269,13 @@ function seed(): PromoCode[] {
       name: "Rimmel 30% Off",
       description: "30% off all Rimmel London products for loyalty customers.",
       rule: {
-        type: "discount-percent",
-        discountPercent: 30,
-        minAmount: null,
-        scope: { kind: "specific", items: ["Rimmel Translucent Loose Setting Powder", "Rimmel Translucent Hydrating Setting Spray Ultra-Blur"] },
+        condition: { kind: "any-purchase" },
+        reward: {
+          kind: "percent-off",
+          percent: 30,
+          appliesTo: { kind: "specific", items: ["Rimmel Translucent Loose Setting Powder", "Rimmel Translucent Hydrating Setting Spray Ultra-Blur"] },
+          maxDiscount: null,
+        },
       },
       usageType: "one-to-many",
       maxUsage: 300,
