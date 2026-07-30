@@ -446,8 +446,7 @@ function Dashboard() {
             </SectionCard>
 
             <SectionCard
-              title="Recent conversations"
-              description="Latest activity in your shared inbox"
+              title="Recent Conversations"
               className="lg:col-span-2"
               action={
                 <Link to="/inbox" className="text-[11px] text-primary hover:underline">Open inbox →</Link>
