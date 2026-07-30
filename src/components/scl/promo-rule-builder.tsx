@@ -203,7 +203,7 @@ function ConditionEditor({ condition, onChange, items }: { condition: PromoCondi
   return (
     <div className="space-y-2">
       <Segmented options={CONDITION_OPTIONS} value={condition.kind} onChange={(kind) => onChange(defaultCondition(kind))} />
-      <div className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8">
+      <div key={condition.kind} className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in">
         <span className="text-muted-foreground">When</span>
         {condition.kind === "any-purchase" && (
           <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes any purchase</span>
