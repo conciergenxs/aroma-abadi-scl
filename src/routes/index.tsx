@@ -387,14 +387,17 @@ function ConversionSection({ broadcast, orders, funnelRates, totalConversations 
 // ── Date range popover — filters every metric on the page down to the
 // selected window (presets or a custom from/to pair). ──────────────────────
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Both helpers work directly on the "YYYY-MM-DD" components — parsing via
+// `new Date(iso)` interprets local vs. UTC differently depending on whether
+// a time component is present, which can silently shift the date by a day
+// depending on the machine's timezone (and SSR/client can disagree too).
 function fmtShortDate(iso: string) {
-  const d = new Date(`${iso}T00:00:00`);
-  return `${String(d.getDate()).padStart(2, "0")} ${MONTHS_SHORT[d.getMonth()]}`;
+  const [, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
 }
 function addDaysIso(iso: string, days: number): string {
-  const d = new Date(`${iso}T00:00:00`);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
 function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fullRange: DateRange; onChange: (r: DateRange) => void }) {
