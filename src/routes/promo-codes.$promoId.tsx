@@ -158,7 +158,7 @@ function PromoDetailPage() {
           <div className="grid grid-cols-4 gap-4 pt-1">
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Period</div>
-              <div className="text-[13px]">{promo.startDate ? fmtDateID(promo.startDate) : "—"} — {promo.endDate ? fmtDateID(promo.endDate) : "—"}</div>
+              <div className="text-[13px]">{promo.startDate ? fmtDateTimeID(promo.startDate) : "—"} — {promo.endDate ? fmtDateTimeID(promo.endDate) : "—"}</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Max Usage</div>
