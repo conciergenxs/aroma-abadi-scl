@@ -148,9 +148,10 @@ export type OrdersAndSales = {
   dailySales: { date: string; sales: number }[];
 };
 
-export function computeOrdersAndSales(transactions: Transaction[]): OrdersAndSales {
-  const totalOrders = transactions.length;
-  const paid = transactions.filter((t) => t.status !== "Cancelled");
+export function computeOrdersAndSales(transactions: Transaction[], range?: DateRange): OrdersAndSales {
+  const scoped = range ? transactions.filter((t) => inRange(t.date, range)) : transactions;
+  const totalOrders = scoped.length;
+  const paid = scoped.filter((t) => t.status !== "Cancelled");
   const totalTransactions = paid.length;
   const totalSales = paid.reduce((s, t) => s + t.total, 0);
 
