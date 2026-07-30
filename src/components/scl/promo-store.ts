@@ -310,9 +310,8 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: 150,
-      startDate: "2026-07-10",
-      endDate: "2026-08-10",
-      status: "active",
+      startDate: "2026-07-10T00:00",
+      endDate: "2026-08-10T23:59",
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: "2026-07-08T08:30:00Z",
       redemptions: [
