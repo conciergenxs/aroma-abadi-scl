@@ -140,7 +140,7 @@ function PromoDetailPage() {
               </code>
               <UsageTypeBadge type={promo.usageType} />
             </div>
-            <StatusBadge status={promo.status} />
+            <StatusBadge status={getPromoStatus(promo)} />
           </div>
 
           <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] px-4 py-3">
