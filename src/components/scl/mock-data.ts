@@ -360,7 +360,7 @@ export type Broadcast = {
 };
 
 export const broadcasts: Broadcast[] = [
-  { id: "b1", name: "Velvet Rouge — VIP Early Access", channel: "whatsapp", audience: "VIP · 12,408", reach: 12408, delivered: 12380, read: 11244, clicks: 4128, sentAt: "Hari ini · 09:00", sentAtDate: "2026-07-07", status: "Sent",
+  { id: "b1", name: "Velvet Rouge — VIP Early Access", channel: "whatsapp", audience: "VIP · 12,408", reach: 12408, delivered: 12380, read: 11244, clicks: 4128, sentAt: "Hari ini · 09:00", sentAtDate: "2026-07-30", status: "Sent",
     channelId: "wa-main", listIds: ["ls-vip", "ls-launch"], totalAudience: 12408, sendMode: "now", createdBy: "Putri Anggraini", createdAt: "Hari ini · 08:42",
     contentMode: "template", templateId: "tp1", body: "Hi {{name}}, koleksi Velvet Rouge baru saja launching! VIP dapat akses 24 jam lebih awal.", footer: "Balas STOP untuk berhenti.",
     buttons: [{ label: "Belanja sekarang", kind: "url" }], replied: 824, failed: 28 },
