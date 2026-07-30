@@ -5,10 +5,11 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { conversations, contacts, recentActivity } from "@/components/scl/mock-data";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
-  audienceSegmentation, avgMessagesBetweenTransaction,
-  computeAverages, computeBroadcastMetrics, computeFunnelRates, computeOrdersAndSales,
-  mostAskedProducts, mostUnfulfilledProducts, totalConversations,
-  type BroadcastMetrics, type OrdersAndSales, type RankedProduct,
+  avgMessagesBetweenTransaction, computeAverages, computeBroadcastMetrics,
+  computeFunnelRates, computeOrdersAndSales, computeRangeScale,
+  getTransactionDateBounds, mostAskedProducts, mostUnfulfilledProducts,
+  scaleRankedProducts, scaledAudienceSegmentation, scaledTotalConversations,
+  type BroadcastMetrics, type DateRange, type OrdersAndSales, type RankedProduct,
 } from "@/components/scl/overview-metrics";
 import { Link } from "@tanstack/react-router";
 import {
@@ -17,7 +18,7 @@ import {
   HelpCircle, ShoppingCart, PackageX,
   ClipboardList, Receipt, CircleDollarSign,
   Repeat, Wallet, Tags, ShoppingBasket,
-  Reply, TrendingUp, CheckCheck, Eye, Calendar, Info,
+  Reply, TrendingUp, CheckCheck, Eye, Calendar, ChevronDown, Info,
 } from "lucide-react";
 import {
   Tooltip as InfoTooltip, TooltipContent, TooltipProvider, TooltipTrigger,
