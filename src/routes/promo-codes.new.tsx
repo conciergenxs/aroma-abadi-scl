@@ -3,7 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Upload, FileSpreadsheet, X as XIcon } from "lucide-react";
-import { promoStore, defaultRuleForType, type PromoRule } from "@/components/scl/promo-store";
+import { promoStore, defaultRule, type PromoRule } from "@/components/scl/promo-store";
 import { PromoRuleBuilder } from "@/components/scl/promo-rule-builder";
 
 export const Route = createFileRoute("/promo-codes/new")({
