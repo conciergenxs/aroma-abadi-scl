@@ -252,7 +252,7 @@ function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChan
             <InlineCurrency value={reward.amount} onChange={(v) => onChange({ ...reward, amount: v })} />
             <select
               value={reward.timing}
-              onChange={(e) => onChange({ ...reward, timing: e.target.value as PromoReward extends { kind: "amount-off" } ? never : never } as never)}
+              onChange={(e) => onChange({ ...reward, timing: e.target.value as "immediate" | "next-purchase" })}
               className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
             >
               <option value="immediate">off (this purchase)</option>
