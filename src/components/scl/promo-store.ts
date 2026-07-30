@@ -203,9 +203,8 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-one",
       maxUsage: 200,
-      startDate: "2026-07-01",
-      endDate: "2026-07-15",
-      status: "active",
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-08-15T23:59",
       createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
       createdAt: "2026-06-25T10:00:00Z",
       redemptions: [
