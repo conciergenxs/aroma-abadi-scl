@@ -239,7 +239,6 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard
         title="Broadcast & Messaging"
-        description="Campaign volume and how well messages land."
         action={
           <div className="flex items-center gap-4">
             <CornerStat value={fmtPct(broadcast.deliveryRate)} label="Delivery Rate" info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)." />
