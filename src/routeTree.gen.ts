@@ -107,14 +107,14 @@ const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => PromoCodesRoute,
+  id: '/promo-codes/new',
+  path: '/promo-codes/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesPromoIdRoute = PromoCodesPromoIdRouteImport.update({
-  id: '/$promoId',
-  path: '/$promoId',
-  getParentRoute: () => PromoCodesRoute,
+  id: '/promo-codes/$promoId',
+  path: '/promo-codes/$promoId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsNewRoute = ContactsNewRouteImport.update({
   id: '/new',
@@ -291,6 +291,8 @@ export interface RootRouteChildren {
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
+  PromoCodesPromoIdRoute: typeof PromoCodesPromoIdRoute
+  PromoCodesNewRoute: typeof PromoCodesNewRoute
   SkuDetailSkuIdRoute: typeof SkuDetailSkuIdRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
   BroadcastsIndexRoute: typeof BroadcastsIndexRoute
@@ -407,17 +409,17 @@ declare module '@tanstack/react-router' {
     }
     '/promo-codes/new': {
       id: '/promo-codes/new'
-      path: '/new'
+      path: '/promo-codes/new'
       fullPath: '/promo-codes/new'
       preLoaderRoute: typeof PromoCodesNewRouteImport
-      parentRoute: typeof PromoCodesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/promo-codes/$promoId': {
       id: '/promo-codes/$promoId'
-      path: '/$promoId'
+      path: '/promo-codes/$promoId'
       fullPath: '/promo-codes/$promoId'
       preLoaderRoute: typeof PromoCodesPromoIdRouteImport
-      parentRoute: typeof PromoCodesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/contacts/new': {
       id: '/contacts/new'
@@ -486,6 +488,8 @@ const rootRouteChildren: RootRouteChildren = {
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
+  PromoCodesPromoIdRoute: PromoCodesPromoIdRoute,
+  PromoCodesNewRoute: PromoCodesNewRoute,
   SkuDetailSkuIdRoute: SkuDetailSkuIdRoute,
   TemplatesNewRoute: TemplatesNewRoute,
   BroadcastsIndexRoute: BroadcastsIndexRoute,
