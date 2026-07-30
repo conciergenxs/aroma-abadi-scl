@@ -187,11 +187,8 @@ function seed(): PromoCode[] {
       name: "Sisley Rp150k Off",
       description: "Rp150,000 off any Sisley product. Single-use code issued per customer.",
       rule: {
-        type: "buy-x-get-discount",
-        buyItem: { kind: "specific", items: ["Sisley Real Flawless Foundation"] },
-        minAmount: 1000000,
-        discountAmount: 150000,
-        variant: "immediate",
+        condition: { kind: "buy-item", qty: 1, item: { kind: "specific", items: ["Sisley Real Flawless Foundation"] } },
+        reward: { kind: "amount-off", amount: 150000, timing: "immediate" },
       },
       usageType: "one-to-one",
       maxUsage: 200,
