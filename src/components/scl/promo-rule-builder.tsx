@@ -230,7 +230,7 @@ function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChan
   return (
     <div className="space-y-2">
       <Segmented options={REWARD_OPTIONS} value={reward.kind} onChange={(kind) => onChange(defaultReward(kind))} />
-      <div className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8">
+      <div key={reward.kind} className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in">
         <span className="text-muted-foreground">Get</span>
         {reward.kind === "free-item" && (
           <>
