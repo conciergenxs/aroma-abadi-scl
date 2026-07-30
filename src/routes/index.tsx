@@ -288,54 +288,52 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <SectionCard title="Orders & Sales" description="What's coming in, and how much it's worth.">
+      <SectionCard title="Orders & Sales">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 stagger">
           <MetricStat icon={ClipboardList} label="Total Orders" value={fmtNum(orders.totalOrders)} info="Number of incoming orders (total count)." />
           <MetricStat icon={Receipt} label="Total Transactions" value={fmtNum(orders.totalTransactions)} info="Number of transactions completed / paid (total count)." />
           <MetricStat icon={CircleDollarSign} label="Total Sales" value={fmtIDR(orders.totalSales)} info="Total sales value (IDR)." />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 border-t border-border p-4">
-          <div className="lg:col-span-2">
-            <div className={`${CAPTION} mb-2`}>Sales Trend</div>
-            <div className="h-52">
-              {inView && (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={orders.dailySales} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="salesTrend" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                    <XAxis dataKey="date" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(d: string) => fmtDateEN(d).slice(0, 6)} />
-                    <YAxis stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(v: number) => (v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}jt` : fmtNum(v))} />
-                    <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} labelFormatter={(d: string) => fmtDateEN(d)} formatter={(v: number) => [fmtIDR(Number(v)), "Sales"]} />
-                    <Area type="monotone" dataKey="sales" stroke="var(--chart-1)" fill="url(#salesTrend)" strokeWidth={2} isAnimationActive animationDuration={700} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+        <div className="border-t border-border p-4">
+          <div className={`${CAPTION} mb-2`}>Sales Trend</div>
+          <div className="h-52">
+            {inView && (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={orders.dailySales} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="salesTrend" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                  <XAxis dataKey="date" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(d: string) => fmtDateEN(d).slice(0, 6)} />
+                  <YAxis stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(v: number) => (v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}jt` : fmtNum(v))} />
+                  <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} labelFormatter={(d: string) => fmtDateEN(d)} formatter={(v: number) => [fmtIDR(Number(v)), "Sales"]} />
+                  <Area type="monotone" dataKey="sales" stroke="var(--chart-1)" fill="url(#salesTrend)" strokeWidth={2} isAnimationActive animationDuration={700} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
-          <div>
-            <div className={`${CAPTION} mb-2 inline-flex items-center gap-1`}>
-              Qty Sold — by Brand <InfoHint text="Number of items sold, by brand." />
-            </div>
-            <div className="h-52">
-              {inView && (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={orders.qtyByBrand} layout="vertical" margin={{ top: 4, right: 20, left: 4, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
-                    <XAxis type="number" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="brand" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} width={92} />
-                    <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number) => [fmtNum(Number(v)), "Units sold"]} />
-                    <Bar dataKey="qty" radius={[0, 6, 6, 0]} barSize={16} isAnimationActive animationDuration={700}>
-                      {orders.qtyByBrand.map((d, i) => <Cell key={d.brand} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />)}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+        </div>
+        <div className="border-t border-border p-4">
+          <div className={`${CAPTION} mb-2 inline-flex items-center gap-1`}>
+            Qty Sold — by Brand <InfoHint text="Number of items sold, by brand." />
+          </div>
+          <div className="h-40">
+            {inView && (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={orders.qtyByBrand} layout="vertical" margin={{ top: 4, right: 20, left: 4, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                  <XAxis type="number" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <YAxis type="category" dataKey="brand" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} width={100} />
+                  <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number) => [fmtNum(Number(v)), "Units sold"]} />
+                  <Bar dataKey="qty" radius={[0, 6, 6, 0]} barSize={18} isAnimationActive animationDuration={700}>
+                    {orders.qtyByBrand.map((d, i) => <Cell key={d.brand} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </SectionCard>
