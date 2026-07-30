@@ -381,7 +381,7 @@ export const promoStore = {
 
   subscribe(cb: () => void) {
     _listeners.add(cb);
-    return () => _listeners.delete(cb);
+    return () => { _listeners.delete(cb); };
   },
 };
 
