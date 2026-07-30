@@ -106,8 +106,8 @@ function CreatePromoModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto">
-        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8">
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto modal-backdrop">
+        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8 modal-content">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <div className="text-sm font-semibold text-foreground">Create Promo Code</div>
             <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
@@ -142,8 +142,8 @@ export function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: 
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto">
-        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8">
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto modal-backdrop">
+        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8 modal-content">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <div className="text-sm font-semibold text-foreground">Edit — {promo.code}</div>
             <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
