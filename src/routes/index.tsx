@@ -346,7 +346,7 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <SectionCard title="Averages & Basket Economics" description="What a typical order looks like.">
+      <SectionCard title="Averages & Basket Economics">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 stagger">
           <MetricStat icon={Repeat} label="Avg. Messages / Transaction" value={avgMessagesBetweenTransaction.toFixed(1)} info="Average number of messages exchanged between transactions." />
           <MetricStat icon={Wallet} label="Avg. Order Value" value={fmtIDR(averages.avgOrderValue)} info="Average value per order (Sales ÷ Orders)." />
