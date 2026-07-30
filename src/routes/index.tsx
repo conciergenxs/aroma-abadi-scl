@@ -431,7 +431,7 @@ function Dashboard() {
 
           {/* Activity + Conversations */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <SectionCard title="Recent activity" className="lg:col-span-1">
+            <SectionCard title="Recent Activity" className="lg:col-span-1">
               <ul className="divide-y divide-border">
                 {recentActivity.map((a) => (
                   <li key={a.id} className="px-5 py-3 flex items-start gap-3">
