@@ -329,7 +329,18 @@ function seed(): PromoCode[] {
   ];
 }
 
-const STORAGE_KEY = "aroma_promo_store_v4";
+// Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
+// with an older cached shape in localStorage will load stale data that crashes
+// against the current code (e.g. rule.condition/reward missing on old records).
+const STORAGE_KEY = "aroma_promo_store_v5";
+
+function isCurrentShape(promos: unknown): promos is PromoCode[] {
+  return Array.isArray(promos) && promos.every(
+    (p) => p && typeof p === "object" && "rule" in p &&
+      (p as PromoCode).rule?.condition?.kind !== undefined &&
+      (p as PromoCode).rule?.reward?.kind !== undefined,
+  );
+}
 
 // ── In-memory state (module-level, never touches window during module init) ───
 
@@ -344,8 +355,10 @@ function _load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed?.promos && Array.isArray(parsed.promos)) {
+      if (parsed?.promos && isCurrentShape(parsed.promos)) {
         _promos = parsed.promos;
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
       }
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
