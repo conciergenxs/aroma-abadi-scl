@@ -215,7 +215,7 @@ function CreatePromoModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<PromoFormState>({
     code: "", codeFile: null, name: "", description: "",
     usageType: "one-to-many", maxUsage: "", startDate: "", endDate: "",
-    status: "active", rule: defaultRuleForType("discount-percent"),
+    status: "active", rule: defaultRule(),
   });
 
   const handleSave = () => {
