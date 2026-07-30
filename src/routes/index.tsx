@@ -17,7 +17,7 @@ import {
   HelpCircle, ShoppingCart, PackageX,
   ClipboardList, Receipt, CircleDollarSign,
   Repeat, Wallet, Tags, ShoppingBasket,
-  Reply, TrendingUp, Calendar, Info,
+  Reply, TrendingUp, CheckCheck, Eye, Calendar, Info,
 } from "lucide-react";
 import {
   Tooltip as InfoTooltip, TooltipContent, TooltipProvider, TooltipTrigger,
