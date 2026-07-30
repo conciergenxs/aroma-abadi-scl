@@ -339,6 +339,8 @@ export type Broadcast = {
   read: number;
   clicks: number;
   sentAt: string;
+  /** Real ISO date (YYYY-MM-DD) — only set for "Sent" broadcasts, used to filter Overview metrics by date range. */
+  sentAtDate?: string;
   status: "Sent" | "Scheduled" | "Draft";
   channelId?: string;
   listIds?: string[];
