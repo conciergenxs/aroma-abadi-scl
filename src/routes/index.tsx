@@ -237,24 +237,21 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
   ];
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <SectionCard
-        title="Broadcast & Messaging"
-        action={
-          <div className="flex items-center gap-4">
-            <CornerStat value={fmtPct(broadcast.deliveryRate)} label="Delivery Rate" info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)." />
-            <div className="w-px h-8 bg-border" />
-            <CornerStat value={fmtPct(broadcast.readRate)} label="Read Rate" info="Share of delivered broadcast messages that were read (Read ÷ Delivered)." />
-          </div>
-        }
-      >
+      <SectionCard title="Broadcast & Messaging">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 stagger">
           <MetricStat icon={Radio} label="Broadcast Sent" value={fmtNum(broadcast.broadcastSent)} sub="campaigns sent" info="Number of broadcast campaigns sent." />
           <MetricStat icon={Megaphone} label="Broadcast Reach" value={fmtNum(broadcast.reach)} info="Number of contacts a broadcast message reached." />
           <MetricStat icon={MessageSquare} label="Message Received" value={fmtNum(broadcast.messageReceived)} info="Number of messages received from customer-initiated conversations." />
         </div>
         {inView && (
-          <div className="border-t border-border">
-            <StepFunnel stages={stages} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 border-t border-border p-4">
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card/60 glass">
+              <StepFunnel stages={stages} />
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              <MetricStat icon={CheckCheck} label="Delivery Rate" value={fmtPct(broadcast.deliveryRate)} info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)." />
+              <MetricStat icon={Eye} label="Read Rate" value={fmtPct(broadcast.readRate)} info="Share of delivered broadcast messages that were read (Read ÷ Delivered)." />
+            </div>
           </div>
         )}
       </SectionCard>
