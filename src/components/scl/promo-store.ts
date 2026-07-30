@@ -251,11 +251,8 @@ function seed(): PromoCode[] {
       name: "Laura Mercier Rp50k Off",
       description: "Rp50,000 off any Laura Mercier product. No minimum purchase.",
       rule: {
-        type: "buy-x-get-discount",
-        buyItem: { kind: "specific", items: ["Laura Mercier Translucent Loose Setting Powder"] },
-        minAmount: null,
-        discountAmount: 50000,
-        variant: "immediate",
+        condition: { kind: "buy-item", qty: 1, item: { kind: "specific", items: ["Laura Mercier Translucent Loose Setting Powder"] } },
+        reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
       },
       usageType: "one-to-many",
       maxUsage: 100,
