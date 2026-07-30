@@ -5,7 +5,7 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { conversations, contacts, recentActivity } from "@/components/scl/mock-data";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
-  audienceDonutData, audienceSegmentation, avgMessagesBetweenTransaction,
+  audienceSegmentation, avgMessagesBetweenTransaction,
   computeAverages, computeBroadcastMetrics, computeFunnelRates, computeOrdersAndSales,
   mostAskedProducts, mostUnfulfilledProducts, totalConversations,
   type BroadcastMetrics, type OrdersAndSales, type RankedProduct,
@@ -17,14 +17,14 @@ import {
   HelpCircle, ShoppingCart, PackageX,
   ClipboardList, Receipt, CircleDollarSign,
   Repeat, Wallet, Tags, ShoppingBasket,
-  Calendar, Info,
+  Reply, TrendingUp, Calendar, Info,
 } from "lucide-react";
 import {
   Tooltip as InfoTooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  BarChart, Bar, PieChart, Pie, Cell,
+  BarChart, Bar, Cell,
 } from "recharts";
 
 export const Route = createFileRoute("/")({
