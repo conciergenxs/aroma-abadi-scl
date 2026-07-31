@@ -146,6 +146,11 @@ function PromoDetailPage() {
   const [redemptionPageSize, setRedemptionPageSize] = useState(10);
   const [codesPage, setCodesPage] = useState(1);
   const [codesPageSize, setCodesPageSize] = useState(10);
+  // recharts renders differently server- vs. client-side (no ResizeObserver
+  // during SSR), which throws off hydration — only mount it after the client
+  // has taken over, matching the pattern already used on the Overview page.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const promo = promos.find((p) => p.id === promoId);
 
