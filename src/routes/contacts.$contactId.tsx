@@ -386,6 +386,7 @@ function ContactDetailPage() {
                 <div className="flex items-center gap-1">
                   <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={filteredActivities.length} />
                   <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={filteredTransactions.length} />
+                  <TabButton active={tab === "redeemed"} onClick={() => setTab("redeemed")} icon={<Ticket className="h-3.5 w-3.5" />} label="Code Redeem" count={filteredRedemptions.length} />
                   <div className="ml-auto flex items-center gap-1.5 py-1.5">
                     <input
                       type="date"
