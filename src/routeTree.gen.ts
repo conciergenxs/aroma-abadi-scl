@@ -30,6 +30,7 @@ import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
+import { Route as PromoCodesPromoIdEditRouteImport } from './routes/promo-codes.$promoId.edit'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -136,6 +137,11 @@ const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
   path: '/broadcasts/$broadcastId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PromoCodesPromoIdEditRoute = PromoCodesPromoIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => PromoCodesPromoIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -151,7 +157,7 @@ export interface FileRoutesByFullPath {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
-  '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
+  '/promo-codes/$promoId': typeof PromoCodesPromoIdRouteWithChildren
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -174,7 +181,7 @@ export interface FileRoutesByTo {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
-  '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
+  '/promo-codes/$promoId': typeof PromoCodesPromoIdRouteWithChildren
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/broadcasts': typeof BroadcastsIndexRoute
   '/promo-codes': typeof PromoCodesIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,7 +206,7 @@ export interface FileRoutesById {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
-  '/promo-codes/$promoId': typeof PromoCodesPromoIdRoute
+  '/promo-codes/$promoId': typeof PromoCodesPromoIdRouteWithChildren
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
+    | '/promo-codes/$promoId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/broadcasts'
     | '/promo-codes'
     | '/templates'
+    | '/promo-codes/$promoId/edit'
   id:
     | '__root__'
     | '/'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
+    | '/promo-codes/$promoId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -291,7 +303,7 @@ export interface RootRouteChildren {
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
-  PromoCodesPromoIdRoute: typeof PromoCodesPromoIdRoute
+  PromoCodesPromoIdRoute: typeof PromoCodesPromoIdRouteWithChildren
   PromoCodesNewRoute: typeof PromoCodesNewRoute
   SkuDetailSkuIdRoute: typeof SkuDetailSkuIdRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
@@ -449,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastsBroadcastIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/promo-codes/$promoId/edit': {
+      id: '/promo-codes/$promoId/edit'
+      path: '/edit'
+      fullPath: '/promo-codes/$promoId/edit'
+      preLoaderRoute: typeof PromoCodesPromoIdEditRouteImport
+      parentRoute: typeof PromoCodesPromoIdRoute
+    }
   }
 }
 
@@ -476,6 +495,17 @@ const SkuRouteChildren: SkuRouteChildren = {
 
 const SkuRouteWithChildren = SkuRoute._addFileChildren(SkuRouteChildren)
 
+interface PromoCodesPromoIdRouteChildren {
+  PromoCodesPromoIdEditRoute: typeof PromoCodesPromoIdEditRoute
+}
+
+const PromoCodesPromoIdRouteChildren: PromoCodesPromoIdRouteChildren = {
+  PromoCodesPromoIdEditRoute: PromoCodesPromoIdEditRoute,
+}
+
+const PromoCodesPromoIdRouteWithChildren =
+  PromoCodesPromoIdRoute._addFileChildren(PromoCodesPromoIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
@@ -488,7 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
-  PromoCodesPromoIdRoute: PromoCodesPromoIdRoute,
+  PromoCodesPromoIdRoute: PromoCodesPromoIdRouteWithChildren,
   PromoCodesNewRoute: PromoCodesNewRoute,
   SkuDetailSkuIdRoute: SkuDetailSkuIdRoute,
   TemplatesNewRoute: TemplatesNewRoute,
