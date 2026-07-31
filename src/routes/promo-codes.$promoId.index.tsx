@@ -200,7 +200,7 @@ function PromoDetailPage() {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => navigate({ to: "/promo-codes/$promoId/edit", params: { promoId: promo.id } })}
+                onClick={() => navigate({ to: "/promo-codes/edit/$promoId", params: { promoId: promo.id } })}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit
