@@ -12,30 +12,45 @@ export function fmtIDR(n: number) {
 }
 
 /**
- * All extraction below uses the UTC getters (getUTCDate, not getDate). The
- * plain local-time getters reflect whichever timezone is executing the code —
- * Vercel's server and a browser in a different timezone disagree, so the same
- * ISO string renders different text on each side and React's hydration check
- * (which requires the server and first client render to match exactly) fails.
- * UTC getters are deterministic regardless of the runtime's local timezone.
+ * Bare "YYYY-MM-DDTHH:mm" strings (what <input type="datetime-local"> and
+ * some seed data produce) have no timezone marker, so `new Date(...)` parses
+ * them as local time in whatever timezone happens to be executing — Vercel's
+ * server and a browser in a different timezone disagree, so the same string
+ * produces a different Date object on each side before any getter even runs.
+ * UTC getters alone don't fix that; the parsing itself has to be
+ * timezone-independent. Pulling the digits straight out of the string with a
+ * regex sidesteps Date's ambiguous parsing entirely — for strings that do
+ * carry a "Z"/offset (already-UTC data like createdAt/redeemedAt), this still
+ * does the right thing: those digits already represent the UTC instant, so
+ * echoing them back as-is is correct, not a coincidence.
  */
+function dateParts(iso: string | Date) {
+  if (typeof iso === "string") {
+    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/);
+    if (m) {
+      return { y: +m[1], mo: +m[2] - 1, d: +m[3], h: m[4] ? +m[4] : 0, mi: m[5] ? +m[5] : 0 };
+    }
+  }
+  const d = new Date(iso);
+  return { y: d.getUTCFullYear(), mo: d.getUTCMonth(), d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes() };
+}
 
 /** 07 Jul 2026 (ID) */
 export function fmtDateID(iso: string | Date) {
-  const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2,"0")} ${MONTHS_ID[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  const p = dateParts(iso);
+  return `${String(p.d).padStart(2,"0")} ${MONTHS_ID[p.mo]} ${p.y}`;
 }
 
 /** 07 Jul 2026 (EN) */
 export function fmtDateEN(iso: string | Date) {
-  const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2,"0")} ${MONTHS_EN[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  const p = dateParts(iso);
+  return `${String(p.d).padStart(2,"0")} ${MONTHS_EN[p.mo]} ${p.y}`;
 }
 
 /** 07 Jul 2026, 14:05 */
 export function fmtDateTimeID(iso: string | Date) {
-  const d = new Date(iso);
-  return `${fmtDateID(d)}, ${String(d.getUTCHours()).padStart(2,"0")}:${String(d.getUTCMinutes()).padStart(2,"0")}`;
+  const p = dateParts(iso);
+  return `${fmtDateID(iso)}, ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}`;
 }
 
 /** 1.234 (dot-separated thousand, no currency) */
