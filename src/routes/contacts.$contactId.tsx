@@ -197,6 +197,16 @@ function ContactDetailPage() {
     });
   }, [contactTransactions, dateFrom, dateTo]);
 
+  const filteredRedemptions = useMemo(() => {
+    if (!dateFrom && !dateTo) return contactRedemptions;
+    return contactRedemptions.filter((r) => {
+      const d = r.redeemedAt.slice(0, 10);
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+      return true;
+    });
+  }, [contactRedemptions, dateFrom, dateTo]);
+
   const handleDelete = () => {
     if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
     contactsStore.softDeleteContacts([contact.id]);
