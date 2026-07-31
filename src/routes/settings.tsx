@@ -1353,7 +1353,7 @@ function ArmaConfigSection() {
               : "border-border bg-card text-muted-foreground hover:bg-muted"
           }`}
         >
-          {persona.status === "active" ? "● Aktif" : "○ Nonaktif"}
+          {persona.status === "active" ? "● Active" : "○ Inactive"}
         </button>
       </div>
 
