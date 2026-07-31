@@ -35,14 +35,14 @@ function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPro
         <button
           type="button"
           onClick={onViewDetails}
-          className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors"
+          className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors"
         >
           View Details
         </button>
         <button
           type="button"
           onClick={onBackToList}
-          className="rounded-md border border-border px-4 h-9 text-sm text-foreground hover:bg-muted transition-colors"
+          className="rounded-md border border-border px-4 h-9 text-[14px] text-foreground hover:bg-muted transition-colors"
         >
           Back to Promo Codes
         </button>
