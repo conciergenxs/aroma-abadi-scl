@@ -250,7 +250,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
     <div className="flex items-center gap-1">
       <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name..." className="h-8 rounded-md border border-border bg-card/60 px-2 text-sm" />
       <button onClick={() => { if (!name.trim()) return; skuStore.addCategory(brandId, name.trim()); setName(""); setOpen(false); toast.success("Category added"); }}
-        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-sm font-medium">Add</button>
+        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-[14px] font-medium">Add</button>
       <button onClick={() => { setOpen(false); setName(""); }} className="h-8 w-8 grid place-items-center rounded-md border border-border"><X className="h-3.5 w-3.5" /></button>
     </div>
   );
