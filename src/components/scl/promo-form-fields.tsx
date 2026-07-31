@@ -287,14 +287,14 @@ export function PromoFormActionBar({ onCancel, onSubmit, submitLabel }: { onCanc
       <button
         type="button"
         onClick={onCancel}
-        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-sm text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
       >
         Cancel
       </button>
       <button
         type="button"
         onClick={onSubmit}
-        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
       >
         {submitLabel}
       </button>
