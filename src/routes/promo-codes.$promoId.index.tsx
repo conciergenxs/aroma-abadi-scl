@@ -262,14 +262,16 @@ function PromoDetailPage() {
             ) : (
               <>
                 <div className="h-32">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Tooltip contentStyle={chartTooltipStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} />
-                      <Pie data={channelData} dataKey="value" nameKey="name" innerRadius={34} outerRadius={54} paddingAngle={2} strokeWidth={0} isAnimationActive animationDuration={600}>
-                        {channelData.map((d) => <Cell key={d.name} fill={d.color} />)}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {mounted && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Tooltip contentStyle={chartTooltipStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} />
+                        <Pie data={channelData} dataKey="value" nameKey="name" innerRadius={34} outerRadius={54} paddingAngle={2} strokeWidth={0} isAnimationActive animationDuration={600}>
+                          {channelData.map((d) => <Cell key={d.name} fill={d.color} />)}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
                 <div className="mt-2 space-y-1">
                   {channelData.map((d) => (
