@@ -192,13 +192,13 @@ function AuthPage() {
               onSubmit={async (e) => {
                 e.preventDefault();
                 setError(null);
-                if (!email.trim()) return setError("Masukkan nomor WhatsApp.");
-                if (password.length < 4) return setError("Password minimal 4 karakter.");
+                if (!email.trim()) return setError("Enter your WhatsApp number.");
+                if (password.length < 4) return setError("Password must be at least 4 characters.");
                 setLoading(true);
                 await new Promise((r) => setTimeout(r, 700));
                 setLoading(false);
                 if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
-                toast.success("Selamat datang, Beauty Ambassador!");
+                toast.success("Welcome, Beauty Ambassador!");
                 navigate({ to: "/" });
               }}
               className="mt-6 space-y-4"
