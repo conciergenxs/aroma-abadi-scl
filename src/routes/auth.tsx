@@ -8,9 +8,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Aroma Abadi" },
-      { name: "description", content: "Masuk ke workspace Aroma Abadi untuk mengelola percakapan WhatsApp pelanggan." },
+      { name: "description", content: "Sign in to the Aroma Abadi workspace to manage customer WhatsApp conversations." },
       { property: "og:title", content: "Sign in — Aroma Abadi" },
-      { property: "og:description", content: "Akses workspace Aroma Abadi kamu." },
+      { property: "og:description", content: "Access your Aroma Abadi workspace." },
     ],
   }),
   component: AuthPage,
