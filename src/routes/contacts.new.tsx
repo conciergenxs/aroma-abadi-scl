@@ -220,7 +220,7 @@ function NewContactPage() {
               <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">
                 Cancel
               </button>
-              <button onClick={submitBA} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button onClick={submitBA} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
                 <Plus className="h-3.5 w-3.5" /> Create BA
               </button>
             </div>
@@ -311,7 +311,7 @@ function NewContactPage() {
             <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">
               Cancel
             </button>
-            <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+            <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
               <Plus className="h-3.5 w-3.5" /> Create Customer
             </button>
           </div>
