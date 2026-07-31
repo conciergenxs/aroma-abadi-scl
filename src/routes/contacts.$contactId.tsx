@@ -16,6 +16,10 @@ import {
   ShoppingBag,
   ExternalLink,
   Eye,
+  Ticket,
+  FileText,
+  Megaphone,
+  Pencil,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
