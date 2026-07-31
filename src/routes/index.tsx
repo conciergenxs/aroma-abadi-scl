@@ -512,7 +512,7 @@ function Dashboard() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <div className="text-lg font-semibold">Hello, Aria 👋</div>
-              <span className="text-muted-foreground/40 text-base select-none">|</span>
+              <span className="text-muted-foreground/40 text-[15px] select-none">|</span>
               <DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />
             </div>
             <div className="flex items-center gap-2">
