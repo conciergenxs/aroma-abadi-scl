@@ -308,7 +308,7 @@ function NewContactPage() {
             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-sm hover:bg-card transition-colors">
+            <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] hover:bg-card transition-colors">
               Cancel
             </button>
             <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
