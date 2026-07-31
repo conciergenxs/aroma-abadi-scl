@@ -137,12 +137,12 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
   return (
     <div className="space-y-4">
       {/* Promo Name + Usage Type */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
+      <div className="flex items-end gap-4">
+        <div className="flex-1 min-w-0">
           <label className={labelCls}>Promo Name</label>
           <input value={form.name} onChange={(e) => handleNameChange(e.target.value)} placeholder="e.g. Summer 20% Off" className={inputCls} />
         </div>
-        <div>
+        <div className="shrink-0">
           <label className={labelCls}>Usage Type</label>
           <div className="inline-flex h-9 items-center rounded-md border border-border bg-muted/40 p-0.5 gap-0.5">
             {(["one-to-many", "one-to-one"] as const).map((t) => (
@@ -150,25 +150,13 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
                 key={t}
                 type="button"
                 onClick={() => setForm({ ...form, usageType: t, code: "", codeFile: null, csvCodes: [] })}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors whitespace-nowrap ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {t === "one-to-many" ? "1-to-Many" : "1-to-1 (unique)"}
               </button>
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className={labelCls}>Description</label>
-        <textarea
-          value={form.description}
-          onChange={(e) => set("description", e.target.value)}
-          rows={2}
-          placeholder="Short description..."
-          className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
-        />
       </div>
 
       {/* Promo Code + Max Usage */}
