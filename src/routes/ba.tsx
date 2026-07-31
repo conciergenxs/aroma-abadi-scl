@@ -164,7 +164,7 @@ function BAPage() {
                     <Td>{b.store} · <span className="text-muted-foreground">{b.city}</span></Td>
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
-                        <button onClick={() => setEditing(b)} className="rounded px-2 h-8 text-sm border border-border hover:bg-gray-50 transition-colors">Edit</button>
+                        <button onClick={() => setEditing(b)} className="rounded px-2 h-8 text-[14px] border border-border hover:bg-gray-50 transition-colors">Edit</button>
                         <button
                           onClick={() => { baStore.remove(b.id); toast.success("BA deleted"); }}
                           className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors"
