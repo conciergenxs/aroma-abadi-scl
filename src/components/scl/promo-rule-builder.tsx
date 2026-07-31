@@ -163,7 +163,7 @@ function ItemScopeEditor({
           ) : filtered.map((it) => {
             const checked = selected.includes(it.name);
             return (
-              <label key={it.name} className="flex items-center gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-muted cursor-pointer">
+              <label key={`${it.brand}::${it.name}`} className="flex items-center gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-muted cursor-pointer">
                 <input
                   type="checkbox"
                   checked={checked}
