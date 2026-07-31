@@ -38,7 +38,7 @@ export function MultiFileUploader({
       onAdd(atts);
       toast.success(`${atts.length} file(s) added`);
     } catch {
-      toast.error("Gagal memproses file");
+      toast.error("Failed to process file");
     }
   }
 
