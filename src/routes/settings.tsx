@@ -1395,7 +1395,7 @@ function ArmaConfigSection() {
           <button
             type="button"
             onClick={() => toast.success(`${persona.label} configuration saved`)}
-            className="h-9 px-4 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Save Configuration
           </button>
