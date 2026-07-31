@@ -24,12 +24,15 @@ const CONDITION_OPTIONS: { kind: PromoCondition["kind"]; label: string }[] = [
   { kind: "any-purchase", label: "Any Purchase" },
   { kind: "buy-item", label: "Buy Item(s)" },
   { kind: "min-spend", label: "Minimum Spend" },
+  { kind: "first-purchase", label: "First Purchase" },
 ];
 
 const REWARD_OPTIONS: { kind: PromoReward["kind"]; label: string }[] = [
   { kind: "free-item", label: "Free Item(s)" },
   { kind: "percent-off", label: "% Discount" },
   { kind: "amount-off", label: "Rp Discount" },
+  { kind: "free-shipping", label: "Free Shipping" },
+  { kind: "bonus-points", label: "Bonus Points" },
 ];
 
 // One preset per genuinely distinct condition × reward pairing — not variations
@@ -71,16 +74,35 @@ const PRESETS: { label: string; build: () => PromoRule }[] = [
       reward: { kind: "percent-off", percent: 15, appliesTo: { kind: "any" }, maxDiscount: null },
     }),
   },
+  {
+    label: "Welcome Free Shipping",
+    build: () => ({
+      condition: { kind: "first-purchase" },
+      reward: { kind: "free-shipping" },
+    }),
+  },
+  {
+    label: "Bonus Points on Purchase",
+    build: () => ({
+      condition: { kind: "any-purchase" },
+      reward: { kind: "bonus-points", points: 100 },
+    }),
+  },
 ];
 
-function useSkuItemNames(): string[] {
+type SkuItem = { name: string; brand: string };
+
+function useSkuItems(): SkuItem[] {
   const { brands } = useSkuStore();
   return useMemo(
-    () => brands.flatMap((b) => b.categories.flatMap((c) => c.skus.map((s) => s.name))),
+    () => brands.flatMap((b) => b.categories.flatMap((c) => c.skus.map((s) => ({ name: s.name, brand: b.name })))),
     [brands],
   );
 }
 
+// Searchable, multi-select item picker — portaled via FloatingMenu so it's
+// never clipped by an ancestor's overflow (table cells, modal scroll areas,
+// the rule-builder's own bordered box, etc.) and always renders on top.
 function ItemScopeEditor({
   scope,
   onChange,
@@ -89,66 +111,76 @@ function ItemScopeEditor({
 }: {
   scope: PromoItemScope;
   onChange: (s: PromoItemScope) => void;
-  items: string[];
+  items: SkuItem[];
   anyLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = useState("");
+  const btnRef = useRef<HTMLButtonElement>(null);
   const selected = scope.kind === "specific" ? scope.items : [];
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((it) => it.name.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q));
+  }, [items, search]);
 
   const label = scope.kind === "any" ? anyLabel : selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
 
   return (
-    <div ref={ref} className="relative inline-block align-middle">
+    <>
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex max-w-[220px] items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium text-foreground hover:bg-primary/15 transition-colors"
+        className="inline-flex max-w-[220px] items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium text-foreground hover:bg-primary/15 transition-colors align-middle"
       >
         <span className="truncate">{label}</span>
         <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
       </button>
-      {open && (
-        <div className="absolute left-0 top-9 z-30 w-72 rounded-lg border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
-          <button
-            type="button"
-            onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
-            className={`w-full flex items-center justify-between rounded px-2 py-1.5 text-[12px] text-left hover:bg-muted ${scope.kind === "any" ? "text-primary font-medium" : ""}`}
-          >
-            {anyLabel} {scope.kind === "any" && <Check className="h-3.5 w-3.5" />}
-          </button>
-          <div className="my-1 border-t border-border" />
-          <div className="max-h-48 overflow-y-auto space-y-0.5">
-            {items.map((it) => {
-              const checked = selected.includes(it);
-              return (
-                <label key={it} className="flex items-center gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-muted cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    className="accent-[oklch(0.62_0.17_40)] h-3 w-3 shrink-0"
-                    onChange={() => {
-                      const next = checked ? selected.filter((x) => x !== it) : [...selected, it];
-                      onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
-                    }}
-                  />
-                  <span className="truncate">{it}</span>
-                </label>
-              );
-            })}
-          </div>
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} width={288} className="rounded-lg border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
+        <div className="relative mb-1.5">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <input
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search items..."
+            className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+          />
         </div>
-      )}
-    </div>
+        <button
+          type="button"
+          onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
+          className={`w-full flex items-center justify-between rounded px-2 py-1.5 text-[12px] text-left hover:bg-muted ${scope.kind === "any" ? "text-primary font-medium" : ""}`}
+        >
+          {anyLabel} {scope.kind === "any" && <Check className="h-3.5 w-3.5" />}
+        </button>
+        <div className="my-1 border-t border-border" />
+        <div className="max-h-48 overflow-y-auto space-y-0.5">
+          {filtered.length === 0 ? (
+            <p className="px-2 py-3 text-[12px] text-muted-foreground text-center italic">No items match "{search}"</p>
+          ) : filtered.map((it) => {
+            const checked = selected.includes(it.name);
+            return (
+              <label key={it.name} className="flex items-center gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-muted cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  className="accent-[oklch(0.62_0.17_40)] h-3 w-3 shrink-0"
+                  onChange={() => {
+                    const next = checked ? selected.filter((x) => x !== it.name) : [...selected, it.name];
+                    onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
+                  }}
+                />
+                <span className="flex-1 min-w-0 truncate">{it.name}</span>
+                <span className="shrink-0 text-[10px] text-muted-foreground">{it.brand}</span>
+              </label>
+            );
+          })}
+        </div>
+      </FloatingMenu>
+    </>
   );
 }
 
