@@ -47,10 +47,16 @@ export function fmtDateEN(iso: string | Date) {
   return `${String(p.d).padStart(2,"0")} ${MONTHS_EN[p.mo]} ${p.y}`;
 }
 
-/** 07 Jul 2026, 14:05 */
+/** 07 Jul 2026, 14:05 (ID) */
 export function fmtDateTimeID(iso: string | Date) {
   const p = dateParts(iso);
   return `${fmtDateID(iso)}, ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}`;
+}
+
+/** 07 Jul 2026, 14:05 (EN) */
+export function fmtDateTimeEN(iso: string | Date) {
+  const p = dateParts(iso);
+  return `${fmtDateEN(iso)}, ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}`;
 }
 
 /** 1.234 (dot-separated thousand, no currency) */
