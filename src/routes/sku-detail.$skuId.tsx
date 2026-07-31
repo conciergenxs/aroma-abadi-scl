@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router"
 import { AppShell } from "@/components/scl/app-shell";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
+import { fmtDateEN as formatDate } from "@/lib/fmt";
 import { Fragment, useMemo, useState } from "react";
 import {
   Package, TrendingUp, ShoppingCart, DollarSign, Hash,
