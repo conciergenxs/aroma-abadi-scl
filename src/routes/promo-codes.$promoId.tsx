@@ -15,11 +15,14 @@ import {
   FileText,
   Megaphone,
   ShoppingBag,
-  UserCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { usePromoStore, promoStore, describePromoRule, getPromoStatus, type PromoRedemption, type PromoStatus } from "@/components/scl/promo-store";
-import { EditPromoModal } from "@/routes/promo-codes.index";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { usePromoStore, promoStore, describePromoRule, getPromoStatus, type PromoRedemption, type AssignedCode, type PromoStatus } from "@/components/scl/promo-store";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/promo-codes/$promoId")({
   head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
@@ -62,11 +65,11 @@ function UsageTypeBadge({ type }: { type: "one-to-one" | "one-to-many" }) {
   );
 }
 
-const CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string }> = {
-  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white" },
-  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white" },
-  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white" },
-  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white" },
+const CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string; chartColor: string }> = {
+  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white", chartColor: "var(--chart-1)" },
+  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white", chartColor: "var(--chart-2)" },
+  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white", chartColor: "var(--chart-3)" },
+  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white", chartColor: "var(--chart-4)" },
 };
 
 function ChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
@@ -90,19 +93,65 @@ function StatTile({ label, value, icon: Icon }: { label: string; value: string; 
   );
 }
 
+const chartTooltipStyle = {
+  background: "var(--popover)",
+  border: "1px solid var(--border)",
+  borderRadius: 10,
+  fontSize: 12,
+  padding: "8px 12px",
+  boxShadow: "0 8px 24px oklch(0.2 0.02 30 / 12%)",
+};
+
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
+
+function TableFooterPagination({
+  page, setPage, pageSize, setPageSize, total,
+}: { page: number; setPage: (p: number) => void; pageSize: number; setPageSize: (n: number) => void; total: number }) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, total);
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-border">
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <span>Rows per page</span>
+        <select
+          value={pageSize}
+          onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+          className="h-7 rounded-md border border-border bg-card px-1.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+        >
+          {PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
+        </select>
+      </div>
+      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+        <span>{total === 0 ? "0 of 0" : `${start}–${end} of ${total}`}</span>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1}
+            className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors">‹</button>
+          <button type="button" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages}
+            className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors">›</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 function PromoDetailPage() {
   const { promoId } = useParams({ from: "/promo-codes/$promoId" });
   const navigate = useNavigate();
   const { promos } = usePromoStore();
-  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [redemptionPage, setRedemptionPage] = useState(1);
+  const [redemptionPageSize, setRedemptionPageSize] = useState(10);
+  const [codesPage, setCodesPage] = useState(1);
+  const [codesPageSize, setCodesPageSize] = useState(10);
 
   const promo = promos.find((p) => p.id === promoId);
 
   if (!promo) {
     return (
-      <AppShell backTo="/promo-codes" title="Promo Code">
+      <AppShell backTo="/promo-codes" title="Promo Code Detail">
         <div className="flex flex-col items-center justify-center py-24 text-sm text-muted-foreground gap-3">
           <div>Promo code not found.</div>
         </div>
@@ -110,8 +159,7 @@ function PromoDetailPage() {
     );
   }
 
-  const handleDelete = () => {
-    if (!confirm(`Delete "${promo.name}"? This cannot be undone.`)) return;
+  const handleConfirmDelete = () => {
     promoStore.deletePromo(promo.id);
     toast.success("Promo deleted");
     navigate({ to: "/promo-codes" });
@@ -126,21 +174,44 @@ function PromoDetailPage() {
     acc[r.channel] = (acc[r.channel] ?? 0) + 1;
     return acc;
   }, {});
-  const maxChannelCount = Math.max(1, ...Object.values(channelCounts));
+  const channelData = (Object.keys(CHANNEL_META) as PromoRedemption["channel"][])
+    .filter((c) => channelCounts[c])
+    .map((c) => ({ name: CHANNEL_META[c].label, value: channelCounts[c], color: CHANNEL_META[c].chartColor }));
+
+  const pagedRedemptions = redemptions.slice((redemptionPage - 1) * redemptionPageSize, redemptionPage * redemptionPageSize);
+  const assignedCodes: AssignedCode[] = promo.assignedCodes ?? [];
+  const pagedCodes = assignedCodes.slice((codesPage - 1) * codesPageSize, codesPage * codesPageSize);
 
   return (
-    <AppShell backTo="/promo-codes" title={promo.name}>
+    <AppShell backTo="/promo-codes" title="Promo Code Detail">
       <div className="max-w-5xl space-y-6 stagger">
         {/* Header card */}
         <div className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <code className="font-mono text-base font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
-                {promo.code}
-              </code>
-              <UsageTypeBadge type={promo.usageType} />
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold text-foreground truncate">{promo.name}</h2>
+              <div className="mt-2 flex items-center flex-wrap gap-2">
+                <code className="font-mono text-base font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
+                  {promo.code}
+                </code>
+                <UsageTypeBadge type={promo.usageType} />
+                <StatusBadge status={getPromoStatus(promo)} />
+              </div>
             </div>
-            <StatusBadge status={getPromoStatus(promo)} />
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => navigate({ to: "/promo-codes/$promoId/edit", params: { promoId: promo.id } })}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => setConfirmingDelete(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete
+              </button>
+            </div>
           </div>
 
           <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] px-4 py-3">
@@ -155,7 +226,7 @@ function PromoDetailPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-4 gap-4 pt-1">
+          <div className="grid grid-cols-3 gap-4 pt-1">
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Period</div>
               <div className="text-[13px]">{promo.startDate ? fmtDateTimeID(promo.startDate) : "—"} — {promo.endDate ? fmtDateTimeID(promo.endDate) : "—"}</div>
@@ -165,97 +236,97 @@ function PromoDetailPage() {
               <div className="text-[13px]">{promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Owner</div>
-              <div className="text-[13px] flex items-center gap-1.5">
-                <UserCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
-                {promo.createdBy.name}
-                <span className="text-muted-foreground">· {promo.createdBy.jobTitle}</span>
-              </div>
-            </div>
-            <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Created</div>
               <div className="text-[13px]">{fmtDateTimeID(promo.createdAt)}</div>
             </div>
           </div>
         </div>
 
-        {/* Insight tiles */}
-        <div className="grid grid-cols-4 gap-4">
-          <StatTile label="Redemptions" icon={Ticket} value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`} />
-          <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
-          <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
-          <StatTile label="Usage Rate" icon={Percent} value={usageRate == null ? "Unlimited" : `${usageRate}%`} />
-        </div>
-
-        {/* Channel breakdown */}
-        {redemptions.length > 0 && (
-          <SectionCard title="Redemptions by Channel">
-            <div className="p-5 space-y-2.5">
-              {(Object.keys(CHANNEL_META) as PromoRedemption["channel"][])
-                .filter((c) => channelCounts[c])
-                .map((c) => {
-                  const meta = CHANNEL_META[c];
-                  const Icon = meta.icon;
-                  const count = channelCounts[c];
-                  return (
-                    <div key={c} className="flex items-center gap-3">
-                      <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                      <span className="text-[12px] w-24 shrink-0 text-foreground">{meta.label}</span>
-                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${(count / maxChannelCount) * 100}%` }} />
-                      </div>
-                      <span className="text-[12px] font-semibold text-foreground w-6 text-right shrink-0">{count}</span>
+        {/* Insight tiles + channel donut — side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+            <StatTile label="Redemptions" icon={Ticket} value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`} />
+            <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
+            <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
+            <StatTile label="Usage Rate" icon={Percent} value={usageRate == null ? "Unlimited" : `${usageRate}%`} />
+          </div>
+          <div className="rounded-xl border border-border bg-card/40 p-4 flex flex-col">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Redemptions by Channel</div>
+            {channelData.length === 0 ? (
+              <div className="flex-1 grid place-items-center text-[12px] text-muted-foreground italic py-6">No redemptions yet</div>
+            ) : (
+              <>
+                <div className="h-32">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip contentStyle={chartTooltipStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} />
+                      <Pie data={channelData} dataKey="value" nameKey="name" innerRadius={34} outerRadius={54} paddingAngle={2} strokeWidth={0} isAnimationActive animationDuration={600}>
+                        {channelData.map((d) => <Cell key={d.name} fill={d.color} />)}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 space-y-1">
+                  {channelData.map((d) => (
+                    <div key={d.name} className="flex items-center gap-1.5 text-[11px]">
+                      <span className="h-2 w-2 rounded-sm shrink-0" style={{ background: d.color }} />
+                      <span className="flex-1 text-muted-foreground truncate">{d.name}</span>
+                      <span className="font-semibold text-foreground tabular-nums">{d.value}</span>
                     </div>
-                  );
-                })}
-            </div>
-          </SectionCard>
-        )}
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Redemption Log */}
         <SectionCard title={`Redemption Log (${redemptions.length})`} description="Who redeemed this code, and in which transaction">
           {redemptions.length === 0 ? (
             <p className="p-5 text-[12px] text-muted-foreground italic">Not yet redeemed by any customer.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Customer</th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Transaction</th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Store</th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Channel</th>
-                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Discount</th>
-                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60 stagger">
-                  {redemptions.map((r) => (
-                    <tr key={r.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-5 py-2.5">
-                        <Link to="/contacts/$contactId" params={{ contactId: r.contactId }} className="text-[13px] font-medium text-primary hover:underline">
-                          {r.contactName}
-                        </Link>
-                      </td>
-                      <td className="px-5 py-2.5">
-                        <div className="text-[12px] font-mono text-foreground/90">{r.invoice}</div>
-                        <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
-                      </td>
-                      <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
-                      <td className="px-5 py-2.5"><ChannelBadge channel={r.channel} /></td>
-                      <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">{fmtIDR(r.discountValue)}</td>
-                      <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeID(r.redeemedAt)}</td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Customer</th>
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Transaction</th>
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Store</th>
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Channel</th>
+                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Discount</th>
+                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Redeemed</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/60 stagger">
+                    {pagedRedemptions.map((r) => (
+                      <tr key={r.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-5 py-2.5">
+                          <Link to="/contacts/$contactId" params={{ contactId: r.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                            {r.contactName}
+                          </Link>
+                        </td>
+                        <td className="px-5 py-2.5">
+                          <div className="text-[12px] font-mono text-foreground/90">{r.invoice}</div>
+                          <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
+                        </td>
+                        <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
+                        <td className="px-5 py-2.5"><ChannelBadge channel={r.channel} /></td>
+                        <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">{fmtIDR(r.discountValue)}</td>
+                        <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeID(r.redeemedAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <TableFooterPagination page={redemptionPage} setPage={setRedemptionPage} pageSize={redemptionPageSize} setPageSize={setRedemptionPageSize} total={redemptions.length} />
+            </>
           )}
         </SectionCard>
 
         {/* Assigned Codes — 1-to-1 promos only */}
-        {promo.usageType === "one-to-one" && promo.assignedCodes && promo.assignedCodes.length > 0 && (
-          <SectionCard title={`Individual Codes (${promo.assignedCodes.length})`} description="Each unique code and who it was issued to">
+        {promo.usageType === "one-to-one" && assignedCodes.length > 0 && (
+          <SectionCard title={`Individual Codes (${assignedCodes.length})`} description="Each unique code and who it was issued to">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -267,7 +338,7 @@ function PromoDetailPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60 stagger">
-                  {promo.assignedCodes.map((a) => (
+                  {pagedCodes.map((a) => (
                     <tr key={a.code} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-2.5">
                         <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{a.code}</code>
@@ -296,27 +367,25 @@ function PromoDetailPage() {
                 </tbody>
               </table>
             </div>
+            <TableFooterPagination page={codesPage} setPage={setCodesPage} pageSize={codesPageSize} setPageSize={setCodesPageSize} total={assignedCodes.length} />
           </SectionCard>
         )}
-
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <Pencil className="h-3.5 w-3.5" /> Edit
-          </button>
-          <button
-            onClick={handleDelete}
-            className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </button>
-        </div>
       </div>
 
-      {editing && <EditPromoModal promo={promo} onClose={() => setEditing(false)} />}
+      <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this promo code?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{promo.name}" ({promo.code}) will be permanently deleted. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
