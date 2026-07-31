@@ -666,7 +666,7 @@ function ContactsTable({
                     {tx ? (
                       <div>
                         <div className="text-foreground font-medium">{tx.invoice}</div>
-                        <div className="text-muted-foreground">{fmtDateID(tx.date)}</div>
+                        <div className="text-muted-foreground">{fmtDateEN(tx.date)}</div>
                       </div>
                     ) : (
                       <span className="text-muted-foreground">—</span>
