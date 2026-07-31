@@ -18,10 +18,10 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "customer",
     label: "Customer Facing",
-    description: "Berinteraksi langsung dengan konsumen akhir — menyambut, menjawab pertanyaan produk, dan merekomendasikan produk berdasarkan kebutuhan.",
+    description: "Interacts directly with end consumers — greeting, answering product questions, and recommending products based on their needs.",
     waNumber: "+62 811 9001 2233",
     waName: "Arma by Aroma Abadi",
-    behavior: "Friendly, personal, product-driven. Fokus pada customer experience, upsell produk, dan follow-up pasca pembelian.",
+    behavior: "Friendly, personal, product-driven. Focused on customer experience, product upsells, and post-purchase follow-up.",
     examples: [
       "Hai Kak! Berdasarkan kulit kakak yang dry, aku rekomendasiin Real Flawless Foundation dari Sisley — cocok banget!",
       "Promo 12.12 berlaku sampai tengah malam ya Kak! Kalau order sekarang free ongkir ke seluruh Indonesia.",
@@ -34,10 +34,10 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "ba",
     label: "BA Facing",
-    description: "Mendukung Beauty Advisor (BA) dengan informasi produk, tips penjualan, dan update knowledge secara real-time.",
+    description: "Supports Beauty Advisors (BA) with product information, sales tips, and real-time knowledge updates.",
     waNumber: "+62 811 9002 3344",
     waName: "Arma for BA",
-    behavior: "Informatif, teknikal, profesional. Fokus pada product knowledge, script penjualan, dan reporting performa BA.",
+    behavior: "Informative, technical, professional. Focused on product knowledge, sales scripts, and BA performance reporting.",
     examples: [
       "SKU SIS-RFF-30 shade No.30 sudah restok di gudang Jakarta. ETA 2 hari kerja ke Pakuwon.",
       "Script untuk objeksi 'harganya mahal': fokus ke value — SPF 25, tahan 16 jam, natural glow finish.",
@@ -50,10 +50,10 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "operation",
     label: "Operation Facing",
-    description: "Membantu tim operasional Aroma Abadi dengan reminder, laporan harian, alert stok, dan monitoring performa secara otomatis.",
+    description: "Helps the Aroma Abadi operations team with reminders, daily reports, stock alerts, and automatic performance monitoring.",
     waNumber: "+62 811 9003 4455",
     waName: "Arma Ops",
-    behavior: "Ringkas, actionable, schedule-based. Kirim reminder, alert, dan daily digest ke staf Aroma Abadi sesuai jadwal.",
+    behavior: "Concise, actionable, schedule-based. Sends reminders, alerts, and daily digests to Aroma Abadi staff on schedule.",
     examples: [
       "⏰ Reminder: 3 transaksi belum diproses lebih dari 24 jam. Cek dashboard sekarang.",
       "📦 Alert Stok: SKU SIS-RFF-30 tersisa 4 unit di Pakuwon. Perlu reorder?",

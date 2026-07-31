@@ -190,7 +190,7 @@ function SkuDetailPage() {
                     ? "border-primary/40 bg-primary/15 text-foreground"
                     : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
                 }`}>
-                {s === "all" ? "Semua Status" : s}
+                {s === "all" ? "All Status" : s}
               </button>
             ))}
           </div>
@@ -226,10 +226,10 @@ function SkuDetailPage() {
         {/* Metrics — full width 4 cols */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label:"Unit Terjual",    value: String(metrics.unitsSold), icon: ShoppingCart, color:"text-sky-600",     bg:"bg-sky-50" },
+            { label:"Units Sold",      value: String(metrics.unitsSold), icon: ShoppingCart, color:"text-sky-600",     bg:"bg-sky-50" },
             { label:"Total Revenue",   value: formatIDR(metrics.revenue),         icon: DollarSign,   color:"text-emerald-600", bg:"bg-emerald-50" },
-            { label:"Transaksi",       value: String(metrics.txCount),   icon: Hash,         color:"text-violet-600",  bg:"bg-violet-50" },
-            { label:"Rata-rata Order", value: formatIDR(metrics.avgOrderValue),   icon: TrendingUp,   color:"text-amber-600",   bg:"bg-amber-50" },
+            { label:"Transactions",    value: String(metrics.txCount),   icon: Hash,         color:"text-violet-600",  bg:"bg-violet-50" },
+            { label:"Average Order",   value: formatIDR(metrics.avgOrderValue),   icon: TrendingUp,   color:"text-amber-600",   bg:"bg-amber-50" },
           ].map((m) => (
             <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 flex items-start gap-3 shadow-sm hover:shadow-md transition-shadow">
               <div className={`h-9 w-9 rounded-md ${m.bg} grid place-items-center shrink-0`}>
@@ -247,9 +247,9 @@ function SkuDetailPage() {
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold">Riwayat Transaksi</div>
+              <div className="text-sm font-semibold">Transaction History</div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                {filteredTx.length} transaksi
+                {filteredTx.length} transactions
                 {allRelatedTx.length !== filteredTx.length && <span className="ml-1 opacity-60">· {allRelatedTx.length} total</span>}
               </div>
             </div>
@@ -265,7 +265,7 @@ function SkuDetailPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50/60">
-                      {["Invoice","Customer","BA","Store","Kota","Qty","Subtotal","Status"].map((h) => (
+                      {["Invoice","Customer","BA","Store","City","Qty","Subtotal","Status"].map((h) => (
                         <th key={h} className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground ${h==="Qty"||h==="Subtotal"?"text-right":"text-left"}`}>{h}</th>
                       ))}
                     </tr>

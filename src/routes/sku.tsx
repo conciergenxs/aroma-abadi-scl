@@ -584,7 +584,7 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
             <span className="block text-xs text-muted-foreground mb-1">Brand Name</span>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Brand name..." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
           </label>
-          <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category bisa di-setup setelah brand dibuat.</p>
+          <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category can be set up after the brand is created.</p>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>

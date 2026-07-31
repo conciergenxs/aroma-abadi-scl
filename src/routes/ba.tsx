@@ -12,7 +12,7 @@ export const Route = createFileRoute("/ba")({
   head: () => ({
     meta: [
       { title: "Beauty Ambassadors — Aroma Abadi" },
-      { name: "description", content: "Kelola data Beauty Ambassador Aroma Abadi: profil, brand, store, dan kredensial login WhatsApp." },
+      { name: "description", content: "Manage Aroma Abadi Beauty Ambassador data: profile, brand, store, and WhatsApp login credentials." },
     ],
   }),
   component: BAPage,
@@ -370,7 +370,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           <div className="grid grid-cols-2 gap-3">
             <Field label="Position">
               <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
-                <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staf</option>
+                <option>BA</option><option>Senior BA</option><option>Supervisor</option><option>Area Manager</option><option>Staff</option>
               </select>
             </Field>
             <Field label="Brand">

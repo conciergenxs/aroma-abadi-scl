@@ -630,9 +630,9 @@ function ContactsTable({
           {isBaView && <>
             <th className={thCls}>Brand</th>
             <th className={thCls}>Gender</th>
-            <th className={thCls}>Posisi</th>
+            <th className={thCls}>Position</th>
             <th className={thCls}>Store</th>
-            <th className={thCls}>Kota</th>
+            <th className={thCls}>City</th>
           </>}
         </tr>
       </thead>

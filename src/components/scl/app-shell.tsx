@@ -62,16 +62,16 @@ const MOCK_NOTIFS: MockNotif[] = [
     id: "n1",
     title: "New message from Dewi Lestari",
     body: "Hi Arma! A customer is asking about the 12.12 promo, how should I explain it?",
-    time: "2 menit lalu",
+    time: "2 minutes ago",
     icon: MessageCircle,
     iconBg: "bg-sky-500/15",
     iconColor: "text-sky-400",
   },
   {
     id: "n2",
-    title: "Transaksi baru — INV-2024-0089",
-    body: "Putri Anggraini baru saja checkout Velvet Rouge Shade 03 · Rp 485.000",
-    time: "15 menit lalu",
+    title: "New transaction — INV-2024-0089",
+    body: "Putri Anggraini just checked out Velvet Rouge Shade 03 · Rp 485.000",
+    time: "15 minutes ago",
     icon: ShoppingBag,
     iconBg: "bg-emerald-500/15",
     iconColor: "text-emerald-400",
@@ -80,7 +80,7 @@ const MOCK_NOTIFS: MockNotif[] = [
     id: "n3",
     title: "Broadcast 'Promo Harbolnas' sent",
     body: "Successfully sent to 248 contacts. Delivery rate 96.4%.",
-    time: "1 jam lalu",
+    time: "1 hour ago",
     icon: MegaphoneIcon,
     iconBg: "bg-primary/15",
     iconColor: "text-primary",
@@ -89,25 +89,25 @@ const MOCK_NOTIFS: MockNotif[] = [
     id: "n4",
     title: "New message from Hesti Andriani",
     body: "Arma, which shade is best-selling at Pakuwon this month?",
-    time: "2 jam lalu",
+    time: "2 hours ago",
     icon: MessageCircle,
     iconBg: "bg-sky-500/15",
     iconColor: "text-sky-400",
   },
   {
     id: "n5",
-    title: "Transaksi baru — INV-2024-0088",
-    body: "Bayu Hartanto checkout Glow Serum (3 pcs) + Vitamin C Serum · Rp 1.240.000",
-    time: "3 jam lalu",
+    title: "New transaction — INV-2024-0088",
+    body: "Bayu Hartanto checked out Glow Serum (3 pcs) + Vitamin C Serum · Rp 1.240.000",
+    time: "3 hours ago",
     icon: ShoppingBag,
     iconBg: "bg-emerald-500/15",
     iconColor: "text-emerald-400",
   },
   {
     id: "n6",
-    title: "Template 'Cart Reminder' disetujui",
-    body: "Template pesan WhatsApp kamu sudah disetujui dan siap digunakan.",
-    time: "Kemarin",
+    title: "Template 'Cart Reminder' approved",
+    body: "Your WhatsApp message template has been approved and is ready to use.",
+    time: "Yesterday",
     icon: CheckCheck,
     iconBg: "bg-violet-500/15",
     iconColor: "text-violet-400",
@@ -309,7 +309,7 @@ export function AppShell({
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                    <span className="text-sm font-semibold">Notifikasi</span>
+                    <span className="text-sm font-semibold">Notifications</span>
                     <div className="flex items-center gap-2">
                       {unreadCount > 0 && (
                         <button

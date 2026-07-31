@@ -1363,27 +1363,27 @@ function ArmaConfigSection() {
         {/* Left: identity + behavior */}
         <div className="space-y-5">
           <div className={`rounded-xl border p-4 ${persona.bgColor}`}>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Jenis</div>
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Type</div>
             <div className={`text-base font-semibold ${persona.color}`}>{persona.label}</div>
             <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{persona.description}</div>
           </div>
 
           {/* WA Number */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Nomor WhatsApp</label>
+            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">WhatsApp Number</label>
             <input
               value={persona.waNumber}
               onChange={(e) => update(active, { waNumber: e.target.value })}
               className="h-9 w-full rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
             <div className="text-[11px] text-muted-foreground">
-              Nama akun: <span className="text-foreground font-medium">{persona.waName}</span>
+              Account name: <span className="text-foreground font-medium">{persona.waName}</span>
             </div>
           </div>
 
           {/* Behavior */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Perilaku</label>
+            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Behavior</label>
             <textarea
               value={persona.behavior}
               onChange={(e) => update(active, { behavior: e.target.value })}
@@ -1394,16 +1394,16 @@ function ArmaConfigSection() {
 
           <button
             type="button"
-            onClick={() => toast.success(`Konfigurasi ${persona.label} disimpan`)}
+            onClick={() => toast.success(`${persona.label} configuration saved`)}
             className="h-9 px-4 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Simpan Konfigurasi
+            Save Configuration
           </button>
         </div>
 
         {/* Right: example messages */}
         <div className="space-y-3">
-          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Contoh Pesan</div>
+          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Sample Message</div>
           <div className="space-y-2.5">
             {persona.examples.map((ex, i) => (
               <div key={i} className="rounded-lg border border-border bg-card/60 px-4 py-3">

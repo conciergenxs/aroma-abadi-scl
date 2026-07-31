@@ -8,12 +8,12 @@ import { useContactsStore, contactsStore } from "@/components/scl/contacts-store
 
 // Promo codes registry (mirrors promo-codes page + new page data)
 const PROMO_REGISTRY: Record<string, { code: string; name: string; usageType: "one-to-one" | "one-to-many"; availableCodes: number }> = {
-  "promo-1": { code: "AROMA20",    name: "Diskon 20% All Brand",        usageType: "one-to-many", availableCodes: 999 },
-  "promo-2": { code: "SISLEY150K", name: "Diskon Rp150.000 Sisley",     usageType: "one-to-one",  availableCodes: 500 },
-  "promo-3": { code: "BEAUTY10",   name: "Diskon 10% New Arrival",      usageType: "one-to-many", availableCodes: 999 },
-  "promo-4": { code: "RIMMEL50K",  name: "Cashback Rp50.000 Rimmel",   usageType: "one-to-one",  availableCodes: 300 },
+  "promo-1": { code: "AROMA20",    name: "20% Off All Brand",          usageType: "one-to-many", availableCodes: 999 },
+  "promo-2": { code: "SISLEY150K", name: "Rp150.000 Off Sisley",       usageType: "one-to-one",  availableCodes: 500 },
+  "promo-3": { code: "BEAUTY10",   name: "10% Off New Arrival",        usageType: "one-to-many", availableCodes: 999 },
+  "promo-4": { code: "RIMMEL50K",  name: "Rimmel Rp50.000 Cashback",   usageType: "one-to-one",  availableCodes: 300 },
   "promo-5": { code: "DGVIP25",    name: "VIP D&G 25% Off",            usageType: "one-to-one",  availableCodes: 150 },
-  "promo-6": { code: "BIRTHDAY30", name: "Hadiah Ulang Tahun 30%",     usageType: "one-to-many", availableCodes: 999 },
+  "promo-6": { code: "BIRTHDAY30", name: "30% Birthday Gift",          usageType: "one-to-many", availableCodes: 999 },
 };
 import { useMemo, useRef, useState } from "react";
 import {

@@ -231,7 +231,7 @@ function NewContactPage() {
               <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
                 <FormSection title="Basic Information">
                   <FormGrid>
-                    <Field label="Nama Lengkap" required>
+                    <Field label="Full Name" required>
                       <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
                     </Field>
                     <Field label="WA Number" required>
@@ -240,7 +240,7 @@ function NewContactPage() {
                     <Field label="Gender" required>
                       <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
                     </Field>
-                    <Field label="Posisi" required>
+                    <Field label="Position" required>
                       <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Select position…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
                     </Field>
                   </FormGrid>
@@ -268,9 +268,9 @@ function NewContactPage() {
                   </div>
                 </FormSection>
 
-                <FormSection title="Lokasi">
+                <FormSection title="Location">
                   <FormGrid>
-                    <Field label="Kota" required>
+                    <Field label="City" required>
                       <SimpleSelect value={city} onChange={(v) => { setCity(v); setStore(""); }} options={[{ value: "", label: "Select city…" }, ...CITIES.map((c) => ({ value: c, label: c }))]} />
                     </Field>
                     <Field label="Store" required>
@@ -320,9 +320,9 @@ function NewContactPage() {
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
             <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
-              <FormSection title="Informasi Dasar">
+              <FormSection title="Basic Information">
                 <FormGrid>
-                  <Field label="Nama Lengkap" required>
+                  <Field label="Full Name" required>
                     <Input value={name} onChange={setName} placeholder="Putri Anggraini" />
                   </Field>
                   <Field label="WA Number" required>

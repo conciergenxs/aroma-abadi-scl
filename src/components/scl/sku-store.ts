@@ -116,7 +116,7 @@ function seed(): Brand[] {
               price: 2450000, photoUrl: skuFoundation,
               description: "Liquid serum foundation with SPF 25, medium-buildable coverage, natural glow finish.",
               knowledgeCards: [
-                { id: "kc-sis-1", coverUrl: kc4, title: "Skin Benefits", text: "Mengandung botanical extract yang menutrisi kulit selama dipakai." },
+                { id: "kc-sis-1", coverUrl: kc4, title: "Skin Benefits", text: "Contains botanical extract that nourishes the skin while worn." },
                 { id: "kc-sis-2", coverUrl: kc2, title: "Application", text: "Pour 1-2 drops on the back of hand, blend with a round brush from the center of the face." },
               ],
             },
@@ -158,7 +158,7 @@ function seed(): Brand[] {
               price: 189000, photoUrl: skuTranslucent,
               description: "Translucent loose setting powder, flashback-free, suitable for all skin tones.",
               knowledgeCards: [
-                { id: "kc-rim-1", coverUrl: kc2, title: "No Flashback", text: "Formula bebas talc dan silica yang memantulkan flash kamera." },
+                { id: "kc-rim-1", coverUrl: kc2, title: "No Flashback", text: "Formula free of talc and silica that reflects camera flash." },
                 { id: "kc-rim-2", coverUrl: kc1, title: "Setting Technique", text: "Press with puff on T-zone, bake for 3 minutes for best results." },
               ],
             },
@@ -197,8 +197,8 @@ function seed(): Brand[] {
               price: 745000, photoUrl: skuTranslucent,
               description: "The iconic loose setting powder, soft-focus finish, does not add color to the skin.",
               knowledgeCards: [
-                { id: "kc-lm-1", coverUrl: kc1, title: "Iconic Status", text: "Best-seller dunia sejak 1996, signature product Laura Mercier." },
-                { id: "kc-lm-2", coverUrl: kc2, title: "Universal Shade", text: "Translucent berarti dapat dipakai semua skin tone tanpa mengubah warna foundation." },
+                { id: "kc-lm-1", coverUrl: kc1, title: "Iconic Status", text: "World best-seller since 1996, Laura Mercier's signature product." },
+                { id: "kc-lm-2", coverUrl: kc2, title: "Universal Shade", text: "Translucent means it can be worn on all skin tones without altering the foundation's color." },
               ],
             },
           ],

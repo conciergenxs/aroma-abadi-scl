@@ -61,12 +61,12 @@ const BUTTON_OPTIONS = [
 
 // Promo codes mock (same data as promo-codes page)
 const PROMO_CODES_LIST = [
-  { id: "promo-1", code: "AROMA20", name: "Diskon 20% All Brand" },
-  { id: "promo-2", code: "SISLEY150K", name: "Diskon Rp150.000 Sisley" },
-  { id: "promo-3", code: "BEAUTY10", name: "Diskon 10% New Arrival" },
-  { id: "promo-4", code: "RIMMEL50K", name: "Cashback Rp50.000 Rimmel" },
+  { id: "promo-1", code: "AROMA20", name: "20% Off All Brand" },
+  { id: "promo-2", code: "SISLEY150K", name: "Rp150.000 Off Sisley" },
+  { id: "promo-3", code: "BEAUTY10", name: "10% Off New Arrival" },
+  { id: "promo-4", code: "RIMMEL50K", name: "Rimmel Rp50.000 Cashback" },
   { id: "promo-5", code: "DGVIP25", name: "VIP D&G 25% Off" },
-  { id: "promo-6", code: "BIRTHDAY30", name: "Hadiah Ulang Tahun 30%" },
+  { id: "promo-6", code: "BIRTHDAY30", name: "30% Birthday Gift" },
 ];
 
 function CreateTemplatePage() {

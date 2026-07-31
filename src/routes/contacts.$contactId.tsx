@@ -105,7 +105,7 @@ function ContactDetailPage() {
         id: `tx-act-${t.id}`,
         contactId: contact.id,
         type: "transaction" as const,
-        message: `Transaksi ${t.invoice} · ${t.brandName} · ${formatIDR(t.total)} · ${t.status}\n${t.items.map((i) => `${i.skuName} ×${i.qty}`).join(", ")}`,
+        message: `Transaction ${t.invoice} · ${t.brandName} · ${formatIDR(t.total)} · ${t.status}\n${t.items.map((i) => `${i.skuName} ×${i.qty}`).join(", ")}`,
         at: t.date,
       })),
     [contactTransactions, contact.id],
@@ -818,9 +818,9 @@ function PeekRow({ label, children }: { label: string; children: React.ReactNode
 }
 
 function TransactionActivityCard({ message, at }: { message: string; at: string }) {
-  // Parse: "Transaksi {invoice} · {brand} · {total} · {status}\n{items}"
+  // Parse: "Transaction {invoice} · {brand} · {total} · {status}\n{items}"
   const [header, items] = message.split("\n");
-  const parts = header.replace("Transaksi ", "").split(" · ");
+  const parts = header.replace("Transaction ", "").split(" · ");
   const [invoice, brand, total, status] = parts;
   const statusColor =
     status === "Shipped"

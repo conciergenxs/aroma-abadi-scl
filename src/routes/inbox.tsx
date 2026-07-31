@@ -938,7 +938,7 @@ function InboxPage() {
               <div className="rounded-xl border border-border bg-card/30 px-4 py-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Bot className="h-4 w-4 text-primary" />
-                  <span>Arma sedang membalas percakapan ini secara otomatis.</span>
+                  <span>Arma is currently replying to this conversation automatically.</span>
                 </div>
                 <button
                   type="button"
