@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
 import { fmtDateTimeID, fmtNum, fmtIDR } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   XCircle,
