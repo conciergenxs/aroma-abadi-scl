@@ -187,7 +187,7 @@ function PromoCodesPage() {
                   <div className="flex justify-end">
                     <ActionMenu
                       onSeeDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
-                      onEdit={() => navigate({ to: "/promo-codes/$promoId/edit", params: { promoId: promo.id } })}
+                      onEdit={() => navigate({ to: "/promo-codes/edit/$promoId", params: { promoId: promo.id } })}
                       onDelete={() => setDeletingPromo(promo)}
                     />
                   </div>
