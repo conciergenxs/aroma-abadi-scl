@@ -38,6 +38,7 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
     case "any-purchase": return { kind };
     case "buy-item": return { kind, qty: 1, item: { kind: "any" } };
     case "min-spend": return { kind, amount: 500000 };
+    case "first-purchase": return { kind };
   }
 }
 
@@ -46,6 +47,8 @@ export function defaultReward(kind: PromoReward["kind"]): PromoReward {
     case "free-item": return { kind, qty: 1, sameAsPurchased: true, item: { kind: "any" } };
     case "percent-off": return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
     case "amount-off": return { kind, amount: 50000, timing: "immediate" };
+    case "free-shipping": return { kind };
+    case "bonus-points": return { kind, points: 100 };
   }
 }
 
