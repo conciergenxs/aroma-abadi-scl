@@ -61,6 +61,7 @@ function ContactDetailPage() {
   const state = useContactsStore();
   const { contacts, labels, lists, properties, activities } = state;
   const { transactions } = useTransactionsStore();
+  const { promos } = usePromoStore();
   const navigate = useNavigate();
 
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
