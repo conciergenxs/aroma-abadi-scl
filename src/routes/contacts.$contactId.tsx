@@ -1348,7 +1348,7 @@ function formatDate(iso: string) {
 }
 
 function formatTime(iso: string) {
-  try { return fmtDateTimeID(iso); } catch { return iso; }
+  try { return fmtDateTimeEN(iso); } catch { return iso; }
 }
 
 function groupByDay(activities: ContactActivity[]) {
