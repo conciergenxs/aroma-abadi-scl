@@ -1148,7 +1148,7 @@ function ContactDrawer({
 
         <div className="p-5 text-center border-b border-border">
           <div className="relative mx-auto h-16 w-16">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-base font-medium">{contact.avatar}</div>
+            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[15px] font-medium">{contact.avatar}</div>
             <ChannelIcon
               channel={contact.channel}
               className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
