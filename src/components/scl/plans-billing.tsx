@@ -113,10 +113,10 @@ function SubscriptionPage({
               <p className="mt-2 text-xs text-muted-foreground">Includes subscription and active recurring add-ons.</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={onManagePlan} className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+              <button type="button" onClick={onManagePlan} className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">
                 Manage Plan
               </button>
-              <button type="button" onClick={onUpdatePaymentMethod} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card/60 px-3 text-sm font-medium hover:bg-card">
+              <button type="button" onClick={onUpdatePaymentMethod} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">
                 Update Payment Method
               </button>
             </div>
