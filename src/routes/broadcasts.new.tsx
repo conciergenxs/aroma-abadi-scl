@@ -686,46 +686,6 @@ function TemplateSummary({
   );
 }
 
-function VariablePicker({
-  properties,
-  onPick,
-}: {
-  properties: { key: string; name: string }[];
-  onPick: (key: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
-      >
-        <AtSign className="h-3 w-3" /> Insert variable
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute z-40 mt-1 w-56 max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-lg">
-            {properties.map((p) => (
-              <button
-                key={p.key}
-                onClick={() => {
-                  onPick(p.key);
-                  setOpen(false);
-                }}
-                className="w-full text-left flex items-center justify-between gap-2 px-3 py-1.5 text-[12px] hover:bg-gray-50"
-              >
-                <span>{p.name}</span>
-                <code className="text-[10px] text-primary">{`{{${p.key}}}`}</code>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 function PhoneFrame({
   channel,
   senderName,
