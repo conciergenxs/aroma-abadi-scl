@@ -6,7 +6,7 @@ import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useState, useMemo, useRef } from "react";
 import {
   Plus, Search, Copy, Trash2, CheckCircle2, Clock, XCircle,
-  MoreVertical, Pencil, Info,
+  MoreVertical, Pencil, Info, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
