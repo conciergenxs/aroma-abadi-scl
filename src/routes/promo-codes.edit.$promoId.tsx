@@ -8,13 +8,13 @@ import {
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 
-export const Route = createFileRoute("/promo-codes/$promoId/edit")({
+export const Route = createFileRoute("/promo-codes/edit/$promoId")({
   head: () => ({ meta: [{ title: "Edit Promo Code — SCL" }] }),
   component: EditPromoCodePage,
 });
 
 function EditPromoCodePage() {
-  const { promoId } = useParams({ from: "/promo-codes/$promoId/edit" });
+  const { promoId } = useParams({ from: "/promo-codes/edit/$promoId" });
   const navigate = useNavigate();
   const { promos } = usePromoStore();
   const promo = promos.find((p) => p.id === promoId);
