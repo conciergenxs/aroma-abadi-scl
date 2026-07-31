@@ -23,12 +23,6 @@ function defaultTo() {
   return new Date().toISOString().slice(0, 10);
 }
 
-const MONTHS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2,"0")} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
-}
-
 const STATUS_COLORS: Record<string, string> = {
   Shipped:   "border-emerald-700 bg-emerald-600 text-white",
   Processed: "border-sky-700    bg-sky-500     text-white",
