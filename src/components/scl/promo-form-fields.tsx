@@ -241,11 +241,25 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Start Date &amp; Time</label>
-          <input type="datetime-local" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={inputCls} />
+          <input
+            ref={startDateRef}
+            type="datetime-local"
+            value={form.startDate}
+            onChange={(e) => set("startDate", e.target.value)}
+            onClick={() => startDateRef.current?.showPicker?.()}
+            className={inputCls}
+          />
         </div>
         <div>
           <label className={labelCls}>End Date &amp; Time</label>
-          <input type="datetime-local" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} className={inputCls} />
+          <input
+            ref={endDateRef}
+            type="datetime-local"
+            value={form.endDate}
+            onChange={(e) => set("endDate", e.target.value)}
+            onClick={() => endDateRef.current?.showPicker?.()}
+            className={inputCls}
+          />
         </div>
       </div>
 
