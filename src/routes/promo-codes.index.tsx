@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createPortal } from "react-dom";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { FloatingMenu } from "@/components/scl/floating-menu";
+import { useState, useMemo, useRef } from "react";
 import {
   Plus, Search, Copy, Trash2, CheckCircle2, Clock, XCircle,
-  MoreVertical, Pencil, Info, X,
+  MoreVertical, Pencil, Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -13,7 +14,7 @@ import {
   type PromoCode, type PromoStatus,
 } from "@/components/scl/promo-store";
 import {
-  PromoFormFields, emptyPromoForm, promoFormFromExisting, promoFormToPayload, validatePromoForm,
+  PromoFormFields, promoFormFromExisting, promoFormToPayload, validatePromoForm,
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 
