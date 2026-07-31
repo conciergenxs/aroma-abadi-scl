@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
-import { fmtDateEN, fmtDateID, fmtDateTimeID } from "@/lib/fmt";
+import { fmtDateEN, fmtDateTimeEN } from "@/lib/fmt";
 import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
