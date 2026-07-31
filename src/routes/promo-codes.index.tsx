@@ -44,87 +44,41 @@ function StatusBadge({ status }: { status: PromoStatus }) {
 }
 
 // ── Three-dot action menu ─────────────────────────────────────────────────────
+// Portaled via FloatingMenu — table cells don't establish a stacking context,
+// so a plain `absolute` dropdown here gets its clicks intercepted by sibling
+// <td> content (e.g. the "Used" column) painting over it. Portaling to
+// document.body sidesteps table stacking entirely.
 
 function ActionMenu({ onSeeDetails, onEdit, onDelete }: { onSeeDetails: () => void; onEdit: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
+        ref={btnRef}
         type="button"
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
         className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
-      {open && (
-        <div className="absolute right-0 top-8 z-50 min-w-[148px] rounded-lg border border-border bg-card shadow-xl py-1 animate-scale-in origin-top-right">
-          <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
-            <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
-          </button>
-          <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onSeeDetails(); }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
-            <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
-          </button>
-          <div className="border-t border-border my-1" />
-          <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left">
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Create Modal ──────────────────────────────────────────────────────────────
-
-function CreatePromoModal({ onClose }: { onClose: () => void }) {
-  const [form, setForm] = useState<PromoFormState>(() => emptyPromoForm());
-
-  const handleSave = () => {
-    const error = validatePromoForm(form);
-    if (error) { toast.error(error); return; }
-    promoStore.addPromo({
-      ...promoFormToPayload(form),
-      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
-      createdAt: new Date().toISOString(),
-    });
-    toast.success("Promo code created");
-    onClose();
-  };
-
-  return (
-    <Portal>
-      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto modal-backdrop">
-        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8 modal-content">
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <div className="text-sm font-semibold text-foreground">Create Promo Code</div>
-            <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="p-5 max-h-[75vh] overflow-y-auto">
-            <PromoFormFields form={form} setForm={setForm} />
-          </div>
-          <div className="p-4 border-t border-border flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
-            <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Promo Code</button>
-          </div>
-        </div>
-      </div>
-    </Portal>
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={148} className="rounded-lg border border-border bg-card shadow-xl py-1 animate-scale-in origin-top-right">
+        <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
+          <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
+        </button>
+        <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onSeeDetails(); }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
+          <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
+        </button>
+        <div className="border-t border-border my-1" />
+        <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left">
+          <Trash2 className="h-3.5 w-3.5" /> Delete
+        </button>
+      </FloatingMenu>
+    </>
   );
 }
 
