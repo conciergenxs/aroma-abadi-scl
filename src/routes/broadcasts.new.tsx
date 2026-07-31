@@ -111,6 +111,16 @@ function CreateBroadcastPage() {
     });
   };
 
+  const insertBrand = (brandName: string) => {
+    insertVariable(`brands-${brandName}`);
+    setVarPopup(null);
+  };
+
+  const insertPromo = (code: string) => {
+    insertVariable(`promo-${code}`);
+    setVarPopup(null);
+  };
+
   const submit = (kind: "draft" | "send" | "schedule") => {
     if (kind !== "draft" && !valid) {
       toast.error("Please complete all required fields");
