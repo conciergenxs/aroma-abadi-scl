@@ -175,7 +175,7 @@ function SkuDetailPage() {
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Cari invoice, customer, BA…"
+              placeholder="Search invoice, customer, BA…"
               className="h-9 w-56 rounded-md border border-border bg-card/60 pl-9 pr-3 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
