@@ -196,7 +196,7 @@ function PromoDetailPage() {
             <div className="min-w-0">
               <h2 className="text-lg font-semibold text-foreground truncate">{promo.name}</h2>
               <div className="mt-2 flex items-center flex-wrap gap-2">
-                <code className="font-mono text-base font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
+                <code className="font-mono text-[15px] font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
                   {promo.code}
                 </code>
                 <UsageTypeBadge type={promo.usageType} />
