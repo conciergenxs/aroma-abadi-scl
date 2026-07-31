@@ -138,7 +138,7 @@ function TransactionsPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-[13px]">
               <thead className="text-muted-foreground">
                 <tr className="border-b border-border">
                   <Th>Invoice</Th>
