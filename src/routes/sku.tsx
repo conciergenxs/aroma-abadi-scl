@@ -97,7 +97,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
           <div className="text-sm font-semibold">Brands</div>
           <div className="text-sm text-muted-foreground">Click a brand to view its categories and SKUs.</div>
         </div>
-        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium hover:opacity-90">
+        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90">
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
       </div>
