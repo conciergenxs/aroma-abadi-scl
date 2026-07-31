@@ -109,7 +109,7 @@ function AuthPage() {
                 </span>
               </h1>
               <p className="mt-4 text-sm text-sidebar-foreground/70 max-w-md leading-relaxed">
-                Kelola percakapan WhatsApp pelanggan Aroma Abadi dalam satu workspace.
+                Manage Aroma Abadi's customer WhatsApp conversations in one workspace.
               </p>
             </div>
             <div />
