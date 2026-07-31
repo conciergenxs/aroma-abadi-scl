@@ -52,7 +52,9 @@ export const Route = createFileRoute("/contacts/$contactId")({
   component: ContactDetailPage,
 });
 
-type Tab = "activity" | "transactions";
+type Tab = "activity" | "transactions" | "redeemed";
+
+type ContactRedemption = PromoRedemption & { promoName: string; promoCode: string };
 
 function ContactDetailPage() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
