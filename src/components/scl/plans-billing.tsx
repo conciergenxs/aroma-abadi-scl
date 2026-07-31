@@ -438,7 +438,7 @@ function AddOnTotal({ amount }: { amount: number }) {
 }
 
 function AddOnActions({ onCancel, onPurchase }: { onCancel: () => void; onPurchase: () => void }) {
-  return <div className="flex justify-end gap-2"><button type="button" onClick={onCancel} className="h-9 rounded-md border border-border bg-card/60 px-3 text-sm font-medium hover:bg-card">Cancel</button><button type="button" onClick={onPurchase} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">Purchase Add-on</button></div>;
+  return <div className="flex justify-end gap-2"><button type="button" onClick={onCancel} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">Cancel</button><button type="button" onClick={onPurchase} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">Purchase Add-on</button></div>;
 }
 
 function PurchaseConfirmDialog({ purchase, onClose }: { purchase: AddOnPurchase | null; onClose: () => void }) {
