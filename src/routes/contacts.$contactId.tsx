@@ -841,6 +841,89 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   );
 }
 
+const REDEEM_CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string }> = {
+  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white" },
+  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white" },
+  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white" },
+  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white" },
+};
+
+function RedeemChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
+  const meta = REDEEM_CHANNEL_META[channel];
+  const Icon = meta.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}>
+      <Icon className="h-2.5 w-2.5" /> {meta.label}
+    </span>
+  );
+}
+
+function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
+  if (redemptions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
+        <div className="h-12 w-12 rounded-full bg-white border border-border grid place-items-center">
+          <Ticket className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="text-sm text-foreground">No promo codes redeemed yet.</div>
+        <div className="text-[11px] text-muted-foreground">Promo codes this contact has redeemed will appear here.</div>
+      </div>
+    );
+  }
+
+  const totalDiscount = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
+
+  return (
+    <div className="max-w-3xl space-y-4">
+      {/* Summary */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Redemptions</div>
+          <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Discount Received</div>
+          <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-lg border border-border overflow-hidden">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="border-b border-border bg-white">
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Promo Code</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Transaction</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Store</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Channel</th>
+              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Discount</th>
+              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Redeemed</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {redemptions.map((r) => (
+              <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3">
+                  <div className="font-medium text-foreground text-xs">{r.promoName}</div>
+                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{r.promoCode}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-xs font-mono text-foreground/90">{r.invoice}</div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">{r.sourceName}</div>
+                </td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{r.store}</td>
+                <td className="px-4 py-3"><RedeemChannelBadge channel={r.channel} /></td>
+                <td className="px-4 py-3 text-right text-xs font-medium text-foreground whitespace-nowrap">{formatIDR(r.discountValue)}</td>
+                <td className="px-4 py-3 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeEN(r.redeemedAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-3">
