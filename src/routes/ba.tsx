@@ -229,14 +229,14 @@ function BAPage() {
               </p>
             </div>
             <div className="p-4 flex justify-end gap-2">
-              <button onClick={() => setResetConfirm(null)} className="rounded-md border border-border px-3 h-9 text-sm">Cancel</button>
+              <button onClick={() => setResetConfirm(null)} className="rounded-md border border-border px-3 h-9 text-[14px]">Cancel</button>
               <button
                 onClick={() => {
                   const pw = baStore.regeneratePassword(resetConfirm.id);
                   toast.success(`New password: ${pw}`);
                   setResetConfirm(null);
                 }}
-                className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-sm font-medium"
+                className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
               >
                 Reset
               </button>
