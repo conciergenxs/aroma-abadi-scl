@@ -88,7 +88,7 @@ function BroadcastListPage() {
   };
 
   return (
-    <AppShell title="Broadcasts">
+    <AppShell title="Broadcasts" subtitle="Send and track WhatsApp campaigns to your contacts.">
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           {stats.map((s) => (
