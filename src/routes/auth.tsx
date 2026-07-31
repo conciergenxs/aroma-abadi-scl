@@ -178,7 +178,7 @@ function AuthPage() {
                 </p>
                 <button
                   onClick={() => { setMode("signin"); setError(null); }}
-                  className="mt-6 w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
+                  className="mt-6 w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition"
                 >
                   Back to Sign In
                 </button>
