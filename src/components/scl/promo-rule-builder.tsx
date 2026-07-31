@@ -116,70 +116,118 @@ function ItemScopeEditor({
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const btnRef = useRef<HTMLButtonElement>(null);
+  const [brandFilter, setBrandFilter] = useState("all");
   const selected = scope.kind === "specific" ? scope.items : [];
+
+  const brands = useMemo(() => Array.from(new Set(items.map((it) => it.brand))).sort(), [items]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((it) => it.name.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q));
-  }, [items, search]);
+    return items.filter((it) => {
+      const matchesBrand = brandFilter === "all" || it.brand === brandFilter;
+      const matchesSearch = !q || it.name.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q);
+      return matchesBrand && matchesSearch;
+    });
+  }, [items, search, brandFilter]);
 
   const label = scope.kind === "any" ? anyLabel : selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
 
   return (
     <>
       <button
-        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(true)}
         className="inline-flex max-w-[220px] items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium text-foreground hover:bg-primary/15 transition-colors align-middle"
       >
         <span className="truncate">{label}</span>
         <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
       </button>
-      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} width={288} className="rounded-lg border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
-        <div className="relative mb-1.5">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-          <input
-            autoFocus
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search items..."
-            className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
-          className={`w-full flex items-center justify-between rounded px-2 py-1.5 text-[12px] text-left hover:bg-muted ${scope.kind === "any" ? "text-primary font-medium" : ""}`}
+      {open && typeof document !== "undefined" && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 modal-backdrop"
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
         >
-          {anyLabel} {scope.kind === "any" && <Check className="h-3.5 w-3.5" />}
-        </button>
-        <div className="my-1 border-t border-border" />
-        <div className="max-h-48 overflow-y-auto space-y-0.5">
-          {filtered.length === 0 ? (
-            <p className="px-2 py-3 text-[12px] text-muted-foreground text-center italic">No items match "{search}"</p>
-          ) : filtered.map((it) => {
-            const checked = selected.includes(it.name);
-            return (
-              <label key={`${it.brand}::${it.name}`} className="flex items-center gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-muted cursor-pointer">
+          <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
+            <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+              <div className="text-sm font-semibold text-foreground">Select Items</div>
+              <button type="button" onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3 border-b border-border shrink-0">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
                 <input
-                  type="checkbox"
-                  checked={checked}
-                  className="accent-[oklch(0.62_0.17_40)] h-3 w-3 shrink-0"
-                  onChange={() => {
-                    const next = checked ? selected.filter((x) => x !== it.name) : [...selected, it.name];
-                    onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
-                  }}
+                  autoFocus
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search items..."
+                  className="h-9 w-full rounded-md border border-border bg-card pl-9 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
                 />
-                <span className="flex-1 min-w-0 truncate">{it.name}</span>
-                <span className="shrink-0 text-[10px] text-muted-foreground">{it.brand}</span>
-              </label>
-            );
-          })}
-        </div>
-      </FloatingMenu>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setBrandFilter("all")}
+                  className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === "all" ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
+                >
+                  All Brands
+                </button>
+                {brands.map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBrandFilter(b)}
+                    className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === b ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+              <button
+                type="button"
+                onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
+                className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-[13px] text-left hover:bg-muted ${scope.kind === "any" ? "text-primary font-medium" : ""}`}
+              >
+                {anyLabel} {scope.kind === "any" && <Check className="h-4 w-4" />}
+              </button>
+              <div className="my-1 border-t border-border" />
+              {filtered.length === 0 ? (
+                <p className="px-3 py-8 text-[13px] text-muted-foreground text-center italic">No items match your filters</p>
+              ) : (
+                <div className="stagger">
+                  {filtered.map((it) => {
+                    const checked = selected.includes(it.name);
+                    return (
+                      <label key={`${it.brand}::${it.name}`} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                          onChange={() => {
+                            const next = checked ? selected.filter((x) => x !== it.name) : [...selected, it.name];
+                            onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
+                          }}
+                        />
+                        <span className="flex-1 min-w-0 truncate">{it.name}</span>
+                        <span className="shrink-0 text-[11px] text-muted-foreground">{it.brand}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="p-3 border-t border-border flex justify-end shrink-0">
+              <button type="button" onClick={() => setOpen(false)} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">
+                Done
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 }
