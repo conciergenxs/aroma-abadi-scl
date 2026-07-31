@@ -353,7 +353,7 @@ function ContactDetailPage() {
   };
 
   return (
-    <AppShell backTo="/contacts" noPadding>
+    <AppShell backTo="/contacts" title="Contact Details" noPadding>
       <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
         {/* 2-panel workspace */}
         <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-0">
