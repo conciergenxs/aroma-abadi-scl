@@ -7,6 +7,15 @@ DEBOUNCE=3        # detik tunggu setelah perubahan terakhir sebelum push
 PENDING=0
 LAST_CHANGE=0
 
+# launchd runs this with a bare-bones PATH (no /opt/homebrew/bin), so `git`
+# would otherwise silently resolve to Xcode's /usr/bin/git instead of the
+# Homebrew git used interactively. Two different git binaries means two
+# different bundled git-credential-osxkeychain helpers, so macOS Keychain's
+# "Always Allow" (tied to the binary's identity) never sticks — it keeps
+# alternating between the two, prompting again each time. Pinning PATH here
+# keeps every push using the same git/credential-helper as the terminal.
+export PATH="/opt/homebrew/bin:$PATH"
+
 log() { echo "[$(date +%H:%M:%S)] $1"; }
 
 cd "$REPO" || { echo "Folder tidak ditemukan: $REPO"; exit 1; }

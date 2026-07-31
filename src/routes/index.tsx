@@ -403,6 +403,11 @@ function addDaysIso(iso: string, days: number): string {
 function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fullRange: DateRange; onChange: (r: DateRange) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // Presets can clamp to an identical range once the window is short enough
+  // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
+  // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
+  // just because it's listed first. Track the actual click instead.
+  const [selectedLabel, setSelectedLabel] = useState<string | null>("Last 90 Days");
 
   useEffect(() => {
     if (!open) return;
