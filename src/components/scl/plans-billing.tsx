@@ -256,7 +256,7 @@ function PaymentMethodsPage() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
         <PageHeader title="Payment Methods" description="Manage saved cards and default billing method." />
-        <button type="button" onClick={openNew} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+        <button type="button" onClick={openNew} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">
           <Plus className="h-4 w-4" /> Add Payment Method
         </button>
       </div>
