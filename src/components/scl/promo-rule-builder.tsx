@@ -383,7 +383,7 @@ export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange
         {/* Big preview */}
         <div className="px-4 py-4 text-center border-b border-dashed border-primary/20 bg-primary/[0.05]">
           <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Preview</div>
-          <div key={describePromoRule(rule)} className="text-base md:text-lg font-semibold text-foreground leading-snug animate-fade-in">
+          <div key={describePromoRule(rule)} className="text-[15px] md:text-lg font-semibold text-foreground leading-snug animate-fade-in">
             {describePromoRule(rule)}
           </div>
         </div>
