@@ -67,6 +67,7 @@ function describeCondition(c: PromoCondition): string {
     case "any-purchase": return "Any Purchase";
     case "buy-item": return `Buy ${c.qty} ${scopeLabel(c.item)}`;
     case "min-spend": return `Spend min. ${fmtIDR(c.amount)}`;
+    case "first-purchase": return "Customer's First Purchase";
   }
 }
 
@@ -82,6 +83,8 @@ function describeReward(r: PromoReward): string {
       return r.timing === "next-purchase"
         ? `Get ${fmtIDR(r.amount)} Cashback for Next Purchase`
         : `Get ${fmtIDR(r.amount)} Off`;
+    case "free-shipping": return "Get Free Shipping";
+    case "bonus-points": return `Get ${r.points} Bonus Points`;
   }
 }
 
