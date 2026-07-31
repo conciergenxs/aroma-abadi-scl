@@ -17,13 +17,16 @@ export type PromoItemScope = { kind: "any" } | { kind: "specific"; items: string
 export type PromoCondition =
   | { kind: "any-purchase" }
   | { kind: "buy-item"; qty: number; item: PromoItemScope }
-  | { kind: "min-spend"; amount: number };
+  | { kind: "min-spend"; amount: number }
+  | { kind: "first-purchase" };
 
 // Y — what the customer gets
 export type PromoReward =
   | { kind: "free-item"; qty: number; sameAsPurchased: boolean; item: PromoItemScope }
   | { kind: "percent-off"; percent: number; appliesTo: PromoItemScope; maxDiscount: number | null }
-  | { kind: "amount-off"; amount: number; timing: "immediate" | "next-purchase" };
+  | { kind: "amount-off"; amount: number; timing: "immediate" | "next-purchase" }
+  | { kind: "free-shipping" }
+  | { kind: "bonus-points"; points: number };
 
 export type PromoRule = {
   condition: PromoCondition;
