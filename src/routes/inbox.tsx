@@ -2213,11 +2213,11 @@ function ForwardModal({
           })}
         </div>
         <div className="shrink-0 flex items-center justify-end gap-2 px-4 h-14 border-t border-border">
-          <button onClick={onClose} className="h-9 px-3 rounded-md border border-border bg-card/60 text-sm hover:bg-gray-50 transition-colors">Cancel</button>
+          <button onClick={onClose} className="h-9 px-3 rounded-md border border-border bg-card/60 text-[14px] hover:bg-gray-50 transition-colors">Cancel</button>
           <button
             onClick={onConfirm}
             disabled={selected.size === 0}
-            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ForwardIcon className="h-3.5 w-3.5" /> Forward Messages
           </button>
