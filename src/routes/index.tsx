@@ -425,8 +425,8 @@ function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fu
     { label: "Last 30 Days", range: { start: clampStart(addDaysIso(fullRange.end, -29)), end: fullRange.end } },
     { label: "Last 90 Days", range: { start: clampStart(addDaysIso(fullRange.end, -89)), end: fullRange.end } },
   ];
-  const matchedPreset = presets.find((p) => p.range.start === range.start && p.range.end === range.end);
-  const label = matchedPreset ? matchedPreset.label : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
+  const isKnownPreset = presets.some((p) => p.range.start === range.start && p.range.end === range.end);
+  const label = isKnownPreset && selectedLabel ? selectedLabel : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
 
   return (
     <div ref={ref} className="relative">
