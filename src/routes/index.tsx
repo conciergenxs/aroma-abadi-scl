@@ -444,12 +444,12 @@ function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fu
         <div className="absolute left-0 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
           <div className="space-y-0.5">
             {presets.map((p) => {
-              const active = range.start === p.range.start && range.end === p.range.end;
+              const active = selectedLabel === p.label;
               return (
                 <button
                   key={p.label}
                   type="button"
-                  onClick={() => { onChange(p.range); setOpen(false); }}
+                  onClick={() => { setSelectedLabel(p.label); onChange(p.range); setOpen(false); }}
                   className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
                     active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
@@ -467,7 +467,7 @@ function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fu
               value={range.start}
               min={fullRange.start}
               max={range.end}
-              onChange={(e) => e.target.value && onChange({ start: e.target.value, end: range.end })}
+              onChange={(e) => { if (e.target.value) { setSelectedLabel(null); onChange({ start: e.target.value, end: range.end }); } }}
               className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
             />
             <input
@@ -475,7 +475,7 @@ function DateRangePopover({ range, fullRange, onChange }: { range: DateRange; fu
               value={range.end}
               min={range.start}
               max={fullRange.end}
-              onChange={(e) => e.target.value && onChange({ start: range.start, end: e.target.value })}
+              onChange={(e) => { if (e.target.value) { setSelectedLabel(null); onChange({ start: range.start, end: e.target.value }); } }}
               className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
             />
           </div>
