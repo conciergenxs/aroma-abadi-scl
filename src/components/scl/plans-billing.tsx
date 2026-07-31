@@ -560,7 +560,7 @@ function PlanCard({ plan, cycle, onSelect }: { plan: (typeof plans)[number]; cyc
         <div className="mt-5 space-y-2 flex-1">
           {plan.features.map((feature) => <div key={feature} className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" /> {feature}</div>)}
         </div>
-        <button type="button" disabled={disabled} onClick={onSelect} className={`mt-6 h-9 rounded-md px-3 text-sm font-medium ${disabled ? "cursor-not-allowed border border-border bg-muted text-muted-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>{plan.button}</button>
+        <button type="button" disabled={disabled} onClick={onSelect} className={`mt-6 h-9 rounded-md px-3 text-[14px] font-medium ${disabled ? "cursor-not-allowed border border-border bg-muted text-muted-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>{plan.button}</button>
       </div>
     </SectionCard>
   );
