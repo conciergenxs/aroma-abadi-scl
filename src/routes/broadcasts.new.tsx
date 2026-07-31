@@ -55,8 +55,10 @@ type Condition = {
 
 function CreateBroadcastPage() {
   const navigate = useNavigate();
-  const { lists, properties } = useContactsStore();
+  const { lists } = useContactsStore();
   const { templates } = useTemplatesStore();
+  const { brands } = useSkuStore();
+  const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
 
   // Section 1
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
