@@ -1318,8 +1318,8 @@ function ArmaConfigSection() {
 
   return (
     <SectionCard
-      title="Konfigurasi Arma"
-      description="Atur perilaku dan penerima Arma untuk setiap jenis pengguna."
+      title="Arma Configuration"
+      description="Set Arma's behavior and audience for each user type."
     >
       {/* Tabs */}
       <div className="border-b border-border px-4 flex items-center gap-1">
