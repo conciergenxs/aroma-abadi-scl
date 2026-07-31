@@ -644,7 +644,7 @@ function PaymentMethodModal({ open, method, onClose, onSave }: { open: boolean; 
           <PaymentField label="Billing Address" value={address} onChange={setAddress} className="sm:col-span-2" />
           <PaymentField label="Country" value={country} onChange={setCountry} />
         </div>
-        <div className="flex justify-end gap-2 border-t border-border px-5 py-4"><button type="button" onClick={onClose} className="h-9 rounded-md border border-border bg-card/60 px-3 text-sm font-medium hover:bg-card">Cancel</button><button type="button" onClick={save} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">{method ? "Save Changes" : "Save Payment Method"}</button></div>
+        <div className="flex justify-end gap-2 border-t border-border px-5 py-4"><button type="button" onClick={onClose} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">Cancel</button><button type="button" onClick={save} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">{method ? "Save Changes" : "Save Payment Method"}</button></div>
       </div>
     </div>
   );
