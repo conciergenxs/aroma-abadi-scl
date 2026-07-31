@@ -76,37 +76,25 @@ function NewPromoCodePage() {
 
   if (created) {
     return (
-      <AppShell backTo="/promo-codes" title="New Promo Code">
-        <SuccessView
-          promo={created}
-          onViewDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: created.id } })}
-          onBackToList={() => navigate({ to: "/promo-codes" })}
-        />
+      <AppShell backTo="/promo-codes" title="New Promo Code" noPadding>
+        <div className="p-6">
+          <SuccessView
+            promo={created}
+            onViewDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: created.id } })}
+            onBackToList={() => navigate({ to: "/promo-codes" })}
+          />
+        </div>
       </AppShell>
     );
   }
 
   return (
-    <AppShell backTo="/promo-codes" title="New Promo Code">
-      <div className="max-w-3xl space-y-5">
-        <PromoFormFields form={form} setForm={setForm} />
-
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleCreateClick}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Create Promo Code
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/promo-codes" })}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-sm text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
-          >
-            Cancel
-          </button>
+    <AppShell backTo="/promo-codes" title="New Promo Code" noPadding>
+      <div className="min-h-full flex flex-col">
+        <div className="flex-1 p-6">
+          <PromoFormFields form={form} setForm={setForm} />
         </div>
+        <PromoFormActionBar onCancel={() => navigate({ to: "/promo-codes" })} onSubmit={handleCreateClick} submitLabel="Create Promo Code" />
       </div>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
