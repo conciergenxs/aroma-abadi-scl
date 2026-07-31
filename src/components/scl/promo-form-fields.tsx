@@ -98,6 +98,8 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-mut
 
 export function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f: PromoFormState) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const startDateRef = useRef<HTMLInputElement>(null);
+  const endDateRef = useRef<HTMLInputElement>(null);
   const [viewingCsv, setViewingCsv] = useState(false);
   // Auto-sync the code from the name only until the user edits the code
   // directly — after that we stop overwriting their manual choice.
