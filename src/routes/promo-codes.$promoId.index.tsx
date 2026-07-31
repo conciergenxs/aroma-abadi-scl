@@ -24,7 +24,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/promo-codes/$promoId")({
+export const Route = createFileRoute("/promo-codes/$promoId/")({
   head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
   component: PromoDetailPage,
 });
