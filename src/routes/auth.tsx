@@ -140,7 +140,7 @@ function AuthPage() {
               <>
                 <h2 className="text-2xl font-semibold tracking-tight">Beauty Ambassador Login</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Masuk menggunakan nomor WhatsApp dan password kamu.
+                  Sign in with your WhatsApp number and password.
                 </p>
               </>
             )}
