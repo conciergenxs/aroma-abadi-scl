@@ -234,7 +234,7 @@ function PromoDetailPage() {
           <div className="grid grid-cols-3 gap-4 pt-1">
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Period</div>
-              <div className="text-[13px]">{promo.startDate ? fmtDateTimeID(promo.startDate) : "—"} — {promo.endDate ? fmtDateTimeID(promo.endDate) : "—"}</div>
+              <div className="text-[13px]">{promo.startDate ? fmtDateTimeEN(promo.startDate) : "—"} — {promo.endDate ? fmtDateTimeEN(promo.endDate) : "—"}</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Max Usage</div>
@@ -242,7 +242,7 @@ function PromoDetailPage() {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Created</div>
-              <div className="text-[13px]">{fmtDateTimeID(promo.createdAt)}</div>
+              <div className="text-[13px]">{fmtDateTimeEN(promo.createdAt)}</div>
             </div>
           </div>
         </div>
@@ -320,7 +320,7 @@ function PromoDetailPage() {
                         <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
                         <td className="px-5 py-2.5"><ChannelBadge channel={r.channel} /></td>
                         <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">{fmtIDR(r.discountValue)}</td>
-                        <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeID(r.redeemedAt)}</td>
+                        <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeEN(r.redeemedAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -367,7 +367,7 @@ function PromoDetailPage() {
                         )}
                       </td>
                       <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">
-                        {a.redeemedAt ? fmtDateTimeID(a.redeemedAt) : "—"}
+                        {a.redeemedAt ? fmtDateTimeEN(a.redeemedAt) : "—"}
                       </td>
                     </tr>
                   ))}
