@@ -489,7 +489,7 @@ function ContactsPage() {
               )}
               <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>{inAudCount} contact{inAudCount !== 1 ? "s" : ""} in this audience</span>
-                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">Done</button>
+                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors">Done</button>
               </div>
             </div>
           </div>
