@@ -206,8 +206,8 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
 
         <div>
           <label className={labelCls}>Max Usage</label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
+          <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
+            <div className="relative flex-1 min-w-0 h-full">
               <input
                 type="number"
                 value={form.maxUsage}
@@ -215,14 +215,15 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
                 onChange={(e) => set("maxUsage", e.target.value)}
                 placeholder={form.maxUsageUnlimited ? "" : "e.g. 500"}
                 min={1}
-                className={`${inputCls} transition-opacity disabled:opacity-40 disabled:cursor-not-allowed`}
+                className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
               />
               {form.maxUsageUnlimited && (
-                <div className="absolute inset-0 flex items-center px-3 pointer-events-none text-muted-foreground animate-fade-in">
+                <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
                   <InfinityIcon className="h-4 w-4" />
                 </div>
               )}
             </div>
+            <div className="w-px h-5 bg-border shrink-0" />
             <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
               <input
                 type="checkbox"
