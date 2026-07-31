@@ -127,7 +127,6 @@ function PromoCodesPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
-  const [creating, setCreating] = useState(false);
   const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null);
 
   const filtered = useMemo(() => {
