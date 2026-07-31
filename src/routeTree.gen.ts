@@ -30,7 +30,7 @@ import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contac
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
-import { Route as PromoCodesPromoIdEditRouteImport } from './routes/promo-codes.$promoId.edit'
+import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -137,9 +137,9 @@ const PromoCodesPromoIdIndexRoute = PromoCodesPromoIdIndexRouteImport.update({
   path: '/promo-codes/$promoId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PromoCodesPromoIdEditRoute = PromoCodesPromoIdEditRouteImport.update({
-  id: '/promo-codes/$promoId/edit',
-  path: '/promo-codes/$promoId/edit',
+const PromoCodesEditPromoIdRoute = PromoCodesEditPromoIdRouteImport.update({
+  id: '/promo-codes/edit/$promoId',
+  path: '/promo-codes/edit/$promoId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -164,7 +164,7 @@ export interface FileRoutesByFullPath {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
-  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
+  '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -188,7 +188,7 @@ export interface FileRoutesByTo {
   '/broadcasts': typeof BroadcastsIndexRoute
   '/promo-codes': typeof PromoCodesIndexRoute
   '/templates': typeof TemplatesIndexRoute
-  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
+  '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId': typeof PromoCodesPromoIdIndexRoute
 }
 export interface FileRoutesById {
@@ -213,7 +213,7 @@ export interface FileRoutesById {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
-  '/promo-codes/$promoId/edit': typeof PromoCodesPromoIdEditRoute
+  '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -239,7 +239,7 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
-    | '/promo-codes/$promoId/edit'
+    | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -263,7 +263,7 @@ export interface FileRouteTypes {
     | '/broadcasts'
     | '/promo-codes'
     | '/templates'
-    | '/promo-codes/$promoId/edit'
+    | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId'
   id:
     | '__root__'
@@ -287,7 +287,7 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
-    | '/promo-codes/$promoId/edit'
+    | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId/'
   fileRoutesById: FileRoutesById
 }
@@ -309,7 +309,7 @@ export interface RootRouteChildren {
   BroadcastsIndexRoute: typeof BroadcastsIndexRoute
   PromoCodesIndexRoute: typeof PromoCodesIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
-  PromoCodesPromoIdEditRoute: typeof PromoCodesPromoIdEditRoute
+  PromoCodesEditPromoIdRoute: typeof PromoCodesEditPromoIdRoute
   PromoCodesPromoIdIndexRoute: typeof PromoCodesPromoIdIndexRoute
 }
 
@@ -462,11 +462,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesPromoIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/promo-codes/$promoId/edit': {
-      id: '/promo-codes/$promoId/edit'
-      path: '/promo-codes/$promoId/edit'
-      fullPath: '/promo-codes/$promoId/edit'
-      preLoaderRoute: typeof PromoCodesPromoIdEditRouteImport
+    '/promo-codes/edit/$promoId': {
+      id: '/promo-codes/edit/$promoId'
+      path: '/promo-codes/edit/$promoId'
+      fullPath: '/promo-codes/edit/$promoId'
+      preLoaderRoute: typeof PromoCodesEditPromoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -514,7 +514,7 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastsIndexRoute: BroadcastsIndexRoute,
   PromoCodesIndexRoute: PromoCodesIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
-  PromoCodesPromoIdEditRoute: PromoCodesPromoIdEditRoute,
+  PromoCodesEditPromoIdRoute: PromoCodesEditPromoIdRoute,
   PromoCodesPromoIdIndexRoute: PromoCodesPromoIdIndexRoute,
 }
 export const routeTree = rootRouteImport
