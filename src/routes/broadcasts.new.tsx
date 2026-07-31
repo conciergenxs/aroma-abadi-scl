@@ -32,6 +32,8 @@ import {
   Save,
   FileText,
   Pencil,
+  ChevronRight,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 
