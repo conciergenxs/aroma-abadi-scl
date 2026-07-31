@@ -232,7 +232,7 @@ function Segmented<T extends string>({ options, value, onChange }: { options: { 
   );
 }
 
-function ConditionEditor({ condition, onChange, items }: { condition: PromoCondition; onChange: (c: PromoCondition) => void; items: string[] }) {
+function ConditionEditor({ condition, onChange, items }: { condition: PromoCondition; onChange: (c: PromoCondition) => void; items: SkuItem[] }) {
   return (
     <div className="space-y-2">
       <Segmented options={CONDITION_OPTIONS} value={condition.kind} onChange={(kind) => onChange(defaultCondition(kind))} />
@@ -254,12 +254,15 @@ function ConditionEditor({ condition, onChange, items }: { condition: PromoCondi
             <InlineCurrency value={condition.amount} onChange={(v) => onChange({ ...condition, amount: v })} />
           </>
         )}
+        {condition.kind === "first-purchase" && (
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes their first purchase</span>
+        )}
       </div>
     </div>
   );
 }
 
-function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: string[] }) {
+function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: SkuItem[] }) {
   return (
     <div className="space-y-2">
       <Segmented options={REWARD_OPTIONS} value={reward.kind} onChange={(kind) => onChange(defaultReward(kind))} />
@@ -303,6 +306,15 @@ function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChan
             </select>
           </>
         )}
+        {reward.kind === "free-shipping" && (
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">free shipping</span>
+        )}
+        {reward.kind === "bonus-points" && (
+          <>
+            <InlineNumber value={reward.points} onChange={(v) => onChange({ ...reward, points: v })} min={10} />
+            <span className="text-muted-foreground">bonus loyalty points</span>
+          </>
+        )}
       </div>
       {reward.kind === "percent-off" && (
         <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
@@ -315,7 +327,7 @@ function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChan
 }
 
 export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange: (r: PromoRule) => void }) {
-  const items = useSkuItemNames();
+  const items = useSkuItems();
 
   return (
     <div className="space-y-3">
