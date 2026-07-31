@@ -260,3 +260,27 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
     </div>
   );
 }
+
+// ── Shared full-page action bar — sticks to the bottom of the viewport so the
+// primary action is always reachable regardless of form length. Cancel sits
+// left, the primary action right, matching standard form-footer convention. ──
+export function PromoFormActionBar({ onCancel, onSubmit, submitLabel }: { onCancel: () => void; onSubmit: () => void; submitLabel: string }) {
+  return (
+    <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-sm text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={onSubmit}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      >
+        {submitLabel}
+      </button>
+    </div>
+  );
+}
