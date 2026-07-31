@@ -1417,8 +1417,8 @@ function ArmaConfigSection() {
             ))}
           </div>
           <div className="rounded-lg border border-dashed border-border p-3 text-[11px] text-muted-foreground">
-            💡 Pesan di atas adalah contoh respons Arma untuk jenis <span className="font-medium text-foreground">{persona.label}</span>.
-            Perilaku sebenarnya ditentukan oleh konfigurasi di atas dan data yang terhubung.
+            💡 The message above is a sample of Arma's response for the <span className="font-medium text-foreground">{persona.label}</span> type.
+            Actual behavior is determined by the configuration above and connected data.
           </div>
         </div>
       </div>
