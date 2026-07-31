@@ -138,7 +138,7 @@ function TableFooterPagination({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 function PromoDetailPage() {
-  const { promoId } = useParams({ from: "/promo-codes/$promoId" });
+  const { promoId } = useParams({ from: "/promo-codes/$promoId/" });
   const navigate = useNavigate();
   const { promos } = usePromoStore();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
