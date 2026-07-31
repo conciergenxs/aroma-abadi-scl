@@ -1099,7 +1099,7 @@ function InboxPage() {
                   <button
                     onClick={submitNote}
                     disabled={!noteText.trim()}
-                    className="inline-flex items-center gap-2 h-9 rounded-md bg-amber-400 px-4 text-sm font-medium text-amber-950 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="inline-flex items-center gap-2 h-9 rounded-md bg-amber-400 px-4 text-[14px] font-medium text-amber-950 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <StickyNote className="h-3.5 w-3.5" /> Add note
                   </button>
