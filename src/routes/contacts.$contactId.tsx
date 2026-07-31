@@ -40,6 +40,7 @@ import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
 import { useBaStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
+import { usePromoStore, type PromoRedemption } from "@/components/scl/promo-store";
 
 const SYSTEM_KEYS = new Set([
   "name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email",
