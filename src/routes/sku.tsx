@@ -576,8 +576,8 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
                 {logoUrl ? <img src={logoUrl} alt="" className="h-full w-full object-cover" /> : <Package className="h-5 w-5 text-primary" />}
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickLogo(f); }} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-sm">Upload Logo</button>
-              {logoUrl && <button type="button" onClick={() => setLogoUrl("")} className="text-sm text-rose-500">Remove</button>}
+              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-[14px]">Upload Logo</button>
+              {logoUrl && <button type="button" onClick={() => setLogoUrl("")} className="text-[14px] text-rose-500">Remove</button>}
             </div>
           </div>
           <label className="block">
