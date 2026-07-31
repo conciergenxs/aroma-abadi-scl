@@ -206,13 +206,13 @@ function PromoDetailPage() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => navigate({ to: "/promo-codes/edit/$promoId", params: { promoId: promo.id } })}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit
               </button>
               <button
                 onClick={() => setConfirmingDelete(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Delete
               </button>
