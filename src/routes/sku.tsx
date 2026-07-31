@@ -646,7 +646,7 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm hover:bg-gray-50 transition-colors">Close</button>
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors">Close</button>
         </div>
       </div>
     </div>
