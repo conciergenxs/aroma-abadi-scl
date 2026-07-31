@@ -367,7 +367,7 @@ export function AppShell({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="text-[15px]">
                   <Link to="/settings" className="cursor-pointer flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     Profile Settings
@@ -375,7 +375,7 @@ export function AppShell({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="cursor-pointer text-destructive focus:text-destructive"
+                  className="cursor-pointer text-destructive focus:text-destructive text-[15px]"
                   onClick={() => setLogoutOpen(true)}
                 >
                   <LogOut className="h-4 w-4" />
