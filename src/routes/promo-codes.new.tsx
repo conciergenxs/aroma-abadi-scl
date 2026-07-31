@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
 import { promoStore, describePromoRule } from "@/components/scl/promo-store";
 import {
-  PromoFormFields, emptyPromoForm, promoFormToPayload, validatePromoForm,
+  PromoFormFields, PromoFormActionBar, emptyPromoForm, promoFormToPayload, validatePromoForm,
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 import {
