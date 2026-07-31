@@ -255,8 +255,7 @@ function PromoCodesPage() {
         </div>
       )}
 
-      {/* Modals */}
-      {creating && <CreatePromoModal onClose={() => setCreating(false)} />}
+      {/* Modal */}
       {editingPromo && <EditPromoModal promo={editingPromo} onClose={() => setEditingPromo(null)} />}
     </AppShell>
   );
