@@ -414,7 +414,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium hover:opacity-90"
+        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90"
       >
         <Plus className="h-3.5 w-3.5" /> Add SKU
       </button>
