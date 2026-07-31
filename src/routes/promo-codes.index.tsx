@@ -1,12 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createPortal } from "react-dom";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useState, useMemo, useRef } from "react";
 import {
   Plus, Search, Copy, Trash2, CheckCircle2, Clock, XCircle,
-  MoreVertical, Pencil, Info, X,
+  MoreVertical, Pencil, Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -14,9 +13,9 @@ import {
   type PromoCode, type PromoStatus,
 } from "@/components/scl/promo-store";
 import {
-  PromoFormFields, promoFormFromExisting, promoFormToPayload, validatePromoForm,
-  type PromoFormState,
-} from "@/components/scl/promo-form-fields";
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/promo-codes/")({
   head: () => ({ meta: [{ title: "Promo Codes — Aroma Abadi" }] }),
@@ -28,11 +27,6 @@ export const Route = createFileRoute("/promo-codes/")({
 function formatDate(iso: string) {
   if (!iso) return "—";
   return fmtDateEN(iso);
-}
-
-function Portal({ children }: { children: React.ReactNode }) {
-  if (typeof document === "undefined") return null;
-  return createPortal(children, document.body);
 }
 
 function StatusBadge({ status }: { status: PromoStatus }) {
@@ -82,42 +76,6 @@ function ActionMenu({ onSeeDetails, onEdit, onDelete }: { onSeeDetails: () => vo
   );
 }
 
-// ── Edit Modal ────────────────────────────────────────────────────────────────
-
-export function EditPromoModal({ promo, onClose }: { promo: PromoCode; onClose: () => void }) {
-  const [form, setForm] = useState<PromoFormState>(() => promoFormFromExisting(promo));
-
-  const handleSave = () => {
-    const error = validatePromoForm(form);
-    if (error) { toast.error(error); return; }
-    promoStore.updatePromo(promo.id, promoFormToPayload(form));
-    toast.success("Promo code updated");
-    onClose();
-  };
-
-  return (
-    <Portal>
-      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-10 overflow-y-auto modal-backdrop">
-        <div className="w-full max-w-3xl bg-card border border-border rounded-xl shadow-2xl mb-8 modal-content">
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <div className="text-sm font-semibold text-foreground">Edit — {promo.code}</div>
-            <button type="button" onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="p-5 max-h-[75vh] overflow-y-auto">
-            <PromoFormFields form={form} setForm={setForm} />
-          </div>
-          <div className="p-4 border-t border-border flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-sm text-foreground hover:bg-muted transition-colors">Cancel</button>
-            <button type="button" onClick={handleSave} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
-          </div>
-        </div>
-      </div>
-    </Portal>
-  );
-}
-
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 function PromoCodesPage() {
@@ -127,7 +85,7 @@ function PromoCodesPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
-  const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null);
+  const [deletingPromo, setDeletingPromo] = useState<PromoCode | null>(null);
 
   const filtered = useMemo(() => {
     let list = promos;
@@ -144,13 +102,15 @@ function PromoCodesPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleDelete = (promo: PromoCode) => {
-    promoStore.deletePromo(promo.id);
-    toast.success(`"${promo.name}" deleted`);
+  const confirmDelete = () => {
+    if (!deletingPromo) return;
+    promoStore.deletePromo(deletingPromo.id);
+    toast.success(`"${deletingPromo.name}" deleted`);
+    setDeletingPromo(null);
   };
 
   return (
-    <AppShell title="Promo Codes">
+    <AppShell title="Promo Codes" subtitle="Create and manage discount codes, rules, and redemptions.">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative">
@@ -227,8 +187,8 @@ function PromoCodesPage() {
                   <div className="flex justify-end">
                     <ActionMenu
                       onSeeDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
-                      onEdit={() => setEditingPromo(promo)}
-                      onDelete={() => handleDelete(promo)}
+                      onEdit={() => navigate({ to: "/promo-codes/$promoId/edit", params: { promoId: promo.id } })}
+                      onDelete={() => setDeletingPromo(promo)}
                     />
                   </div>
                 </td>
@@ -255,8 +215,20 @@ function PromoCodesPage() {
         </div>
       )}
 
-      {/* Modal */}
-      {editingPromo && <EditPromoModal promo={editingPromo} onClose={() => setEditingPromo(null)} />}
+      <AlertDialog open={!!deletingPromo} onOpenChange={(open) => !open && setDeletingPromo(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this promo code?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deletingPromo && `"${deletingPromo.name}" (${deletingPromo.code}) will be permanently deleted. This cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
