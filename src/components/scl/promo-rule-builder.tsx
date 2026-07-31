@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from "react";
-import { ChevronDown, Check, Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { ChevronDown, Check, Search, X } from "lucide-react";
 import { useSkuStore } from "./sku-store";
-import { FloatingMenu } from "./floating-menu";
 import {
   type PromoRule,
   type PromoCondition,
