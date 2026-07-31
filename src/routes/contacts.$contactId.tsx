@@ -106,6 +106,19 @@ function ContactDetailPage() {
     [transactions, contact.id],
   );
 
+  // Promo code redemptions linked to this contact, across every promo code
+  const contactRedemptions = useMemo<ContactRedemption[]>(
+    () =>
+      promos
+        .flatMap((p) =>
+          p.redemptions
+            .filter((r) => r.contactId === contact.id)
+            .map((r) => ({ ...r, promoName: p.name, promoCode: p.code })),
+        )
+        .sort((a, b) => new Date(b.redeemedAt).getTime() - new Date(a.redeemedAt).getTime()),
+    [promos, contact.id],
+  );
+
   // Transaction activities — one entry per transaction
   const txActivities = useMemo<ContactActivity[]>(
     () =>
