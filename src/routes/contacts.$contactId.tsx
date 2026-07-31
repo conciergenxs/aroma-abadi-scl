@@ -427,6 +427,7 @@ function ContactDetailPage() {
                 <>
                   {tab === "activity" && <ActivityTab activities={filteredActivities} />}
                   {tab === "transactions" && <TransactionsTab transactions={filteredTransactions} />}
+                  {tab === "redeemed" && <RedeemedTab redemptions={filteredRedemptions} />}
                 </>
               )}
             </div>
