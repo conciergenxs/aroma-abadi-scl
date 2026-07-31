@@ -220,7 +220,7 @@ function ItemScopeEditor({
               )}
             </div>
             <div className="p-3 border-t border-border flex justify-end shrink-0">
-              <button type="button" onClick={() => setOpen(false)} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-sm font-medium hover:bg-primary/90 transition-colors">
+              <button type="button" onClick={() => setOpen(false)} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors">
                 Done
               </button>
             </div>
