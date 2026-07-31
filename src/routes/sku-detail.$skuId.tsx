@@ -237,7 +237,7 @@ function SkuDetailPage() {
               </div>
               <div className="min-w-0">
                 <div className="text-[11px] text-muted-foreground">{m.label}</div>
-                <div className="text-base font-semibold mt-0.5 truncate">{m.value}</div>
+                <div className="text-[15px] font-semibold mt-0.5 truncate">{m.value}</div>
               </div>
             </div>
           ))}
