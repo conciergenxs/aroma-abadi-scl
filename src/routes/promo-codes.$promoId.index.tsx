@@ -380,7 +380,10 @@ function PromoDetailPage() {
                   {pagedCodes.map((a) => (
                     <tr key={a.code} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-2.5">
-                        <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{a.code}</code>
+                        <div className="flex items-center gap-1.5">
+                          <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{a.code}</code>
+                          <CopyCodeButton code={a.code} />
+                        </div>
                       </td>
                       <td className="px-5 py-2.5">
                         {a.contactId ? (
