@@ -151,6 +151,25 @@ export function getPromoStatus(promo: { startDate: string; endDate: string }): P
   return "active";
 }
 
+// Lets 1-to-1 codes be shared anywhere outside the app (email, chat, print).
+export function downloadAssignedCodesCsv(promoCode: string, assignedCodes: AssignedCode[]) {
+  const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  const header = ["Code", "Owner", "Status", "Redeemed At"].map(escape).join(",");
+  const rows = assignedCodes.map((a) =>
+    [a.code, a.contactName ?? "Unassigned", a.redeemed ? "Redeemed" : "Not yet", a.redeemedAt ?? ""].map(escape).join(","),
+  );
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${promoCode || "promo"}-codes.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // Cross-reference the transactions store so redemption logs point at real,
 // clickable-consistent invoices/customers instead of made-up references.
 function tx(id: string) {
