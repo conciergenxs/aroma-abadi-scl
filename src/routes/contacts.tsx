@@ -244,7 +244,7 @@ function ContactsPage() {
             <div className="flex items-center justify-between px-3 mb-2">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Audience</span>
               <button
-                onClick={() => setCreatingAudience(true)}
+                onClick={() => navigate({ to: "/contacts/audience/new" })}
                 className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground"
               >
                 <Plus className="h-3 w-3" />
