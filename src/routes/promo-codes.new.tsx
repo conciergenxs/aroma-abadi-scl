@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
-import { promoStore, type AssignedCode } from "@/components/scl/promo-store";
+import { CheckCircle2, Download } from "lucide-react";
+import { promoStore, downloadAssignedCodesCsv, type AssignedCode } from "@/components/scl/promo-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import {
   PromoFormFields, PromoFormActionBar, emptyPromoForm, promoFormToPayload, validatePromoForm,
