@@ -157,12 +157,13 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
               )}
             </div>
             <div className="w-px h-5 bg-border shrink-0" />
-            <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
+            <label className={`flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground ${form.usageType === "one-to-one" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
               <input
                 type="checkbox"
                 checked={form.maxUsageUnlimited}
+                disabled={form.usageType === "one-to-one"}
                 onChange={(e) => setForm({ ...form, maxUsageUnlimited: e.target.checked, maxUsage: e.target.checked ? "" : form.maxUsage })}
-                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
+                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 disabled:cursor-not-allowed"
               />
               Unlimited
             </label>
