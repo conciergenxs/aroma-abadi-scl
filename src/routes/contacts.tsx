@@ -650,18 +650,16 @@ function ContactsTable({
             <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={allSelected} onChange={onSelectAll} />
           </th>
           <th className={thCls}>Name</th>
-          {(isAllOrBrand || isMineView) && <th className={thCls}>Gender</th>}
+          {showGender && <th className={thCls}>Gender</th>}
           <th className={thCls}>WA Number</th>
           <th className={thCls}>Contact Type</th>
-          {isMineView && <th className={thCls}>Point Balance</th>}
-          {isMineView && <th className={thCls}>Last Transaction</th>}
-          {isBaView && <>
-            <th className={thCls}>Brand</th>
-            <th className={thCls}>Gender</th>
-            <th className={thCls}>Position</th>
-            <th className={thCls}>Store</th>
-            <th className={thCls}>City</th>
-          </>}
+          {showPointBalance && <th className={thCls}>Point Balance</th>}
+          {showLastTransaction && <th className={thCls}>Last Transaction</th>}
+          {showBaBrand && <th className={thCls}>Brand</th>}
+          {showBaGender && <th className={thCls}>Gender</th>}
+          {showBaPosition && <th className={thCls}>Position</th>}
+          {showBaStore && <th className={thCls}>Store</th>}
+          {showBaCity && <th className={thCls}>City</th>}
         </tr>
       </thead>
       <tbody className="stagger divide-y divide-border">
