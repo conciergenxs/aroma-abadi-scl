@@ -35,9 +35,8 @@ import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    audience: typeof search.audience === "string" ? search.audience : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { audience?: string } =>
+    typeof search.audience === "string" ? { audience: search.audience } : {},
   component: ContactsPage,
 });
 
