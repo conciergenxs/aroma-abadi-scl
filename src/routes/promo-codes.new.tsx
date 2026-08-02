@@ -82,7 +82,7 @@ function NewPromoCodePage() {
     });
     toast.success("Promo code created");
     setSettingCode(false);
-    setCreated({ id, code: payload.code, name: payload.name });
+    setCreated({ id, code: payload.code, name: payload.name, assignedCodes });
   };
 
   if (created) {
