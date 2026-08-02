@@ -379,6 +379,7 @@ function ContactsPage() {
                   onSelectAll={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
                   onToggle={toggle}
                   onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
+                  properties={properties}
                 />
               </div>
               <TablePagination
