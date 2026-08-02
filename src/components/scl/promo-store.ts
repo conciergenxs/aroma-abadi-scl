@@ -11,7 +11,10 @@ export type PromoStatus = "active" | "expired" | "inactive";
 // so the same builder can express any promo shape: Buy 1 Get 1, Buy 2 Get 1
 // different item, min-spend cashback, item-specific % off with a cap, etc.
 
-export type PromoItemScope = { kind: "any" } | { kind: "specific"; items: string[] };
+export type PromoItemScope =
+  | { kind: "any" }
+  | { kind: "any-in-brand"; brand: string }
+  | { kind: "specific"; items: string[] };
 
 // X — what the customer must do to qualify
 export type PromoCondition =
