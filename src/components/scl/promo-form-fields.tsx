@@ -97,7 +97,7 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
   return (
     <div className="space-y-4">
       {/* Promo Name + Usage Type */}
-      <div className="flex items-end gap-4">
+      <div className="flex items-start gap-4">
         <div className="flex-1 min-w-0">
           <label className={labelCls}>Promo Name</label>
           <input
