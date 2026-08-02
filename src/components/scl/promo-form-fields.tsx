@@ -142,7 +142,14 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
       <div className="flex items-end gap-4">
         <div className="flex-1 min-w-0">
           <label className={labelCls}>Promo Name</label>
-          <input value={form.name} onChange={(e) => handleNameChange(e.target.value)} placeholder="e.g. Summer 20% Off" className={inputCls} />
+          <input
+            value={form.name}
+            onChange={(e) => handleNameChange(e.target.value.slice(0, PROMO_NAME_MAX_LENGTH))}
+            maxLength={PROMO_NAME_MAX_LENGTH}
+            placeholder="e.g. Summer 20% Off"
+            className={inputCls}
+          />
+          <div className="mt-1 text-[10px] text-muted-foreground text-right">{PROMO_NAME_MAX_LENGTH - form.name.length} characters left</div>
         </div>
         <div className="shrink-0">
           <label className={labelCls}>Usage Type</label>
