@@ -46,7 +46,7 @@ function EditPromoCodePage() {
     <AppShell backTo={detailPath} title={`Edit — ${promo.code}`} noPadding>
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6">
-          <PromoFormFields form={form} setForm={setForm} />
+          <PromoFormFields form={form} setForm={setForm} audiences={lists} />
         </div>
         <PromoFormActionBar
           onCancel={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
