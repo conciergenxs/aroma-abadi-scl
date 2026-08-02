@@ -82,7 +82,7 @@ function NewAudiencePage() {
         <div className="p-6">
           <SuccessView
             audience={created}
-            onViewAudience={() => navigate({ to: "/contacts", search: { audience: created.id } as never })}
+            onViewAudience={() => navigate({ to: "/contacts", search: { audience: created.id } })}
             onBackToList={() => navigate({ to: "/contacts" })}
           />
         </div>
