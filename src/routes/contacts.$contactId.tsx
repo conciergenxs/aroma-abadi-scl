@@ -661,8 +661,8 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
     );
   }
 
-  const totalSpend = transactions.filter((t) => t.status === "Paid").reduce((sum, t) => sum + t.total, 0);
-  const paidCount = transactions.filter((t) => t.status === "Paid").length;
+  const totalSpend = transactions.filter((t) => t.status !== "Cancelled").reduce((sum, t) => sum + t.total, 0);
+  const completedCount = transactions.filter((t) => t.status !== "Cancelled").length;
 
   // Favorite Brand
   const favoriteBrand = (() => {
