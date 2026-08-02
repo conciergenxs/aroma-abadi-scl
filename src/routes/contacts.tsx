@@ -240,7 +240,7 @@ function ContactsPage() {
             <div className="flex items-center justify-between px-3 mb-2">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Audience</span>
               <button
-                onClick={() => setNewAudienceOpen(true)}
+                onClick={() => setCreatingAudience(true)}
                 className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground"
               >
                 <Plus className="h-3 w-3" />
@@ -264,25 +264,6 @@ function ContactsPage() {
                 </span>
               </button>
             ))}
-            {newAudienceOpen && (
-              <div className="px-3 py-2">
-                <input
-                  autoFocus
-                  value={newAudienceName}
-                  onChange={(e) => setNewAudienceName(e.target.value)}
-                  placeholder="Audience name..."
-                  className="w-full h-7 rounded border border-border bg-[oklch(0.97_0_0)] px-2 text-xs focus:outline-none"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && newAudienceName.trim()) {
-                      setLists((l) => [...l, { id: `ls-${Date.now()}`, name: newAudienceName.trim() }]);
-                      setNewAudienceName("");
-                      setNewAudienceOpen(false);
-                    }
-                    if (e.key === "Escape") setNewAudienceOpen(false);
-                  }}
-                />
-              </div>
-            )}
           </div>
         </aside>
 
