@@ -482,23 +482,6 @@ function ContactsPage() {
           </div>
         );
       })()}
-      {creatingAudience && (
-        <CreateAudienceModal
-          contacts={contacts}
-          transactions={transactions}
-          brands={brands.map((b) => b.name)}
-          onClose={() => setCreatingAudience(false)}
-          onCreate={(name, contactIds) => {
-            const id = `ls-${Date.now()}`;
-            setLists((l) => [...l, { id, name }]);
-            if (contactIds.length) {
-              setContacts((cs) => cs.map((c) => (contactIds.includes(c.id) ? { ...c, listIds: [...c.listIds, id] } : c)));
-            }
-            setCreatingAudience(false);
-            toast.success(`Audience "${name}" created${contactIds.length ? ` with ${contactIds.length} contact${contactIds.length !== 1 ? "s" : ""}` : ""}`);
-          }}
-        />
-      )}
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
