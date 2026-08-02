@@ -3,15 +3,13 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
-import { promoStore, describePromoRule } from "@/components/scl/promo-store";
+import { promoStore, type AssignedCode } from "@/components/scl/promo-store";
+import { useContactsStore } from "@/components/scl/contacts-store";
 import {
   PromoFormFields, PromoFormActionBar, emptyPromoForm, promoFormToPayload, validatePromoForm,
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { PromoCodeSetupModal } from "@/components/scl/promo-code-setup-modal";
 
 export const Route = createFileRoute("/promo-codes/new")({
   head: () => ({ meta: [{ title: "New Promo Code — SCL" }] }),
@@ -53,24 +51,27 @@ function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPro
 
 function NewPromoCodePage() {
   const navigate = useNavigate();
+  const { lists } = useContactsStore();
   const [form, setForm] = useState<PromoFormState>(() => emptyPromoForm());
-  const [confirming, setConfirming] = useState(false);
+  const [settingCode, setSettingCode] = useState(false);
   const [created, setCreated] = useState<CreatedPromo | null>(null);
 
-  const handleCreateClick = () => {
+  const handleConfirmClick = () => {
     const error = validatePromoForm(form);
     if (error) { toast.error(error); return; }
-    setConfirming(true);
+    setSettingCode(true);
   };
 
-  const handleConfirmCreate = () => {
-    const payload = promoFormToPayload(form);
+  const handleLaunch = (code: string, assignedCodes?: AssignedCode[]) => {
+    const payload = promoFormToPayload({ ...form, code });
     const id = promoStore.addPromo({
       ...payload,
+      assignedCodes,
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: new Date().toISOString(),
     });
     toast.success("Promo code created");
+    setSettingCode(false);
     setCreated({ id, code: payload.code, name: payload.name });
   };
 
@@ -92,25 +93,14 @@ function NewPromoCodePage() {
     <AppShell backTo="/promo-codes" title="New Promo Code" noPadding>
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6">
-          <PromoFormFields form={form} setForm={setForm} />
+          <PromoFormFields form={form} setForm={setForm} audiences={lists} />
         </div>
-        <PromoFormActionBar onCancel={() => navigate({ to: "/promo-codes" })} onSubmit={handleCreateClick} submitLabel="Create Promo Code" />
+        <PromoFormActionBar onCancel={() => navigate({ to: "/promo-codes" })} onSubmit={handleConfirmClick} submitLabel="Confirm Promo Code" />
       </div>
 
-      <AlertDialog open={confirming} onOpenChange={setConfirming}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Create this promo code?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {form.name} ({form.code || "auto-generated code"}) — {describePromoRule(form.rule)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmCreate}>Create Promo Code</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {settingCode && (
+        <PromoCodeSetupModal form={form} onCancel={() => setSettingCode(false)} onConfirm={handleLaunch} />
+      )}
     </AppShell>
   );
 }
