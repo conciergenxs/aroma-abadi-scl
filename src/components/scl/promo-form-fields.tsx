@@ -95,6 +95,8 @@ async function parseCsvFile(file: File): Promise<string[]> {
 
 const inputCls = "h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40";
 const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
+export const PROMO_NAME_MAX_LENGTH = 40;
+export const PROMO_CODE_MAX_LENGTH = 20;
 
 export function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f: PromoFormState) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
