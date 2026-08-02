@@ -84,6 +84,25 @@ function ChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
   );
 }
 
+function CopyCodeButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button
+      type="button"
+      title="Copy code"
+      onClick={handleCopy}
+      className={`h-6 w-6 grid place-items-center rounded transition-colors shrink-0 ${copied ? "text-emerald-500" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+    >
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+    </button>
+  );
+}
+
 function StatTile({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Users }) {
   return (
     <div className="rounded-xl border border-border bg-card/40 p-4">
