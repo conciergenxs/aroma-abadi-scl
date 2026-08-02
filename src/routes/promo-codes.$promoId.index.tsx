@@ -206,6 +206,17 @@ function PromoDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              {promo.usageType === "one-to-one" && (promo.assignedCodes?.length ?? 0) > 0 && (
+                <>
+                  <button
+                    onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border px-4 h-9 text-[14px] text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Download .csv
+                  </button>
+                  <div className="w-px h-6 bg-border" />
+                </>
+              )}
               <button
                 onClick={() => navigate({ to: "/promo-codes/edit/$promoId", params: { promoId: promo.id } })}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
