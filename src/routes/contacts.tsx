@@ -287,6 +287,14 @@ function ContactsPage() {
               />
             </div>
             <div className="ml-auto flex items-center gap-2">
+              {activeView.startsWith("brand:") && (
+                <PickerPopover
+                  label={`Add All (${visibleContacts.length}) to Audience`}
+                  icon={<ListPlus className="h-3.5 w-3.5" />}
+                  items={lists.map((l) => ({ id: l.id, name: l.name }))}
+                  onPick={(id) => addAllVisibleToList(id)}
+                />
+              )}
               <button
                 onClick={() => setShowManageProps(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card"
