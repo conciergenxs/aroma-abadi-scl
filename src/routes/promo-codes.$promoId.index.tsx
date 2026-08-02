@@ -350,9 +350,13 @@ function PromoDetailPage() {
                         <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{a.code}</code>
                       </td>
                       <td className="px-5 py-2.5">
-                        <Link to="/contacts/$contactId" params={{ contactId: a.contactId }} className="text-[13px] font-medium text-primary hover:underline">
-                          {a.contactName}
-                        </Link>
+                        {a.contactId ? (
+                          <Link to="/contacts/$contactId" params={{ contactId: a.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                            {a.contactName}
+                          </Link>
+                        ) : (
+                          <span className="text-[13px] text-muted-foreground italic">Unassigned</span>
+                        )}
                       </td>
                       <td className="px-5 py-2.5">
                         {a.redeemed ? (
