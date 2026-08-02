@@ -202,9 +202,90 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
         <label className={labelCls}>Promo Rule</label>
         <PromoRuleBuilder rule={form.rule} onChange={(r) => set("rule", r)} />
       </div>
+    </div>
+  );
+}
 
-      {viewingCsv && form.codeFile && (
-        <CsvCodesModal fileName={form.codeFile.name} codes={form.csvCodes} onClose={() => setViewingCsv(false)} />
+function AudienceSegmentPicker({
+  audiences,
+  selectedIds,
+  onChange,
+}: {
+  audiences: ContactList[];
+  selectedIds: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const label = selectedIds.length === 0
+    ? "Any Audience"
+    : selectedIds.length === 1
+      ? audiences.find((a) => a.id === selectedIds[0])?.name ?? "1 audience"
+      : `${selectedIds.length} audiences`;
+
+  const toggle = (id: string) => {
+    onChange(selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="h-9 w-full flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-sm text-left hover:bg-muted/40 transition-colors"
+      >
+        <span className={`truncate flex items-center gap-1.5 ${selectedIds.length ? "text-foreground" : "text-muted-foreground"}`}>
+          <Users className="h-3.5 w-3.5 shrink-0" /> {label}
+        </span>
+        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
+          <div className="absolute z-40 mt-1 w-full min-w-[240px] max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-xl">
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-left hover:bg-muted ${selectedIds.length === 0 ? "text-primary font-medium" : ""}`}
+            >
+              Any Audience {selectedIds.length === 0 && <Check className="h-3.5 w-3.5" />}
+            </button>
+            <div className="my-1 border-t border-border" />
+            {audiences.length === 0 ? (
+              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">No audiences yet — create one on the Contacts page</p>
+            ) : (
+              audiences.map((a) => {
+                const checked = selectedIds.includes(a.id);
+                return (
+                  <label key={a.id} className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggle(a.id)}
+                      className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                    />
+                    <span className="truncate">{a.name}</span>
+                  </label>
+                );
+              })
+            )}
+          </div>
+        </>
+      )}
+      {selectedIds.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {selectedIds.map((id) => {
+            const a = audiences.find((x) => x.id === id);
+            if (!a) return null;
+            return (
+              <span key={id} className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 h-5 text-[10px] text-foreground">
+                {a.name}
+                <button type="button" onClick={() => toggle(id)} className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20">
+                  <XIcon className="h-2.5 w-2.5" />
+                </button>
+              </span>
+            );
+          })}
+        </div>
       )}
     </div>
   );
