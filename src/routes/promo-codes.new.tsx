@@ -16,9 +16,10 @@ export const Route = createFileRoute("/promo-codes/new")({
   component: NewPromoCodePage,
 });
 
-type CreatedPromo = { id: string; code: string; name: string };
+type CreatedPromo = { id: string; code: string; name: string; assignedCodes?: AssignedCode[] };
 
 function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPromo; onViewDetails: () => void; onBackToList: () => void }) {
+  const hasIndividualCodes = (promo.assignedCodes?.length ?? 0) > 0;
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
@@ -45,6 +46,15 @@ function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPro
           Back to Promo Codes
         </button>
       </div>
+      {hasIndividualCodes && (
+        <button
+          type="button"
+          onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
+          className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline animate-fade-in"
+        >
+          <Download className="h-3.5 w-3.5" /> Download individual codes (.csv) to share
+        </button>
+      )}
     </div>
   );
 }
