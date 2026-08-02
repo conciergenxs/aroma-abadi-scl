@@ -62,12 +62,10 @@ export function validatePromoForm(form: PromoFormState): string | null {
 
 export function promoFormToPayload(form: PromoFormState): Pick<
   PromoCode,
-  "code" | "name" | "description" | "rule" | "usageType" | "maxUsage" | "startDate" | "endDate"
+  "code" | "name" | "description" | "rule" | "usageType" | "maxUsage" | "startDate" | "endDate" | "audienceIds"
 > {
   return {
-    code: form.usageType === "one-to-many"
-      ? form.code.trim().toUpperCase()
-      : (form.codeFile?.name || form.code.trim() || "BULK"),
+    code: form.code.trim().toUpperCase(),
     name: form.name.trim(),
     description: form.description.trim(),
     rule: form.rule,
@@ -75,19 +73,8 @@ export function promoFormToPayload(form: PromoFormState): Pick<
     maxUsage: form.maxUsageUnlimited ? null : (form.maxUsage ? Number(form.maxUsage) : null),
     startDate: form.startDate,
     endDate: form.endDate,
+    audienceIds: form.audienceIds,
   };
-}
-
-function generateCodeFromName(name: string): string {
-  return name.toUpperCase().replace(/[^A-Z0-9]+/g, "").slice(0, 16);
-}
-
-async function parseCsvFile(file: File): Promise<string[]> {
-  const text = await file.text();
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.split(",")[0]?.trim())
-    .filter((line): line is string => !!line);
 }
 
 const inputCls = "h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40";
