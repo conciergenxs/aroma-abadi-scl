@@ -31,6 +31,8 @@ import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
 import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
+import { Route as ContactsAudienceNewRouteImport } from './routes/contacts.audience.new'
+import { Route as ContactsAudienceAddAudienceIdRouteImport } from './routes/contacts.audience.add.$audienceId'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -142,6 +144,17 @@ const PromoCodesEditPromoIdRoute = PromoCodesEditPromoIdRouteImport.update({
   path: '/promo-codes/edit/$promoId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactsAudienceNewRoute = ContactsAudienceNewRouteImport.update({
+  id: '/audience/new',
+  path: '/audience/new',
+  getParentRoute: () => ContactsRoute,
+} as any)
+const ContactsAudienceAddAudienceIdRoute =
+  ContactsAudienceAddAudienceIdRouteImport.update({
+    id: '/audience/add/$audienceId',
+    path: '/audience/add/$audienceId',
+    getParentRoute: () => ContactsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -164,8 +177,10 @@ export interface FileRoutesByFullPath {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
+  '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -188,8 +203,10 @@ export interface FileRoutesByTo {
   '/broadcasts': typeof BroadcastsIndexRoute
   '/promo-codes': typeof PromoCodesIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId': typeof PromoCodesPromoIdIndexRoute
+  '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,8 +230,10 @@ export interface FileRoutesById {
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
+  '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -239,8 +258,10 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
+    | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId/'
+    | '/contacts/audience/add/$audienceId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -263,8 +284,10 @@ export interface FileRouteTypes {
     | '/broadcasts'
     | '/promo-codes'
     | '/templates'
+    | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId'
+    | '/contacts/audience/add/$audienceId'
   id:
     | '__root__'
     | '/'
@@ -287,8 +310,10 @@ export interface FileRouteTypes {
     | '/broadcasts/'
     | '/promo-codes/'
     | '/templates/'
+    | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/promo-codes/$promoId/'
+    | '/contacts/audience/add/$audienceId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -469,17 +494,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesEditPromoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contacts/audience/new': {
+      id: '/contacts/audience/new'
+      path: '/audience/new'
+      fullPath: '/contacts/audience/new'
+      preLoaderRoute: typeof ContactsAudienceNewRouteImport
+      parentRoute: typeof ContactsRoute
+    }
+    '/contacts/audience/add/$audienceId': {
+      id: '/contacts/audience/add/$audienceId'
+      path: '/audience/add/$audienceId'
+      fullPath: '/contacts/audience/add/$audienceId'
+      preLoaderRoute: typeof ContactsAudienceAddAudienceIdRouteImport
+      parentRoute: typeof ContactsRoute
+    }
   }
 }
 
 interface ContactsRouteChildren {
   ContactsContactIdRoute: typeof ContactsContactIdRoute
   ContactsNewRoute: typeof ContactsNewRoute
+  ContactsAudienceNewRoute: typeof ContactsAudienceNewRoute
+  ContactsAudienceAddAudienceIdRoute: typeof ContactsAudienceAddAudienceIdRoute
 }
 
 const ContactsRouteChildren: ContactsRouteChildren = {
   ContactsContactIdRoute: ContactsContactIdRoute,
   ContactsNewRoute: ContactsNewRoute,
+  ContactsAudienceNewRoute: ContactsAudienceNewRoute,
+  ContactsAudienceAddAudienceIdRoute: ContactsAudienceAddAudienceIdRoute,
 }
 
 const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
