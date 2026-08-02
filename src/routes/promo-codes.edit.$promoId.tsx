@@ -3,6 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 import { promoStore, usePromoStore } from "@/components/scl/promo-store";
+import { useContactsStore } from "@/components/scl/contacts-store";
 import {
   PromoFormFields, PromoFormActionBar, promoFormFromExisting, promoFormToPayload, validatePromoForm,
   type PromoFormState,
