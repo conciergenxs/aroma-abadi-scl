@@ -82,44 +82,16 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-mut
 export const PROMO_NAME_MAX_LENGTH = 40;
 export const PROMO_CODE_MAX_LENGTH = 20;
 
-export function PromoFormFields({ form, setForm }: { form: PromoFormState; setForm: (f: PromoFormState) => void }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormState; setForm: (f: PromoFormState) => void; audiences: ContactList[] }) {
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
-  const [viewingCsv, setViewingCsv] = useState(false);
-  // Auto-sync the code from the name only until the user edits the code
-  // directly — after that we stop overwriting their manual choice.
-  const autoSyncCode = useRef(!form.code.trim());
 
   const set = <K extends keyof PromoFormState>(key: K, val: PromoFormState[K]) => setForm({ ...form, [key]: val });
 
-  const handleNameChange = (val: string) => {
-    if (autoSyncCode.current && form.usageType === "one-to-many") {
-      setForm({ ...form, name: val, code: generateCodeFromName(val) });
-    } else {
-      set("name", val);
-    }
-  };
-
-  const handleCodeChange = (val: string) => {
-    autoSyncCode.current = false;
-    set("code", val.toUpperCase());
-  };
-
-  const regenerateCode = () => {
-    if (!form.name.trim()) { toast.error("Enter a Promo Name first"); return; }
-    autoSyncCode.current = true;
-    set("code", generateCodeFromName(form.name));
-  };
-
-  const handleFile = async (file: File | null) => {
-    if (!file) { setForm({ ...form, codeFile: null, csvCodes: [] }); return; }
-    try {
-      const codes = await parseCsvFile(file);
-      setForm({ ...form, codeFile: file, csvCodes: codes });
-    } catch {
-      toast.error("Couldn't read that CSV file");
-    }
+  const setUsageType = (t: PromoFormState["usageType"]) => {
+    // 1-to-1 needs a concrete count to generate that many individual codes,
+    // so Unlimited can't apply there — force it off when switching in.
+    setForm({ ...form, usageType: t, maxUsageUnlimited: t === "one-to-one" ? false : form.maxUsageUnlimited });
   };
 
   return (
@@ -130,7 +102,7 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
           <label className={labelCls}>Promo Name</label>
           <input
             value={form.name}
-            onChange={(e) => handleNameChange(e.target.value.slice(0, PROMO_NAME_MAX_LENGTH))}
+            onChange={(e) => set("name", e.target.value.slice(0, PROMO_NAME_MAX_LENGTH))}
             maxLength={PROMO_NAME_MAX_LENGTH}
             placeholder="e.g. Summer 20% Off"
             className={inputCls}
@@ -144,7 +116,7 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
               <button
                 key={t}
                 type="button"
-                onClick={() => setForm({ ...form, usageType: t, code: "", codeFile: null, csvCodes: [] })}
+                onClick={() => setUsageType(t)}
                 className={`px-3 h-7 text-[12px] font-medium rounded transition-colors whitespace-nowrap ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {t === "one-to-many" ? "1-to-Many" : "1-to-1 (unique)"}
@@ -154,50 +126,16 @@ export function PromoFormFields({ form, setForm }: { form: PromoFormState; setFo
         </div>
       </div>
 
-      {/* Promo Code + Max Usage */}
+      {/* Audience Segment + Max Usage */}
       <div className="grid grid-cols-2 gap-4">
-        {form.usageType === "one-to-many" ? (
-          <div className="animate-fade-in">
-            <label className={labelCls}>Promo Code</label>
-            <div className="flex items-center gap-1.5">
-              <input value={form.code} onChange={(e) => handleCodeChange(e.target.value)} placeholder="e.g. SUMMER20" className={inputCls} />
-              <button
-                type="button"
-                title="Generate from name"
-                onClick={regenerateCode}
-                className="h-9 w-9 shrink-0 grid place-items-center rounded-md border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Wand2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="animate-fade-in">
-            <label className={labelCls}>Promo Code — Upload CSV</label>
-            <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
-            {form.codeFile ? (
-              <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card text-sm animate-scale-in">
-                <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
-                <span className="flex-1 truncate">{form.codeFile.name}</span>
-                <button type="button" title="View codes" onClick={() => setViewingCsv(true)} className="text-muted-foreground hover:text-primary shrink-0">
-                  <Eye className="h-3.5 w-3.5" />
-                </button>
-                <button type="button" onClick={() => handleFile(null)} className="text-muted-foreground hover:text-destructive shrink-0">
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full h-9 rounded-md border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-1.5 text-muted-foreground transition-colors"
-              >
-                <Upload className="h-3.5 w-3.5" />
-                <span className="text-xs">Click to upload CSV</span>
-              </button>
-            )}
-          </div>
-        )}
+        <div>
+          <label className={labelCls}>Audience Segment</label>
+          <AudienceSegmentPicker
+            audiences={audiences}
+            selectedIds={form.audienceIds}
+            onChange={(ids) => set("audienceIds", ids)}
+          />
+        </div>
 
         <div>
           <label className={labelCls}>Max Usage</label>
