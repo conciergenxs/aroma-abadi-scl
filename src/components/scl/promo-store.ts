@@ -60,7 +60,9 @@ export function defaultRule(): PromoRule {
 }
 
 function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
-  if (scope.kind === "any" || scope.items.length === 0) return anyLabel;
+  if (scope.kind === "any") return anyLabel;
+  if (scope.kind === "any-in-brand") return `${anyLabel} (${scope.brand})`;
+  if (scope.items.length === 0) return anyLabel;
   if (scope.items.length === 1) return scope.items[0];
   return `${scope.items[0]} +${scope.items.length - 1} more`;
 }
