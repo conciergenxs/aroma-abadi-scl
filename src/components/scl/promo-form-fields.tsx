@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Check, ChevronDown, Users, X as XIcon } from "lucide-react";
+import { Check, ChevronDown, Users, X as XIcon, Infinity as InfinityIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultRule, type PromoRule, type PromoCode } from "./promo-store";
 import type { ContactList } from "./mock-data";
