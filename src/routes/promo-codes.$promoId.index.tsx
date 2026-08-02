@@ -15,10 +15,13 @@ import {
   Instagram,
   Music2,
   MessageCircle,
+  Download,
+  Copy,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { usePromoStore, promoStore, describePromoRule, getPromoStatus, type PromoRedemption, type AssignedCode, type PromoStatus } from "@/components/scl/promo-store";
+import { usePromoStore, promoStore, describePromoRule, getPromoStatus, downloadAssignedCodesCsv, type PromoRedemption, type AssignedCode, type PromoStatus } from "@/components/scl/promo-store";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
