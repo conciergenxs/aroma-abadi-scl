@@ -697,8 +697,8 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   })();
 
   function statusBadge(s: string) {
-    if (s === "Paid") return "border-emerald-700 bg-emerald-600 text-white";
-    if (s === "Pending") return "border-amber-700 bg-amber-600 text-white";
+    if (s === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
+    if (s === "Processed") return "border-amber-700 bg-amber-600 text-white";
     return "border-rose-700 bg-rose-600 text-white";
   }
 
