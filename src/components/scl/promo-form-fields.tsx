@@ -1,17 +1,14 @@
 import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { Upload, FileSpreadsheet, X, Wand2, Eye, Infinity as InfinityIcon } from "lucide-react";
+import { Check, ChevronDown, Users, X as XIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultRule, type PromoRule, type PromoCode } from "./promo-store";
-import { CsvCodesModal } from "./csv-codes-modal";
+import type { ContactList } from "./mock-data";
 
-// ── Shared promo form — used by the Create modal, Edit modal, and the /new
-// full-page flow so the field set can never drift out of sync between them. ──
+// ── Shared promo form — used by the Create page and the Edit page so the
+// field set can never drift out of sync between them. ──
 
 export type PromoFormState = {
   code: string;
-  codeFile: File | null;
-  csvCodes: string[];
   name: string;
   description: string;
   usageType: "one-to-many" | "one-to-one";
@@ -20,13 +17,13 @@ export type PromoFormState = {
   startDate: string;
   endDate: string;
   rule: PromoRule;
+  /** Contact audiences this promo is restricted to. Empty = everyone. */
+  audienceIds: string[];
 };
 
 export function emptyPromoForm(): PromoFormState {
   return {
     code: "",
-    codeFile: null,
-    csvCodes: [],
     name: "",
     description: "",
     usageType: "one-to-many",
@@ -35,14 +32,13 @@ export function emptyPromoForm(): PromoFormState {
     startDate: "",
     endDate: "",
     rule: defaultRule(),
+    audienceIds: [],
   };
 }
 
 export function promoFormFromExisting(promo: PromoCode): PromoFormState {
   return {
     code: promo.code,
-    codeFile: null,
-    csvCodes: [],
     name: promo.name,
     description: promo.description,
     usageType: promo.usageType,
@@ -51,15 +47,16 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
     startDate: promo.startDate,
     endDate: promo.endDate,
     rule: promo.rule,
+    audienceIds: promo.audienceIds ?? [],
   };
 }
 
 export function validatePromoForm(form: PromoFormState): string | null {
-  if (form.usageType === "one-to-many" && !form.code.trim()) return "Promo Code is required";
-  // A CSV is only mandatory when there's no code assigned yet (brand-new 1-to-1
-  // promo). Editing an existing 1-to-1 promo shouldn't force a re-upload.
-  if (form.usageType === "one-to-one" && !form.codeFile && !form.code.trim()) return "Please upload a CSV file";
   if (!form.name.trim()) return "Promo Name is required";
+  if (!form.startDate || !form.endDate) return "Start and End dates are required";
+  if (form.usageType === "one-to-one" && (form.maxUsageUnlimited || !form.maxUsage.trim())) {
+    return "Max Usage is required for 1-to-1 codes";
+  }
   return null;
 }
 
