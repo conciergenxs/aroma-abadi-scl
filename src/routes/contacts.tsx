@@ -405,14 +405,25 @@ function ContactsPage() {
                 </button>
               </div>
               {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                <input
-                  value={audienceSearch}
-                  onChange={e => setAudienceSearch(e.target.value)}
-                  placeholder="Search by name or phone..."
-                  className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-                />
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  <input
+                    value={audienceSearch}
+                    onChange={e => setAudienceSearch(e.target.value)}
+                    placeholder="Search by name or phone..."
+                    className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  />
+                </div>
+                <div className="w-px h-6 bg-border shrink-0" />
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/contacts/audience/add/$audienceId", params: { audienceId: audienceModalId } })}
+                  className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-md border border-primary/30 bg-primary/10 text-[11px] font-medium text-primary hover:bg-primary/15 transition-colors whitespace-nowrap"
+                >
+                  <Plus className="h-3 w-3" /> Add More
+                </button>
+              </div>
               </div>
               {/* Contact list */}
               <div className="max-h-64 overflow-y-auto space-y-0.5 border border-border rounded-lg bg-background">
