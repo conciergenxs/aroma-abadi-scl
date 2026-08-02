@@ -132,6 +132,12 @@ function ContactsPage() {
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, labelIds: c.labelIds.filter((x) => x !== lid) } : c)));
   const bulkAddList = (lsId: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) && !c.listIds.includes(lsId) ? { ...c, listIds: [...c.listIds, lsId] } : c)));
+  const addAllVisibleToList = (lsId: string) => {
+    const ids = visibleContacts.map((c) => c.id);
+    setContacts((cs) => cs.map((c) => (ids.includes(c.id) && !c.listIds.includes(lsId) ? { ...c, listIds: [...c.listIds, lsId] } : c)));
+    const aud = lists.find((l) => l.id === lsId);
+    toast.success(`Added ${ids.length} contact${ids.length === 1 ? "" : "s"} to ${aud?.name ?? "audience"}`);
+  };
   const bulkRemoveList = (lsId: string) =>
     setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
   const bulkDelete = () => {
