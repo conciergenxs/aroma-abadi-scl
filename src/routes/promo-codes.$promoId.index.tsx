@@ -229,7 +229,7 @@ function PromoDetailPage() {
                 <>
                   <button
                     onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border px-4 h-9 text-[14px] text-foreground hover:bg-muted transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-600 px-4 h-9 text-[14px] font-medium text-white hover:bg-emerald-700 transition-colors"
                   >
                     <Download className="h-3.5 w-3.5" /> Download .csv
                   </button>
