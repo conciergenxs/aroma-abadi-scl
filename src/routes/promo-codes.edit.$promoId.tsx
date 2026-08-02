@@ -18,6 +18,7 @@ function EditPromoCodePage() {
   const { promoId } = useParams({ from: "/promo-codes/edit/$promoId" });
   const navigate = useNavigate();
   const { promos } = usePromoStore();
+  const { lists } = useContactsStore();
   const promo = promos.find((p) => p.id === promoId);
   const [form, setForm] = useState<PromoFormState | null>(() => (promo ? promoFormFromExisting(promo) : null));
 
