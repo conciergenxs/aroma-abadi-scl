@@ -715,8 +715,8 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <div className="text-lg font-semibold mt-1">{formatIDR(totalSpend)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Paid</div>
-          <div className="text-lg font-semibold mt-1">{paidCount} <span className="text-xs font-normal text-muted-foreground">/ {transactions.length}</span></div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Completed</div>
+          <div className="text-lg font-semibold mt-1">{completedCount} <span className="text-xs font-normal text-muted-foreground">/ {transactions.length}</span></div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Favorite Brand</div>
