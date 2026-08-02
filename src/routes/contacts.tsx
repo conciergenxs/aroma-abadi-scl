@@ -586,6 +586,7 @@ function ContactsTable({
   onSelectAll,
   onToggle,
   onOpen,
+  properties,
 }: {
   contacts: Contact[];
   view: string;
@@ -594,11 +595,16 @@ function ContactsTable({
   onSelectAll: () => void;
   onToggle: (id: string) => void;
   onOpen: (id: string) => void;
+  properties: ContactProperty[];
 }) {
   const { bas } = useBaStore();
   const { brands } = useSkuStore();
   const { transactions } = useTransactionsStore();
   const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
+  // Manage Properties' Visible toggle governs which of these optional
+  // columns render — a property missing from the list defaults to shown so
+  // this never silently hides a column no one configured.
+  const isVisible = (key: string) => properties.find((p) => p.key === key)?.visible !== false;
 
 
   // Last transaction per contact
