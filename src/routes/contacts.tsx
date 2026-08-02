@@ -47,14 +47,15 @@ function ContactsPage() {
 
   const { contacts, labels, lists, properties } = useContactsStore();
   const lifecycleStages = useContactsStore().lifecycleStages;
+  const { brands } = useSkuStore();
+  const { transactions } = useTransactionsStore();
   const setContacts = contactsStore.setContacts;
   const setLabels = contactsStore.setLabels;
   const setLists = contactsStore.setLists;
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
   const [showManageProps, setShowManageProps] = useState(false);
-  const [newAudienceOpen, setNewAudienceOpen] = useState(false);
-  const [newAudienceName, setNewAudienceName] = useState("");
+  const [creatingAudience, setCreatingAudience] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [infoContact, setInfoContact] = useState<Contact | null>(null);
