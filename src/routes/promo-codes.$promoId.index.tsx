@@ -65,11 +65,10 @@ function UsageTypeBadge({ type }: { type: "one-to-one" | "one-to-many" }) {
   );
 }
 
-const CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string; chartColor: string }> = {
-  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white", chartColor: "var(--chart-1)" },
-  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white", chartColor: "var(--chart-2)" },
-  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white", chartColor: "var(--chart-3)" },
-  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white", chartColor: "var(--chart-4)" },
+const CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof Instagram; badge: string; chartColor: string }> = {
+  instagram: { label: "Instagram", icon: Instagram, badge: "border-fuchsia-700 bg-fuchsia-600 text-white", chartColor: "var(--chart-2)" },
+  tiktok: { label: "TikTok", icon: Music2, badge: "border-slate-700 bg-slate-800 text-white", chartColor: "var(--chart-3)" },
+  whatsapp: { label: "WhatsApp", icon: MessageCircle, badge: "border-emerald-700 bg-emerald-600 text-white", chartColor: "var(--chart-1)" },
 };
 
 function ChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
