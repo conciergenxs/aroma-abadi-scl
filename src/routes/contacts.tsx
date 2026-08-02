@@ -639,8 +639,9 @@ function ContactsTable({
   const showBaStore = isBaView && isVisible("store");
   const showBaCity = isBaView && isVisible("city");
 
-  // colSpan for empty state
-  const colSpan = isBaView ? 9 : isMineView ? 7 : 5;
+  // colSpan for empty state — base columns (checkbox, name, WA number, contact
+  // type) plus whichever optional columns are currently toggled on
+  const colSpan = 4 + [showGender, showPointBalance, showLastTransaction, showBaBrand, showBaGender, showBaPosition, showBaStore, showBaCity].filter(Boolean).length;
 
   return (
     <table className="min-w-full text-sm">
