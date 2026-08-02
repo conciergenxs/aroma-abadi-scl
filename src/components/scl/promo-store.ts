@@ -101,7 +101,7 @@ export type PromoRedemption = {
   transactionId: string;
   invoice: string;
   discountValue: number;
-  channel: "template" | "broadcast" | "manual" | "pos";
+  channel: "instagram" | "tiktok" | "whatsapp";
   sourceName: string;
   store: string;
   redeemedAt: string;
