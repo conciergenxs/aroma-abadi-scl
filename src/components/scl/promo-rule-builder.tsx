@@ -189,13 +189,25 @@ function ItemScopeEditor({
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
-              <button
-                type="button"
-                onClick={() => { onChange({ kind: "any" }); setOpen(false); }}
-                className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-[13px] text-left hover:bg-muted ${scope.kind === "any" ? "text-primary font-medium" : ""}`}
-              >
-                {anyLabel} {scope.kind === "any" && <Check className="h-4 w-4" />}
-              </button>
+              {(() => {
+                const isBrandScoped = brandFilter !== "all";
+                const rowLabel = isBrandScoped ? `${anyLabel} in ${brandFilter}` : anyLabel;
+                const rowChecked = isBrandScoped
+                  ? scope.kind === "any-in-brand" && scope.brand === brandFilter
+                  : scope.kind === "any";
+                return (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
+                      setOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-[13px] text-left hover:bg-muted ${rowChecked ? "text-primary font-medium" : ""}`}
+                  >
+                    {rowLabel} {rowChecked && <Check className="h-4 w-4" />}
+                  </button>
+                );
+              })()}
               <div className="my-1 border-t border-border" />
               {filtered.length === 0 ? (
                 <p className="px-3 py-8 text-[13px] text-muted-foreground text-center italic">No items match your filters</p>
