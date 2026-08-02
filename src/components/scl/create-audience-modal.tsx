@@ -35,7 +35,7 @@ type ContactStats = {
 };
 
 function computeStats(contactId: string, transactions: Transaction[]): ContactStats {
-  const txs = transactions.filter((t) => t.customerId === contactId && t.status === "Paid");
+  const txs = transactions.filter((t) => t.customerId === contactId && t.status !== "Cancelled");
   const brands = new Set<string>();
   for (const t of txs) {
     for (const b of t.brandNames?.length ? t.brandNames : [t.brandName]) brands.add(b);
