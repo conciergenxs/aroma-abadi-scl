@@ -114,8 +114,8 @@ export type PromoRedemption = {
 
 export type AssignedCode = {
   code: string;
-  contactId: string;
-  contactName: string;
+  contactId?: string;
+  contactName?: string;
   redeemed: boolean;
   redeemedAt?: string;
 };
@@ -130,6 +130,8 @@ export type PromoCode = {
   maxUsage: number | null;
   startDate: string;
   endDate: string;
+  /** Contact audiences (from Contacts) this promo is restricted to. Empty/absent = everyone. */
+  audienceIds?: string[];
   createdBy: { name: string; jobTitle: string };
   createdAt: string;
   redemptions: PromoRedemption[];
