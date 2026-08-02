@@ -12,9 +12,9 @@ import {
   Wallet,
   Percent,
   Ticket,
-  FileText,
-  Megaphone,
-  ShoppingBag,
+  Instagram,
+  Music2,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
