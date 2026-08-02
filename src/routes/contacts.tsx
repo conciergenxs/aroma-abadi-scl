@@ -22,6 +22,7 @@ import {
 import { useBaStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
+import { CreateAudienceModal } from "@/components/scl/create-audience-modal";
 import { toast } from "sonner";
 import {
   Search, Plus, MoreHorizontal,
