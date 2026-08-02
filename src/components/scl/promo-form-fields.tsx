@@ -179,6 +179,7 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
             ref={startDateRef}
             type="datetime-local"
             value={form.startDate}
+            max={form.endDate || undefined}
             onChange={(e) => set("startDate", e.target.value)}
             onClick={() => startDateRef.current?.showPicker?.()}
             className={inputCls}
@@ -190,6 +191,7 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
             ref={endDateRef}
             type="datetime-local"
             value={form.endDate}
+            min={form.startDate || undefined}
             onChange={(e) => set("endDate", e.target.value)}
             onClick={() => endDateRef.current?.showPicker?.()}
             className={inputCls}
