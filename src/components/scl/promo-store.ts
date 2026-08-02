@@ -187,17 +187,17 @@ function seed(): PromoCode[] {
         {
           id: "rdm-1a", contactId: t1000.customerId!, contactName: t1000.customerName,
           transactionId: t1000.id, invoice: t1000.invoice, discountValue: Math.round(t1000.total * 0.2),
-          channel: "template", sourceName: "June Flash Sale", store: t1000.store, redeemedAt: t1000.date,
+          channel: "whatsapp", sourceName: "June Flash Sale", store: t1000.store, redeemedAt: t1000.date,
         },
         {
           id: "rdm-1b", contactId: t1006.customerId!, contactName: t1006.customerName,
           transactionId: t1006.id, invoice: t1006.invoice, discountValue: Math.round(t1006.total * 0.2),
-          channel: "broadcast", sourceName: "VIP Customer Blast", store: t1006.store, redeemedAt: t1006.date,
+          channel: "whatsapp", sourceName: "VIP Customer Blast", store: t1006.store, redeemedAt: t1006.date,
         },
         {
           id: "rdm-1c", contactId: t1012.customerId!, contactName: t1012.customerName,
           transactionId: t1012.id, invoice: t1012.invoice, discountValue: Math.round(t1012.total * 0.2),
-          channel: "template", sourceName: "End of Month Promo", store: t1012.store, redeemedAt: t1012.date,
+          channel: "instagram", sourceName: "End of Month Promo", store: t1012.store, redeemedAt: t1012.date,
         },
       ],
     },
@@ -220,12 +220,12 @@ function seed(): PromoCode[] {
         {
           id: "rdm-2a", contactId: t1004.customerId!, contactName: t1004.customerName,
           transactionId: t1004.id, invoice: t1004.invoice, discountValue: 150000,
-          channel: "broadcast", sourceName: "Sisley Summer Sale", store: t1004.store, redeemedAt: t1004.date,
+          channel: "instagram", sourceName: "Sisley Summer Sale", store: t1004.store, redeemedAt: t1004.date,
         },
         {
           id: "rdm-2b", contactId: t1005.customerId!, contactName: t1005.customerName,
           transactionId: t1005.id, invoice: t1005.invoice, discountValue: 150000,
-          channel: "template", sourceName: "Abandoned Cart Reminder", store: t1005.store, redeemedAt: t1005.date,
+          channel: "whatsapp", sourceName: "Abandoned Cart Reminder", store: t1005.store, redeemedAt: t1005.date,
         },
       ],
       assignedCodes: [
@@ -254,12 +254,12 @@ function seed(): PromoCode[] {
         {
           id: "rdm-3a", contactId: t1001.customerId!, contactName: t1001.customerName,
           transactionId: t1001.id, invoice: t1001.invoice, discountValue: Math.round(t1001.total * 0.1),
-          channel: "template", sourceName: "New Arrival May", store: t1001.store, redeemedAt: t1001.date,
+          channel: "tiktok", sourceName: "New Arrival May", store: t1001.store, redeemedAt: t1001.date,
         },
         {
           id: "rdm-3b", contactId: t1003.customerId!, contactName: t1003.customerName,
           transactionId: t1003.id, invoice: t1003.invoice, discountValue: Math.round(t1003.total * 0.1),
-          channel: "broadcast", sourceName: "All Contacts Blast", store: t1003.store, redeemedAt: t1003.date,
+          channel: "whatsapp", sourceName: "All Contacts Blast", store: t1003.store, redeemedAt: t1003.date,
         },
       ],
     },
@@ -304,7 +304,7 @@ function seed(): PromoCode[] {
         {
           id: "rdm-5a", contactId: t1008.customerId!, contactName: t1008.customerName,
           transactionId: t1008.id, invoice: t1008.invoice, discountValue: Math.round(t1008.total * 0.3),
-          channel: "broadcast", sourceName: "April Loyalty Blast", store: t1008.store, redeemedAt: t1008.date,
+          channel: "instagram", sourceName: "April Loyalty Blast", store: t1008.store, redeemedAt: t1008.date,
         },
       ],
     },
@@ -327,17 +327,17 @@ function seed(): PromoCode[] {
         {
           id: "rdm-6a", contactId: t1002.customerId!, contactName: t1002.customerName,
           transactionId: t1002.id, invoice: t1002.invoice, discountValue: 685000,
-          channel: "pos", sourceName: "Point of Sale", store: t1002.store, redeemedAt: t1002.date,
+          channel: "whatsapp", sourceName: "Point of Sale", store: t1002.store, redeemedAt: t1002.date,
         },
         {
           id: "rdm-6b", contactId: t1014.customerId!, contactName: t1014.customerName,
           transactionId: t1014.id, invoice: t1014.invoice, discountValue: 685000,
-          channel: "manual", sourceName: "Manual entry by BA", store: t1014.store, redeemedAt: t1014.date,
+          channel: "instagram", sourceName: "Manual entry by BA", store: t1014.store, redeemedAt: t1014.date,
         },
         {
           id: "rdm-6c", contactId: t1020.customerId!, contactName: t1020.customerName,
           transactionId: t1020.id, invoice: t1020.invoice, discountValue: 685000,
-          channel: "pos", sourceName: "Point of Sale", store: t1020.store, redeemedAt: t1020.date,
+          channel: "tiktok", sourceName: "Point of Sale", store: t1020.store, redeemedAt: t1020.date,
         },
       ],
     },
