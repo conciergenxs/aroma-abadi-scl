@@ -424,7 +424,6 @@ function ContactsPage() {
                   <Plus className="h-3 w-3" /> Add More
                 </button>
               </div>
-              </div>
               {/* Contact list */}
               <div className="max-h-64 overflow-y-auto space-y-0.5 border border-border rounded-lg bg-background">
                 {nonBA.length === 0 && (
