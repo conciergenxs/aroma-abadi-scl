@@ -70,8 +70,12 @@ function ContactsPage() {
   const [perPage, setPerPage] = useState(20);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  if (isChildRoute) return <Outlet />;
-
+  // These hooks must run on every render of this component — including when
+  // isChildRoute is true and we're about to bail out to <Outlet /> below.
+  // Conditionally skipping them (e.g. by placing them after an early return)
+  // violates the Rules of Hooks: this same component instance re-renders with
+  // a different hook count as the user navigates between /contacts and its
+  // child routes, which React detects as "Rendered fewer hooks than expected."
   const visibleContacts = useMemo(() => {
     let base: Contact[];
     const live = contacts.filter((c) => !c.deleted);
@@ -97,6 +101,8 @@ function ContactsPage() {
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
   useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+
+  if (isChildRoute) return <Outlet />;
   const pageStart = (page - 1) * perPage;
   const pageContacts = visibleContacts.slice(pageStart, pageStart + perPage);
 
