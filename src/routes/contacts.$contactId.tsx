@@ -841,11 +841,10 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   );
 }
 
-const REDEEM_CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof FileText; badge: string }> = {
-  template: { label: "Template", icon: FileText, badge: "border-sky-700 bg-sky-600 text-white" },
-  broadcast: { label: "Broadcast", icon: Megaphone, badge: "border-violet-700 bg-violet-600 text-white" },
-  manual: { label: "Manual", icon: Pencil, badge: "border-amber-700 bg-amber-600 text-white" },
-  pos: { label: "Point of Sale", icon: ShoppingBag, badge: "border-emerald-700 bg-emerald-600 text-white" },
+const REDEEM_CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof Instagram; badge: string }> = {
+  instagram: { label: "Instagram", icon: Instagram, badge: "border-fuchsia-700 bg-fuchsia-600 text-white" },
+  tiktok: { label: "TikTok", icon: Music2, badge: "border-slate-700 bg-slate-800 text-white" },
+  whatsapp: { label: "WhatsApp", icon: MessageCircle, badge: "border-emerald-700 bg-emerald-600 text-white" },
 };
 
 function RedeemChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
