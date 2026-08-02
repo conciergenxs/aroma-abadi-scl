@@ -626,10 +626,18 @@ function ContactsTable({
   const isBA = (c: Contact) => c.labelIds.includes("lb-ba");
   const getBA = (c: Contact) => bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
 
-  // Column layout per view
+  // Column layout per view, filtered further by Manage Properties' Visible toggle
   const isBaView    = view === "ba";
   const isMineView  = view === "mine";
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
+  const showGender = (isAllOrBrand || isMineView) && isVisible("gender");
+  const showPointBalance = isMineView && isVisible("point_balance");
+  const showLastTransaction = isMineView && isVisible("last_transaction");
+  const showBaBrand = isBaView && isVisible("brand");
+  const showBaGender = isBaView && isVisible("gender");
+  const showBaPosition = isBaView && isVisible("position");
+  const showBaStore = isBaView && isVisible("store");
+  const showBaCity = isBaView && isVisible("city");
 
   // colSpan for empty state
   const colSpan = isBaView ? 9 : isMineView ? 7 : 5;
