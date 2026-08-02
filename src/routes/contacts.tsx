@@ -58,7 +58,6 @@ function ContactsPage() {
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
   const [showManageProps, setShowManageProps] = useState(false);
-  const [creatingAudience, setCreatingAudience] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [infoContact, setInfoContact] = useState<Contact | null>(null);
