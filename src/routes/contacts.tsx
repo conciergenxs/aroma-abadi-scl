@@ -673,19 +673,19 @@ function ContactsTable({
               <td className={tdCls}>
                 <span className="font-medium text-foreground">{c.name}</span>
               </td>
-              {(isAllOrBrand || isMineView) && (
+              {showGender && (
                 <td className={tdCls}>{c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
               )}
               <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
               <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
-              {isMineView && (
+              {showPointBalance && (
                 <td className={`${tdCls} tabular-nums`}>
                   {c.pointBalance != null && c.pointBalance > 0
                     ? <span className="text-foreground font-medium">{fmtNum(c.pointBalance)} pts</span>
                     : <span className="text-muted-foreground">—</span>}
                 </td>
               )}
-              {isMineView && (() => {
+              {showLastTransaction && (() => {
                 const tx = lastTxByContact.get(c.id);
                 return (
                   <td className={`${tdCls} text-[11px]`}>
@@ -700,13 +700,11 @@ function ContactsTable({
                   </td>
                 );
               })()}
-              {isBaView && <>
-                <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>
-                <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
-                <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>
-                <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>
-                <td className={tdCls}>{ba?.city ?? <span className="text-muted-foreground">—</span>}</td>
-              </>}
+              {showBaBrand && <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>}
+              {showBaGender && <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>}
+              {showBaPosition && <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>}
+              {showBaStore && <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>}
+              {showBaCity && <td className={tdCls}>{ba?.city ?? <span className="text-muted-foreground">—</span>}</td>}
             </tr>
           );
         })}
