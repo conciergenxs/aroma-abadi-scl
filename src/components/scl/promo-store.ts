@@ -398,7 +398,7 @@ function _save() {
 export const promoStore = {
   getPromos(): PromoCode[] { return _promos; },
 
-  addPromo(data: Omit<PromoCode, "id" | "redemptions" | "assignedCodes">): string {
+  addPromo(data: Omit<PromoCode, "id" | "redemptions">): string {
     const id = `promo-${Date.now()}`;
     _promos = [{ ...data, id, redemptions: [] }, ..._promos];
     _save();
