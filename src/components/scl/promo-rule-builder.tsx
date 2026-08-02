@@ -130,7 +130,10 @@ function ItemScopeEditor({
     });
   }, [items, search, brandFilter]);
 
-  const label = scope.kind === "any" ? anyLabel : selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
+  const label =
+    scope.kind === "any" ? anyLabel :
+    scope.kind === "any-in-brand" ? `${anyLabel} (${scope.brand})` :
+    selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
 
   return (
     <>
