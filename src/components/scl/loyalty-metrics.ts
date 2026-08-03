@@ -190,7 +190,7 @@ export const TIER_MAINTENANCE: MaintenanceRow[] = [
 ];
 
 // ── 2. Points & Benefits ─────────────────────────────────────────────────
-export function pointsSummary(window: RollingWindow) {
+export function pointsSummary(window: DateRangeFilter) {
   const windowSlice = trailing(MONTHLY, window);
   const issued = sum(windowSlice.map((m) => m.pointsIssued));
   const redeemed = sum(windowSlice.map((m) => m.pointsRedeemed));
