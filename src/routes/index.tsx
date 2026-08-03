@@ -422,7 +422,7 @@ function Dashboard() {
               }
             >
               <ul className="divide-y divide-border">
-                {conversations.slice(0, 5).map((c) => {
+                {conversations.slice(0, 6).map((c) => {
                   const contact = contacts.find((x) => x.id === c.contactId)!;
                   return (
                     <li key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
