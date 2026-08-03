@@ -234,7 +234,7 @@ const REFERRAL_FUNNEL_BASE = [
   { label: "Successful Referral", value: 1296 },
 ];
 
-export function referralFunnel(window: RollingWindow) {
+export function referralFunnel(window: DateRangeFilter) {
   return REFERRAL_FUNNEL_BASE.map((s) => ({ ...s, value: scaleToWindow(s.value, window) }));
 }
 
