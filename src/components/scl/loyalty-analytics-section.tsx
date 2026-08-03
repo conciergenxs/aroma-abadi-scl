@@ -406,8 +406,14 @@ export function CrmLoyaltyAnalytics() {
             icon={UserPlus}
             label="New Members"
             value={fmtNum(nm.value)}
-            sub={nm.applies ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "Always starts at Bronze"}
-            accent={nm.applies ? (nm.deltaPct >= 0 ? "up" : "down") : undefined}
+            sub={
+              !nm.applies
+                ? "Always starts at Bronze"
+                : nm.hasPreviousPeriod
+                  ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period`
+                  : "No prior period in range"
+            }
+            accent={nm.applies && nm.hasPreviousPeriod ? (nm.deltaPct >= 0 ? "up" : "down") : undefined}
             info="Total member baru yang berhasil registrasi pada periode terpilih."
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
           />
