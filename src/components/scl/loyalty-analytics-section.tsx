@@ -452,8 +452,9 @@ export function CrmLoyaltyAnalytics() {
           <MetricStat icon={Gift} label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
         </div>
 
-        {/* 1. Tier Overview */}
-        <SubSection title="Tier Overview">
+        {/* 1. Tier Overview — no visible sub-header; the two chart captions
+            underneath (Tier Distribution / Tier Movement) already label it. */}
+        <SubSection>
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
