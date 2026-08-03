@@ -106,11 +106,15 @@ export function newMembersKpi(window: RollingWindow, tier: TierFilter) {
   const applies = tier === "All" || tier === "Bronze";
   const windowSlice = trailing(MONTHLY, window);
   const prevSlice = MONTHLY.slice(Math.max(0, MONTHLY.length - window * 2), MONTHLY.length - window);
+  // A rolling-12-month window has no prior 12 months of history in this
+  // 12-month seed — comparing against zero would read as "0% growth"
+  // instead of "no prior period to compare against".
+  const hasPreviousPeriod = applies && prevSlice.length === window;
   const current = applies ? sum(windowSlice.map((m) => m.newMembers)) : 0;
-  const previous = applies ? sum(prevSlice.map((m) => m.newMembers)) : 0;
-  const deltaPct = previous > 0 ? (current - previous) / previous : 0;
+  const previous = hasPreviousPeriod ? sum(prevSlice.map((m) => m.newMembers)) : 0;
+  const deltaPct = hasPreviousPeriod && previous > 0 ? (current - previous) / previous : 0;
   const spark: SparkPoint[] = windowSlice.map((m) => ({ month: m.month, value: applies ? m.newMembers : 0 }));
-  return { value: current, deltaPct, spark, applies };
+  return { value: current, deltaPct, spark, applies, hasPreviousPeriod };
 }
 
 export function tierUpgradeRateKpi(window: RollingWindow, tier: TierFilter) {
