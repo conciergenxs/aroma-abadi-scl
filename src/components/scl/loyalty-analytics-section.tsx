@@ -162,6 +162,27 @@ function renderSankeyNode(props: { x: number; y: number; width: number; height: 
   );
 }
 
+type SankeyLinkProps = {
+  sourceX: number; sourceY: number; sourceControlX: number;
+  targetX: number; targetY: number; targetControlX: number;
+  linkWidth: number;
+  payload: { source: SankeyNodeDatum };
+};
+function renderSankeyLink(props: SankeyLinkProps) {
+  const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, payload } = props;
+  const color = TIER_COLOR[payload.source.tier];
+  return (
+    <path
+      className="transition-opacity duration-150 hover:opacity-80"
+      d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
+      fill="none"
+      stroke={color}
+      strokeWidth={linkWidth}
+      strokeOpacity={0.22}
+    />
+  );
+}
+
 function TierMovementSankey() {
   const nodes: SankeyNodeDatum[] = [
     ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Start`, tier: t, side: "start" })),
