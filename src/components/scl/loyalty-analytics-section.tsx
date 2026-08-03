@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { SectionCard } from "@/components/scl/app-shell";
 import {
@@ -11,12 +11,11 @@ import {
   UPGRADE_JOURNEY, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS, ADVOCACY_REVENUE, REFERRAL_QUALITY,
   newMembersKpi, tierUpgradeRateKpi, repeatPurchaseRateKpi, referralConversionRateKpi,
   pointsRedemptionRateKpi, pointsSummary, benefitUsage, referralFunnel, topAdvocates,
-  type TierFilter, type RollingWindow, type LeaderboardWindow, type LoyaltyTier,
-  type SparkPoint, type Advocate,
+  type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
 } from "@/components/scl/loyalty-metrics";
 import {
   UserPlus, Repeat, Share2, ArrowUpCircle, Gift, Coins, Wallet, Percent,
-  CircleDollarSign, Tags, UserCheck, ShoppingBasket, ArrowUpRight, Clock3,
+  CircleDollarSign, Tags, UserCheck, ShoppingBasket, ArrowUpRight, Clock3, ChevronDown,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -25,14 +24,15 @@ import {
 
 /**
  * CRM & Loyalty Program Analytics — a dedicated dashboard-within-the-
- * dashboard on the Overview page. Deliberately self-contained (own Global
- * Filter row, own KPI strip, own 3 sub-sections) so it never repeats a
- * metric that's already covered by the Overview page's existing sections
- * above it — see loyalty-metrics.ts for the objective/rationale behind
- * every number here.
+ * dashboard on the Overview page, boxed as one card like every other
+ * Overview section. Deliberately self-contained (own Global Filter row,
+ * own KPI strip, own 3 sub-sections) so it never repeats a metric that's
+ * already covered by the Overview page's existing sections above it — see
+ * loyalty-metrics.ts for the data behind every number here.
  */
 
 const STATUS_COLORS = { maintained: "#10b981", gracePeriod: "#f59e0b", atRisk: "#f97316", decayed: "#f43f5e" };
+const TOP_ADVOCATES_LIMIT = 5;
 
 // ── Sparkline — tiny trend chart embedded in a KPI card. ────────────────
 function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
@@ -47,40 +47,59 @@ function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
   );
 }
 
-// ── Global Filter row — Date Range (rolling window), Tier, and the
-// Top Advocates leaderboard's own window toggle. ────────────────────────
+// ── A titled sub-block inside the outer card — mirrors the "Sales Trend" /
+// "Qty Sold — by Brand" nesting pattern OrdersSection already uses, one
+// level deeper (Tier Overview / Points & Benefits / Referral & Advocacy
+// each bundle several of those inner blocks). ───────────────────────────
+function SubSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="border-t border-border">
+      <div className="px-5 pt-4 pb-1">
+        <div className="text-sm font-semibold">{title}</div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Custom select — native <select> with a custom chevron (matches the
+// rest of the app's dropdown styling instead of the browser default). ───
+function FilterSelect<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { label: string; value: T }[] }) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        className="h-8 appearance-none rounded-md border border-border bg-card/60 pl-2.5 pr-7 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
+      >
+        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+    </div>
+  );
+}
+
+// ── Global Filter row — Date Range (rolling window or All Time) and Tier.
+// Top Advocates' leaderboard window now follows the same Date Range
+// filter instead of its own separate control. ───────────────────────────
 function GlobalFilterBar({
-  window, setWindow, tier, setTier, leaderboardWindow, setLeaderboardWindow,
+  window, setWindow, tier, setTier,
 }: {
-  window: RollingWindow; setWindow: (w: RollingWindow) => void;
+  window: DateRangeFilter; setWindow: (w: DateRangeFilter) => void;
   tier: TierFilter; setTier: (t: TierFilter) => void;
-  leaderboardWindow: LeaderboardWindow; setLeaderboardWindow: (w: LeaderboardWindow) => void;
 }) {
-  const selectClass = "h-8 rounded-md border border-border bg-card/60 px-2.5 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40";
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <select value={window} onChange={(e) => setWindow(Number(e.target.value) as RollingWindow)} className={selectClass}>
-        {DATE_RANGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-      <select value={tier} onChange={(e) => setTier(e.target.value as TierFilter)} className={selectClass}>
-        <option value="All">All Tier</option>
-        {LOYALTY_TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
-      </select>
-      <div className="inline-flex items-center gap-1.5">
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Leaderboard</span>
-        <div className="inline-flex items-center rounded-md border border-border bg-card/60 p-0.5 text-[12px]">
-          {([["rolling12m", "Rolling 12M"], ["allTime", "All Time"]] as const).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setLeaderboardWindow(value)}
-              className={`h-7 px-2.5 rounded-[5px] transition-colors duration-150 ${leaderboardWindow === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterSelect
+        value={String(window) as DateRangeFilter extends infer T ? string : never}
+        onChange={(v) => setWindow((v === "all" ? "all" : Number(v)) as DateRangeFilter)}
+        options={DATE_RANGE_OPTIONS.map((o) => ({ label: o.label, value: String(o.value) }))}
+      />
+      <FilterSelect
+        value={tier}
+        onChange={setTier}
+        options={[{ label: "All Tier", value: "All" }, ...LOYALTY_TIERS.map((t) => ({ label: t, value: t }))]}
+      />
     </div>
   );
 }
@@ -229,8 +248,8 @@ function UpgradeJourney() {
   return (
     <div className="p-4 space-y-3">
       <div className="grid grid-cols-2 gap-3 stagger">
-        <MetricStat icon={ArrowUpRight} label="Total Upgrades" value={fmtNum(UPGRADE_JOURNEY.totalUpgrades)} info="Jumlah member yang naik tier pada review cycle terakhir." />
-        <MetricStat icon={Clock3} label="Avg. Days to Upgrade" value={`${UPGRADE_JOURNEY.avgDaysToUpgrade}d`} info="Rata-rata waktu yang dibutuhkan member untuk naik tier." />
+        <MetricStat icon={ArrowUpRight} label="Total Upgrades" value={fmtNum(UPGRADE_JOURNEY.totalUpgrades)} info="Number of members who moved up a tier in the last review cycle." />
+        <MetricStat icon={Clock3} label="Avg. Days to Upgrade" value={`${UPGRADE_JOURNEY.avgDaysToUpgrade}d`} info="Average time it takes a member to move up a tier." />
       </div>
       <div className="rounded-lg border border-border overflow-hidden">
         <table className="w-full text-[12px]">
@@ -354,30 +373,30 @@ function BenefitEffectivenessTable() {
   );
 }
 
-// ── 3a. Top Advocates — Leaderboard ──────────────────────────────────────
+// ── 3a. Top Advocates — Leaderboard (top 5, compact rows) ────────────────
 function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
   if (advocates.length === 0) {
     return <div className="text-center text-xs text-muted-foreground py-10">No advocates in this tier yet.</div>;
   }
   const max = Math.max(...advocates.map((a) => a.referrals), 1);
   return (
-    <div className="p-4 space-y-2 stagger">
+    <div className="p-4 space-y-1.5 stagger">
       {advocates.map((a, i) => (
-        <div key={a.contactId} className="flex items-center gap-3 rounded-lg border border-border bg-card/40 px-3 py-2 card-hover transition-all duration-300">
-          <span className={`text-[11px] w-5 shrink-0 text-center font-semibold ${i < 3 ? "text-primary" : "text-muted-foreground"}`}>{i + 1}</span>
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium shrink-0">{a.avatar}</div>
+        <div key={a.contactId} className="flex items-center gap-2.5 rounded-lg border border-border bg-card/40 px-2.5 py-1.5 card-hover transition-all duration-300">
+          <span className={`text-[11px] w-4 shrink-0 text-center font-semibold ${i < 3 ? "text-primary" : "text-muted-foreground"}`}>{i + 1}</span>
+          <div className="h-6 w-6 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[10px] font-medium shrink-0">{a.avatar}</div>
           <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-medium truncate">{a.name}</div>
-            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+            <div className="text-[12px] font-medium truncate leading-tight">{a.name}</div>
+            <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground leading-tight">
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: TIER_COLOR[a.tier] }} /> {a.tier}
             </span>
           </div>
-          <div className="w-16 shrink-0 h-1.5 rounded-full bg-muted overflow-hidden hidden sm:block">
+          <div className="w-14 shrink-0 h-1 rounded-full bg-muted overflow-hidden hidden sm:block">
             <div className="h-full rounded-full animate-grow-x" style={{ width: `${(a.referrals / max) * 100}%`, background: TIER_COLOR[a.tier] }} />
           </div>
           <div className="text-right shrink-0">
-            <div className="text-[13px] font-semibold tabular-nums">{a.referrals}</div>
-            <div className="text-[10px] text-muted-foreground">{fmtIDR(a.revenue)}</div>
+            <div className="text-[12px] font-semibold tabular-nums leading-tight">{a.referrals}</div>
+            <div className="text-[9px] text-muted-foreground leading-tight">{fmtIDR(a.revenue)}</div>
           </div>
         </div>
       ))}
@@ -388,9 +407,8 @@ function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
 // ── Component ─────────────────────────────────────────────────────────────
 export function CrmLoyaltyAnalytics() {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
-  const [window, setWindow] = useState<RollingWindow>(12);
+  const [window, setWindow] = useState<DateRangeFilter>(12);
   const [tier, setTier] = useState<TierFilter>("All");
-  const [leaderboardWindow, setLeaderboardWindow] = useState<LeaderboardWindow>("rolling12m");
 
   const nm = useMemo(() => newMembersKpi(window, tier), [window, tier]);
   const tu = useMemo(() => tierUpgradeRateKpi(window, tier), [window, tier]);
@@ -400,68 +418,51 @@ export function CrmLoyaltyAnalytics() {
   const points = useMemo(() => pointsSummary(window), [window]);
   const benefitUsageData = useMemo(() => benefitUsage(window), [window]);
   const funnel = useMemo(() => referralFunnel(window), [window]);
-  const advocates = useMemo(() => topAdvocates(leaderboardWindow, tier), [leaderboardWindow, tier]);
+  const advocates = useMemo(() => topAdvocates(window, tier).slice(0, TOP_ADVOCATES_LIMIT), [window, tier]);
 
   const funnelStages: FunnelStage[] = funnel.map((s, i) => ({ label: s.label, value: s.value, color: BRAND_COLORS[i % BRAND_COLORS.length] }));
 
   return (
     <Reveal innerRef={ref} inView={inView}>
-      <div className="space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
-          <div>
-            <div className="text-lg font-semibold">CRM & Loyalty Program Analytics</div>
-            <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
-              Kesehatan membership tier, penggunaan benefit, efektivitas referral, dan kontribusi customer terhadap bisnis — di luar metrik yang sudah ditampilkan di atas.
-            </p>
-          </div>
-          <GlobalFilterBar
-            window={window} setWindow={setWindow}
-            tier={tier} setTier={setTier}
-            leaderboardWindow={leaderboardWindow} setLeaderboardWindow={setLeaderboardWindow}
-          />
-        </div>
-
+      <SectionCard
+        title="CRM & Loyalty Program Analytics"
+        action={<GlobalFilterBar window={window} setWindow={setWindow} tier={tier} setTier={setTier} />}
+      >
         {/* Top KPI Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 stagger">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
           <MetricStat
             icon={UserPlus}
             label="New Members"
             value={fmtNum(nm.value)}
-            sub={
-              !nm.applies
-                ? "Always starts at Bronze"
-                : nm.hasPreviousPeriod
-                  ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period`
-                  : "No prior period in range"
-            }
+            sub={nm.applies ? (nm.hasPreviousPeriod ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range") : "Always starts at Bronze"}
             accent={nm.applies && nm.hasPreviousPeriod ? (nm.deltaPct >= 0 ? "up" : "down") : undefined}
-            info="Total member baru yang berhasil registrasi pada periode terpilih."
+            info="Total new members who registered in the selected period."
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
           />
-          <MetricStat icon={Repeat} label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Member dengan ≥2 transaksi ÷ Total member yang pernah bertransaksi." />
-          <MetricStat icon={Share2} label="Referral Conversion Rate" value={fmtPct(rcr)} info="Successful Referral ÷ Referral Shared." />
+          <MetricStat icon={Repeat} label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Members with 2+ transactions ÷ total members who ever transacted." />
+          <MetricStat icon={Share2} label="Referral Conversion Rate" value={fmtPct(rcr)} info="Successful referrals ÷ referrals shared." />
           <MetricStat
             icon={ArrowUpCircle}
             label="Tier Upgrade Rate"
             value={fmtPct(tu.value)}
-            info="Member Upgrade ÷ Member Eligible Review."
+            info="Members who upgraded ÷ members eligible for review."
             spark={<Sparkline data={tu.spark} color="var(--chart-2)" />}
           />
-          <MetricStat icon={Gift} label="Points Redemption Rate" value={fmtPct(prr)} info="Points Redeemed ÷ Points Issued." />
+          <MetricStat icon={Gift} label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
         </div>
 
         {/* 1. Tier Overview */}
-        <SectionCard title="Tier Overview" description="Kesehatan struktur tier membership, perpindahan antar tier, serta customer yang berisiko kehilangan status loyalty.">
+        <SubSection title="Tier Overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Tier Distribution <InfoHint text="Jumlah member aktif pada masing-masing tier." />
+                Tier Distribution <InfoHint text="Member count in each tier." />
               </div>
               <TierDonut tierFilter={tier} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Tier Movement <InfoHint text="Perpindahan member antar tier selama periode tertentu (Upgrade, Maintain, Decay)." />
+                Tier Movement <InfoHint text="How members moved between tiers over the review cycle: Upgrade, Maintain, or Decay." />
               </div>
               <TierMovementSankey />
             </div>
@@ -469,26 +470,26 @@ export function CrmLoyaltyAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Upgrade Journey <InfoHint text="Jalur upgrade yang paling sering terjadi serta rata-rata waktu yang dibutuhkan untuk naik tier." />
+                Upgrade Journey <InfoHint text="The most common upgrade paths and the average time it takes to move up a tier." />
               </div>
               <UpgradeJourney />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Tier Maintenance Status <InfoHint text="Member yang berhasil mempertahankan tier, memasuki grace period, berisiko turun tier, atau sudah decay." />
+                Tier Maintenance Status <InfoHint text="Members who maintained their tier, entered a grace period, are at risk, or already decayed." />
               </div>
               <MaintenanceStackedBar tierFilter={tier} />
             </div>
           </div>
-        </SectionCard>
+        </SubSection>
 
         {/* 2. Points & Benefits */}
-        <SectionCard title="Points & Benefits" description="Efektivitas program reward, penggunaan benefit, serta biaya loyalty program.">
+        <SubSection title="Points & Benefits">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 stagger">
-            <MetricStat icon={Coins} label="Points Issued" value={fmtNum(points.issued)} info="Total poin loyalty yang diterbitkan pada periode terpilih." />
-            <MetricStat icon={Gift} label="Points Redeemed" value={fmtNum(points.redeemed)} info="Total poin loyalty yang ditukarkan pada periode terpilih." />
-            <MetricStat icon={Wallet} label="Outstanding Points" value={fmtNum(points.outstanding)} info="Total poin yang belum ditukarkan — kumulatif, tidak pernah reset." />
-            <MetricStat icon={Percent} label="Redemption Rate" value={fmtPct(points.redemptionRate)} info="Points Redeemed ÷ Points Issued." />
+            <MetricStat icon={Coins} label="Points Issued" value={fmtNum(points.issued)} info="Total loyalty points issued in the selected period." />
+            <MetricStat icon={Gift} label="Points Redeemed" value={fmtNum(points.redeemed)} info="Total loyalty points redeemed in the selected period." />
+            <MetricStat icon={Wallet} label="Outstanding Points" value={fmtNum(points.outstanding)} info="Points not yet redeemed — cumulative, never resets." />
+            <MetricStat icon={Percent} label="Redemption Rate" value={fmtPct(points.redemptionRate)} info="Points redeemed ÷ points issued." />
           </div>
           <div className="border-t border-border p-4">
             <div className={`${CAPTION} mb-2`}>Points Issued vs Redeemed</div>
@@ -497,47 +498,47 @@ export function CrmLoyaltyAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Benefit Usage <InfoHint text="Benefit apa yang paling sering digunakan oleh member." />
+                Benefit Usage <InfoHint text="Which benefits members use the most." />
               </div>
               <BenefitUsageBar data={benefitUsageData} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Benefit Effectiveness <InfoHint text="Benefit mana yang paling berhasil meningkatkan aktivitas customer setelah redemption." />
+                Benefit Effectiveness <InfoHint text="Which benefits are most successful at lifting customer activity after redemption." />
               </div>
               <BenefitEffectivenessTable />
             </div>
           </div>
-        </SectionCard>
+        </SubSection>
 
         {/* 3. Referral & Advocacy */}
-        <SectionCard title="Referral & Advocacy" description="Efektivitas referral sebagai mesin pertumbuhan loyalty, serta kontributor terbesar terhadap bisnis.">
+        <SubSection title="Referral & Advocacy">
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Referral Funnel <InfoHint text="Performa referral pada setiap tahapan funnel." />
+                Referral Funnel <InfoHint text="Referral performance at each stage of the funnel." />
               </div>
               <StepFunnel stages={funnelStages} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Top Advocates <InfoHint text="Member dengan kontribusi referral terbesar, berdasarkan Successful Referral dan Referral Revenue." />
+                Top Advocates <InfoHint text="Members with the biggest referral contribution, ranked by successful referrals and referral revenue." />
               </div>
               <AdvocateLeaderboard advocates={advocates} />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
-            <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(ADVOCACY_REVENUE.revenueFromReferral)} info="Total revenue yang dikontribusikan melalui referral." />
-            <MetricStat icon={Wallet} label="Referral CLV" value={fmtIDR(ADVOCACY_REVENUE.referralCLV)} info="Rata-rata lifetime value dari customer hasil referral." />
-            <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(ADVOCACY_REVENUE.referralAOV)} info="Rata-rata order value dari customer hasil referral." />
+            <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(ADVOCACY_REVENUE.revenueFromReferral)} info="Total revenue contributed through referrals." />
+            <MetricStat icon={Wallet} label="Referral CLV" value={fmtIDR(ADVOCACY_REVENUE.referralCLV)} info="Average lifetime value of a referred customer." />
+            <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(ADVOCACY_REVENUE.referralAOV)} info="Average order value of a referred customer." />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
-            <MetricStat icon={Repeat} label="Referred Repeat Purchase Rate" value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)} info="Repeat purchase rate dari customer hasil referral." />
-            <MetricStat icon={UserCheck} label="Referred Retention Rate" value={fmtPct(REFERRAL_QUALITY.retentionRate)} info="Retention rate dari customer hasil referral." />
-            <MetricStat icon={ShoppingBasket} label="Referred AOV" value={fmtIDR(REFERRAL_QUALITY.aov)} info="Average order value dari customer hasil referral." />
+            <MetricStat icon={Repeat} label="Referred Repeat Purchase Rate" value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)} info="Repeat purchase rate among referred customers." />
+            <MetricStat icon={UserCheck} label="Referred Retention Rate" value={fmtPct(REFERRAL_QUALITY.retentionRate)} info="Retention rate among referred customers." />
+            <MetricStat icon={ShoppingBasket} label="Referred AOV" value={fmtIDR(REFERRAL_QUALITY.aov)} info="Average order value among referred customers." />
           </div>
-        </SectionCard>
-      </div>
+        </SubSection>
+      </SectionCard>
     </Reveal>
   );
 }
