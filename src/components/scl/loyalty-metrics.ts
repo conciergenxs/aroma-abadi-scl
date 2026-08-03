@@ -272,7 +272,12 @@ export type Advocate = {
   revenue: number;
 };
 
-export function topAdvocates(window: LeaderboardWindow, tier: TierFilter): Advocate[] {
+/** Every rolling window (3/6/12 months) reads the same "recent window"
+ *  advocate numbers — only "All Time" switches to the larger cumulative
+ *  figures. There's no separate leaderboard control anymore; it follows
+ *  the same Date Range filter as everything else. */
+export function topAdvocates(window: DateRangeFilter, tier: TierFilter): Advocate[] {
+  const useAllTime = window === "all";
   return TOP_ADVOCATES_SEED
     .filter((a) => tier === "All" || a.tier === tier)
     .map((a) => {
@@ -283,8 +288,8 @@ export function topAdvocates(window: LeaderboardWindow, tier: TierFilter): Advoc
         avatar: contact?.avatar ?? "?",
         phone: contact?.phone ?? "",
         tier: a.tier,
-        referrals: window === "rolling12m" ? a.referrals.rolling12m : a.referrals.allTime,
-        revenue: window === "rolling12m" ? a.revenue.rolling12m : a.revenue.allTime,
+        referrals: useAllTime ? a.referrals.allTime : a.referrals.rolling12m,
+        revenue: useAllTime ? a.revenue.allTime : a.revenue.rolling12m,
       };
     })
     .sort((a, b) => b.referrals - a.referrals);
