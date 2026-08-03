@@ -161,49 +161,18 @@ function sankeyNodeIndex(tier: LoyaltyTier, side: "start" | "end") {
   return LOYALTY_TIERS.indexOf(tier) + (side === "start" ? 0 : LOYALTY_TIERS.length);
 }
 
-function renderSankeyNode(props: { x: number; y: number; width: number; height: number; payload: SankeyNodeDatum; index: number }) {
-  const { x, y, width, height, payload } = props;
-  const color = TIER_COLOR[payload.tier];
-  const isStart = payload.side === "start";
-  return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} rx={2} />
-      <text
-        x={isStart ? x - 8 : x + width + 8}
-        y={y + height / 2}
-        textAnchor={isStart ? "end" : "start"}
-        dominantBaseline="middle"
-        fontSize={11}
-        fill="var(--foreground)"
-      >
-        {payload.tier}
-      </text>
-    </g>
-  );
-}
+type SankeyLinkPayload = { source: SankeyNodeDatum; target: SankeyNodeDatum; value: number };
+type SankeyHoverInfo = { x: number; y: number; label: string; value: number };
 
-type SankeyLinkProps = {
-  sourceX: number; sourceY: number; sourceControlX: number;
-  targetX: number; targetY: number; targetControlX: number;
-  linkWidth: number;
-  payload: { source: SankeyNodeDatum };
-};
-function renderSankeyLink(props: SankeyLinkProps) {
-  const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, payload } = props;
-  const color = TIER_COLOR[payload.source.tier];
-  return (
-    <path
-      className="transition-opacity duration-150 hover:opacity-80"
-      d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
-      fill="none"
-      stroke={color}
-      strokeWidth={linkWidth}
-      strokeOpacity={0.22}
-    />
-  );
-}
-
+/** recharts' own Sankey Tooltip never activates on hover here (confirmed:
+ *  native mouseenter/mouseover reach the node/link elements and React does
+ *  attach onMouseEnter/onClick to their wrapping <Layer>, but the
+ *  component's internal isTooltipActive state never flips — a known gap in
+ *  its Sankey implementation) — so hover/tooltip is handled entirely here
+ *  instead of relying on <Sankey>'s built-in <Tooltip> child. */
 function TierMovementSankey() {
+  const [hover, setHover] = useState<SankeyHoverInfo | null>(null);
+
   const nodes: SankeyNodeDatum[] = [
     ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Start`, tier: t, side: "start" })),
     ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Now`, tier: t, side: "end" })),
@@ -213,6 +182,59 @@ function TierMovementSankey() {
     target: sankeyNodeIndex(f.to, "end"),
     value: f.value,
   }));
+  const nodeTotal = (tier: LoyaltyTier, side: "start" | "end") =>
+    TIER_MOVEMENT
+      .filter((f) => (side === "start" ? f.from === tier : f.to === tier))
+      .reduce((s, f) => s + f.value, 0);
+
+  const renderNode = (props: { x: number; y: number; width: number; height: number; payload: SankeyNodeDatum }) => {
+    const { x, y, width, height, payload } = props;
+    const color = TIER_COLOR[payload.tier];
+    const isStart = payload.side === "start";
+    return (
+      <g
+        className="cursor-pointer"
+        onMouseEnter={() => setHover({ x: x + width / 2, y, label: `${payload.tier} · ${isStart ? "Start of Cycle" : "End of Cycle"}`, value: nodeTotal(payload.tier, payload.side) })}
+        onMouseLeave={() => setHover(null)}
+      >
+        <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} rx={2} />
+        <text
+          x={isStart ? x - 8 : x + width + 8}
+          y={y + height / 2}
+          textAnchor={isStart ? "end" : "start"}
+          dominantBaseline="middle"
+          fontSize={11}
+          fill="var(--foreground)"
+        >
+          {payload.tier}
+        </text>
+      </g>
+    );
+  };
+
+  const renderLink = (props: {
+    sourceX: number; sourceY: number; sourceControlX: number;
+    targetX: number; targetY: number; targetControlX: number;
+    linkWidth: number;
+    payload: SankeyLinkPayload;
+  }) => {
+    const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, payload } = props;
+    const color = TIER_COLOR[payload.source.tier];
+    const midX = (sourceX + targetX) / 2;
+    const midY = (sourceY + targetY) / 2;
+    return (
+      <path
+        className="transition-opacity duration-150 hover:opacity-70 cursor-pointer"
+        d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
+        fill="none"
+        stroke={color}
+        strokeWidth={linkWidth}
+        strokeOpacity={0.22}
+        onMouseEnter={() => setHover({ x: midX, y: midY, label: `${payload.source.tier} → ${payload.target.tier}`, value: payload.value })}
+        onMouseLeave={() => setHover(null)}
+      />
+    );
+  };
 
   return (
     <div className="p-4">
@@ -220,24 +242,28 @@ function TierMovementSankey() {
         <span>Start of Cycle</span>
         <span>End of Cycle</span>
       </div>
-      <div className="h-64">
+      <div className="h-64 relative">
         <ResponsiveContainer width="100%" height="100%">
           <Sankey
             data={{ nodes, links }}
-            node={renderSankeyNode}
-            link={renderSankeyLink}
+            node={renderNode}
+            link={renderLink}
             nodePadding={22}
             nodeWidth={10}
             margin={{ top: 4, right: 64, bottom: 4, left: 64 }}
-          >
-            <Tooltip
-              contentStyle={chartTooltipStyle}
-              labelStyle={chartLabelStyle}
-              itemStyle={chartItemStyle}
-              formatter={(v: number) => [`${fmtNum(v)} members`, ""]}
-            />
-          </Sankey>
+          />
         </ResponsiveContainer>
+        {hover && (
+          <div
+            className="pointer-events-none absolute z-10 animate-fade-in whitespace-nowrap"
+            style={{ left: hover.x, top: hover.y, transform: "translate(-50%, -110%)" }}
+          >
+            <div style={chartTooltipStyle}>
+              <div style={chartLabelStyle}>{hover.label}</div>
+              <div style={chartItemStyle}>{fmtNum(hover.value)} members</div>
+            </div>
+          </div>
+        )}
       </div>
       <p className="text-[10px] text-muted-foreground text-center mt-1">Per review cycle (6 months) · Upgrade, Maintain, or Decay</p>
     </div>
