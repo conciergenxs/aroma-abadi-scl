@@ -70,8 +70,12 @@ export const MONTHLY: MonthRow[] = MONTHS.map((month, i) => ({
   pointsRedeemed: POINTS_REDEEMED[i],
 }));
 
-function trailing<T>(arr: T[], n: RollingWindow): T[] {
-  return arr.slice(arr.length - n);
+function monthCount(window: DateRangeFilter): number {
+  return window === "all" ? MONTHS.length : window;
+}
+
+function trailing<T>(arr: T[], window: DateRangeFilter): T[] {
+  return arr.slice(arr.length - monthCount(window));
 }
 
 function sum(arr: number[]): number {
@@ -81,9 +85,9 @@ function sum(arr: number[]): number {
 /** Baseline is a 12-month total; scaled by the selected rolling window's
  *  share of a year — same illustrative-scaling convention as
  *  overview-metrics.ts's `scaleStatic`, for metrics with no real
- *  per-month source. */
-function scaleToWindow(baseline12mo: number, window: RollingWindow): number {
-  return Math.max(0, Math.round(baseline12mo * (window / 12)));
+ *  per-month source. "all" maps to the full 12-month baseline (1:1). */
+function scaleToWindow(baseline12mo: number, window: DateRangeFilter): number {
+  return Math.max(0, Math.round(baseline12mo * (monthCount(window) / 12)));
 }
 
 // ── Top KPI Strip ────────────────────────────────────────────────────────
