@@ -64,12 +64,12 @@ function SubSection({ title, children }: { title: string; children: ReactNode })
 
 // ── Custom select — native <select> with a custom chevron (matches the
 // rest of the app's dropdown styling instead of the browser default). ───
-function FilterSelect<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { label: string; value: T }[] }) {
+function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { label: string; value: string }[] }) {
   return (
     <div className="relative">
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value as T)}
+        onChange={(e) => onChange(e.target.value)}
         className="h-8 appearance-none rounded-md border border-border bg-card/60 pl-2.5 pr-7 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
       >
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -91,13 +91,13 @@ function GlobalFilterBar({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <FilterSelect
-        value={String(window) as DateRangeFilter extends infer T ? string : never}
+        value={String(window)}
         onChange={(v) => setWindow((v === "all" ? "all" : Number(v)) as DateRangeFilter)}
         options={DATE_RANGE_OPTIONS.map((o) => ({ label: o.label, value: String(o.value) }))}
       />
       <FilterSelect
         value={tier}
-        onChange={setTier}
+        onChange={(v) => setTier(v as TierFilter)}
         options={[{ label: "All Tier", value: "All" }, ...LOYALTY_TIERS.map((t) => ({ label: t, value: t }))]}
       />
     </div>
