@@ -18,18 +18,16 @@ import {
   HelpCircle, ShoppingCart, PackageX,
   ClipboardList, Receipt, CircleDollarSign,
   Repeat, Wallet, Tags, ShoppingBasket,
-  Reply, TrendingUp, CheckCheck, Eye, Calendar, ChevronDown, Info,
+  Reply, TrendingUp, CheckCheck, Eye, Calendar, ChevronDown,
 } from "lucide-react";
-import {
-  Tooltip as InfoTooltip, TooltipContent, TooltipProvider, TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   BarChart, Bar, Cell,
 } from "recharts";
 import {
   chartTooltipStyle, chartLabelStyle, chartItemStyle, axisColor, gridColor, cursorFill, axisTick,
-  BRAND_COLORS, VALUE_LG, CAPTION, fmtPct, useRevealOnScroll, Reveal, InfoHint, MetricStat, CornerStat,
+  BRAND_COLORS, CAPTION, fmtPct, useRevealOnScroll, Reveal, InfoHint, MetricStat, CornerStat,
   StepFunnel, type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
