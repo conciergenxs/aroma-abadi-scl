@@ -108,16 +108,17 @@ const KPI_BY_TIER: Record<TierFilter, TierKpis> = {
 
 export type SparkPoint = { month: string; value: number };
 
-export function newMembersKpi(window: RollingWindow, tier: TierFilter) {
+export function newMembersKpi(window: DateRangeFilter, tier: TierFilter) {
   // New members always enter the program at Bronze — a tier filter other
   // than All/Bronze has nothing to show, rather than a misleading number.
   const applies = tier === "All" || tier === "Bronze";
+  const n = monthCount(window);
   const windowSlice = trailing(MONTHLY, window);
-  const prevSlice = MONTHLY.slice(Math.max(0, MONTHLY.length - window * 2), MONTHLY.length - window);
-  // A rolling-12-month window has no prior 12 months of history in this
-  // 12-month seed — comparing against zero would read as "0% growth"
-  // instead of "no prior period to compare against".
-  const hasPreviousPeriod = applies && prevSlice.length === window;
+  const prevSlice = MONTHLY.slice(Math.max(0, MONTHLY.length - n * 2), MONTHLY.length - n);
+  // A rolling-12-month (or All Time) window has no prior period of equal
+  // length in this 12-month seed — comparing against zero would read as
+  // "0% growth" instead of "no prior period to compare against".
+  const hasPreviousPeriod = applies && window !== "all" && prevSlice.length === n;
   const current = applies ? sum(windowSlice.map((m) => m.newMembers)) : 0;
   const previous = hasPreviousPeriod ? sum(prevSlice.map((m) => m.newMembers)) : 0;
   const deltaPct = hasPreviousPeriod && previous > 0 ? (current - previous) / previous : 0;
@@ -125,7 +126,7 @@ export function newMembersKpi(window: RollingWindow, tier: TierFilter) {
   return { value: current, deltaPct, spark, applies, hasPreviousPeriod };
 }
 
-export function tierUpgradeRateKpi(window: RollingWindow, tier: TierFilter) {
+export function tierUpgradeRateKpi(window: DateRangeFilter, tier: TierFilter) {
   const windowSlice = trailing(MONTHLY, window);
   const spark: SparkPoint[] = windowSlice.map((m) => ({ month: m.month, value: m.upgrades / m.eligibleForReview }));
   return { value: KPI_BY_TIER[tier].tierUpgradeRate, spark };
@@ -137,7 +138,7 @@ export function repeatPurchaseRateKpi(tier: TierFilter) {
 export function referralConversionRateKpi(tier: TierFilter) {
   return KPI_BY_TIER[tier].referralConversionRate;
 }
-export function pointsRedemptionRateKpi(window: RollingWindow, tier: TierFilter) {
+export function pointsRedemptionRateKpi(window: DateRangeFilter, tier: TierFilter) {
   if (tier !== "All") return KPI_BY_TIER[tier].pointsRedemptionRate;
   const windowSlice = trailing(MONTHLY, window);
   const issued = sum(windowSlice.map((m) => m.pointsIssued));
