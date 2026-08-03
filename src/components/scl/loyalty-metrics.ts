@@ -212,7 +212,7 @@ const BENEFIT_USAGE_BASE: { benefit: string; count: number }[] = [
   { benefit: "Priority Customer Service", count: 940 },
 ];
 
-export function benefitUsage(window: RollingWindow) {
+export function benefitUsage(window: DateRangeFilter) {
   return BENEFIT_USAGE_BASE
     .map((b) => ({ benefit: b.benefit, count: scaleToWindow(b.count, window) }))
     .sort((a, b) => b.count - a.count);
