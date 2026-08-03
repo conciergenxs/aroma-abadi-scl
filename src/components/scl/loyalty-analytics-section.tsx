@@ -51,7 +51,8 @@ function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
 // "Qty Sold — by Brand" nesting pattern OrdersSection already uses, one
 // level deeper (Tier Overview / Points & Benefits / Referral & Advocacy
 // each bundle several of those inner blocks). ───────────────────────────
-function SubSection({ title, children }: { title: string; children: ReactNode }) {
+function SubSection({ title, children }: { title?: string; children: ReactNode }) {
+  if (!title) return <>{children}</>;
   return (
     <div className="border-t border-border">
       <div className="px-5 pt-4 pb-1">
