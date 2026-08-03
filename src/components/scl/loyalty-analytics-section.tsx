@@ -205,7 +205,7 @@ function TierMovementSankey() {
           <Sankey
             data={{ nodes, links }}
             node={renderSankeyNode}
-            link={{ stroke: "var(--muted-foreground)", strokeOpacity: 0.18 }}
+            link={renderSankeyLink}
             nodePadding={22}
             nodeWidth={10}
             margin={{ top: 4, right: 64, bottom: 4, left: 64 }}
