@@ -27,6 +27,12 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   BarChart, Bar, Cell,
 } from "recharts";
+import {
+  chartTooltipStyle, chartLabelStyle, chartItemStyle, axisColor, gridColor, cursorFill, axisTick,
+  BRAND_COLORS, VALUE_LG, CAPTION, fmtPct, useRevealOnScroll, Reveal, InfoHint, MetricStat, CornerStat,
+  StepFunnel, type FunnelStage,
+} from "@/components/scl/dashboard-ui";
+import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
 
 export const Route = createFileRoute("/")({
   head: () => ({
