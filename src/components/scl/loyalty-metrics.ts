@@ -24,13 +24,17 @@ export const TIER_COLOR: Record<LoyaltyTier, string> = {
 };
 
 export type TierFilter = "All" | LoyaltyTier;
-export type RollingWindow = 3 | 6 | 12;
-export type LeaderboardWindow = "rolling12m" | "allTime";
+/** "all" behaves like the full 12-month baseline for the monthly-series
+ *  metrics below (this seed only has 12 months of history to begin with)
+ *  — it only makes a real difference for the Top Advocates leaderboard,
+ *  which carries a genuinely larger "all time" number per advocate. */
+export type DateRangeFilter = 3 | 6 | 12 | "all";
 
-export const DATE_RANGE_OPTIONS: { label: string; value: RollingWindow }[] = [
+export const DATE_RANGE_OPTIONS: { label: string; value: DateRangeFilter }[] = [
   { label: "Rolling 3 Months", value: 3 },
   { label: "Rolling 6 Months", value: 6 },
   { label: "Rolling 12 Months", value: 12 },
+  { label: "All Time", value: "all" },
 ];
 
 // ── Monthly time series (12 trailing months) — backs everything with a
