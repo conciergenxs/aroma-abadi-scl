@@ -402,7 +402,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <SectionCard title="Recent Activity" className="lg:col-span-1">
               <ul className="divide-y divide-border">
-                {recentActivity.map((a) => (
+                {recentActivity.slice(0, 5).map((a) => (
                   <li key={a.id} className="px-5 py-3 flex items-start gap-3">
                     <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
                     <div className="flex-1">
