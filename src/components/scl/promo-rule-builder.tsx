@@ -195,17 +195,35 @@ function ItemScopeEditor({
                 const rowChecked = isBrandScoped
                   ? scope.kind === "any-in-brand" && scope.brand === brandFilter
                   : scope.kind === "any";
+                const allFilteredSelected = filtered.length > 0 && filtered.every((it) => selected.includes(it.name));
                 return (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
-                      setOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-[13px] text-left hover:bg-muted ${rowChecked ? "text-primary font-medium" : ""}`}
-                  >
-                    {rowLabel} {rowChecked && <Check className="h-4 w-4" />}
-                  </button>
+                  <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted">
+                    <input
+                      type="checkbox"
+                      checked={allFilteredSelected}
+                      title="Select all items matching the current search/brand filter"
+                      className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                      onChange={() => {
+                        if (allFilteredSelected) {
+                          const next = selected.filter((name) => !filtered.some((it) => it.name === name));
+                          onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
+                        } else {
+                          const next = Array.from(new Set([...selected, ...filtered.map((it) => it.name)]));
+                          onChange({ kind: "specific", items: next });
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
+                        setOpen(false);
+                      }}
+                      className={`flex-1 min-w-0 flex items-center justify-between text-[13px] text-left ${rowChecked ? "text-primary font-medium" : ""}`}
+                    >
+                      {rowLabel} {rowChecked && <Check className="h-4 w-4" />}
+                    </button>
+                  </div>
                 );
               })()}
               <div className="my-1 border-t border-border" />
