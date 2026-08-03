@@ -396,6 +396,8 @@ function Dashboard() {
           <AveragesSection averages={averages} />
           <ConversionSection broadcast={broadcast} orders={orders} funnelRates={funnelRates} totalConversations={conversationsCount} />
 
+          <CrmLoyaltyAnalytics />
+
           {/* Activity + Conversations */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <SectionCard title="Recent Activity" className="lg:col-span-1">
