@@ -286,7 +286,7 @@ function TierMovementSankey() {
         stroke={color}
         strokeWidth={linkWidth}
         strokeOpacity={0.22}
-        onMouseEnter={() => setHover({ x: midX, y: midY, label: `${payload.source.tier} → ${payload.target.tier}`, value: payload.value })}
+        onMouseEnter={() => setHover({ x: midX, y: midY, label: `${TIER_LABEL[payload.source.tier]} → ${TIER_LABEL[payload.target.tier]}`, value: payload.value })}
         onMouseLeave={() => setHover(null)}
       />
     );
