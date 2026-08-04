@@ -59,16 +59,6 @@ const BUTTON_OPTIONS = [
   { value: "cta", label: "Call to Action", icon: <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" /> },
 ];
 
-// Promo codes mock (same data as promo-codes page)
-const PROMO_CODES_LIST = [
-  { id: "promo-1", code: "AROMA20", name: "20% Off All Brand" },
-  { id: "promo-2", code: "SISLEY150K", name: "Rp150.000 Off Sisley" },
-  { id: "promo-3", code: "BEAUTY10", name: "10% Off New Arrival" },
-  { id: "promo-4", code: "RIMMEL50K", name: "Rimmel Rp50.000 Cashback" },
-  { id: "promo-5", code: "DGVIP25", name: "VIP D&G 25% Off" },
-  { id: "promo-6", code: "BIRTHDAY30", name: "30% Birthday Gift" },
-];
-
 function CreateTemplatePage() {
   const navigate = useNavigate();
   const { groups } = useTemplatesStore();
