@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { SectionCard } from "@/components/scl/app-shell";
 import {
@@ -7,8 +7,9 @@ import {
   type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import {
-  LOYALTY_TIERS, TIER_COLOR, DATE_RANGE_OPTIONS, TIER_DISTRIBUTION, TIER_MOVEMENT,
-  UPGRADE_JOURNEY, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS, ADVOCACY_REVENUE, REFERRAL_QUALITY,
+  LOYALTY_TIERS, TIER_COLOR, DATE_RANGE_PRESETS, CUSTOM_RANGE_MIN, CUSTOM_RANGE_MAX, resolveMonthsBack,
+  TIER_DISTRIBUTION, TIER_MOVEMENT, upgradeJourney, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS,
+  advocacyRevenue, REFERRAL_QUALITY,
   newMembersKpi, tierUpgradeRateKpi, repeatPurchaseRateKpi, referralConversionRateKpi,
   pointsRedemptionRateKpi, pointsSummary, benefitUsage, referralFunnel, topAdvocates,
   type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
@@ -25,14 +26,22 @@ import {
 /**
  * CRM & Loyalty Program Analytics — a dedicated dashboard-within-the-
  * dashboard on the Overview page, boxed as one card like every other
- * Overview section. Deliberately self-contained (own Global Filter row,
- * own KPI strip, own 3 sub-sections) so it never repeats a metric that's
- * already covered by the Overview page's existing sections above it — see
- * loyalty-metrics.ts for the data behind every number here.
+ * Overview section, with each of its 3 sub-sections boxed again inside it
+ * so they read as distinct panels rather than bleeding into each other.
+ * Deliberately self-contained (own Global Filter row, own KPI strip) so it
+ * never repeats a metric that's already covered by the Overview page's
+ * existing sections above it — see loyalty-metrics.ts for the data behind
+ * every number here, and for which metrics are genuine rates (tier-scoped
+ * only) vs. counts (scaled by the Date Range filter too).
  */
 
 const STATUS_COLORS = { maintained: "#10b981", gracePeriod: "#f59e0b", atRisk: "#f97316", decayed: "#f43f5e" };
 const TOP_ADVOCATES_LIMIT = 5;
+const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function fmtShortDate(iso: string) {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
+}
 
 // ── Sparkline — tiny trend chart embedded in a KPI card. ────────────────
 function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
@@ -47,60 +56,107 @@ function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
   );
 }
 
-// ── A titled sub-block inside the outer card — mirrors the "Sales Trend" /
-// "Qty Sold — by Brand" nesting pattern OrdersSection already uses, one
-// level deeper (Tier Overview / Points & Benefits / Referral & Advocacy
-// each bundle several of those inner blocks). ───────────────────────────
-function SubSection({ title, children }: { title?: string; children: ReactNode }) {
-  if (!title) return <>{children}</>;
+// ── A boxed, titled sub-block inside the outer card — keeps Tier Overview /
+// Points & Benefits / Referral & Advocacy visually distinct instead of
+// bleeding into each other. ──────────────────────────────────────────────
+function SubSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-border">
-      <div className="px-5 pt-4 pb-1">
-        <div className="text-sm font-semibold">{title}</div>
-      </div>
-      {children}
+    <div className="p-4">
+      <div className="text-sm font-semibold mb-3 px-1">{title}</div>
+      <div className="rounded-xl border border-border overflow-hidden">{children}</div>
     </div>
   );
 }
 
-// ── Custom select — native <select> with a custom chevron (matches the
-// rest of the app's dropdown styling instead of the browser default). ───
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { label: string; value: string }[] }) {
+// ── Date Range control — presets + a Custom start/end popover, matching
+// the Overview page's own DateRangePopover pattern. ──────────────────────
+function DateRangeControl({
+  window, onSelectPreset, customRange, onCustomChange,
+}: {
+  window: DateRangeFilter;
+  onSelectPreset: (w: DateRangeFilter) => void;
+  customRange: { start: string; end: string } | null;
+  onCustomChange: (patch: Partial<{ start: string; end: string }>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const label = window === "custom"
+    ? (customRange ? `${fmtShortDate(customRange.start)} – ${fmtShortDate(customRange.end)}` : "Custom Range")
+    : (DATE_RANGE_PRESETS.find((p) => p.value === window)?.label ?? "Rolling 12 Months");
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="h-8 inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 pl-2.5 pr-2 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors"
+      >
+        <span className="max-w-[160px] truncate">{label}</span>
+        <ChevronDown className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-right">
+          <div className="space-y-0.5">
+            {DATE_RANGE_PRESETS.map((p) => (
+              <button
+                key={String(p.value)}
+                type="button"
+                onClick={() => { onSelectPreset(p.value); setOpen(false); }}
+                className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
+                  window === p.value ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <div className="my-2 border-t border-border" />
+          <div className="px-1 pb-1 space-y-1.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">Custom Range</div>
+            <input
+              type="date"
+              value={customRange?.start ?? ""}
+              min={CUSTOM_RANGE_MIN}
+              max={customRange?.end ?? CUSTOM_RANGE_MAX}
+              onChange={(e) => { if (e.target.value) onCustomChange({ start: e.target.value }); }}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+            <input
+              type="date"
+              value={customRange?.end ?? ""}
+              min={customRange?.start ?? CUSTOM_RANGE_MIN}
+              max={CUSTOM_RANGE_MAX}
+              onChange={(e) => { if (e.target.value) onCustomChange({ end: e.target.value }); }}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Tier filter — plain select with a custom chevron. ────────────────────
+function TierSelect({ value, onChange }: { value: TierFilter; onChange: (v: TierFilter) => void }) {
   return (
     <div className="relative">
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value as TierFilter)}
         className="h-8 appearance-none rounded-md border border-border bg-card/60 pl-2.5 pr-7 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
       >
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        <option value="All">All Tier</option>
+        {LOYALTY_TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
       </select>
       <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-    </div>
-  );
-}
-
-// ── Global Filter row — Date Range (rolling window or All Time) and Tier.
-// Top Advocates' leaderboard window now follows the same Date Range
-// filter instead of its own separate control. ───────────────────────────
-function GlobalFilterBar({
-  window, setWindow, tier, setTier,
-}: {
-  window: DateRangeFilter; setWindow: (w: DateRangeFilter) => void;
-  tier: TierFilter; setTier: (t: TierFilter) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <FilterSelect
-        value={String(window)}
-        onChange={(v) => setWindow((v === "all" ? "all" : Number(v)) as DateRangeFilter)}
-        options={DATE_RANGE_OPTIONS.map((o) => ({ label: o.label, value: String(o.value) }))}
-      />
-      <FilterSelect
-        value={tier}
-        onChange={(v) => setTier(v as TierFilter)}
-        options={[{ label: "All Tier", value: "All" }, ...LOYALTY_TIERS.map((t) => ({ label: t, value: t }))]}
-      />
     </div>
   );
 }
@@ -271,12 +327,12 @@ function TierMovementSankey() {
 }
 
 // ── 1c. Upgrade Journey — Stat Card + Detail Table ───────────────────────
-function UpgradeJourney() {
+function UpgradeJourney({ data }: { data: ReturnType<typeof upgradeJourney> }) {
   return (
     <div className="p-4 space-y-3">
       <div className="grid grid-cols-2 gap-3 stagger">
-        <MetricStat icon={ArrowUpRight} label="Total Upgrades" value={fmtNum(UPGRADE_JOURNEY.totalUpgrades)} info="Number of members who moved up a tier in the last review cycle." />
-        <MetricStat icon={Clock3} label="Avg. Days to Upgrade" value={`${UPGRADE_JOURNEY.avgDaysToUpgrade}d`} info="Average time it takes a member to move up a tier." />
+        <MetricStat icon={ArrowUpRight} label="Total Upgrades" value={fmtNum(data.totalUpgrades)} info="Number of members who moved up a tier in the selected period." />
+        <MetricStat icon={Clock3} label="Avg. Days to Upgrade" value={`${data.avgDaysToUpgrade}d`} info="Average time it takes a member to move up a tier." />
       </div>
       <div className="rounded-lg border border-border overflow-hidden">
         <table className="w-full text-[12px]">
@@ -288,7 +344,7 @@ function UpgradeJourney() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border stagger">
-            {UPGRADE_JOURNEY.paths.map((p) => (
+            {data.paths.map((p) => (
               <tr key={p.path} className="hover:bg-muted/30 transition-colors duration-150">
                 <td className="px-3 py-2 font-medium">{p.path}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{fmtNum(p.count)}</td>
@@ -400,30 +456,27 @@ function BenefitEffectivenessTable() {
   );
 }
 
-// ── 3a. Top Advocates — Leaderboard (top 5, compact rows) ────────────────
+// ── 3a. Top Advocates — Leaderboard (top 5, photo cards) ─────────────────
+const RANK_COLOR = ["text-amber-500", "text-slate-400", "text-amber-700"];
 function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
   if (advocates.length === 0) {
     return <div className="text-center text-xs text-muted-foreground py-10">No advocates in this tier yet.</div>;
   }
-  const max = Math.max(...advocates.map((a) => a.referrals), 1);
   return (
-    <div className="p-4 space-y-1.5 stagger">
+    <div className="p-4 grid grid-cols-1 gap-2 stagger">
       {advocates.map((a, i) => (
-        <div key={a.contactId} className="flex items-center gap-2.5 rounded-lg border border-border bg-card/40 px-2.5 py-1.5 card-hover transition-all duration-300">
-          <span className={`text-[11px] w-4 shrink-0 text-center font-semibold ${i < 3 ? "text-primary" : "text-muted-foreground"}`}>{i + 1}</span>
-          <div className="h-6 w-6 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[10px] font-medium shrink-0">{a.avatar}</div>
+        <div key={a.contactId} className="flex items-center gap-3 rounded-xl border border-border bg-card/50 p-2.5 card-hover transition-all duration-300">
+          <span className={`text-[12px] w-4 shrink-0 text-center font-bold ${i < 3 ? RANK_COLOR[i] : "text-muted-foreground"}`}>{i + 1}</span>
+          <img src={a.photo} alt={a.name} loading="lazy" className="h-10 w-10 rounded-full object-cover border border-border shrink-0" />
           <div className="min-w-0 flex-1">
-            <div className="text-[12px] font-medium truncate leading-tight">{a.name}</div>
-            <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground leading-tight">
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: TIER_COLOR[a.tier] }} /> {a.tier}
+            <div className="text-[13px] font-medium truncate leading-tight">{a.name}</div>
+            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground leading-tight mt-0.5">
+              <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: TIER_COLOR[a.tier] }} /> {a.tier}
             </span>
           </div>
-          <div className="w-14 shrink-0 h-1 rounded-full bg-muted overflow-hidden hidden sm:block">
-            <div className="h-full rounded-full animate-grow-x" style={{ width: `${(a.referrals / max) * 100}%`, background: TIER_COLOR[a.tier] }} />
-          </div>
           <div className="text-right shrink-0">
-            <div className="text-[12px] font-semibold tabular-nums leading-tight">{a.referrals}</div>
-            <div className="text-[9px] text-muted-foreground leading-tight">{fmtIDR(a.revenue)}</div>
+            <div className="text-[13px] font-semibold tabular-nums leading-tight">{a.referrals} <span className="text-[9px] font-normal text-muted-foreground">refs</span></div>
+            <div className="text-[10px] text-muted-foreground leading-tight">{fmtIDR(a.revenue)}</div>
           </div>
         </div>
       ))}
@@ -435,17 +488,29 @@ function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
 export function CrmLoyaltyAnalytics() {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   const [window, setWindow] = useState<DateRangeFilter>(12);
+  const [customRange, setCustomRange] = useState<{ start: string; end: string } | null>(null);
   const [tier, setTier] = useState<TierFilter>("All");
 
-  const nm = useMemo(() => newMembersKpi(window, tier), [window, tier]);
-  const tu = useMemo(() => tierUpgradeRateKpi(window, tier), [window, tier]);
+  const monthsBack = useMemo(() => resolveMonthsBack(window, customRange), [window, customRange]);
+  const allTime = window === "all";
+
+  const selectPreset = (w: DateRangeFilter) => setWindow(w);
+  const onCustomChange = (patch: Partial<{ start: string; end: string }>) => {
+    setCustomRange((r) => ({ start: patch.start ?? r?.start ?? CUSTOM_RANGE_MIN, end: patch.end ?? r?.end ?? CUSTOM_RANGE_MAX }));
+    setWindow("custom");
+  };
+
+  const nm = useMemo(() => newMembersKpi(monthsBack, tier), [monthsBack, tier]);
+  const tu = useMemo(() => tierUpgradeRateKpi(monthsBack, tier), [monthsBack, tier]);
   const rpr = useMemo(() => repeatPurchaseRateKpi(tier), [tier]);
   const rcr = useMemo(() => referralConversionRateKpi(tier), [tier]);
-  const prr = useMemo(() => pointsRedemptionRateKpi(window, tier), [window, tier]);
-  const points = useMemo(() => pointsSummary(window), [window]);
-  const benefitUsageData = useMemo(() => benefitUsage(window), [window]);
-  const funnel = useMemo(() => referralFunnel(window), [window]);
-  const advocates = useMemo(() => topAdvocates(window, tier).slice(0, TOP_ADVOCATES_LIMIT), [window, tier]);
+  const prr = useMemo(() => pointsRedemptionRateKpi(monthsBack, tier), [monthsBack, tier]);
+  const points = useMemo(() => pointsSummary(monthsBack), [monthsBack]);
+  const benefitUsageData = useMemo(() => benefitUsage(monthsBack), [monthsBack]);
+  const funnel = useMemo(() => referralFunnel(monthsBack), [monthsBack]);
+  const advocates = useMemo(() => topAdvocates(monthsBack, allTime, tier).slice(0, TOP_ADVOCATES_LIMIT), [monthsBack, allTime, tier]);
+  const journey = useMemo(() => upgradeJourney(monthsBack), [monthsBack]);
+  const advocacy = useMemo(() => advocacyRevenue(monthsBack), [monthsBack]);
 
   const funnelStages: FunnelStage[] = funnel.map((s, i) => ({ label: s.label, value: s.value, color: BRAND_COLORS[i % BRAND_COLORS.length] }));
 
@@ -453,7 +518,12 @@ export function CrmLoyaltyAnalytics() {
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard
         title="CRM & Loyalty Program Analytics"
-        action={<GlobalFilterBar window={window} setWindow={setWindow} tier={tier} setTier={setTier} />}
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <DateRangeControl window={window} onSelectPreset={selectPreset} customRange={customRange} onCustomChange={onCustomChange} />
+            <TierSelect value={tier} onChange={setTier} />
+          </div>
+        }
       >
         {/* Top KPI Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
@@ -472,16 +542,17 @@ export function CrmLoyaltyAnalytics() {
             icon={ArrowUpCircle}
             label="Tier Upgrade Rate"
             value={fmtPct(tu.value)}
+            sub={tu.hasPreviousPeriod ? `${tu.deltaPct >= 0 ? "+" : ""}${(tu.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range"}
+            accent={tu.hasPreviousPeriod ? (tu.deltaPct >= 0 ? "up" : "down") : undefined}
             info="Members who upgraded ÷ members eligible for review."
             spark={<Sparkline data={tu.spark} color="var(--chart-2)" />}
           />
           <MetricStat icon={Gift} label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
         </div>
 
-        {/* 1. Tier Overview — no visible sub-header; the two chart captions
-            underneath (Tier Distribution / Tier Movement) already label it. */}
-        <SubSection>
-          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
+        {/* 1. Tier Overview */}
+        <SubSection title="Tier Overview">
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
                 Tier Distribution <InfoHint text="Member count in each tier." />
@@ -500,7 +571,7 @@ export function CrmLoyaltyAnalytics() {
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
                 Upgrade Journey <InfoHint text="The most common upgrade paths and the average time it takes to move up a tier." />
               </div>
-              <UpgradeJourney />
+              <UpgradeJourney data={journey} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
@@ -541,7 +612,7 @@ export function CrmLoyaltyAnalytics() {
 
         {/* 3. Referral & Advocacy */}
         <SubSection title="Referral & Advocacy">
-          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
                 Referral Funnel <InfoHint text="Referral performance at each stage of the funnel." />
@@ -556,9 +627,9 @@ export function CrmLoyaltyAnalytics() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
-            <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(ADVOCACY_REVENUE.revenueFromReferral)} info="Total revenue contributed through referrals." />
-            <MetricStat icon={Wallet} label="Referral CLV" value={fmtIDR(ADVOCACY_REVENUE.referralCLV)} info="Average lifetime value of a referred customer." />
-            <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(ADVOCACY_REVENUE.referralAOV)} info="Average order value of a referred customer." />
+            <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(advocacy.revenueFromReferral)} info="Total revenue contributed through referrals in the selected period." />
+            <MetricStat icon={Wallet} label="Referral CLV" value={fmtIDR(advocacy.referralCLV)} info="Average lifetime value of a referred customer." />
+            <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(advocacy.referralAOV)} info="Average order value of a referred customer." />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
             <MetricStat icon={Repeat} label="Referred Repeat Purchase Rate" value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)} info="Repeat purchase rate among referred customers." />
