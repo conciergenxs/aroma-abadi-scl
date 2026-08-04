@@ -107,16 +107,14 @@ export function MetricStat({
         </div>
       </div>
       <div className="mt-2 flex items-end justify-between gap-2">
-        <div>
-          <div className={VALUE_LG}>{value}</div>
-          {sub && (
-            <div className={`mt-0.5 text-[11px] ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}>
-              {sub}
-            </div>
-          )}
-        </div>
+        <div className={VALUE_LG}>{value}</div>
         {spark && <div className="shrink-0">{spark}</div>}
       </div>
+      {sub && (
+        <div className={`mt-1 text-[11px] ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}>
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
