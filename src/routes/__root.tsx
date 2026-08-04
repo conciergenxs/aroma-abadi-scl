@@ -134,7 +134,8 @@ function RootComponent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const authed = window.localStorage.getItem("scl_authed") === "1";
-    if (!authed && pathname !== "/auth") {
+    const isPublicRoute = pathname === "/auth" || pathname === "/access-denied" || pathname === "/invite/set-password";
+    if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });
     }
   }, [pathname, router]);
