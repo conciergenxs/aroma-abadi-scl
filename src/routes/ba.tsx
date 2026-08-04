@@ -138,6 +138,7 @@ function BAPage() {
                 <Th>Gender</Th>
                 <Th>WA (Login)</Th>
                 <Th>Password</Th>
+                <Th>Area Coordinator</Th>
                 <Th>Position</Th>
                 <Th>Store · City</Th>
                 <Th>&nbsp;</Th>
