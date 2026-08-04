@@ -606,8 +606,8 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
   const disabledInput = "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 animate-fade-in">
-      <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
+      <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add SKU</div>
           <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
