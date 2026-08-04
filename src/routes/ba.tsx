@@ -36,6 +36,7 @@ function BAPage() {
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const [resetConfirm, setResetConfirm] = useState<BA | null>(null);
+  const [revealTarget, setRevealTarget] = useState<BA | null>(null);
 
   // Unique filter options
   const allStores = useMemo(() => [...new Set(bas.map((b) => b.store).filter(Boolean))].sort(), [bas]);
