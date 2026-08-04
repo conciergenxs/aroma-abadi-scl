@@ -8,7 +8,7 @@ type Props = {
   onSelect: (brand: Brand) => void;
 };
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
 
 /**
  * Large "select2-style" brand picker — same modal/search/pagination shell
