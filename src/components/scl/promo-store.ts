@@ -21,7 +21,11 @@ export type PromoCondition =
   | { kind: "any-purchase" }
   | { kind: "buy-item"; qty: number; item: PromoItemScope }
   | { kind: "min-spend"; amount: number }
-  | { kind: "first-purchase" };
+  | { kind: "first-purchase" }
+  // A referred customer redeems their referral code — the Y reward below
+  // is paid out to both sides of the referral (referrer + referred), not
+  // just the purchasing customer, see describePromoRule.
+  | { kind: "referral-usage" };
 
 // Y — what the customer gets
 export type PromoReward =
