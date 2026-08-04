@@ -222,8 +222,11 @@ export const TIER_MOVEMENT: TierFlow[] = [
   { from: "Gold", to: "Gold", value: 330 },
   { from: "Gold", to: "Platinum", value: 95 },
   { from: "Gold", to: "Silver", value: 55 },
-  { from: "Platinum", to: "Platinum", value: 122 },
+  { from: "Platinum", to: "Platinum", value: 108 },
+  { from: "Platinum", to: "Icon", value: 14 },
   { from: "Platinum", to: "Gold", value: 28 },
+  { from: "Icon", to: "Icon", value: 30 },
+  { from: "Icon", to: "Platinum", value: 4 },
 ];
 
 const UPGRADE_JOURNEY_BASE = {
