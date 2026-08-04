@@ -229,13 +229,13 @@ export const TIER_MOVEMENT: TierFlow[] = [
   { from: "Icon", to: "Platinum", value: 4 },
 ];
 
-const UPGRADE_JOURNEY_BASE = {
+const UPGRADE_JOURNEY_BASE: { avgDaysToUpgrade: number; paths: { from: LoyaltyTier; to: LoyaltyTier; count: number; avgDays: number }[] } = {
   avgDaysToUpgrade: 47, // an average time-to-upgrade, not a count — stays constant.
   paths: [
-    { from: "Bronze", to: "Silver", count: 320, avgDays: 38 } as const,
-    { from: "Silver", to: "Gold", count: 210, avgDays: 52 } as const,
-    { from: "Gold", to: "Platinum", count: 95, avgDays: 61 } as const,
-    { from: "Platinum", to: "Icon", count: 14, avgDays: 74 } as const,
+    { from: "Bronze", to: "Silver", count: 320, avgDays: 38 },
+    { from: "Silver", to: "Gold", count: 210, avgDays: 52 },
+    { from: "Gold", to: "Platinum", count: 95, avgDays: 61 },
+    { from: "Platinum", to: "Icon", count: 14, avgDays: 74 },
   ],
 };
 
