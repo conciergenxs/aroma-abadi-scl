@@ -191,20 +191,19 @@ function AuthPage() {
             )}
           </div>
 
-          {/* BA Login Form */}
+          {/* BA Login Form — Beauty Ambassadors don't get dashboard access;
+              a successful submit routes to /access-denied, not "/". */}
           {mode === "ba" && (
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
                 setError(null);
-                if (!email.trim()) return setError("Enter your WhatsApp number.");
+                if (!validatePhone(phone)) return setError("Enter your WhatsApp number.");
                 if (password.length < 4) return setError("Password must be at least 4 characters.");
                 setLoading(true);
                 await new Promise((r) => setTimeout(r, 700));
                 setLoading(false);
-                if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
-                toast.success("Welcome, Beauty Ambassador!");
-                navigate({ to: "/" });
+                navigate({ to: "/access-denied" });
               }}
               className="mt-6 space-y-4"
             >
@@ -213,8 +212,8 @@ function AuthPage() {
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     type="tel"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+62 812 3456 7890"
                     className={`${inputCls} pl-9`}
                     autoComplete="tel"
