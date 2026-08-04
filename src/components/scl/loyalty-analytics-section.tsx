@@ -250,7 +250,7 @@ function TierMovementSankey() {
     return (
       <g
         className="cursor-pointer"
-        onMouseEnter={() => setHover({ x: x + width / 2, y, label: `${payload.tier} · ${isStart ? "Start of Cycle" : "End of Cycle"}`, value: nodeTotal(payload.tier, payload.side) })}
+        onMouseEnter={() => setHover({ x: x + width / 2, y, label: `${TIER_LABEL[payload.tier]} · ${isStart ? "Start of Cycle" : "End of Cycle"}`, value: nodeTotal(payload.tier, payload.side) })}
         onMouseLeave={() => setHover(null)}
       >
         <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} rx={2} />
@@ -262,7 +262,7 @@ function TierMovementSankey() {
           fontSize={11}
           fill="var(--foreground)"
         >
-          {payload.tier}
+          {TIER_LABEL[payload.tier]}
         </text>
       </g>
     );
