@@ -136,8 +136,8 @@ function CreateTemplatePage() {
     });
   };
 
-  const insertBrand = (brandName: string) => {
-    insertVariable(`{{brands-${brandName}}}`);
+  const insertBrand = (brand: Brand) => {
+    insertVariable(`{{brands-${brand.name}}}`);
     setVarPopup(null);
   };
 
