@@ -461,7 +461,7 @@ export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange
             <ConditionEditor condition={rule.condition} onChange={(condition) => onChange({ ...rule, condition })} items={items} />
           </div>
           <div className="p-3">
-            <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} />
+            <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} bothSides={rule.condition.kind === "referral-usage"} />
           </div>
         </div>
       </div>
