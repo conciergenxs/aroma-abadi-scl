@@ -422,7 +422,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
                   type="button"
                   onClick={() => {
                     setSpinning(true);
-                    setPassword(baStore.generatePassword());
+                    setPassword(baStore.generatePassword(areaCoordinator, name));
                     setTimeout(() => setSpinning(false), 420);
                   }}
                   className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
