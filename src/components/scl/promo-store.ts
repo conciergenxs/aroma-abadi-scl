@@ -78,6 +78,7 @@ function describeCondition(c: PromoCondition): string {
     case "buy-item": return `Buy ${c.qty} ${scopeLabel(c.item)}`;
     case "min-spend": return `Spend min. ${fmtIDR(c.amount)}`;
     case "first-purchase": return "Customer's First Purchase";
+    case "referral-usage": return "Referral Usage";
   }
 }
 
