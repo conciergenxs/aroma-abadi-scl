@@ -254,7 +254,7 @@ function AudienceSegmentPicker({
             </button>
             <div className="my-1 border-t border-border" />
             {audiences.length === 0 ? (
-              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">No audiences yet — create one on the Contacts page</p>
+              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">No audiences yet — create one below</p>
             ) : (
               audiences.map((a) => {
                 const checked = selectedIds.includes(a.id);
@@ -271,6 +271,15 @@ function AudienceSegmentPicker({
                 );
               })
             )}
+            <div className="my-1 border-t border-border" />
+            <Link
+              to="/contacts/audience/new"
+              target="_blank"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-[13px] text-primary hover:bg-muted transition-colors duration-150"
+            >
+              <Plus className="h-3.5 w-3.5 shrink-0" /> Create New Audience
+            </Link>
           </div>
         </>
       )}
