@@ -144,19 +144,23 @@ function Field({
 const inputCls =
   "h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-xs placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/40";
 
-function EmailTab({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState("");
+function WhatsAppTab({ onClose }: { onClose: () => void }) {
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState("Member");
   return (
     <div className="space-y-3">
-      <Field label="Email address" required>
-        <input
-          autoFocus
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="teammate@company.com"
-          className={inputCls}
-        />
+      <Field label="WhatsApp number" required>
+        <div className="relative">
+          <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            autoFocus
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+62 812 3456 7890"
+            className={`${inputCls} pl-8`}
+          />
+        </div>
       </Field>
       <Field label="Role">
         <select value={role} onChange={(e) => setRole(e.target.value)} className={inputCls}>
@@ -171,8 +175,8 @@ function EmailTab({ onClose }: { onClose: () => void }) {
         </button>
         <button
           onClick={() => {
-            if (!email) return toast.error("Email is required");
-            toast.success(`Invitation sent to ${email}`);
+            if (!phone.trim()) return toast.error("WhatsApp number is required");
+            toast.success(`Invitation sent to ${phone} via WhatsApp`);
             onClose();
           }}
           className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
@@ -180,31 +184,6 @@ function EmailTab({ onClose }: { onClose: () => void }) {
           <UserPlus className="h-3.5 w-3.5" /> Send Invitation
         </button>
       </div>
-    </div>
-  );
-}
-
-function LinkTab() {
-  const [link] = useState("https://scl.app/join/wks_8c2a-aria?invite=k29df1");
-  return (
-    <div className="space-y-3">
-      <Field label="Shareable invite link" hint="Anyone with this link can join as a Member. Link expires in 7 days.">
-        <div className="flex gap-2">
-          <input readOnly value={link} className={`${inputCls} font-mono`} />
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(link);
-              toast.success("Link copied to clipboard");
-            }}
-            className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 transition-colors duration-150"
-          >
-            <CopyIcon className="h-3.5 w-3.5" /> Copy
-          </button>
-        </div>
-      </Field>
-      <button className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-150">
-        <RefreshCw className="h-3 w-3" /> Regenerate link
-      </button>
     </div>
   );
 }
