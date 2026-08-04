@@ -235,6 +235,7 @@ const UPGRADE_JOURNEY_BASE = {
     { path: "Bronze → Silver", count: 320, avgDays: 38 },
     { path: "Silver → Gold", count: 210, avgDays: 52 },
     { path: "Gold → Platinum", count: 95, avgDays: 61 },
+    { path: "Platinum → Icon", count: 14, avgDays: 74 },
   ],
 };
 
