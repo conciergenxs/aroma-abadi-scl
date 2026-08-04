@@ -274,7 +274,6 @@ function AudienceSegmentPicker({
             <div className="my-1 border-t border-border" />
             <Link
               to="/contacts/audience/new"
-              target="_blank"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-[13px] text-primary hover:bg-muted transition-colors duration-150"
             >
