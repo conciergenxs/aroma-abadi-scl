@@ -35,7 +35,7 @@ import {
  * only) vs. counts (scaled by the Date Range filter too).
  */
 
-const STATUS_COLORS = { maintained: "#10b981", gracePeriod: "#f59e0b", atRisk: "#f97316", decayed: "#f43f5e" };
+const STATUS_COLORS = { maintained: "#10b981", gracePeriod: "#f59e0b", decayed: "#f43f5e" };
 const TOP_ADVOCATES_LIMIT = 5;
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function fmtShortDate(iso: string) {
