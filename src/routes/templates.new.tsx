@@ -62,7 +62,6 @@ const BUTTON_OPTIONS = [
 function CreateTemplatePage() {
   const navigate = useNavigate();
   const { groups } = useTemplatesStore();
-  const { brands } = useSkuStore();
 
   // Variable popup state
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
