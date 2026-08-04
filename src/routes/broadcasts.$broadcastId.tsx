@@ -319,11 +319,11 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 stagger">
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <div key={k.l} className="rounded-xl border border-border bg-card/60 p-5 glass">
+            <div key={k.l} className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">{k.l}</div>
                 <Icon className={`h-3.5 w-3.5 ${k.color}`} />
