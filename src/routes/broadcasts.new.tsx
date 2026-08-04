@@ -796,10 +796,10 @@ function AudienceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl max-h-[88vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="w-full max-w-2xl max-h-[88vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
       >
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex items-center gap-2">
