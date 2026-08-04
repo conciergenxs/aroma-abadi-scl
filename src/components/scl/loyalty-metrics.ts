@@ -336,6 +336,7 @@ export function topAdvocates(monthsBack: number, allTime: boolean, tier: TierFil
       return {
         contactId: a.contactId,
         name: contact?.name ?? "Unknown",
+        phone: contact?.phone ?? "",
         photo: a.photo,
         tier: a.tier,
         referrals: allTime ? a.referrals.allTime : scaleToWindow(a.referrals.rolling12m, monthsBack),
