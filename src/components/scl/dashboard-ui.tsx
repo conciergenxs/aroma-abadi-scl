@@ -94,17 +94,19 @@ export function InfoHint({ text }: { text: string }) {
 // chart (e.g. <Sparkline/>) to the right of the value. ─────────────────────
 export function MetricStat({
   icon: Icon, label, value, sub, info, spark, accent,
-}: { icon: React.ElementType; label: string; value: string; sub?: string; info: string; spark?: ReactNode; accent?: "up" | "down" }) {
+}: { icon?: React.ElementType; label: string; value: string; sub?: string; info: string; spark?: ReactNode; accent?: "up" | "down" }) {
   return (
     <div className="card-hover rounded-xl border border-border bg-card/60 p-4 glass relative overflow-hidden transition-all duration-300">
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
           {label}
           <InfoHint text={info} />
         </span>
-        <div className="h-6 w-6 shrink-0 grid place-items-center rounded-md bg-white/[0.04] border border-border">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-        </div>
+        {Icon && (
+          <div className="h-6 w-6 shrink-0 grid place-items-center rounded-md bg-white/[0.04] border border-border">
+            <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+        )}
       </div>
       <div className="mt-2 flex items-end justify-between gap-2">
         <div className={VALUE_LG}>{value}</div>
