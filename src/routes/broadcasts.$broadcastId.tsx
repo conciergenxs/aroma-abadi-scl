@@ -529,7 +529,7 @@ function ContactStatusBadge({ status }: { status: ContactRowStatus }) {
     Failed: "border-red-500/30 bg-red-500/10 text-red-300",
   };
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}>
+    <span className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}>
       {status}
     </span>
   );
