@@ -300,10 +300,10 @@ export const BENEFIT_EFFECTIVENESS: { benefit: string; repeatPurchaseUplift: num
 
 // ── 3. Referral & Advocacy ───────────────────────────────────────────────
 const REFERRAL_FUNNEL_BASE = [
-  { label: "Referral Shared", value: 5400 },
+  { label: "Referral Generated", value: 5400 },
   { label: "Referral Clicked", value: 3160 },
   { label: "Referral Registered", value: 1780 },
-  { label: "Successful Referral", value: 1296 },
+  { label: "Referral Purchase", value: 1296 },
 ];
 
 export function referralFunnel(monthsBack: number) {
