@@ -143,6 +143,13 @@ function AuthPage() {
             )}
             {mode === "ba" && (
               <>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signin"); setError(null); }}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
+                >
+                  <ArrowLeft className="h-3 w-3" /> Back to Sign In
+                </button>
                 <h2 className="text-2xl font-semibold tracking-tight">Beauty Ambassador Login</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Sign in with your WhatsApp number and password.
