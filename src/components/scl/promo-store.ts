@@ -100,7 +100,10 @@ function describeReward(r: PromoReward): string {
 }
 
 export function describePromoRule(rule: PromoRule): string {
-  return `${describeCondition(rule.condition)} → ${describeReward(rule.reward)}`;
+  const rewardText = rule.condition.kind === "referral-usage"
+    ? describeReward(rule.reward).replace(/^Get /, "Referrer & Referred Both Get ")
+    : describeReward(rule.reward);
+  return `${describeCondition(rule.condition)} → ${rewardText}`;
 }
 
 // ── Redemption + ownership model ───────────────────────────────────────────────
