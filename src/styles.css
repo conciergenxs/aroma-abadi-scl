@@ -254,8 +254,18 @@
 
 /* ---- Page & Layout ---- */
 
+/* No `both`/`forwards` fill-mode here on purpose: it would leave a
+ * permanent non-`none` `transform` (translateY(0)) on <main> once the
+ * animation ends, which — per spec — turns <main> into a containing block
+ * for every `position: fixed` descendant (every hand-rolled modal in the
+ * app lives inside <main>). That silently clipped every full-screen modal
+ * backdrop to the content area instead of covering the sidebar/navbar too.
+ * <main> has no other opacity/transform rule, so its default fill-mode
+ * end state (opacity: 1, transform: none) already matches the "to"
+ * keyframe visually — dropping the fill-mode removes the lingering
+ * transform without changing how the animation looks. */
 .page-enter {
-  animation: page-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ---- Stagger lists ---- */
