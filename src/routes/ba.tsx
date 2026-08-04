@@ -69,12 +69,12 @@ function BAPage() {
     setPage(1);
   }
 
-  function toggleReveal(id: string) {
-    setRevealed((s) => {
-      const n = new Set(s);
-      if (n.has(id)) n.delete(id); else n.add(id);
-      return n;
-    });
+  function toggleReveal(b: BA) {
+    if (revealed.has(b.id)) {
+      setRevealed((s) => { const n = new Set(s); n.delete(b.id); return n; });
+      return;
+    }
+    setRevealTarget(b);
   }
 
   function brandNames(ids: string[]) {
