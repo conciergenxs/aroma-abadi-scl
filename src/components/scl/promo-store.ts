@@ -46,6 +46,7 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
     case "buy-item": return { kind, qty: 1, item: { kind: "any" } };
     case "min-spend": return { kind, amount: 500000 };
     case "first-purchase": return { kind };
+    case "referral-usage": return { kind };
   }
 }
 
