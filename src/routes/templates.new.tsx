@@ -30,8 +30,6 @@ import {
   ExternalLink,
   MessageSquare,
   ChevronRight,
-  X as XIcon,
-  Tag,
   Check,
   Phone,
 } from "lucide-react";
