@@ -370,7 +370,7 @@ function Dashboard() {
   return (
     <TooltipProvider delayDuration={150}>
       <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
-        <div className="space-y-5">
+        <div className="space-y-5 pb-[50px]">
 
           {/* Header row */}
           <div className="flex items-center justify-between gap-4">
