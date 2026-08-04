@@ -1,11 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { AI_AGENTS, type AIAgent } from "@/components/scl/agents";
+import whatsappAsset from "@/assets/whatsapp.png";
 import {
   Bot,
-  Copy as CopyIcon,
-  Link as LinkIcon,
-  Mail,
+  Phone,
   RefreshCw,
   UserPlus,
   X as XIcon,
