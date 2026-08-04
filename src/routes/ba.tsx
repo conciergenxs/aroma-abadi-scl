@@ -186,7 +186,7 @@ function BAPage() {
                 );
               })}
               {paginated.length === 0 && (
-                <tr><td colSpan={8} className="text-center py-10 text-muted-foreground text-sm">No Beauty Ambassadors found</td></tr>
+                <tr><td colSpan={9} className="text-center py-10 text-muted-foreground text-sm">No Beauty Ambassadors found</td></tr>
               )}
             </tbody>
           </table>
