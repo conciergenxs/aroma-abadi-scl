@@ -318,6 +318,7 @@ const TOP_ADVOCATES_SEED: AdvocateSeed[] = [
 export type Advocate = {
   contactId: string;
   name: string;
+  phone: string;
   photo: string;
   tier: LoyaltyTier;
   referrals: number;
