@@ -88,7 +88,7 @@ export function ConfirmDialog({
               onConfirm();
               onClose();
             }}
-            className={`inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold ${
+            className={`inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold transition-colors duration-150 active:scale-[0.97] ${
               isDestructive
                 ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
