@@ -92,7 +92,7 @@ export const baStore = {
   add(input: Omit<BA, "id" | "password"> & { password?: string }) {
     const ba: BA = {
       id: `ba-${Date.now()}`,
-      password: input.password || genPassword(),
+      password: input.password || genPassword(input.areaCoordinator, input.name),
       ...input,
     };
     state = { ...state, bas: [ba, ...state.bas] };
@@ -108,7 +108,8 @@ export const baStore = {
     emit();
   },
   regeneratePassword(id: string) {
-    const pw = genPassword();
+    const ba = state.bas.find((b) => b.id === id);
+    const pw = genPassword(ba?.areaCoordinator ?? "", ba?.name ?? "");
     state = { ...state, bas: state.bas.map((b) => (b.id === id ? { ...b, password: pw } : b)) };
     emit();
     return pw;
