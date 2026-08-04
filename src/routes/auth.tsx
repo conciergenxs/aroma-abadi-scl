@@ -291,19 +291,37 @@ function AuthPage() {
                 </>
               )}
 
-              <Field label="Email Address">
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    className={`${inputCls} pl-9`}
-                    autoComplete="email"
-                  />
-                </div>
-              </Field>
+              {(mode === "signin" || mode === "signup") && (
+                <Field label="Phone Number">
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+62 812 3456 7890"
+                      className={`${inputCls} pl-9`}
+                      autoComplete="tel"
+                    />
+                  </div>
+                </Field>
+              )}
+
+              {(mode === "forgot" || mode === "signup") && (
+                <Field label={mode === "signup" ? "Email Address (Optional)" : "Email Address"}>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      className={`${inputCls} pl-9`}
+                      autoComplete="email"
+                    />
+                  </div>
+                </Field>
+              )}
 
               {mode !== "forgot" && (
                 <Field
