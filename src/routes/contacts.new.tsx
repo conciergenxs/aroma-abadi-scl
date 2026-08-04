@@ -244,6 +244,9 @@ function NewContactPage() {
                     <Field label="Position" required>
                       <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Select position…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
                     </Field>
+                    <Field label="Area Coordinator (ARCO)" required>
+                      <Input value={areaCoordinator} onChange={setAreaCoordinator} placeholder="Bagas Wirawan" />
+                    </Field>
                   </FormGrid>
                 </FormSection>
 
