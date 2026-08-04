@@ -142,8 +142,8 @@ function CreateTemplatePage() {
     setVarPopup(null);
   };
 
-  const insertPromo = (code: string) => {
-    insertVariable(`{{promo-${code}}}`);
+  const insertPromo = (promo: PromoCode) => {
+    insertVariable(`{{promo-${promo.code}}}`);
     setVarPopup(null);
   };
 
