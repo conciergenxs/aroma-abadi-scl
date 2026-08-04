@@ -448,6 +448,17 @@ function CreateTemplatePage() {
           </div>
         </div>
       </div>
+
+      <BrandPicker
+        open={varPopup === "brands"}
+        onClose={() => setVarPopup(null)}
+        onSelect={insertBrand}
+      />
+      <PromoCodePicker
+        open={varPopup === "promo"}
+        onClose={() => setVarPopup(null)}
+        onSelect={insertPromo}
+      />
     </AppShell>
   );
 }
