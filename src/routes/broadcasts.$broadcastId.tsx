@@ -507,7 +507,7 @@ function hash(s: string) {
 function StatusBadge({ status }: { status: Broadcast["status"] }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
         status === "Sent"
           ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
           : status === "Scheduled"
