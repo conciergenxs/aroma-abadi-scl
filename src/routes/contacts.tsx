@@ -413,8 +413,8 @@ function ContactsPage() {
         const inAudCount = contacts.filter(c => c.listIds.includes(audienceModalId)).length;
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50" onClick={() => { setAudienceModalId(null); setInfoContact(null); }} />
-            <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-2xl p-5 space-y-4">
+            <div className="absolute inset-0 bg-black/50 modal-backdrop" onClick={() => { setAudienceModalId(null); setInfoContact(null); }} />
+            <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-2xl p-5 space-y-4 modal-content">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-semibold">{aud.name}</h2>
