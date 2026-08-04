@@ -47,6 +47,7 @@ function NewContactPage() {
   // BA-specific
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [position, setPosition] = useState("");
+  const [areaCoordinator, setAreaCoordinator] = useState("");
   const [city, setCity] = useState("");
   const [store, setStore] = useState("");
 
