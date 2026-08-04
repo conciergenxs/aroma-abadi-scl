@@ -135,6 +135,17 @@ function ItemScopeEditor({
     scope.kind === "any-in-brand" ? `${anyLabel} (${scope.brand})` :
     selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
 
+  const isBrandScoped = brandFilter !== "all";
+  const rowChecked = isBrandScoped
+    ? scope.kind === "any-in-brand" && scope.brand === brandFilter
+    : scope.kind === "any";
+  const noSearch = !search.trim();
+  // "Any Item [in Brand]" covers every item in the current filter as long
+  // as nothing's narrowing it further with a search — so every row below
+  // should read as checked too, without actually rewriting the rule into
+  // a giant explicit list.
+  const impliedByAny = rowChecked && noSearch;
+
   return (
     <>
       <button
