@@ -323,7 +323,7 @@ type AdvocateSeed = {
 };
 
 const TOP_ADVOCATES_SEED: AdvocateSeed[] = [
-  { contactId: "c16", tier: "Platinum", photo: "https://i.pravatar.cc/150?img=47", referrals: { rolling12m: 14, allTime: 22 }, revenue: { rolling12m: 18_200_000, allTime: 29_400_000 } },
+  { contactId: "c16", tier: "Icon", photo: "https://i.pravatar.cc/150?img=47", referrals: { rolling12m: 14, allTime: 22 }, revenue: { rolling12m: 18_200_000, allTime: 29_400_000 } },
   { contactId: "c6", tier: "Platinum", photo: "https://i.pravatar.cc/150?img=32", referrals: { rolling12m: 12, allTime: 19 }, revenue: { rolling12m: 15_600_000, allTime: 25_100_000 } },
   { contactId: "c11", tier: "Gold", photo: "https://i.pravatar.cc/150?img=13", referrals: { rolling12m: 10, allTime: 17 }, revenue: { rolling12m: 12_400_000, allTime: 21_800_000 } },
   { contactId: "c1", tier: "Gold", photo: "https://i.pravatar.cc/150?img=45", referrals: { rolling12m: 9, allTime: 14 }, revenue: { rolling12m: 11_100_000, allTime: 17_900_000 } },
