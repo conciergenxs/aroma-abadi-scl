@@ -192,7 +192,7 @@ function TierDonut({ tierFilter }: { tierFilter: TierFilter }) {
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center animate-fade-in">
             <div className="text-xl font-semibold stat-value">{fmtNum(centerValue)}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{tierFilter === "All" ? "Total Members" : tierFilter}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{tierFilter === "All" ? "Total Members" : TIER_LABEL[tierFilter]}</div>
           </div>
         </div>
       </div>
