@@ -248,12 +248,15 @@ export function upgradeJourney(monthsBack: number) {
   };
 }
 
-export type MaintenanceRow = { tier: LoyaltyTier; maintained: number; gracePeriod: number; atRisk: number; decayed: number };
+// "At Risk" was folded into "Decayed" — a member either maintained their
+// tier, is in a grace period, or has decayed; no separate at-risk bucket.
+export type MaintenanceRow = { tier: LoyaltyTier; maintained: number; gracePeriod: number; decayed: number };
 export const TIER_MAINTENANCE: MaintenanceRow[] = [
-  { tier: "Bronze", maintained: 1180, gracePeriod: 140, atRisk: 60, decayed: 40 },
-  { tier: "Silver", maintained: 640, gracePeriod: 110, atRisk: 45, decayed: 25 },
-  { tier: "Gold", maintained: 330, gracePeriod: 60, atRisk: 20, decayed: 12 },
-  { tier: "Platinum", maintained: 122, gracePeriod: 15, atRisk: 6, decayed: 2 },
+  { tier: "Bronze", maintained: 1180, gracePeriod: 140, decayed: 100 },
+  { tier: "Silver", maintained: 640, gracePeriod: 110, decayed: 70 },
+  { tier: "Gold", maintained: 330, gracePeriod: 60, decayed: 32 },
+  { tier: "Platinum", maintained: 108, gracePeriod: 14, decayed: 8 },
+  { tier: "Icon", maintained: 30, gracePeriod: 3, decayed: 1 },
 ];
 
 // ── 2. Points & Benefits ─────────────────────────────────────────────────
