@@ -380,12 +380,12 @@ function ConditionEditor({ condition, onChange, items }: { condition: PromoCondi
   );
 }
 
-function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: SkuItem[] }) {
+function RewardEditor({ reward, onChange, items, bothSides = false }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: SkuItem[]; bothSides?: boolean }) {
   return (
     <div className="space-y-2">
       <Segmented options={REWARD_OPTIONS} value={reward.kind} onChange={(kind) => onChange(defaultReward(kind))} />
       <div key={reward.kind} className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in">
-        <span className="text-muted-foreground">Get</span>
+        <span className="text-muted-foreground">{bothSides ? "Referrer & Referred both get" : "Get"}</span>
         {reward.kind === "free-item" && (
           <>
             <InlineNumber value={reward.qty} onChange={(v) => onChange({ ...reward, qty: v })} />
