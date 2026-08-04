@@ -25,6 +25,7 @@ const CONDITION_OPTIONS: { kind: PromoCondition["kind"]; label: string }[] = [
   { kind: "buy-item", label: "Buy Item(s)" },
   { kind: "min-spend", label: "Minimum Spend" },
   { kind: "first-purchase", label: "First Purchase" },
+  { kind: "referral-usage", label: "Referral Usage" },
 ];
 
 const REWARD_OPTIONS: { kind: PromoReward["kind"]; label: string }[] = [
