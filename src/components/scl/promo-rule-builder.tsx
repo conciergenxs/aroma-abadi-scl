@@ -251,7 +251,10 @@ function ItemScopeEditor({
               ) : (
                 <div className="stagger">
                   {filtered.map((it) => {
-                    const checked = selected.includes(it.name);
+                    // Covered by the active "Any Item [in Brand]" rule —
+                    // shows checked like every other row, without this
+                    // item actually being in an explicit list.
+                    const checked = impliedByAny || selected.includes(it.name);
                     return (
                       <label key={`${it.brand}::${it.name}`} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150">
                         <input
@@ -259,6 +262,14 @@ function ItemScopeEditor({
                           checked={checked}
                           className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
                           onChange={() => {
+                            if (impliedByAny) {
+                              // Opting this one item out of "Any Item [in
+                              // Brand]" — keep everything else in the
+                              // current filter explicitly selected.
+                              const next = filtered.filter((x) => x.name !== it.name).map((x) => x.name);
+                              onChange({ kind: "specific", items: next });
+                              return;
+                            }
                             const next = checked ? selected.filter((x) => x !== it.name) : [...selected, it.name];
                             onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
                           }}
