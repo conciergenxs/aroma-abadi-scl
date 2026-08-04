@@ -259,7 +259,7 @@ const BENEFIT_USAGE_BASE: { benefit: string; count: number }[] = [
   { benefit: "Free Shipping Voucher", count: 4820 },
   { benefit: "Birthday Gift", count: 2150 },
   { benefit: "Exclusive Product Access", count: 1380 },
-  { benefit: "Priority Customer Service", count: 940 },
+  { benefit: "Priority Support", count: 940 },
 ];
 
 export function benefitUsage(monthsBack: number) {
