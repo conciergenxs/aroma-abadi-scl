@@ -8,6 +8,7 @@ const CONDITION_CODE: Record<PromoCondition["kind"], string> = {
   "buy-item": "BUY",
   "min-spend": "SPD",
   "first-purchase": "1ST",
+  "referral-usage": "REF",
 };
 
 const REWARD_CODE: Record<PromoReward["kind"], string> = {
