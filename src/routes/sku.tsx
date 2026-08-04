@@ -559,10 +559,10 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <form
         onSubmit={(e) => { e.preventDefault(); if (!name.trim()) return; const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined }); toast.success("Brand added"); onCreated(b); }}
-        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden"
+        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add New Brand</div>
