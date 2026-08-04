@@ -13,7 +13,10 @@ import {
   TEMPLATE_LANGUAGES,
   type Template,
 } from "@/components/scl/mock-data";
-import { useSkuStore } from "@/components/scl/sku-store";
+import { BrandPicker } from "@/components/scl/brand-picker";
+import { PromoCodePicker } from "@/components/scl/promo-code-picker";
+import type { Brand } from "@/components/scl/sku-store";
+import type { PromoCode } from "@/components/scl/promo-store";
 import {
   Save,
   Send,
