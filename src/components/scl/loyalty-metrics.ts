@@ -204,7 +204,8 @@ export const TIER_DISTRIBUTION: { tier: LoyaltyTier; count: number }[] = [
   { tier: "Bronze", count: 1420 },
   { tier: "Silver", count: 980 },
   { tier: "Gold", count: 510 },
-  { tier: "Platinum", count: 172 },
+  { tier: "Platinum", count: 138 },
+  { tier: "Icon", count: 34 },
 ];
 
 // Tier Movement — one Sankey layer: tier at the start of the review cycle
