@@ -345,8 +345,8 @@ function UpgradeJourney({ data }: { data: ReturnType<typeof upgradeJourney> }) {
           </thead>
           <tbody className="divide-y divide-border stagger">
             {data.paths.map((p) => (
-              <tr key={p.path} className="hover:bg-muted/30 transition-colors duration-150">
-                <td className="px-3 py-2 font-medium">{p.path}</td>
+              <tr key={`${p.from}-${p.to}`} className="hover:bg-muted/30 transition-colors duration-150">
+                <td className="px-3 py-2 font-medium">{TIER_LABEL[p.from]} → {TIER_LABEL[p.to]}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{fmtNum(p.count)}</td>
                 <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">{p.avgDays}d</td>
               </tr>
