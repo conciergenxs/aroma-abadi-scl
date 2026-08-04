@@ -463,20 +463,26 @@ function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
     return <div className="text-center text-xs text-muted-foreground py-10">No advocates in this tier yet.</div>;
   }
   return (
-    <div className="p-4 grid grid-cols-1 gap-2 stagger">
+    <div className="p-4 grid grid-cols-1 gap-1.5 stagger">
       {advocates.map((a, i) => (
-        <div key={a.contactId} className="flex items-center gap-3 rounded-xl border border-border bg-card/50 p-2.5 card-hover transition-all duration-300">
+        <div key={a.contactId} className="flex items-center gap-2.5 rounded-lg border border-border bg-card/50 px-2.5 py-2 card-hover transition-all duration-300">
           <span className={`text-[12px] w-4 shrink-0 text-center font-bold ${i < 3 ? RANK_COLOR[i] : "text-muted-foreground"}`}>{i + 1}</span>
-          <img src={a.photo} alt={a.name} loading="lazy" className="h-10 w-10 rounded-full object-cover border border-border shrink-0" />
+          <img src={a.photo} alt={a.name} loading="lazy" className="h-9 w-9 rounded-full object-cover border border-border shrink-0" />
           <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-medium truncate leading-tight">{a.name}</div>
-            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground leading-tight mt-0.5">
-              <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: TIER_COLOR[a.tier] }} /> {a.tier}
-            </span>
-          </div>
-          <div className="text-right shrink-0">
-            <div className="text-[13px] font-semibold tabular-nums leading-tight">{a.referrals} <span className="text-[9px] font-normal text-muted-foreground">refs</span></div>
-            <div className="text-[10px] text-muted-foreground leading-tight">{fmtIDR(a.revenue)}</div>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-[13px] font-medium truncate leading-tight">{a.name}</span>
+              <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">
+                {a.referrals} <span className="text-[11px] font-normal text-muted-foreground">refs</span>
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between gap-2 mt-0.5">
+              <span className="inline-flex items-center gap-1 min-w-0 text-[12px] text-muted-foreground leading-tight truncate">
+                <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: TIER_COLOR[a.tier] }} />
+                <span className="shrink-0">{a.tier}</span>
+                {a.phone && <span className="truncate">· {a.phone}</span>}
+              </span>
+              <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">{fmtIDR(a.revenue)}</span>
+            </div>
           </div>
         </div>
       ))}
