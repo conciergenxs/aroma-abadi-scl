@@ -38,10 +38,10 @@ export function useWorkspaceAgents() {
   return agents;
 }
 
-type Tab = "email" | "link" | "agent";
+type Tab = "whatsapp" | "agent";
 
 export function InviteModal({ onClose }: { onClose: () => void }) {
-  const [tab, setTab] = useState<Tab>("email");
+  const [tab, setTab] = useState<Tab>("whatsapp");
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
