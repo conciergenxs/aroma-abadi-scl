@@ -1258,14 +1258,14 @@ function AssignUsersModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-2xl rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+        className="w-full max-w-2xl rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[80vh] modal-content"
       >
         <div className="px-5 pt-5 pb-3 flex items-start justify-between">
           <div>
