@@ -639,7 +639,7 @@ function TemplateDetailModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[90vw] max-w-[1280px] h-[85vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="w-[90vw] max-w-[1280px] h-[85vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-border">
