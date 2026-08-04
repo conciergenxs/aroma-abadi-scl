@@ -22,13 +22,24 @@ import { contacts } from "./mock-data";
  */
 
 // ── Tiers ────────────────────────────────────────────────────────────────
-export type LoyaltyTier = "Bronze" | "Silver" | "Gold" | "Platinum";
-export const LOYALTY_TIERS: LoyaltyTier[] = ["Bronze", "Silver", "Gold", "Platinum"];
+// Internal tier keys stay Bronze/Silver/Gold/Platinum/Icon (used as lookup
+// keys everywhere below); TIER_LABEL is the only place the customer-facing
+// program names (Prestige/Atelier/Legacy/Élite/Icon) live.
+export type LoyaltyTier = "Bronze" | "Silver" | "Gold" | "Platinum" | "Icon";
+export const LOYALTY_TIERS: LoyaltyTier[] = ["Bronze", "Silver", "Gold", "Platinum", "Icon"];
+export const TIER_LABEL: Record<LoyaltyTier, string> = {
+  Bronze: "Prestige",
+  Silver: "Atelier",
+  Gold: "Legacy",
+  Platinum: "Élite",
+  Icon: "Icon",
+};
 export const TIER_COLOR: Record<LoyaltyTier, string> = {
   Bronze: "var(--chart-3)",
   Silver: "var(--chart-4)",
   Gold: "var(--chart-2)",
   Platinum: "var(--chart-1)",
+  Icon: "var(--chart-5)",
 };
 
 export type TierFilter = "All" | LoyaltyTier;
