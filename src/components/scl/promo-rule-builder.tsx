@@ -369,7 +369,13 @@ function ConditionEditor({ condition, onChange, items }: { condition: PromoCondi
         {condition.kind === "first-purchase" && (
           <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes their first purchase</span>
         )}
+        {condition.kind === "referral-usage" && (
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">a referred customer redeems their referral code</span>
+        )}
       </div>
+      {condition.kind === "referral-usage" && (
+        <p className="text-[11.5px] text-muted-foreground">The reward on the right goes to <span className="font-medium text-foreground">both</span> the referrer and the referred customer.</p>
+      )}
     </div>
   );
 }
