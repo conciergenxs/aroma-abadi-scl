@@ -1694,14 +1694,14 @@ function TeamFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content"
       >
         <div className="px-5 pt-5 pb-3 flex items-start justify-between">
           <h2 className="text-sm font-semibold">{title}</h2>
@@ -1967,14 +1967,14 @@ function AddMembersModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content"
       >
         <div className="px-5 pt-5 pb-3 flex items-start justify-between">
           <h2 className="text-sm font-semibold">Add Team Members</h2>
