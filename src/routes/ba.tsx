@@ -155,8 +155,8 @@ function BAPage() {
                     <Td>{b.waNumber}</Td>
                     <Td>
                       <div className="flex items-center gap-1.5">
-                        <code className="font-mono text-sm">{shown ? b.password : "••••••••"}</code>
-                        <button onClick={() => toggleReveal(b.id)} className="text-muted-foreground hover:text-foreground transition-colors" title={shown ? "Hide" : "Show"}>
+                        <code className="font-mono text-sm">{shown ? b.password : "••••••••••••"}</code>
+                        <button onClick={() => toggleReveal(b)} className="text-muted-foreground hover:text-foreground transition-colors" title={shown ? "Hide" : "Show (requires your account password)"}>
                           {shown ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </button>
                         <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
@@ -167,6 +167,7 @@ function BAPage() {
                         </button>
                       </div>
                     </Td>
+                    <Td>{b.areaCoordinator || "—"}</Td>
                     <Td>{b.position}</Td>
                     <Td>{b.store} · <span className="text-muted-foreground">{b.city}</span></Td>
                     <Td>
