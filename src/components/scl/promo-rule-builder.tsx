@@ -195,7 +195,16 @@ function ItemScopeEditor({
                 const rowChecked = isBrandScoped
                   ? scope.kind === "any-in-brand" && scope.brand === brandFilter
                   : scope.kind === "any";
-                const allFilteredSelected = filtered.length > 0 && filtered.every((it) => selected.includes(it.name));
+                const noSearch = !search.trim();
+                // Checking this box with no search narrowing the view
+                // selects literally everything in the current brand scope
+                // — which is exactly what "Any Item [in Brand]" already
+                // means, so the box should read as checked (and toggling
+                // it should collapse to/from that rule kind) instead of
+                // ever writing out every single item name.
+                const allFilteredSelected = filtered.length > 0 && (
+                  (rowChecked && noSearch) || filtered.every((it) => selected.includes(it.name))
+                );
                 return (
                   <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
                     <input
@@ -204,9 +213,13 @@ function ItemScopeEditor({
                       title="Select all items matching the current search/brand filter"
                       className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
                       onChange={() => {
-                        if (allFilteredSelected) {
+                        if (rowChecked && noSearch) {
+                          onChange({ kind: "specific", items: [] });
+                        } else if (allFilteredSelected) {
                           const next = selected.filter((name) => !filtered.some((it) => it.name === name));
                           onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
+                        } else if (noSearch) {
+                          onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
                         } else {
                           const next = Array.from(new Set([...selected, ...filtered.map((it) => it.name)]));
                           onChange({ kind: "specific", items: next });
