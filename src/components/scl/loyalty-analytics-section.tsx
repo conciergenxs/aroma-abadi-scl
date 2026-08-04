@@ -631,13 +631,8 @@ export function CrmLoyaltyAnalytics() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
             <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(advocacy.revenueFromReferral)} info="Total revenue contributed through referrals in the selected period." />
-            <MetricStat icon={Wallet} label="Referral CLV" value={fmtIDR(advocacy.referralCLV)} info="Average lifetime value of a referred customer." />
             <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(advocacy.referralAOV)} info="Average order value of a referred customer." />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
             <MetricStat icon={Repeat} label="Referred Repeat Purchase Rate" value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)} info="Repeat purchase rate among referred customers." />
-            <MetricStat icon={UserCheck} label="Referred Retention Rate" value={fmtPct(REFERRAL_QUALITY.retentionRate)} info="Retention rate among referred customers." />
-            <MetricStat icon={ShoppingBasket} label="Referred AOV" value={fmtIDR(REFERRAL_QUALITY.aov)} info="Average order value among referred customers." />
           </div>
         </SubSection>
       </SectionCard>
