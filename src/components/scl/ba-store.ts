@@ -12,17 +12,26 @@ export type BA = {
   store: string;
   adraName?: string; // deprecated, kept for backward compat
   position: string;
+  /** Area Coordinator overseeing this BA — feeds the first 3 letters of the auto-generated password. */
+  areaCoordinator: string;
 };
 
 type State = { bas: BA[]; currentBaId: string | null };
 
-const STORAGE_KEY = "aroma_ba_store_v5";
+const STORAGE_KEY = "aroma_ba_store_v6";
 
-function genPassword(len = 10) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-  let s = "";
-  for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return s;
+function first3(name: string): string {
+  const first = name.trim().split(/\s+/)[0] || "";
+  return (first + "XXX").slice(0, 3).toUpperCase();
+}
+
+// Format: 3 letters of the Area Coordinator's name + 3 letters of the BA's
+// name + 6 random symbol/number/letter characters.
+const RANDOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*";
+function genPassword(arcoName: string, baName: string) {
+  let suffix = "";
+  for (let i = 0; i < 6; i++) suffix += RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)];
+  return `${first3(arcoName)}${first3(baName)}${suffix}`;
 }
 
 function seed(): BA[] {
