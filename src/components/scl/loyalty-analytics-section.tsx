@@ -203,7 +203,7 @@ function TierDonut({ tierFilter }: { tierFilter: TierFilter }) {
             className={`inline-flex items-center gap-1.5 text-[11px] transition-opacity duration-200 ${tierFilter !== "All" && tierFilter !== d.tier ? "opacity-40" : ""}`}
           >
             <span className="h-2 w-2 rounded-full" style={{ background: TIER_COLOR[d.tier] }} />
-            {d.tier} <span className="text-muted-foreground">({fmtNum(d.count)})</span>
+            {TIER_LABEL[d.tier]} <span className="text-muted-foreground">({fmtNum(d.count)})</span>
           </span>
         ))}
       </div>
