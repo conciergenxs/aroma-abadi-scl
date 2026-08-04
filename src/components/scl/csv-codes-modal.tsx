@@ -19,7 +19,7 @@ export function CsvCodesModal({ fileName, codes, onClose }: { fileName: string; 
             <div className="text-sm font-semibold text-foreground truncate">{fileName}</div>
             <div className="text-[11px] text-muted-foreground">{codes.length} code{codes.length === 1 ? "" : "s"} found</div>
           </div>
-          <button type="button" onClick={onClose} className="h-7 w-7 shrink-0 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+          <button type="button" onClick={onClose} className="h-7 w-7 shrink-0 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -61,7 +61,7 @@ export function CsvCodesModal({ fileName, codes, onClose }: { fileName: string; 
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted"
+                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors duration-150"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
@@ -70,7 +70,7 @@ export function CsvCodesModal({ fileName, codes, onClose }: { fileName: string; 
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted"
+                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors duration-150"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </button>

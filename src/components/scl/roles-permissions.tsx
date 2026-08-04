@@ -506,7 +506,7 @@ export function RolesPermissionsModule() {
         </div>
         <button
           onClick={() => setView({ mode: "create" })}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create New Role
         </button>
@@ -518,7 +518,7 @@ export function RolesPermissionsModule() {
             <span className="font-medium">{selected.length} selected</span>
             <button
               onClick={() => setConfirmDelete(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Delete Role
             </button>
@@ -543,7 +543,7 @@ export function RolesPermissionsModule() {
                 <tr
                   key={r.id}
                   onClick={() => setView({ mode: "detail", roleId: r.id })}
-                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer"
+                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer transition-colors duration-150"
                 >
                   <td className="px-4 py-3 align-middle" onClick={(e) => e.stopPropagation()}>
                     <Checkbox checked={selected.includes(r.id)} onChange={() => toggleOne(r.id)} />
@@ -623,7 +623,7 @@ function RoleEditor({
       <div className="flex items-center gap-3 px-1 pt-0.5">
         <button
           onClick={onCancel}
-          className="h-8 w-8 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card text-muted-foreground hover:text-foreground transition-colors duration-150"
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
@@ -705,7 +705,7 @@ function RoleEditor({
       <div className="flex items-center justify-between gap-3 pt-1">
         <button
           onClick={() => (step === 1 ? onCancel() : setStep((step - 1) as Step))}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 text-xs font-medium text-foreground hover:bg-card"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 text-xs font-medium text-foreground hover:bg-card transition-colors duration-150"
         >
           {step === 1 ? "Cancel" : "Back"}
         </button>
@@ -713,14 +713,14 @@ function RoleEditor({
           <button
             disabled={step === 1 && !canContinue1}
             onClick={() => setStep((step + 1) as Step)}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             Continue
           </button>
         ) : (
           <button
             onClick={() => onSubmit(name.trim(), description.trim(), state)}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
           >
             {initial ? "Save Changes" : "Create Role"}
           </button>
@@ -1057,7 +1057,7 @@ function RoleDetailPage({
       <div className="px-1 pt-0.5">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3 transition-colors duration-150"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Roles & Permissions
         </button>
@@ -1078,13 +1078,13 @@ function RoleDetailPage({
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setShowAssign(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <UserPlus className="h-3.5 w-3.5" /> Add User
             </button>
             <button
               onClick={onEdit}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
             >
               <Pencil className="h-3.5 w-3.5" /> Edit Role
             </button>
@@ -1097,7 +1097,7 @@ function RoleDetailPage({
                     ? "Reassign all users before deleting this role"
                     : "Delete role"
                 }
-                className="h-9 inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 text-xs font-medium hover:bg-destructive/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-9 inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 text-xs font-medium hover:bg-destructive/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Delete Role
               </button>
@@ -1115,7 +1115,7 @@ function RoleDetailPage({
             <span className="font-medium">{selected.length} selected</span>
             <button
               onClick={() => setConfirmRemove(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Remove Role
             </button>
@@ -1137,7 +1137,7 @@ function RoleDetailPage({
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1276,7 +1276,7 @@ function AssignUsersModal({
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1360,14 +1360,14 @@ function AssignUsersModal({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
             >
               Cancel
             </button>
             <button
               disabled={selected.length === 0}
               onClick={() => onSubmit(selected)}
-              className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
               Assign Users
             </button>

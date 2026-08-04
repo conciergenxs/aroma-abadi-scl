@@ -314,12 +314,12 @@ export function AppShell({
                       {unreadCount > 0 && (
                         <button
                           onClick={markAllRead}
-                          className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+                          className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 transition-colors duration-150"
                         >
                           <CheckCheck className="h-3 w-3" /> Mark all as read
                         </button>
                       )}
-                      <button onClick={() => setNotifOpen(false)} className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05]">
+                      <button onClick={() => setNotifOpen(false)} className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors duration-150">
                         <XIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -401,7 +401,7 @@ export function AppShell({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150"
               onClick={() => {
                 if (typeof window !== "undefined") window.localStorage.removeItem("scl_authed");
                 navigate({ to: "/auth" });
@@ -595,7 +595,7 @@ export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?:
       <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[label.color]}`} />
       {label.name}
       {onRemove && (
-        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10">
+        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150">
           <X className="h-2.5 w-2.5" />
         </button>
       )}
@@ -609,7 +609,7 @@ export function ListChip({ name, onRemove }: { name: string; onRemove?: () => vo
       <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
       {name}
       {onRemove && (
-        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10">
+        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150">
           <X className="h-2.5 w-2.5" />
         </button>
       )}

@@ -418,14 +418,14 @@ function Dashboard() {
               title="Recent Conversations"
               className="lg:col-span-2"
               action={
-                <Link to="/inbox" className="text-[11px] font-semibold text-primary hover:underline">OPEN INBOX →</Link>
+                <Link to="/inbox" className="text-[11px] font-semibold text-primary hover:underline transition-colors duration-150">OPEN INBOX →</Link>
               }
             >
               <ul className="divide-y divide-border">
                 {conversations.slice(0, 6).map((c) => {
                   const contact = contacts.find((x) => x.id === c.contactId)!;
                   return (
-                    <li key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
+                    <li key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-150">
                       <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                         {contact.avatar}
                       </div>

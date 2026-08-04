@@ -84,7 +84,7 @@ function SettingsPage() {
                 {section.id !== "company" ? (
                   <button
                     onClick={() => setOpen((o) => ({ ...o, [section.id]: !o[section.id] }))}
-                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80"
+                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55 hover:text-muted-foreground/80 transition-colors duration-150"
                   >
                     <span>{section.label}</span>
                     <ChevronDown
@@ -236,7 +236,7 @@ function ProfileTab() {
             <div className="mt-3">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium hover:bg-gray-100"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
               >
                 <Upload className="h-3.5 w-3.5" /> Upload avatar
               </button>
@@ -349,7 +349,7 @@ function TeamMultiSelect({
                 e.stopPropagation();
                 toggle(t);
               }}
-              className="hover:text-foreground/80"
+              className="hover:text-foreground/80 transition-colors duration-150"
             >
               <X className="h-3 w-3" />
             </button>
@@ -370,7 +370,7 @@ function TeamMultiSelect({
             <button
               key={t}
               onClick={() => toggle(t)}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-gray-50"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-gray-50 transition-colors duration-150"
             >
               <span
                 className={`h-4 w-4 rounded border grid place-items-center ${
@@ -499,13 +499,13 @@ function WhatsAppQrTab() {
             <div className="flex items-center gap-2 pt-1 w-full">
               <button
                 onClick={download}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-xs font-medium hover:bg-gray-100"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
               >
                 <Download className="h-3.5 w-3.5" /> Download QR
               </button>
               <button
                 onClick={copy}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors duration-150"
               >
                 <Copy className="h-3.5 w-3.5" /> Copy link
               </button>
@@ -735,7 +735,7 @@ function CompanySecurityTab() {
                     {ip}
                     <button
                       onClick={() => setIps((s) => s.filter((_, j) => j !== i))}
-                      className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+                      className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -756,7 +756,7 @@ function CompanySecurityTab() {
                     setDraft("");
                     toast.success("IP added to allowlist");
                   }}
-                  className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add IP address
                 </button>
@@ -952,7 +952,7 @@ function UserManagementPage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Invite user
         </button>
@@ -1021,7 +1021,7 @@ function UserManagementPage() {
           />
           <button
             onClick={resetFilters}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs hover:bg-gray-100"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs hover:bg-gray-100 transition-colors duration-150"
           >
             <Filter className="h-3.5 w-3.5" /> Reset
           </button>
@@ -1032,7 +1032,7 @@ function UserManagementPage() {
             <span className="font-medium">{selected.length} selected</span>
             <button
               onClick={() => setConfirmDelete(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Delete users
             </button>
@@ -1057,7 +1057,7 @@ function UserManagementPage() {
             </thead>
             <tbody>
               {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1216,7 +1216,7 @@ function ConnectedAgentsSection() {
           <span className="font-medium">{selected.length} selected</span>
           <button
             onClick={() => setConfirm(true)}
-            className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+            className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
           >
             <Trash2 className="h-3.5 w-3.5" /> Disconnect agent
           </button>
@@ -1244,7 +1244,7 @@ function ConnectedAgentsSection() {
                 connectedOn: "Today",
               };
               return (
-                <tr key={a.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
+                <tr key={a.id} className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(a.id)}
@@ -1536,7 +1536,7 @@ function TeamManagementPage() {
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create Team
         </button>
@@ -1560,7 +1560,7 @@ function TeamManagementPage() {
             <span className="font-medium">{selected.length} selected</span>
             <button
               onClick={() => setConfirmDelete(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Delete Team
             </button>
@@ -1585,7 +1585,7 @@ function TeamManagementPage() {
                 <tr
                   key={t.id}
                   onClick={() => setOpenTeamId(t.id)}
-                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer"
+                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer transition-colors duration-150"
                 >
                   <td
                     className="px-4 py-3 align-middle"
@@ -1707,7 +1707,7 @@ function TeamFormModal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1742,14 +1742,14 @@ function TeamFormModal({
         <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
           >
             Cancel
           </button>
           <button
             disabled={!name.trim()}
             onClick={() => onSubmit(name.trim(), channelId)}
-            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             {submitLabel}
           </button>
@@ -1796,7 +1796,7 @@ function TeamDetailPage({
       <div className="px-1 pt-0.5">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3 transition-colors duration-150"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Team Management
         </button>
@@ -1819,13 +1819,13 @@ function TeamDetailPage({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setEditOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
             >
               Edit Team
             </button>
             <button
               onClick={() => setAddOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <UserPlus className="h-3.5 w-3.5" /> Add Team Members
             </button>
@@ -1842,7 +1842,7 @@ function TeamDetailPage({
             <span className="font-medium">{selected.length} selected</span>
             <button
               onClick={() => setConfirmRemove(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90"
+              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Remove From Team
             </button>
@@ -1864,7 +1864,7 @@ function TeamDetailPage({
             </thead>
             <tbody>
               {members.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14">
+                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150">
                   <td className="px-4 py-3 align-middle">
                     <Checkbox
                       checked={selected.includes(u.id)}
@@ -1980,7 +1980,7 @@ function AddMembersModal({
           <h2 className="text-sm font-semibold">Add Team Members</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -2005,7 +2005,7 @@ function AddMembersModal({
                 <button
                   key={u.id}
                   onClick={() => toggle(u.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
                 >
                   <Checkbox checked={checked} onChange={() => toggle(u.id)} />
                   <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
@@ -2031,14 +2031,14 @@ function AddMembersModal({
         <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
           >
             Cancel
           </button>
           <button
             disabled={picked.length === 0}
             onClick={() => onSubmit(picked)}
-            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             Add Members
           </button>

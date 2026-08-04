@@ -71,7 +71,7 @@ export function ConfirmDialog({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0 transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -79,7 +79,7 @@ export function ConfirmDialog({
         <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
           >
             {cancelLabel}
           </button>

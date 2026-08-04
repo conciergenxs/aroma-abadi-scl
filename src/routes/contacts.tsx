@@ -254,7 +254,7 @@ function ContactsPage() {
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Audience</span>
               <button
                 onClick={() => navigate({ to: "/contacts/audience/new" })}
-                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground"
+                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -269,7 +269,7 @@ function ContactsPage() {
                 <Users className="h-3 w-3 shrink-0" />
                 <span className="truncate flex-1">{l.name}</span>
                 <span
-                  className="text-[10px] text-muted-foreground/60 hover:text-primary cursor-pointer"
+                  className="text-[10px] text-muted-foreground/60 hover:text-primary cursor-pointer transition-colors duration-150"
                   onClick={(e) => { e.stopPropagation(); setAudienceModalId(l.id); setAudienceSearch(""); }}
                   title="Manage contacts"
                 >
@@ -303,14 +303,14 @@ function ContactsPage() {
               )}
               <button
                 onClick={() => setShowManageProps(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card transition-colors duration-150"
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
                 <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">{properties.length}</span>
               </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> New Contact
               </button>
@@ -352,11 +352,11 @@ function ContactsPage() {
               />
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Contacts
               </button>
-              <button onClick={() => setSelected([])} className="ml-auto text-muted-foreground hover:text-foreground">Clear selection</button>
+              <button onClick={() => setSelected([])} className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150">Clear selection</button>
             </div>
           )}
 
@@ -420,7 +420,7 @@ function ContactsPage() {
                   <h2 className="text-sm font-semibold">{aud.name}</h2>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Select contacts to include in this audience</p>
                 </div>
-                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -841,11 +841,11 @@ function ManagePropertiesModal({
           <div className="flex items-center gap-2">
             <button
               onClick={() => { setEditing(null); setShowAdd(true); }}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> Add Property
             </button>
-            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -894,7 +894,7 @@ function ManagePropertiesModal({
                     <div className="inline-flex items-center gap-1">
                       <button
                         onClick={() => { setEditing(p); setShowAdd(true); }}
-                        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
                         title="Edit"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -902,7 +902,7 @@ function ManagePropertiesModal({
                       {!p.system && (
                         <button
                           onClick={() => deleteProp(p.id)}
-                          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
                           title="Delete"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -975,7 +975,7 @@ function ListSidebarRow({
             role="button"
             tabIndex={0}
             onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
-            className="opacity-0 group-hover:opacity-100 h-5 w-5 grid place-items-center rounded hover:bg-gray-100"
+            className="opacity-0 group-hover:opacity-100 h-5 w-5 grid place-items-center rounded hover:bg-gray-100 transition-colors duration-150"
           >
             <MoreHorizontal className="h-3 w-3" />
           </span>
@@ -985,13 +985,13 @@ function ListSidebarRow({
         <div className="absolute right-2 top-full z-20 mt-1 w-36 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
           <button
             onClick={() => { setMenu(false); setEditing(true); }}
-            className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 inline-flex items-center gap-2"
+            className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
           >
             <Pencil className="h-3 w-3" /> Rename
           </button>
           <button
             onClick={() => { setMenu(false); onDelete(); }}
-            className="w-full px-3 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 inline-flex items-center gap-2"
+            className="w-full px-3 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 inline-flex items-center gap-2 transition-colors duration-150"
           >
             <Trash2 className="h-3 w-3" /> Delete
           </button>
@@ -1014,7 +1014,7 @@ function PickerPopover({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-2.5 py-1.5 hover:bg-card"
+        className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-2.5 py-1.5 hover:bg-card transition-colors duration-150"
       >
         {icon} {label}
       </button>
@@ -1029,7 +1029,7 @@ function PickerPopover({
               <button
                 key={it.id}
                 onClick={() => { onPick(it.id); setOpen(false); }}
-                className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
               >
                 {it.color ? (
                   <span className={`h-2 w-2 rounded-full ${labelColorDot[it.color]}`} />
@@ -1069,7 +1069,7 @@ function LabelManager({
                 <div className="text-sm font-medium">Manage labels</div>
                 <div className="text-[11px] text-muted-foreground">Create, edit, or remove labels.</div>
               </div>
-              <button onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+              <button onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -1087,7 +1087,7 @@ function LabelManager({
                   />
                   <button
                     onClick={() => onDelete(l.id)}
-                    className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-150"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -1106,7 +1106,7 @@ function LabelManager({
                 />
                 <button
                   onClick={() => { if (newName.trim()) { onCreate(newName.trim(), newColor); setNewName(""); } }}
-                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                 >
                   Add
                 </button>
@@ -1167,7 +1167,7 @@ function ContactDrawer({
       <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto glass">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-medium">Contact details</div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -1257,7 +1257,7 @@ function Dropdown({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center gap-2 rounded-md border border-dashed border-border bg-card/40 px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
+        className="w-full inline-flex items-center gap-2 rounded-md border border-dashed border-border bg-card/40 px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors duration-150"
       >
         {icon} {placeholder}
       </button>
@@ -1272,7 +1272,7 @@ function Dropdown({
               <button
                 key={it.id}
                 onClick={() => onPick(it.id)}
-                className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
               >
                 {it.color ? (
                   <span className={`h-2 w-2 rounded-full ${labelColorDot[it.color]}`} />
@@ -1318,7 +1318,7 @@ function LabelPicker({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center gap-2 rounded-md border border-dashed border-border bg-card/40 px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card"
+        className="w-full inline-flex items-center gap-2 rounded-md border border-dashed border-border bg-card/40 px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors duration-150"
       >
         <TagIcon className="h-3 w-3" /> Add label…
       </button>
@@ -1343,7 +1343,7 @@ function LabelPicker({
                   <div key={l.id} className="group/row flex items-center gap-1">
                     <button
                       onClick={() => onToggle(l.id)}
-                      className="flex-1 text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2"
+                      className="flex-1 text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
                     >
                       <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
                       <span className="flex-1">{l.name}</span>
@@ -1352,7 +1352,7 @@ function LabelPicker({
                     <button
                       onClick={() => onDelete(l.id)}
                       title="Delete label"
-                      className="opacity-0 group-hover/row:opacity-100 h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 mr-1"
+                      className="opacity-0 group-hover/row:opacity-100 h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 mr-1 transition-colors duration-150"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -1365,7 +1365,7 @@ function LabelPicker({
               {canCreate && (
                 <button
                   onClick={handleCreate}
-                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
                 >
                   <Plus className="h-3 w-3 text-primary" />
                   Create <span className="font-medium text-foreground">“{search.trim()}”</span>
@@ -1423,7 +1423,7 @@ function TablePagination({
         <button
           onClick={() => onPageChange(Math.max(1, page - 1))}
           disabled={page <= 1}
-          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           <ChevronLeft className="h-3 w-3" /> Prev
         </button>
@@ -1447,7 +1447,7 @@ function TablePagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
           disabled={page >= totalPages}
-          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border bg-card/60 hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           Next <ChevronRight className="h-3 w-3" />
         </button>
@@ -1550,7 +1550,7 @@ function KanbanBoard({
                   >
                     <span
                       aria-hidden
-                      className="absolute top-1.5 right-1.5 grid place-items-center h-5 w-5 rounded text-muted-foreground/60 group-hover:text-muted-foreground cursor-grab active:cursor-grabbing"
+                      className="absolute top-1.5 right-1.5 grid place-items-center h-5 w-5 rounded text-muted-foreground/60 group-hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors duration-150"
                       title="Drag to move"
                     >
                       <GripVertical className="h-3.5 w-3.5" />

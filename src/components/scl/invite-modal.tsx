@@ -60,7 +60,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
             <h3 className="text-sm font-semibold">Invite to workspace</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">Invite humans or connect an AI agent</p>
           </div>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100">
+          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 transition-colors duration-150">
             <XIcon className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
@@ -171,7 +171,7 @@ function EmailTab({ onClose }: { onClose: () => void }) {
         </select>
       </Field>
       <div className="flex justify-end gap-2 pt-2">
-        <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50">
+        <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 transition-colors duration-150">
           Cancel
         </button>
         <button
@@ -180,7 +180,7 @@ function EmailTab({ onClose }: { onClose: () => void }) {
             toast.success(`Invitation sent to ${email}`);
             onClose();
           }}
-          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5"
+          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Send Invitation
         </button>
@@ -201,13 +201,13 @@ function LinkTab() {
               navigator.clipboard.writeText(link);
               toast.success("Link copied to clipboard");
             }}
-            className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5"
+            className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 transition-colors duration-150"
           >
             <CopyIcon className="h-3.5 w-3.5" /> Copy
           </button>
         </div>
       </Field>
-      <button className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
+      <button className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-150">
         <RefreshCw className="h-3 w-3" /> Regenerate link
       </button>
     </div>
@@ -296,14 +296,14 @@ function AgentTab({
         <button
           onClick={handleTest}
           disabled={testing}
-          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 disabled:opacity-60"
+          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 disabled:opacity-60 transition-colors duration-150"
         >
           {testing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
           Test Connection
         </button>
         <button
           onClick={handleConnect}
-          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5"
+          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
           <Bot className="h-3.5 w-3.5" /> Connect Agent
         </button>

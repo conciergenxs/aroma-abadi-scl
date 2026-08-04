@@ -354,19 +354,19 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
             <span className="text-muted-foreground">{selected.length} selected</span>
             <button
               onClick={() => setAddListOpen(true)}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
             >
               <ListPlus className="h-3 w-3" /> Add to List
             </button>
             <button
               onClick={() => setRemoveListOpen(true)}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
             >
               <ListMinus className="h-3 w-3" /> Remove from List
             </button>
             <button
               onClick={clearSelection}
-              className="ml-auto text-muted-foreground hover:text-foreground"
+              className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
             >
               Clear Selection
             </button>
@@ -402,7 +402,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                   .filter(Boolean)
                   .slice(0, 2) as { id: string; name: string }[];
                 return (
-                  <tr key={contact.id} className="hover:bg-gray-50">
+                  <tr key={contact.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -676,7 +676,7 @@ function ListPickerModal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <XIcon className="h-4 w-4" />
           </button>
@@ -726,14 +726,14 @@ function ListPickerModal({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px]"
+              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px] transition-colors duration-150"
             >
               Cancel
             </button>
             <button
               onClick={() => picked.size > 0 && onConfirm(Array.from(picked))}
               disabled={picked.size === 0}
-              className="inline-flex items-center rounded-md bg-primary px-3 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex items-center rounded-md bg-primary px-3 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
             >
               {confirmLabel}
             </button>

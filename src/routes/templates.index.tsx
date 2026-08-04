@@ -166,13 +166,13 @@ function TemplatesPage() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setGroupsOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
             >
               <Tags className="h-3.5 w-3.5" /> Manage Groups
             </button>
             <Link
               to="/templates/new"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> New Template
             </Link>
@@ -188,25 +188,25 @@ function TemplatesPage() {
               </span>
               <button
                 onClick={() => setAddGroupOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
               >
                 <FolderPlus className="h-3 w-3" /> Add to Group
               </button>
               <button
                 onClick={() => setRemoveGroupOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5"
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
               >
                 <FolderMinus className="h-3 w-3" /> Remove from Group
               </button>
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Templates
               </button>
               <button
                 onClick={clearSelection}
-                className="ml-auto text-muted-foreground hover:text-foreground"
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 Clear Selection
               </button>
@@ -463,7 +463,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -481,7 +481,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
             <button
               onClick={submitNew}
               disabled={!newName.trim()}
-              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> Create
             </button>
@@ -515,7 +515,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                     />
                     <button
                       onClick={() => submitRename(g.id)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-emerald-300"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-emerald-300 transition-colors duration-150"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>
@@ -528,13 +528,13 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                         setEditingId(g.id);
                         setEditingName(g.name);
                       }}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => setPendingDelete(g)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-destructive"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-destructive transition-colors duration-150"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -553,7 +553,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
         <div className="px-5 py-3 border-t border-border flex items-center justify-end">
           <button
             onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px]"
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px] transition-colors duration-150"
           >
             Done
           </button>
@@ -677,7 +677,7 @@ function TemplateDetailModal({
           </div>
           <button
             onClick={onClose}
-            className="h-8 w-8 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0"
+            className="h-8 w-8 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground shrink-0 transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -862,7 +862,7 @@ function TemplateDetailModal({
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-border">
           <button
             onClick={() => setConfirmDelete(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
+            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150"
           >
             <Trash2 className="h-3.5 w-3.5" /> Delete Template
           </button>
@@ -1052,7 +1052,7 @@ function GroupPickerModal({
           </h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1073,7 +1073,7 @@ function GroupPickerModal({
               return (
                 <label
                   key={g.id}
-                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-150"
                 >
                   <input
                     type="checkbox"
@@ -1098,13 +1098,13 @@ function GroupPickerModal({
         <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
           >
             Cancel
           </button>
           <button
             onClick={apply}
-            className="inline-flex items-center rounded-md bg-primary px-3 h-9 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+            className="inline-flex items-center rounded-md bg-primary px-3 h-9 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
           >
             Apply
           </button>

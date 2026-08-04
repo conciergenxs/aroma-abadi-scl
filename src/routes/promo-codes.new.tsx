@@ -50,7 +50,7 @@ function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPro
         <button
           type="button"
           onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
-          className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline animate-fade-in"
+          className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline animate-fade-in transition-colors duration-150"
         >
           <Download className="h-3.5 w-3.5" /> Download individual codes (.csv) to share
         </button>

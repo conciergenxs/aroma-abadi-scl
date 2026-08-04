@@ -131,7 +131,7 @@ function BroadcastListPage() {
             <div className="ml-auto">
               <Link
                 to="/broadcasts/new"
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Create Broadcast
               </Link>
@@ -146,20 +146,20 @@ function BroadcastListPage() {
               <button
                 onClick={doDuplicate}
                 disabled={selected.length !== 1}
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                 title={selected.length === 1 ? "" : "Select a single broadcast to duplicate"}
               >
                 <Copy className="h-3 w-3" /> Duplicate Broadcast
               </button>
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10"
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Broadcast
               </button>
               <button
                 onClick={clearSelection}
-                className="ml-auto text-muted-foreground hover:text-foreground"
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 Clear Selection
               </button>

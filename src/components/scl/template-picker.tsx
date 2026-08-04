@@ -112,11 +112,11 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
           <div className="ml-auto flex items-center gap-1.5">
             <Link
               to="/templates"
-              className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1.5 rounded-md border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1.5 rounded-md border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
             >
               Manage templates <ExternalLink className="h-3 w-3" />
             </Link>
-            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
               <XIcon className="h-4 w-4" />
             </button>
           </div>
@@ -256,7 +256,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                 <div className="px-4 py-3 border-t border-border/60">
                   <button
                     onClick={() => { onInsert(selected.body, selected); onClose(); }}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                   >
                     Use template
                   </button>
@@ -306,7 +306,7 @@ function EmptyState() {
         </div>
         <Link
           to="/templates"
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create template
         </Link>

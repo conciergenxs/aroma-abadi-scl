@@ -113,10 +113,10 @@ function SubscriptionPage({
               <p className="mt-2 text-xs text-muted-foreground">Includes subscription and active recurring add-ons.</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={onManagePlan} className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">
+              <button type="button" onClick={onManagePlan} className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">
                 Manage Plan
               </button>
-              <button type="button" onClick={onUpdatePaymentMethod} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">
+              <button type="button" onClick={onUpdatePaymentMethod} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card transition-colors duration-150">
                 Update Payment Method
               </button>
             </div>
@@ -198,7 +198,7 @@ function ManagePlanPage({ onBack }: { onBack: () => void }) {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
           <ArrowLeft className="h-4 w-4" /> Back to Subscription
         </button>
         <div className="flex rounded-md border border-border bg-card/60 p-1">
@@ -256,7 +256,7 @@ function PaymentMethodsPage() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
         <PageHeader title="Payment Methods" description="Manage saved cards and default billing method." />
-        <button type="button" onClick={openNew} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">
+        <button type="button" onClick={openNew} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">
           <Plus className="h-4 w-4" /> Add Payment Method
         </button>
       </div>
@@ -388,7 +388,7 @@ function LimitCard({ title, value, detail, current, max, unlimited, onAdd }: { t
             <div className="mt-2 text-xl font-semibold">{value}</div>
             <p className="m-0 mt-1 text-xs text-muted-foreground">{detail}</p>
           </div>
-          {onAdd && <button type="button" onClick={onAdd} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card"><Plus className="h-3.5 w-3.5" /> Add</button>}
+          {onAdd && <button type="button" onClick={onAdd} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card transition-colors duration-150"><Plus className="h-3.5 w-3.5" /> Add</button>}
         </div>
         {percent === null ? <div className="mt-4 rounded-full border border-border bg-background/50 px-3 py-2 text-xs text-muted-foreground">Unlimited plan limit</div> : <ProgressBar value={percent} className="mt-4" />}
       </div>
@@ -426,9 +426,9 @@ function AddOnCard({ title, description, currentLabel, currentValue, price, chil
 function QuantityStepper({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   return (
     <div className="inline-flex items-center overflow-hidden rounded-md border border-border bg-card/70">
-      <button type="button" onClick={() => onChange(Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center hover:bg-gray-50" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
+      <button type="button" onClick={() => onChange(Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center hover:bg-gray-50 transition-colors duration-150" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
       <div className="grid h-8 w-10 place-items-center border-x border-border text-sm font-medium">{value}</div>
-      <button type="button" onClick={() => onChange(value + 1)} className="grid h-8 w-8 place-items-center hover:bg-gray-50" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
+      <button type="button" onClick={() => onChange(value + 1)} className="grid h-8 w-8 place-items-center hover:bg-gray-50 transition-colors duration-150" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
     </div>
   );
 }
@@ -438,7 +438,7 @@ function AddOnTotal({ amount }: { amount: number }) {
 }
 
 function AddOnActions({ onCancel, onPurchase }: { onCancel: () => void; onPurchase: () => void }) {
-  return <div className="flex justify-end gap-2"><button type="button" onClick={onCancel} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">Cancel</button><button type="button" onClick={onPurchase} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">Purchase Add-on</button></div>;
+  return <div className="flex justify-end gap-2"><button type="button" onClick={onCancel} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card transition-colors duration-150">Cancel</button><button type="button" onClick={onPurchase} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">Purchase Add-on</button></div>;
 }
 
 function PurchaseConfirmDialog({ purchase, onClose }: { purchase: AddOnPurchase | null; onClose: () => void }) {
@@ -509,12 +509,12 @@ function InvoiceTable({ rows }: { rows: InvoiceRow[] }) {
         </thead>
         <tbody className="divide-y divide-border">
           {rows.map((row) => (
-            <tr key={`${row.date}-${row.description}`} className="hover:bg-gray-50">
+            <tr key={`${row.date}-${row.description}`} className="hover:bg-gray-50 transition-colors duration-150">
               <td className="px-5 py-3">{row.date}</td>
               <td className="px-5 py-3">{row.amount}</td>
               <td className="px-5 py-3 text-muted-foreground">{row.description}</td>
               <td className="px-5 py-3"><StatusBadge status={row.status} /></td>
-              <td className="px-5 py-3 text-right"><button type="button" onClick={() => downloadInvoice(row)} className="inline-grid h-8 w-8 place-items-center rounded-md border border-border bg-card/60 hover:bg-card" aria-label="Download invoice"><Download className="h-4 w-4" /></button></td>
+              <td className="px-5 py-3 text-right"><button type="button" onClick={() => downloadInvoice(row)} className="inline-grid h-8 w-8 place-items-center rounded-md border border-border bg-card/60 hover:bg-card transition-colors duration-150" aria-label="Download invoice"><Download className="h-4 w-4" /></button></td>
             </tr>
           ))}
         </tbody>
@@ -573,7 +573,7 @@ function PlanComparisonTable() {
         <table className="w-full min-w-[760px] text-sm">
           <thead className="border-b border-border bg-muted/20 text-xs text-muted-foreground"><tr><th className="px-5 py-3 text-left font-medium">Feature</th>{plans.map((plan) => <th key={plan.name} className="px-5 py-3 text-left font-medium">{plan.name}</th>)}</tr></thead>
           <tbody className="divide-y divide-border">
-            {comparisonRows.map((row) => <tr key={row.feature} className="hover:bg-gray-50"><td className="px-5 py-3 font-medium">{row.feature}</td>{row.values.map((value, index) => <td key={`${row.feature}-${plans[index].name}`} className="px-5 py-3 text-muted-foreground">{value === "check" ? <Check className="h-4 w-4 text-primary" /> : value === "x" ? <X className="h-4 w-4 text-muted-foreground/50" /> : value}</td>)}</tr>)}
+            {comparisonRows.map((row) => <tr key={row.feature} className="hover:bg-gray-50 transition-colors duration-150"><td className="px-5 py-3 font-medium">{row.feature}</td>{row.values.map((value, index) => <td key={`${row.feature}-${plans[index].name}`} className="px-5 py-3 text-muted-foreground">{value === "check" ? <Check className="h-4 w-4 text-primary" /> : value === "x" ? <X className="h-4 w-4 text-muted-foreground/50" /> : value}</td>)}</tr>)}
           </tbody>
         </table>
       </div>
@@ -591,9 +591,9 @@ function PaymentMethodCard({ method, primary, onEdit, onSetDefault, onRemove }: 
       </div>
       <div className="grid gap-3 sm:grid-cols-3"><SummaryMetric label="Card Holder" value={method.holder} /><SummaryMetric label="Expiry Date" value={method.expiry} /><SummaryMetric label="Card Type" value={method.type} /></div>
       <div className="flex flex-wrap justify-end gap-2">
-        <button type="button" onClick={onEdit} className="h-8 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card">Edit</button>
-        {onSetDefault && <button type="button" onClick={onSetDefault} className="h-8 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card">Set as Default</button>}
-        {onRemove && <button type="button" onClick={onRemove} className="h-8 rounded-md border border-destructive/30 bg-destructive/10 px-2.5 text-xs font-medium text-destructive hover:bg-destructive/15">Remove</button>}
+        <button type="button" onClick={onEdit} className="h-8 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card transition-colors duration-150">Edit</button>
+        {onSetDefault && <button type="button" onClick={onSetDefault} className="h-8 rounded-md border border-border bg-card/60 px-2.5 text-xs font-medium hover:bg-card transition-colors duration-150">Set as Default</button>}
+        {onRemove && <button type="button" onClick={onRemove} className="h-8 rounded-md border border-destructive/30 bg-destructive/10 px-2.5 text-xs font-medium text-destructive hover:bg-destructive/15 transition-colors duration-150">Remove</button>}
       </div>
     </div>
   );
@@ -635,7 +635,7 @@ function PaymentMethodModal({ open, method, onClose, onSave }: { open: boolean; 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm" onMouseDown={onClose}>
       <div className="w-full max-w-xl rounded-xl border border-border bg-popover shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4"><h3 className="m-0 text-base font-semibold">{method ? "Edit Payment Method" : "Add Payment Method"}</h3><button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md hover:bg-gray-50" aria-label="Close"><X className="h-4 w-4" /></button></div>
+        <div className="flex items-center justify-between border-b border-border px-5 py-4"><h3 className="m-0 text-base font-semibold">{method ? "Edit Payment Method" : "Add Payment Method"}</h3><button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md hover:bg-gray-50 transition-colors duration-150" aria-label="Close"><X className="h-4 w-4" /></button></div>
         <div className="grid gap-4 p-5 sm:grid-cols-2">
           <PaymentField label="Cardholder Name" value={holder} onChange={setHolder} />
           <PaymentField label="Card Number" value={cardNumber} onChange={setCardNumber} />
@@ -644,7 +644,7 @@ function PaymentMethodModal({ open, method, onClose, onSave }: { open: boolean; 
           <PaymentField label="Billing Address" value={address} onChange={setAddress} className="sm:col-span-2" />
           <PaymentField label="Country" value={country} onChange={setCountry} />
         </div>
-        <div className="flex justify-end gap-2 border-t border-border px-5 py-4"><button type="button" onClick={onClose} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card">Cancel</button><button type="button" onClick={save} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90">{method ? "Save Changes" : "Save Payment Method"}</button></div>
+        <div className="flex justify-end gap-2 border-t border-border px-5 py-4"><button type="button" onClick={onClose} className="h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card transition-colors duration-150">Cancel</button><button type="button" onClick={save} className="h-9 rounded-md bg-primary px-3 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">{method ? "Save Changes" : "Save Payment Method"}</button></div>
       </div>
     </div>
   );

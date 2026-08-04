@@ -93,7 +93,7 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
               onChange(null);
               setOpen(false);
             }}
-            className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-white/[0.04] hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+            className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-white/[0.04] hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-colors duration-150"
           >
             <X className="h-3.5 w-3.5" />
             Clear Selection

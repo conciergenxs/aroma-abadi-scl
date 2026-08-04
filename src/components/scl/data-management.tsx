@@ -113,7 +113,7 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
     >
       {children}
     </button>
@@ -133,7 +133,7 @@ function GhostButton({
     <button
       type={type}
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
     >
       {children}
     </button>
@@ -320,7 +320,7 @@ function LifecycleGroupSection({
       <button
         type="button"
         onClick={onCreate}
-        className="mt-3 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs text-primary hover:underline transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Create
       </button>
@@ -370,7 +370,7 @@ function LifecycleStageRow({
       <button
         type="button"
         onClick={onEdit}
-        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
         aria-label="Edit stage"
       >
         <Pencil className="h-3.5 w-3.5" />
@@ -379,7 +379,7 @@ function LifecycleStageRow({
         <button
           type="button"
           onClick={onDelete}
-          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
           aria-label="Delete stage"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -582,7 +582,7 @@ function RecentlyDeletedContactsPage() {
               </GhostButton>
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium transition-colors duration-150"
               >
                 <Trash2 className="h-3.5 w-3.5" />{" "}
                 {selected.size === 1 ? "Permanently Delete" : "Permanently Delete Selected"}
@@ -620,7 +620,7 @@ function RecentlyDeletedContactsPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {deletedContacts.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50">
+                  <tr key={c.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-5 py-3">
                       <Checkbox
                         checked={selected.has(c.id)}
@@ -640,7 +640,7 @@ function RecentlyDeletedContactsPage() {
                         <button
                           type="button"
                           onClick={() => restore([c.id])}
-                          className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 py-1 text-[11px]"
+                          className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 py-1 text-[11px] transition-colors duration-150"
                         >
                           <RotateCcw className="h-3 w-3" /> Restore
                         </button>
@@ -650,7 +650,7 @@ function RecentlyDeletedContactsPage() {
                             setSelected(new Set([c.id]));
                             setBulkDeleteOpen(true);
                           }}
-                          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-2 py-1 text-[11px]"
+                          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-2 py-1 text-[11px] transition-colors duration-150"
                         >
                           <Trash2 className="h-3 w-3" /> Delete
                         </button>
@@ -804,7 +804,7 @@ function Modal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -861,7 +861,7 @@ function Toggle({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="w-full flex items-center justify-between gap-4 rounded-md border border-border bg-background/40 px-3 py-2.5 text-left hover:bg-background/60"
+      className="w-full flex items-center justify-between gap-4 rounded-md border border-border bg-background/40 px-3 py-2.5 text-left hover:bg-background/60 transition-colors duration-150"
     >
       <div>
         <div className="text-sm">{label}</div>
@@ -945,7 +945,7 @@ function Pagination({
         <button
           onClick={() => onPage(Math.max(1, page - 1))}
           disabled={page <= 1}
-          className="h-7 px-2 rounded border border-border bg-card/60 hover:bg-card disabled:opacity-40"
+          className="h-7 px-2 rounded border border-border bg-card/60 hover:bg-card disabled:opacity-40 transition-colors duration-150"
         >
           Prev
         </button>
@@ -955,7 +955,7 @@ function Pagination({
         <button
           onClick={() => onPage(Math.min(pageCount, page + 1))}
           disabled={page >= pageCount}
-          className="h-7 px-2 rounded border border-border bg-card/60 hover:bg-card disabled:opacity-40"
+          className="h-7 px-2 rounded border border-border bg-card/60 hover:bg-card disabled:opacity-40 transition-colors duration-150"
         >
           Next
         </button>
@@ -1108,7 +1108,7 @@ function LabelsPage() {
               )}
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium transition-colors duration-150"
               >
                 <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Label" : "Delete Labels"}
               </button>
@@ -1145,7 +1145,7 @@ function LabelsPage() {
                   {paged.map((row) => {
                     const c = colorMeta(row.color);
                     return (
-                      <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50">
+                      <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150">
                         <td className="px-5 py-3">
                           <Checkbox
                             checked={selected.has(row.id)}
@@ -1474,7 +1474,7 @@ function ContactPropertiesRouter() {
               {!anySystemSelected && (
                 <button
                   onClick={() => setBulkDeleteOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium transition-colors duration-150"
                 >
                   <Trash2 className="h-3.5 w-3.5" />{" "}
                   {selected.size === 1 ? "Delete Property" : "Delete Properties"}
@@ -1516,7 +1516,7 @@ function ContactPropertiesRouter() {
                 </thead>
                 <tbody>
                   {paged.map((row) => (
-                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50">
+                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-5 py-3">
                         <Checkbox
                           checked={selected.has(row.id)}

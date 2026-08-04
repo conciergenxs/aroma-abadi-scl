@@ -59,16 +59,16 @@ function ActionMenu({ onSeeDetails, onEdit, onDelete }: { onSeeDetails: () => vo
       </button>
       <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={148} className="rounded-lg border border-border bg-card shadow-xl py-1 animate-scale-in origin-top-right">
         <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left transition-colors duration-150">
           <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
         </button>
         <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onSeeDetails(); }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left">
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left transition-colors duration-150">
           <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
         </button>
         <div className="border-t border-border my-1" />
         <button type="button" onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left">
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left transition-colors duration-150">
           <Trash2 className="h-3.5 w-3.5" /> Delete
         </button>
       </FloatingMenu>
@@ -204,13 +204,13 @@ function PromoCodesPage() {
           <span>{filtered.length} promo codes</span>
           <div className="flex items-center gap-1">
             <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card">‹</button>
+              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150">‹</button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button key={p} type="button" onClick={() => setPage(p)}
                 className={`h-7 w-7 rounded border text-[11px] ${p === page ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card"}`}>{p}</button>
             ))}
             <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card">›</button>
+              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150">›</button>
           </div>
         </div>
       )}
@@ -225,7 +225,7 @@ function PromoCodesPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

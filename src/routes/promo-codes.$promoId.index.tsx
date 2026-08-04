@@ -341,7 +341,7 @@ function PromoDetailPage() {
                     {pagedRedemptions.map((r) => (
                       <tr key={r.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-5 py-2.5">
-                          <Link to="/contacts/$contactId" params={{ contactId: r.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                          <Link to="/contacts/$contactId" params={{ contactId: r.contactId }} className="text-[13px] font-medium text-primary hover:underline transition-colors duration-150">
                             {r.contactName}
                           </Link>
                         </td>
@@ -387,7 +387,7 @@ function PromoDetailPage() {
                       </td>
                       <td className="px-5 py-2.5">
                         {a.contactId ? (
-                          <Link to="/contacts/$contactId" params={{ contactId: a.contactId }} className="text-[13px] font-medium text-primary hover:underline">
+                          <Link to="/contacts/$contactId" params={{ contactId: a.contactId }} className="text-[13px] font-medium text-primary hover:underline transition-colors duration-150">
                             {a.contactName}
                           </Link>
                         ) : (
@@ -428,7 +428,7 @@ function PromoDetailPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

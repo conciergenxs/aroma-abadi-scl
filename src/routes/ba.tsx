@@ -108,7 +108,7 @@ function BAPage() {
               {allStores.map((s) => <option key={s}>{s}</option>)}
             </select>
             {hasFilters && (
-              <button onClick={clearFilters} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2 h-8">
+              <button onClick={clearFilters} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2 h-8 transition-colors duration-150">
                 <X className="h-3 w-3" /> Reset
               </button>
             )}
@@ -306,7 +306,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
             <div className="inline-flex items-center gap-2 text-sm text-primary mb-1"><BadgeCheck className="h-3.5 w-3.5" /> Beauty Ambassador</div>
             <div className="text-base font-semibold">{initial ? "Edit Beauty Ambassador" : "Add New Beauty Ambassador"}</div>
           </div>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors duration-150"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5 space-y-3">
           <Field label="Full Name">

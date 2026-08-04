@@ -305,7 +305,7 @@ function SkuDetailPage() {
                   <span>Menampilkan {(page-1)*PAGE_SIZE+1}–{Math.min(page*PAGE_SIZE, filteredTx.length)} dari {filteredTx.length}</span>
                   <div className="flex items-center gap-1">
                     <button type="button" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1}
-                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50">
+                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150">
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
                     {Array.from({length:totalPages},(_,i)=>i+1).filter(p=> p===1||p===totalPages||Math.abs(p-page)<=1).map((p,idx,arr)=>(
@@ -318,7 +318,7 @@ function SkuDetailPage() {
                       </Fragment>
                     ))}
                     <button type="button" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page>=totalPages}
-                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50">
+                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150">
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>

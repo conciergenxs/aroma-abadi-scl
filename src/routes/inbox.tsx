@@ -588,7 +588,7 @@ function InboxPage() {
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Labels</span>
               <button
                 onClick={() => setLabelModalOpen(true)}
-                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground"
+                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -729,7 +729,7 @@ function InboxPage() {
                 )}
                 <button
                   onClick={() => setFilters(emptyFilters)}
-                  className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
+                  className="ml-auto text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-150"
                 >
                   Clear all
                 </button>
@@ -966,7 +966,7 @@ function InboxPage() {
                     <button
                       onClick={clearReply}
                       aria-label="Cancel reply"
-                      className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50"
+                      className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
                     >
                       <XIcon className="h-3.5 w-3.5" />
                     </button>
@@ -985,17 +985,17 @@ function InboxPage() {
                 />
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
                   <div className="flex items-center gap-0.5 text-muted-foreground/70">
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground"><Paperclip className="h-4 w-4" /></button>
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground"><Smile className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"><Paperclip className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"><Smile className="h-4 w-4" /></button>
                     <button
                       onClick={() => setTemplatePickerOpen(true)}
-                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-gray-50 hover:text-foreground"
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
                     >
                       Use template <ChevronDown className="h-3 w-3" />
                     </button>
                     <button
                       onClick={() => { setComposerMode("note"); requestAnimationFrame(() => noteRef.current?.focus()); }}
-                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90"
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90 transition-colors duration-150"
                     >
                       <StickyNote className="h-3.5 w-3.5" /> Internal note
                     </button>
@@ -1027,7 +1027,7 @@ function InboxPage() {
                   <button
                     onClick={exitNoteMode}
                     aria-label="Exit internal note"
-                    className="ml-auto h-6 w-6 grid place-items-center rounded hover:bg-amber-300/15 text-amber-300/80 hover:text-amber-200"
+                    className="ml-auto h-6 w-6 grid place-items-center rounded hover:bg-amber-300/15 text-amber-300/80 hover:text-amber-200 transition-colors duration-150"
                   >
                     <XIcon className="h-3.5 w-3.5" />
                   </button>
@@ -1070,8 +1070,8 @@ function InboxPage() {
                 )}
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-amber-300/20">
                   <div className="flex items-center gap-0.5 text-amber-300/70">
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"><Paperclip className="h-4 w-4" /></button>
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"><Smile className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200 transition-colors duration-150"><Paperclip className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200 transition-colors duration-150"><Smile className="h-4 w-4" /></button>
                     <button
                       onClick={() => {
                         const el = noteRef.current;
@@ -1085,13 +1085,13 @@ function InboxPage() {
                           el?.setSelectionRange(pos, pos);
                         });
                       }}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200"
+                      className="h-7 w-7 grid place-items-center rounded hover:bg-amber-300/10 hover:text-amber-200 transition-colors duration-150"
                     >
                       <AtSignIcon className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setTemplatePickerOpen(true)}
-                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 hover:text-amber-200"
+                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 hover:text-amber-200 transition-colors duration-150"
                     >
                       Use template
                     </button>
@@ -1130,7 +1130,7 @@ function InboxPage() {
               <div className="text-sm font-semibold truncate">{contact.name}</div>
               <button
                 onClick={() => setContextOpen(false)}
-                className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50"
+                className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
                 aria-label="Close"
               >
                 <XIcon className="h-4 w-4" />
@@ -1159,7 +1159,7 @@ function InboxPage() {
                 <Link
                   to="/contacts/$contactId"
                   params={{ contactId: contact.id }}
-                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline transition-colors duration-150"
                 >
                   Open full contact <ExternalLink className="h-3 w-3" />
                 </Link>
@@ -1385,14 +1385,14 @@ function ConversationHeader({
         >
           <button
             onClick={() => { onTogglePin(); setMoreOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
           >
             {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
             <span>{isPinned ? "Unpin Contact" : "Pin Contact"}</span>
           </button>
           <button
             onClick={() => { onToggleRead(); setMoreOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
           >
             {isUnread ? <MailOpen className="h-3.5 w-3.5" /> : <MailIcon className="h-3.5 w-3.5" />}
             <span>{isUnread ? "Mark as Read" : "Mark as Unread"}</span>
@@ -1428,7 +1428,7 @@ function OwnerSelect({
         ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-gray-50 text-xs"
+        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-gray-50 text-xs transition-colors duration-150"
       >
         {current ? (
           <>
@@ -1536,7 +1536,7 @@ function OwnerSelect({
                 onChange(null);
                 setOpen(false);
               }}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-gray-50 hover:text-foreground disabled:opacity-40"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-gray-50 hover:text-foreground disabled:opacity-40 transition-colors duration-150"
             >
               <XIcon className="h-3.5 w-3.5" /> Unassign
             </button>
@@ -1628,7 +1628,7 @@ function CollaboratorsPopover({
                     ) : null}
                     <button
                       onClick={() => toggle(id)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground transition-colors duration-150"
                     >
                       <XIcon className="h-3 w-3" />
                     </button>
@@ -1657,7 +1657,7 @@ function CollaboratorsPopover({
                       <button
                         key={u.id}
                         onClick={() => toggle(u.id)}
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50"
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50 transition-colors duration-150"
                       >
                         <span
                           className={`h-4 w-4 rounded border grid place-items-center ${
@@ -1689,7 +1689,7 @@ function CollaboratorsPopover({
                     <button
                       key={a.id}
                       onClick={() => toggle(a.id)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50 transition-colors duration-150"
                     >
                       <span
                         className={`h-4 w-4 rounded border grid place-items-center ${
@@ -1720,7 +1720,7 @@ function CollaboratorsPopover({
                 onChange([]);
                 setOpen(false);
               }}
-              className="text-[11px] text-muted-foreground hover:text-foreground"
+              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-150"
             >
               Clear
             </button>
@@ -1729,7 +1729,7 @@ function CollaboratorsPopover({
                 onChange(draft);
                 setOpen(false);
               }}
-              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <UserPlus className="h-3.5 w-3.5" /> Add collaborators
             </button>
@@ -1747,7 +1747,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
       <button
         onClick={onRemove}
         aria-label={`Remove ${label}`}
-        className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20"
+        className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20 transition-colors duration-150"
       >
         <XIcon className="h-2.5 w-2.5" />
       </button>
@@ -1812,14 +1812,14 @@ function FilterPanel(props: FilterPanelProps) {
           <button
             onClick={onClear}
             disabled={activeCount === 0}
-            className="text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-40"
+            className="text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors duration-150"
           >
             Clear all
           </button>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50"
+            className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
           >
             <XIcon className="h-3.5 w-3.5" />
           </button>
@@ -1963,7 +1963,7 @@ function FilterCheckList({
       {items.map((it) => (
         <label
           key={it.key}
-          className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-foreground hover:bg-gray-50 cursor-pointer"
+          className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-foreground hover:bg-gray-50 cursor-pointer transition-colors duration-150"
         >
           <input
             type="checkbox"
@@ -2099,7 +2099,7 @@ function MessageRow({
 
 function MenuItem({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50">
+    <button onClick={onClick} className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150">
       {icon}
       <span>{label}</span>
     </button>
@@ -2167,7 +2167,7 @@ function ForwardModal({
               {count} message{count === 1 ? "" : "s"} · {selected.size} recipient{selected.size === 1 ? "" : "s"}
             </div>
           </div>
-          <button onClick={onClose} aria-label="Close" className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50">
+          <button onClick={onClose} aria-label="Close" className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150">
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -2311,14 +2311,14 @@ function SearchStrip({
             <button
               onClick={onPrev}
               aria-label="Previous match"
-              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
             >
               <ChevronUp className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={onNext}
               aria-label="Next match"
-              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50"
+              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
             >
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
@@ -2330,7 +2330,7 @@ function SearchStrip({
       <button
         onClick={onClose}
         aria-label="Close search"
-        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 shrink-0"
+        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 shrink-0 transition-colors duration-150"
       >
         <XIcon className="h-3.5 w-3.5" />
       </button>

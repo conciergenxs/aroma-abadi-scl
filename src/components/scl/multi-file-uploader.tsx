@@ -86,7 +86,7 @@ export function MultiFileUploader({
                 <a
                   href={f.url}
                   download={f.fileName}
-                  className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 text-muted-foreground"
+                  className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors duration-150"
                   title="Download"
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -94,7 +94,7 @@ export function MultiFileUploader({
                 <button
                   type="button"
                   onClick={() => onRemove(f.id)}
-                  className="grid h-7 w-7 place-items-center rounded hover:bg-rose-500/10 text-rose-400"
+                  className="grid h-7 w-7 place-items-center rounded hover:bg-rose-500/10 text-rose-400 transition-colors duration-150"
                   title="Remove"
                 >
                   <X className="h-3.5 w-3.5" />

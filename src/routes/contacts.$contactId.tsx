@@ -403,7 +403,7 @@ function ContactDetailPage() {
                       title="To date"
                     />
                     {(dateFrom || dateTo) && (
-                      <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-muted-foreground hover:text-foreground">Clear</button>
+                      <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-150">Clear</button>
                     )}
                   </div>
                 </div>
@@ -1290,7 +1290,7 @@ function LabelSelector({
           >
             <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
             {l.name}
-            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5">
+            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -1299,7 +1299,7 @@ function LabelSelector({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50"
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add label</span>
         <ChevronDown className="h-3 w-3" />
@@ -1324,7 +1324,7 @@ function LabelSelector({
                   type="button"
                   key={l.id}
                   onClick={() => onToggle(l.id)}
-                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2"
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
                 >
                   <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
                   <span className="flex-1">{l.name}</span>
@@ -1336,7 +1336,7 @@ function LabelSelector({
               <button
                 type="button"
                 onClick={() => { onCreate(search.trim()); setSearch(""); }}
-                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
+                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
               >
                 <Plus className="h-3 w-3 text-primary" />
                 Create <span className="font-medium text-foreground">"{search.trim()}"</span>
@@ -1393,7 +1393,7 @@ function ListSelector({
           >
             <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
             {l.name}
-            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5">
+            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -1402,7 +1402,7 @@ function ListSelector({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50"
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add to list</span>
         <ChevronDown className="h-3 w-3" />
@@ -1427,7 +1427,7 @@ function ListSelector({
                   type="button"
                   key={l.id}
                   onClick={() => onToggle(l.id)}
-                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2"
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
                 >
                   <span className="h-2 w-2 rounded-sm bg-primary/70" />
                   <span className="flex-1">{l.name}</span>
@@ -1439,7 +1439,7 @@ function ListSelector({
               <button
                 type="button"
                 onClick={() => { onCreate(search.trim()); setSearch(""); }}
-                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2"
+                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
               >
                 <Plus className="h-3 w-3 text-primary" />
                 Create <span className="font-medium text-foreground">"{search.trim()}"</span>

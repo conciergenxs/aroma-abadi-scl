@@ -71,7 +71,7 @@ function BrandChips({ brands }: { brands: string[] }) {
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpanded(true); }}
-          className="text-[10px] text-primary hover:underline"
+          className="text-[10px] text-primary hover:underline transition-colors duration-150"
         >
           &amp; {hiddenCount} other{hiddenCount === 1 ? "" : "s"}
         </button>
@@ -253,7 +253,7 @@ export function AudienceContactPicker({
                   <div key={c.id} className="flex items-center gap-2 px-3 py-2">
                     <span className="h-6 w-6 rounded-full bg-primary/15 border border-primary/30 grid place-items-center text-[9px] font-semibold shrink-0">{c.avatar}</span>
                     <span className="text-[12px] font-medium truncate flex-1">{c.name}</span>
-                    <button type="button" onClick={() => onToggle(c.id)} className="h-5 w-5 shrink-0 grid place-items-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                    <button type="button" onClick={() => onToggle(c.id)} className="h-5 w-5 shrink-0 grid place-items-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-150">
                       <X className="h-3 w-3" />
                     </button>
                   </div>

@@ -153,7 +153,7 @@ function ItemScopeEditor({
           <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
               <div className="text-sm font-semibold text-foreground">Select Items</div>
-              <button type="button" onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground">
+              <button type="button" onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -197,7 +197,7 @@ function ItemScopeEditor({
                   : scope.kind === "any";
                 const allFilteredSelected = filtered.length > 0 && filtered.every((it) => selected.includes(it.name));
                 return (
-                  <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted">
+                  <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
                     <input
                       type="checkbox"
                       checked={allFilteredSelected}
@@ -234,7 +234,7 @@ function ItemScopeEditor({
                   {filtered.map((it) => {
                     const checked = selected.includes(it.name);
                     return (
-                      <label key={`${it.brand}::${it.name}`} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer">
+                      <label key={`${it.brand}::${it.name}`} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150">
                         <input
                           type="checkbox"
                           checked={checked}
@@ -361,7 +361,7 @@ function RewardEditor({ reward, onChange, items }: { reward: PromoReward; onChan
             <button
               type="button"
               onClick={() => onChange({ ...reward, sameAsPurchased: !reward.sameAsPurchased })}
-              className="ml-1 text-[11px] text-primary hover:underline"
+              className="ml-1 text-[11px] text-primary hover:underline transition-colors duration-150"
             >
               {reward.sameAsPurchased ? "use a different item instead" : "use the same item instead"}
             </button>

@@ -245,7 +245,7 @@ function CreateTemplatePage() {
                       <button
                         onClick={createGroupInline}
                         disabled={!newGroupName.trim()}
-                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-8 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-8 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
                       >
                         Create
                       </button>
@@ -254,7 +254,7 @@ function CreateTemplatePage() {
                           setShowNewGroupInput(false);
                           setNewGroupName("");
                         }}
-                        className="text-[11px] text-muted-foreground hover:text-foreground"
+                        className="text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-150"
                       >
                         Cancel
                       </button>
@@ -262,7 +262,7 @@ function CreateTemplatePage() {
                   ) : (
                     <button
                       onClick={() => setShowNewGroupInput(true)}
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline transition-colors duration-150"
                     >
                       <Plus className="h-3 w-3" /> New group
                     </button>
@@ -302,7 +302,7 @@ function CreateTemplatePage() {
                 {/* Name — direct insert */}
                 <button
                   onClick={() => insertVariable("{{name}}")}
-                  className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground"
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                 >
                   <AtSign className="h-3 w-3" /> Name
                 </button>
@@ -310,7 +310,7 @@ function CreateTemplatePage() {
                 <div className="relative">
                   <button
                     onClick={() => setVarPopup(varPopup === "brands" ? null : "brands")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                   >
                     <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                   </button>
@@ -318,7 +318,7 @@ function CreateTemplatePage() {
                     <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                       <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                         <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Brand</span>
-                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
                       </div>
                       <div className="max-h-44 overflow-y-auto py-1">
                         {brands.map((b) => (
@@ -337,7 +337,7 @@ function CreateTemplatePage() {
                 <div className="relative">
                   <button
                     onClick={() => setVarPopup(varPopup === "promo" ? null : "promo")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                   >
                     <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                   </button>
@@ -345,7 +345,7 @@ function CreateTemplatePage() {
                     <div className="absolute top-full left-0 mt-1 w-60 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                       <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                         <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Promo Code</span>
-                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                        <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
                       </div>
                       <div className="max-h-44 overflow-y-auto py-1">
                         {PROMO_CODES_LIST.map((p) => (
@@ -428,14 +428,14 @@ function CreateTemplatePage() {
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               onClick={() => submit("draft")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
             >
               <Save className="h-3.5 w-3.5" /> Save draft
             </button>
             <button
               onClick={() => submit("submit")}
               disabled={!valid}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <Send className="h-3.5 w-3.5" /> Submit for review
             </button>

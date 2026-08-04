@@ -258,7 +258,7 @@ function AudienceSegmentPicker({
               audiences.map((a) => {
                 const checked = selectedIds.includes(a.id);
                 return (
-                  <label key={a.id} className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer">
+                  <label key={a.id} className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150">
                     <input
                       type="checkbox"
                       checked={checked}
@@ -281,7 +281,7 @@ function AudienceSegmentPicker({
             return (
               <span key={id} className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 h-5 text-[10px] text-foreground">
                 {a.name}
-                <button type="button" onClick={() => toggle(id)} className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20">
+                <button type="button" onClick={() => toggle(id)} className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20 transition-colors duration-150">
                   <XIcon className="h-2.5 w-2.5" />
                 </button>
               </span>

@@ -97,7 +97,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
           <div className="text-sm font-semibold">Brands</div>
           <div className="text-sm text-muted-foreground">Click a brand to view its categories and SKUs.</div>
         </div>
-        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90">
+        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150">
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
       </div>
@@ -142,7 +142,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Prev
             </button>
@@ -150,7 +150,7 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -176,7 +176,7 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
         </nav>
         <button
           onClick={() => { if (confirm(`Delete brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand deleted"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Delete brand"
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150" title="Delete brand"
         >
           <Trash2 className="h-4 w-4" /> Delete Brand
         </button>
@@ -244,7 +244,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50"><Plus className="h-3.5 w-3.5" /> Category</button>;
+    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"><Plus className="h-3.5 w-3.5" /> Category</button>;
   }
   return (
     <div className="flex items-center gap-1">
@@ -276,7 +276,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
         </nav>
         <button
           onClick={() => { if (confirm(`Delete category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category deleted"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm" title="Delete"
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150" title="Delete"
         >
           <Trash2 className="h-4 w-4" /> Delete Category
         </button>
@@ -331,7 +331,7 @@ function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
 
                   <Accordion type="single" collapsible className="mt-3">
                     <AccordionItem value={s.id} className="border-border">
-                      <AccordionTrigger className="text-sm hover:no-underline py-2">
+                      <AccordionTrigger className="text-sm hover:no-underline py-2 transition-colors duration-150">
                         <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({s.knowledgeCards.length})</span>
                       </AccordionTrigger>
                       <AccordionContent>
@@ -414,7 +414,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90"
+        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Add SKU
       </button>
@@ -435,7 +435,7 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
                 <button
                   type="button"
                   onClick={() => { onSelect(sku); setOpen(false); setQuery(""); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm transition-colors duration-150"
                 >
                   <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                     {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-4 w-4 text-primary" />}
@@ -473,7 +473,7 @@ function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categor
               <div className="text-sm font-medium line-clamp-2">{k.title}</div>
               <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
               <div className="mt-2 flex items-center justify-end gap-2">
-                <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground">Edit</button>
+                <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150">Edit</button>
                 <span className="text-xs text-muted-foreground">·</span>
                 <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card deleted"); }} className="text-xs text-rose-500">Delete</button>
               </div>

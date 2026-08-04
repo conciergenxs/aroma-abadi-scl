@@ -263,7 +263,7 @@ function CreateBroadcastPage() {
                     </div>
                     <button
                       onClick={() => setAudienceOpen(true)}
-                      className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+                      className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 transition-colors duration-150"
                     >
                       <Pencil className="h-3 w-3" /> Edit
                     </button>
@@ -328,14 +328,14 @@ function CreateBroadcastPage() {
                 <div className="flex flex-wrap items-center gap-1.5 relative">
                   <button
                     onClick={() => setManualBody((b) => b + " 🎉")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                   >
                     <Smile className="h-3 w-3" /> Emoji
                   </button>
                   {/* Name — direct insert */}
                   <button
                     onClick={() => insertVariable("name")}
-                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                   >
                     <AtSign className="h-3 w-3" /> Name
                   </button>
@@ -343,7 +343,7 @@ function CreateBroadcastPage() {
                   <div className="relative">
                     <button
                       onClick={() => setVarPopup(varPopup === "brands" ? null : "brands")}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                     >
                       <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                     </button>
@@ -351,7 +351,7 @@ function CreateBroadcastPage() {
                       <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                         <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Brand</span>
-                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
                           {brands.map((b) => (
@@ -370,7 +370,7 @@ function CreateBroadcastPage() {
                   <div className="relative">
                     <button
                       onClick={() => setVarPopup(varPopup === "promo" ? null : "promo")}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground"
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                     >
                       <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                     </button>
@@ -378,7 +378,7 @@ function CreateBroadcastPage() {
                       <div className="absolute top-full left-0 mt-1 w-60 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                         <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Promo Code</span>
-                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground"><XIcon className="h-3 w-3" /></button>
+                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
                           {Object.values(PROMO_REGISTRY).map((p) => (
@@ -418,7 +418,7 @@ function CreateBroadcastPage() {
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               onClick={() => submit("draft")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium text-foreground transition-colors duration-150"
             >
               <Save className="h-3.5 w-3.5" /> Save draft
             </button>
@@ -426,7 +426,7 @@ function CreateBroadcastPage() {
               <button
                 onClick={() => submit("schedule")}
                 disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
               </button>
@@ -434,7 +434,7 @@ function CreateBroadcastPage() {
               <button
                 onClick={() => submit("send")}
                 disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast
               </button>
@@ -603,7 +603,7 @@ function ChannelDropdown({ value, onChange }: { value: string; onChange: (id: st
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full inline-flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-3 h-10 text-[13px]"
+        className="w-full inline-flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-3 h-10 text-[13px] transition-colors duration-150"
       >
         {selected ? (
           <span className="inline-flex items-center gap-2">
@@ -669,13 +669,13 @@ function TemplateSummary({
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={onChange}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 h-7 text-[11px]"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 h-7 text-[11px] transition-colors duration-150"
           >
             <Pencil className="h-3 w-3" /> Change
           </button>
           <button
             onClick={onClear}
-            className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-border bg-card/60 hover:bg-card text-muted-foreground hover:text-destructive"
+            className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-border bg-card/60 hover:bg-card text-muted-foreground hover:text-destructive transition-colors duration-150"
             aria-label="Clear template"
           >
             <Trash2 className="h-3 w-3" />
@@ -806,7 +806,7 @@ function AudienceModal({
             <Users className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Choose Audience</h2>
           </div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground">
+          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -914,7 +914,7 @@ function AudienceModal({
                     />
                     <button
                       onClick={() => removeCondition(c.id)}
-                      className="h-9 w-9 grid place-items-center rounded-md border border-border bg-background/40 hover:text-destructive"
+                      className="h-9 w-9 grid place-items-center rounded-md border border-border bg-background/40 hover:text-destructive transition-colors duration-150"
                       aria-label="Remove condition"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -924,7 +924,7 @@ function AudienceModal({
               </div>
               <button
                 onClick={addCondition}
-                className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border hover:border-primary/40 hover:bg-primary/5 px-3 h-8 text-[12px] text-muted-foreground hover:text-primary"
+                className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border hover:border-primary/40 hover:bg-primary/5 px-3 h-8 text-[12px] text-muted-foreground hover:text-primary transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Add condition
               </button>
@@ -941,13 +941,13 @@ function AudienceModal({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px]"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px] transition-colors duration-150"
             >
               Cancel
             </button>
             <button
               onClick={confirm}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Check className="h-3.5 w-3.5" /> Apply audience
             </button>

@@ -463,7 +463,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
             <span key={id} className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]">
               <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
               {l.name}
-              <span role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); onToggle(id); }} className="text-muted-foreground hover:text-foreground">
+              <span role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); onToggle(id); }} className="text-muted-foreground hover:text-foreground transition-colors duration-150">
                 <X className="h-3 w-3" />
               </span>
             </span>
@@ -480,7 +480,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
             {filtered.map((l) => {
               const on = selectedIds.includes(l.id);
               return (
-                <button type="button" key={l.id} onClick={() => onToggle(l.id)} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2">
+                <button type="button" key={l.id} onClick={() => onToggle(l.id)} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150">
                   <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
                   <span className="flex-1">{l.name}</span>
                   {on && <Check className="h-3 w-3 text-primary" />}
@@ -489,7 +489,7 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
             })}
             {filtered.length === 0 && !canCreate && <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No labels found</div>}
             {canCreate && (
-              <button type="button" onClick={() => { onCreate(search.trim()); setSearch(""); }} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2">
+              <button type="button" onClick={() => { onCreate(search.trim()); setSearch(""); }} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150">
                 <Plus className="h-3 w-3 text-primary" />
                 Create <span className="font-medium text-foreground">"{search.trim()}"</span>
               </button>
