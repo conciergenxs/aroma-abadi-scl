@@ -9,7 +9,7 @@ import {
 import {
   LOYALTY_TIERS, TIER_COLOR, TIER_LABEL, DATE_RANGE_PRESETS, CUSTOM_RANGE_MIN, CUSTOM_RANGE_MAX, resolveMonthsBack,
   TIER_DISTRIBUTION, TIER_MOVEMENT, upgradeJourney, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS,
-  advocacyRevenue,
+  advocacyRevenue, REFERRAL_QUALITY,
   newMembersKpi, tierUpgradeRateKpi, repeatPurchaseRateKpi, referralConversionRateKpi,
   pointsRedemptionRateKpi, pointsSummary, benefitUsage, referralFunnel, topAdvocates,
   type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
