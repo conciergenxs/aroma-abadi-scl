@@ -50,10 +50,10 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 modal-backdrop" onMouseDown={onClose}>
       <div
         onMouseDown={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-xl border border-border bg-popover shadow-2xl"
+        className="w-full max-w-lg rounded-xl border border-border bg-popover shadow-2xl modal-content"
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
