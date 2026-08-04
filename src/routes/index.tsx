@@ -418,7 +418,7 @@ function Dashboard() {
               title="Recent Conversations"
               className="lg:col-span-2"
               action={
-                <Link to="/inbox" className="text-[11px] text-primary hover:underline">Open inbox →</Link>
+                <Link to="/inbox" className="text-[11px] font-semibold text-primary hover:underline">OPEN INBOX →</Link>
               }
             >
               <ul className="divide-y divide-border">
