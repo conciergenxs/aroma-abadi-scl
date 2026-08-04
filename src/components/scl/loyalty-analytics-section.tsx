@@ -522,7 +522,7 @@ export function CrmLoyaltyAnalytics() {
   return (
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard
-        title="CRM & Loyalty Program Analytics"
+        title="Aroma Prive Program Analytics"
         action={
           <div className="flex flex-wrap items-center gap-2">
             <DateRangeControl window={window} onSelectPreset={selectPreset} customRange={customRange} onCustomChange={onCustomChange} />
