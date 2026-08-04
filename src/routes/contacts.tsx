@@ -1062,8 +1062,8 @@ function LabelManager({
     <>
       <span onClick={() => setOpen(true)}>{trigger}</span>
       {open && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)}>
-          <div className="w-[420px] rounded-xl border border-border bg-popover shadow-xl glass" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop" onClick={() => setOpen(false)}>
+          <div className="w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-sm font-medium">Manage labels</div>
