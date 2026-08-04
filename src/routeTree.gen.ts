@@ -17,6 +17,7 @@ import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as ChannelsRouteImport } from './routes/channels'
 import { Route as BaRouteImport } from './routes/ba'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as PromoCodesIndexRouteImport } from './routes/promo-codes.index'
@@ -25,6 +26,7 @@ import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 import { Route as SkuSkuIdRouteImport } from './routes/sku.$skuId'
 import { Route as SkuDetailSkuIdRouteImport } from './routes/sku-detail.$skuId'
 import { Route as PromoCodesNewRouteImport } from './routes/promo-codes.new'
+import { Route as InviteSetPasswordRouteImport } from './routes/invite.set-password'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
@@ -74,6 +76,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccessDeniedRoute = AccessDeniedRouteImport.update({
+  id: '/access-denied',
+  path: '/access-denied',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -112,6 +119,11 @@ const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
 const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
   id: '/promo-codes/new',
   path: '/promo-codes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteSetPasswordRoute = InviteSetPasswordRouteImport.update({
+  id: '/invite/set-password',
+  path: '/invite/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsNewRoute = ContactsNewRouteImport.update({
@@ -158,6 +170,7 @@ const ContactsAudienceAddAudienceIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -170,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -184,6 +198,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -196,6 +211,7 @@ export interface FileRoutesByTo {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -211,6 +227,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -223,6 +240,7 @@ export interface FileRoutesById {
   '/broadcasts/new': typeof BroadcastsNewRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/new': typeof ContactsNewRoute
+  '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
@@ -239,6 +257,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/access-denied'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -251,6 +270,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/invite/set-password'
     | '/promo-codes/new'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
@@ -265,6 +285,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/access-denied'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -277,6 +298,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/invite/set-password'
     | '/promo-codes/new'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
@@ -291,6 +313,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/access-denied'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -303,6 +326,7 @@ export interface FileRouteTypes {
     | '/broadcasts/new'
     | '/contacts/$contactId'
     | '/contacts/new'
+    | '/invite/set-password'
     | '/promo-codes/new'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
@@ -318,6 +342,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccessDeniedRoute: typeof AccessDeniedRoute
   AuthRoute: typeof AuthRoute
   BaRoute: typeof BaRoute
   ChannelsRoute: typeof ChannelsRoute
@@ -328,6 +353,7 @@ export interface RootRouteChildren {
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
+  InviteSetPasswordRoute: typeof InviteSetPasswordRoute
   PromoCodesNewRoute: typeof PromoCodesNewRoute
   SkuDetailSkuIdRoute: typeof SkuDetailSkuIdRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
@@ -396,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/access-denied': {
+      id: '/access-denied'
+      path: '/access-denied'
+      fullPath: '/access-denied'
+      preLoaderRoute: typeof AccessDeniedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -450,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/promo-codes/new'
       fullPath: '/promo-codes/new'
       preLoaderRoute: typeof PromoCodesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/set-password': {
+      id: '/invite/set-password'
+      path: '/invite/set-password'
+      fullPath: '/invite/set-password'
+      preLoaderRoute: typeof InviteSetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacts/new': {
@@ -541,6 +581,7 @@ const SkuRouteWithChildren = SkuRoute._addFileChildren(SkuRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccessDeniedRoute: AccessDeniedRoute,
   AuthRoute: AuthRoute,
   BaRoute: BaRoute,
   ChannelsRoute: ChannelsRoute,
@@ -551,6 +592,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,
+  InviteSetPasswordRoute: InviteSetPasswordRoute,
   PromoCodesNewRoute: PromoCodesNewRoute,
   SkuDetailSkuIdRoute: SkuDetailSkuIdRoute,
   TemplatesNewRoute: TemplatesNewRoute,
