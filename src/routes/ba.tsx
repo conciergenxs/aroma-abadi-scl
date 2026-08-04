@@ -253,6 +253,17 @@ function BAPage() {
         </div>
       )}
 
+      {revealTarget && (
+        <RevealPasswordModal
+          ba={revealTarget}
+          onClose={() => setRevealTarget(null)}
+          onConfirmed={() => {
+            setRevealed((s) => new Set(s).add(revealTarget.id));
+            setRevealTarget(null);
+          }}
+        />
+      )}
+
       {(showCreate || editing) && (
         <BAForm
           initial={editing}
