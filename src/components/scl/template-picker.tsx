@@ -99,10 +99,10 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-4xl h-[600px] max-h-[90vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="w-full max-w-4xl h-[600px] max-h-[90vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
       >
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
