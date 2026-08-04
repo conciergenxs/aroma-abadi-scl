@@ -831,8 +831,8 @@ function ManagePropertiesModal({
   };
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop" onClick={onClose}>
+      <div className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
             <div className="text-sm font-medium">Manage Properties</div>
