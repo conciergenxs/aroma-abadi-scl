@@ -534,7 +534,6 @@ export function CrmLoyaltyAnalytics() {
         {/* Top KPI Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
           <MetricStat
-            icon={UserPlus}
             label="New Members"
             value={fmtNum(nm.value)}
             sub={nm.applies ? (nm.hasPreviousPeriod ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range") : "Always starts at Bronze"}
@@ -542,10 +541,9 @@ export function CrmLoyaltyAnalytics() {
             info="Total new members who registered in the selected period."
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
           />
-          <MetricStat icon={Repeat} label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Members with 2+ transactions ÷ total members who ever transacted." />
-          <MetricStat icon={Share2} label="Referral Conversion Rate" value={fmtPct(rcr)} info="Successful referrals ÷ referrals shared." />
+          <MetricStat label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Members with 2+ transactions ÷ total members who ever transacted." />
+          <MetricStat label="Referral Conversion Rate" value={fmtPct(rcr)} info="Successful referrals ÷ referrals shared." />
           <MetricStat
-            icon={ArrowUpCircle}
             label="Tier Upgrade Rate"
             value={fmtPct(tu.value)}
             sub={tu.hasPreviousPeriod ? `${tu.deltaPct >= 0 ? "+" : ""}${(tu.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range"}
@@ -553,7 +551,7 @@ export function CrmLoyaltyAnalytics() {
             info="Members who upgraded ÷ members eligible for review."
             spark={<Sparkline data={tu.spark} color="var(--chart-2)" />}
           />
-          <MetricStat icon={Gift} label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
+          <MetricStat label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
         </div>
 
         {/* 1. Tier Overview */}
