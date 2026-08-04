@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useBaStore, baStore, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
