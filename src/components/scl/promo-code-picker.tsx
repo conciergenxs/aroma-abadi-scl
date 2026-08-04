@@ -141,7 +141,7 @@ export function PromoCodePicker({ open, onClose, onSelect }: Props) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
-                      <div className="text-[11px] text-primary/80 mt-0.5 max-w-[240px] truncate">{describePromoRule(promo.rule)}</div>
+                      <div className="text-[11px] text-primary/80 mt-0.5 max-w-[420px] truncate">{describePromoRule(promo.rule)}</div>
                     </td>
                     <td className="px-4 py-3">
                       {promo.usageType === "one-to-one"
