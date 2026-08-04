@@ -396,6 +396,9 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
           <Field label="Full Name">
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter full name…" className={inputCls} />
           </Field>
+          <Field label="Area Coordinator (ARCO)">
+            <input value={areaCoordinator} onChange={(e) => setAreaCoordinator(e.target.value)} placeholder="Enter Area Coordinator name…" className={inputCls} />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Gender">
               <select value={gender} onChange={(e) => setGender(e.target.value as BA["gender"])} className={inputCls}>
