@@ -56,7 +56,7 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl max-h-[85vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
+        className="w-full max-w-3xl h-[560px] max-h-[88vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
       >
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
