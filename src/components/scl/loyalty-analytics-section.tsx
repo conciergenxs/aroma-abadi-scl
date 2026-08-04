@@ -377,7 +377,7 @@ function MaintenanceStackedBar({ tierFilter }: { tierFilter: TierFilter }) {
         </ResponsiveContainer>
       </div>
       <div className="flex flex-wrap justify-center gap-3 mt-1">
-        {([["Maintained", STATUS_COLORS.maintained], ["Grace Period", STATUS_COLORS.gracePeriod], ["At Risk", STATUS_COLORS.atRisk], ["Decayed", STATUS_COLORS.decayed]] as const).map(([label, color]) => (
+        {([["Maintained", STATUS_COLORS.maintained], ["Grace Period", STATUS_COLORS.gracePeriod], ["Decayed", STATUS_COLORS.decayed]] as const).map(([label, color]) => (
           <span key={label} className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <span className="h-2 w-2 rounded-full" style={{ background: color }} />
             {label}
