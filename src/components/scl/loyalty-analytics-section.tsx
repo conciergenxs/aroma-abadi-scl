@@ -367,12 +367,11 @@ function MaintenanceStackedBar({ tierFilter }: { tierFilter: TierFilter }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-            <XAxis dataKey="tier" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} />
+            <XAxis dataKey="tier" tickFormatter={(t: LoyaltyTier) => TIER_LABEL[t]} stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} />
             <YAxis stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
-            <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} />
+            <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} labelFormatter={(t: LoyaltyTier) => TIER_LABEL[t]} />
             <Bar dataKey="maintained" name="Maintained" stackId="a" fill={STATUS_COLORS.maintained} isAnimationActive animationDuration={700} />
             <Bar dataKey="gracePeriod" name="Grace Period" stackId="a" fill={STATUS_COLORS.gracePeriod} isAnimationActive animationDuration={700} />
-            <Bar dataKey="atRisk" name="At Risk" stackId="a" fill={STATUS_COLORS.atRisk} isAnimationActive animationDuration={700} />
             <Bar dataKey="decayed" name="Decayed" stackId="a" fill={STATUS_COLORS.decayed} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={700} />
           </BarChart>
         </ResponsiveContainer>
