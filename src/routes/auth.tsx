@@ -26,6 +26,7 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   // form state
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -33,6 +34,9 @@ function AuthPage() {
   const [company, setCompany] = useState("");
   const [remember, setRemember] = useState(true);
 
+  function validatePhone(v: string) {
+    return /^\+?[\d\s-]{8,}$/.test(v.trim());
+  }
   function validateEmail(v: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   }
@@ -42,7 +46,7 @@ function AuthPage() {
     setError(null);
 
     if (mode === "signin") {
-      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
       if (password.length < 6) return setError("Password must be at least 6 characters.");
       setLoading(true);
       await new Promise((r) => setTimeout(r, 700));
@@ -56,7 +60,8 @@ function AuthPage() {
     if (mode === "signup") {
       if (!fullName.trim()) return setError("Please enter your full name.");
       if (!company.trim()) return setError("Please enter your company name.");
-      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
+      if (email.trim() && !validateEmail(email)) return setError("Enter a valid email address.");
       if (password.length < 6) return setError("Password must be at least 6 characters.");
       if (password !== confirmPassword) return setError("Passwords don't match.");
       setLoading(true);
