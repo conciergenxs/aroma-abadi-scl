@@ -541,7 +541,7 @@ export function CrmLoyaltyAnalytics() {
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
           />
           <MetricStat label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Members with 2+ transactions ÷ total members who ever transacted." />
-          <MetricStat label="Referral Conversion Rate" value={fmtPct(rcr)} info="Successful referrals ÷ referrals shared." />
+          <MetricStat label="Referral Conversion Rate" value={fmtPct(rcr)} info="Referral purchases ÷ referrals generated." />
           <MetricStat
             label="Tier Upgrade Rate"
             value={fmtPct(tu.value)}
