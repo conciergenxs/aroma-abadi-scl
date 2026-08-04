@@ -45,14 +45,14 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content"
       >
         <div className="flex items-start gap-3 px-5 pt-5 pb-3">
           {isDestructive && (
