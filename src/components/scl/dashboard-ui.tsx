@@ -98,7 +98,7 @@ export function MetricStat({
   return (
     <div className="card-hover rounded-xl border border-border bg-card/60 p-4 glass relative overflow-hidden transition-all duration-300">
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
           {label}
           <InfoHint text={info} />
         </span>
