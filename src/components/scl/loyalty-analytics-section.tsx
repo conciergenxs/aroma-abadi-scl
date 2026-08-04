@@ -477,7 +477,7 @@ function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
             <div className="flex items-baseline justify-between gap-2 mt-0.5">
               <span className="inline-flex items-center gap-1 min-w-0 text-[12px] text-muted-foreground leading-tight truncate">
                 <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: TIER_COLOR[a.tier] }} />
-                <span className="shrink-0">{a.tier}</span>
+                <span className="shrink-0">{TIER_LABEL[a.tier]}</span>
                 {a.phone && <span className="truncate">· {a.phone}</span>}
               </span>
               <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">{fmtIDR(a.revenue)}</span>
