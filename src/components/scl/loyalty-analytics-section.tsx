@@ -7,16 +7,16 @@ import {
   type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import {
-  LOYALTY_TIERS, TIER_COLOR, DATE_RANGE_PRESETS, CUSTOM_RANGE_MIN, CUSTOM_RANGE_MAX, resolveMonthsBack,
+  LOYALTY_TIERS, TIER_COLOR, TIER_LABEL, DATE_RANGE_PRESETS, CUSTOM_RANGE_MIN, CUSTOM_RANGE_MAX, resolveMonthsBack,
   TIER_DISTRIBUTION, TIER_MOVEMENT, upgradeJourney, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS,
-  advocacyRevenue, REFERRAL_QUALITY,
+  advocacyRevenue,
   newMembersKpi, tierUpgradeRateKpi, repeatPurchaseRateKpi, referralConversionRateKpi,
   pointsRedemptionRateKpi, pointsSummary, benefitUsage, referralFunnel, topAdvocates,
   type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
 } from "@/components/scl/loyalty-metrics";
 import {
   Repeat, Gift, Coins, Wallet, Percent,
-  CircleDollarSign, Tags, UserCheck, ShoppingBasket, ArrowUpRight, Clock3, ChevronDown,
+  CircleDollarSign, Tags, ArrowUpRight, Clock3, ChevronDown,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
