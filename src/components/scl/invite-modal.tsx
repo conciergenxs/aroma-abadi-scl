@@ -66,11 +66,8 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 
         <div className="px-5 pt-3 border-b border-border">
           <div className="flex gap-1">
-            <TabBtn active={tab === "email"} onClick={() => setTab("email")} icon={<Mail className="h-3.5 w-3.5" />}>
-              Invite by Email
-            </TabBtn>
-            <TabBtn active={tab === "link"} onClick={() => setTab("link")} icon={<LinkIcon className="h-3.5 w-3.5" />}>
-              Invite with Link
+            <TabBtn active={tab === "whatsapp"} onClick={() => setTab("whatsapp")} icon={<img src={whatsappAsset} alt="" className="h-3.5 w-3.5" />}>
+              Invite by WhatsApp
             </TabBtn>
             <TabBtn active={tab === "agent"} onClick={() => setTab("agent")} icon={<Bot className="h-3.5 w-3.5" />}>
               Connect Agent
@@ -79,8 +76,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="p-5">
-          {tab === "email" && <EmailTab onClose={onClose} />}
-          {tab === "link" && <LinkTab />}
+          {tab === "whatsapp" && <WhatsAppTab onClose={onClose} />}
           {tab === "agent" && (
             <AgentTab
               onClose={onClose}
