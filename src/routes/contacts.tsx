@@ -1163,8 +1163,8 @@ function ContactDrawer({
 }) {
   return (
     <div className="fixed inset-0 z-40 flex">
-      <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto glass">
+      <div className="flex-1 bg-black/50 backdrop-blur-sm modal-backdrop" onClick={onClose} />
+      <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto glass animate-slide-in-right">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-medium">Contact details</div>
           <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
