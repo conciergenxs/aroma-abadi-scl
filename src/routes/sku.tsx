@@ -513,8 +513,8 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <form onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; onSubmit({ title, text, coverUrl: coverUrl || undefined }); }} className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
+      <form onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; onSubmit({ title, text, coverUrl: coverUrl || undefined }); }} className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">{initial ? "Edit Knowledge Card" : "Add Knowledge Card"}</div>
           <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
