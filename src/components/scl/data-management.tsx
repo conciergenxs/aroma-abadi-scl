@@ -793,12 +793,12 @@ function Modal({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`w-full ${width} rounded-xl border border-border bg-card shadow-2xl overflow-hidden`}
+        className={`w-full ${width} rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content`}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h2 className="text-sm font-semibold">{title}</h2>
