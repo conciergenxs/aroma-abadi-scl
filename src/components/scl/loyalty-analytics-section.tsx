@@ -154,7 +154,7 @@ function TierSelect({ value, onChange }: { value: TierFilter; onChange: (v: Tier
         className="h-8 appearance-none rounded-md border border-border bg-card/60 pl-2.5 pr-7 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
       >
         <option value="All">All Tier</option>
-        {LOYALTY_TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
+        {LOYALTY_TIERS.map((t) => <option key={t} value={t}>{TIER_LABEL[t]}</option>)}
       </select>
       <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
     </div>
