@@ -535,7 +535,7 @@ export function CrmLoyaltyAnalytics() {
           <MetricStat
             label="New Members"
             value={fmtNum(nm.value)}
-            sub={nm.applies ? (nm.hasPreviousPeriod ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range") : "Always starts at Bronze"}
+            sub={nm.applies ? (nm.hasPreviousPeriod ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range") : `Always starts at ${TIER_LABEL.Bronze}`}
             accent={nm.applies && nm.hasPreviousPeriod ? (nm.deltaPct >= 0 ? "up" : "down") : undefined}
             info="Total new members who registered in the selected period."
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
