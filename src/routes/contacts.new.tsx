@@ -80,6 +80,7 @@ function NewContactPage() {
     if (!gender) { toast.error("Gender is required"); return; }
     if (brandIds.length === 0) { toast.error("Select at least one brand"); return; }
     if (!position) { toast.error("Position is required"); return; }
+    if (!areaCoordinator.trim()) { toast.error("Area Coordinator is required"); return; }
     if (!city) { toast.error("City is required"); return; }
     if (!store) { toast.error("Store is required"); return; }
 
