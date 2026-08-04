@@ -113,6 +113,7 @@ function NewContactPage() {
       city,
       store,
       position,
+      areaCoordinator: areaCoordinator.trim(),
     });
 
     toast.success("BA Contact created successfully");
