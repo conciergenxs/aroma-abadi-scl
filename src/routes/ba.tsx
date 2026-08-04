@@ -345,14 +345,24 @@ function RevealPasswordModal({ ba, onClose, onConfirmed }: { ba: BA; onClose: ()
 function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: () => void; onSubmit: (input: Omit<BA, "id">, id?: string) => void }) {
   const { brands } = useSkuStore();
   const [name, setName] = useState(initial?.name || "");
+  const [areaCoordinator, setAreaCoordinator] = useState(initial?.areaCoordinator || "");
   const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
   const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Female");
-  const [password, setPassword] = useState(initial?.password || baStore.generatePassword());
+  const [password, setPassword] = useState(initial?.password || baStore.generatePassword(areaCoordinator, name));
   const [spinning, setSpinning] = useState(false);
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
   const [city, setCity] = useState(initial?.city || "");
   const [store, setStore] = useState(initial?.store || "");
   const [position, setPosition] = useState(initial?.position || "BA");
+
+  // Keep the auto-generated password in sync with the ARCO + BA name prefix
+  // while creating a new BA — editing an existing one leaves its live
+  // credentials untouched unless Regenerate is pressed explicitly.
+  useEffect(() => {
+    if (initial) return;
+    setPassword(baStore.generatePassword(areaCoordinator, name));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, areaCoordinator]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -367,6 +377,7 @@ function BAForm({ initial, onClose, onSubmit }: { initial: BA | null; onClose: (
       city,
       store,
       position,
+      areaCoordinator,
     }, initial?.id);
   }
 
