@@ -15,7 +15,7 @@ import {
   type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
 } from "@/components/scl/loyalty-metrics";
 import {
-  UserPlus, Repeat, Share2, ArrowUpCircle, Gift, Coins, Wallet, Percent,
+  Repeat, Gift, Coins, Wallet, Percent,
   CircleDollarSign, Tags, UserCheck, ShoppingBasket, ArrowUpRight, Clock3, ChevronDown,
 } from "lucide-react";
 import {
