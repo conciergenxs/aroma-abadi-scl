@@ -137,7 +137,8 @@ const KPI_BY_TIER: Record<TierFilter, TierKpis> = {
   Bronze: { repeatPurchaseRate: 0.42, referralConversionRate: 0.15, pointsRedemptionRate: 0.33, tierUpgradeRate: 0.22 },
   Silver: { repeatPurchaseRate: 0.58, referralConversionRate: 0.21, pointsRedemptionRate: 0.47, tierUpgradeRate: 0.19 },
   Gold: { repeatPurchaseRate: 0.71, referralConversionRate: 0.29, pointsRedemptionRate: 0.58, tierUpgradeRate: 0.11 },
-  Platinum: { repeatPurchaseRate: 0.84, referralConversionRate: 0.37, pointsRedemptionRate: 0.68, tierUpgradeRate: 0 },
+  Platinum: { repeatPurchaseRate: 0.84, referralConversionRate: 0.37, pointsRedemptionRate: 0.68, tierUpgradeRate: 0.08 },
+  Icon: { repeatPurchaseRate: 0.91, referralConversionRate: 0.46, pointsRedemptionRate: 0.77, tierUpgradeRate: 0 },
 };
 
 export type SparkPoint = { month: string; value: number };
