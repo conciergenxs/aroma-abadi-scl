@@ -2,9 +2,17 @@ import { useState } from "react";
 import { Lock, Loader2 } from "lucide-react";
 
 // Stand-in for a real "confirm your account password" check — this app has
-// no backend auth session to verify against, so revealing a BA's password
-// is gated behind this fixed demo value for the logged-in admin (Aria Kapoor).
+// no backend auth session to verify against, so this reuses whatever
+// password the admin actually typed when signing in this session (stored by
+// auth.tsx). Falls back to this fixed demo value if no session password was
+// ever captured (e.g. a stale/pre-existing "authed" session).
 export const MOCK_ACCOUNT_PASSWORD = "AriaK@2026";
+const ACCOUNT_PASSWORD_KEY = "scl_account_password";
+
+export function getAccountPassword(): string {
+  if (typeof window === "undefined") return MOCK_ACCOUNT_PASSWORD;
+  return window.localStorage.getItem(ACCOUNT_PASSWORD_KEY) || MOCK_ACCOUNT_PASSWORD;
+}
 
 export function RevealPasswordModal({ label, onClose, onConfirmed }: { label: string; onClose: () => void; onConfirmed: () => void }) {
   const [value, setValue] = useState("");
@@ -17,7 +25,7 @@ export function RevealPasswordModal({ label, onClose, onConfirmed }: { label: st
     setChecking(true);
     await new Promise((r) => setTimeout(r, 450));
     setChecking(false);
-    if (value !== MOCK_ACCOUNT_PASSWORD) {
+    if (value !== getAccountPassword()) {
       setError("Incorrect password. Try again.");
       return;
     }
