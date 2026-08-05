@@ -1011,7 +1011,21 @@ function RightPanel({
             </FieldRow>
             <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
               <div className="flex items-center gap-1.5 px-2 py-1">
-                <code className="font-mono text-xs text-foreground/90">••••••••••••</code>
+                <code className="font-mono text-xs text-foreground/90">{revealed ? baRecord.password : "••••••••••••"}</code>
+                <button
+                  onClick={() => setRevealed((r) => !r)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title={revealed ? "Hide" : "Show (requires your account password)"}
+                >
+                  {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </button>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(baRecord.password); toast.success("Password copied"); }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title="Copy"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
               </div>
             </FieldRow>
           </div>
