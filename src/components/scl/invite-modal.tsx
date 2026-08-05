@@ -4,6 +4,7 @@ import { AI_AGENTS, type AIAgent } from "@/components/scl/agents";
 import whatsappAsset from "@/assets/whatsapp.png";
 import {
   Bot,
+  Copy as CopyIcon,
   Phone,
   RefreshCw,
   UserPlus,
