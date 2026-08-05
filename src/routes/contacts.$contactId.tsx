@@ -1014,7 +1014,7 @@ function RightPanel({
               <div className="flex items-center gap-1.5 px-2 py-1">
                 <code className="font-mono text-xs text-foreground/90">{revealed ? baRecord.password : "••••••••••••"}</code>
                 <button
-                  onClick={() => setRevealed((r) => !r)}
+                  onClick={() => (revealed ? setRevealed(false) : setShowConfirm(true))}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                   title={revealed ? "Hide" : "Show (requires your account password)"}
                 >
