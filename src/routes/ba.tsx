@@ -3,15 +3,11 @@ import { useState, useMemo, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useBaStore, baStore, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { Search, Plus, KeyRound, Copy, Trash2, Eye, EyeOff, BadgeCheck, X, ChevronLeft, ChevronRight, Filter, RefreshCw, Lock, Loader2 } from "lucide-react";
+import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
+import { Search, Plus, KeyRound, Copy, Trash2, Eye, EyeOff, BadgeCheck, X, ChevronLeft, ChevronRight, Filter, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
-
-// Stand-in for a real "confirm your account password" check — this app has
-// no backend auth session to verify against, so revealing a BA's password
-// is gated behind this fixed demo value for the logged-in admin (Aria Kapoor).
-const MOCK_ACCOUNT_PASSWORD = "AriaK@2026";
 
 export const Route = createFileRoute("/ba")({
   head: () => ({
