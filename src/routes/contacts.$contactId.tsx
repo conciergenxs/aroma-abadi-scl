@@ -1003,7 +1003,7 @@ function RightPanel({
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
-        <RightSection title="BA Login Credentials DEBUG">
+        <RightSection title="BA Login Credentials">
           <div className="space-y-2.5">
             <FieldRow icon={<BadgeCheck className="h-3.5 w-3.5" />} label="Username">
               <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.username}</div>
