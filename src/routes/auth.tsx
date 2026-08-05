@@ -416,7 +416,7 @@ function AuthPage() {
           )}
 
           {/* SCL Admin Forms */}
-          {mode === "signin" || mode === "signup" || mode === "forgot" ? (
+          {(mode === "signin" || mode === "signup" || mode === "forgot") && (
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               {mode === "signup" && (
                 <>
