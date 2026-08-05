@@ -970,6 +970,7 @@ function RightPanel({
   labels,
   lists,
   customProps,
+  baRecord,
   onUpdateField,
   onToggleLabel,
   onCreateLabel,
@@ -982,6 +983,7 @@ function RightPanel({
   labels: ContactLabel[];
   lists: { id: string; name: string }[];
   customProps: ContactProperty[];
+  baRecord: BA | undefined;
   onUpdateField: <K extends keyof Contact>(key: K, value: Contact[K], label: string) => void;
   onToggleLabel: (id: string) => void;
   onCreateLabel: (name: string) => void;
@@ -993,6 +995,8 @@ function RightPanel({
   const { brands } = useSkuStore();
   return (
     <div className="p-4 space-y-6">
+      {baRecord && <BALoginCredentials baRecord={baRecord} />}
+
       <RightSection title="Contact Information">
         <div className="space-y-2.5">
           <FieldRow icon={<Phone className="h-3.5 w-3.5" />} label="Phone">
