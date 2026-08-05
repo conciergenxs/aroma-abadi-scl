@@ -1000,7 +1000,7 @@ function RightPanel({
   const { brands } = useSkuStore();
   return (
     <div className="p-4 space-y-6">
-      {baRecord && <BALoginCredentials baRecord={baRecord} />}
+      {false && baRecord && <BALoginCredentials baRecord={baRecord} />}
 
       <RightSection title="Contact Information">
         <div className="space-y-2.5">
