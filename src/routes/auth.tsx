@@ -402,20 +402,12 @@ function AuthPage() {
               </button>
 
               {mode === "signin" && (
-                <>
-                  <p className="text-center text-xs text-muted-foreground">
-                    Don't have an account?{" "}
-                    <button type="button" onClick={() => { setMode("signup"); setError(null); }} className="text-primary hover:underline transition-colors duration-150">
-                      Create Account
-                    </button>
-                  </p>
-                  <p className="text-center text-xs text-muted-foreground">
-                    Beauty Ambassador?{" "}
-                    <button type="button" onClick={() => { setMode("ba"); setError(null); }} className="text-primary hover:underline transition-colors duration-150">
-                      Sign in here
-                    </button>
-                  </p>
-                </>
+                <p className="text-center text-xs text-muted-foreground">
+                  Don't have an account?{" "}
+                  <button type="button" onClick={() => { setMode("signup"); setError(null); }} className="text-primary hover:underline transition-colors duration-150">
+                    Create Account
+                  </button>
+                </p>
               )}
               {mode === "signup" && (
                 <p className="text-center text-xs text-muted-foreground">
