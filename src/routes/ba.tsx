@@ -251,7 +251,7 @@ function BAPage() {
 
       {revealTarget && (
         <RevealPasswordModal
-          ba={revealTarget}
+          label={revealTarget.name}
           onClose={() => setRevealTarget(null)}
           onConfirmed={() => {
             setRevealed((s) => new Set(s).add(revealTarget.id));
