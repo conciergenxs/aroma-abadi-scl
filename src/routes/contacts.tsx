@@ -675,6 +675,7 @@ function ContactsTable({
           {showBaPosition && <th className={thCls}>Position</th>}
           {showBaStore && <th className={thCls}>Store</th>}
           {showBaCity && <th className={thCls}>City</th>}
+          {showBaPassword && <th className={thCls}>Password</th>}
         </tr>
       </thead>
       <tbody className="stagger divide-y divide-border">
