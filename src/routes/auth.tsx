@@ -51,7 +51,10 @@ function AuthPage() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 700));
       setLoading(false);
-      if (typeof window !== "undefined") window.localStorage.setItem("scl_authed", "1");
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("scl_authed", "1");
+        window.localStorage.setItem("scl_account_password", password);
+      }
       toast.success("Welcome back, Aria.");
       navigate({ to: "/" });
       return;
