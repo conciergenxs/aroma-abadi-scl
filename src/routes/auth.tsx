@@ -74,7 +74,7 @@ function AuthPage() {
     }
 
     if (mode === "forgot") {
-      if (!validateEmail(email)) return setError("Enter a valid email address.");
+      if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
       setLoading(true);
       await new Promise((r) => setTimeout(r, 700));
       setLoading(false);
