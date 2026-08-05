@@ -1000,7 +1000,12 @@ function RightPanel({
   const { brands } = useSkuStore();
   return (
     <div className="p-4 space-y-6">
-      {false && baRecord && <BALoginCredentials baRecord={baRecord} />}
+      {baRecord && (
+        <div style={{ border: "1px solid red", padding: 8 }}>
+          <div>DEBUG Username: {baRecord.username}</div>
+          <div>DEBUG Arco: {baRecord.areaCoordinator}</div>
+        </div>
+      )}
 
       <RightSection title="Contact Information">
         <div className="space-y-2.5">
