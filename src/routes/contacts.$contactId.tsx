@@ -998,6 +998,7 @@ function RightPanel({
   onSetCustomProperty: (key: string, value: unknown, displayName: string) => void;
 }) {
   const { brands } = useSkuStore();
+  const [revealed, setRevealed] = useState(false);
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
