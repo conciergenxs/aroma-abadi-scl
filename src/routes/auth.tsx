@@ -258,6 +258,14 @@ function AuthPage() {
                 </p>
               </div>
             )}
+            {mode === "forgot-reset" && (
+              <>
+                <h2 className="text-2xl font-semibold tracking-tight">Set a new password</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Choose a new password for your account.
+                </p>
+              </>
+            )}
           </div>
 
           {/* BA Login Form — Beauty Ambassadors don't get dashboard access;
