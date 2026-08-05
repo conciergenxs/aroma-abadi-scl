@@ -148,6 +148,34 @@ const inputCls =
 function WhatsAppTab({ onClose }: { onClose: () => void }) {
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("Member");
+  const [sentLink, setSentLink] = useState<string | null>(null);
+
+  if (sentLink) {
+    return (
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Invitation sent to <span className="text-foreground font-medium">{phone}</span> via WhatsApp, as <span className="text-foreground font-medium">{role}</span>. The link below is what they'd receive — opening it lets them set a password and land on the sign-in page.
+        </p>
+        <Field label="Invite link">
+          <div className="flex gap-2">
+            <input readOnly value={sentLink} className={`${inputCls} font-mono`} />
+            <button
+              onClick={() => { navigator.clipboard.writeText(sentLink); toast.success("Link copied to clipboard"); }}
+              className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 transition-colors duration-150"
+            >
+              <CopyIcon className="h-3.5 w-3.5" /> Copy
+            </button>
+          </div>
+        </Field>
+        <div className="flex justify-end gap-2 pt-2">
+          <button onClick={onClose} className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">
+            Done
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <Field label="WhatsApp number" required>
@@ -163,7 +191,7 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
           />
         </div>
       </Field>
-      <Field label="Role">
+      <Field label="Role" hint="Set in Roles & Permissions — this is what they'll be assigned on joining.">
         <select value={role} onChange={(e) => setRole(e.target.value)} className={inputCls}>
           <option>Member</option>
           <option>Admin</option>
@@ -177,8 +205,9 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
         <button
           onClick={() => {
             if (!phone.trim()) return toast.error("WhatsApp number is required");
+            const link = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/set-password?phone=${encodeURIComponent(phone)}&role=${encodeURIComponent(role)}`;
             toast.success(`Invitation sent to ${phone} via WhatsApp`);
-            onClose();
+            setSentLink(link);
           }}
           className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
