@@ -16,7 +16,13 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-type Mode = "signin" | "signup" | "forgot" | "forgot-sent" | "ba";
+type Mode = "signin" | "signup" | "forgot" | "forgot-otp" | "forgot-reset" | "ba";
+
+// Demo-only OTP — this app has no real SMS/WhatsApp gateway, so the reset
+// flow accepts this fixed code as the "correct" verification.
+const DEMO_OTP = "123456";
+const OTP_LENGTH = 6;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 function AuthPage() {
   const navigate = useNavigate();
