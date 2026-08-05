@@ -750,18 +750,19 @@ function ContactsTable({
           </tr>
         )}
       </tbody>
-
-      {revealTarget && (
-        <RevealPasswordModal
-          label={revealTarget.name}
-          onClose={() => setRevealTarget(null)}
-          onConfirmed={() => {
-            setRevealed((s) => new Set(s).add(revealTarget.id));
-            setRevealTarget(null);
-          }}
-        />
-      )}
     </table>
+
+    {revealTarget && (
+      <RevealPasswordModal
+        label={revealTarget.name}
+        onClose={() => setRevealTarget(null)}
+        onConfirmed={() => {
+          setRevealed((s) => new Set(s).add(revealTarget.id));
+          setRevealTarget(null);
+        }}
+      />
+    )}
+    </>
   );
 }
 
