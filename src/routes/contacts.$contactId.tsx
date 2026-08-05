@@ -1122,51 +1122,6 @@ function RightPanel({
   );
 }
 
-function BALoginCredentials({ baRecord }: { baRecord: BA }) {
-  const [revealed, setRevealed] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  return (
-    <RightSection title="BA Login Credentials">
-      <div className="space-y-2.5">
-        <FieldRow icon={<BadgeCheck className="h-3.5 w-3.5" />} label="Username">
-          <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.username}</div>
-        </FieldRow>
-        <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Area Coordinator">
-          <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.areaCoordinator || "—"}</div>
-        </FieldRow>
-        <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
-          <div className="flex items-center gap-1.5 px-2 py-1">
-            <code className="font-mono text-xs text-foreground/90">{revealed ? baRecord.password : "••••••••••••"}</code>
-            <button
-              onClick={() => (revealed ? setRevealed(false) : setShowConfirm(true))}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title={revealed ? "Hide" : "Show (requires your account password)"}
-            >
-              {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            </button>
-            <button
-              onClick={() => { navigator.clipboard.writeText(baRecord.password); toast.success("Password copied"); }}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title="Copy"
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </FieldRow>
-      </div>
-
-      {showConfirm && (
-        <RevealPasswordModal
-          label={baRecord.name}
-          onClose={() => setShowConfirm(false)}
-          onConfirmed={() => { setRevealed(true); setShowConfirm(false); }}
-        />
-      )}
-    </RightSection>
-  );
-}
-
 function RightSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
