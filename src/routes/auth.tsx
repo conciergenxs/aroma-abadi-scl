@@ -498,6 +498,51 @@ function AuthPage() {
 const inputCls =
   "w-full rounded-md border border-border bg-card/60 px-3 py-2.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition";
 
+function OtpInput({ value, onChange, length = OTP_LENGTH }: { value: string; onChange: (v: string) => void; length?: number }) {
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const digits = value.split("").concat(Array(length).fill("")).slice(0, length);
+
+  function handleChange(i: number, raw: string) {
+    const d = raw.replace(/\D/g, "").slice(-1);
+    const next = digits.slice();
+    next[i] = d;
+    onChange(next.join("").replace(/\s+$/, ""));
+    if (d && i < length - 1) refs.current[i + 1]?.focus();
+  }
+
+  function handleKeyDown(i: number, e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Backspace" && !digits[i] && i > 0) refs.current[i - 1]?.focus();
+  }
+
+  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
+    const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length);
+    if (!text) return;
+    e.preventDefault();
+    onChange(text);
+    refs.current[Math.min(text.length, length - 1)]?.focus();
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {digits.map((d, i) => (
+        <input
+          key={i}
+          ref={(el) => { refs.current[i] = el; }}
+          value={d}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+          onPaste={handlePaste}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={1}
+          autoFocus={i === 0}
+          className="h-12 w-11 text-center text-lg font-semibold rounded-md border border-border bg-card/60 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition"
+        />
+      ))}
+    </div>
+  );
+}
+
 function Field({
   label,
   rightSlot,
