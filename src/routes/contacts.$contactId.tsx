@@ -999,6 +999,7 @@ function RightPanel({
 }) {
   const { brands } = useSkuStore();
   const [revealed, setRevealed] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
