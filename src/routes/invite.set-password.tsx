@@ -11,15 +11,22 @@ export const Route = createFileRoute("/invite/set-password")({
       { name: "description", content: "Finish setting up your Aroma Abadi workspace account." },
     ],
   }),
+  // The real invite link carries the invitee's phone number and the role
+  // assigned to them in Roles & Permissions — falls back to illustrative
+  // defaults when opened without those params (e.g. typed in directly).
+  validateSearch: (search: Record<string, unknown>): { phone?: string; role?: string } => ({
+    phone: typeof search.phone === "string" ? search.phone : undefined,
+    role: typeof search.role === "string" ? search.role : undefined,
+  }),
   component: SetPasswordPage,
 });
 
-// Illustrative — a real invite link would carry the invitee's phone number
-// (and a token) as query params; this stands in for that context.
-const INVITED_PHONE = "+62 812 3456 7890";
+const DEFAULT_INVITED_PHONE = "+62 812 3456 7890";
+const DEFAULT_INVITED_ROLE = "Member";
 
 function SetPasswordPage() {
   const navigate = useNavigate();
+  const { phone: invitedPhone, role: invitedRole } = Route.useSearch();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
