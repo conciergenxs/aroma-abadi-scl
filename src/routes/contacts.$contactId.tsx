@@ -1030,6 +1030,13 @@ function RightPanel({
               </div>
             </FieldRow>
           </div>
+          {showConfirm && (
+            <RevealPasswordModal
+              label={baRecord.name}
+              onClose={() => setShowConfirm(false)}
+              onConfirmed={() => { setRevealed(true); setShowConfirm(false); }}
+            />
+          )}
         </RightSection>
       )}
 
