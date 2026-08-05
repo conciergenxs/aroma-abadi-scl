@@ -721,6 +721,21 @@ function ContactsTable({
               {showBaPosition && <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>}
               {showBaStore && <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>}
               {showBaCity && <td className={tdCls}>{ba?.city ?? <span className="text-muted-foreground">—</span>}</td>}
+              {showBaPassword && (
+                <td className={tdCls} onClick={(e) => e.stopPropagation()}>
+                  {ba ? (
+                    <div className="flex items-center gap-1.5">
+                      <code className="font-mono text-xs">{revealed.has(ba.id) ? ba.password : "••••••••••••"}</code>
+                      <button onClick={() => toggleReveal(ba)} className="text-muted-foreground hover:text-foreground transition-colors" title={revealed.has(ba.id) ? "Hide" : "Show (requires your account password)"}>
+                        {revealed.has(ba.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </button>
+                      <button onClick={() => { navigator.clipboard.writeText(ba.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : <span className="text-muted-foreground">—</span>}
+                </td>
+              )}
             </tr>
           );
         })}
@@ -734,6 +749,17 @@ function ContactsTable({
           </tr>
         )}
       </tbody>
+
+      {revealTarget && (
+        <RevealPasswordModal
+          label={revealTarget.name}
+          onClose={() => setRevealTarget(null)}
+          onConfirmed={() => {
+            setRevealed((s) => new Set(s).add(revealTarget.id));
+            setRevealTarget(null);
+          }}
+        />
+      )}
     </table>
   );
 }
