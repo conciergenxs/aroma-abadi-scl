@@ -66,6 +66,7 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
   { id: "p-store",           key: "store",            name: "Store",            type: "text",        visible: false },
   { id: "p-city",            key: "city",             name: "City",             type: "text",        visible: false },
   { id: "p-position",        key: "position",         name: "Position",         type: "select",      visible: false, options: ["BA", "Senior BA", "Team Leader"] },
+  { id: "p-ba-password",     key: "password",         name: "Password",        type: "text",        visible: true },
   { id: "p-status",          key: "status",           name: "Status",           type: "select",      visible: false, system: true },
   // ── Extra fields for New Contact form ──────────────────────────────────
   { id: "p-pic",             key: "pic",              name: "PIC",              type: "text",        visible: false },
