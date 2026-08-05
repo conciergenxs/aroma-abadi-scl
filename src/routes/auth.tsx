@@ -141,10 +141,8 @@ function AuthPage() {
 
     if (mode === "forgot") {
       if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 700));
-      setLoading(false);
-      setMode("forgot-sent");
+      await sendOtp();
+      setMode("forgot-otp");
       return;
     }
   }
