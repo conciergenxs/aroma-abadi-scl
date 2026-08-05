@@ -642,10 +642,20 @@ function ContactsTable({
   const showBaPosition = isBaView && isVisible("position");
   const showBaStore = isBaView && isVisible("store");
   const showBaCity = isBaView && isVisible("city");
+  const showBaPassword = isBaView && isVisible("password");
 
   // colSpan for empty state — base columns (checkbox, name, WA number, contact
   // type) plus whichever optional columns are currently toggled on
-  const colSpan = 4 + [showGender, showPointBalance, showLastTransaction, showBaBrand, showBaGender, showBaPosition, showBaStore, showBaCity].filter(Boolean).length;
+  const colSpan = 4 + [showGender, showPointBalance, showLastTransaction, showBaBrand, showBaGender, showBaPosition, showBaStore, showBaCity, showBaPassword].filter(Boolean).length;
+
+  function toggleReveal(ba: BA | undefined) {
+    if (!ba) return;
+    if (revealed.has(ba.id)) {
+      setRevealed((s) => { const n = new Set(s); n.delete(ba.id); return n; });
+      return;
+    }
+    setRevealTarget(ba);
+  }
 
   return (
     <table className="min-w-full text-sm">
