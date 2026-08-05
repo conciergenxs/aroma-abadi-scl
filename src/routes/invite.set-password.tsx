@@ -51,7 +51,7 @@ function SetPasswordPage() {
         <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain mb-8" />
         <h1 className="text-2xl font-semibold tracking-tight">Set your password</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          You've been invited to join the Aroma Abadi workspace as <span className="text-foreground">{INVITED_PHONE}</span>. Create a password to finish setting up your account.
+          You've been invited to join the Aroma Abadi workspace as <span className="text-foreground">{invitedPhone || DEFAULT_INVITED_PHONE}</span>, with the role of <span className="text-foreground">{invitedRole || DEFAULT_INVITED_ROLE}</span>. Create a password to finish setting up your account.
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
