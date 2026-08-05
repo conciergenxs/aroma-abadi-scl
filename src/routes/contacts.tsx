@@ -730,9 +730,11 @@ function ContactsTable({
                       <button onClick={() => toggleReveal(ba)} className="text-muted-foreground hover:text-foreground transition-colors" title={revealed.has(ba.id) ? "Hide" : "Show (requires your account password)"}>
                         {revealed.has(ba.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                       </button>
-                      <button onClick={() => { navigator.clipboard.writeText(ba.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
+                      {revealed.has(ba.id) && (
+                        <button onClick={() => { navigator.clipboard.writeText(ba.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </div>
                   ) : <span className="text-muted-foreground">—</span>}
                 </td>
