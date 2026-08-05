@@ -333,8 +333,90 @@ function AuthPage() {
             </form>
           )}
 
+          {/* OTP verification */}
+          {mode === "forgot-otp" && (
+            <form onSubmit={verifyOtp} className="mt-6 space-y-4">
+              <OtpInput value={otp} onChange={(v) => { setOtp(v); setError(null); }} />
+              {error && (
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300 text-center">
+                  {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={loading || otp.length < OTP_LENGTH}
+                className="w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Verifying…" : "Verify Code"}
+              </button>
+              <p className="text-center text-xs text-muted-foreground">
+                {resendCooldown > 0 ? (
+                  <>Resend code in {resendCooldown}s</>
+                ) : (
+                  <>
+                    Didn't get a code?{" "}
+                    <button type="button" onClick={sendOtp} className="text-primary hover:underline transition-colors duration-150">
+                      Resend OTP
+                    </button>
+                  </>
+                )}
+              </p>
+            </form>
+          )}
+
+          {/* Set new password after OTP verification */}
+          {mode === "forgot-reset" && (
+            <form onSubmit={resetPassword} className="mt-6 space-y-4">
+              <Field label="New Password">
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className={`${inputCls} pr-10`}
+                    autoComplete="new-password"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </Field>
+              <Field label="Confirm New Password">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className={inputCls}
+                  autoComplete="new-password"
+                />
+              </Field>
+              {error && (
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                  {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Saving…" : "Set New Password"}
+              </button>
+            </form>
+          )}
+
           {/* SCL Admin Forms */}
-          {mode !== "forgot-sent" && mode !== "ba" && (
+          {mode === "signin" || mode === "signup" || mode === "forgot" ? (
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               {mode === "signup" && (
                 <>
