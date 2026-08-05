@@ -811,7 +811,7 @@ function AudienceModal({
           </button>
         </div>
 
-        <div className="px-5 pt-3 border-b border-border">
+        <div className="px-5 pt-3 border-b border-border flex items-center justify-between gap-3">
           <div className="inline-flex rounded-md border border-border bg-background/40 p-1">
             {(["list", "condition"] as const).map((t) => {
               const sel = tab === t;
@@ -828,6 +828,12 @@ function AudienceModal({
               );
             })}
           </div>
+          <Link
+            to="/contacts/audience/new"
+            className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150 mb-3"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add New Audience
+          </Link>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto p-5">
