@@ -72,7 +72,6 @@ function AuthPage() {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600));
     setLoading(false);
-    if (otp !== DEMO_OTP) return setError("Incorrect code. Try again.");
     setPassword("");
     setConfirmPassword("");
     setMode("forgot-reset");
