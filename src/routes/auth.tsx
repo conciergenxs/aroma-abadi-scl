@@ -175,7 +175,7 @@ function AuthPage() {
                 </button>
                 <h2 className="text-2xl font-semibold tracking-tight">Reset your password</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Enter your email and we'll send you a reset link.
+                  Enter your WhatsApp number and we'll send you a reset link.
                 </p>
               </>
             )}
@@ -184,9 +184,9 @@ function AuthPage() {
                 <div className="h-12 w-12 rounded-full bg-primary/15 border border-primary/30 grid place-items-center mb-4">
                   <CheckCircle2 className="h-6 w-6 text-primary" />
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight">Check your inbox</h2>
+                <h2 className="text-2xl font-semibold tracking-tight">Check WhatsApp</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  We've sent a password reset link to <span className="text-foreground">{email || "your email"}</span>.
+                  We've sent a password reset link to <span className="text-foreground">{phone || "your WhatsApp number"}</span> via WhatsApp.
                 </p>
                 <button
                   onClick={() => { setMode("signin"); setError(null); }}
