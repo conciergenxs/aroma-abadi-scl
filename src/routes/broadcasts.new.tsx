@@ -830,7 +830,7 @@ function AudienceModal({
           </div>
           <Link
             to="/contacts/audience/new"
-            className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150 mb-3"
+            className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
           >
             <Plus className="h-3.5 w-3.5" /> Add New Audience
           </Link>
