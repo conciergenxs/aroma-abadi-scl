@@ -658,6 +658,7 @@ function ContactsTable({
   }
 
   return (
+    <>
     <table className="min-w-full text-sm">
       <thead>
         <tr>
