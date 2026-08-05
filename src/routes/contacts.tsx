@@ -19,7 +19,8 @@ import {
   LIFECYCLE_COLORS,
   getStageStyle,
 } from "@/components/scl/contacts-store";
-import { useBaStore } from "@/components/scl/ba-store";
+import { useBaStore, type BA } from "@/components/scl/ba-store";
+import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import { toast } from "sonner";
@@ -27,7 +28,7 @@ import {
   Search, Plus, MoreHorizontal,
   Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
   Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3, Info,
-  Phone, Mail, Hash,
+  Phone, Mail, Hash, Eye, EyeOff, Copy,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
