@@ -155,9 +155,11 @@ function BAPage() {
                         <button onClick={() => toggleReveal(b)} className="text-muted-foreground hover:text-foreground transition-colors" title={shown ? "Hide" : "Show (requires your account password)"}>
                           {shown ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </button>
-                        <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
-                          <Copy className="h-3.5 w-3.5" />
-                        </button>
+                        {shown && (
+                          <button onClick={() => { navigator.clipboard.writeText(b.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
+                            <Copy className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                         <button onClick={() => setResetConfirm(b)} className="text-muted-foreground hover:text-foreground transition-colors" title="Reset password">
                           <KeyRound className="h-3.5 w-3.5" />
                         </button>
