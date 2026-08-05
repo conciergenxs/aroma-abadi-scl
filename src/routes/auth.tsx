@@ -307,8 +307,8 @@ function AuthPage() {
                 </Field>
               )}
 
-              {(mode === "forgot" || mode === "signup") && (
-                <Field label={mode === "signup" ? "Email Address (Optional)" : "Email Address"}>
+              {mode === "signup" && (
+                <Field label="Email Address (Optional)">
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
