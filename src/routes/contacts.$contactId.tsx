@@ -439,6 +439,7 @@ function ContactDetailPage() {
               labels={labels}
               lists={lists}
               customProps={customProps}
+              baRecord={baRecord}
               onUpdateField={updateField}
               onToggleLabel={toggleLabel}
               onCreateLabel={createLabel}
