@@ -39,12 +39,66 @@ function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [company, setCompany] = useState("");
   const [remember, setRemember] = useState(true);
+  const [otp, setOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   function validatePhone(v: string) {
     return /^\+?[\d\s-]{8,}$/.test(v.trim());
   }
   function validateEmail(v: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
+
+  async function sendOtp() {
+    setError(null);
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 700));
+    setLoading(false);
+    setOtp("");
+    setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    toast.success(`OTP sent to ${phone} via WhatsApp`);
+  }
+
+  async function verifyOtp(e?: FormEvent) {
+    e?.preventDefault();
+    if (loading) return;
+    setError(null);
+    if (otp.length < OTP_LENGTH) return setError("Enter the 6-digit code.");
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setLoading(false);
+    if (otp !== DEMO_OTP) return setError("Incorrect code. Try again.");
+    setPassword("");
+    setConfirmPassword("");
+    setMode("forgot-reset");
+  }
+
+  // Auto-verify once all 6 digits are in, so the user doesn't have to also
+  // press a button — the manual "Verify Code" button stays as a fallback.
+  useEffect(() => {
+    if (mode === "forgot-otp" && otp.length === OTP_LENGTH) verifyOtp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp]);
+
+  async function resetPassword(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (password.length < 6) return setError("Password must be at least 6 characters.");
+    if (password !== confirmPassword) return setError("Passwords don't match.");
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setLoading(false);
+    toast.success("Password reset. Please sign in with your new password.");
+    setPassword("");
+    setConfirmPassword("");
+    setOtp("");
+    setMode("signin");
   }
 
   async function onSubmit(e: FormEvent) {
