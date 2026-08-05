@@ -1001,10 +1001,21 @@ function RightPanel({
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
-        <div style={{ border: "1px solid red", padding: 8 }}>
-          <div>DEBUG Username: {baRecord.username}</div>
-          <div>DEBUG Arco: {baRecord.areaCoordinator}</div>
-        </div>
+        <RightSection title="BA Login Credentials DEBUG">
+          <div className="space-y-2.5">
+            <FieldRow icon={<BadgeCheck className="h-3.5 w-3.5" />} label="Username">
+              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.username}</div>
+            </FieldRow>
+            <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Area Coordinator">
+              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.areaCoordinator || "—"}</div>
+            </FieldRow>
+            <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
+              <div className="flex items-center gap-1.5 px-2 py-1">
+                <code className="font-mono text-xs text-foreground/90">••••••••••••</code>
+              </div>
+            </FieldRow>
+          </div>
+        </RightSection>
       )}
 
       <RightSection title="Contact Information">
