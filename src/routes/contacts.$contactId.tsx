@@ -37,7 +37,8 @@ import {
 import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
-import { useBaStore } from "@/components/scl/ba-store";
+import { useBaStore, type BA } from "@/components/scl/ba-store";
+import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { usePromoStore, type PromoRedemption } from "@/components/scl/promo-store";
 
