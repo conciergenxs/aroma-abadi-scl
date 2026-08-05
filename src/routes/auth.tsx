@@ -239,25 +239,23 @@ function AuthPage() {
                 </button>
                 <h2 className="text-2xl font-semibold tracking-tight">Reset your password</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Enter your WhatsApp number and we'll send you a reset link.
+                  Enter your WhatsApp number and we'll send you a verification code.
                 </p>
               </>
             )}
-            {mode === "forgot-sent" && (
+            {mode === "forgot-otp" && (
               <div className="w-full">
-                <div className="h-12 w-12 rounded-full bg-primary/15 border border-primary/30 grid place-items-center mb-4">
-                  <CheckCircle2 className="h-6 w-6 text-primary" />
-                </div>
-                <h2 className="text-2xl font-semibold tracking-tight">Check WhatsApp</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  We've sent a password reset link to <span className="text-foreground">{phone || "your WhatsApp number"}</span> via WhatsApp.
-                </p>
                 <button
-                  onClick={() => { setMode("signin"); setError(null); }}
-                  className="mt-6 w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition"
+                  type="button"
+                  onClick={() => { setMode("forgot"); setError(null); }}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
                 >
-                  Back to Sign In
+                  <ArrowLeft className="h-3 w-3" /> Back
                 </button>
+                <h2 className="text-2xl font-semibold tracking-tight text-center">Enter verification code</h2>
+                <p className="mt-1 text-sm text-muted-foreground text-center">
+                  We sent a 6-digit code to <span className="text-foreground">{phone || "your WhatsApp number"}</span> via WhatsApp.
+                </p>
               </div>
             )}
           </div>
