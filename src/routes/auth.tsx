@@ -550,7 +550,7 @@ function AuthPage() {
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === "signin" && (loading ? "Signing in…" : "Sign In")}
                 {mode === "signup" && (loading ? "Creating account…" : "Create Account")}
-                {mode === "forgot" && (loading ? "Sending link…" : "Send Reset Link")}
+                {mode === "forgot" && (loading ? "Sending code…" : "Send OTP")}
               </button>
 
               {mode === "signin" && (
