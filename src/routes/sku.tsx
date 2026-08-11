@@ -540,45 +540,27 @@ function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: st
   );
 }
 
-function KnowledgeCards({ brandId, categoryId, sku }: { brandId: string; categoryId: string; sku: SKU }) {
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<KnowledgeCard | null>(null);
+/* Purely presentational — the "add" trigger lives beside the accordion
+ * header in SkuRow, which also owns the shared add/edit form state. */
+function KnowledgeCards({ brandId, categoryId, sku, onEdit }: { brandId: string; categoryId: string; sku: SKU; onEdit: (card: KnowledgeCard) => void }) {
   return (
-    <div>
-      <div className="flex items-center justify-end mb-2">
-        <button onClick={() => { setEditing(null); setShowForm(true); }} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors"><Plus className="h-3.5 w-3.5" /> Knowledge Card</button>
-      </div>
-      {/* Horizontal scroll knowledge cards with numbered labels */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
-        {sku.knowledgeCards.map((k, idx) => (
-          <div key={k.id} className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden">
-            {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />}
-            <div className="p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Knowledge {idx + 1}</div>
-              <div className="text-sm font-medium line-clamp-2">{k.title}</div>
-              <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
-              <div className="mt-2 flex items-center justify-end gap-2">
-                <button onClick={() => { setEditing(k); setShowForm(true); }} className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150">Edit</button>
-                <span className="text-xs text-muted-foreground">·</span>
-                <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card deleted"); }} className="text-xs text-rose-500">Delete</button>
-              </div>
+    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+      {sku.knowledgeCards.map((k, idx) => (
+        <div key={k.id} className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden">
+          {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />}
+          <div className="p-3">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Knowledge {idx + 1}</div>
+            <div className="text-sm font-medium line-clamp-2">{k.title}</div>
+            <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
+            <div className="mt-2 flex items-center justify-end gap-2">
+              <button onClick={() => onEdit(k)} className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150">Edit</button>
+              <span className="text-xs text-muted-foreground">·</span>
+              <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card deleted"); }} className="text-xs text-rose-500">Delete</button>
             </div>
           </div>
-        ))}
-        {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>}
-      </div>
-      {showForm && (
-        <KnowledgeCardForm
-          initial={editing}
-          onClose={() => { setShowForm(false); setEditing(null); }}
-          onSubmit={(data) => {
-            if (editing) skuStore.updateKnowledgeCard(brandId, categoryId, sku.id, editing.id, data);
-            else skuStore.addKnowledgeCard(brandId, categoryId, sku.id, data);
-            toast.success(editing ? "Card updated" : "Card added");
-            setShowForm(false); setEditing(null);
-          }}
-        />
-      )}
+        </div>
+      ))}
+      {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>}
     </div>
   );
 }
