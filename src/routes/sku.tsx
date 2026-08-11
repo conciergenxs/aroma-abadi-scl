@@ -365,6 +365,77 @@ function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands
   );
 }
 
+function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sku: SKU }) {
+  const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<KnowledgeCard | null>(null);
+
+  return (
+    <li className="p-4">
+      <div className="flex items-start gap-3">
+        <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+          {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="text-sm font-medium">{sku.name}</div>
+            <span className="text-xs text-muted-foreground">{sku.code}</span>
+          </div>
+          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{sku.description}</div>
+          <div className="mt-2 flex items-center gap-3 text-sm">
+            <span className="font-semibold">{formatIDR(sku.price)}</span>
+            <span className="text-muted-foreground">{sku.knowledgeCards.length} knowledge card</span>
+          </div>
+        </div>
+        <SkuMenu
+          onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } })}
+          onDelete={() => { skuStore.removeSku(brand.id, category.id, sku.id); toast.success("SKU deleted"); }}
+        />
+      </div>
+
+      <Accordion type="single" collapsible className="mt-3">
+        <AccordionItem value={sku.id} className="border-border">
+          <AccordionTrigger
+            className="text-sm hover:no-underline py-2 transition-colors duration-150"
+            actions={
+              <button
+                type="button"
+                onClick={() => { setEditing(null); setShowForm(true); }}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+              >
+                <Plus className="h-3.5 w-3.5" /> Knowledge Card
+              </button>
+            }
+          >
+            <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({sku.knowledgeCards.length})</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <KnowledgeCards
+              brandId={brand.id}
+              categoryId={category.id}
+              sku={sku}
+              onEdit={(k) => { setEditing(k); setShowForm(true); }}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {showForm && (
+        <KnowledgeCardForm
+          initial={editing}
+          onClose={() => { setShowForm(false); setEditing(null); }}
+          onSubmit={(data) => {
+            if (editing) skuStore.updateKnowledgeCard(brand.id, category.id, sku.id, editing.id, data);
+            else skuStore.addKnowledgeCard(brand.id, category.id, sku.id, data);
+            toast.success(editing ? "Card updated" : "Card added");
+            setShowForm(false); setEditing(null);
+          }}
+        />
+      )}
+    </li>
+  );
+}
+
 /* 3-dot action menu for each SKU row */
 function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
