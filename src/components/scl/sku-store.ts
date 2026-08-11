@@ -45,6 +45,7 @@ export type Category = {
   id: string;
   brandId: string;
   name: string;
+  imageUrl?: string;
   categoryKnowledge: Attachment[];
   skus: SKU[];
 };
