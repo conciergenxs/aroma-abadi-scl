@@ -291,6 +291,14 @@ export const skuStore = {
     state = { brands: state.brands.map((b) => (b.id === brandId ? { ...b, categories: b.categories.filter((c) => c.id !== categoryId) } : b)) };
     emit();
   },
+  updateCategory(brandId: string, categoryId: string, patch: Partial<Category>) {
+    state = {
+      brands: state.brands.map((b) => b.id !== brandId ? b : {
+        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, ...patch })
+      })
+    };
+    emit();
+  },
   addCategoryKnowledge(brandId: string, categoryId: string, files: Attachment[]) {
     state = {
       brands: state.brands.map((b) => b.id !== brandId ? b : {
