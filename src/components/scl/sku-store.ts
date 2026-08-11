@@ -60,6 +60,50 @@ export type Brand = {
 
 type State = { brands: Brand[] };
 
+// ── Odoo product catalog (mock) ─────────────────────────────────────────────
+// This app has no real Odoo integration — adding a SKU means picking one of
+// these pre-existing "Odoo" records (per category) instead of typing product
+// data by hand, matching how it actually works: name/code/price/description
+// all come from Odoo and are read-only here. Odoo carries no product
+// photography, so the photo is the one field the user must supply themselves.
+export type OdooProduct = {
+  odooId: string;
+  categoryId: string;
+  name: string;
+  code: string;
+  price: number;
+  description: string;
+};
+
+export const ODOO_CATALOG: OdooProduct[] = [
+  // Dolce & Gabbana — Lip
+  { odooId: "odoo-dg-lip-1", categoryId: "cat-dg-lip", name: "Passion Duo Gloss Fusion Lipstick", code: "DG-PDG-08", price: 890_000, description: "A dual-finish lipstick combining a matte core with a glossy overcoat for rich color and a luminous shine." },
+  { odooId: "odoo-dg-lip-2", categoryId: "cat-dg-lip", name: "The Only One Luminous Lipstick", code: "DG-TOL-15", price: 750_000, description: "A luminous, hydrating lipstick with a soft-focus finish for naturally radiant lips." },
+  // Sisley — Foundation
+  { odooId: "odoo-sis-fdn-1", categoryId: "cat-sisley-foundation", name: "Phyto-Teint Nude Foundation", code: "SIS-PTN-30", price: 1_450_000, description: "A lightweight, nude-finish foundation with 24-hour hydration and buildable, natural coverage." },
+  { odooId: "odoo-sis-fdn-2", categoryId: "cat-sisley-foundation", name: "Le Teint Sisley Foundation", code: "SIS-LTS-30", price: 1_690_000, description: "A luxurious foundation with anti-aging skincare benefits and a satin, second-skin finish." },
+  // Sisley — Powder
+  { odooId: "odoo-sis-pwd-1", categoryId: "cat-sisley-powder", name: "Phyto-Poudre Libre Loose Powder", code: "SIS-PPL-12", price: 980_000, description: "A finely-milled loose powder that sets makeup with a soft, blurred, matte finish." },
+  { odooId: "odoo-sis-pwd-2", categoryId: "cat-sisley-powder", name: "Éclat Minute Compact Powder", code: "SIS-ECM-09", price: 1_120_000, description: "A pressed powder that instantly refreshes and mattifies while brightening the complexion." },
+  // Rimmel — Powder
+  { odooId: "odoo-rim-pwd-1", categoryId: "cat-rimmel-powder", name: "Stay Matte Pressed Powder", code: "RIM-SMP-14", price: 165_000, description: "A classic pressed powder that controls shine and sets makeup for an all-day matte finish." },
+  { odooId: "odoo-rim-pwd-2", categoryId: "cat-rimmel-powder", name: "Fix & Perfect Two-Way Powder", code: "RIM-FTW-12", price: 175_000, description: "A two-way powder that can be used wet or dry for a flawless, buildable finish." },
+  // Rimmel — Setting Spray
+  { odooId: "odoo-rim-spr-1", categoryId: "cat-rimmel-spray", name: "Fix & Perfect Setting Spray", code: "RIM-FPS-75", price: 145_000, description: "A lightweight setting spray that locks makeup in place for up to 16 hours." },
+  { odooId: "odoo-rim-spr-2", categoryId: "cat-rimmel-spray", name: "Match Perfection Setting Mist", code: "RIM-MPM-100", price: 155_000, description: "A hydrating setting mist that refreshes makeup while extending its wear." },
+  // Laura Mercier — Powder
+  { odooId: "odoo-lm-pwd-1", categoryId: "cat-laura-powder", name: "Invisible Pressed Setting Powder", code: "LM-IPS-29", price: 890_000, description: "A pressed setting powder with a soft-focus effect that blurs pores and fine lines." },
+  { odooId: "odoo-lm-pwd-2", categoryId: "cat-laura-powder", name: "Secret Brightening Powder", code: "LM-SBP-09", price: 750_000, description: "A luminizing powder that highlights and brightens without adding shimmer or glitter." },
+  // BareMinerals — Blush
+  { odooId: "odoo-bm-bl-1", categoryId: "cat-bm-blush", name: "Gen Nude Powder Blush", code: "BM-GNP-06", price: 420_000, description: "A silky powder blush with a natural, second-skin finish in a universally flattering shade." },
+  { odooId: "odoo-bm-bl-2", categoryId: "cat-bm-blush", name: "Bounce Liquid Blush", code: "BM-BLB-06", price: 480_000, description: "A weightless liquid blush that blends seamlessly for a dewy, natural flush." },
+];
+
+/** Odoo products for a category, minus ones already imported as SKUs there. */
+export function availableOdooProducts(categoryId: string, importedCodes: string[]): OdooProduct[] {
+  return ODOO_CATALOG.filter((p) => p.categoryId === categoryId && !importedCodes.includes(p.code));
+}
+
 const STORAGE_KEY = "aroma_sku_store_v3";
 
 function mockPdf(name: string, kb = 480): Attachment {
