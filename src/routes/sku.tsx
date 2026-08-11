@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useSkuStore, skuStore, type Brand, type Category, type SKU, type KnowledgeCard } from "@/components/scl/sku-store";
+import { useSkuStore, skuStore, availableOdooProducts, type Brand, type Category, type SKU, type KnowledgeCard, type OdooProduct } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
 import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen, Home, MoreHorizontal, ExternalLink, Camera } from "lucide-react";
