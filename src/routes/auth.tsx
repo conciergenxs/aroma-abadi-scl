@@ -30,7 +30,8 @@ const RESEND_COOLDOWN_SECONDS = 30;
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("signin");
+  const { mode: modeParam } = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(modeParam === "ba" ? "ba" : "signin");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
