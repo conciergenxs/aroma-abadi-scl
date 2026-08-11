@@ -44,7 +44,7 @@ function SkuPage() {
   const { brands } = useSkuStore();
   const [view, setView] = useState<View>({ kind: "brands" });
   const [showBrandForm, setShowBrandForm] = useState(false);
-  const [editingSku, setEditingSku] = useState<{ sku?: SKU; brandId: string; categoryId: string } | null>(null);
+  const [importingSku, setImportingSku] = useState<{ product: OdooProduct; brandId: string; categoryId: string } | null>(null);
 
   const brand = useMemo(
     () => (view.kind !== "brands" ? brands.find((b) => b.id === view.brandId) || null : null),
