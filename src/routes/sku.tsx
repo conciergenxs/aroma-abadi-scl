@@ -642,15 +642,27 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
   );
 }
 
-function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: string; categoryId: string; initial?: SKU; onClose: () => void }) {
-  const [name] = useState(initial?.name || "");
-  const [code] = useState(initial?.code || "");
-  const [price] = useState<number>(initial?.price || 0);
-  const [description] = useState(initial?.description || "");
-  const [photoUrl] = useState(initial?.photoUrl || "");
+function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: string; categoryId: string; product: OdooProduct; onClose: () => void }) {
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+  const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
 
-  // Fields are read-only — data is synced from Odoo
+  // Everything but the photo comes straight from Odoo — read-only here.
   const disabledInput = "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
+
+  function submit() {
+    if (!photoUrl) return toast.error("Upload a product photo to continue.");
+    setSaving(true);
+    skuStore.addSku(brandId, categoryId, {
+      name: product.name,
+      code: product.code,
+      price: product.price,
+      description: product.description,
+      photoUrl,
+    });
+    toast.success("SKU added");
+    onClose();
+  }
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
@@ -663,37 +675,51 @@ function SkuFormModal({ brandId, categoryId, initial, onClose }: { brandId: stri
           {/* Odoo sync notice */}
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
-            <span>SKU data is synced from Odoo. Fields are read-only and cannot be edited here.</span>
+            <span>Product data is synced from Odoo and read-only. Odoo doesn't carry photography, so upload one below.</span>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground mb-1">Product Photo</div>
+            <div className="text-xs text-muted-foreground mb-1">
+              Product Photo <span className="text-rose-500">*</span>
+            </div>
             <div className="flex items-center gap-3">
-              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
+              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                 {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 text-primary/40" />}
               </div>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
+              <button type="button" onClick={openPicker} className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150">
+                {photoUrl ? "Replace Photo" : "Upload Photo"}
+              </button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Name</span>
-              <input disabled value={name} placeholder="Synced from Odoo" className={disabledInput} />
+              <input disabled value={product.name} className={disabledInput} />
             </label>
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Code</span>
-              <input disabled value={code} placeholder="Synced from Odoo" className={disabledInput} />
+              <input disabled value={product.code} className={disabledInput} />
             </label>
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Price (Rp)</span>
-            <input disabled type="number" value={price} placeholder="Synced from Odoo" className={disabledInput} />
+            <input disabled value={formatIDR(product.price)} className={disabledInput} />
           </label>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Description</span>
-            <textarea disabled value={description} rows={4} placeholder="Synced from Odoo" className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none" />
+            <textarea disabled value={product.description} rows={4} className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none" />
           </label>
         </div>
-        <div className="p-4 border-t border-border flex justify-end">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors">Close</button>
+        <div className="p-4 border-t border-border flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150">Cancel</button>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={saving}
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Add SKU
+          </button>
         </div>
       </div>
     </div>
