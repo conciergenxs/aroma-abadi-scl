@@ -351,7 +351,7 @@ function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands
           <SectionCard
             title="SKUs"
             description="Select SKUs from the database or add new ones."
-            action={<SkuSearchSelect brandId={brand.id} categoryId={category.id} onSelect={onAddSku} onAdd={onAddSku} />}
+            action={<SkuSearchSelect categoryId={category.id} importedCodes={category.skus.map((s) => s.code)} onPick={onPickProduct} />}
           >
             <ul className="divide-y divide-border">
               {category.skus.map((s) => (
