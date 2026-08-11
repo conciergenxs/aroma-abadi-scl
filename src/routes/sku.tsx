@@ -580,7 +580,15 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
     reader.readAsDataURL(file);
   }
 
-  return (
+  // Portaled to <body> — this form can be opened from deep inside a
+  // SectionCard/Accordion tree, and any ancestor's `backdrop-filter`
+  // (the `.glass` card treatment) becomes a containing block for
+  // `position: fixed` descendants just like `transform` does, which
+  // clips a non-portaled backdrop to that card's box instead of the
+  // real viewport. Portaling escapes that regardless of where this is
+  // triggered from — see BrandPicker/ItemScopeEditor for the same pattern.
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <form onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; onSubmit({ title, text, coverUrl: coverUrl || undefined }); }} className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
@@ -611,7 +619,8 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
           <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium">Save</button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
