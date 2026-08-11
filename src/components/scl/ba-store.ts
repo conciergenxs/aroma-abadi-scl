@@ -139,5 +139,5 @@ export const baStore = {
 };
 
 export function useBaStore(): State {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
