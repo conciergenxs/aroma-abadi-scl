@@ -13,6 +13,11 @@ export const Route = createFileRoute("/auth")({
       { property: "og:description", content: "Access your Aroma Abadi workspace." },
     ],
   }),
+  // Beauty Ambassador login has no visible entry point in the UI (BAs don't
+  // get dashboard access, so it isn't advertised) — /auth?mode=ba is the
+  // deliberate back door for demoing/testing the access-denied flow.
+  validateSearch: (search: Record<string, unknown>): { mode?: "ba" } =>
+    search.mode === "ba" ? { mode: "ba" } : {},
   component: AuthPage,
 });
 
