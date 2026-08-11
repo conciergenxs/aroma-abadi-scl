@@ -137,13 +137,22 @@ const emit = () => {
 const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
 const getSnapshot = () => state;
 
+// What SSR actually rendered (server has no localStorage) — a stable
+// reference distinct from `state` so useSyncExternalStore can detect that
+// the client's real (localStorage-backed) value differs and correctly
+// re-render after hydration, instead of leaving stale server-rendered DOM
+// stuck on screen. See promo-store.ts for the same fix via a different
+// (useState+useEffect) mechanism.
+const SERVER_SNAPSHOT: { transactions: Transaction[] } = { transactions: seed() };
+const getServerSnapshot = () => SERVER_SNAPSHOT;
+
 export const transactionsStore = {
   get state() { return state; },
   reseed() { state = { transactions: seed() }; emit(); },
 };
 
 export function useTransactionsStore() {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export function formatIDR(n: number) {
