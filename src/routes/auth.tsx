@@ -143,6 +143,10 @@ function AuthPage() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 900));
       setLoading(false);
+      if (matchBaCredentials(phone, password)) {
+        navigate({ to: "/access-denied" });
+        return;
+      }
       if (typeof window !== "undefined") {
         window.localStorage.setItem("scl_authed", "1");
         window.localStorage.setItem("scl_account_password", password);
