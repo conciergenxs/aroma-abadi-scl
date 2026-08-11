@@ -713,8 +713,7 @@ function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: stri
           <button
             type="button"
             onClick={submit}
-            disabled={saving}
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
             Add SKU
           </button>
