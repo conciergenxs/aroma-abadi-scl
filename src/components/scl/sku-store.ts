@@ -387,7 +387,7 @@ export const skuStore = {
 };
 
 export function useSkuStore(): State {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export async function fileToAttachment(file: File): Promise<Attachment> {
