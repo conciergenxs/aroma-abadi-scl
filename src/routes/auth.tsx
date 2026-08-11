@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent, type ClipboardEvent, type KeyboardEvent } from "react";
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
-import { isBaPhoneNumber } from "@/components/scl/ba-store";
+import { matchBaCredentials } from "@/components/scl/ba-store";
 import { Eye, EyeOff, Loader2, Phone, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
