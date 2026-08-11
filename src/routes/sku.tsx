@@ -204,8 +204,17 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
 
       <SectionCard>
         <div className="p-5 flex items-center gap-4">
-          <div className="h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+          <div className="relative h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" /> : <Package className="h-10 w-10 text-primary" />}
+            <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={handleLogoChange} />
+            <button
+              type="button"
+              onClick={openLogoPicker}
+              title="Change brand logo"
+              className="absolute bottom-1.5 right-1.5 h-7 w-7 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </button>
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
