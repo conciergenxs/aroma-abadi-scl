@@ -116,6 +116,14 @@ function AuthPage() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 700));
       setLoading(false);
+      // This dummy sign-in has no real backend to check against — any long
+      // enough password "succeeds". A BA's actual number+password pair is
+      // the one exception: it must not land in the dashboard just because
+      // it was typed into the wrong form.
+      if (matchBaCredentials(phone, password)) {
+        navigate({ to: "/access-denied" });
+        return;
+      }
       if (typeof window !== "undefined") {
         window.localStorage.setItem("scl_authed", "1");
         window.localStorage.setItem("scl_account_password", password);
