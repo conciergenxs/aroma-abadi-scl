@@ -306,8 +306,8 @@ function CategoryRow({ brandId, category, onOpen }: { brandId: string; category:
 
 /* ---------------- Level 3: Category Detail ---------------- */
 
-function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
-  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onAddSku: () => void;
+function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands }: {
+  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onPickProduct: (product: OdooProduct) => void;
 }) {
   const navigate = useNavigate();
   return (
