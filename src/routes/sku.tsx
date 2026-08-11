@@ -75,7 +75,7 @@ function SkuPage() {
           category={category}
           onBack={() => setView({ kind: "brand", brandId: brand.id })}
           onBackToBrands={() => setView({ kind: "brands" })}
-          onAddSku={() => setEditingSku({ brandId: brand.id, categoryId: category.id })}
+          onPickProduct={(product) => setImportingSku({ product, brandId: brand.id, categoryId: category.id })}
           />
       )}
 
@@ -85,12 +85,12 @@ function SkuPage() {
           onCreated={(b) => { setView({ kind: "brand", brandId: b.id }); setShowBrandForm(false); }}
         />
       )}
-      {editingSku && (
+      {importingSku && (
         <SkuFormModal
-          brandId={editingSku.brandId}
-          categoryId={editingSku.categoryId}
-          initial={editingSku.sku}
-          onClose={() => setEditingSku(null)}
+          brandId={importingSku.brandId}
+          categoryId={importingSku.categoryId}
+          product={importingSku.product}
+          onClose={() => setImportingSku(null)}
         />
       )}
     </AppShell>
