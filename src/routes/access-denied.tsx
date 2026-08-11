@@ -1,6 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import { ShieldAlert } from "lucide-react";
+
+const LMS_URL = "https://aroma-lms.vercel.app/";
 
 export const Route = createFileRoute("/access-denied")({
   head: () => ({
@@ -13,8 +15,6 @@ export const Route = createFileRoute("/access-denied")({
 });
 
 function AccessDeniedPage() {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-[440px] text-center">
@@ -24,14 +24,14 @@ function AccessDeniedPage() {
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">You can't access this page</h1>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-          Beauty Ambassador accounts are for the Aroma Abadi WhatsApp assistant only. The ARMA dashboard is reserved for workspace admins and team members.
+          Beauty Ambassador accounts are for the Aroma Abadi WhatsApp assistant and LMS only. The ARMA dashboard is reserved for workspace admins and team members.
         </p>
-        <button
-          onClick={() => navigate({ to: "/auth" })}
-          className="mt-8 w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+        <a
+          href={LMS_URL}
+          className="mt-8 block w-full rounded-md bg-primary px-4 py-2.5 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
-          Back to Sign In
-        </button>
+          Login to LMS
+        </a>
       </div>
     </div>
   );
