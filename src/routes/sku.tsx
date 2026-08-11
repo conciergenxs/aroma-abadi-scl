@@ -309,7 +309,6 @@ function CategoryRow({ brandId, category, onOpen }: { brandId: string; category:
 function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands }: {
   brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onPickProduct: (product: OdooProduct) => void;
 }) {
-  const navigate = useNavigate();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
