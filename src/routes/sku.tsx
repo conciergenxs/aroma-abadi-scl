@@ -181,6 +181,9 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
 /* ---------------- Level 2: Brand Detail ---------------- */
 
 function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: () => void; onOpenCategory: (c: Category) => void }) {
+  const { fileRef: logoFileRef, openPicker: openLogoPicker, handleChange: handleLogoChange } =
+    useImagePicker((dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }));
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
