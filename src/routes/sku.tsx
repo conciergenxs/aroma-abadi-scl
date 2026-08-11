@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useSkuStore, skuStore, availableOdooProducts, type Brand, type Category, type SKU, type KnowledgeCard, type OdooProduct } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
