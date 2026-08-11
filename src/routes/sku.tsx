@@ -433,32 +433,27 @@ function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () 
   );
 }
 
-/* Searchable SKU select (search from existing + add new) */
-function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: string; categoryId: string; onSelect: (sku: SKU) => void; onAdd: () => void }) {
-  void brandId; void categoryId; void onSelect;
-  const { brands } = useSkuStore();
+/* Select2-style search: pick a product from Odoo to import as a SKU here.
+ * Already-imported products (matched by code) drop out of the list. */
+function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: string; importedCodes: string[]; onPick: (product: OdooProduct) => void }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
 
-  // Collect all SKUs across all brands/categories as searchable pool
-  const allSkus = useMemo(() => {
-    const list: { sku: SKU; brandName: string; catName: string }[] = [];
-    for (const b of brands) {
-      for (const c of b.categories) {
-        for (const s of c.skus) {
-          list.push({ sku: s, brandName: b.name, catName: c.name });
-        }
-      }
-    }
-    return list;
-  }, [brands]);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
 
+  const available = useMemo(() => availableOdooProducts(categoryId, importedCodes), [categoryId, importedCodes]);
   const filtered = query
-    ? allSkus.filter((x) => x.sku.name.toLowerCase().includes(query.toLowerCase()) || x.sku.code.toLowerCase().includes(query.toLowerCase()))
-    : allSkus.slice(0, 8);
+    ? available.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()) || p.code.toLowerCase().includes(query.toLowerCase()))
+    : available;
 
   return (
-    <div className="relative">
+    <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -467,35 +462,39 @@ function SkuSearchSelect({ brandId, categoryId, onSelect, onAdd }: { brandId: st
         <Plus className="h-3.5 w-3.5" /> Add SKU
       </button>
       {open && (
-        <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden">
+        <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right">
           <div className="p-2 border-b border-border">
             <input
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search SKU from database…"
+              placeholder="Search product from Odoo…"
               className="w-full h-8 rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
           <ul className="max-h-52 overflow-y-auto py-1">
-            {filtered.map(({ sku, brandName, catName }) => (
-              <li key={sku.id}>
+            {filtered.map((product) => (
+              <li key={product.odooId}>
                 <button
                   type="button"
-                  onClick={() => { onSelect(sku); setOpen(false); setQuery(""); }}
+                  onClick={() => { onPick(product); setOpen(false); setQuery(""); }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm transition-colors duration-150"
                 >
                   <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                    {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-4 w-4 text-primary" />}
+                    <ImageIcon className="h-4 w-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="truncate font-medium">{sku.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{brandName} · {catName}</div>
+                    <div className="truncate font-medium">{product.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{product.code} · {formatIDR(product.price)}</div>
                   </div>
                 </button>
               </li>
             ))}
-            {filtered.length === 0 && <li className="px-3 py-4 text-center text-sm text-muted-foreground">Not found</li>}
+            {filtered.length === 0 && (
+              <li className="px-3 py-4 text-center text-sm text-muted-foreground">
+                {available.length === 0 ? "All Odoo products for this category are already imported." : "Not found"}
+              </li>
+            )}
           </ul>
         </div>
       )}
