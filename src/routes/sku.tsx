@@ -350,7 +350,7 @@ function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands
         <div className="flex-1 min-w-0">
           <SectionCard
             title="SKUs"
-            description="Select SKUs from the database or add new ones."
+            description="Import products synced from Odoo, then upload a photo to complete each one."
             action={<SkuSearchSelect categoryId={category.id} importedCodes={category.skus.map((s) => s.code)} onPick={onPickProduct} />}
           >
             <ul className="divide-y divide-border">
