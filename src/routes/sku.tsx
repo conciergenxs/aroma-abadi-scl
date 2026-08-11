@@ -644,7 +644,6 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
 
 function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: string; categoryId: string; product: OdooProduct; onClose: () => void }) {
   const [photoUrl, setPhotoUrl] = useState("");
-  const [saving, setSaving] = useState(false);
   const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
 
   // Everything but the photo comes straight from Odoo — read-only here.
@@ -652,7 +651,6 @@ function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: stri
 
   function submit() {
     if (!photoUrl) return toast.error("Upload a product photo to continue.");
-    setSaving(true);
     skuStore.addSku(brandId, categoryId, {
       name: product.name,
       code: product.code,
