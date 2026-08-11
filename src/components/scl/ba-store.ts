@@ -96,6 +96,16 @@ function normalizeWa(s: string) {
   return s.replace(/[^\d]/g, "");
 }
 
+/** Is this WhatsApp number a known BA? Used to block dashboard access even
+ *  when someone enters BA credentials into the regular admin sign-in form
+ *  instead of the dedicated BA login (that other form has no real backend
+ *  to check against, so it would otherwise let any long-enough password
+ *  through) — role is decided by phone number, not by which form was used. */
+export function isBaPhoneNumber(waNumber: string): boolean {
+  const wa = normalizeWa(waNumber);
+  return state.bas.some((b) => normalizeWa(b.waNumber) === wa);
+}
+
 export const baStore = {
   get state() { return state; },
   add(input: Omit<BA, "id" | "password"> & { password?: string }) {
