@@ -271,6 +271,39 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   );
 }
 
+function CategoryRow({ brandId, category, onOpen }: { brandId: string; category: Category; onOpen: () => void }) {
+  const { fileRef, openPicker, handleChange } =
+    useImagePicker((dataUrl) => skuStore.updateCategory(brandId, category.id, { imageUrl: dataUrl }));
+
+  return (
+    <li className="flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-card/40 hover:bg-card transition-colors">
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); openPicker(); }}
+        title="Upload category image"
+        className="group relative h-10 w-10 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
+      >
+        {category.imageUrl ? (
+          <img src={category.imageUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <FolderOpen className="h-5 w-5 text-primary" />
+        )}
+        <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+          <Camera className="h-3.5 w-3.5 text-white" />
+        </span>
+      </button>
+      <button onClick={onOpen} className="flex-1 min-w-0 flex items-center gap-3 text-left">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium">{category.name}</div>
+          <div className="text-xs text-muted-foreground">{category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} · {category.categoryKnowledge.length} {category.categoryKnowledge.length === 1 ? "document" : "documents"}</div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+      </button>
+    </li>
+  );
+}
+
 /* ---------------- Level 3: Category Detail ---------------- */
 
 function CategoryDetail({ brand, category, onBack, onAddSku, onBackToBrands }: {
