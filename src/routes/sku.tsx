@@ -23,6 +23,23 @@ type View =
   | { kind: "brand"; brandId: string }
   | { kind: "category"; brandId: string; categoryId: string };
 
+/** Shared "pick an image, read it as a data URL" helper — this app is
+ *  frontend-only with no upload backend, so the picked file's data URL is
+ *  what actually gets stored (same approach BrandFormModal already uses). */
+function useImagePicker(onPick: (dataUrl: string) => void) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  function openPicker() { fileRef.current?.click(); }
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // reset so picking the same file again still fires onChange
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => onPick(String(reader.result));
+    reader.readAsDataURL(file);
+  }
+  return { fileRef, openPicker, handleChange };
+}
+
 function SkuPage() {
   const { brands } = useSkuStore();
   const [view, setView] = useState<View>({ kind: "brands" });
