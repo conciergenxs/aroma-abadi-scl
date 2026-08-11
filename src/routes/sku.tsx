@@ -355,39 +355,7 @@ function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands
           >
             <ul className="divide-y divide-border">
               {category.skus.map((s) => (
-                <li key={s.id} className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                      {s.photoUrl ? <img src={s.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div className="text-sm font-medium">{s.name}</div>
-                        <span className="text-xs text-muted-foreground">{s.code}</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{s.description}</div>
-                      <div className="mt-2 flex items-center gap-3 text-sm">
-                        <span className="font-semibold">{formatIDR(s.price)}</span>
-                        <span className="text-muted-foreground">{s.knowledgeCards.length} knowledge card</span>
-                      </div>
-                    </div>
-                    <SkuMenu
-                      onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: s.id } })}
-                      onDelete={() => { skuStore.removeSku(brand.id, category.id, s.id); toast.success("SKU deleted"); }}
-                    />
-                  </div>
-
-                  <Accordion type="single" collapsible className="mt-3">
-                    <AccordionItem value={s.id} className="border-border">
-                      <AccordionTrigger className="text-sm hover:no-underline py-2 transition-colors duration-150">
-                        <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({s.knowledgeCards.length})</span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <KnowledgeCards brandId={brand.id} categoryId={category.id} sku={s} />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </li>
+                <SkuRow key={s.id} brand={brand} category={category} sku={s} />
               ))}
               {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No SKUs yet. Use the button above to add.</li>}
             </ul>
