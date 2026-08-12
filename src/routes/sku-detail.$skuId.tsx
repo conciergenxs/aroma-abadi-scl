@@ -312,7 +312,7 @@ function SkuDetailPage() {
           ].map((m) => (
             <div
               key={m.label}
-              className="rounded-xl border border-gray-200 bg-white p-4 flex items-start gap-3 shadow-sm hover:shadow-md transition-shadow"
+              className="card-hover rounded-xl border border-gray-200 bg-white p-4 flex items-start gap-3 shadow-sm transition-all duration-300"
             >
               <div className={`h-9 w-9 rounded-md ${m.bg} grid place-items-center shrink-0`}>
                 <m.icon className={`h-4 w-4 ${m.color}`} />
