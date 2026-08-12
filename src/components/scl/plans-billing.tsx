@@ -139,7 +139,7 @@ function SubscriptionPage({
       </section>
 
       <SectionTitle title="Monthly Usage" description="31 May 2026 – 30 Jun 2026" />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 stagger">
         {monthlyUsage.map((item) => (
           <UsageCard key={item.title} {...item} />
         ))}
