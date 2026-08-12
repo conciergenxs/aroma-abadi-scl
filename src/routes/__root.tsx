@@ -13,7 +13,6 @@ import { useRouterState } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { LITE_MODE } from "@/lib/feature-flags";
 
 function NotFoundComponent() {
   return (
