@@ -368,7 +368,7 @@ function SkuDetailPage() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 stagger">
                     {pagedTx.map((t) => {
                       const line = t.items.find((i) => i.skuId === skuId)!;
                       return (
