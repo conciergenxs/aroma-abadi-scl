@@ -1036,7 +1036,7 @@ function UserManagementPage() {
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Joined on</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {filtered.map((u) => (
                 <tr
                   key={u.id}
