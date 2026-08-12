@@ -460,7 +460,7 @@ function InboxPage() {
       const v = activeFilter.value;
       if (v === "my") return { title: "My Inbox", subtitle: "Showing conversations assigned to you" };
       if (v === "ba") return { title: "BA Inbox", subtitle: "Showing conversations with Beauty Ambassadors" };
-      return { title: "All Inbox", subtitle: "Showing every conversation" };
+      return { title: "All Inbox", subtitle: "Showing every conversation across your workspace" };
     }
     if (activeFilter.kind === "stage") {
       return { title: activeFilter.value, subtitle: `Showing contacts in ${activeFilter.value} stage` };
