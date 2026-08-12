@@ -262,7 +262,7 @@ export function AppShell({
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-6">
           <div className="flex items-center gap-1.5">
             {backTo && (
-              <Link to={backTo as any} className="-ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0">
+              <Link to={backTo as ComponentProps<typeof Link>["to"]} className="-ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0">
                 <ChevronLeft className="h-4 w-4" />
               </Link>
             )}
