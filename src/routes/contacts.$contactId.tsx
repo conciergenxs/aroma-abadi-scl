@@ -87,58 +87,52 @@ function ContactDetailPage() {
     [properties],
   );
 
-  if (!contact) {
-    return (
-      <AppShell backTo="/contacts" title="Contact" noPadding>
-        <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center text-sm text-muted-foreground gap-3">
-          <div>Contact not found.</div>
-          <Link to="/contacts" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ChevronLeft className="h-4 w-4" /> Contacts
-          </Link>
-        </div>
-      </AppShell>
-    );
-  }
-
-  const contactLabels = labels.filter((l) => contact.labelIds.includes(l.id));
-  const contactLists = lists.filter((l) => contact.listIds.includes(l.id));
-  const contactActivities = activities[contact.id] ?? [];
+  // Every hook below must run on every render regardless of whether the
+  // contact resolves — the "not found" return sits after all of them so
+  // hook order never changes between renders (see rules-of-hooks).
+  const contactLabels = contact ? labels.filter((l) => contact.labelIds.includes(l.id)) : [];
+  const contactLists = contact ? lists.filter((l) => contact.listIds.includes(l.id)) : [];
 
   // Transactions linked to this contact
   const contactTransactions = useMemo(
-    () => transactions.filter((t) => t.customerId === contact.id),
-    [transactions, contact.id],
+    () => (contact ? transactions.filter((t) => t.customerId === contact.id) : []),
+    [transactions, contact],
   );
 
   // Promo code redemptions linked to this contact, across every promo code
   const contactRedemptions = useMemo<ContactRedemption[]>(
     () =>
-      promos
-        .flatMap((p) =>
-          p.redemptions
-            .filter((r) => r.contactId === contact.id)
-            .map((r) => ({ ...r, promoName: p.name, promoCode: p.code })),
-        )
-        .sort((a, b) => new Date(b.redeemedAt).getTime() - new Date(a.redeemedAt).getTime()),
-    [promos, contact.id],
+      !contact
+        ? []
+        : promos
+            .flatMap((p) =>
+              p.redemptions
+                .filter((r) => r.contactId === contact.id)
+                .map((r) => ({ ...r, promoName: p.name, promoCode: p.code })),
+            )
+            .sort((a, b) => new Date(b.redeemedAt).getTime() - new Date(a.redeemedAt).getTime()),
+    [promos, contact],
   );
 
   // Transaction activities — one entry per transaction
   const txActivities = useMemo<ContactActivity[]>(
     () =>
-      contactTransactions.map((t) => ({
-        id: `tx-act-${t.id}`,
-        contactId: contact.id,
-        type: "transaction" as const,
-        message: `Transaction ${t.invoice} · ${t.brandName} · ${formatIDR(t.total)} · ${t.status}\n${t.items.map((i) => `${i.skuName} ×${i.qty}`).join(", ")}`,
-        at: t.date,
-      })),
-    [contactTransactions, contact.id],
+      !contact
+        ? []
+        : contactTransactions.map((t) => ({
+            id: `tx-act-${t.id}`,
+            contactId: contact.id,
+            type: "transaction" as const,
+            message: `Transaction ${t.invoice} · ${t.brandName} · ${formatIDR(t.total)} · ${t.status}\n${t.items.map((i) => `${i.skuName} ×${i.qty}`).join(", ")}`,
+            at: t.date,
+          })),
+    [contactTransactions, contact],
   );
 
   const derivedActivities = useMemo<ContactActivity[]>(() => {
+    if (!contact) return [];
     const base = contact.stageEnteredAt ?? new Date().toISOString();
-    const out: ContactActivity[] = [...contactActivities];
+    const out: ContactActivity[] = [...(activities[contact.id] ?? [])];
     if (out.length === 0) {
       if (contact.lifecycleStage) {
         out.push({
@@ -179,7 +173,7 @@ function ContactDetailPage() {
     const merged = [...out, ...txActivities];
     merged.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
     return merged;
-  }, [contact, contactActivities, contactLabels, contactLists, txActivities]);
+  }, [contact, activities, contactLabels, contactLists, txActivities]);
 
   const filteredActivities = useMemo(() => {
     if (!dateFrom && !dateTo) return derivedActivities;
@@ -210,6 +204,19 @@ function ContactDetailPage() {
       return true;
     });
   }, [contactRedemptions, dateFrom, dateTo]);
+
+  if (!contact) {
+    return (
+      <AppShell backTo="/contacts" title="Contact" noPadding>
+        <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center text-sm text-muted-foreground gap-3">
+          <div>Contact not found.</div>
+          <Link to="/contacts" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ChevronLeft className="h-4 w-4" /> Contacts
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
 
   const handleDelete = () => {
     if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
