@@ -397,7 +397,7 @@ function Dashboard() {
           <AveragesSection averages={averages} />
           <ConversionSection broadcast={broadcast} orders={orders} funnelRates={funnelRates} totalConversations={conversationsCount} />
 
-          <CrmLoyaltyAnalytics />
+          {!LITE_MODE && <CrmLoyaltyAnalytics />}
 
           {/* Activity + Conversations */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
