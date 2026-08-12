@@ -1,7 +1,7 @@
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode, type ComponentProps } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
