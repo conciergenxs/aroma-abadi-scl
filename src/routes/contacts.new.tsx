@@ -42,7 +42,7 @@ function NewContactPage() {
   // Shared
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [gender, setGender] = useState<typeof GENDERS[number] | "">("");
+  const [gender, setGender] = useState<string>("");
 
   // BA-specific
   const [brandIds, setBrandIds] = useState<string[]>([]);
