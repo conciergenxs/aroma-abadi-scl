@@ -1058,7 +1058,7 @@ function PickerPopover({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-2.5 py-1.5 hover:bg-card transition-colors duration-150"
+        className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 px-2.5 py-1.5 text-xs hover:bg-card transition-colors duration-150"
       >
         {icon} {label}
       </button>
