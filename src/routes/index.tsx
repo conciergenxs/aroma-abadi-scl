@@ -31,6 +31,7 @@ import {
   StepFunnel, type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/")({
   head: () => ({
