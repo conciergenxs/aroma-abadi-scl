@@ -1491,7 +1491,7 @@ function AssignUsersModal({
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Current Role</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {filtered.map((u) => {
                 const already = u.role === role.name;
                 const isSel = selected.includes(u.id);
