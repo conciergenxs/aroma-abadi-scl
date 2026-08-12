@@ -1198,7 +1198,7 @@ function BreakdownTile({
         ? "text-amber-300 border-amber-500/30 bg-amber-500/5"
         : "text-muted-foreground border-border bg-background/40";
   return (
-    <div className={`rounded-lg border px-4 py-4 ${color}`}>
+    <div className={`card-hover rounded-lg border px-4 py-4 transition-all duration-300 ${color}`}>
       <div className="text-2xl font-semibold leading-none">{value}</div>
       <div className="text-[11px] uppercase tracking-wider mt-2 opacity-80">{label}</div>
     </div>
