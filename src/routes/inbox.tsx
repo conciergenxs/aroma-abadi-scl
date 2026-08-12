@@ -196,25 +196,11 @@ function InboxPage() {
   const markUnread = (id: string) =>
     setUnreadOverrides((p) => ({ ...p, [id]: true }));
 
-  // Internal note composer state
-  type InternalNote = {
-    id: string;
-    authorId: string;
-    text: string;
-    mentions: string[];
-    time: string;
-  };
-  const [composerMode, setComposerMode] = useState<"reply" | "note">("reply");
   const [replyText, setReplyText] = useState("");
   // Autopilot state: per conversation
   const [autopilotByConvo, setAutopilotByConvo] = useState<Record<string, boolean>>({});
   const isAutopilot = (id: string) => autopilotByConvo[id] !== false; // default = autopilot ON
   const setAutopilot = (id: string, v: boolean) => setAutopilotByConvo((p) => ({ ...p, [id]: v }));
-  const [noteText, setNoteText] = useState("");
-  const [notesByConvo, setNotesByConvo] = useState<Record<string, InternalNote[]>>({});
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionIndex, setMentionIndex] = useState(0);
-  const noteRef = useRef<HTMLTextAreaElement | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
 
   // ============== MESSAGE ACTIONS (reply / copy / forward) ==============
