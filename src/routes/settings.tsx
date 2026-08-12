@@ -1859,7 +1859,7 @@ function TeamDetailPage({
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Date Added</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {members.map((u) => (
                 <tr
                   key={u.id}
