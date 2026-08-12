@@ -152,7 +152,7 @@ function StatTile({
   icon: typeof Users;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/40 p-4">
+    <div className="card-hover rounded-xl border border-border bg-card/40 p-4 transition-all duration-300">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
         <Icon className="h-3 w-3" /> {label}
       </div>
