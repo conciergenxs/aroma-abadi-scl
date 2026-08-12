@@ -943,7 +943,7 @@ function InboxPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setAutopilot(active.id, false)}
+                  onClick={() => { setAutopilot(active.id, false); setComposerMode("reply"); }}
                   className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-semibold hover:bg-primary/90 transition shrink-0"
                 >
                   Takeover
