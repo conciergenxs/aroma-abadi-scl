@@ -1323,7 +1323,7 @@ function RoleDetailPage({
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {users.map((u) => (
                 <tr
                   key={u.id}
