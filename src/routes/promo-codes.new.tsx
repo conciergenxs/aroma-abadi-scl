@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
+import { LITE_MODE } from "@/lib/feature-flags";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Download } from "lucide-react";
