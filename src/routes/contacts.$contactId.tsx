@@ -719,7 +719,7 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
             {g.label}
           </div>
-          <ol className="relative border-l border-border ml-1.5 space-y-3">
+          <ol className="relative border-l border-border ml-1.5 space-y-3 stagger">
             {g.items.map((a) => (
               <li key={a.id} className="pl-4 relative">
                 <span
