@@ -294,7 +294,7 @@ function InboxPage() {
       }
       return true;
     });
-  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides, labelFilter]);
+  }, [contacts, activeFilter, tab, search, collaborators, filters, unreadOverrides, labelFilter, isUnread]);
 
   // Pinned conversations float to the top while preserving original order.
   const sortedVisible = useMemo(() => {
