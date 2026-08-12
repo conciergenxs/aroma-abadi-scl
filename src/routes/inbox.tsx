@@ -838,14 +838,6 @@ function InboxPage() {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      {stageColor && ct.lifecycleStage && (
-                        <span
-                          title={ct.lifecycleStage}
-                          className={`inline-block h-2.5 w-2.5 rounded-full ${stageColor.dot}`}
-                        />
-                      )}
-                    </div>
                   </div>
                 </button>
               );
