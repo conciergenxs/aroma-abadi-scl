@@ -780,7 +780,7 @@ function InvoiceTable({ rows }: { rows: InvoiceRow[] }) {
             <th className="px-5 py-3 text-right font-medium">Download</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-border stagger">
           {rows.map((row) => (
             <tr
               key={`${row.date}-${row.description}`}
