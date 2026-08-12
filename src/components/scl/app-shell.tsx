@@ -46,6 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { InviteModal } from "@/components/scl/invite-modal";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 // ── Mock Notifications ───────────────────────────────────────────────────────
 type MockNotif = {
