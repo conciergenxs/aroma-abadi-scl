@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
 import { ChannelIcon } from "@/components/scl/channel-badge";
