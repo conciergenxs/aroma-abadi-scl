@@ -830,13 +830,13 @@ function InboxPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setAutopilot(active.id, false); setComposerMode("reply"); }}
+                  onClick={() => setAutopilot(active.id, false)}
                   className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-8 text-xs font-semibold hover:bg-primary/90 transition shrink-0"
                 >
                   Takeover
                 </button>
               </div>
-            ) : composerMode === "reply" ? (
+            ) : (
               <div className="rounded-xl border border-border bg-card/80 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition">
                 {replyTarget && (
                   <div className="flex items-start gap-2 mx-3 mt-3 rounded-md border-l-2 border-primary bg-primary/[0.08] pl-2.5 pr-2 py-2">
