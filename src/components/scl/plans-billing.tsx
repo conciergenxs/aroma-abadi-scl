@@ -103,7 +103,7 @@ function SubscriptionPage({
               <h2 className="m-0 text-3xl font-semibold leading-tight">Premium</h2>
               <span className="mb-1 text-sm text-muted-foreground">Monthly plan</span>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 stagger">
               <SummaryMetric label="Payment Details" value="Rp2,445,000 / month" />
               <SummaryMetric label="Billing Cycle" value="Monthly" />
               <SummaryMetric label="Next Billing Date" value="30 Jun 2026" />
