@@ -339,7 +339,7 @@ function InboxPage() {
     [thread, sentByConvo, active.id],
   );
 
-  // Search matches across messages + notes of the active conversation.
+  // Search matches across messages of the active conversation.
   const searchMatches = useMemo(() => {
     if (!searchOpen) return [] as string[];
     const q = searchQuery.trim().toLowerCase();
@@ -348,11 +348,8 @@ function InboxPage() {
     for (const m of combinedThread) {
       if (m.text.toLowerCase().includes(q)) ids.push(m.id);
     }
-    for (const n of notesByConvo[active.id] ?? []) {
-      if (n.text.toLowerCase().includes(q)) ids.push(n.id);
-    }
     return ids;
-  }, [searchOpen, searchQuery, combinedThread, notesByConvo, active.id]);
+  }, [searchOpen, searchQuery, combinedThread]);
   const activeMatchId = searchMatches[searchActiveIdx];
   useEffect(() => { setSearchActiveIdx(0); }, [searchQuery, active.id]);
   useEffect(() => {
