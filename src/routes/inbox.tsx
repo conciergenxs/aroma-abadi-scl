@@ -797,38 +797,6 @@ function InboxPage() {
                 isActiveMatch={activeMatchId === m.id}
               />
             ))}
-            {(notesByConvo[active.id] ?? []).map((n) => (
-              <div key={n.id} data-search-id={n.id} className="flex justify-center">
-                <div className={`max-w-[80%] w-full rounded-xl border px-4 py-3 shadow-sm transition ${activeMatchId === n.id ? "border-amber-300/70 bg-amber-300/[0.12] ring-2 ring-amber-300/40" : "border-amber-300/30 bg-amber-300/[0.06]"}`}>
-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold">
-                    <StickyNote className="h-3 w-3" />
-                    Internal note
-                    <span className="ml-auto text-muted-foreground/70 normal-case tracking-normal">
-                      {userLabel(n.authorId)} · {n.time}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-[14px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
-                    {highlightQuery ? (
-                      <HighlightedText text={n.text} query={highlightQuery} isActive={activeMatchId === n.id} />
-                    ) : (
-                      n.text.split(/(@[A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g).map((part, i) =>
-                        part.startsWith("@") && TEAM_USERS.some((u) => `@${u.name}` === part.trim()) ? (
-                          <span key={i} className="rounded bg-amber-300/20 text-amber-200 px-1 font-medium">{part}</span>
-                        ) : (
-                          <span key={i}>{part}</span>
-                        ),
-                      )
-                    )}
-                  </p>
-                  {n.mentions.length > 0 && (
-                    <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground/80">
-                      <AtSignIcon className="h-3 w-3" />
-                      Notified {n.mentions.map((id) => userLabel(id)).join(", ")}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
 
           <div className="border-t border-border/60 bg-background/30 px-6 py-4">
