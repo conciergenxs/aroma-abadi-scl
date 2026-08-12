@@ -267,7 +267,7 @@ export function AppShell({
               </Link>
             )}
             {backTo ? (
-              <Link to={backTo as any} className="flex flex-col hover:opacity-75 transition-opacity">
+              <Link to={backTo as ComponentProps<typeof Link>["to"]} className="flex flex-col hover:opacity-75 transition-opacity">
                 {title ? (
                   <h1 className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}>{title}</h1>
                 ) : null}
