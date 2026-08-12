@@ -792,6 +792,12 @@ function InboxPage() {
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
                       {ct.avatar}
                     </div>
+                    {stageColor && ct.lifecycleStage && (
+                      <span
+                        title={ct.lifecycleStage}
+                        className={`absolute -top-0.5 -left-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-background ${stageColor.dot}`}
+                      />
+                    )}
                     <ChannelIcon
                       channel={c.channel}
                       className="absolute -bottom-0.5 -right-0.5 h-[16px] w-[16px] ring-2 ring-background shadow-sm"
