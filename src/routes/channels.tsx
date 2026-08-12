@@ -454,7 +454,7 @@ function OptInTab() {
               <th className="text-left font-medium px-4 py-3">Channels</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="stagger">
             {rows.map((r) => (
               <OptInRow key={r.id} channel={r} />
             ))}
