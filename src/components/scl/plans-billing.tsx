@@ -471,7 +471,7 @@ function SummaryMetric({
   detail?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-background/45 p-3">
+    <div className="card-hover rounded-lg border border-border bg-background/45 p-3 transition-all duration-300">
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 text-sm font-medium">{value}</div>
       {detail && <div className="mt-0.5 text-xs text-muted-foreground">{detail}</div>}
