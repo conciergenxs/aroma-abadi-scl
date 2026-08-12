@@ -366,7 +366,6 @@ function InboxPage() {
   const senderName = (m: Message) => (m.from === "me" ? "You" : contact.name);
   const replyTarget = replyTargets[active.id];
   const startReply = (m: Message) => {
-    setComposerMode("reply");
     setReplyTargets((prev) => ({
       ...prev,
       [active.id]: { id: m.id, text: m.text, fromName: senderName(m), time: m.time },
