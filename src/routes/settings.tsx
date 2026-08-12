@@ -1585,7 +1585,7 @@ function TeamManagementPage() {
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Last Updated</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {filtered.map((t) => (
                 <tr
                   key={t.id}
