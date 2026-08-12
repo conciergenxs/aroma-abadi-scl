@@ -918,7 +918,7 @@ function TransactionsTab({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border stagger">
             {transactions
               .slice()
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
