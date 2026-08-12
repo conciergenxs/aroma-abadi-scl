@@ -140,7 +140,7 @@ const topNav: NavItem[] = [
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/sku", label: "SKU & Knowledge", icon: Package },
   { to: "/transactions", label: "Transactions", icon: Receipt },
-  { to: "/promo-codes", label: "Promo Codes", icon: Tag },
+  ...(LITE_MODE ? [] : [{ to: "/promo-codes", label: "Promo Codes", icon: Tag } as const]),
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings },
