@@ -162,13 +162,10 @@ function RootComponent() {
       pathname === "/auth" || pathname === "/access-denied" || pathname === "/invite/set-password";
     if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });
-      return;
     }
-    // Promo Codes is excluded from the lite deployment — block direct URL
-    // access too, not just the nav link.
-    if (LITE_MODE && pathname.startsWith("/promo-codes")) {
-      router.navigate({ to: "/", replace: true });
-    }
+    // Promo Codes' own routes carry a beforeLoad guard that redirects away
+    // under LITE_MODE — handled at the route level (not here) so the page
+    // never mounts/hydrates in the first place.
   }, [pathname, router]);
 
   return (
