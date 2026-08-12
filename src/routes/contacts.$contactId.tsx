@@ -90,8 +90,14 @@ function ContactDetailPage() {
   // Every hook below must run on every render regardless of whether the
   // contact resolves — the "not found" return sits after all of them so
   // hook order never changes between renders (see rules-of-hooks).
-  const contactLabels = contact ? labels.filter((l) => contact.labelIds.includes(l.id)) : [];
-  const contactLists = contact ? lists.filter((l) => contact.listIds.includes(l.id)) : [];
+  const contactLabels = useMemo(
+    () => (contact ? labels.filter((l) => contact.labelIds.includes(l.id)) : []),
+    [contact, labels],
+  );
+  const contactLists = useMemo(
+    () => (contact ? lists.filter((l) => contact.listIds.includes(l.id)) : []),
+    [contact, lists],
+  );
 
   // Transactions linked to this contact
   const contactTransactions = useMemo(
