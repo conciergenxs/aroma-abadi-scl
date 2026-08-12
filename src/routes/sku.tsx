@@ -965,7 +965,7 @@ function KnowledgeCardForm({
             />
           </label>
           <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Teks</span>
+            <span className="block text-xs text-muted-foreground mb-1">Content</span>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
