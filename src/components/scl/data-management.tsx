@@ -1265,7 +1265,7 @@ function LabelsPage() {
                     <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="stagger">
                   {paged.map((row) => {
                     const c = colorMeta(row.color);
                     return (
