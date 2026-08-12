@@ -137,6 +137,12 @@ function RootComponent() {
     const isPublicRoute = pathname === "/auth" || pathname === "/access-denied" || pathname === "/invite/set-password";
     if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });
+      return;
+    }
+    // Promo Codes is excluded from the lite deployment — block direct URL
+    // access too, not just the nav link.
+    if (LITE_MODE && pathname.startsWith("/promo-codes")) {
+      router.navigate({ to: "/", replace: true });
     }
   }, [pathname, router]);
 
