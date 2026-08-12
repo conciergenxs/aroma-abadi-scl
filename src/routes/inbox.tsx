@@ -881,12 +881,6 @@ function InboxPage() {
                     >
                       Use template <ChevronDown className="h-3 w-3" />
                     </button>
-                    <button
-                      onClick={() => { setComposerMode("note"); requestAnimationFrame(() => noteRef.current?.focus()); }}
-                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-amber-300/10 text-amber-300/90 transition-colors duration-150"
-                    >
-                      <StickyNote className="h-3.5 w-3.5" /> Internal note
-                    </button>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
