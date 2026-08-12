@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, useParams, Link } from "@tanstack/react-router";
 import { fmtDateTimeEN, fmtNum, fmtIDR } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { LITE_MODE } from "@/lib/feature-flags";
 import { useEffect, useState } from "react";
 import {
   CheckCircle2,
