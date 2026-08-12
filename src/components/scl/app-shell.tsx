@@ -363,7 +363,7 @@ export function AppShell({
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
                     AK
                   </div>
-                  <span className="text-[15px] font-medium text-foreground hidden lg:block">Aria Kapoor</span>
+                  <span className="text-[13px] font-medium text-foreground hidden lg:block">Aria Kapoor</span>
                   <ChevronDown className="h-3 w-3 text-muted-foreground hidden lg:block" />
                 </button>
               </DropdownMenuTrigger>
