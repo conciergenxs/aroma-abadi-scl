@@ -1153,7 +1153,7 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border stagger">
             {redemptions.map((r) => (
               <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
