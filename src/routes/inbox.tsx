@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
-import { conversations, threadsByContact, connectedChannels, type LifecycleStage } from "@/components/scl/mock-data";
+import {
+  AppShell,
+  LabelChip,
+  ListChip,
+  labelColorClass,
+  labelColorDot,
+} from "@/components/scl/app-shell";
+import {
+  conversations,
+  threadsByContact,
+  connectedChannels,
+  type LifecycleStage,
+} from "@/components/scl/mock-data";
 import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
 import { useContactsStore, contactsStore, getStageStyle } from "@/components/scl/contacts-store";
@@ -10,12 +21,43 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Search, Filter, Paperclip, Smile, Send, Phone, MoreHorizontal, ChevronUp,
-  Check, CheckCheck, ChevronDown, Inbox as InboxIcon, Users, AtSign,
-  UserX, MessageSquare, Info, Building2,
-  Mail, User2, ExternalLink, UserPlus, X as XIcon, Bot, Plus,
+  Search,
+  Filter,
+  Paperclip,
+  Smile,
+  Send,
+  Phone,
+  MoreHorizontal,
+  ChevronUp,
+  Check,
+  CheckCheck,
+  ChevronDown,
+  Inbox as InboxIcon,
+  Users,
+  AtSign,
+  UserX,
+  MessageSquare,
+  Info,
+  Building2,
+  Mail,
+  User2,
+  ExternalLink,
+  UserPlus,
+  X as XIcon,
+  Bot,
+  Plus,
 } from "lucide-react";
-import { Pin, PinOff, MailOpen, Mail as MailIcon, Reply as ReplyIcon, Copy as CopyIcon, ClipboardPaste, Forward as ForwardIcon, CornerDownRight } from "lucide-react";
+import {
+  Pin,
+  PinOff,
+  MailOpen,
+  Mail as MailIcon,
+  Reply as ReplyIcon,
+  Copy as CopyIcon,
+  ClipboardPaste,
+  Forward as ForwardIcon,
+  CornerDownRight,
+} from "lucide-react";
 import { AI_AGENTS, findAgent, isAgentId } from "@/components/scl/agents";
 import { toast } from "sonner";
 import type { Message } from "@/components/scl/mock-data";
@@ -55,7 +97,7 @@ const TEAM_USERS: TeamUser[] = [
 ];
 const TEAMS = Array.from(new Set(TEAM_USERS.map((u) => u.team)));
 const teamOfOwner = (ownerId?: string | null) =>
-  ownerId ? TEAM_USERS.find((u) => u.id === ownerId)?.team ?? null : null;
+  ownerId ? (TEAM_USERS.find((u) => u.id === ownerId)?.team ?? null) : null;
 const userLabel = (id?: string | null) => {
   if (!id) return "Unassigned";
   const u = TEAM_USERS.find((x) => x.id === id);
@@ -74,7 +116,8 @@ function InboxPage() {
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
   const [labelModalOpen, setLabelModalOpen] = useState(false);
   const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState<import("@/components/scl/mock-data").LabelColor>("indigo");
+  const [newLabelColor, setNewLabelColor] =
+    useState<import("@/components/scl/mock-data").LabelColor>("indigo");
 
   // ============== INBOX FILTER PANEL ==============
   type FilterCategory = "channels" | "labels" | "owner" | "lifecycle" | "unread";
@@ -143,7 +186,7 @@ function InboxPage() {
     }
     return out;
   }, []);
-  const channelLabel = (c: Channel) => ("WhatsApp");
+  const channelLabel = (c: Channel) => "WhatsApp";
 
   const ownerOptions = useMemo(
     () => [
@@ -156,10 +199,7 @@ function InboxPage() {
   const ownerLabel = (id: string) =>
     id === "__unassigned" ? "Unassigned" : id === "me" ? "Me" : userLabel(id);
 
-  const labelById = useMemo(
-    () => new Map(labels.map((l) => [l.id, l] as const)),
-    [labels],
-  );
+  const labelById = useMemo(() => new Map(labels.map((l) => [l.id, l] as const)), [labels]);
 
   useEffect(() => {
     if (!contextOpen) return;
@@ -194,10 +234,8 @@ function InboxPage() {
     [unreadOverrides],
   );
   const isUnread = useCallback((c: Conversation) => unreadCount(c) > 0, [unreadCount]);
-  const markRead = (id: string) =>
-    setUnreadOverrides((p) => ({ ...p, [id]: false }));
-  const markUnread = (id: string) =>
-    setUnreadOverrides((p) => ({ ...p, [id]: true }));
+  const markRead = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: false }));
+  const markUnread = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: true }));
 
   const [replyText, setReplyText] = useState("");
   // Autopilot state: per conversation
@@ -275,7 +313,8 @@ function InboxPage() {
       if (tab === "Unassigned" && ct.ownerId) return false;
       // Inbox filter panel
       if (filters.channels.length && !filters.channels.includes(c.channel)) return false;
-      if (filters.labels.length && !filters.labels.some((id) => ct.labelIds.includes(id))) return false;
+      if (filters.labels.length && !filters.labels.some((id) => ct.labelIds.includes(id)))
+        return false;
       if (filters.owners.length) {
         const matchUnassigned = filters.owners.includes("__unassigned") && !ct.ownerId;
         const matchUser = ct.ownerId ? filters.owners.includes(ct.ownerId) : false;
@@ -290,7 +329,8 @@ function InboxPage() {
       // Search
       if (search) {
         const q = search.toLowerCase();
-        if (!ct.name.toLowerCase().includes(q) && !c.preview.toLowerCase().includes(q)) return false;
+        if (!ct.name.toLowerCase().includes(q) && !c.preview.toLowerCase().includes(q))
+          return false;
       }
       return true;
     });
@@ -305,7 +345,8 @@ function InboxPage() {
     });
   }, [visible, pinnedIds]);
 
-  const active = sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
+  const active =
+    sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
   const thread: Message[] = useMemo(() => {
     const existing = threadsByContact[contact.id];
@@ -354,7 +395,9 @@ function InboxPage() {
     return ids;
   }, [searchOpen, searchQuery, combinedThread]);
   const activeMatchId = searchMatches[searchActiveIdx];
-  useEffect(() => { setSearchActiveIdx(0); }, [searchQuery, active.id]);
+  useEffect(() => {
+    setSearchActiveIdx(0);
+  }, [searchQuery, active.id]);
   useEffect(() => {
     setSearchOpen(false);
     setSearchQuery("");
@@ -375,8 +418,7 @@ function InboxPage() {
     }));
     requestAnimationFrame(() => composerRef.current?.focus());
   };
-  const clearReply = () =>
-    setReplyTargets((prev) => ({ ...prev, [active.id]: undefined }));
+  const clearReply = () => setReplyTargets((prev) => ({ ...prev, [active.id]: undefined }));
   const submitReply = () => {
     const text = replyText.trim();
     if (!text) return;
@@ -407,10 +449,9 @@ function InboxPage() {
     const recipients = forwardContacts.size;
     setForwardModalOpen(false);
     exitForwardMode();
-    toast.success(
-      `Messages forwarded successfully`,
-      { description: `${count} message${count === 1 ? "" : "s"} sent to ${recipients} contact${recipients === 1 ? "" : "s"}` },
-    );
+    toast.success(`Messages forwarded successfully`, {
+      description: `${count} message${count === 1 ? "" : "s"} sent to ${recipients} contact${recipients === 1 ? "" : "s"}`,
+    });
   };
 
   const stageCounts = useMemo(() => {
@@ -447,8 +488,7 @@ function InboxPage() {
     return map;
   }, [contacts]);
 
-  const isViewActive = (id: InboxView) =>
-    activeFilter.kind === "view" && activeFilter.value === id;
+  const isViewActive = (id: InboxView) => activeFilter.kind === "view" && activeFilter.value === id;
   const isStageActive = (s: LifecycleStage | null) =>
     s === null
       ? activeFilter.kind !== "stage"
@@ -461,14 +501,22 @@ function InboxPage() {
   const filterContext = useMemo(() => {
     if (activeFilter.kind === "view") {
       const v = activeFilter.value;
-      if (v === "my") return { title: "My Inbox", subtitle: "Showing conversations assigned to you" };
-      if (v === "ba") return { title: "BA Inbox", subtitle: "Showing conversations with Beauty Ambassadors" };
+      if (v === "my")
+        return { title: "My Inbox", subtitle: "Showing conversations assigned to you" };
+      if (v === "ba")
+        return { title: "BA Inbox", subtitle: "Showing conversations with Beauty Ambassadors" };
       return { title: "All Inbox", subtitle: "Showing every conversation across your workspace" };
     }
     if (activeFilter.kind === "stage") {
-      return { title: activeFilter.value, subtitle: `Showing contacts in ${activeFilter.value} stage` };
+      return {
+        title: activeFilter.value,
+        subtitle: `Showing contacts in ${activeFilter.value} stage`,
+      };
     }
-    return { title: `${activeFilter.value} Team`, subtitle: `Showing conversations handled by ${activeFilter.value} Team` };
+    return {
+      title: `${activeFilter.value} Team`,
+      subtitle: `Showing conversations handled by ${activeFilter.value} Team`,
+    };
   }, [activeFilter]);
 
   return (
@@ -494,7 +542,9 @@ function InboxPage() {
                   <Icon className={`h-4 w-4 ${sel ? "" : "opacity-70"}`} />
                   <span className="flex-1 text-left">{v.label}</span>
                   {count > 0 && (
-                    <span className={`text-[11px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/60"}`}>
+                    <span
+                      className={`text-[11px] tabular-nums ${sel ? "text-primary" : "text-muted-foreground/60"}`}
+                    >
                       {count}
                     </span>
                   )}
@@ -506,7 +556,9 @@ function InboxPage() {
           {/* Labels filter section */}
           <div className="border-t border-border pt-3 mt-2 px-2">
             <div className="flex items-center justify-between mb-1.5 px-1">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Labels</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Labels
+              </span>
               <button
                 onClick={() => setLabelModalOpen(true)}
                 className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
@@ -540,39 +592,60 @@ function InboxPage() {
                 />
                 <select
                   value={newLabelColor}
-                  onChange={(e) => setNewLabelColor(e.target.value as import("@/components/scl/mock-data").LabelColor)}
+                  onChange={(e) =>
+                    setNewLabelColor(
+                      e.target.value as import("@/components/scl/mock-data").LabelColor,
+                    )
+                  }
                   className="w-full h-7 rounded border border-border bg-white px-2 text-xs focus:outline-none"
                 >
-                  {(["indigo","pink","emerald","amber","sky","violet","slate"] as const).map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  {(["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"] as const).map(
+                    (c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ),
+                  )}
                 </select>
                 <div className="flex gap-1">
                   <button
                     onClick={() => {
                       if (!newLabelName.trim()) return;
-                      contactsStore.setLabels((l) => [...l, { id: `lb-${Date.now()}`, name: newLabelName.trim(), color: newLabelColor }]);
+                      contactsStore.setLabels((l) => [
+                        ...l,
+                        { id: `lb-${Date.now()}`, name: newLabelName.trim(), color: newLabelColor },
+                      ]);
                       setNewLabelName("");
                       setLabelModalOpen(false);
                     }}
                     className="flex-1 h-7 rounded bg-primary text-primary-foreground text-xs font-medium"
-                  >Save</button>
+                  >
+                    Save
+                  </button>
                   <button
-                    onClick={() => { setNewLabelName(""); setLabelModalOpen(false); }}
+                    onClick={() => {
+                      setNewLabelName("");
+                      setLabelModalOpen(false);
+                    }}
                     className="flex-1 h-7 rounded border border-border text-xs text-muted-foreground"
-                  >Cancel</button>
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}
           </div>
-
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
         <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-background/40">
           <div className="px-3.5 pt-3 pb-2 border-b border-border/60">
-            <div className="text-[13px] font-semibold text-foreground truncate">{filterContext.title}</div>
-            <div className="text-[11px] text-muted-foreground/70 truncate mt-0.5">{filterContext.subtitle}</div>
+            <div className="text-[13px] font-semibold text-foreground truncate">
+              {filterContext.title}
+            </div>
+            <div className="text-[11px] text-muted-foreground/70 truncate mt-0.5">
+              {filterContext.subtitle}
+            </div>
           </div>
           <div className="p-3 border-b border-border space-y-2.5">
             <div className="relative">
@@ -586,7 +659,11 @@ function InboxPage() {
             </div>
             <div className="flex items-center gap-1 text-[11px]">
               {tabs.map((t) => (
-                <button key={t} onClick={() => setTab(t)} className={`px-2 py-1 rounded ${tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`px-2 py-1 rounded ${tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
                   {t}
                 </button>
               ))}
@@ -603,7 +680,9 @@ function InboxPage() {
                 >
                   <Filter className="h-3.5 w-3.5" />
                   {activeFilterCount > 0 && (
-                    <span className="text-[10px] font-semibold tabular-nums">{activeFilterCount}</span>
+                    <span className="text-[10px] font-semibold tabular-nums">
+                      {activeFilterCount}
+                    </span>
                   )}
                 </button>
                 {filtersOpen && (
@@ -630,23 +709,50 @@ function InboxPage() {
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-0.5">
                 {filters.channels.map((c) => (
-                  <FilterChip key={`ch-${c}`} label={channelLabel(c)} onRemove={() => setFilters((f) => ({ ...f, channels: f.channels.filter((x) => x !== c) }))} />
+                  <FilterChip
+                    key={`ch-${c}`}
+                    label={channelLabel(c)}
+                    onRemove={() =>
+                      setFilters((f) => ({ ...f, channels: f.channels.filter((x) => x !== c) }))
+                    }
+                  />
                 ))}
                 {filters.labels.map((id) => {
                   const lb = labelById.get(id);
                   if (!lb) return null;
                   return (
-                    <FilterChip key={`lb-${id}`} label={lb.name} onRemove={() => setFilters((f) => ({ ...f, labels: f.labels.filter((x) => x !== id) }))} />
+                    <FilterChip
+                      key={`lb-${id}`}
+                      label={lb.name}
+                      onRemove={() =>
+                        setFilters((f) => ({ ...f, labels: f.labels.filter((x) => x !== id) }))
+                      }
+                    />
                   );
                 })}
                 {filters.owners.map((id) => (
-                  <FilterChip key={`ow-${id}`} label={ownerLabel(id)} onRemove={() => setFilters((f) => ({ ...f, owners: f.owners.filter((x) => x !== id) }))} />
+                  <FilterChip
+                    key={`ow-${id}`}
+                    label={ownerLabel(id)}
+                    onRemove={() =>
+                      setFilters((f) => ({ ...f, owners: f.owners.filter((x) => x !== id) }))
+                    }
+                  />
                 ))}
                 {filters.stages.map((s) => (
-                  <FilterChip key={`st-${s}`} label={s} onRemove={() => setFilters((f) => ({ ...f, stages: f.stages.filter((x) => x !== s) }))} />
+                  <FilterChip
+                    key={`st-${s}`}
+                    label={s}
+                    onRemove={() =>
+                      setFilters((f) => ({ ...f, stages: f.stages.filter((x) => x !== s) }))
+                    }
+                  />
                 ))}
                 {filters.unreadOnly && (
-                  <FilterChip label="Unread only" onRemove={() => setFilters((f) => ({ ...f, unreadOnly: false }))} />
+                  <FilterChip
+                    label="Unread only"
+                    onRemove={() => setFilters((f) => ({ ...f, unreadOnly: false }))}
+                  />
                 )}
                 <button
                   onClick={() => setFilters(emptyFilters)}
@@ -693,22 +799,31 @@ function InboxPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className={`text-[15px] truncate ${unread ? "font-semibold text-foreground" : "font-medium text-foreground/90"}`}>
+                      <span
+                        className={`text-[15px] truncate ${unread ? "font-semibold text-foreground" : "font-medium text-foreground/90"}`}
+                      >
                         {ct.name}
                       </span>
                       <span className="flex items-center gap-1 shrink-0">
-                        <span className={`text-[10px] tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}>
+                        <span
+                          className={`text-[10px] tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}
+                        >
                           {c.time}
                         </span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-1">
-                      <p className={`text-[12px] truncate leading-snug ${unread ? "text-foreground/85" : "text-muted-foreground/70"}`}>
+                      <p
+                        className={`text-[12px] truncate leading-snug ${unread ? "text-foreground/85" : "text-muted-foreground/70"}`}
+                      >
                         {c.preview}
                       </p>
                       <span className="flex items-center gap-1.5 shrink-0">
                         {pinned && (
-                          <Pin className="h-3 w-3 text-primary fill-primary/80" aria-label="Pinned" />
+                          <Pin
+                            className="h-3 w-3 text-primary fill-primary/80"
+                            aria-label="Pinned"
+                          />
                         )}
                         {unread && (
                           <span className="rounded-full bg-primary px-1.5 min-w-[18px] h-[18px] grid place-items-center text-[10px] font-semibold text-primary-foreground">
@@ -719,7 +834,10 @@ function InboxPage() {
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {stageColor && ct.lifecycleStage && (
-                        <span title={ct.lifecycleStage} className={`inline-block h-2.5 w-2.5 rounded-full ${stageColor.dot}`} />
+                        <span
+                          title={ct.lifecycleStage}
+                          className={`inline-block h-2.5 w-2.5 rounded-full ${stageColor.dot}`}
+                        />
                       )}
                     </div>
                   </div>
@@ -737,12 +855,16 @@ function InboxPage() {
             collaborators={collaborators[active.id] ?? []}
             onChangeLifecycle={(next) => {
               contactsStore.setContacts((list) =>
-                list.map((c) => (c.id === contact.id ? { ...c, lifecycleStage: next ?? undefined } : c)),
+                list.map((c) =>
+                  c.id === contact.id ? { ...c, lifecycleStage: next ?? undefined } : c,
+                ),
               );
             }}
             onChangeOwner={(ownerId) => {
               contactsStore.setContacts((list) =>
-                list.map((c) => (c.id === contact.id ? { ...c, ownerId: ownerId ?? undefined } : c)),
+                list.map((c) =>
+                  c.id === contact.id ? { ...c, ownerId: ownerId ?? undefined } : c,
+                ),
               );
             }}
             onChangeCollaborators={(ids) =>
@@ -753,9 +875,7 @@ function InboxPage() {
             isPinned={isPinned(active.id)}
             isUnread={isUnread(active)}
             onTogglePin={() => togglePinned(active.id)}
-            onToggleRead={() =>
-              isUnread(active) ? markRead(active.id) : markUnread(active.id)
-            }
+            onToggleRead={() => (isUnread(active) ? markRead(active.id) : markUnread(active.id))}
             searchOpen={searchOpen}
             onToggleSearch={() => setSearchOpen((v) => !v)}
           />
@@ -768,7 +888,9 @@ function InboxPage() {
               index={searchActiveIdx}
               onPrev={() =>
                 setSearchActiveIdx((i) =>
-                  searchMatches.length === 0 ? 0 : (i - 1 + searchMatches.length) % searchMatches.length,
+                  searchMatches.length === 0
+                    ? 0
+                    : (i - 1 + searchMatches.length) % searchMatches.length,
                 )
               }
               onNext={() =>
@@ -776,12 +898,17 @@ function InboxPage() {
                   searchMatches.length === 0 ? 0 : (i + 1) % searchMatches.length,
                 )
               }
-              onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+              onClose={() => {
+                setSearchOpen(false);
+                setSearchQuery("");
+              }}
             />
           )}
 
           <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
-            <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">Today</div>
+            <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">
+              Today
+            </div>
             {combinedThread.map((m) => (
               <MessageRow
                 key={m.id}
@@ -844,7 +971,9 @@ function InboxPage() {
                     <CornerDownRight className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                        <span className="font-semibold text-primary/90">Replying to {replyTarget.fromName}</span>
+                        <span className="font-semibold text-primary/90">
+                          Replying to {replyTarget.fromName}
+                        </span>
                         <span>·</span>
                         <span>{replyTarget.time}</span>
                       </div>
@@ -867,15 +996,22 @@ function InboxPage() {
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitReply(); }
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault();
+                      submitReply();
+                    }
                   }}
                   placeholder="Reply as Arma.."
                   className="w-full bg-transparent resize-none px-4 pt-3.5 pb-2 text-[14px] leading-relaxed focus:outline-none placeholder:text-muted-foreground/60"
                 />
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
                   <div className="flex items-center gap-0.5 text-muted-foreground/70">
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"><Paperclip className="h-4 w-4" /></button>
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"><Smile className="h-4 w-4" /></button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150">
+                      <Paperclip className="h-4 w-4" />
+                    </button>
+                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150">
+                      <Smile className="h-4 w-4" />
+                    </button>
                     <button
                       onClick={() => setTemplatePickerOpen(true)}
                       className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
@@ -904,7 +1040,6 @@ function InboxPage() {
             )}
           </div>
         </section>
-
       </div>
       {/* ============== CONTACT CONTEXT PANEL (overlay side drawer) ============== */}
       {contextOpen && (
@@ -934,91 +1069,129 @@ function InboxPage() {
             </div>
             {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto">
-            <div className="p-5 border-b border-border text-center">
-              <div className="relative mx-auto h-16 w-16">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[15px] font-medium">{contact.avatar}</div>
-                <ChannelIcon
-                  channel={contact.channel}
-                  className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
-                />
-              </div>
-              <div className="mt-3 text-sm font-medium">{contact.name}</div>
-              {contact.lifecycleStage && (
-                <div className="mt-2">
-                  <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${getStageStyle(contact.lifecycleStage).badge}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${getStageStyle(contact.lifecycleStage).dot}`} />
-                    {contact.lifecycleStage}
-                  </span>
+              <div className="p-5 border-b border-border text-center">
+                <div className="relative mx-auto h-16 w-16">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[15px] font-medium">
+                    {contact.avatar}
+                  </div>
+                  <ChannelIcon
+                    channel={contact.channel}
+                    className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
+                  />
                 </div>
-              )}
-              <div className="mt-3">
-                <Link
-                  to="/contacts/$contactId"
-                  params={{ contactId: contact.id }}
-                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline transition-colors duration-150"
-                >
-                  Open full contact <ExternalLink className="h-3 w-3" />
-                </Link>
+                <div className="mt-3 text-sm font-medium">{contact.name}</div>
+                {contact.lifecycleStage && (
+                  <div className="mt-2">
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] ${getStageStyle(contact.lifecycleStage).badge}`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${getStageStyle(contact.lifecycleStage).dot}`}
+                      />
+                      {contact.lifecycleStage}
+                    </span>
+                  </div>
+                )}
+                <div className="mt-3">
+                  <Link
+                    to="/contacts/$contactId"
+                    params={{ contactId: contact.id }}
+                    className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline transition-colors duration-150"
+                  >
+                    Open full contact <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            <Section title="Labels">
-              <div className="flex flex-wrap gap-1">
-                {contact.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">No labels</span>}
-                {contact.labelIds.map((id) => {
-                  const l = labels.find((x) => x.id === id);
-                  return l ? <LabelChip key={id} label={l} /> : null;
-                })}
-              </div>
-            </Section>
+              <Section title="Labels">
+                <div className="flex flex-wrap gap-1">
+                  {contact.labelIds.length === 0 && (
+                    <span className="text-[11px] text-muted-foreground">No labels</span>
+                  )}
+                  {contact.labelIds.map((id) => {
+                    const l = labels.find((x) => x.id === id);
+                    return l ? <LabelChip key={id} label={l} /> : null;
+                  })}
+                </div>
+              </Section>
 
-            <Section title="Audience">
-              <div className="flex flex-wrap gap-1">
-                {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any audience</span>}
-                {contact.listIds.map((id) => {
-                  const l = lists.find((x) => x.id === id);
-                  return l ? <ListChip key={id} name={l.name} /> : null;
-                })}
-              </div>
-            </Section>
+              <Section title="Audience">
+                <div className="flex flex-wrap gap-1">
+                  {contact.listIds.length === 0 && (
+                    <span className="text-[11px] text-muted-foreground">Not in any audience</span>
+                  )}
+                  {contact.listIds.map((id) => {
+                    const l = lists.find((x) => x.id === id);
+                    return l ? <ListChip key={id} name={l.name} /> : null;
+                  })}
+                </div>
+              </Section>
 
-            <Section title="Contact Information">
-              <InfoRow icon={<Mail className="h-3 w-3" />} label="Email" value={contact.email ?? "—"} />
-              <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
-              <InfoRow icon={<MessageSquare className="h-3 w-3" />} label="Channel" value="WhatsApp" />
-              <InfoRow icon={<span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>} label="Last interaction" value={contact.lastInteraction} />
-            </Section>
+              <Section title="Contact Information">
+                <InfoRow
+                  icon={<Mail className="h-3 w-3" />}
+                  label="Email"
+                  value={contact.email ?? "—"}
+                />
+                <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
+                <InfoRow
+                  icon={<MessageSquare className="h-3 w-3" />}
+                  label="Channel"
+                  value="WhatsApp"
+                />
+                <InfoRow
+                  icon={
+                    <span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>
+                  }
+                  label="Last interaction"
+                  value={contact.lastInteraction}
+                />
+              </Section>
 
-            <Section title="Contact Properties">
-              {(() => {
-                const SYS = new Set(["name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email"]);
-                const custom = properties.filter((p) => !p.system && !SYS.has(p.key));
-                if (custom.length === 0) {
+              <Section title="Contact Properties">
+                {(() => {
+                  const SYS = new Set([
+                    "name",
+                    "phone",
+                    "channel",
+                    "labels",
+                    "lists",
+                    "lastInteraction",
+                    "status",
+                    "email",
+                  ]);
+                  const custom = properties.filter((p) => !p.system && !SYS.has(p.key));
+                  if (custom.length === 0) {
+                    return (
+                      <div className="text-[11px] text-muted-foreground">
+                        No custom properties. Add them in Manage Properties.
+                      </div>
+                    );
+                  }
                   return (
-                    <div className="text-[11px] text-muted-foreground">
-                      No custom properties. Add them in Manage Properties.
+                    <div className="space-y-2">
+                      {custom.map((p) => {
+                        const v = contact.customFields?.[p.key];
+                        const display = formatPropertyValue(v);
+                        return (
+                          <div
+                            key={p.id}
+                            className="flex items-start justify-between gap-3 text-xs"
+                          >
+                            <span className="text-muted-foreground">{p.name}</span>
+                            <span
+                              className={`text-right break-words ${display === "—" ? "text-muted-foreground" : "text-foreground"}`}
+                            >
+                              {display}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
-                }
-                return (
-                  <div className="space-y-2">
-                    {custom.map((p) => {
-                      const v = contact.customFields?.[p.key];
-                      const display = formatPropertyValue(v);
-                      return (
-                        <div key={p.id} className="flex items-start justify-between gap-3 text-xs">
-                          <span className="text-muted-foreground">{p.name}</span>
-                          <span className={`text-right break-words ${display === "—" ? "text-muted-foreground" : "text-foreground"}`}>
-                            {display}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-            </Section>
-          </div>
+                })()}
+              </Section>
+            </div>
           </aside>
         </div>
       )}
@@ -1073,8 +1246,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 py-1.5 text-xs">
-      <span className="inline-flex items-center gap-1.5 text-muted-foreground">{icon}{label}</span>
-      <span className={`text-right truncate ${value === "—" || value === "Unassigned" ? "text-muted-foreground" : "text-foreground"}`}>{value}</span>
+      <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+        {icon}
+        {label}
+      </span>
+      <span
+        className={`text-right truncate ${value === "—" || value === "Unassigned" ? "text-muted-foreground" : "text-foreground"}`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -1127,9 +1307,7 @@ function ConversationHeader({
     <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
       <div className="flex items-center gap-3 min-w-0">
-        <span className="text-[13px] font-medium text-foreground truncate">
-          {contact.name}
-        </span>
+        <span className="text-[13px] font-medium text-foreground truncate">{contact.name}</span>
         {!contact.labelIds.includes("lb-ba") && (
           <LifecycleSelect
             size="sm"
@@ -1141,60 +1319,72 @@ function ConversationHeader({
 
       {/* RIGHT — actions */}
       <div className="ml-auto flex items-center gap-3">
-      <div className="flex items-center gap-0.5 text-muted-foreground/70">
-        <button
-          onClick={onToggleSearch}
-          title="Search messages"
-          className={`h-9 w-9 grid place-items-center rounded transition ${
-            searchOpen ? "bg-primary/15 text-primary" : "hover:bg-gray-50 hover:text-foreground"
-          }`}
-        >
-          <Search className="h-4 w-4" />
-        </button>
-        <button
-          onClick={onToggleContext}
-          data-contact-toggle
-          title={contextOpen ? "Hide contact details" : "Show contact details"}
-          className={`h-9 w-9 grid place-items-center rounded transition ${
-            contextOpen ? "bg-primary/15 text-primary" : "hover:bg-gray-50"
-          }`}
-        >
-          <Info className="h-4 w-4" />
-        </button>
-        <button
-          ref={moreRef}
-          onClick={() => setMoreOpen((v) => !v)}
-          title="More actions"
-          className={`h-9 w-9 grid place-items-center rounded transition ${
-            moreOpen ? "bg-white/[0.06] text-foreground" : "hover:bg-gray-50 hover:text-foreground"
-          }`}
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
-        <FloatingMenu
-          anchorRef={moreRef}
-          open={moreOpen}
-          onClose={() => setMoreOpen(false)}
-          align="end"
-          width={200}
-          className="rounded-md border border-border bg-popover/95 backdrop-blur shadow-lg py-1 text-[13px]"
-        >
+        <div className="flex items-center gap-0.5 text-muted-foreground/70">
           <button
-            onClick={() => { onTogglePin(); setMoreOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
+            onClick={onToggleSearch}
+            title="Search messages"
+            className={`h-9 w-9 grid place-items-center rounded transition ${
+              searchOpen ? "bg-primary/15 text-primary" : "hover:bg-gray-50 hover:text-foreground"
+            }`}
           >
-            {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-            <span>{isPinned ? "Unpin Contact" : "Pin Contact"}</span>
+            <Search className="h-4 w-4" />
           </button>
           <button
-            onClick={() => { onToggleRead(); setMoreOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
+            onClick={onToggleContext}
+            data-contact-toggle
+            title={contextOpen ? "Hide contact details" : "Show contact details"}
+            className={`h-9 w-9 grid place-items-center rounded transition ${
+              contextOpen ? "bg-primary/15 text-primary" : "hover:bg-gray-50"
+            }`}
           >
-            {isUnread ? <MailOpen className="h-3.5 w-3.5" /> : <MailIcon className="h-3.5 w-3.5" />}
-            <span>{isUnread ? "Mark as Read" : "Mark as Unread"}</span>
+            <Info className="h-4 w-4" />
           </button>
-        </FloatingMenu>
-      </div>
+          <button
+            ref={moreRef}
+            onClick={() => setMoreOpen((v) => !v)}
+            title="More actions"
+            className={`h-9 w-9 grid place-items-center rounded transition ${
+              moreOpen
+                ? "bg-white/[0.06] text-foreground"
+                : "hover:bg-gray-50 hover:text-foreground"
+            }`}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          <FloatingMenu
+            anchorRef={moreRef}
+            open={moreOpen}
+            onClose={() => setMoreOpen(false)}
+            align="end"
+            width={200}
+            className="rounded-md border border-border bg-popover/95 backdrop-blur shadow-lg py-1 text-[13px]"
+          >
+            <button
+              onClick={() => {
+                onTogglePin();
+                setMoreOpen(false);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
+            >
+              {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+              <span>{isPinned ? "Unpin Contact" : "Pin Contact"}</span>
+            </button>
+            <button
+              onClick={() => {
+                onToggleRead();
+                setMoreOpen(false);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
+            >
+              {isUnread ? (
+                <MailOpen className="h-3.5 w-3.5" />
+              ) : (
+                <MailIcon className="h-3.5 w-3.5" />
+              )}
+              <span>{isUnread ? "Mark as Read" : "Mark as Unread"}</span>
+            </button>
+          </FloatingMenu>
+        </div>
       </div>
     </div>
   );
@@ -1212,12 +1402,8 @@ function OwnerSelect({
   const btnRef = useRef<HTMLButtonElement>(null);
   const current = TEAM_USERS.find((u) => u.id === value);
   const currentAgent = findAgent(value);
-  const filtered = TEAM_USERS.filter((u) =>
-    u.name.toLowerCase().includes(q.toLowerCase()),
-  );
-  const filteredAgents = AI_AGENTS.filter((a) =>
-    a.name.toLowerCase().includes(q.toLowerCase()),
-  );
+  const filtered = TEAM_USERS.filter((u) => u.name.toLowerCase().includes(q.toLowerCase()));
+  const filteredAgents = AI_AGENTS.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="relative">
       <button
@@ -1248,7 +1434,13 @@ function OwnerSelect({
         )}
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
       </button>
-      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={256}>
+      <FloatingMenu
+        anchorRef={btnRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        align="end"
+        width={256}
+      >
         <div className="rounded-md border border-border bg-popover shadow-xl p-2">
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
@@ -1357,12 +1549,8 @@ function CollaboratorsPopover({
   useEffect(() => {
     if (open) setDraft(value);
   }, [open, value]);
-  const filtered = TEAM_USERS.filter((u) =>
-    u.name.toLowerCase().includes(q.toLowerCase()),
-  );
-  const filteredAgents = AI_AGENTS.filter((a) =>
-    a.name.toLowerCase().includes(q.toLowerCase()),
-  );
+  const filtered = TEAM_USERS.filter((u) => u.name.toLowerCase().includes(q.toLowerCase()));
+  const filteredAgents = AI_AGENTS.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()));
   const toggle = (id: string) =>
     setDraft((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]));
   return (
@@ -1383,9 +1571,17 @@ function CollaboratorsPopover({
           </span>
         )}
       </button>
-      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} align="end" width={288}>
+      <FloatingMenu
+        anchorRef={btnRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        align="end"
+        width={288}
+      >
         <div className="rounded-md border border-border bg-popover shadow-xl p-2">
-          <div className="text-[11px] font-semibold px-1 pb-2 text-foreground">Add collaborators</div>
+          <div className="text-[11px] font-semibold px-1 pb-2 text-foreground">
+            Add collaborators
+          </div>
           <div className="relative mb-2">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <input
@@ -1572,15 +1768,26 @@ type FilterPanelProps = {
   ownerOptions: { id: string; name: string }[];
   onClose: () => void;
   onClear: () => void;
-  toggleIn: <T,>(arr: T[], v: T) => T[];
+  toggleIn: <T>(arr: T[], v: T) => T[];
 };
 
 function FilterPanel(props: FilterPanelProps) {
   const {
-    panelRef, category, setCategory, filters, setFilters,
-    activeCount, search, setSearch,
-    availableChannels, channelLabel, labels, ownerOptions,
-    onClose, onClear, toggleIn,
+    panelRef,
+    category,
+    setCategory,
+    filters,
+    setFilters,
+    activeCount,
+    search,
+    setSearch,
+    availableChannels,
+    channelLabel,
+    labels,
+    ownerOptions,
+    onClose,
+    onClear,
+    toggleIn,
   } = props;
   const { lifecycleStages } = useContactsStore();
 
@@ -1636,7 +1843,9 @@ function FilterPanel(props: FilterPanelProps) {
             >
               <span>{c.label}</span>
               {c.count > 0 && (
-                <span className={`text-[10px] tabular-nums ${category === c.id ? "text-primary" : "text-muted-foreground/70"}`}>
+                <span
+                  className={`text-[10px] tabular-nums ${category === c.id ? "text-primary" : "text-muted-foreground/70"}`}
+                >
                   {c.count}
                 </span>
               )}
@@ -1682,8 +1891,7 @@ function FilterPanel(props: FilterPanelProps) {
                     key: l.id,
                     label: l.name,
                     checked: filters.labels.includes(l.id),
-                    onToggle: () =>
-                      setFilters((f) => ({ ...f, labels: toggleIn(f.labels, l.id) })),
+                    onToggle: () => setFilters((f) => ({ ...f, labels: toggleIn(f.labels, l.id) })),
                   }))}
               />
             )}
@@ -1695,8 +1903,7 @@ function FilterPanel(props: FilterPanelProps) {
                     key: o.id,
                     label: o.name,
                     checked: filters.owners.includes(o.id),
-                    onToggle: () =>
-                      setFilters((f) => ({ ...f, owners: toggleIn(f.owners, o.id) })),
+                    onToggle: () => setFilters((f) => ({ ...f, owners: toggleIn(f.owners, o.id) })),
                   }))}
               />
             )}
@@ -1720,9 +1927,7 @@ function FilterPanel(props: FilterPanelProps) {
                   <input
                     type="checkbox"
                     checked={filters.unreadOnly}
-                    onChange={(e) =>
-                      setFilters((f) => ({ ...f, unreadOnly: e.target.checked }))
-                    }
+                    onChange={(e) => setFilters((f) => ({ ...f, unreadOnly: e.target.checked }))}
                     className="h-3.5 w-3.5 rounded border-border bg-card accent-primary"
                   />
                   Show only conversations with unread messages
@@ -1826,16 +2031,22 @@ function MessageRow({
                 : "border-primary bg-primary/10"
             }`}
           >
-            <div className={`font-semibold ${isMe ? "text-primary-foreground/90" : "text-primary"}`}>
+            <div
+              className={`font-semibold ${isMe ? "text-primary-foreground/90" : "text-primary"}`}
+            >
               {m.replyTo.fromName}
             </div>
-            <div className={`mt-0.5 line-clamp-2 ${isMe ? "text-primary-foreground/80" : "text-foreground/75"}`}>
+            <div
+              className={`mt-0.5 line-clamp-2 ${isMe ? "text-primary-foreground/80" : "text-foreground/75"}`}
+            >
               {m.replyTo.text}
             </div>
           </div>
         )}
         {m.forwardedFrom && (
-          <div className={`mb-1 inline-flex items-center gap-1 text-[10px] italic ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+          <div
+            className={`mb-1 inline-flex items-center gap-1 text-[10px] italic ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}
+          >
             <ForwardIcon className="h-3 w-3" /> Forwarded
           </div>
         )}
@@ -1846,9 +2057,16 @@ function MessageRow({
             m.text
           )}
         </p>
-        <div className={`mt-1.5 flex items-center gap-1 text-[10px] ${isMe ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}>
+        <div
+          className={`mt-1.5 flex items-center gap-1 text-[10px] ${isMe ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}
+        >
           <span>{m.time}</span>
-          {isMe && (m.status === "read" ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
+          {isMe &&
+            (m.status === "read" ? (
+              <CheckCheck className="h-3 w-3" />
+            ) : (
+              <Check className="h-3 w-3" />
+            ))}
         </div>
       </div>
 
@@ -1856,7 +2074,10 @@ function MessageRow({
       {!forwardMode && (
         <button
           ref={moreRef}
-          onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen((v) => !v);
+          }}
           aria-label="Message actions"
           className={`absolute -top-2 ${isMe ? "-left-2" : "-right-2"} h-6 w-6 grid place-items-center rounded-full border border-border bg-popover text-muted-foreground shadow-sm transition opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-foreground ${open ? "opacity-100" : ""}`}
         >
@@ -1872,30 +2093,68 @@ function MessageRow({
         width={210}
         className="rounded-md border border-border bg-popover/95 backdrop-blur shadow-lg py-1 text-[13px]"
       >
-        <MenuItem icon={<ReplyIcon className="h-3.5 w-3.5" />} label="Reply" onClick={() => { onReply(); setOpen(false); }} />
-        <MenuItem icon={<CopyIcon className="h-3.5 w-3.5" />} label="Copy Message" onClick={() => { onCopy(); setOpen(false); }} />
-        <MenuItem icon={<ClipboardPaste className="h-3.5 w-3.5" />} label="Copy to Message Box" onClick={() => { onCopyToBox(); setOpen(false); }} />
-        <MenuItem icon={<ForwardIcon className="h-3.5 w-3.5" />} label="Forward" onClick={() => { onForward(); setOpen(false); }} />
+        <MenuItem
+          icon={<ReplyIcon className="h-3.5 w-3.5" />}
+          label="Reply"
+          onClick={() => {
+            onReply();
+            setOpen(false);
+          }}
+        />
+        <MenuItem
+          icon={<CopyIcon className="h-3.5 w-3.5" />}
+          label="Copy Message"
+          onClick={() => {
+            onCopy();
+            setOpen(false);
+          }}
+        />
+        <MenuItem
+          icon={<ClipboardPaste className="h-3.5 w-3.5" />}
+          label="Copy to Message Box"
+          onClick={() => {
+            onCopyToBox();
+            setOpen(false);
+          }}
+        />
+        <MenuItem
+          icon={<ForwardIcon className="h-3.5 w-3.5" />}
+          label="Forward"
+          onClick={() => {
+            onForward();
+            setOpen(false);
+          }}
+        />
       </FloatingMenu>
     </div>
   );
 
   return (
-    <div data-search-id={m.id} className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
-      {forwardMode && !isMe && (
-        <ForwardCheckbox checked={selected} onChange={onToggleSelect} />
-      )}
+    <div
+      data-search-id={m.id}
+      className={`flex items-start gap-2 ${isMe ? "justify-end" : "justify-start"}`}
+    >
+      {forwardMode && !isMe && <ForwardCheckbox checked={selected} onChange={onToggleSelect} />}
       {bubble}
-      {forwardMode && isMe && (
-        <ForwardCheckbox checked={selected} onChange={onToggleSelect} />
-      )}
+      {forwardMode && isMe && <ForwardCheckbox checked={selected} onChange={onToggleSelect} />}
     </div>
   );
 }
 
-function MenuItem({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+function MenuItem({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
   return (
-    <button onClick={onClick} className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150">
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
+    >
       {icon}
       <span>{label}</span>
     </button>
@@ -1942,12 +2201,16 @@ function ForwardModal({
   onConfirm: () => void;
 }) {
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   const q = search.trim().toLowerCase();
-  const filtered = contacts.filter((c) => !q || c.name.toLowerCase().includes(q) || (c.phone ?? "").toLowerCase().includes(q));
+  const filtered = contacts.filter(
+    (c) => !q || c.name.toLowerCase().includes(q) || (c.phone ?? "").toLowerCase().includes(q),
+  );
   return (
     <div className="fixed inset-0 z-[60]">
       <div className="absolute inset-0 bg-black/50 animate-fade-in" onClick={onClose} />
@@ -1960,10 +2223,15 @@ function ForwardModal({
           <div>
             <div className="text-sm font-semibold">Forward Messages</div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              {count} message{count === 1 ? "" : "s"} · {selected.size} recipient{selected.size === 1 ? "" : "s"}
+              {count} message{count === 1 ? "" : "s"} · {selected.size} recipient
+              {selected.size === 1 ? "" : "s"}
             </div>
           </div>
-          <button onClick={onClose} aria-label="Close" className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150">
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="h-8 w-8 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
+          >
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -1981,7 +2249,9 @@ function ForwardModal({
         </div>
         <div className="flex-1 overflow-y-auto py-1">
           {filtered.length === 0 && (
-            <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">No contacts match your search.</div>
+            <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
+              No contacts match your search.
+            </div>
           )}
           {filtered.map((c) => {
             const checked = selected.has(c.id);
@@ -1991,12 +2261,19 @@ function ForwardModal({
                 onClick={() => toggle(c.id)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition ${checked ? "bg-primary/10" : "hover:bg-gray-50"}`}
               >
-                <span className={`h-5 w-5 shrink-0 rounded border grid place-items-center ${checked ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card/60"}`}>
+                <span
+                  className={`h-5 w-5 shrink-0 rounded border grid place-items-center ${checked ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card/60"}`}
+                >
                   {checked && <Check className="h-3.5 w-3.5" />}
                 </span>
                 <div className="relative shrink-0 h-9 w-9">
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">{c.avatar}</div>
-                  <ChannelIcon channel={c.channel} className="absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] ring-2 ring-popover" />
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[11px] font-medium">
+                    {c.avatar}
+                  </div>
+                  <ChannelIcon
+                    channel={c.channel}
+                    className="absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] ring-2 ring-popover"
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[13px] text-foreground truncate">{c.name}</div>
@@ -2009,7 +2286,12 @@ function ForwardModal({
           })}
         </div>
         <div className="shrink-0 flex items-center justify-end gap-2 px-4 h-14 border-t border-border">
-          <button onClick={onClose} className="h-9 px-3 rounded-md border border-border bg-card/60 text-[14px] hover:bg-gray-50 transition-colors">Cancel</button>
+          <button
+            onClick={onClose}
+            className="h-9 px-3 rounded-md border border-border bg-card/60 text-[14px] hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
           <button
             onClick={onConfirm}
             disabled={selected.size === 0}
@@ -2031,7 +2313,15 @@ function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function HighlightedText({ text, query, isActive }: { text: string; query: string; isActive?: boolean }) {
+function HighlightedText({
+  text,
+  query,
+  isActive,
+}: {
+  text: string;
+  query: string;
+  isActive?: boolean;
+}) {
   const q = query.trim();
   if (!q) return <>{text}</>;
   const parts = text.split(new RegExp(`(${escapeRegExp(q)})`, "gi"));
@@ -2088,18 +2378,21 @@ function SearchStrip({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Escape") { e.preventDefault(); onClose(); }
-            else if (e.key === "Enter") {
+            if (e.key === "Escape") {
               e.preventDefault();
-              if (e.shiftKey) onPrev(); else onNext();
+              onClose();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (e.shiftKey) onPrev();
+              else onNext();
             }
           }}
           placeholder="Search messages..."
           className="h-9 w-full rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
         />
       </div>
-      {hasQuery && (
-        total > 0 ? (
+      {hasQuery &&
+        (total > 0 ? (
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-[11px] text-muted-foreground tabular-nums">
               {index + 1} of {total}
@@ -2121,8 +2414,7 @@ function SearchStrip({
           </div>
         ) : (
           <span className="text-[11px] text-muted-foreground shrink-0">No messages found</span>
-        )
-      )}
+        ))}
       <button
         onClick={onClose}
         aria-label="Close search"

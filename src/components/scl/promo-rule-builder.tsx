@@ -96,7 +96,10 @@ type SkuItem = { name: string; brand: string };
 function useSkuItems(): SkuItem[] {
   const { brands } = useSkuStore();
   return useMemo(
-    () => brands.flatMap((b) => b.categories.flatMap((c) => c.skus.map((s) => ({ name: s.name, brand: b.name })))),
+    () =>
+      brands.flatMap((b) =>
+        b.categories.flatMap((c) => c.skus.map((s) => ({ name: s.name, brand: b.name }))),
+      ),
     [brands],
   );
 }
@@ -126,15 +129,22 @@ function ItemScopeEditor({
     const q = search.trim().toLowerCase();
     return items.filter((it) => {
       const matchesBrand = brandFilter === "all" || it.brand === brandFilter;
-      const matchesSearch = !q || it.name.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q);
+      const matchesSearch =
+        !q || it.name.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q);
       return matchesBrand && matchesSearch;
     });
   }, [items, search, brandFilter]);
 
   const label =
-    scope.kind === "any" ? anyLabel :
-    scope.kind === "any-in-brand" ? `${anyLabel} (${scope.brand})` :
-    selected.length === 1 ? selected[0] : selected.length ? `${selected.length} items` : "Select items";
+    scope.kind === "any"
+      ? anyLabel
+      : scope.kind === "any-in-brand"
+        ? `${anyLabel} (${scope.brand})`
+        : selected.length === 1
+          ? selected[0]
+          : selected.length
+            ? `${selected.length} items`
+            : "Select items";
 
   const isBrandScoped = brandFilter !== "all";
   const rowChecked = isBrandScoped
@@ -157,146 +167,195 @@ function ItemScopeEditor({
         <span className="truncate">{label}</span>
         <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
       </button>
-      {open && typeof document !== "undefined" && createPortal(
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 modal-backdrop"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-        >
-          <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
-            <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-              <div className="text-sm font-semibold text-foreground">Select Items</div>
-              <button type="button" onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-4 space-y-3 border-b border-border shrink-0">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                <input
-                  autoFocus
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search items..."
-                  className="h-9 w-full rounded-md border border-border bg-card pl-9 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5">
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 modal-backdrop"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) setOpen(false);
+            }}
+          >
+            <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
+              <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+                <div className="text-sm font-semibold text-foreground">Select Items</div>
                 <button
                   type="button"
-                  onClick={() => setBrandFilter("all")}
-                  className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === "all" ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
+                  onClick={() => setOpen(false)}
+                  className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
                 >
-                  All Brands
+                  <X className="h-4 w-4" />
                 </button>
-                {brands.map((b) => (
+              </div>
+              <div className="p-4 space-y-3 border-b border-border shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  <input
+                    autoFocus
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search items..."
+                    className="h-9 w-full rounded-md border border-border bg-card pl-9 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
                   <button
-                    key={b}
                     type="button"
-                    onClick={() => setBrandFilter(b)}
-                    className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === b ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
+                    onClick={() => setBrandFilter("all")}
+                    className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === "all" ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
                   >
-                    {b}
+                    All Brands
                   </button>
-                ))}
+                  {brands.map((b) => (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => setBrandFilter(b)}
+                      className={`px-2.5 h-7 rounded-full text-[11px] font-medium border transition-colors ${brandFilter === b ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
+                    >
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                {(() => {
+                  const rowLabel = isBrandScoped ? `${anyLabel} in ${brandFilter}` : anyLabel;
+                  // Checking this box with no search narrowing the view
+                  // selects literally everything in the current brand scope
+                  // — which is exactly what "Any Item [in Brand]" already
+                  // means, so the box should read as checked (and toggling
+                  // it should collapse to/from that rule kind) instead of
+                  // ever writing out every single item name.
+                  const allFilteredSelected =
+                    filtered.length > 0 &&
+                    (impliedByAny || filtered.every((it) => selected.includes(it.name)));
+                  return (
+                    <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
+                      <input
+                        type="checkbox"
+                        checked={allFilteredSelected}
+                        title="Select all items matching the current search/brand filter"
+                        className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                        onChange={() => {
+                          if (impliedByAny) {
+                            onChange({ kind: "specific", items: [] });
+                          } else if (allFilteredSelected) {
+                            const next = selected.filter(
+                              (name) => !filtered.some((it) => it.name === name),
+                            );
+                            onChange(
+                              next.length ? { kind: "specific", items: next } : { kind: "any" },
+                            );
+                          } else if (noSearch) {
+                            onChange(
+                              isBrandScoped
+                                ? { kind: "any-in-brand", brand: brandFilter }
+                                : { kind: "any" },
+                            );
+                          } else {
+                            const next = Array.from(
+                              new Set([...selected, ...filtered.map((it) => it.name)]),
+                            );
+                            onChange({ kind: "specific", items: next });
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onChange(
+                            isBrandScoped
+                              ? { kind: "any-in-brand", brand: brandFilter }
+                              : { kind: "any" },
+                          );
+                          setOpen(false);
+                        }}
+                        className={`flex-1 min-w-0 flex items-center justify-between text-[13px] text-left ${rowChecked ? "text-primary font-medium" : ""}`}
+                      >
+                        {rowLabel} {rowChecked && <Check className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  );
+                })()}
+                <div className="my-1 border-t border-border" />
+                {filtered.length === 0 ? (
+                  <p className="px-3 py-8 text-[13px] text-muted-foreground text-center italic">
+                    No items match your filters
+                  </p>
+                ) : (
+                  <div className="stagger">
+                    {filtered.map((it) => {
+                      // Covered by the active "Any Item [in Brand]" rule —
+                      // shows checked like every other row, without this
+                      // item actually being in an explicit list.
+                      const checked = impliedByAny || selected.includes(it.name);
+                      return (
+                        <label
+                          key={`${it.brand}::${it.name}`}
+                          className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                            onChange={() => {
+                              if (impliedByAny) {
+                                // Opting this one item out of "Any Item [in
+                                // Brand]" — keep everything else in the
+                                // current filter explicitly selected.
+                                const next = filtered
+                                  .filter((x) => x.name !== it.name)
+                                  .map((x) => x.name);
+                                onChange({ kind: "specific", items: next });
+                                return;
+                              }
+                              const next = checked
+                                ? selected.filter((x) => x !== it.name)
+                                : [...selected, it.name];
+                              onChange(
+                                next.length ? { kind: "specific", items: next } : { kind: "any" },
+                              );
+                            }}
+                          />
+                          <span className="flex-1 min-w-0 truncate">{it.name}</span>
+                          <span className="shrink-0 text-[11px] text-muted-foreground">
+                            {it.brand}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="p-3 border-t border-border flex justify-end shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Done
+                </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-2">
-              {(() => {
-                const rowLabel = isBrandScoped ? `${anyLabel} in ${brandFilter}` : anyLabel;
-                // Checking this box with no search narrowing the view
-                // selects literally everything in the current brand scope
-                // — which is exactly what "Any Item [in Brand]" already
-                // means, so the box should read as checked (and toggling
-                // it should collapse to/from that rule kind) instead of
-                // ever writing out every single item name.
-                const allFilteredSelected = filtered.length > 0 && (
-                  impliedByAny || filtered.every((it) => selected.includes(it.name))
-                );
-                return (
-                  <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
-                    <input
-                      type="checkbox"
-                      checked={allFilteredSelected}
-                      title="Select all items matching the current search/brand filter"
-                      className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
-                      onChange={() => {
-                        if (impliedByAny) {
-                          onChange({ kind: "specific", items: [] });
-                        } else if (allFilteredSelected) {
-                          const next = selected.filter((name) => !filtered.some((it) => it.name === name));
-                          onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
-                        } else if (noSearch) {
-                          onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
-                        } else {
-                          const next = Array.from(new Set([...selected, ...filtered.map((it) => it.name)]));
-                          onChange({ kind: "specific", items: next });
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onChange(isBrandScoped ? { kind: "any-in-brand", brand: brandFilter } : { kind: "any" });
-                        setOpen(false);
-                      }}
-                      className={`flex-1 min-w-0 flex items-center justify-between text-[13px] text-left ${rowChecked ? "text-primary font-medium" : ""}`}
-                    >
-                      {rowLabel} {rowChecked && <Check className="h-4 w-4" />}
-                    </button>
-                  </div>
-                );
-              })()}
-              <div className="my-1 border-t border-border" />
-              {filtered.length === 0 ? (
-                <p className="px-3 py-8 text-[13px] text-muted-foreground text-center italic">No items match your filters</p>
-              ) : (
-                <div className="stagger">
-                  {filtered.map((it) => {
-                    // Covered by the active "Any Item [in Brand]" rule —
-                    // shows checked like every other row, without this
-                    // item actually being in an explicit list.
-                    const checked = impliedByAny || selected.includes(it.name);
-                    return (
-                      <label key={`${it.brand}::${it.name}`} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
-                          onChange={() => {
-                            if (impliedByAny) {
-                              // Opting this one item out of "Any Item [in
-                              // Brand]" — keep everything else in the
-                              // current filter explicitly selected.
-                              const next = filtered.filter((x) => x.name !== it.name).map((x) => x.name);
-                              onChange({ kind: "specific", items: next });
-                              return;
-                            }
-                            const next = checked ? selected.filter((x) => x !== it.name) : [...selected, it.name];
-                            onChange(next.length ? { kind: "specific", items: next } : { kind: "any" });
-                          }}
-                        />
-                        <span className="flex-1 min-w-0 truncate">{it.name}</span>
-                        <span className="shrink-0 text-[11px] text-muted-foreground">{it.brand}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-            <div className="p-3 border-t border-border flex justify-end shrink-0">
-              <button type="button" onClick={() => setOpen(false)} className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors">
-                Done
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body,
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
 
-function InlineNumber({ value, onChange, suffix, min = 1 }: { value: number; onChange: (v: number) => void; suffix?: string; min?: number }) {
+function InlineNumber({
+  value,
+  onChange,
+  suffix,
+  min = 1,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  suffix?: string;
+  min?: number;
+}) {
   return (
     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-1.5 h-8 align-middle">
       <input
@@ -311,7 +370,15 @@ function InlineNumber({ value, onChange, suffix, min = 1 }: { value: number; onC
   );
 }
 
-function InlineCurrency({ value, onChange, placeholder }: { value: number; onChange: (v: number) => void; placeholder?: string }) {
+function InlineCurrency({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  placeholder?: string;
+}) {
   return (
     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 h-8 align-middle">
       <span className="text-[12px] text-muted-foreground">Rp</span>
@@ -327,14 +394,24 @@ function InlineCurrency({ value, onChange, placeholder }: { value: number; onCha
   );
 }
 
-function Segmented<T extends string>({ options, value, onChange }: { options: { kind: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { kind: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
   return (
     <div className="inline-flex rounded-md border border-border bg-muted/40 p-0.5 gap-0.5">
       {options.map((opt) => (
         <button
           key={opt.kind}
           type="button"
-          onClick={() => { if (opt.kind !== value) onChange(opt.kind); }}
+          onClick={() => {
+            if (opt.kind !== value) onChange(opt.kind);
+          }}
           className={`px-2.5 h-7 text-[11px] font-medium rounded transition-colors ${value === opt.kind ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         >
           {opt.label}
@@ -344,52 +421,108 @@ function Segmented<T extends string>({ options, value, onChange }: { options: { 
   );
 }
 
-function ConditionEditor({ condition, onChange, items }: { condition: PromoCondition; onChange: (c: PromoCondition) => void; items: SkuItem[] }) {
+function ConditionEditor({
+  condition,
+  onChange,
+  items,
+}: {
+  condition: PromoCondition;
+  onChange: (c: PromoCondition) => void;
+  items: SkuItem[];
+}) {
   return (
     <div className="space-y-2">
-      <Segmented options={CONDITION_OPTIONS} value={condition.kind} onChange={(kind) => onChange(defaultCondition(kind))} />
-      <div key={condition.kind} className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in">
+      <Segmented
+        options={CONDITION_OPTIONS}
+        value={condition.kind}
+        onChange={(kind) => onChange(defaultCondition(kind))}
+      />
+      <div
+        key={condition.kind}
+        className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in"
+      >
         <span className="text-muted-foreground">When</span>
         {condition.kind === "any-purchase" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes any purchase</span>
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+            customer makes any purchase
+          </span>
         )}
         {condition.kind === "buy-item" && (
           <>
             <span className="text-muted-foreground">customer buys</span>
-            <InlineNumber value={condition.qty} onChange={(v) => onChange({ ...condition, qty: v })} />
-            <ItemScopeEditor scope={condition.item} onChange={(s) => onChange({ ...condition, item: s })} items={items} />
+            <InlineNumber
+              value={condition.qty}
+              onChange={(v) => onChange({ ...condition, qty: v })}
+            />
+            <ItemScopeEditor
+              scope={condition.item}
+              onChange={(s) => onChange({ ...condition, item: s })}
+              items={items}
+            />
           </>
         )}
         {condition.kind === "min-spend" && (
           <>
             <span className="text-muted-foreground">customer spends at least</span>
-            <InlineCurrency value={condition.amount} onChange={(v) => onChange({ ...condition, amount: v })} />
+            <InlineCurrency
+              value={condition.amount}
+              onChange={(v) => onChange({ ...condition, amount: v })}
+            />
           </>
         )}
         {condition.kind === "first-purchase" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">customer makes their first purchase</span>
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+            customer makes their first purchase
+          </span>
         )}
         {condition.kind === "referral-usage" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">a referred customer redeems their referral code</span>
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+            a referred customer redeems their referral code
+          </span>
         )}
       </div>
     </div>
   );
 }
 
-function RewardEditor({ reward, onChange, items, bothSides = false }: { reward: PromoReward; onChange: (r: PromoReward) => void; items: SkuItem[]; bothSides?: boolean }) {
+function RewardEditor({
+  reward,
+  onChange,
+  items,
+  bothSides = false,
+}: {
+  reward: PromoReward;
+  onChange: (r: PromoReward) => void;
+  items: SkuItem[];
+  bothSides?: boolean;
+}) {
   return (
     <div className="space-y-2">
-      <Segmented options={REWARD_OPTIONS} value={reward.kind} onChange={(kind) => onChange(defaultReward(kind))} />
-      <div key={reward.kind} className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in">
-        <span className="text-muted-foreground">{bothSides ? "Referrer & Referred both get" : "Get"}</span>
+      <Segmented
+        options={REWARD_OPTIONS}
+        value={reward.kind}
+        onChange={(kind) => onChange(defaultReward(kind))}
+      />
+      <div
+        key={reward.kind}
+        className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in"
+      >
+        <span className="text-muted-foreground">
+          {bothSides ? "Referrer & Referred both get" : "Get"}
+        </span>
         {reward.kind === "free-item" && (
           <>
             <InlineNumber value={reward.qty} onChange={(v) => onChange({ ...reward, qty: v })} />
             {reward.sameAsPurchased ? (
-              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">Same Item</span>
+              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+                Same Item
+              </span>
             ) : (
-              <ItemScopeEditor scope={reward.item} onChange={(s) => onChange({ ...reward, item: s })} items={items} />
+              <ItemScopeEditor
+                scope={reward.item}
+                onChange={(s) => onChange({ ...reward, item: s })}
+                items={items}
+              />
             )}
             <span className="text-muted-foreground">free</span>
             <button
@@ -397,23 +530,39 @@ function RewardEditor({ reward, onChange, items, bothSides = false }: { reward: 
               onClick={() => onChange({ ...reward, sameAsPurchased: !reward.sameAsPurchased })}
               className="ml-1 text-[11px] text-primary hover:underline transition-colors duration-150"
             >
-              {reward.sameAsPurchased ? "use a different item instead" : "use the same item instead"}
+              {reward.sameAsPurchased
+                ? "use a different item instead"
+                : "use the same item instead"}
             </button>
           </>
         )}
         {reward.kind === "percent-off" && (
           <>
-            <InlineNumber value={reward.percent} onChange={(v) => onChange({ ...reward, percent: v })} suffix="%" />
+            <InlineNumber
+              value={reward.percent}
+              onChange={(v) => onChange({ ...reward, percent: v })}
+              suffix="%"
+            />
             <span className="text-muted-foreground">off</span>
-            <ItemScopeEditor scope={reward.appliesTo} onChange={(s) => onChange({ ...reward, appliesTo: s })} items={items} anyLabel="Total Purchase" />
+            <ItemScopeEditor
+              scope={reward.appliesTo}
+              onChange={(s) => onChange({ ...reward, appliesTo: s })}
+              items={items}
+              anyLabel="Total Purchase"
+            />
           </>
         )}
         {reward.kind === "amount-off" && (
           <>
-            <InlineCurrency value={reward.amount} onChange={(v) => onChange({ ...reward, amount: v })} />
+            <InlineCurrency
+              value={reward.amount}
+              onChange={(v) => onChange({ ...reward, amount: v })}
+            />
             <select
               value={reward.timing}
-              onChange={(e) => onChange({ ...reward, timing: e.target.value as "immediate" | "next-purchase" })}
+              onChange={(e) =>
+                onChange({ ...reward, timing: e.target.value as "immediate" | "next-purchase" })
+              }
               className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
             >
               <option value="immediate">off (this purchase)</option>
@@ -422,11 +571,17 @@ function RewardEditor({ reward, onChange, items, bothSides = false }: { reward: 
           </>
         )}
         {reward.kind === "free-shipping" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">free shipping</span>
+          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+            free shipping
+          </span>
         )}
         {reward.kind === "bonus-points" && (
           <>
-            <InlineNumber value={reward.points} onChange={(v) => onChange({ ...reward, points: v })} min={10} />
+            <InlineNumber
+              value={reward.points}
+              onChange={(v) => onChange({ ...reward, points: v })}
+              min={10}
+            />
             <span className="text-muted-foreground">bonus loyalty points</span>
           </>
         )}
@@ -434,14 +589,24 @@ function RewardEditor({ reward, onChange, items, bothSides = false }: { reward: 
       {reward.kind === "percent-off" && (
         <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
           <span>Max discount cap (optional):</span>
-          <InlineCurrency value={reward.maxDiscount ?? 0} onChange={(v) => onChange({ ...reward, maxDiscount: v || null })} placeholder="no cap" />
+          <InlineCurrency
+            value={reward.maxDiscount ?? 0}
+            onChange={(v) => onChange({ ...reward, maxDiscount: v || null })}
+            placeholder="no cap"
+          />
         </div>
       )}
     </div>
   );
 }
 
-export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange: (r: PromoRule) => void }) {
+export function PromoRuleBuilder({
+  rule,
+  onChange,
+}: {
+  rule: PromoRule;
+  onChange: (r: PromoRule) => void;
+}) {
   const items = useSkuItems();
 
   return (
@@ -449,8 +614,13 @@ export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange
       <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] overflow-hidden">
         {/* Big preview */}
         <div className="px-4 py-4 text-center border-b border-dashed border-primary/20 bg-primary/[0.05]">
-          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Preview</div>
-          <div key={describePromoRule(rule)} className="text-[15px] md:text-lg font-semibold text-foreground leading-snug animate-fade-in">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+            Preview
+          </div>
+          <div
+            key={describePromoRule(rule)}
+            className="text-[15px] md:text-lg font-semibold text-foreground leading-snug animate-fade-in"
+          >
             {describePromoRule(rule)}
           </div>
         </div>
@@ -458,16 +628,27 @@ export function PromoRuleBuilder({ rule, onChange }: { rule: PromoRule; onChange
         {/* Condition (rule 1) + Reward (rule 2) side by side */}
         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dashed divide-primary/20">
           <div className="p-3">
-            <ConditionEditor condition={rule.condition} onChange={(condition) => onChange({ ...rule, condition })} items={items} />
+            <ConditionEditor
+              condition={rule.condition}
+              onChange={(condition) => onChange({ ...rule, condition })}
+              items={items}
+            />
           </div>
           <div className="p-3">
-            <RewardEditor reward={rule.reward} onChange={(reward) => onChange({ ...rule, reward })} items={items} bothSides={rule.condition.kind === "referral-usage"} />
+            <RewardEditor
+              reward={rule.reward}
+              onChange={(reward) => onChange({ ...rule, reward })}
+              items={items}
+              bothSides={rule.condition.kind === "referral-usage"}
+            />
           </div>
         </div>
       </div>
 
       <div>
-        <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70 mb-1.5">Quick Template</div>
+        <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70 mb-1.5">
+          Quick Template
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {PRESETS.map((p) => (
             <button

@@ -35,7 +35,9 @@ const AccordionTrigger = React.forwardRef<
         <div className="h-5 w-px bg-border shrink-0 mx-2" />
         {/* Stop clicks from bubbling to the trigger button so using the
          *  action doesn't also toggle the accordion open/closed. */}
-        <div onClick={(e) => e.stopPropagation()} className="shrink-0">{actions}</div>
+        <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+          {actions}
+        </div>
       </>
     )}
   </AccordionPrimitive.Header>

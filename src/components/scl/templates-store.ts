@@ -87,9 +87,7 @@ export const templatesStore = {
     const set = new Set(ids);
     state = {
       ...state,
-      templates: state.templates.map((t) =>
-        set.has(t.id) ? { ...t, groupId } : t,
-      ),
+      templates: state.templates.map((t) => (set.has(t.id) ? { ...t, groupId } : t)),
     };
     emit();
   },
@@ -126,9 +124,7 @@ export const templatesStore = {
     state = {
       ...state,
       groups: state.groups.filter((g) => g.id !== id),
-      templates: state.templates.map((t) =>
-        t.groupId === id ? { ...t, groupId: undefined } : t,
-      ),
+      templates: state.templates.map((t) => (t.groupId === id ? { ...t, groupId: undefined } : t)),
     };
     emit();
   },

@@ -1,6 +1,13 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, ChevronDown, Users, X as XIcon, Infinity as InfinityIcon, Plus } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Users,
+  X as XIcon,
+  Infinity as InfinityIcon,
+  Plus,
+} from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultRule, type PromoRule, type PromoCode } from "./promo-store";
 import type { ContactList } from "./mock-data";
@@ -61,9 +68,19 @@ export function validatePromoForm(form: PromoFormState): string | null {
   return null;
 }
 
-export function promoFormToPayload(form: PromoFormState): Pick<
+export function promoFormToPayload(
+  form: PromoFormState,
+): Pick<
   PromoCode,
-  "code" | "name" | "description" | "rule" | "usageType" | "maxUsage" | "startDate" | "endDate" | "audienceIds"
+  | "code"
+  | "name"
+  | "description"
+  | "rule"
+  | "usageType"
+  | "maxUsage"
+  | "startDate"
+  | "endDate"
+  | "audienceIds"
 > {
   return {
     code: form.code.trim().toUpperCase(),
@@ -71,28 +88,42 @@ export function promoFormToPayload(form: PromoFormState): Pick<
     description: form.description.trim(),
     rule: form.rule,
     usageType: form.usageType,
-    maxUsage: form.maxUsageUnlimited ? null : (form.maxUsage ? Number(form.maxUsage) : null),
+    maxUsage: form.maxUsageUnlimited ? null : form.maxUsage ? Number(form.maxUsage) : null,
     startDate: form.startDate,
     endDate: form.endDate,
     audienceIds: form.audienceIds,
   };
 }
 
-const inputCls = "h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40";
+const inputCls =
+  "h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40";
 const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
 export const PROMO_NAME_MAX_LENGTH = 40;
 export const PROMO_CODE_MAX_LENGTH = 20;
 
-export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormState; setForm: (f: PromoFormState) => void; audiences: ContactList[] }) {
+export function PromoFormFields({
+  form,
+  setForm,
+  audiences,
+}: {
+  form: PromoFormState;
+  setForm: (f: PromoFormState) => void;
+  audiences: ContactList[];
+}) {
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
 
-  const set = <K extends keyof PromoFormState>(key: K, val: PromoFormState[K]) => setForm({ ...form, [key]: val });
+  const set = <K extends keyof PromoFormState>(key: K, val: PromoFormState[K]) =>
+    setForm({ ...form, [key]: val });
 
   const setUsageType = (t: PromoFormState["usageType"]) => {
     // 1-to-1 needs a concrete count to generate that many individual codes,
     // so Unlimited can't apply there — force it off when switching in.
-    setForm({ ...form, usageType: t, maxUsageUnlimited: t === "one-to-one" ? false : form.maxUsageUnlimited });
+    setForm({
+      ...form,
+      usageType: t,
+      maxUsageUnlimited: t === "one-to-one" ? false : form.maxUsageUnlimited,
+    });
   };
 
   return (
@@ -108,7 +139,9 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
             placeholder="e.g. Summer 20% Off"
             className={inputCls}
           />
-          <div className="mt-1 text-[10px] text-muted-foreground text-right">{PROMO_NAME_MAX_LENGTH - form.name.length} characters left</div>
+          <div className="mt-1 text-[10px] text-muted-foreground text-right">
+            {PROMO_NAME_MAX_LENGTH - form.name.length} characters left
+          </div>
         </div>
         <div className="shrink-0">
           <label className={labelCls}>Usage Type</label>
@@ -158,12 +191,20 @@ export function PromoFormFields({ form, setForm, audiences }: { form: PromoFormS
               )}
             </div>
             <div className="w-px h-5 bg-border shrink-0" />
-            <label className={`flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground ${form.usageType === "one-to-one" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
+            <label
+              className={`flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground ${form.usageType === "one-to-one" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+            >
               <input
                 type="checkbox"
                 checked={form.maxUsageUnlimited}
                 disabled={form.usageType === "one-to-one"}
-                onChange={(e) => setForm({ ...form, maxUsageUnlimited: e.target.checked, maxUsage: e.target.checked ? "" : form.maxUsage })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    maxUsageUnlimited: e.target.checked,
+                    maxUsage: e.target.checked ? "" : form.maxUsage,
+                  })
+                }
                 className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 disabled:cursor-not-allowed"
               />
               Unlimited
@@ -219,11 +260,12 @@ function AudienceSegmentPicker({
   onChange: (ids: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const label = selectedIds.length === 0
-    ? "Any Audience"
-    : selectedIds.length === 1
-      ? audiences.find((a) => a.id === selectedIds[0])?.name ?? "1 audience"
-      : `${selectedIds.length} audiences`;
+  const label =
+    selectedIds.length === 0
+      ? "Any Audience"
+      : selectedIds.length === 1
+        ? (audiences.find((a) => a.id === selectedIds[0])?.name ?? "1 audience")
+        : `${selectedIds.length} audiences`;
 
   const toggle = (id: string) => {
     onChange(selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]);
@@ -236,7 +278,9 @@ function AudienceSegmentPicker({
         onClick={() => setOpen((o) => !o)}
         className="h-9 w-full flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-sm text-left hover:bg-muted/40 transition-colors"
       >
-        <span className={`truncate flex items-center gap-1.5 ${selectedIds.length ? "text-foreground" : "text-muted-foreground"}`}>
+        <span
+          className={`truncate flex items-center gap-1.5 ${selectedIds.length ? "text-foreground" : "text-muted-foreground"}`}
+        >
           <Users className="h-3.5 w-3.5 shrink-0" /> {label}
         </span>
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -254,12 +298,17 @@ function AudienceSegmentPicker({
             </button>
             <div className="my-1 border-t border-border" />
             {audiences.length === 0 ? (
-              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">No audiences yet — create one below</p>
+              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">
+                No audiences yet — create one below
+              </p>
             ) : (
               audiences.map((a) => {
                 const checked = selectedIds.includes(a.id);
                 return (
-                  <label key={a.id} className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150">
+                  <label
+                    key={a.id}
+                    className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
+                  >
                     <input
                       type="checkbox"
                       checked={checked}
@@ -288,9 +337,16 @@ function AudienceSegmentPicker({
             const a = audiences.find((x) => x.id === id);
             if (!a) return null;
             return (
-              <span key={id} className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 h-5 text-[10px] text-foreground">
+              <span
+                key={id}
+                className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 h-5 text-[10px] text-foreground"
+              >
                 {a.name}
-                <button type="button" onClick={() => toggle(id)} className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20 transition-colors duration-150">
+                <button
+                  type="button"
+                  onClick={() => toggle(id)}
+                  className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20 transition-colors duration-150"
+                >
                   <XIcon className="h-2.5 w-2.5" />
                 </button>
               </span>
@@ -305,7 +361,15 @@ function AudienceSegmentPicker({
 // ── Shared full-page action bar — sticks to the bottom of the viewport so the
 // primary action is always reachable regardless of form length. Cancel sits
 // left, the primary action right, matching standard form-footer convention. ──
-export function PromoFormActionBar({ onCancel, onSubmit, submitLabel }: { onCancel: () => void; onSubmit: () => void; submitLabel: string }) {
+export function PromoFormActionBar({
+  onCancel,
+  onSubmit,
+  submitLabel,
+}: {
+  onCancel: () => void;
+  onSubmit: () => void;
+  submitLabel: string;
+}) {
   return (
     <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between">
       <button

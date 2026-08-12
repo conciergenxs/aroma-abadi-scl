@@ -51,12 +51,7 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       </button>
 
-      <FloatingMenu
-        anchorRef={btnRef}
-        open={open}
-        onClose={() => setOpen(false)}
-        width={256}
-      >
+      <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} width={256}>
         <div className="rounded-md border border-border bg-popover shadow-xl p-1 max-h-[320px] overflow-auto scl-scroll">
           <Group label="PROGRESSING STAGE">
             {active.map((s) => (
@@ -135,7 +130,9 @@ function Row({
     >
       <span className="flex items-center gap-2 min-w-0">
         <span className={`h-2 w-2 rounded-full ${c.dot}`} />
-        <span className={`truncate inline-flex items-center rounded px-1.5 py-0.5 border text-[10px] ${c.badge}`}>
+        <span
+          className={`truncate inline-flex items-center rounded px-1.5 py-0.5 border text-[10px] ${c.badge}`}
+        >
           {stage.name}
         </span>
       </span>

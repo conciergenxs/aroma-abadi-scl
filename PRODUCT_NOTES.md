@@ -8,17 +8,21 @@
 ## 1. Halaman Contacts
 
 ### 1.1 Layout & Sidebar
+
 - **Contact Lists → Brands**: Sidebar "Contact Lists" diganti menjadi daftar **Brands** (seperti sekarang sudah ada). Label tetap dipertahankan. **Kolom Owner dihapus** dari tabel kontak.
 - **Search bar di sebelah notifikasi**: Hapus search bar yang ada di header/notification bar (top-right area).
 
 ### 1.2 All Contacts & Customer Contacts (Mine)
+
 - Tambahkan kolom **Brands** di Customer Contacts — bisa berisi lebih dari satu brand per kontak (multi-brand).
 - Tambahkan kolom **Last Transaction** di Customer Contacts — menampilkan tanggal/invoice transaksi terakhir kontak tersebut.
 
 ### 1.3 BA Contact — Detail Page
+
 **Kondisi saat ini:** Ada dropdown lifecycle stage di bawah nama, lalu tab chips (Activity Log, Transactions, Media).
 
 **Yang diubah:**
+
 - **Hapus dropdown** lifecycle stage di bawah nama BA.
 - **Ganti dengan:**
   - **Brand Chips** (multi-pilih): BA bisa diassign ke lebih dari satu brand. Chip brand ini langsung tampil di halaman detail, bisa diklik untuk edit assignment brand.
@@ -27,16 +31,19 @@
 - **Panel kanan (Contact Details):** Tidak ada perubahan untuk saat ini — biarkan seperti adanya.
 
 ### 1.4 Customer Contact — Detail Page
+
 - Field dan layout halaman detail Customer Contact akan didefinisikan oleh Wicak (termasuk isi panel kanan).
 - Saat ini: belum ada perubahan, pending keputusan Wicak.
 
 ### 1.5 New Contact Form
+
 - Saat membuka form **New Contact**, tampilkan pilihan terlebih dahulu:
   - **BA (Beauty Ambassador)**
   - **Customer**
 - Setelah memilih, form yang muncul **mengikuti persis kolom yang ada di tabel halaman Contacts** untuk masing-masing tipe:
 
 #### Form BA
+
 Kolom sesuai tabel BA Contacts:
 | Field | Tipe Input |
 |---|---|
@@ -49,6 +56,7 @@ Kolom sesuai tabel BA Contacts:
 | Kota | Searchable select |
 
 #### Form Customer
+
 Kolom sesuai tabel Customer Contacts:
 | Field | Tipe Input |
 |---|---|
@@ -66,6 +74,7 @@ Kolom sesuai tabel Customer Contacts:
 ## 2. Halaman Inbox
 
 ### 2.1 Left Panel
+
 - Tambahkan kembali **daftar/list** di panel kiri Inbox seperti tampilan sebelumnya.
   - Berisi navigation tambahan (stage, label, atau filter lainnya) di samping view All / Consumer / BA Inbox yang sudah ada.
 
@@ -74,23 +83,28 @@ Kolom sesuai tabel Customer Contacts:
 ## 3. Halaman Transactions
 
 ### 3.1 Hapus Payment Method "Cash"
+
 - Hapus opsi **Cash** dari pilihan metode bayar. Hanya sisakan payment method non-cash (transfer, kartu, dll).
 
 ### 3.2 Kolom Customer & BA
-- Tinjau ulang tampilan kolom Customer dan BA di tabel transaksi — apakah perlu digabung, disederhanakan, atau dihapus salah satunya. *(Perlu klarifikasi lebih lanjut.)*
+
+- Tinjau ulang tampilan kolom Customer dan BA di tabel transaksi — apakah perlu digabung, disederhanakan, atau dihapus salah satunya. _(Perlu klarifikasi lebih lanjut.)_
 
 ---
 
 ## 4. Halaman Templates
 
 ### 4.1 Channel
+
 - Channel yang tersedia hanya **Arma** (bukan WhatsApp langsung). Template digunakan untuk kebutuhan broadcast **manual** (tidak otomatis/triggered).
 - Cek apakah kolom **Category** secara default sudah berisi kategori WhatsApp atau tidak — sesuaikan jika perlu.
 
 ### 4.2 Kolom Baru: Promotional Code
+
 Tambahkan kolom **Promotional Code** di halaman Templates (tabel dan form tambah/edit template). Jenisnya ada dua:
 
 #### One-to-One
+
 - Setiap kontak mendapat kode unik yang berbeda.
 - Muncul **field upload file `.csv`** berisi daftar kode promo.
 - Setelah upload, tampilkan info: _"This code is eligible for [n] customers"_ (n = jumlah baris di file CSV).
@@ -100,10 +114,12 @@ Tambahkan kolom **Promotional Code** di halaman Templates (tabel dan form tambah
   - Hanya bisa 1 kode dikirim ke 1 kontak (1-to-1), tidak boleh kode yang sama terkirim ke lebih dari satu kontak.
 
 #### One-to-Many
+
 - Satu kode promo yang sama dikirim ke banyak kontak.
 - Muncul **field input angka** untuk menentukan jumlah maksimal penggunaan kode tersebut.
 
 #### Field di Form Template
+
 - **Nama Promo** (text input)
 - **Voucher Code** (text input atau select2 — tanyakan ke tech apakah bisa searchable select untuk pilih promo yang sudah ada di sistem)
 
@@ -112,6 +128,7 @@ Tambahkan kolom **Promotional Code** di halaman Templates (tabel dan form tambah
 ## 5. Halaman Broadcasts
 
 ### 5.1 Filter Audience
+
 - Saat memilih **Choose Audience**, tambahkan filter berdasarkan:
   - **Nama** kontak
   - **Channels**
@@ -119,6 +136,7 @@ Tambahkan kolom **Promotional Code** di halaman Templates (tabel dan form tambah
 - Tambahkan filter pemisah antara **Customer** dan **BA** di halaman Broadcasts.
 
 ### 5.2 Detail Broadcast — Kolom Promo Code
+
 - Di halaman detail broadcast (setelah broadcast dikirim), tambahkan kolom:
   - **Kode terkirim atau belum** (status per kontak)
   - **Kode apa yang terkirim** (value kode promo per kontak, khusus tipe one-to-one)
@@ -130,18 +148,21 @@ Tambahkan kolom **Promotional Code** di halaman Templates (tabel dan form tambah
 Buat halaman standalone **Promo Code** yang bisa diakses dari sidebar.
 
 ### 6.1 Fungsi Utama
+
 - Daftar semua promo code yang tersedia (data diambil dari **Odoo**).
 - Bisa di-attach ke **Template** maupun **Broadcast**.
 
 ### 6.2 Data per Promo
-| Field | Keterangan |
-|---|---|
-| Nama Promo | Nama campaign/promo |
-| Voucher Code / Rules | Aturan penggunaan kode |
-| Active Duration | Periode berlakunya promo |
-| Sumber Data | Odoo (read-only, sync) |
+
+| Field                | Keterangan               |
+| -------------------- | ------------------------ |
+| Nama Promo           | Nama campaign/promo      |
+| Voucher Code / Rules | Aturan penggunaan kode   |
+| Active Duration      | Periode berlakunya promo |
+| Sumber Data          | Odoo (read-only, sync)   |
 
 ### 6.3 Tracking
+
 - **Berapa kali kode digunakan** (usage count)
 - **Di Template mana** kode ini pernah dipakai
 - **Di Broadcast mana** kode ini pernah dipakai
@@ -151,20 +172,20 @@ Buat halaman standalone **Promo Code** yang bisa diakses dari sidebar.
 
 ## 7. Ringkasan Prioritas (Estimasi)
 
-| # | Fitur | Halaman | Kompleksitas |
-|---|---|---|---|
-| 1 | New Contact: pilih tipe BA / Customer dulu | Contacts | Sedang |
-| 2 | BA Detail: brand chips + See Inbox button + hapus tabs | Contact Detail | Sedang |
-| 3 | Tambah kolom Last Transaction di Customer Contacts | Contacts | Rendah |
-| 4 | Tambah kolom Brands di Customer Contacts | Contacts | Rendah |
-| 5 | Hapus search bar di notifikasi | Global | Rendah |
-| 6 | Inbox: tambah list di panel kiri | Inbox | Sedang |
-| 7 | Hapus Cash dari payment method | Transactions | Rendah |
-| 8 | Template: Promotional Code column (one-to-one & one-to-many) | Templates | Tinggi |
-| 9 | Broadcast: filter Customer/BA + Choose Audience by Brand | Broadcasts | Sedang |
-| 10 | Broadcast Detail: kolom status & nilai kode terkirim | Broadcasts | Sedang |
-| 11 | Halaman baru: Promo Code (sync Odoo + tracking) | New Page | Tinggi |
-| 12 | Customer Contact Detail: field & layout (pending Wicak) | Contact Detail | TBD |
+| #   | Fitur                                                        | Halaman        | Kompleksitas |
+| --- | ------------------------------------------------------------ | -------------- | ------------ |
+| 1   | New Contact: pilih tipe BA / Customer dulu                   | Contacts       | Sedang       |
+| 2   | BA Detail: brand chips + See Inbox button + hapus tabs       | Contact Detail | Sedang       |
+| 3   | Tambah kolom Last Transaction di Customer Contacts           | Contacts       | Rendah       |
+| 4   | Tambah kolom Brands di Customer Contacts                     | Contacts       | Rendah       |
+| 5   | Hapus search bar di notifikasi                               | Global         | Rendah       |
+| 6   | Inbox: tambah list di panel kiri                             | Inbox          | Sedang       |
+| 7   | Hapus Cash dari payment method                               | Transactions   | Rendah       |
+| 8   | Template: Promotional Code column (one-to-one & one-to-many) | Templates      | Tinggi       |
+| 9   | Broadcast: filter Customer/BA + Choose Audience by Brand     | Broadcasts     | Sedang       |
+| 10  | Broadcast Detail: kolom status & nilai kode terkirim         | Broadcasts     | Sedang       |
+| 11  | Halaman baru: Promo Code (sync Odoo + tracking)              | New Page       | Tinggi       |
+| 12  | Customer Contact Detail: field & layout (pending Wicak)      | Contact Detail | TBD          |
 
 ---
 
@@ -173,6 +194,7 @@ Buat halaman standalone **Promo Code** yang bisa diakses dari sidebar.
 **Kondisi saat ini:** Ikon lonceng di header hanya tampil statis dengan dot merah, belum bisa diklik dan tidak menampilkan isi apapun.
 
 **Yang diubah:**
+
 - Ikon lonceng **bisa diklik** dan memunculkan **dropdown/popover** berisi daftar notifikasi.
 - Setiap notifikasi memiliki:
   - **Ikon tipe** (pesan baru, transaksi, broadcast selesai, dll)

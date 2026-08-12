@@ -60,7 +60,8 @@ export function PromoCodeSetupModal({
   const maxUsage = Number(form.maxUsage) || 0;
 
   const individualCodes = useMemo(
-    () => (isOneToOne && code.trim() ? generateIndividualCodes(code.trim().toUpperCase(), maxUsage) : []),
+    () =>
+      isOneToOne && code.trim() ? generateIndividualCodes(code.trim().toUpperCase(), maxUsage) : [],
     [isOneToOne, code, maxUsage],
   );
 
@@ -78,22 +79,34 @@ export function PromoCodeSetupModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-backdrop"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
       <div className="w-full max-w-lg max-h-[85vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
           <div>
             <h2 className="text-sm font-semibold text-foreground">Set Promo Code</h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {isOneToOne ? "Suggested from your promo details — this becomes the prefix for each individual code" : "Suggested from your promo details, editable if you'd like something else"}
+              {isOneToOne
+                ? "Suggested from your promo details — this becomes the prefix for each individual code"
+                : "Suggested from your promo details, editable if you'd like something else"}
             </p>
           </div>
-          <button onClick={onCancel} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
+          <button
+            onClick={onCancel}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="p-4 space-y-1 border-b border-border shrink-0">
-          <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">Promo Code</label>
+          <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
+            Promo Code
+          </label>
           <div className="flex items-center gap-1.5">
             <input
               autoFocus
@@ -111,7 +124,9 @@ export function PromoCodeSetupModal({
               <Wand2 className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="text-[10px] text-muted-foreground text-right">{PROMO_CODE_MAX_LENGTH - code.length} characters left</div>
+          <div className="text-[10px] text-muted-foreground text-right">
+            {PROMO_CODE_MAX_LENGTH - code.length} characters left
+          </div>
         </div>
 
         {isOneToOne && (
@@ -122,41 +137,71 @@ export function PromoCodeSetupModal({
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border sticky top-0 bg-card">
-                        <th className="px-4 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Code</th>
-                        <th className="px-4 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">#</th>
+                        <th className="px-4 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Code
+                        </th>
+                        <th className="px-4 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          #
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/60">
                       {pagedCodes.map((c, i) => (
                         <tr key={c.code}>
                           <td className="px-4 py-1.5">
-                            <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">{c.code}</code>
+                            <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                              {c.code}
+                            </code>
                           </td>
-                          <td className="px-4 py-1.5 text-right text-[11px] text-muted-foreground">{(page - 1) * PAGE_SIZE + i + 1}</td>
+                          <td className="px-4 py-1.5 text-right text-[11px] text-muted-foreground">
+                            {(page - 1) * PAGE_SIZE + i + 1}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-border">
-                  <span className="text-[11px] text-muted-foreground">{individualCodes.length} codes total (read-only, generated from max usage)</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {individualCodes.length} codes total (read-only, generated from max usage)
+                  </span>
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors">‹</button>
-                    <span className="text-[11px] text-muted-foreground px-1">{page} / {totalPages}</span>
-                    <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors">›</button>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                    >
+                      ‹
+                    </button>
+                    <span className="text-[11px] text-muted-foreground px-1">
+                      {page} / {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                    >
+                      ›
+                    </button>
                   </div>
                 </div>
               </>
             ) : (
-              <p className="px-4 py-8 text-[13px] text-muted-foreground text-center italic">Enter a code above to preview the {maxUsage} generated codes</p>
+              <p className="px-4 py-8 text-[13px] text-muted-foreground text-center italic">
+                Enter a code above to preview the {maxUsage} generated codes
+              </p>
             )}
           </div>
         )}
 
         <div className="p-3 border-t border-border flex items-center justify-end gap-2 shrink-0">
-          <button type="button" onClick={onCancel} className="h-9 px-4 rounded-md border border-border text-[14px] text-foreground hover:bg-muted transition-colors">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-9 px-4 rounded-md border border-border text-[14px] text-foreground hover:bg-muted transition-colors"
+          >
             Cancel
           </button>
           <button

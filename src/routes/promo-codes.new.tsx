@@ -3,10 +3,18 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Download } from "lucide-react";
-import { promoStore, downloadAssignedCodesCsv, type AssignedCode } from "@/components/scl/promo-store";
+import {
+  promoStore,
+  downloadAssignedCodesCsv,
+  type AssignedCode,
+} from "@/components/scl/promo-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import {
-  PromoFormFields, PromoFormActionBar, emptyPromoForm, promoFormToPayload, validatePromoForm,
+  PromoFormFields,
+  PromoFormActionBar,
+  emptyPromoForm,
+  promoFormToPayload,
+  validatePromoForm,
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 import { PromoCodeSetupModal } from "@/components/scl/promo-code-setup-modal";
@@ -18,17 +26,29 @@ export const Route = createFileRoute("/promo-codes/new")({
 
 type CreatedPromo = { id: string; code: string; name: string; assignedCodes?: AssignedCode[] };
 
-function SuccessView({ promo, onViewDetails, onBackToList }: { promo: CreatedPromo; onViewDetails: () => void; onBackToList: () => void }) {
+function SuccessView({
+  promo,
+  onViewDetails,
+  onBackToList,
+}: {
+  promo: CreatedPromo;
+  onViewDetails: () => void;
+  onBackToList: () => void;
+}) {
   const hasIndividualCodes = (promo.assignedCodes?.length ?? 0) > 0;
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
         <CheckCircle2 className="h-9 w-9 text-emerald-500" />
       </div>
-      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">Promo Code Created!</h2>
+      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">
+        Promo Code Created!
+      </h2>
       <p className="mt-1.5 text-sm text-muted-foreground animate-fade-in">
-        <code className="font-mono font-semibold text-foreground bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">{promo.code}</code>
-        {" "}— {promo.name} is ready to use.
+        <code className="font-mono font-semibold text-foreground bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">
+          {promo.code}
+        </code>{" "}
+        — {promo.name} is ready to use.
       </p>
       <div className="mt-6 flex items-center justify-center gap-3 animate-fade-in">
         <button
@@ -68,7 +88,10 @@ function NewPromoCodePage() {
 
   const handleConfirmClick = () => {
     const error = validatePromoForm(form);
-    if (error) { toast.error(error); return; }
+    if (error) {
+      toast.error(error);
+      return;
+    }
     setSettingCode(true);
   };
 
@@ -91,7 +114,9 @@ function NewPromoCodePage() {
         <div className="p-6">
           <SuccessView
             promo={created}
-            onViewDetails={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: created.id } })}
+            onViewDetails={() =>
+              navigate({ to: "/promo-codes/$promoId", params: { promoId: created.id } })
+            }
             onBackToList={() => navigate({ to: "/promo-codes" })}
           />
         </div>
@@ -105,11 +130,19 @@ function NewPromoCodePage() {
         <div className="flex-1 p-6">
           <PromoFormFields form={form} setForm={setForm} audiences={lists} />
         </div>
-        <PromoFormActionBar onCancel={() => navigate({ to: "/promo-codes" })} onSubmit={handleConfirmClick} submitLabel="Confirm Promo Code" />
+        <PromoFormActionBar
+          onCancel={() => navigate({ to: "/promo-codes" })}
+          onSubmit={handleConfirmClick}
+          submitLabel="Confirm Promo Code"
+        />
       </div>
 
       {settingCode && (
-        <PromoCodeSetupModal form={form} onCancel={() => setSettingCode(false)} onConfirm={handleLaunch} />
+        <PromoCodeSetupModal
+          form={form}
+          onCancel={() => setSettingCode(false)}
+          onConfirm={handleLaunch}
+        />
       )}
     </AppShell>
   );

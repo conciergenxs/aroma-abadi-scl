@@ -3,12 +3,43 @@
  * produce different output in Node vs browser, causing React hydration errors).
  */
 
-const MONTHS_ID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_ID = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Agu",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Des",
+];
+const MONTHS_EN = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 /** Rp 2.450.000 */
 export function fmtIDR(n: number) {
-  return "Rp " + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return (
+    "Rp " +
+    Math.round(n)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  );
 }
 
 /**
@@ -32,34 +63,42 @@ function dateParts(iso: string | Date) {
     }
   }
   const d = new Date(iso);
-  return { y: d.getUTCFullYear(), mo: d.getUTCMonth(), d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes() };
+  return {
+    y: d.getUTCFullYear(),
+    mo: d.getUTCMonth(),
+    d: d.getUTCDate(),
+    h: d.getUTCHours(),
+    mi: d.getUTCMinutes(),
+  };
 }
 
 /** 07 Jul 2026 (ID) */
 export function fmtDateID(iso: string | Date) {
   const p = dateParts(iso);
-  return `${String(p.d).padStart(2,"0")} ${MONTHS_ID[p.mo]} ${p.y}`;
+  return `${String(p.d).padStart(2, "0")} ${MONTHS_ID[p.mo]} ${p.y}`;
 }
 
 /** 07 Jul 2026 (EN) */
 export function fmtDateEN(iso: string | Date) {
   const p = dateParts(iso);
-  return `${String(p.d).padStart(2,"0")} ${MONTHS_EN[p.mo]} ${p.y}`;
+  return `${String(p.d).padStart(2, "0")} ${MONTHS_EN[p.mo]} ${p.y}`;
 }
 
 /** 07 Jul 2026, 14:05 (ID) */
 export function fmtDateTimeID(iso: string | Date) {
   const p = dateParts(iso);
-  return `${fmtDateID(iso)}, ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}`;
+  return `${fmtDateID(iso)}, ${String(p.h).padStart(2, "0")}:${String(p.mi).padStart(2, "0")}`;
 }
 
 /** 07 Jul 2026, 14:05 (EN) */
 export function fmtDateTimeEN(iso: string | Date) {
   const p = dateParts(iso);
-  return `${fmtDateEN(iso)}, ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}`;
+  return `${fmtDateEN(iso)}, ${String(p.h).padStart(2, "0")}:${String(p.mi).padStart(2, "0")}`;
 }
 
 /** 1.234 (dot-separated thousand, no currency) */
 export function fmtNum(n: number) {
-  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return Math.round(n)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }

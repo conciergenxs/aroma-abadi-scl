@@ -11,7 +11,6 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
-  
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -33,9 +32,7 @@ const CHANNELS: {
   label: string;
   sublabel: string;
   enabled: boolean;
-}[] = [
-  { key: "whatsapp", label: "WhatsApp Business API", sublabel: "Cloud API", enabled: true },
-];
+}[] = [{ key: "whatsapp", label: "WhatsApp Business API", sublabel: "Cloud API", enabled: true }];
 
 function ChannelsPage() {
   const [selected, setSelected] = useState<ChannelKey>("whatsapp");
@@ -127,11 +124,13 @@ function WhatsAppDetail() {
 
       {/* Tabs */}
       <div className="border-b border-border flex items-center gap-1">
-        {([
-          ["accounts", "Accounts"],
-          ["billing", "Billing"],
-          ["optin", "Message Opt-in"],
-        ] as const).map(([k, label]) => (
+        {(
+          [
+            ["accounts", "Accounts"],
+            ["billing", "Billing"],
+            ["optin", "Message Opt-in"],
+          ] as const
+        ).map(([k, label]) => (
           <button
             key={k}
             type="button"
@@ -166,9 +165,13 @@ function AccountsTab() {
             </div>
             <div className="mt-1 text-sm font-semibold">Aroma Abadi</div>
             <div className="mt-3 flex items-center gap-3 text-[11px]">
-              <button className="text-primary hover:underline transition-colors duration-150">Get verified</button>
+              <button className="text-primary hover:underline transition-colors duration-150">
+                Get verified
+              </button>
               <span className="text-border">•</span>
-              <button className="text-primary hover:underline transition-colors duration-150">Request MM API</button>
+              <button className="text-primary hover:underline transition-colors duration-150">
+                Request MM API
+              </button>
             </div>
           </div>
           <div className="text-right">
@@ -189,7 +192,12 @@ function AccountsTab() {
           Connected WhatsApp Numbers
         </h3>
         <div className="space-y-3">
-          <ConnectedNumberCard businessAccount="Arma by Aroma Abadi" phone="+62 811 9001 2233" displayName="Arma by Aroma Abadi" accountId="waba_arma_aroma" />
+          <ConnectedNumberCard
+            businessAccount="Arma by Aroma Abadi"
+            phone="+62 811 9001 2233"
+            displayName="Arma by Aroma Abadi"
+            accountId="waba_arma_aroma"
+          />
         </div>
       </div>
     </div>
@@ -298,11 +306,13 @@ function BillingTab() {
   return (
     <div className="space-y-4">
       <div className="inline-flex items-center rounded-md border border-border bg-card/50 p-0.5 text-[11px]">
-        {([
-          ["all", "All"],
-          ["mba", "Pay with MBA Credits"],
-          ["waba", "Pay with WABA Credits"],
-        ] as const).map(([k, label]) => (
+        {(
+          [
+            ["all", "All"],
+            ["mba", "Pay with MBA Credits"],
+            ["waba", "Pay with WABA Credits"],
+          ] as const
+        ).map(([k, label]) => (
           <button
             key={k}
             type="button"
@@ -455,11 +465,7 @@ function OptInTab() {
   );
 }
 
-function OptInRow({
-  channel,
-}: {
-  channel: (typeof WHATSAPP_CHANNELS)[number];
-}) {
+function OptInRow({ channel }: { channel: (typeof WHATSAPP_CHANNELS)[number] }) {
   const [on, setOn] = useState(false);
   return (
     <tr className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150">

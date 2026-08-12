@@ -15,16 +15,26 @@ export const Route = createFileRoute("/contacts/audience/new")({
 
 type CreatedAudience = { id: string; name: string; count: number };
 
-function SuccessView({ audience, onViewAudience, onBackToList }: { audience: CreatedAudience; onViewAudience: () => void; onBackToList: () => void }) {
+function SuccessView({
+  audience,
+  onViewAudience,
+  onBackToList,
+}: {
+  audience: CreatedAudience;
+  onViewAudience: () => void;
+  onBackToList: () => void;
+}) {
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
         <CheckCircle2 className="h-9 w-9 text-emerald-500" />
       </div>
-      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">Audience Created!</h2>
+      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">
+        Audience Created!
+      </h2>
       <p className="mt-1.5 text-sm text-muted-foreground animate-fade-in">
-        <span className="font-semibold text-foreground">{audience.name}</span>
-        {" "}is ready with {audience.count} contact{audience.count === 1 ? "" : "s"}.
+        <span className="font-semibold text-foreground">{audience.name}</span> is ready with{" "}
+        {audience.count} contact{audience.count === 1 ? "" : "s"}.
       </p>
       <div className="mt-6 flex items-center justify-center gap-3 animate-fade-in">
         <button
@@ -65,12 +75,17 @@ function NewAudiencePage() {
   };
 
   const handleCreate = () => {
-    if (!name.trim()) { toast.error("Audience name is required"); return; }
+    if (!name.trim()) {
+      toast.error("Audience name is required");
+      return;
+    }
     const id = `ls-${Date.now()}`;
     const contactIds = Array.from(staged);
     contactsStore.setLists((l) => [...l, { id, name: name.trim() }]);
     if (contactIds.length) {
-      contactsStore.setContacts((cs) => cs.map((c) => (contactIds.includes(c.id) ? { ...c, listIds: [...c.listIds, id] } : c)));
+      contactsStore.setContacts((cs) =>
+        cs.map((c) => (contactIds.includes(c.id) ? { ...c, listIds: [...c.listIds, id] } : c)),
+      );
     }
     toast.success("Audience created");
     setCreated({ id, name: name.trim(), count: contactIds.length });
@@ -91,11 +106,18 @@ function NewAudiencePage() {
   }
 
   return (
-    <AppShell backTo="/contacts" title="New Audience" subtitle="Name your audience, then filter or search to bulk-add contacts" noPadding>
+    <AppShell
+      backTo="/contacts"
+      title="New Audience"
+      subtitle="Name your audience, then filter or search to bulk-add contacts"
+      noPadding
+    >
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6 space-y-4">
           <div className="max-w-sm">
-            <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">Audience Name</label>
+            <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
+              Audience Name
+            </label>
             <input
               autoFocus
               value={name}

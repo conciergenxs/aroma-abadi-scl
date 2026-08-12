@@ -70,9 +70,27 @@ const SCHEMA: CategorySection[] = [
             id: "basic",
             label: "Basic Access",
             items: [
-              { id: "view-conv", label: "View Conversations", select: "3", defaultChecked: true, defaultAccess: "full" },
-              { id: "send-msg", label: "Send Messages", select: "2", defaultChecked: true, defaultAccess: "full" },
-              { id: "assign-conv", label: "Assign Conversations", select: "2", defaultChecked: true, defaultAccess: "full" },
+              {
+                id: "view-conv",
+                label: "View Conversations",
+                select: "3",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
+              {
+                id: "send-msg",
+                label: "Send Messages",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
+              {
+                id: "assign-conv",
+                label: "Assign Conversations",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
               { id: "send-product", label: "Send Product Links", defaultChecked: true },
               { id: "send-payment", label: "Send Payment Links", defaultChecked: true },
               { id: "live-monitor", label: "View Live Monitoring Dashboard" },
@@ -118,10 +136,34 @@ const SCHEMA: CategorySection[] = [
             label: "Contact Access",
             items: [
               { id: "access-page", label: "Access Contacts Page", defaultChecked: true },
-              { id: "view-detail", label: "View Contact Details", select: "2", defaultChecked: true, defaultAccess: "full" },
-              { id: "create-contact", label: "Create Contacts", select: "2", defaultChecked: true, defaultAccess: "full" },
-              { id: "edit-contact", label: "Edit Contacts", select: "2", defaultChecked: true, defaultAccess: "full" },
-              { id: "assign-contact", label: "Assign Contacts", select: "2", defaultChecked: true, defaultAccess: "full" },
+              {
+                id: "view-detail",
+                label: "View Contact Details",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
+              {
+                id: "create-contact",
+                label: "Create Contacts",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
+              {
+                id: "edit-contact",
+                label: "Edit Contacts",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
+              {
+                id: "assign-contact",
+                label: "Assign Contacts",
+                select: "2",
+                defaultChecked: true,
+                defaultAccess: "full",
+              },
               { id: "delete-contact", label: "Delete Contacts", select: "2" },
             ],
           },
@@ -129,7 +171,11 @@ const SCHEMA: CategorySection[] = [
             id: "list-mgmt",
             label: "Audience Management",
             items: [
-              { id: "add-remove-list", label: "Add / Remove Contacts To Audience", defaultChecked: true },
+              {
+                id: "add-remove-list",
+                label: "Add / Remove Contacts To Audience",
+                defaultChecked: true,
+              },
               { id: "export-contacts", label: "Export Contacts" },
               {
                 id: "view-lists",
@@ -283,7 +329,7 @@ function buildDefaultState(): PermState {
         for (const it of flattenItems(g.items)) {
           items[it.id] = {
             checked: !!it.defaultChecked,
-            access: it.select ? it.defaultAccess ?? "none" : undefined,
+            access: it.select ? (it.defaultAccess ?? "none") : undefined,
           };
         }
       }
@@ -304,10 +350,31 @@ export type Role = {
 };
 
 const SEED_ROLES: Role[] = [
-  { id: "r-super", name: "Super Admin", description: "Full unrestricted access to all workspace features and settings.", state: buildDefaultState(), system: true },
-  { id: "r-admin", name: "Admin", description: "Manages workspace operations, members, and most configuration.", state: buildDefaultState() },
-  { id: "r-team-admin", name: "Team Admin", description: "Manages a single team's members, conversations, and assignments.", state: buildDefaultState() },
-  { id: "r-staff", name: "Staff", description: "Day-to-day agent access to inbox, contacts, and broadcasts.", state: buildDefaultState() },
+  {
+    id: "r-super",
+    name: "Super Admin",
+    description: "Full unrestricted access to all workspace features and settings.",
+    state: buildDefaultState(),
+    system: true,
+  },
+  {
+    id: "r-admin",
+    name: "Admin",
+    description: "Manages workspace operations, members, and most configuration.",
+    state: buildDefaultState(),
+  },
+  {
+    id: "r-team-admin",
+    name: "Team Admin",
+    description: "Manages a single team's members, conversations, and assignments.",
+    state: buildDefaultState(),
+  },
+  {
+    id: "r-staff",
+    name: "Staff",
+    description: "Day-to-day agent access to inbox, contacts, and broadcasts.",
+    state: buildDefaultState(),
+  },
 ];
 
 // ----- Assigned-users seed (module-local) -----
@@ -324,26 +391,137 @@ export type AssignedUser = {
 };
 
 const SEED_USERS: AssignedUser[] = [
-  { id: "u-aria", name: "Aria Kapoor", email: "aria.kapoor@northstar.co", jobTitle: "Workspace Owner", team: "Customer Support", assignedDate: "Jan 12, 2024", role: "Super Admin" },
-  { id: "u-jonas", name: "Jonas Weber", email: "jonas.weber@northstar.co", jobTitle: "CTO", team: "Operations", assignedDate: "Jan 14, 2024", role: "Super Admin" },
-  { id: "u-ines", name: "Ines Carvalho", email: "ines.c@northstar.co", jobTitle: "VP Customer", team: "Customer Support", assignedDate: "Jan 20, 2024", role: "Super Admin" },
-  { id: "u-tom", name: "Tomas Bergstrom", email: "tomas.b@northstar.co", jobTitle: "Head of Support", team: "Customer Support", assignedDate: "Feb 02, 2024", role: "Admin" },
-  { id: "u-priya", name: "Priya Shah", email: "priya.shah@northstar.co", jobTitle: "Operations Manager", team: "Operations", assignedDate: "Feb 18, 2024", role: "Admin" },
-  { id: "u-mei", name: "Mei Tanaka", email: "mei.tanaka@northstar.co", jobTitle: "Sales Lead", team: "Sales", assignedDate: "Mar 18, 2024", role: "Team Admin" },
-  { id: "u-luca", name: "Luca Romano", email: "luca.romano@northstar.co", jobTitle: "Marketing Manager", team: "Marketing", assignedDate: "Apr 04, 2024", role: "Team Admin" },
-  { id: "u-sara", name: "Sara Iqbal", email: "sara.iqbal@northstar.co", jobTitle: "Support Specialist", team: "Customer Support", assignedDate: "May 22, 2024", role: "Staff" },
-  { id: "u-dimas", name: "Dimas Pratama", email: "dimas.p@northstar.co", jobTitle: "Operations Analyst", team: "Operations", assignedDate: "Jun 09, 2024", role: "Staff" },
-  { id: "u-hana", name: "Hana Wijaya", email: "hana.wijaya@northstar.co", jobTitle: "Sales Associate", team: "Sales", assignedDate: "Jul 03, 2024", role: "Staff" },
-  { id: "u-marco", name: "Marco Silva", email: "marco.silva@northstar.co", jobTitle: "Support Agent", team: "Customer Support", assignedDate: "Aug 15, 2024", role: "Staff" },
-  { id: "u-noor", name: "Noor Hassan", email: "noor.h@northstar.co", jobTitle: "Customer Insights", team: "Marketing", assignedDate: "Sep 01, 2024", role: "Staff" },
+  {
+    id: "u-aria",
+    name: "Aria Kapoor",
+    email: "aria.kapoor@northstar.co",
+    jobTitle: "Workspace Owner",
+    team: "Customer Support",
+    assignedDate: "Jan 12, 2024",
+    role: "Super Admin",
+  },
+  {
+    id: "u-jonas",
+    name: "Jonas Weber",
+    email: "jonas.weber@northstar.co",
+    jobTitle: "CTO",
+    team: "Operations",
+    assignedDate: "Jan 14, 2024",
+    role: "Super Admin",
+  },
+  {
+    id: "u-ines",
+    name: "Ines Carvalho",
+    email: "ines.c@northstar.co",
+    jobTitle: "VP Customer",
+    team: "Customer Support",
+    assignedDate: "Jan 20, 2024",
+    role: "Super Admin",
+  },
+  {
+    id: "u-tom",
+    name: "Tomas Bergstrom",
+    email: "tomas.b@northstar.co",
+    jobTitle: "Head of Support",
+    team: "Customer Support",
+    assignedDate: "Feb 02, 2024",
+    role: "Admin",
+  },
+  {
+    id: "u-priya",
+    name: "Priya Shah",
+    email: "priya.shah@northstar.co",
+    jobTitle: "Operations Manager",
+    team: "Operations",
+    assignedDate: "Feb 18, 2024",
+    role: "Admin",
+  },
+  {
+    id: "u-mei",
+    name: "Mei Tanaka",
+    email: "mei.tanaka@northstar.co",
+    jobTitle: "Sales Lead",
+    team: "Sales",
+    assignedDate: "Mar 18, 2024",
+    role: "Team Admin",
+  },
+  {
+    id: "u-luca",
+    name: "Luca Romano",
+    email: "luca.romano@northstar.co",
+    jobTitle: "Marketing Manager",
+    team: "Marketing",
+    assignedDate: "Apr 04, 2024",
+    role: "Team Admin",
+  },
+  {
+    id: "u-sara",
+    name: "Sara Iqbal",
+    email: "sara.iqbal@northstar.co",
+    jobTitle: "Support Specialist",
+    team: "Customer Support",
+    assignedDate: "May 22, 2024",
+    role: "Staff",
+  },
+  {
+    id: "u-dimas",
+    name: "Dimas Pratama",
+    email: "dimas.p@northstar.co",
+    jobTitle: "Operations Analyst",
+    team: "Operations",
+    assignedDate: "Jun 09, 2024",
+    role: "Staff",
+  },
+  {
+    id: "u-hana",
+    name: "Hana Wijaya",
+    email: "hana.wijaya@northstar.co",
+    jobTitle: "Sales Associate",
+    team: "Sales",
+    assignedDate: "Jul 03, 2024",
+    role: "Staff",
+  },
+  {
+    id: "u-marco",
+    name: "Marco Silva",
+    email: "marco.silva@northstar.co",
+    jobTitle: "Support Agent",
+    team: "Customer Support",
+    assignedDate: "Aug 15, 2024",
+    role: "Staff",
+  },
+  {
+    id: "u-noor",
+    name: "Noor Hassan",
+    email: "noor.h@northstar.co",
+    jobTitle: "Customer Insights",
+    team: "Marketing",
+    assignedDate: "Sep 01, 2024",
+    role: "Staff",
+  },
 ];
 
 // ----- UI atoms -----
 
-function Toggle({ checked, onChange, size = "md" }: { checked: boolean; onChange: (v: boolean) => void; size?: "sm" | "md" }) {
+function Toggle({
+  checked,
+  onChange,
+  size = "md",
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  size?: "sm" | "md";
+}) {
   const dims = size === "sm" ? "h-4 w-7" : "h-5 w-9";
   const thumb = size === "sm" ? "h-3 w-3" : "h-4 w-4";
-  const tx = size === "sm" ? (checked ? "translate-x-[14px]" : "translate-x-0.5") : checked ? "translate-x-[18px]" : "translate-x-0.5";
+  const tx =
+    size === "sm"
+      ? checked
+        ? "translate-x-[14px]"
+        : "translate-x-0.5"
+      : checked
+        ? "translate-x-[18px]"
+        : "translate-x-0.5";
   return (
     <button
       type="button"
@@ -354,12 +532,22 @@ function Toggle({ checked, onChange, size = "md" }: { checked: boolean; onChange
         checked ? "bg-primary" : "bg-white/10 border border-border"
       }`}
     >
-      <span className={`inline-block ${thumb} rounded-full bg-white shadow transition-transform ${tx}`} />
+      <span
+        className={`inline-block ${thumb} rounded-full bg-white shadow transition-transform ${tx}`}
+      />
     </button>
   );
 }
 
-function Checkbox({ checked, onChange, disabled }: { checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+function Checkbox({
+  checked,
+  onChange,
+  disabled,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
@@ -374,8 +562,8 @@ function Checkbox({ checked, onChange, disabled }: { checked: boolean; onChange:
         disabled
           ? "border-border/50 bg-transparent cursor-not-allowed opacity-40"
           : checked
-          ? "bg-primary border-primary"
-          : "border-border hover:border-primary/60 bg-background/40"
+            ? "bg-primary border-primary"
+            : "border-border hover:border-primary/60 bg-background/40"
       }`}
     >
       {checked && <Check className="h-3 w-3 text-primary-foreground" />}
@@ -427,9 +615,7 @@ export function RolesPermissionsModule() {
         onSubmit={(name, description, state) => {
           setRoles((s) =>
             s.map((r) =>
-              r.id === role.id
-                ? { ...r, name: r.system ? r.name : name, description, state }
-                : r,
+              r.id === role.id ? { ...r, name: r.system ? r.name : name, description, state } : r,
             ),
           );
           // If role name changed, propagate to assigned users
@@ -469,7 +655,9 @@ export function RolesPermissionsModule() {
         }}
         onAssignUsers={(ids) => {
           setUsers((s) =>
-            s.map((u) => (ids.includes(u.id) ? { ...u, role: role.name, assignedDate: todayLabel() } : u)),
+            s.map((u) =>
+              ids.includes(u.id) ? { ...u, role: role.name, assignedDate: todayLabel() } : u,
+            ),
           );
           toast.success("Users assigned successfully.");
         }}
@@ -562,7 +750,8 @@ export function RolesPermissionsModule() {
                     {r.description}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {usersByRole(r.name).length} {usersByRole(r.name).length === 1 ? "User" : "Users"}
+                    {usersByRole(r.name).length}{" "}
+                    {usersByRole(r.name).length === 1 ? "User" : "Users"}
                   </td>
                   <td className="px-4 py-3 align-middle text-muted-foreground">
                     <ChevronRight className="h-4 w-4" />
@@ -632,7 +821,9 @@ function RoleEditor({
             {initial ? `Edit Role` : "Create New Role"}
           </h2>
           <p className="text-xs text-muted-foreground mt-1 m-0">
-            {initial ? "Update role information and permissions." : "Define a new role and its permissions."}
+            {initial
+              ? "Update role information and permissions."
+              : "Define a new role and its permissions."}
           </p>
         </div>
       </div>
@@ -650,13 +841,15 @@ function RoleEditor({
                     active
                       ? "bg-primary text-primary-foreground border-primary"
                       : done
-                      ? "bg-primary/15 text-primary border-primary/40"
-                      : "bg-background/40 text-muted-foreground border-border"
+                        ? "bg-primary/15 text-primary border-primary/40"
+                        : "bg-background/40 text-muted-foreground border-border"
                   }`}
                 >
                   {done ? <Check className="h-3.5 w-3.5" /> : s.id}
                 </div>
-                <div className={`text-xs ${active ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                <div
+                  className={`text-xs ${active ? "text-foreground font-medium" : "text-muted-foreground"}`}
+                >
                   {s.label}
                 </div>
                 {idx < STEPS.length - 1 && (
@@ -798,10 +991,10 @@ function PermissionsStep({
                         status === "full"
                           ? "bg-emerald-400"
                           : status === "partial"
-                          ? "bg-amber-400"
-                          : status === "empty"
-                          ? "bg-muted-foreground/30"
-                          : "bg-transparent border border-border"
+                            ? "bg-amber-400"
+                            : status === "empty"
+                              ? "bg-muted-foreground/30"
+                              : "bg-transparent border border-border"
                       }`}
                     />
                   </button>
@@ -868,10 +1061,7 @@ function PermRow({
   const childrenEnabled = it.checked;
   return (
     <div>
-      <div
-        className="flex items-center gap-3 px-4 py-2.5"
-        style={{ paddingLeft: 16 + depth * 24 }}
-      >
+      <div className="flex items-center gap-3 px-4 py-2.5" style={{ paddingLeft: 16 + depth * 24 }}>
         <Checkbox checked={it.checked} onChange={(v) => onCheck(item.id, v)} />
         <div className="text-sm flex-1 min-w-0 truncate">{item.label}</div>
         {item.select && (
@@ -943,15 +1133,15 @@ function PreviewStep({
             <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
               Role Name
             </div>
-            <div className="text-sm font-medium">{name || <span className="text-muted-foreground">—</span>}</div>
+            <div className="text-sm font-medium">
+              {name || <span className="text-muted-foreground">—</span>}
+            </div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60 mb-1">
               Description
             </div>
-            <div className="text-sm text-muted-foreground">
-              {description || "—"}
-            </div>
+            <div className="text-sm text-muted-foreground">{description || "—"}</div>
           </div>
         </div>
       </SectionCard>
@@ -1005,8 +1195,8 @@ function BreakdownTile({
     accent === "emerald"
       ? "text-emerald-300 border-emerald-500/30 bg-emerald-500/5"
       : accent === "amber"
-      ? "text-amber-300 border-amber-500/30 bg-amber-500/5"
-      : "text-muted-foreground border-border bg-background/40";
+        ? "text-amber-300 border-amber-500/30 bg-amber-500/5"
+        : "text-muted-foreground border-border bg-background/40";
   return (
     <div className={`rounded-lg border px-4 py-4 ${color}`}>
       <div className="text-2xl font-semibold leading-none">{value}</div>
@@ -1093,9 +1283,7 @@ function RoleDetailPage({
                 onClick={() => canDeleteRole && setConfirmDeleteRole(true)}
                 disabled={!canDeleteRole}
                 title={
-                  !canDeleteRole
-                    ? "Reassign all users before deleting this role"
-                    : "Delete role"
+                  !canDeleteRole ? "Reassign all users before deleting this role" : "Delete role"
                 }
                 className="h-9 inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 text-xs font-medium hover:bg-destructive/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
@@ -1137,12 +1325,12 @@ function RoleDetailPage({
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150">
+                <tr
+                  key={u.id}
+                  className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150"
+                >
                   <td className="px-4 py-3 align-middle">
-                    <Checkbox
-                      checked={selected.includes(u.id)}
-                      onChange={() => toggleOne(u.id)}
-                    />
+                    <Checkbox checked={selected.includes(u.id)} onChange={() => toggleOne(u.id)} />
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap">
                     <div className="flex items-center gap-2">

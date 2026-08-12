@@ -1,5 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent, type ClipboardEvent, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ClipboardEvent,
+  type KeyboardEvent,
+} from "react";
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import { matchBaCredentials } from "@/components/scl/ba-store";
 import { Eye, EyeOff, Loader2, Phone, Mail, ArrowLeft } from "lucide-react";
@@ -9,7 +16,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Aroma Abadi" },
-      { name: "description", content: "Sign in to the Aroma Abadi workspace to manage customer WhatsApp conversations." },
+      {
+        name: "description",
+        content: "Sign in to the Aroma Abadi workspace to manage customer WhatsApp conversations.",
+      },
       { property: "og:title", content: "Sign in — Aroma Abadi" },
       { property: "og:description", content: "Access your Aroma Abadi workspace." },
     ],
@@ -185,7 +195,9 @@ function AuthPage() {
 
           {/* Content */}
           <div className="relative z-10 flex h-full flex-col justify-between p-10">
-            <div><img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" /></div>
+            <div>
+              <img src={sclIconAsset} alt="Aroma Abadi" className="h-10 w-auto object-contain" />
+            </div>
             <div className="max-w-lg">
               <h1 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05] text-sidebar-foreground">
                 Connect conversations.
@@ -212,7 +224,6 @@ function AuthPage() {
         </div>
 
         <div className="relative w-full max-w-[440px]">
-
           <div className="flex flex-col items-start">
             {mode === "signin" && (
               <>
@@ -226,7 +237,10 @@ function AuthPage() {
               <>
                 <button
                   type="button"
-                  onClick={() => { setMode("signin"); setError(null); }}
+                  onClick={() => {
+                    setMode("signin");
+                    setError(null);
+                  }}
                   className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
                 >
                   <ArrowLeft className="h-3 w-3" /> Back to Sign In
@@ -249,7 +263,10 @@ function AuthPage() {
               <>
                 <button
                   type="button"
-                  onClick={() => { setMode("signin"); setError(null); }}
+                  onClick={() => {
+                    setMode("signin");
+                    setError(null);
+                  }}
                   className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
                 >
                   <ArrowLeft className="h-3 w-3" /> Back to Sign In
@@ -264,14 +281,21 @@ function AuthPage() {
               <div className="w-full">
                 <button
                   type="button"
-                  onClick={() => { setMode("forgot"); setError(null); }}
+                  onClick={() => {
+                    setMode("forgot");
+                    setError(null);
+                  }}
                   className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition mb-4"
                 >
                   <ArrowLeft className="h-3 w-3" /> Back
                 </button>
-                <h2 className="text-2xl font-semibold tracking-tight text-center">Enter verification code</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-center">
+                  Enter verification code
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground text-center">
-                  We sent a 6-digit code to <span className="text-foreground">{phone || "your WhatsApp number"}</span> via WhatsApp.
+                  We sent a 6-digit code to{" "}
+                  <span className="text-foreground">{phone || "your WhatsApp number"}</span> via
+                  WhatsApp.
                 </p>
               </div>
             )}
@@ -353,7 +377,13 @@ function AuthPage() {
           {/* OTP verification */}
           {mode === "forgot-otp" && (
             <form onSubmit={verifyOtp} className="mt-6 space-y-4">
-              <OtpInput value={otp} onChange={(v) => { setOtp(v); setError(null); }} />
+              <OtpInput
+                value={otp}
+                onChange={(v) => {
+                  setOtp(v);
+                  setError(null);
+                }}
+              />
               {error && (
                 <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300 text-center">
                   {error}
@@ -373,7 +403,11 @@ function AuthPage() {
                 ) : (
                   <>
                     Didn't get a code?{" "}
-                    <button type="button" onClick={sendOtp} className="text-primary hover:underline transition-colors duration-150">
+                    <button
+                      type="button"
+                      onClick={sendOtp}
+                      className="text-primary hover:underline transition-colors duration-150"
+                    >
                       Resend OTP
                     </button>
                   </>
@@ -499,7 +533,10 @@ function AuthPage() {
                     mode === "signin" ? (
                       <button
                         type="button"
-                        onClick={() => { setMode("forgot"); setError(null); }}
+                        onClick={() => {
+                          setMode("forgot");
+                          setError(null);
+                        }}
                         className="text-[11px] text-muted-foreground hover:text-primary transition"
                       >
                         Forgot password?
@@ -573,7 +610,14 @@ function AuthPage() {
               {mode === "signin" && (
                 <p className="text-center text-xs text-muted-foreground">
                   Don't have an account?{" "}
-                  <button type="button" onClick={() => { setMode("signup"); setError(null); }} className="text-primary hover:underline transition-colors duration-150">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("signup");
+                      setError(null);
+                    }}
+                    className="text-primary hover:underline transition-colors duration-150"
+                  >
                     Create Account
                   </button>
                 </p>
@@ -581,7 +625,14 @@ function AuthPage() {
               {mode === "signup" && (
                 <p className="text-center text-xs text-muted-foreground">
                   Already have an account?{" "}
-                  <button type="button" onClick={() => { setMode("signin"); setError(null); }} className="text-primary hover:underline transition-colors duration-150">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("signin");
+                      setError(null);
+                    }}
+                    className="text-primary hover:underline transition-colors duration-150"
+                  >
                     Sign In
                   </button>
                 </p>
@@ -591,8 +642,20 @@ function AuthPage() {
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
             By continuing you agree to our{" "}
-            <a href="https://aroma-abadi-scl.vercel.app/" className="text-primary hover:underline transition-colors duration-150">Terms</a> &{" "}
-            <a href="https://aroma-abadi-scl.vercel.app/" className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150">Privacy Policy</a>.
+            <a
+              href="https://aroma-abadi-scl.vercel.app/"
+              className="text-primary hover:underline transition-colors duration-150"
+            >
+              Terms
+            </a>{" "}
+            &{" "}
+            <a
+              href="https://aroma-abadi-scl.vercel.app/"
+              className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150"
+            >
+              Privacy Policy
+            </a>
+            .
           </p>
         </div>
       </main>
@@ -603,7 +666,15 @@ function AuthPage() {
 const inputCls =
   "w-full rounded-md border border-border bg-card/60 px-3 py-2.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition";
 
-function OtpInput({ value, onChange, length = OTP_LENGTH }: { value: string; onChange: (v: string) => void; length?: number }) {
+function OtpInput({
+  value,
+  onChange,
+  length = OTP_LENGTH,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  length?: number;
+}) {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const digits = value.split("").concat(Array(length).fill("")).slice(0, length);
 
@@ -632,7 +703,9 @@ function OtpInput({ value, onChange, length = OTP_LENGTH }: { value: string; onC
       {digits.map((d, i) => (
         <input
           key={i}
-          ref={(el) => { refs.current[i] = el; }}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
           value={d}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
@@ -660,7 +733,9 @@ function Field({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</label>
+        <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          {label}
+        </label>
         {rightSlot}
       </div>
       {children}

@@ -142,9 +142,7 @@ const topNav: NavItem[] = [
   { to: "/transactions", label: "Transactions", icon: Receipt },
   ...(LITE_MODE ? [] : [{ to: "/promo-codes", label: "Promo Codes", icon: Tag } as const]),
 ];
-const bottomNav: NavItem[] = [
-  { to: "/settings", label: "Settings", icon: Settings },
-];
+const bottomNav: NavItem[] = [{ to: "/settings", label: "Settings", icon: Settings }];
 
 export function AppShell({
   children,
@@ -193,8 +191,12 @@ export function AppShell({
           expanded ? "w-56" : "w-[68px]"
         }`}
       >
-        <div className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}>
-          <div className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}>
+        <div
+          className={`flex flex-col w-full border-b border-sidebar-border py-[15px] gap-2 ${expanded ? "px-4" : "px-2 items-center"}`}
+        >
+          <div
+            className={`flex w-full items-center ${expanded ? "justify-between" : "justify-center"}`}
+          >
             {expanded && (
               <img
                 src={sclIconAsset}
@@ -209,13 +211,18 @@ export function AppShell({
               aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
               className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] transition-colors"
             >
-              {expanded ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
+              {expanded ? (
+                <ChevronsLeft className="h-4 w-4" />
+              ) : (
+                <ChevronsRight className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
 
-
-        <nav className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}>
+        <nav
+          className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}
+        >
           {topNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
@@ -232,7 +239,9 @@ export function AppShell({
             );
           })}
         </nav>
-        <nav className={`w-full pb-3 pt-2 flex flex-col gap-1.5 border-t border-sidebar-border ${expanded ? "px-2" : "items-center"}`}>
+        <nav
+          className={`w-full pb-3 pt-2 flex flex-col gap-1.5 border-t border-sidebar-border ${expanded ? "px-2" : "items-center"}`}
+        >
           <SidebarButton
             label="Invite Members"
             Icon={UserPlus}
@@ -262,27 +271,37 @@ export function AppShell({
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-6">
           <div className="flex items-center gap-1.5">
             {backTo && (
-              <Link to={backTo as ComponentProps<typeof Link>["to"]} className="-ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0">
+              <Link
+                to={backTo as ComponentProps<typeof Link>["to"]}
+                className="-ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0"
+              >
                 <ChevronLeft className="h-4 w-4" />
               </Link>
             )}
             {backTo ? (
-              <Link to={backTo as ComponentProps<typeof Link>["to"]} className="flex flex-col hover:opacity-75 transition-opacity">
+              <Link
+                to={backTo as ComponentProps<typeof Link>["to"]}
+                className="flex flex-col hover:opacity-75 transition-opacity"
+              >
                 {title ? (
-                  <h1 className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}>{title}</h1>
+                  <h1
+                    className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}
+                  >
+                    {title}
+                  </h1>
                 ) : null}
-                {subtitle ? (
-                  <p className="text-xs text-muted-foreground">{subtitle}</p>
-                ) : null}
+                {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
               </Link>
             ) : (
               <div className="flex flex-col">
                 {title ? (
-                  <h1 className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}>{title}</h1>
+                  <h1
+                    className={`font-semibold tracking-tight leading-tight ${subtitle ? "text-base" : "text-[15px]"}`}
+                  >
+                    {title}
+                  </h1>
                 ) : null}
-                {subtitle ? (
-                  <p className="text-xs text-muted-foreground">{subtitle}</p>
-                ) : null}
+                {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
               </div>
             )}
           </div>
@@ -295,7 +314,9 @@ export function AppShell({
                 className={`relative h-9 w-9 grid place-items-center rounded-md border border-border bg-card/60 hover:bg-card transition-colors ${notifOpen ? "border-primary/40 bg-primary/10" : ""}`}
                 aria-label="Notifications"
               >
-                <Bell className={`h-4 w-4 ${notifOpen ? "text-primary" : "text-muted-foreground"}`} />
+                <Bell
+                  className={`h-4 w-4 ${notifOpen ? "text-primary" : "text-muted-foreground"}`}
+                />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground grid place-items-center tabular-nums">
                     {unreadCount}
@@ -320,7 +341,10 @@ export function AppShell({
                           <CheckCheck className="h-3 w-3" /> Mark all as read
                         </button>
                       )}
-                      <button onClick={() => setNotifOpen(false)} className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors duration-150">
+                      <button
+                        onClick={() => setNotifOpen(false)}
+                        className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors duration-150"
+                      >
                         <XIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -336,17 +360,25 @@ export function AppShell({
                           onClick={() => setReadIds((prev) => new Set([...prev, n.id]))}
                           className={`w-full flex items-start gap-3 px-4 py-3.5 text-left hover:bg-white/[0.04] transition-colors ${!isRead ? "bg-primary/[0.04]" : ""}`}
                         >
-                          <div className={`mt-0.5 h-8 w-8 shrink-0 rounded-full grid place-items-center ${n.iconBg}`}>
+                          <div
+                            className={`mt-0.5 h-8 w-8 shrink-0 rounded-full grid place-items-center ${n.iconBg}`}
+                          >
                             <Icon className={`h-3.5 w-3.5 ${n.iconColor}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[13px] leading-snug ${isRead ? "text-foreground/70" : "text-foreground font-medium"}`}>
+                            <p
+                              className={`text-[13px] leading-snug ${isRead ? "text-foreground/70" : "text-foreground font-medium"}`}
+                            >
                               {n.title}
                             </p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.body}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
+                              {n.body}
+                            </p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">{n.time}</p>
                           </div>
-                          {!isRead && <span className="mt-2 h-2 w-2 rounded-full bg-primary shrink-0" />}
+                          {!isRead && (
+                            <span className="mt-2 h-2 w-2 rounded-full bg-primary shrink-0" />
+                          )}
                         </button>
                       );
                     })}
@@ -363,7 +395,9 @@ export function AppShell({
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
                     AK
                   </div>
-                  <span className="text-[13px] font-medium text-foreground hidden lg:block">Aria Kapoor</span>
+                  <span className="text-[13px] font-medium text-foreground hidden lg:block">
+                    Aria Kapoor
+                  </span>
                   <ChevronDown className="h-3 w-3 text-muted-foreground hidden lg:block" />
                 </button>
               </DropdownMenuTrigger>
@@ -387,7 +421,15 @@ export function AppShell({
           </div>
         </header>
 
-        <main className={noPadding ? "flex-1 min-h-0 overflow-y-auto page-enter" : "flex-1 p-6 overflow-y-auto page-enter"}>{children}</main>
+        <main
+          className={
+            noPadding
+              ? "flex-1 min-h-0 overflow-y-auto page-enter"
+              : "flex-1 p-6 overflow-y-auto page-enter"
+          }
+        >
+          {children}
+        </main>
       </div>
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
 
@@ -536,16 +578,12 @@ export function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={`rounded-xl border border-border bg-card/60 glass ${className}`}
-    >
+    <div className={`rounded-xl border border-border bg-card/60 glass ${className}`}>
       {(title || action) && (
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             {title && <h3 className="text-sm font-medium">{title}</h3>}
-            {description && (
-              <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
-            )}
+            {description && <p className="text-sm text-muted-foreground mt-0.5">{description}</p>}
           </div>
           {action}
         </div>
@@ -592,11 +630,16 @@ export const labelColorDot: Record<LabelColor, string> = {
 
 export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?: () => void }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium ${labelColorClass[label.color]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium ${labelColorClass[label.color]}`}
+    >
       <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[label.color]}`} />
       {label.name}
       {onRemove && (
-        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150">
+        <button
+          onClick={onRemove}
+          className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150"
+        >
           <X className="h-2.5 w-2.5" />
         </button>
       )}
@@ -610,7 +653,10 @@ export function ListChip({ name, onRemove }: { name: string; onRemove?: () => vo
       <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
       {name}
       {onRemove && (
-        <button onClick={onRemove} className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150">
+        <button
+          onClick={onRemove}
+          className="ml-0.5 -mr-1 grid h-3.5 w-3.5 place-items-center rounded hover:bg-white/10 transition-colors duration-150"
+        >
           <X className="h-2.5 w-2.5" />
         </button>
       )}

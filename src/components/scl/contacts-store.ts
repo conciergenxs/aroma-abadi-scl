@@ -52,26 +52,88 @@ export type ContactProperty = {
 
 export const DEFAULT_PROPERTIES: ContactProperty[] = [
   // ── Core columns shown in the contact table ─────────────────────────────
-  { id: "p-name",            key: "name",            name: "Name",             type: "text",        visible: true,  system: true },
-  { id: "p-phone",           key: "phone",            name: "WA Number",        type: "phone",       visible: true,  system: true },
-  { id: "p-contact-type",    key: "contact_type",     name: "Contact Type",     type: "select",      visible: true,  system: true, options: ["Consumer", "BA"] },
-  { id: "p-gender",          key: "gender",           name: "Gender",           type: "select",      visible: true,               options: ["Male", "Female"] },
-  { id: "p-brand",           key: "brand",            name: "Brand",            type: "select",      visible: true,               options: ["Dolce & Gabbana", "Sisley", "Rimmel", "Laura Mercier", "BareMinerals"] },
-  { id: "p-labels",          key: "labels",           name: "Labels",           type: "labels",      visible: true,  system: true },
-  { id: "p-lists",           key: "lists",            name: "Audience",         type: "multiselect", visible: true,  system: true },
-  { id: "p-lastInteraction", key: "lastInteraction",  name: "Last Interaction", type: "date",        visible: true,  system: true },
+  { id: "p-name", key: "name", name: "Name", type: "text", visible: true, system: true },
+  { id: "p-phone", key: "phone", name: "WA Number", type: "phone", visible: true, system: true },
+  {
+    id: "p-contact-type",
+    key: "contact_type",
+    name: "Contact Type",
+    type: "select",
+    visible: true,
+    system: true,
+    options: ["Consumer", "BA"],
+  },
+  {
+    id: "p-gender",
+    key: "gender",
+    name: "Gender",
+    type: "select",
+    visible: true,
+    options: ["Male", "Female"],
+  },
+  {
+    id: "p-brand",
+    key: "brand",
+    name: "Brand",
+    type: "select",
+    visible: true,
+    options: ["Dolce & Gabbana", "Sisley", "Rimmel", "Laura Mercier", "BareMinerals"],
+  },
+  { id: "p-labels", key: "labels", name: "Labels", type: "labels", visible: true, system: true },
+  {
+    id: "p-lists",
+    key: "lists",
+    name: "Audience",
+    type: "multiselect",
+    visible: true,
+    system: true,
+  },
+  {
+    id: "p-lastInteraction",
+    key: "lastInteraction",
+    name: "Last Interaction",
+    type: "date",
+    visible: true,
+    system: true,
+  },
   // ── Additional columns (toggleable) ────────────────────────────────────
-  { id: "p-point-balance",   key: "point_balance",    name: "Point Balance",    type: "number",      visible: false },
-  { id: "p-last-tx",         key: "last_transaction", name: "Last Transaction", type: "date",        visible: false },
-  { id: "p-store",           key: "store",            name: "Store",            type: "text",        visible: false },
-  { id: "p-city",            key: "city",             name: "City",             type: "text",        visible: false },
-  { id: "p-position",        key: "position",         name: "Position",         type: "select",      visible: false, options: ["BA", "Senior BA", "Team Leader"] },
-  { id: "p-ba-password",     key: "password",         name: "Password",        type: "text",        visible: true },
-  { id: "p-status",          key: "status",           name: "Status",           type: "select",      visible: false, system: true },
+  {
+    id: "p-point-balance",
+    key: "point_balance",
+    name: "Point Balance",
+    type: "number",
+    visible: false,
+  },
+  {
+    id: "p-last-tx",
+    key: "last_transaction",
+    name: "Last Transaction",
+    type: "date",
+    visible: false,
+  },
+  { id: "p-store", key: "store", name: "Store", type: "text", visible: false },
+  { id: "p-city", key: "city", name: "City", type: "text", visible: false },
+  {
+    id: "p-position",
+    key: "position",
+    name: "Position",
+    type: "select",
+    visible: false,
+    options: ["BA", "Senior BA", "Team Leader"],
+  },
+  { id: "p-ba-password", key: "password", name: "Password", type: "text", visible: true },
+  { id: "p-status", key: "status", name: "Status", type: "select", visible: false, system: true },
   // ── Extra fields for New Contact form ──────────────────────────────────
-  { id: "p-pic",             key: "pic",              name: "PIC",              type: "text",        visible: false },
-  { id: "p-company-name",    key: "company_name",     name: "Company Name",     type: "text",        visible: false },
-  { id: "p-business-industry", key: "business_industry", name: "Business Industry", type: "select", visible: false, options: ["Retail", "Finance", "Tech", "Hospitality", "Education", "Healthcare", "Other"] },
+  { id: "p-pic", key: "pic", name: "PIC", type: "text", visible: false },
+  { id: "p-company-name", key: "company_name", name: "Company Name", type: "text", visible: false },
+  {
+    id: "p-business-industry",
+    key: "business_industry",
+    name: "Business Industry",
+    type: "select",
+    visible: false,
+    options: ["Retail", "Finance", "Tech", "Hospitality", "Education", "Healthcare", "Other"],
+  },
 ];
 
 // =========================================================
@@ -84,24 +146,88 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
 // =========================================================
 
 export type LifecycleColorKey =
-  | "orange" | "blue" | "purple" | "yellow" | "green"
-  | "red" | "gray" | "pink" | "sky" | "violet" | "emerald";
+  | "orange"
+  | "blue"
+  | "purple"
+  | "yellow"
+  | "green"
+  | "red"
+  | "gray"
+  | "pink"
+  | "sky"
+  | "violet"
+  | "emerald";
 
 export const LIFECYCLE_COLORS: Record<
   LifecycleColorKey,
   { name: string; bar: string; dot: string; badge: string }
 > = {
-  orange:  { name: "Orange",  bar: "bg-orange-500",  dot: "bg-orange-500",  badge: "border-orange-600 bg-orange-500 text-white font-semibold" },
-  blue:    { name: "Blue",    bar: "bg-blue-500",    dot: "bg-blue-500",    badge: "border-blue-600 bg-blue-600 text-white font-semibold" },
-  purple:  { name: "Purple",  bar: "bg-purple-500",  dot: "bg-purple-500",  badge: "border-purple-700 bg-purple-600 text-white font-semibold" },
-  yellow:  { name: "Yellow",  bar: "bg-yellow-400",  dot: "bg-yellow-400",  badge: "border-yellow-600 bg-yellow-500 text-white font-semibold" },
-  green:   { name: "Green",   bar: "bg-green-500",   dot: "bg-green-500",   badge: "border-green-700 bg-green-600 text-white font-semibold" },
-  red:     { name: "Red",     bar: "bg-red-500",     dot: "bg-red-500",     badge: "border-red-700 bg-red-600 text-white font-semibold" },
-  gray:    { name: "Gray",    bar: "bg-slate-500",   dot: "bg-slate-500",   badge: "border-slate-600 bg-slate-500 text-white font-semibold" },
-  pink:    { name: "Pink",    bar: "bg-pink-500",    dot: "bg-pink-500",    badge: "border-pink-700 bg-pink-600 text-white font-semibold" },
-  sky:     { name: "Sky",     bar: "bg-sky-500",     dot: "bg-sky-500",     badge: "border-sky-700 bg-sky-500 text-white font-semibold" },
-  violet:  { name: "Violet",  bar: "bg-violet-500",  dot: "bg-violet-500",  badge: "border-violet-700 bg-violet-600 text-white font-semibold" },
-  emerald: { name: "Emerald", bar: "bg-emerald-500", dot: "bg-emerald-500", badge: "border-emerald-700 bg-emerald-600 text-white font-semibold" },
+  orange: {
+    name: "Orange",
+    bar: "bg-orange-500",
+    dot: "bg-orange-500",
+    badge: "border-orange-600 bg-orange-500 text-white font-semibold",
+  },
+  blue: {
+    name: "Blue",
+    bar: "bg-blue-500",
+    dot: "bg-blue-500",
+    badge: "border-blue-600 bg-blue-600 text-white font-semibold",
+  },
+  purple: {
+    name: "Purple",
+    bar: "bg-purple-500",
+    dot: "bg-purple-500",
+    badge: "border-purple-700 bg-purple-600 text-white font-semibold",
+  },
+  yellow: {
+    name: "Yellow",
+    bar: "bg-yellow-400",
+    dot: "bg-yellow-400",
+    badge: "border-yellow-600 bg-yellow-500 text-white font-semibold",
+  },
+  green: {
+    name: "Green",
+    bar: "bg-green-500",
+    dot: "bg-green-500",
+    badge: "border-green-700 bg-green-600 text-white font-semibold",
+  },
+  red: {
+    name: "Red",
+    bar: "bg-red-500",
+    dot: "bg-red-500",
+    badge: "border-red-700 bg-red-600 text-white font-semibold",
+  },
+  gray: {
+    name: "Gray",
+    bar: "bg-slate-500",
+    dot: "bg-slate-500",
+    badge: "border-slate-600 bg-slate-500 text-white font-semibold",
+  },
+  pink: {
+    name: "Pink",
+    bar: "bg-pink-500",
+    dot: "bg-pink-500",
+    badge: "border-pink-700 bg-pink-600 text-white font-semibold",
+  },
+  sky: {
+    name: "Sky",
+    bar: "bg-sky-500",
+    dot: "bg-sky-500",
+    badge: "border-sky-700 bg-sky-500 text-white font-semibold",
+  },
+  violet: {
+    name: "Violet",
+    bar: "bg-violet-500",
+    dot: "bg-violet-500",
+    badge: "border-violet-700 bg-violet-600 text-white font-semibold",
+  },
+  emerald: {
+    name: "Emerald",
+    bar: "bg-emerald-500",
+    dot: "bg-emerald-500",
+    badge: "border-emerald-700 bg-emerald-600 text-white font-semibold",
+  },
 };
 
 export type LifecycleGroup = "active" | "lost";
@@ -116,13 +242,19 @@ export type LifecycleStageDef = {
 };
 
 export const DEFAULT_LIFECYCLE_STAGES: LifecycleStageDef[] = [
-  { id: "lcs-new-lead",        name: "New Lead",        color: "orange", group: "active", system: true },
-  { id: "lcs-contacted",       name: "Contacted",       color: "blue",   group: "active", system: true },
-  { id: "lcs-qualified",       name: "Qualified",       color: "purple", group: "active", system: true },
-  { id: "lcs-pending-payment", name: "Pending Payment", color: "yellow", group: "active", system: true },
-  { id: "lcs-customer",        name: "Customer",        color: "green",  group: "active", system: true },
-  { id: "lcs-lost",            name: "Lost",            color: "red",    group: "lost",   system: true },
-  { id: "lcs-no-reply",        name: "No Reply",        color: "gray",   group: "lost",   system: true },
+  { id: "lcs-new-lead", name: "New Lead", color: "orange", group: "active", system: true },
+  { id: "lcs-contacted", name: "Contacted", color: "blue", group: "active", system: true },
+  { id: "lcs-qualified", name: "Qualified", color: "purple", group: "active", system: true },
+  {
+    id: "lcs-pending-payment",
+    name: "Pending Payment",
+    color: "yellow",
+    group: "active",
+    system: true,
+  },
+  { id: "lcs-customer", name: "Customer", color: "green", group: "active", system: true },
+  { id: "lcs-lost", name: "Lost", color: "red", group: "lost", system: true },
+  { id: "lcs-no-reply", name: "No Reply", color: "gray", group: "lost", system: true },
 ];
 
 const initialContacts: Contact[] = seedContacts.map((c, idx) => {
@@ -228,9 +360,7 @@ export const contactsStore = {
   updateLifecycleStage(id: string, patch: Partial<Omit<LifecycleStageDef, "id">>) {
     const old = state.lifecycleStages.find((s) => s.id === id);
     if (!old) return;
-    const nextStages = state.lifecycleStages.map((s) =>
-      s.id === id ? { ...s, ...patch } : s,
-    );
+    const nextStages = state.lifecycleStages.map((s) => (s.id === id ? { ...s, ...patch } : s));
     let nextContacts = state.contacts;
     if (patch.name && patch.name !== old.name) {
       nextContacts = state.contacts.map((c) =>
@@ -339,7 +469,11 @@ export function useContactsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
-const FALLBACK_STAGE_STYLE = { bar: "bg-gray-500", dot: "bg-gray-500", badge: "border-gray-500/30 bg-gray-500/10 text-gray-300" };
+const FALLBACK_STAGE_STYLE = {
+  bar: "bg-gray-500",
+  dot: "bg-gray-500",
+  badge: "border-gray-500/30 bg-gray-500/10 text-gray-300",
+};
 
 /**
  * Lookup the color/style for a stage name. Reads the live contacts-store

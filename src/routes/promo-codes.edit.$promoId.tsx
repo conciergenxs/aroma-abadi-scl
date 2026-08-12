@@ -5,7 +5,11 @@ import { toast } from "sonner";
 import { promoStore, usePromoStore } from "@/components/scl/promo-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import {
-  PromoFormFields, PromoFormActionBar, promoFormFromExisting, promoFormToPayload, validatePromoForm,
+  PromoFormFields,
+  PromoFormActionBar,
+  promoFormFromExisting,
+  promoFormToPayload,
+  validatePromoForm,
   type PromoFormState,
 } from "@/components/scl/promo-form-fields";
 
@@ -20,7 +24,9 @@ function EditPromoCodePage() {
   const { promos } = usePromoStore();
   const { lists } = useContactsStore();
   const promo = promos.find((p) => p.id === promoId);
-  const [form, setForm] = useState<PromoFormState | null>(() => (promo ? promoFormFromExisting(promo) : null));
+  const [form, setForm] = useState<PromoFormState | null>(() =>
+    promo ? promoFormFromExisting(promo) : null,
+  );
 
   if (!promo || !form) {
     return (
@@ -36,7 +42,10 @@ function EditPromoCodePage() {
 
   const handleSave = () => {
     const error = validatePromoForm(form);
-    if (error) { toast.error(error); return; }
+    if (error) {
+      toast.error(error);
+      return;
+    }
     promoStore.updatePromo(promo.id, promoFormToPayload(form));
     toast.success("Promo code updated");
     navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } });

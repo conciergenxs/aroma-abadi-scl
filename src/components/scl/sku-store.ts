@@ -77,26 +77,134 @@ export type OdooProduct = {
 
 export const ODOO_CATALOG: OdooProduct[] = [
   // Dolce & Gabbana — Lip
-  { odooId: "odoo-dg-lip-1", categoryId: "cat-dg-lip", name: "Passion Duo Gloss Fusion Lipstick", code: "DG-PDG-08", price: 890_000, description: "A dual-finish lipstick combining a matte core with a glossy overcoat for rich color and a luminous shine." },
-  { odooId: "odoo-dg-lip-2", categoryId: "cat-dg-lip", name: "The Only One Luminous Lipstick", code: "DG-TOL-15", price: 750_000, description: "A luminous, hydrating lipstick with a soft-focus finish for naturally radiant lips." },
+  {
+    odooId: "odoo-dg-lip-1",
+    categoryId: "cat-dg-lip",
+    name: "Passion Duo Gloss Fusion Lipstick",
+    code: "DG-PDG-08",
+    price: 890_000,
+    description:
+      "A dual-finish lipstick combining a matte core with a glossy overcoat for rich color and a luminous shine.",
+  },
+  {
+    odooId: "odoo-dg-lip-2",
+    categoryId: "cat-dg-lip",
+    name: "The Only One Luminous Lipstick",
+    code: "DG-TOL-15",
+    price: 750_000,
+    description:
+      "A luminous, hydrating lipstick with a soft-focus finish for naturally radiant lips.",
+  },
   // Sisley — Foundation
-  { odooId: "odoo-sis-fdn-1", categoryId: "cat-sisley-foundation", name: "Phyto-Teint Nude Foundation", code: "SIS-PTN-30", price: 1_450_000, description: "A lightweight, nude-finish foundation with 24-hour hydration and buildable, natural coverage." },
-  { odooId: "odoo-sis-fdn-2", categoryId: "cat-sisley-foundation", name: "Le Teint Sisley Foundation", code: "SIS-LTS-30", price: 1_690_000, description: "A luxurious foundation with anti-aging skincare benefits and a satin, second-skin finish." },
+  {
+    odooId: "odoo-sis-fdn-1",
+    categoryId: "cat-sisley-foundation",
+    name: "Phyto-Teint Nude Foundation",
+    code: "SIS-PTN-30",
+    price: 1_450_000,
+    description:
+      "A lightweight, nude-finish foundation with 24-hour hydration and buildable, natural coverage.",
+  },
+  {
+    odooId: "odoo-sis-fdn-2",
+    categoryId: "cat-sisley-foundation",
+    name: "Le Teint Sisley Foundation",
+    code: "SIS-LTS-30",
+    price: 1_690_000,
+    description:
+      "A luxurious foundation with anti-aging skincare benefits and a satin, second-skin finish.",
+  },
   // Sisley — Powder
-  { odooId: "odoo-sis-pwd-1", categoryId: "cat-sisley-powder", name: "Phyto-Poudre Libre Loose Powder", code: "SIS-PPL-12", price: 980_000, description: "A finely-milled loose powder that sets makeup with a soft, blurred, matte finish." },
-  { odooId: "odoo-sis-pwd-2", categoryId: "cat-sisley-powder", name: "Éclat Minute Compact Powder", code: "SIS-ECM-09", price: 1_120_000, description: "A pressed powder that instantly refreshes and mattifies while brightening the complexion." },
+  {
+    odooId: "odoo-sis-pwd-1",
+    categoryId: "cat-sisley-powder",
+    name: "Phyto-Poudre Libre Loose Powder",
+    code: "SIS-PPL-12",
+    price: 980_000,
+    description:
+      "A finely-milled loose powder that sets makeup with a soft, blurred, matte finish.",
+  },
+  {
+    odooId: "odoo-sis-pwd-2",
+    categoryId: "cat-sisley-powder",
+    name: "Éclat Minute Compact Powder",
+    code: "SIS-ECM-09",
+    price: 1_120_000,
+    description:
+      "A pressed powder that instantly refreshes and mattifies while brightening the complexion.",
+  },
   // Rimmel — Powder
-  { odooId: "odoo-rim-pwd-1", categoryId: "cat-rimmel-powder", name: "Stay Matte Pressed Powder", code: "RIM-SMP-14", price: 165_000, description: "A classic pressed powder that controls shine and sets makeup for an all-day matte finish." },
-  { odooId: "odoo-rim-pwd-2", categoryId: "cat-rimmel-powder", name: "Fix & Perfect Two-Way Powder", code: "RIM-FTW-12", price: 175_000, description: "A two-way powder that can be used wet or dry for a flawless, buildable finish." },
+  {
+    odooId: "odoo-rim-pwd-1",
+    categoryId: "cat-rimmel-powder",
+    name: "Stay Matte Pressed Powder",
+    code: "RIM-SMP-14",
+    price: 165_000,
+    description:
+      "A classic pressed powder that controls shine and sets makeup for an all-day matte finish.",
+  },
+  {
+    odooId: "odoo-rim-pwd-2",
+    categoryId: "cat-rimmel-powder",
+    name: "Fix & Perfect Two-Way Powder",
+    code: "RIM-FTW-12",
+    price: 175_000,
+    description: "A two-way powder that can be used wet or dry for a flawless, buildable finish.",
+  },
   // Rimmel — Setting Spray
-  { odooId: "odoo-rim-spr-1", categoryId: "cat-rimmel-spray", name: "Fix & Perfect Setting Spray", code: "RIM-FPS-75", price: 145_000, description: "A lightweight setting spray that locks makeup in place for up to 16 hours." },
-  { odooId: "odoo-rim-spr-2", categoryId: "cat-rimmel-spray", name: "Match Perfection Setting Mist", code: "RIM-MPM-100", price: 155_000, description: "A hydrating setting mist that refreshes makeup while extending its wear." },
+  {
+    odooId: "odoo-rim-spr-1",
+    categoryId: "cat-rimmel-spray",
+    name: "Fix & Perfect Setting Spray",
+    code: "RIM-FPS-75",
+    price: 145_000,
+    description: "A lightweight setting spray that locks makeup in place for up to 16 hours.",
+  },
+  {
+    odooId: "odoo-rim-spr-2",
+    categoryId: "cat-rimmel-spray",
+    name: "Match Perfection Setting Mist",
+    code: "RIM-MPM-100",
+    price: 155_000,
+    description: "A hydrating setting mist that refreshes makeup while extending its wear.",
+  },
   // Laura Mercier — Powder
-  { odooId: "odoo-lm-pwd-1", categoryId: "cat-laura-powder", name: "Invisible Pressed Setting Powder", code: "LM-IPS-29", price: 890_000, description: "A pressed setting powder with a soft-focus effect that blurs pores and fine lines." },
-  { odooId: "odoo-lm-pwd-2", categoryId: "cat-laura-powder", name: "Secret Brightening Powder", code: "LM-SBP-09", price: 750_000, description: "A luminizing powder that highlights and brightens without adding shimmer or glitter." },
+  {
+    odooId: "odoo-lm-pwd-1",
+    categoryId: "cat-laura-powder",
+    name: "Invisible Pressed Setting Powder",
+    code: "LM-IPS-29",
+    price: 890_000,
+    description:
+      "A pressed setting powder with a soft-focus effect that blurs pores and fine lines.",
+  },
+  {
+    odooId: "odoo-lm-pwd-2",
+    categoryId: "cat-laura-powder",
+    name: "Secret Brightening Powder",
+    code: "LM-SBP-09",
+    price: 750_000,
+    description:
+      "A luminizing powder that highlights and brightens without adding shimmer or glitter.",
+  },
   // BareMinerals — Blush
-  { odooId: "odoo-bm-bl-1", categoryId: "cat-bm-blush", name: "Gen Nude Powder Blush", code: "BM-GNP-06", price: 420_000, description: "A silky powder blush with a natural, second-skin finish in a universally flattering shade." },
-  { odooId: "odoo-bm-bl-2", categoryId: "cat-bm-blush", name: "Bounce Liquid Blush", code: "BM-BLB-06", price: 480_000, description: "A weightless liquid blush that blends seamlessly for a dewy, natural flush." },
+  {
+    odooId: "odoo-bm-bl-1",
+    categoryId: "cat-bm-blush",
+    name: "Gen Nude Powder Blush",
+    code: "BM-GNP-06",
+    price: 420_000,
+    description:
+      "A silky powder blush with a natural, second-skin finish in a universally flattering shade.",
+  },
+  {
+    odooId: "odoo-bm-bl-2",
+    categoryId: "cat-bm-blush",
+    name: "Bounce Liquid Blush",
+    code: "BM-BLB-06",
+    price: 480_000,
+    description: "A weightless liquid blush that blends seamlessly for a dewy, natural flush.",
+  },
 ];
 
 /** Odoo products for a category, minus ones already imported as SKUs there. */
@@ -128,17 +236,33 @@ function seed(): Brand[] {
       ],
       categories: [
         {
-          id: "cat-dg-lip", brandId: "brand-dg", name: "Lip",
+          id: "cat-dg-lip",
+          brandId: "brand-dg",
+          name: "Lip",
           categoryKnowledge: [mockPdf("Lip Category Playbook.pdf", 340)],
           skus: [
             {
-              id: "sku-dg-caviar-42", categoryId: "cat-dg-lip",
-              name: "Caviar Hydra-Crème Lipstick 42g", code: "DG-CHC-42",
-              price: 685000, photoUrl: skuCaviar,
-              description: "Hydrating lipstick with caviar essence formula. Satin glossy finish, lasts 8 hours, moisturizing without dryness.",
+              id: "sku-dg-caviar-42",
+              categoryId: "cat-dg-lip",
+              name: "Caviar Hydra-Crème Lipstick 42g",
+              code: "DG-CHC-42",
+              price: 685000,
+              photoUrl: skuCaviar,
+              description:
+                "Hydrating lipstick with caviar essence formula. Satin glossy finish, lasts 8 hours, moisturizing without dryness.",
               knowledgeCards: [
-                { id: "kc-dg-1", coverUrl: kc3, title: "Texture & Finish", text: "Hydra-crème delivers a satin finish with a fine sheen, non-transferring after setting in 2 minutes." },
-                { id: "kc-dg-2", coverUrl: kc1, title: "Shade Story", text: "Available in 12 shades from nude to deep red, all suitable for Indonesian skin tones." },
+                {
+                  id: "kc-dg-1",
+                  coverUrl: kc3,
+                  title: "Texture & Finish",
+                  text: "Hydra-crème delivers a satin finish with a fine sheen, non-transferring after setting in 2 minutes.",
+                },
+                {
+                  id: "kc-dg-2",
+                  coverUrl: kc1,
+                  title: "Shade Story",
+                  text: "Available in 12 shades from nude to deep red, all suitable for Indonesian skin tones.",
+                },
               ],
             },
           ],
@@ -152,32 +276,59 @@ function seed(): Brand[] {
       brandKnowledge: [mockPdf("Sisley Phyto-Cosmetology Overview.pdf", 720)],
       categories: [
         {
-          id: "cat-sisley-foundation", brandId: "brand-sisley", name: "Foundation",
+          id: "cat-sisley-foundation",
+          brandId: "brand-sisley",
+          name: "Foundation",
           categoryKnowledge: [mockPdf("Foundation Shade Matching Guide.pdf", 510)],
           skus: [
             {
-              id: "sku-sisley-real-flawless", categoryId: "cat-sisley-foundation",
-              name: "Real Flawless Foundation", code: "SIS-RFF-30",
-              price: 2450000, photoUrl: skuFoundation,
-              description: "Liquid serum foundation with SPF 25, medium-buildable coverage, natural glow finish.",
+              id: "sku-sisley-real-flawless",
+              categoryId: "cat-sisley-foundation",
+              name: "Real Flawless Foundation",
+              code: "SIS-RFF-30",
+              price: 2450000,
+              photoUrl: skuFoundation,
+              description:
+                "Liquid serum foundation with SPF 25, medium-buildable coverage, natural glow finish.",
               knowledgeCards: [
-                { id: "kc-sis-1", coverUrl: kc4, title: "Skin Benefits", text: "Contains botanical extract that nourishes the skin while worn." },
-                { id: "kc-sis-2", coverUrl: kc2, title: "Application", text: "Pour 1-2 drops on the back of hand, blend with a round brush from the center of the face." },
+                {
+                  id: "kc-sis-1",
+                  coverUrl: kc4,
+                  title: "Skin Benefits",
+                  text: "Contains botanical extract that nourishes the skin while worn.",
+                },
+                {
+                  id: "kc-sis-2",
+                  coverUrl: kc2,
+                  title: "Application",
+                  text: "Pour 1-2 drops on the back of hand, blend with a round brush from the center of the face.",
+                },
               ],
             },
           ],
         },
         {
-          id: "cat-sisley-powder", brandId: "brand-sisley", name: "Powder",
+          id: "cat-sisley-powder",
+          brandId: "brand-sisley",
+          name: "Powder",
           categoryKnowledge: [mockPdf("Powder Finish 101.pdf", 280)],
           skus: [
             {
-              id: "sku-sisley-feather", categoryId: "cat-sisley-powder",
-              name: "Real Flawless Feather Matte Powder Foundation", code: "SIS-FMP-10",
-              price: 1850000, photoUrl: skuFeather,
-              description: "Ultra-lightweight powder foundation, matte finish without cakiness, ideal for combination skin.",
+              id: "sku-sisley-feather",
+              categoryId: "cat-sisley-powder",
+              name: "Real Flawless Feather Matte Powder Foundation",
+              code: "SIS-FMP-10",
+              price: 1850000,
+              photoUrl: skuFeather,
+              description:
+                "Ultra-lightweight powder foundation, matte finish without cakiness, ideal for combination skin.",
               knowledgeCards: [
-                { id: "kc-sis-3", coverUrl: kc2, title: "Layering Tips", text: "Apply with a kabuki brush for natural coverage, or a damp sponge for full coverage." },
+                {
+                  id: "kc-sis-3",
+                  coverUrl: kc2,
+                  title: "Layering Tips",
+                  text: "Apply with a kabuki brush for natural coverage, or a damp sponge for full coverage.",
+                },
               ],
             },
           ],
@@ -194,32 +345,59 @@ function seed(): Brand[] {
       ],
       categories: [
         {
-          id: "cat-rimmel-powder", brandId: "brand-rimmel", name: "Powder",
+          id: "cat-rimmel-powder",
+          brandId: "brand-rimmel",
+          name: "Powder",
           categoryKnowledge: [mockPdf("Setting Powder Best Practice.pdf", 220)],
           skus: [
             {
-              id: "sku-rimmel-translucent-powder", categoryId: "cat-rimmel-powder",
-              name: "Translucent Loose Setting Powder", code: "RIM-TLS-25",
-              price: 189000, photoUrl: skuTranslucent,
-              description: "Translucent loose setting powder, flashback-free, suitable for all skin tones.",
+              id: "sku-rimmel-translucent-powder",
+              categoryId: "cat-rimmel-powder",
+              name: "Translucent Loose Setting Powder",
+              code: "RIM-TLS-25",
+              price: 189000,
+              photoUrl: skuTranslucent,
+              description:
+                "Translucent loose setting powder, flashback-free, suitable for all skin tones.",
               knowledgeCards: [
-                { id: "kc-rim-1", coverUrl: kc2, title: "No Flashback", text: "Formula free of talc and silica that reflects camera flash." },
-                { id: "kc-rim-2", coverUrl: kc1, title: "Setting Technique", text: "Press with puff on T-zone, bake for 3 minutes for best results." },
+                {
+                  id: "kc-rim-1",
+                  coverUrl: kc2,
+                  title: "No Flashback",
+                  text: "Formula free of talc and silica that reflects camera flash.",
+                },
+                {
+                  id: "kc-rim-2",
+                  coverUrl: kc1,
+                  title: "Setting Technique",
+                  text: "Press with puff on T-zone, bake for 3 minutes for best results.",
+                },
               ],
             },
           ],
         },
         {
-          id: "cat-rimmel-spray", brandId: "brand-rimmel", name: "Setting Spray",
+          id: "cat-rimmel-spray",
+          brandId: "brand-rimmel",
+          name: "Setting Spray",
           categoryKnowledge: [mockPdf("Setting Spray Knowledge.pdf", 190)],
           skus: [
             {
-              id: "sku-rimmel-spray", categoryId: "cat-rimmel-spray",
-              name: "Translucent Hydrating Setting Spray Ultra-Blur", code: "RIM-THS-100",
-              price: 215000, photoUrl: skuSpray,
-              description: "Hydrating setting spray with ultra-blur effect, locks makeup for up to 16 hours.",
+              id: "sku-rimmel-spray",
+              categoryId: "cat-rimmel-spray",
+              name: "Translucent Hydrating Setting Spray Ultra-Blur",
+              code: "RIM-THS-100",
+              price: 215000,
+              photoUrl: skuSpray,
+              description:
+                "Hydrating setting spray with ultra-blur effect, locks makeup for up to 16 hours.",
               knowledgeCards: [
-                { id: "kc-rim-3", coverUrl: kc4, title: "Long-wear Promise", text: "Clinically tested to last 16 hours without touch-ups for indoor activities." },
+                {
+                  id: "kc-rim-3",
+                  coverUrl: kc4,
+                  title: "Long-wear Promise",
+                  text: "Clinically tested to last 16 hours without touch-ups for indoor activities.",
+                },
               ],
             },
           ],
@@ -233,17 +411,33 @@ function seed(): Brand[] {
       brandKnowledge: [mockPdf("Laura Mercier Heritage Deck.pdf", 540)],
       categories: [
         {
-          id: "cat-laura-powder", brandId: "brand-laura", name: "Powder",
+          id: "cat-laura-powder",
+          brandId: "brand-laura",
+          name: "Powder",
           categoryKnowledge: [mockPdf("Translucent Powder Iconic Guide.pdf", 460)],
           skus: [
             {
-              id: "sku-laura-translucent", categoryId: "cat-laura-powder",
-              name: "Translucent Loose Setting Powder", code: "LM-TLS-29",
-              price: 745000, photoUrl: skuTranslucent,
-              description: "The iconic loose setting powder, soft-focus finish, does not add color to the skin.",
+              id: "sku-laura-translucent",
+              categoryId: "cat-laura-powder",
+              name: "Translucent Loose Setting Powder",
+              code: "LM-TLS-29",
+              price: 745000,
+              photoUrl: skuTranslucent,
+              description:
+                "The iconic loose setting powder, soft-focus finish, does not add color to the skin.",
               knowledgeCards: [
-                { id: "kc-lm-1", coverUrl: kc1, title: "Iconic Status", text: "World best-seller since 1996, Laura Mercier's signature product." },
-                { id: "kc-lm-2", coverUrl: kc2, title: "Universal Shade", text: "Translucent means it can be worn on all skin tones without altering the foundation's color." },
+                {
+                  id: "kc-lm-1",
+                  coverUrl: kc1,
+                  title: "Iconic Status",
+                  text: "World best-seller since 1996, Laura Mercier's signature product.",
+                },
+                {
+                  id: "kc-lm-2",
+                  coverUrl: kc2,
+                  title: "Universal Shade",
+                  text: "Translucent means it can be worn on all skin tones without altering the foundation's color.",
+                },
               ],
             },
           ],
@@ -257,17 +451,32 @@ function seed(): Brand[] {
       brandKnowledge: [mockPdf("BareMinerals Clean Beauty Pledge.pdf", 320)],
       categories: [
         {
-          id: "cat-bm-blush", brandId: "brand-bm", name: "Blush",
+          id: "cat-bm-blush",
+          brandId: "brand-bm",
+          name: "Blush",
           categoryKnowledge: [mockPdf("Blush Application Guide.pdf", 260)],
           skus: [
             {
-              id: "sku-bm-color-infusion", categoryId: "cat-bm-blush",
-              name: "Blush Color Infusion", code: "BM-BCI-06",
-              price: 425000, photoUrl: skuBlush,
+              id: "sku-bm-color-infusion",
+              categoryId: "cat-bm-blush",
+              name: "Blush Color Infusion",
+              code: "BM-BCI-06",
+              price: 425000,
+              photoUrl: skuBlush,
               description: "Powder blush mineral, pigmented, blendable, finish satin natural.",
               knowledgeCards: [
-                { id: "kc-bm-1", coverUrl: kc1, title: "Mineral Formula", text: "Clean formula without parabens, talc, and fragrance, safe for sensitive skin." },
-                { id: "kc-bm-2", coverUrl: kc4, title: "Application", text: "Tap brush, knock off excess, sweep from apple of cheek towards temples." },
+                {
+                  id: "kc-bm-1",
+                  coverUrl: kc1,
+                  title: "Mineral Formula",
+                  text: "Clean formula without parabens, talc, and fragrance, safe for sensitive skin.",
+                },
+                {
+                  id: "kc-bm-2",
+                  coverUrl: kc4,
+                  title: "Application",
+                  text: "Tap brush, knock off excess, sweep from apple of cheek towards temples.",
+                },
               ],
             },
           ],
@@ -286,17 +495,30 @@ function load(): State {
     /* ignore */
   }
   const initial = { brands: seed() };
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial)); } catch { /* ignore */ }
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  } catch {
+    /* ignore */
+  }
   return initial;
 }
 
 let state: State = load();
 const listeners = new Set<() => void>();
 const emit = () => {
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* ignore */ }
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
   listeners.forEach((l) => l());
 };
-const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
+const subscribe = (cb: () => void) => {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+};
 const getSnapshot = () => state;
 
 // What SSR actually rendered (server has no localStorage) — a stable
@@ -308,12 +530,22 @@ const getSnapshot = () => state;
 const SERVER_SNAPSHOT: State = { brands: seed() };
 const getServerSnapshot = () => SERVER_SNAPSHOT;
 
-function uid(prefix: string) { return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`; }
+function uid(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
 
 export const skuStore = {
-  get state() { return state; },
+  get state() {
+    return state;
+  },
   addBrand(input: { name: string; logoUrl?: string }) {
-    const brand: Brand = { id: uid("brand"), name: input.name, logoUrl: input.logoUrl, brandKnowledge: [], categories: [] };
+    const brand: Brand = {
+      id: uid("brand"),
+      name: input.name,
+      logoUrl: input.logoUrl,
+      brandKnowledge: [],
+      categories: [],
+    };
     state = { brands: [brand, ...state.brands] };
     emit();
     return brand;
@@ -327,104 +559,234 @@ export const skuStore = {
     emit();
   },
   addBrandKnowledge(brandId: string, files: Attachment[]) {
-    state = { brands: state.brands.map((b) => (b.id === brandId ? { ...b, brandKnowledge: [...b.brandKnowledge, ...files] } : b)) };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId ? { ...b, brandKnowledge: [...b.brandKnowledge, ...files] } : b,
+      ),
+    };
     emit();
   },
   removeBrandKnowledge(brandId: string, fileId: string) {
-    state = { brands: state.brands.map((b) => (b.id === brandId ? { ...b, brandKnowledge: b.brandKnowledge.filter((a) => a.id !== fileId) } : b)) };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId
+          ? { ...b, brandKnowledge: b.brandKnowledge.filter((a) => a.id !== fileId) }
+          : b,
+      ),
+    };
     emit();
   },
   addCategory(brandId: string, name: string) {
     const cat: Category = { id: uid("cat"), brandId, name, categoryKnowledge: [], skus: [] };
-    state = { brands: state.brands.map((b) => (b.id === brandId ? { ...b, categories: [...b.categories, cat] } : b)) };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId ? { ...b, categories: [...b.categories, cat] } : b,
+      ),
+    };
     emit();
     return cat;
   },
   removeCategory(brandId: string, categoryId: string) {
-    state = { brands: state.brands.map((b) => (b.id === brandId ? { ...b, categories: b.categories.filter((c) => c.id !== categoryId) } : b)) };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId
+          ? { ...b, categories: b.categories.filter((c) => c.id !== categoryId) }
+          : b,
+      ),
+    };
     emit();
   },
   updateCategory(brandId: string, categoryId: string, patch: Partial<Category>) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, ...patch })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) => (c.id !== categoryId ? c : { ...c, ...patch })),
+            },
+      ),
     };
     emit();
   },
   addCategoryKnowledge(brandId: string, categoryId: string, files: Attachment[]) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, categoryKnowledge: [...c.categoryKnowledge, ...files] })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : { ...c, categoryKnowledge: [...c.categoryKnowledge, ...files] },
+              ),
+            },
+      ),
     };
     emit();
   },
   removeCategoryKnowledge(brandId: string, categoryId: string, fileId: string) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, categoryKnowledge: c.categoryKnowledge.filter((a) => a.id !== fileId) })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : { ...c, categoryKnowledge: c.categoryKnowledge.filter((a) => a.id !== fileId) },
+              ),
+            },
+      ),
     };
     emit();
   },
-  addSku(brandId: string, categoryId: string, input: Omit<SKU, "id" | "categoryId" | "knowledgeCards">) {
+  addSku(
+    brandId: string,
+    categoryId: string,
+    input: Omit<SKU, "id" | "categoryId" | "knowledgeCards">,
+  ) {
     const sku: SKU = { id: uid("sku"), categoryId, knowledgeCards: [], ...input };
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, skus: [...c.skus, sku] })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId ? c : { ...c, skus: [...c.skus, sku] },
+              ),
+            },
+      ),
     };
     emit();
     return sku;
   },
   updateSku(brandId: string, categoryId: string, skuId: string, patch: Partial<SKU>) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : {
-          ...c, skus: c.skus.map((s) => s.id === skuId ? { ...s, ...patch } : s)
-        })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      skus: c.skus.map((s) => (s.id === skuId ? { ...s, ...patch } : s)),
+                    },
+              ),
+            },
+      ),
     };
     emit();
   },
   removeSku(brandId: string, categoryId: string, skuId: string) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : { ...c, skus: c.skus.filter((s) => s.id !== skuId) })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId ? c : { ...c, skus: c.skus.filter((s) => s.id !== skuId) },
+              ),
+            },
+      ),
     };
     emit();
   },
-  addKnowledgeCard(brandId: string, categoryId: string, skuId: string, card: Omit<KnowledgeCard, "id">) {
+  addKnowledgeCard(
+    brandId: string,
+    categoryId: string,
+    skuId: string,
+    card: Omit<KnowledgeCard, "id">,
+  ) {
     const kc: KnowledgeCard = { id: uid("kc"), ...card };
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : {
-          ...c, skus: c.skus.map((s) => s.id !== skuId ? s : { ...s, knowledgeCards: [...s.knowledgeCards, kc] })
-        })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      skus: c.skus.map((s) =>
+                        s.id !== skuId ? s : { ...s, knowledgeCards: [...s.knowledgeCards, kc] },
+                      ),
+                    },
+              ),
+            },
+      ),
     };
     emit();
     return kc;
   },
-  updateKnowledgeCard(brandId: string, categoryId: string, skuId: string, cardId: string, patch: Partial<KnowledgeCard>) {
+  updateKnowledgeCard(
+    brandId: string,
+    categoryId: string,
+    skuId: string,
+    cardId: string,
+    patch: Partial<KnowledgeCard>,
+  ) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : {
-          ...c, skus: c.skus.map((s) => s.id !== skuId ? s : { ...s, knowledgeCards: s.knowledgeCards.map((k) => k.id === cardId ? { ...k, ...patch } : k) })
-        })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      skus: c.skus.map((s) =>
+                        s.id !== skuId
+                          ? s
+                          : {
+                              ...s,
+                              knowledgeCards: s.knowledgeCards.map((k) =>
+                                k.id === cardId ? { ...k, ...patch } : k,
+                              ),
+                            },
+                      ),
+                    },
+              ),
+            },
+      ),
     };
     emit();
   },
   removeKnowledgeCard(brandId: string, categoryId: string, skuId: string, cardId: string) {
     state = {
-      brands: state.brands.map((b) => b.id !== brandId ? b : {
-        ...b, categories: b.categories.map((c) => c.id !== categoryId ? c : {
-          ...c, skus: c.skus.map((s) => s.id !== skuId ? s : { ...s, knowledgeCards: s.knowledgeCards.filter((k) => k.id !== cardId) })
-        })
-      })
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      skus: c.skus.map((s) =>
+                        s.id !== skuId
+                          ? s
+                          : {
+                              ...s,
+                              knowledgeCards: s.knowledgeCards.filter((k) => k.id !== cardId),
+                            },
+                      ),
+                    },
+              ),
+            },
+      ),
     };
     emit();
   },
@@ -441,5 +803,11 @@ export async function fileToAttachment(file: File): Promise<Attachment> {
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
-  return { id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, fileName: file.name, fileType: file.type || "application/octet-stream", size: file.size, url };
+  return {
+    id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    fileName: file.name,
+    fileType: file.type || "application/octet-stream",
+    size: file.size,
+    url,
+  };
 }

@@ -18,10 +18,12 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "customer",
     label: "Customer Facing",
-    description: "Interacts directly with end consumers — greeting, answering product questions, and recommending products based on their needs.",
+    description:
+      "Interacts directly with end consumers — greeting, answering product questions, and recommending products based on their needs.",
     waNumber: "+62 811 9001 2233",
     waName: "Arma by Aroma Abadi",
-    behavior: "Friendly, personal, product-driven. Focused on customer experience, product upsells, and post-purchase follow-up.",
+    behavior:
+      "Friendly, personal, product-driven. Focused on customer experience, product upsells, and post-purchase follow-up.",
     examples: [
       "Hai Kak! Berdasarkan kulit kakak yang dry, aku rekomendasiin Real Flawless Foundation dari Sisley — cocok banget!",
       "Promo 12.12 berlaku sampai tengah malam ya Kak! Kalau order sekarang free ongkir ke seluruh Indonesia.",
@@ -34,10 +36,12 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "ba",
     label: "BA Facing",
-    description: "Supports Beauty Advisors (BA) with product information, sales tips, and real-time knowledge updates.",
+    description:
+      "Supports Beauty Advisors (BA) with product information, sales tips, and real-time knowledge updates.",
     waNumber: "+62 811 9002 3344",
     waName: "Arma for BA",
-    behavior: "Informative, technical, professional. Focused on product knowledge, sales scripts, and BA performance reporting.",
+    behavior:
+      "Informative, technical, professional. Focused on product knowledge, sales scripts, and BA performance reporting.",
     examples: [
       "SKU SIS-RFF-30 shade No.30 sudah restok di gudang Jakarta. ETA 2 hari kerja ke Pakuwon.",
       "Script untuk objeksi 'harganya mahal': fokus ke value — SPF 25, tahan 16 jam, natural glow finish.",
@@ -50,10 +54,12 @@ export const ARMA_PERSONAS: ArmaPersona[] = [
   {
     id: "operation",
     label: "Operation Facing",
-    description: "Helps the Aroma Abadi operations team with reminders, daily reports, stock alerts, and automatic performance monitoring.",
+    description:
+      "Helps the Aroma Abadi operations team with reminders, daily reports, stock alerts, and automatic performance monitoring.",
     waNumber: "+62 811 9003 4455",
     waName: "Arma Ops",
-    behavior: "Concise, actionable, schedule-based. Sends reminders, alerts, and daily digests to Aroma Abadi staff on schedule.",
+    behavior:
+      "Concise, actionable, schedule-based. Sends reminders, alerts, and daily digests to Aroma Abadi staff on schedule.",
     examples: [
       "⏰ Reminder: 3 transaksi belum diproses lebih dari 24 jam. Cek dashboard sekarang.",
       "📦 Alert Stok: SKU SIS-RFF-30 tersisa 4 unit di Pakuwon. Perlu reorder?",
@@ -87,7 +93,8 @@ export const AI_AGENTS: AIAgent[] = [
   {
     id: "support-ai",
     name: "Support AI",
-    description: "Handles FAQ, shipping status, order tracking, and customer support conversations.",
+    description:
+      "Handles FAQ, shipping status, order tracking, and customer support conversations.",
     status: "Connected",
     webhookUrl: "https://agents.scl.app/webhooks/support",
     authType: "Bearer Token",
@@ -95,7 +102,8 @@ export const AI_AGENTS: AIAgent[] = [
   {
     id: "sales-ai",
     name: "Sales AI",
-    description: "Handles lead qualification, promotions, product recommendations, and sales inquiries.",
+    description:
+      "Handles lead qualification, promotions, product recommendations, and sales inquiries.",
     status: "Connected",
     webhookUrl: "https://agents.scl.app/webhooks/sales",
     authType: "API Key",

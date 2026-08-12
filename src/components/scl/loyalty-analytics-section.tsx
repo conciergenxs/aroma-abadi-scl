@@ -2,25 +2,81 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { SectionCard } from "@/components/scl/app-shell";
 import {
-  chartTooltipStyle, chartLabelStyle, chartItemStyle, axisColor, gridColor, cursorFill, axisTick,
-  BRAND_COLORS, CAPTION, fmtPct, useRevealOnScroll, Reveal, InfoHint, MetricStat, StepFunnel,
+  chartTooltipStyle,
+  chartLabelStyle,
+  chartItemStyle,
+  axisColor,
+  gridColor,
+  cursorFill,
+  axisTick,
+  BRAND_COLORS,
+  CAPTION,
+  fmtPct,
+  useRevealOnScroll,
+  Reveal,
+  InfoHint,
+  MetricStat,
+  StepFunnel,
   type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import {
-  LOYALTY_TIERS, TIER_COLOR, TIER_LABEL, DATE_RANGE_PRESETS, CUSTOM_RANGE_MIN, CUSTOM_RANGE_MAX, resolveMonthsBack,
-  TIER_DISTRIBUTION, TIER_MOVEMENT, upgradeJourney, TIER_MAINTENANCE, BENEFIT_EFFECTIVENESS,
-  advocacyRevenue, REFERRAL_QUALITY,
-  newMembersKpi, tierUpgradeRateKpi, repeatPurchaseRateKpi, referralConversionRateKpi,
-  pointsRedemptionRateKpi, pointsSummary, benefitUsage, referralFunnel, topAdvocates,
-  type TierFilter, type DateRangeFilter, type LoyaltyTier, type SparkPoint, type Advocate,
+  LOYALTY_TIERS,
+  TIER_COLOR,
+  TIER_LABEL,
+  DATE_RANGE_PRESETS,
+  CUSTOM_RANGE_MIN,
+  CUSTOM_RANGE_MAX,
+  resolveMonthsBack,
+  TIER_DISTRIBUTION,
+  TIER_MOVEMENT,
+  upgradeJourney,
+  TIER_MAINTENANCE,
+  BENEFIT_EFFECTIVENESS,
+  advocacyRevenue,
+  REFERRAL_QUALITY,
+  newMembersKpi,
+  tierUpgradeRateKpi,
+  repeatPurchaseRateKpi,
+  referralConversionRateKpi,
+  pointsRedemptionRateKpi,
+  pointsSummary,
+  benefitUsage,
+  referralFunnel,
+  topAdvocates,
+  type TierFilter,
+  type DateRangeFilter,
+  type LoyaltyTier,
+  type SparkPoint,
+  type Advocate,
 } from "@/components/scl/loyalty-metrics";
 import {
-  Repeat, Gift, Coins, Wallet, Percent,
-  CircleDollarSign, Tags, ArrowUpRight, Clock3, ChevronDown,
+  Repeat,
+  Gift,
+  Coins,
+  Wallet,
+  Percent,
+  CircleDollarSign,
+  Tags,
+  ArrowUpRight,
+  Clock3,
+  ChevronDown,
 } from "lucide-react";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  Cell, PieChart, Pie, Sankey, ComposedChart, Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Cell,
+  PieChart,
+  Pie,
+  Sankey,
+  ComposedChart,
+  Line,
 } from "recharts";
 
 /**
@@ -37,7 +93,20 @@ import {
 
 const STATUS_COLORS = { maintained: "#10b981", gracePeriod: "#f59e0b", decayed: "#f43f5e" };
 const TOP_ADVOCATES_LIMIT = 5;
-const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 function fmtShortDate(iso: string) {
   const [, m, d] = iso.split("-").map(Number);
   return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
@@ -49,7 +118,16 @@ function Sparkline({ data, color }: { data: SparkPoint[]; color: string }) {
     <div className="h-8 w-16">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-          <Area type="monotone" dataKey="value" stroke={color} fill={color} fillOpacity={0.15} strokeWidth={1.5} isAnimationActive animationDuration={600} />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            fill={color}
+            fillOpacity={0.15}
+            strokeWidth={1.5}
+            isAnimationActive
+            animationDuration={600}
+          />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -71,7 +149,10 @@ function SubSection({ title, children }: { title: string; children: ReactNode })
 // ── Date Range control — presets + a Custom start/end popover, matching
 // the Overview page's own DateRangePopover pattern. ──────────────────────
 function DateRangeControl({
-  window, onSelectPreset, customRange, onCustomChange,
+  window,
+  onSelectPreset,
+  customRange,
+  onCustomChange,
 }: {
   window: DateRangeFilter;
   onSelectPreset: (w: DateRangeFilter) => void;
@@ -82,14 +163,19 @@ function DateRangeControl({
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const label = window === "custom"
-    ? (customRange ? `${fmtShortDate(customRange.start)} – ${fmtShortDate(customRange.end)}` : "Custom Range")
-    : (DATE_RANGE_PRESETS.find((p) => p.value === window)?.label ?? "Rolling 12 Months");
+  const label =
+    window === "custom"
+      ? customRange
+        ? `${fmtShortDate(customRange.start)} – ${fmtShortDate(customRange.end)}`
+        : "Custom Range"
+      : (DATE_RANGE_PRESETS.find((p) => p.value === window)?.label ?? "Rolling 12 Months");
 
   return (
     <div ref={ref} className="relative">
@@ -99,7 +185,9 @@ function DateRangeControl({
         className="h-8 inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 pl-2.5 pr-2 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors"
       >
         <span className="max-w-[160px] truncate">{label}</span>
-        <ChevronDown className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (
@@ -109,9 +197,14 @@ function DateRangeControl({
               <button
                 key={String(p.value)}
                 type="button"
-                onClick={() => { onSelectPreset(p.value); setOpen(false); }}
+                onClick={() => {
+                  onSelectPreset(p.value);
+                  setOpen(false);
+                }}
                 className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
-                  window === p.value ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  window === p.value
+                    ? "bg-primary/15 text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 {p.label}
@@ -120,13 +213,17 @@ function DateRangeControl({
           </div>
           <div className="my-2 border-t border-border" />
           <div className="px-1 pb-1 space-y-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">Custom Range</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">
+              Custom Range
+            </div>
             <input
               type="date"
               value={customRange?.start ?? ""}
               min={CUSTOM_RANGE_MIN}
               max={customRange?.end ?? CUSTOM_RANGE_MAX}
-              onChange={(e) => { if (e.target.value) onCustomChange({ start: e.target.value }); }}
+              onChange={(e) => {
+                if (e.target.value) onCustomChange({ start: e.target.value });
+              }}
               className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
             />
             <input
@@ -134,7 +231,9 @@ function DateRangeControl({
               value={customRange?.end ?? ""}
               min={customRange?.start ?? CUSTOM_RANGE_MIN}
               max={CUSTOM_RANGE_MAX}
-              onChange={(e) => { if (e.target.value) onCustomChange({ end: e.target.value }); }}
+              onChange={(e) => {
+                if (e.target.value) onCustomChange({ end: e.target.value });
+              }}
               className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
             />
           </div>
@@ -154,7 +253,11 @@ function TierSelect({ value, onChange }: { value: TierFilter; onChange: (v: Tier
         className="h-8 appearance-none rounded-md border border-border bg-card/60 pl-2.5 pr-7 text-[12px] text-foreground cursor-pointer hover:bg-card transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
       >
         <option value="All">All Tier</option>
-        {LOYALTY_TIERS.map((t) => <option key={t} value={t}>{TIER_LABEL[t]}</option>)}
+        {LOYALTY_TIERS.map((t) => (
+          <option key={t} value={t}>
+            {TIER_LABEL[t]}
+          </option>
+        ))}
       </select>
       <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
     </div>
@@ -164,13 +267,25 @@ function TierSelect({ value, onChange }: { value: TierFilter; onChange: (v: Tier
 // ── 1a. Tier Distribution — Donut ────────────────────────────────────────
 function TierDonut({ tierFilter }: { tierFilter: TierFilter }) {
   const total = TIER_DISTRIBUTION.reduce((s, d) => s + d.count, 0);
-  const centerValue = tierFilter === "All" ? total : (TIER_DISTRIBUTION.find((d) => d.tier === tierFilter)?.count ?? 0);
+  const centerValue =
+    tierFilter === "All"
+      ? total
+      : (TIER_DISTRIBUTION.find((d) => d.tier === tierFilter)?.count ?? 0);
   return (
     <div className="p-4">
       <div className="h-56 relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={TIER_DISTRIBUTION} dataKey="count" nameKey="tier" innerRadius={56} outerRadius={82} paddingAngle={3} isAnimationActive animationDuration={700}>
+            <Pie
+              data={TIER_DISTRIBUTION}
+              dataKey="count"
+              nameKey="tier"
+              innerRadius={56}
+              outerRadius={82}
+              paddingAngle={3}
+              isAnimationActive
+              animationDuration={700}
+            >
               {TIER_DISTRIBUTION.map((d) => (
                 <Cell
                   key={d.tier}
@@ -185,14 +300,19 @@ function TierDonut({ tierFilter }: { tierFilter: TierFilter }) {
               contentStyle={chartTooltipStyle}
               labelStyle={chartLabelStyle}
               itemStyle={chartItemStyle}
-              formatter={(v: number, n: string) => [`${fmtNum(v)} members (${((v / total) * 100).toFixed(1)}%)`, n]}
+              formatter={(v: number, n: string) => [
+                `${fmtNum(v)} members (${((v / total) * 100).toFixed(1)}%)`,
+                n,
+              ]}
             />
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center animate-fade-in">
             <div className="text-xl font-semibold stat-value">{fmtNum(centerValue)}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{tierFilter === "All" ? "Total Members" : TIER_LABEL[tierFilter]}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">
+              {tierFilter === "All" ? "Total Members" : TIER_LABEL[tierFilter]}
+            </div>
           </div>
         </div>
       </div>
@@ -230,7 +350,9 @@ function TierMovementSankey() {
   const [hover, setHover] = useState<SankeyHoverInfo | null>(null);
 
   const nodes: SankeyNodeDatum[] = [
-    ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Start`, tier: t, side: "start" })),
+    ...LOYALTY_TIERS.map(
+      (t): SankeyNodeDatum => ({ name: `${t} · Start`, tier: t, side: "start" }),
+    ),
     ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Now`, tier: t, side: "end" })),
   ];
   const links = TIER_MOVEMENT.map((f) => ({
@@ -239,18 +361,32 @@ function TierMovementSankey() {
     value: f.value,
   }));
   const nodeTotal = (tier: LoyaltyTier, side: "start" | "end") =>
-    TIER_MOVEMENT
-      .filter((f) => (side === "start" ? f.from === tier : f.to === tier))
-      .reduce((s, f) => s + f.value, 0);
+    TIER_MOVEMENT.filter((f) => (side === "start" ? f.from === tier : f.to === tier)).reduce(
+      (s, f) => s + f.value,
+      0,
+    );
 
-  const renderNode = (props: { x: number; y: number; width: number; height: number; payload: SankeyNodeDatum }) => {
+  const renderNode = (props: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    payload: SankeyNodeDatum;
+  }) => {
     const { x, y, width, height, payload } = props;
     const color = TIER_COLOR[payload.tier];
     const isStart = payload.side === "start";
     return (
       <g
         className="cursor-pointer"
-        onMouseEnter={() => setHover({ x: x + width / 2, y, label: `${TIER_LABEL[payload.tier]} · ${isStart ? "Start of Cycle" : "End of Cycle"}`, value: nodeTotal(payload.tier, payload.side) })}
+        onMouseEnter={() =>
+          setHover({
+            x: x + width / 2,
+            y,
+            label: `${TIER_LABEL[payload.tier]} · ${isStart ? "Start of Cycle" : "End of Cycle"}`,
+            value: nodeTotal(payload.tier, payload.side),
+          })
+        }
         onMouseLeave={() => setHover(null)}
       >
         <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} rx={2} />
@@ -269,12 +405,25 @@ function TierMovementSankey() {
   };
 
   const renderLink = (props: {
-    sourceX: number; sourceY: number; sourceControlX: number;
-    targetX: number; targetY: number; targetControlX: number;
+    sourceX: number;
+    sourceY: number;
+    sourceControlX: number;
+    targetX: number;
+    targetY: number;
+    targetControlX: number;
     linkWidth: number;
     payload: SankeyLinkPayload;
   }) => {
-    const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, payload } = props;
+    const {
+      sourceX,
+      sourceY,
+      sourceControlX,
+      targetX,
+      targetY,
+      targetControlX,
+      linkWidth,
+      payload,
+    } = props;
     const color = TIER_COLOR[payload.source.tier];
     const midX = (sourceX + targetX) / 2;
     const midY = (sourceY + targetY) / 2;
@@ -286,7 +435,14 @@ function TierMovementSankey() {
         stroke={color}
         strokeWidth={linkWidth}
         strokeOpacity={0.22}
-        onMouseEnter={() => setHover({ x: midX, y: midY, label: `${TIER_LABEL[payload.source.tier]} → ${TIER_LABEL[payload.target.tier]}`, value: payload.value })}
+        onMouseEnter={() =>
+          setHover({
+            x: midX,
+            y: midY,
+            label: `${TIER_LABEL[payload.source.tier]} → ${TIER_LABEL[payload.target.tier]}`,
+            value: payload.value,
+          })
+        }
         onMouseLeave={() => setHover(null)}
       />
     );
@@ -321,7 +477,9 @@ function TierMovementSankey() {
           </div>
         )}
       </div>
-      <p className="text-[10px] text-muted-foreground text-center mt-1">Per review cycle (6 months) · Upgrade, Maintain, or Decay</p>
+      <p className="text-[10px] text-muted-foreground text-center mt-1">
+        Per review cycle (6 months) · Upgrade, Maintain, or Decay
+      </p>
     </div>
   );
 }
@@ -331,8 +489,18 @@ function UpgradeJourney({ data }: { data: ReturnType<typeof upgradeJourney> }) {
   return (
     <div className="p-4 space-y-3">
       <div className="grid grid-cols-2 gap-3 stagger">
-        <MetricStat icon={ArrowUpRight} label="Total Upgrades" value={fmtNum(data.totalUpgrades)} info="Number of members who moved up a tier in the selected period." />
-        <MetricStat icon={Clock3} label="Avg. Days to Upgrade" value={`${data.avgDaysToUpgrade}d`} info="Average time it takes a member to move up a tier." />
+        <MetricStat
+          icon={ArrowUpRight}
+          label="Total Upgrades"
+          value={fmtNum(data.totalUpgrades)}
+          info="Number of members who moved up a tier in the selected period."
+        />
+        <MetricStat
+          icon={Clock3}
+          label="Avg. Days to Upgrade"
+          value={`${data.avgDaysToUpgrade}d`}
+          info="Average time it takes a member to move up a tier."
+        />
       </div>
       <div className="rounded-lg border border-border overflow-hidden">
         <table className="w-full text-[12px]">
@@ -345,10 +513,17 @@ function UpgradeJourney({ data }: { data: ReturnType<typeof upgradeJourney> }) {
           </thead>
           <tbody className="divide-y divide-border stagger">
             {data.paths.map((p) => (
-              <tr key={`${p.from}-${p.to}`} className="hover:bg-muted/30 transition-colors duration-150">
-                <td className="px-3 py-2 font-medium">{TIER_LABEL[p.from]} → {TIER_LABEL[p.to]}</td>
+              <tr
+                key={`${p.from}-${p.to}`}
+                className="hover:bg-muted/30 transition-colors duration-150"
+              >
+                <td className="px-3 py-2 font-medium">
+                  {TIER_LABEL[p.from]} → {TIER_LABEL[p.to]}
+                </td>
                 <td className="px-3 py-2 text-right tabular-nums">{fmtNum(p.count)}</td>
-                <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">{p.avgDays}d</td>
+                <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                  {p.avgDays}d
+                </td>
               </tr>
             ))}
           </tbody>
@@ -360,25 +535,77 @@ function UpgradeJourney({ data }: { data: ReturnType<typeof upgradeJourney> }) {
 
 // ── 1d. Tier Maintenance Status — Stacked Bar + Status Chips ─────────────
 function MaintenanceStackedBar({ tierFilter }: { tierFilter: TierFilter }) {
-  const data = tierFilter === "All" ? TIER_MAINTENANCE : TIER_MAINTENANCE.filter((r) => r.tier === tierFilter);
+  const data =
+    tierFilter === "All" ? TIER_MAINTENANCE : TIER_MAINTENANCE.filter((r) => r.tier === tierFilter);
   return (
     <div className="p-4">
       <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-            <XAxis dataKey="tier" tickFormatter={(t: LoyaltyTier) => TIER_LABEL[t]} stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} />
-            <YAxis stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
-            <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n]} labelFormatter={(t: LoyaltyTier) => TIER_LABEL[t]} />
-            <Bar dataKey="maintained" name="Maintained" stackId="a" fill={STATUS_COLORS.maintained} isAnimationActive animationDuration={700} />
-            <Bar dataKey="gracePeriod" name="Grace Period" stackId="a" fill={STATUS_COLORS.gracePeriod} isAnimationActive animationDuration={700} />
-            <Bar dataKey="decayed" name="Decayed" stackId="a" fill={STATUS_COLORS.decayed} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={700} />
+            <XAxis
+              dataKey="tier"
+              tickFormatter={(t: LoyaltyTier) => TIER_LABEL[t]}
+              stroke={axisColor}
+              tick={axisTick}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke={axisColor}
+              tick={axisTick}
+              tickLine={false}
+              axisLine={false}
+              allowDecimals={false}
+            />
+            <Tooltip
+              cursor={{ fill: cursorFill }}
+              contentStyle={chartTooltipStyle}
+              labelStyle={chartLabelStyle}
+              itemStyle={chartItemStyle}
+              formatter={(v: number, n: string) => [fmtNum(Number(v)), n]}
+              labelFormatter={(t: LoyaltyTier) => TIER_LABEL[t]}
+            />
+            <Bar
+              dataKey="maintained"
+              name="Maintained"
+              stackId="a"
+              fill={STATUS_COLORS.maintained}
+              isAnimationActive
+              animationDuration={700}
+            />
+            <Bar
+              dataKey="gracePeriod"
+              name="Grace Period"
+              stackId="a"
+              fill={STATUS_COLORS.gracePeriod}
+              isAnimationActive
+              animationDuration={700}
+            />
+            <Bar
+              dataKey="decayed"
+              name="Decayed"
+              stackId="a"
+              fill={STATUS_COLORS.decayed}
+              radius={[4, 4, 0, 0]}
+              isAnimationActive
+              animationDuration={700}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
       <div className="flex flex-wrap justify-center gap-3 mt-1">
-        {([["Maintained", STATUS_COLORS.maintained], ["Grace Period", STATUS_COLORS.gracePeriod], ["Decayed", STATUS_COLORS.decayed]] as const).map(([label, color]) => (
-          <span key={label} className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        {(
+          [
+            ["Maintained", STATUS_COLORS.maintained],
+            ["Grace Period", STATUS_COLORS.gracePeriod],
+            ["Decayed", STATUS_COLORS.decayed],
+          ] as const
+        ).map(([label, color]) => (
+          <span
+            key={label}
+            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
+          >
             <span className="h-2 w-2 rounded-full" style={{ background: color }} />
             {label}
           </span>
@@ -389,17 +616,58 @@ function MaintenanceStackedBar({ tierFilter }: { tierFilter: TierFilter }) {
 }
 
 // ── 2a. Points Issued vs Redeemed — Combo Chart ──────────────────────────
-function PointsComboChart({ series }: { series: { month: string; pointsIssued: number; pointsRedeemed: number }[] }) {
+function PointsComboChart({
+  series,
+}: {
+  series: { month: string; pointsIssued: number; pointsRedeemed: number }[];
+}) {
   return (
     <div className="h-52">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={series} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-          <XAxis dataKey="month" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} />
-          <YAxis stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : fmtNum(v))} />
-          <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number, n: string) => [fmtNum(Number(v)), n === "pointsIssued" ? "Issued" : "Redeemed"]} />
-          <Bar dataKey="pointsIssued" name="Issued" fill="var(--chart-2)" radius={[4, 4, 0, 0]} barSize={16} isAnimationActive animationDuration={700} />
-          <Line type="monotone" dataKey="pointsRedeemed" name="Redeemed" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} isAnimationActive animationDuration={700} />
+          <XAxis
+            dataKey="month"
+            stroke={axisColor}
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke={axisColor}
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : fmtNum(v))}
+          />
+          <Tooltip
+            contentStyle={chartTooltipStyle}
+            labelStyle={chartLabelStyle}
+            itemStyle={chartItemStyle}
+            formatter={(v: number, n: string) => [
+              fmtNum(Number(v)),
+              n === "pointsIssued" ? "Issued" : "Redeemed",
+            ]}
+          />
+          <Bar
+            dataKey="pointsIssued"
+            name="Issued"
+            fill="var(--chart-2)"
+            radius={[4, 4, 0, 0]}
+            barSize={16}
+            isAnimationActive
+            animationDuration={700}
+          />
+          <Line
+            type="monotone"
+            dataKey="pointsRedeemed"
+            name="Redeemed"
+            stroke="var(--chart-1)"
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            isAnimationActive
+            animationDuration={700}
+          />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -413,11 +681,40 @@ function BenefitUsageBar({ data }: { data: { benefit: string; count: number }[] 
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 20, left: 4, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
-          <XAxis type="number" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
-          <YAxis type="category" dataKey="benefit" stroke={axisColor} tick={axisTick} tickLine={false} axisLine={false} width={140} />
-          <Tooltip cursor={{ fill: cursorFill }} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(v: number) => [fmtNum(Number(v)), "Redemptions"]} />
-          <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={16} isAnimationActive animationDuration={700}>
-            {data.map((d, i) => <Cell key={d.benefit} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />)}
+          <XAxis
+            type="number"
+            stroke={axisColor}
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
+          />
+          <YAxis
+            type="category"
+            dataKey="benefit"
+            stroke={axisColor}
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+            width={140}
+          />
+          <Tooltip
+            cursor={{ fill: cursorFill }}
+            contentStyle={chartTooltipStyle}
+            labelStyle={chartLabelStyle}
+            itemStyle={chartItemStyle}
+            formatter={(v: number) => [fmtNum(Number(v)), "Redemptions"]}
+          />
+          <Bar
+            dataKey="count"
+            radius={[0, 6, 6, 0]}
+            barSize={16}
+            isAnimationActive
+            animationDuration={700}
+          >
+            {data.map((d, i) => (
+              <Cell key={d.benefit} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+            ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
@@ -444,9 +741,15 @@ function BenefitEffectivenessTable() {
             <tr key={b.benefit} className="hover:bg-muted/30 transition-colors duration-150">
               <td className="px-3 py-2 text-muted-foreground">{i + 1}</td>
               <td className="px-3 py-2 font-medium">{b.benefit}</td>
-              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">+{fmtPct(b.repeatPurchaseUplift, 0)}</td>
-              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">+{fmtPct(b.revenueUplift, 0)}</td>
-              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">+{fmtPct(b.retentionUplift, 0)}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">
+                +{fmtPct(b.repeatPurchaseUplift, 0)}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">
+                +{fmtPct(b.revenueUplift, 0)}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums text-emerald-600">
+                +{fmtPct(b.retentionUplift, 0)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -459,28 +762,50 @@ function BenefitEffectivenessTable() {
 const RANK_COLOR = ["text-amber-500", "text-slate-400", "text-amber-700"];
 function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
   if (advocates.length === 0) {
-    return <div className="text-center text-xs text-muted-foreground py-10">No advocates in this tier yet.</div>;
+    return (
+      <div className="text-center text-xs text-muted-foreground py-10">
+        No advocates in this tier yet.
+      </div>
+    );
   }
   return (
     <div className="p-4 grid grid-cols-1 gap-1.5 stagger">
       {advocates.map((a, i) => (
-        <div key={a.contactId} className="flex items-center gap-2.5 rounded-lg border border-border bg-card/50 px-2.5 py-2 card-hover transition-all duration-300">
-          <span className={`text-[12px] w-4 shrink-0 text-center font-bold ${i < 3 ? RANK_COLOR[i] : "text-muted-foreground"}`}>{i + 1}</span>
-          <img src={a.photo} alt={a.name} loading="lazy" className="h-9 w-9 rounded-full object-cover border border-border shrink-0" />
+        <div
+          key={a.contactId}
+          className="flex items-center gap-2.5 rounded-lg border border-border bg-card/50 px-2.5 py-2 card-hover transition-all duration-300"
+        >
+          <span
+            className={`text-[12px] w-4 shrink-0 text-center font-bold ${i < 3 ? RANK_COLOR[i] : "text-muted-foreground"}`}
+          >
+            {i + 1}
+          </span>
+          <img
+            src={a.photo}
+            alt={a.name}
+            loading="lazy"
+            className="h-9 w-9 rounded-full object-cover border border-border shrink-0"
+          />
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
               <span className="text-[13px] font-medium truncate leading-tight">{a.name}</span>
               <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">
-                {a.referrals} <span className="text-[11px] font-normal text-muted-foreground">refs</span>
+                {a.referrals}{" "}
+                <span className="text-[11px] font-normal text-muted-foreground">refs</span>
               </span>
             </div>
             <div className="flex items-baseline justify-between gap-2 mt-0.5">
               <span className="inline-flex items-center gap-1 min-w-0 text-[12px] text-muted-foreground leading-tight truncate">
-                <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: TIER_COLOR[a.tier] }} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full shrink-0"
+                  style={{ background: TIER_COLOR[a.tier] }}
+                />
                 <span className="shrink-0">{TIER_LABEL[a.tier]}</span>
                 {a.phone && <span className="truncate">· {a.phone}</span>}
               </span>
-              <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">{fmtIDR(a.revenue)}</span>
+              <span className="text-[13px] font-semibold tabular-nums leading-tight shrink-0">
+                {fmtIDR(a.revenue)}
+              </span>
             </div>
           </div>
         </div>
@@ -501,7 +826,10 @@ export function CrmLoyaltyAnalytics() {
 
   const selectPreset = (w: DateRangeFilter) => setWindow(w);
   const onCustomChange = (patch: Partial<{ start: string; end: string }>) => {
-    setCustomRange((r) => ({ start: patch.start ?? r?.start ?? CUSTOM_RANGE_MIN, end: patch.end ?? r?.end ?? CUSTOM_RANGE_MAX }));
+    setCustomRange((r) => ({
+      start: patch.start ?? r?.start ?? CUSTOM_RANGE_MIN,
+      end: patch.end ?? r?.end ?? CUSTOM_RANGE_MAX,
+    }));
     setWindow("custom");
   };
 
@@ -513,11 +841,18 @@ export function CrmLoyaltyAnalytics() {
   const points = useMemo(() => pointsSummary(monthsBack), [monthsBack]);
   const benefitUsageData = useMemo(() => benefitUsage(monthsBack), [monthsBack]);
   const funnel = useMemo(() => referralFunnel(monthsBack), [monthsBack]);
-  const advocates = useMemo(() => topAdvocates(monthsBack, allTime, tier).slice(0, TOP_ADVOCATES_LIMIT), [monthsBack, allTime, tier]);
+  const advocates = useMemo(
+    () => topAdvocates(monthsBack, allTime, tier).slice(0, TOP_ADVOCATES_LIMIT),
+    [monthsBack, allTime, tier],
+  );
   const journey = useMemo(() => upgradeJourney(monthsBack), [monthsBack]);
   const advocacy = useMemo(() => advocacyRevenue(monthsBack), [monthsBack]);
 
-  const funnelStages: FunnelStage[] = funnel.map((s, i) => ({ label: s.label, value: s.value, color: BRAND_COLORS[i % BRAND_COLORS.length] }));
+  const funnelStages: FunnelStage[] = funnel.map((s, i) => ({
+    label: s.label,
+    value: s.value,
+    color: BRAND_COLORS[i % BRAND_COLORS.length],
+  }));
 
   return (
     <Reveal innerRef={ref} inView={inView}>
@@ -525,7 +860,12 @@ export function CrmLoyaltyAnalytics() {
         title="Aroma Prive Program Analytics"
         action={
           <div className="flex flex-wrap items-center gap-2">
-            <DateRangeControl window={window} onSelectPreset={selectPreset} customRange={customRange} onCustomChange={onCustomChange} />
+            <DateRangeControl
+              window={window}
+              onSelectPreset={selectPreset}
+              customRange={customRange}
+              onCustomChange={onCustomChange}
+            />
             <TierSelect value={tier} onChange={setTier} />
           </div>
         }
@@ -535,22 +875,46 @@ export function CrmLoyaltyAnalytics() {
           <MetricStat
             label="New Members"
             value={fmtNum(nm.value)}
-            sub={nm.applies ? (nm.hasPreviousPeriod ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range") : `Always starts at ${TIER_LABEL.Bronze}`}
-            accent={nm.applies && nm.hasPreviousPeriod ? (nm.deltaPct >= 0 ? "up" : "down") : undefined}
+            sub={
+              nm.applies
+                ? nm.hasPreviousPeriod
+                  ? `${nm.deltaPct >= 0 ? "+" : ""}${(nm.deltaPct * 100).toFixed(1)}% vs previous period`
+                  : "No prior period in range"
+                : `Always starts at ${TIER_LABEL.Bronze}`
+            }
+            accent={
+              nm.applies && nm.hasPreviousPeriod ? (nm.deltaPct >= 0 ? "up" : "down") : undefined
+            }
             info="Total new members who registered in the selected period."
             spark={<Sparkline data={nm.spark} color="var(--chart-1)" />}
           />
-          <MetricStat label="Repeat Purchase Rate" value={fmtPct(rpr)} info="Members with 2+ transactions ÷ total members who ever transacted." />
-          <MetricStat label="Referral Conversion Rate" value={fmtPct(rcr)} info="Referral purchases ÷ referrals generated." />
+          <MetricStat
+            label="Repeat Purchase Rate"
+            value={fmtPct(rpr)}
+            info="Members with 2+ transactions ÷ total members who ever transacted."
+          />
+          <MetricStat
+            label="Referral Conversion Rate"
+            value={fmtPct(rcr)}
+            info="Referral purchases ÷ referrals generated."
+          />
           <MetricStat
             label="Tier Upgrade Rate"
             value={fmtPct(tu.value)}
-            sub={tu.hasPreviousPeriod ? `${tu.deltaPct >= 0 ? "+" : ""}${(tu.deltaPct * 100).toFixed(1)}% vs previous period` : "No prior period in range"}
+            sub={
+              tu.hasPreviousPeriod
+                ? `${tu.deltaPct >= 0 ? "+" : ""}${(tu.deltaPct * 100).toFixed(1)}% vs previous period`
+                : "No prior period in range"
+            }
             accent={tu.hasPreviousPeriod ? (tu.deltaPct >= 0 ? "up" : "down") : undefined}
             info="Members who upgraded ÷ members eligible for review."
             spark={<Sparkline data={tu.spark} color="var(--chart-2)" />}
           />
-          <MetricStat label="Points Redemption Rate" value={fmtPct(prr)} info="Points redeemed ÷ points issued." />
+          <MetricStat
+            label="Points Redemption Rate"
+            value={fmtPct(prr)}
+            info="Points redeemed ÷ points issued."
+          />
         </div>
 
         {/* 1. Tier Overview */}
@@ -564,7 +928,8 @@ export function CrmLoyaltyAnalytics() {
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Tier Movement <InfoHint text="How members moved between tiers over the review cycle: Upgrade, Maintain, or Decay." />
+                Tier Movement{" "}
+                <InfoHint text="How members moved between tiers over the review cycle: Upgrade, Maintain, or Decay." />
               </div>
               <TierMovementSankey />
             </div>
@@ -572,13 +937,15 @@ export function CrmLoyaltyAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Upgrade Journey <InfoHint text="The most common upgrade paths and the average time it takes to move up a tier." />
+                Upgrade Journey{" "}
+                <InfoHint text="The most common upgrade paths and the average time it takes to move up a tier." />
               </div>
               <UpgradeJourney data={journey} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Tier Maintenance Status <InfoHint text="Members who maintained their tier, entered a grace period, are at risk, or already decayed." />
+                Tier Maintenance Status{" "}
+                <InfoHint text="Members who maintained their tier, entered a grace period, are at risk, or already decayed." />
               </div>
               <MaintenanceStackedBar tierFilter={tier} />
             </div>
@@ -588,10 +955,30 @@ export function CrmLoyaltyAnalytics() {
         {/* 2. Points & Benefits */}
         <SubSection title="Points & Benefits">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 stagger">
-            <MetricStat icon={Coins} label="Points Issued" value={fmtNum(points.issued)} info="Total loyalty points issued in the selected period." />
-            <MetricStat icon={Gift} label="Points Redeemed" value={fmtNum(points.redeemed)} info="Total loyalty points redeemed in the selected period." />
-            <MetricStat icon={Wallet} label="Outstanding Points" value={fmtNum(points.outstanding)} info="Points not yet redeemed — cumulative, never resets." />
-            <MetricStat icon={Percent} label="Redemption Rate" value={fmtPct(points.redemptionRate)} info="Points redeemed ÷ points issued." />
+            <MetricStat
+              icon={Coins}
+              label="Points Issued"
+              value={fmtNum(points.issued)}
+              info="Total loyalty points issued in the selected period."
+            />
+            <MetricStat
+              icon={Gift}
+              label="Points Redeemed"
+              value={fmtNum(points.redeemed)}
+              info="Total loyalty points redeemed in the selected period."
+            />
+            <MetricStat
+              icon={Wallet}
+              label="Outstanding Points"
+              value={fmtNum(points.outstanding)}
+              info="Points not yet redeemed — cumulative, never resets."
+            />
+            <MetricStat
+              icon={Percent}
+              label="Redemption Rate"
+              value={fmtPct(points.redemptionRate)}
+              info="Points redeemed ÷ points issued."
+            />
           </div>
           <div className="border-t border-border p-4">
             <div className={`${CAPTION} mb-2`}>Points Issued vs Redeemed</div>
@@ -606,7 +993,8 @@ export function CrmLoyaltyAnalytics() {
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Benefit Effectiveness <InfoHint text="Which benefits are most successful at lifting customer activity after redemption." />
+                Benefit Effectiveness{" "}
+                <InfoHint text="Which benefits are most successful at lifting customer activity after redemption." />
               </div>
               <BenefitEffectivenessTable />
             </div>
@@ -618,21 +1006,38 @@ export function CrmLoyaltyAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border">
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Referral Funnel <InfoHint text="Referral performance at each stage of the funnel." />
+                Referral Funnel{" "}
+                <InfoHint text="Referral performance at each stage of the funnel." />
               </div>
               <StepFunnel stages={funnelStages} />
             </div>
             <div>
               <div className={`px-4 pt-3 pb-0.5 inline-flex items-center gap-1 ${CAPTION}`}>
-                Top Advocates <InfoHint text="Members with the biggest referral contribution, ranked by successful referrals and referral revenue." />
+                Top Advocates{" "}
+                <InfoHint text="Members with the biggest referral contribution, ranked by successful referrals and referral revenue." />
               </div>
               <AdvocateLeaderboard advocates={advocates} />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border-t border-border stagger">
-            <MetricStat icon={CircleDollarSign} label="Revenue from Referral" value={fmtIDR(advocacy.revenueFromReferral)} info="Total revenue contributed through referrals in the selected period." />
-            <MetricStat icon={Tags} label="Referral AOV" value={fmtIDR(advocacy.referralAOV)} info="Average order value of a referred customer." />
-            <MetricStat icon={Repeat} label="Referred Repeat Purchase Rate" value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)} info="Repeat purchase rate among referred customers." />
+            <MetricStat
+              icon={CircleDollarSign}
+              label="Revenue from Referral"
+              value={fmtIDR(advocacy.revenueFromReferral)}
+              info="Total revenue contributed through referrals in the selected period."
+            />
+            <MetricStat
+              icon={Tags}
+              label="Referral AOV"
+              value={fmtIDR(advocacy.referralAOV)}
+              info="Average order value of a referred customer."
+            />
+            <MetricStat
+              icon={Repeat}
+              label="Referred Repeat Purchase Rate"
+              value={fmtPct(REFERRAL_QUALITY.repeatPurchaseRate)}
+              info="Repeat purchase rate among referred customers."
+            />
           </div>
         </SubSection>
       </SectionCard>

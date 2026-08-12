@@ -32,7 +32,10 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.preventDefault(); onClose(); }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -53,7 +56,10 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-3xl h-[560px] max-h-[88vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
@@ -62,8 +68,13 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
           <Tag className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">Select Brand</h2>
-          <span className="text-[11px] text-muted-foreground">Insert a brand token into the message</span>
-          <button onClick={onClose} className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+          <span className="text-[11px] text-muted-foreground">
+            Insert a brand token into the message
+          </span>
+          <button
+            onClick={onClose}
+            className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+          >
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -99,7 +110,11 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
                     className="flex items-center gap-3 rounded-lg border border-border p-3 text-left hover:bg-muted/40 hover:border-primary/30 transition-colors duration-150"
                   >
                     {b.logoUrl ? (
-                      <img src={b.logoUrl} alt={b.name} className="h-10 w-10 rounded-md object-cover border border-border shrink-0" />
+                      <img
+                        src={b.logoUrl}
+                        alt={b.name}
+                        className="h-10 w-10 rounded-md object-cover border border-border shrink-0"
+                      />
                     ) : (
                       <div className="h-10 w-10 rounded-md bg-primary/10 border border-border grid place-items-center shrink-0">
                         <Tag className="h-4 w-4 text-primary" />
@@ -108,7 +123,8 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-medium truncate">{b.name}</div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {b.categories.length} categor{b.categories.length === 1 ? "y" : "ies"} · {skuCount} SKU{skuCount === 1 ? "" : "s"}
+                        {b.categories.length} categor{b.categories.length === 1 ? "y" : "ies"} ·{" "}
+                        {skuCount} SKU{skuCount === 1 ? "" : "s"}
                       </div>
                     </div>
                   </button>
@@ -121,16 +137,36 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-5 py-3 border-t border-border/60 text-[11px] text-muted-foreground">
-            <span>{filtered.length} brand{filtered.length === 1 ? "" : "s"}</span>
+            <span>
+              {filtered.length} brand{filtered.length === 1 ? "" : "s"}
+            </span>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage <= 1}
-                className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150">‹</button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150"
+              >
+                ‹
+              </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button key={p} type="button" onClick={() => setPage(p)}
-                  className={`h-7 w-7 rounded border text-[11px] transition-colors duration-150 ${p === currentPage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card"}`}>{p}</button>
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPage(p)}
+                  className={`h-7 w-7 rounded border text-[11px] transition-colors duration-150 ${p === currentPage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card"}`}
+                >
+                  {p}
+                </button>
               ))}
-              <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}
-                className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150">›</button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150"
+              >
+                ›
+              </button>
             </div>
           </div>
         )}

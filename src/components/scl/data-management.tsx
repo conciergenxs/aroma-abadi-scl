@@ -1,7 +1,17 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react";
 import {
-  Search, Plus, Trash2, Pencil, X, Check, ChevronDown, Filter, Lock,
-  GripVertical, RotateCcw, AlertTriangle,
+  Search,
+  Plus,
+  Trash2,
+  Pencil,
+  X,
+  Check,
+  ChevronDown,
+  Filter,
+  Lock,
+  GripVertical,
+  RotateCcw,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
@@ -26,24 +36,59 @@ import { PropertyFormModal } from "./property-form-modal";
 // Shared types & palette
 // =========================================================
 
-export type DMSection =
-  | "labels"
-  | "contact-properties"
-  | "customer-lifecycle"
-  | "recently-deleted";
+export type DMSection = "labels" | "contact-properties" | "customer-lifecycle" | "recently-deleted";
 
-type LabelColorKey =
-  | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "gray";
+type LabelColorKey = "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "gray";
 
 const LABEL_COLORS: { key: LabelColorKey; name: string; badge: string; dot: string }[] = [
-  { key: "red",    name: "Red",    badge: "border-red-500/30 bg-red-500/10 text-red-300",          dot: "bg-red-500" },
-  { key: "orange", name: "Orange", badge: "border-orange-500/30 bg-orange-500/10 text-orange-300", dot: "bg-orange-500" },
-  { key: "yellow", name: "Yellow", badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300", dot: "bg-yellow-500" },
-  { key: "green",  name: "Green",  badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300", dot: "bg-emerald-500" },
-  { key: "blue",   name: "Blue",   badge: "border-blue-500/30 bg-blue-500/10 text-blue-300",       dot: "bg-blue-500" },
-  { key: "purple", name: "Purple", badge: "border-violet-500/30 bg-violet-500/10 text-violet-300", dot: "bg-violet-500" },
-  { key: "pink",   name: "Pink",   badge: "border-pink-500/30 bg-pink-500/10 text-pink-300",       dot: "bg-pink-500" },
-  { key: "gray",   name: "Gray",   badge: "border-slate-500/30 bg-slate-500/10 text-slate-300",    dot: "bg-slate-400" },
+  {
+    key: "red",
+    name: "Red",
+    badge: "border-red-500/30 bg-red-500/10 text-red-300",
+    dot: "bg-red-500",
+  },
+  {
+    key: "orange",
+    name: "Orange",
+    badge: "border-orange-500/30 bg-orange-500/10 text-orange-300",
+    dot: "bg-orange-500",
+  },
+  {
+    key: "yellow",
+    name: "Yellow",
+    badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300",
+    dot: "bg-yellow-500",
+  },
+  {
+    key: "green",
+    name: "Green",
+    badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    dot: "bg-emerald-500",
+  },
+  {
+    key: "blue",
+    name: "Blue",
+    badge: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    dot: "bg-blue-500",
+  },
+  {
+    key: "purple",
+    name: "Purple",
+    badge: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    dot: "bg-violet-500",
+  },
+  {
+    key: "pink",
+    name: "Pink",
+    badge: "border-pink-500/30 bg-pink-500/10 text-pink-300",
+    dot: "bg-pink-500",
+  },
+  {
+    key: "gray",
+    name: "Gray",
+    badge: "border-slate-500/30 bg-slate-500/10 text-slate-300",
+    dot: "bg-slate-400",
+  },
 ];
 
 const colorMeta = (k: LabelColorKey) => LABEL_COLORS.find((c) => c.key === k)!;
@@ -266,8 +311,16 @@ function CustomerLifecyclePage() {
 }
 
 function LifecycleGroupSection({
-  title, stages, editingId, dragId, setDragId, onDropTarget,
-  onEdit, onCancelEdit, onDelete, onCreate,
+  title,
+  stages,
+  editingId,
+  dragId,
+  setDragId,
+  onDropTarget,
+  onEdit,
+  onCancelEdit,
+  onDelete,
+  onCreate,
 }: {
   title: string;
   stages: LifecycleStageDef[];
@@ -329,7 +382,13 @@ function LifecycleGroupSection({
 }
 
 function LifecycleStageRow({
-  stage, dragging, onDragStart, onDragEnd, onDropTarget, onEdit, onDelete,
+  stage,
+  dragging,
+  onDragStart,
+  onDragEnd,
+  onDropTarget,
+  onEdit,
+  onDelete,
 }: {
   stage: LifecycleStageDef;
   dragging: boolean;
@@ -390,7 +449,9 @@ function LifecycleStageRow({
 }
 
 function LifecycleStageEditor({
-  stage, onCancel, onSave,
+  stage,
+  onCancel,
+  onSave,
 }: {
   stage: LifecycleStageDef;
   onCancel: () => void;
@@ -420,7 +481,11 @@ function LifecycleStageEditor({
 }
 
 function LifecycleStageModal({
-  open, mode, group, onClose, onSubmit,
+  open,
+  mode,
+  group,
+  onClose,
+  onSubmit,
 }: {
   open: boolean;
   mode: "create";
@@ -431,18 +496,26 @@ function LifecycleStageModal({
   const [name, setName] = useState("");
   const [color, setColor] = useState<LifecycleColorKey>("blue");
   useEffect(() => {
-    if (open) { setName(""); setColor("blue"); }
+    if (open) {
+      setName("");
+      setColor("blue");
+    }
   }, [open]);
   const canSubmit = name.trim().length > 0;
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={mode === "create" ? `Create ${group === "active" ? "Active" : "Lost"} Stage` : "Edit Stage"}
+      title={
+        mode === "create" ? `Create ${group === "active" ? "Active" : "Lost"} Stage` : "Edit Stage"
+      }
       footer={
         <>
           <GhostButton onClick={onClose}>Cancel</GhostButton>
-          <PrimaryButton disabled={!canSubmit} onClick={() => canSubmit && onSubmit(name.trim(), color)}>
+          <PrimaryButton
+            disabled={!canSubmit}
+            onClick={() => canSubmit && onSubmit(name.trim(), color)}
+          >
             Create Stage
           </PrimaryButton>
         </>
@@ -451,7 +524,12 @@ function LifecycleStageModal({
       <div className="space-y-4">
         <label className="block">
           <FieldLabel>Stage Name</FieldLabel>
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="e.g. Negotiation" />
+          <TextInput
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            placeholder="e.g. Negotiation"
+          />
         </label>
         <div>
           <FieldLabel>Stage Color</FieldLabel>
@@ -463,7 +541,8 @@ function LifecycleStageModal({
 }
 
 function LifecycleColorPicker({
-  value, onChange,
+  value,
+  onChange,
 }: {
   value: LifecycleColorKey;
   onChange: (c: LifecycleColorKey) => void;
@@ -506,10 +585,7 @@ function RecentlyDeletedContactsPage() {
   const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  const visibleProps = useMemo(
-    () => properties.filter((p) => p.visible),
-    [properties],
-  );
+  const visibleProps = useMemo(() => properties.filter((p) => p.visible), [properties]);
 
   const deletedContacts = useMemo(() => {
     const base = contacts.filter((c) => c.deleted);
@@ -543,9 +619,7 @@ function RecentlyDeletedContactsPage() {
   const restore = (ids: string[]) => {
     contactsStore.restoreContacts(ids);
     setSelected(new Set());
-    toast.success(
-      ids.length > 1 ? `${ids.length} contacts restored` : "Contact restored",
-    );
+    toast.success(ids.length > 1 ? `${ids.length} contacts restored` : "Contact restored");
   };
   const hardDelete = (ids: string[]) => {
     contactsStore.hardDeleteContacts(ids);
@@ -610,22 +684,15 @@ function RecentlyDeletedContactsPage() {
                       {p.name}
                     </th>
                   ))}
-                  <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">
-                    Deleted
-                  </th>
-                  <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">
-                    Actions
-                  </th>
+                  <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">Deleted</th>
+                  <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {deletedContacts.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-5 py-3">
-                      <Checkbox
-                        checked={selected.has(c.id)}
-                        onChange={() => toggleOne(c.id)}
-                      />
+                      <Checkbox checked={selected.has(c.id)} onChange={() => toggleOne(c.id)} />
                     </td>
                     {visibleProps.map((p) => (
                       <td key={p.id} className="px-3 py-3 whitespace-nowrap align-middle">
@@ -761,9 +828,7 @@ function renderContactCell(
     case "lastInteraction":
       return <span className="text-xs text-muted-foreground">{c.lastInteraction}</span>;
     case "status":
-      return (
-        <span className="text-xs text-muted-foreground">{c.status}</span>
-      );
+      return <span className="text-xs text-muted-foreground">{c.status}</span>;
     default:
       return <span className="text-[11px] text-muted-foreground">—</span>;
   }
@@ -820,9 +885,7 @@ function Modal({
 
 function FieldLabel({ children }: { children: ReactNode }) {
   return (
-    <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-      {children}
-    </span>
+    <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{children}</span>
   );
 }
 
@@ -899,7 +962,9 @@ function Checkbox({
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       className={`h-4 w-4 rounded border grid place-items-center transition ${
-        checked ? "bg-primary border-primary text-primary-foreground" : "border-border bg-background/60"
+        checked
+          ? "bg-primary border-primary text-primary-foreground"
+          : "border-border bg-background/60"
       }`}
     >
       {checked && <Check className="h-3 w-3" />}
@@ -977,16 +1042,76 @@ type LabelRow = {
 };
 
 const SEED_LABELS: LabelRow[] = [
-  { id: "lb-1",  name: "VIP Customer",       color: "yellow", createdAt: "2025-01-12T09:00:00Z", updatedAt: "2025-09-04T14:00:00Z" },
-  { id: "lb-2",  name: "Hot Lead",           color: "red",    createdAt: "2025-02-02T09:00:00Z", updatedAt: "2025-08-19T14:00:00Z" },
-  { id: "lb-3",  name: "Enterprise",         color: "blue",   createdAt: "2025-02-21T09:00:00Z", updatedAt: "2025-09-22T14:00:00Z" },
-  { id: "lb-4",  name: "Potential Client",   color: "purple", createdAt: "2025-03-10T09:00:00Z", updatedAt: "2025-10-01T14:00:00Z" },
-  { id: "lb-5",  name: "Existing Customer",  color: "green",  createdAt: "2025-03-28T09:00:00Z", updatedAt: "2025-10-12T14:00:00Z" },
-  { id: "lb-6",  name: "Repeat Buyer",       color: "green",  createdAt: "2025-04-14T09:00:00Z", updatedAt: "2025-10-20T14:00:00Z" },
-  { id: "lb-7",  name: "Newsletter",         color: "gray",   createdAt: "2025-05-02T09:00:00Z", updatedAt: "2025-10-28T14:00:00Z" },
-  { id: "lb-8",  name: "Partnership",        color: "pink",   createdAt: "2025-05-19T09:00:00Z", updatedAt: "2025-11-05T14:00:00Z" },
-  { id: "lb-9",  name: "Campaign Lead",      color: "orange", createdAt: "2025-06-04T09:00:00Z", updatedAt: "2025-11-12T14:00:00Z" },
-  { id: "lb-10", name: "Inactive Customer",  color: "gray",   createdAt: "2025-06-21T09:00:00Z", updatedAt: "2025-11-22T14:00:00Z" },
+  {
+    id: "lb-1",
+    name: "VIP Customer",
+    color: "yellow",
+    createdAt: "2025-01-12T09:00:00Z",
+    updatedAt: "2025-09-04T14:00:00Z",
+  },
+  {
+    id: "lb-2",
+    name: "Hot Lead",
+    color: "red",
+    createdAt: "2025-02-02T09:00:00Z",
+    updatedAt: "2025-08-19T14:00:00Z",
+  },
+  {
+    id: "lb-3",
+    name: "Enterprise",
+    color: "blue",
+    createdAt: "2025-02-21T09:00:00Z",
+    updatedAt: "2025-09-22T14:00:00Z",
+  },
+  {
+    id: "lb-4",
+    name: "Potential Client",
+    color: "purple",
+    createdAt: "2025-03-10T09:00:00Z",
+    updatedAt: "2025-10-01T14:00:00Z",
+  },
+  {
+    id: "lb-5",
+    name: "Existing Customer",
+    color: "green",
+    createdAt: "2025-03-28T09:00:00Z",
+    updatedAt: "2025-10-12T14:00:00Z",
+  },
+  {
+    id: "lb-6",
+    name: "Repeat Buyer",
+    color: "green",
+    createdAt: "2025-04-14T09:00:00Z",
+    updatedAt: "2025-10-20T14:00:00Z",
+  },
+  {
+    id: "lb-7",
+    name: "Newsletter",
+    color: "gray",
+    createdAt: "2025-05-02T09:00:00Z",
+    updatedAt: "2025-10-28T14:00:00Z",
+  },
+  {
+    id: "lb-8",
+    name: "Partnership",
+    color: "pink",
+    createdAt: "2025-05-19T09:00:00Z",
+    updatedAt: "2025-11-05T14:00:00Z",
+  },
+  {
+    id: "lb-9",
+    name: "Campaign Lead",
+    color: "orange",
+    createdAt: "2025-06-04T09:00:00Z",
+    updatedAt: "2025-11-12T14:00:00Z",
+  },
+  {
+    id: "lb-10",
+    name: "Inactive Customer",
+    color: "gray",
+    createdAt: "2025-06-21T09:00:00Z",
+    updatedAt: "2025-11-22T14:00:00Z",
+  },
 ];
 
 const COLOR_FILTER_OPTIONS = [
@@ -1046,9 +1171,7 @@ function LabelsPage() {
 
   const update = (id: string, name: string, color: LabelColorKey) => {
     const now = new Date().toISOString();
-    setLabels((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, name, color, updatedAt: now } : l)),
-    );
+    setLabels((prev) => prev.map((l) => (l.id === id ? { ...l, name, color, updatedAt: now } : l)));
     toast.success("Label updated");
   };
 
@@ -1110,7 +1233,8 @@ function LabelsPage() {
                 onClick={() => setBulkDeleteOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium transition-colors duration-150"
               >
-                <Trash2 className="h-3.5 w-3.5" /> {selected.size === 1 ? "Delete Label" : "Delete Labels"}
+                <Trash2 className="h-3.5 w-3.5" />{" "}
+                {selected.size === 1 ? "Delete Label" : "Delete Labels"}
               </button>
             </div>
           </div>
@@ -1145,7 +1269,10 @@ function LabelsPage() {
                   {paged.map((row) => {
                     const c = colorMeta(row.color);
                     return (
-                      <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150">
+                      <tr
+                        key={row.id}
+                        className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150"
+                      >
                         <td className="px-5 py-3">
                           <Checkbox
                             checked={selected.has(row.id)}
@@ -1153,7 +1280,9 @@ function LabelsPage() {
                           />
                         </td>
                         <td className="px-3 py-3">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${c.badge}`}>
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${c.badge}`}
+                          >
                             <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
                             {row.name}
                           </span>
@@ -1164,8 +1293,12 @@ function LabelsPage() {
                             {c.name}
                           </span>
                         </td>
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.updatedAt)}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">
+                          {fmtDate(row.createdAt)}
+                        </td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">
+                          {fmtDate(row.updatedAt)}
+                        </td>
                       </tr>
                     );
                   })}
@@ -1310,7 +1443,9 @@ function LabelFormModal({
         <div>
           <FieldLabel>Preview</FieldLabel>
           <div className="mt-1">
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs ${c.badge}`}>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs ${c.badge}`}
+            >
               <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
               {name.trim() || "Label name"}
             </span>
@@ -1320,7 +1455,6 @@ function LabelFormModal({
     </Modal>
   );
 }
-
 
 // =========================================================
 // CONTACT PROPERTIES PAGE
@@ -1359,9 +1493,7 @@ function ContactPropertiesRouter() {
     return properties.filter(
       (p) =>
         (typeFilter === "all" || p.type === typeFilter) &&
-        (!q ||
-          p.name.toLowerCase().includes(q) ||
-          p.key.toLowerCase().includes(q)),
+        (!q || p.name.toLowerCase().includes(q) || p.key.toLowerCase().includes(q)),
     );
   }, [properties, query, typeFilter]);
 
@@ -1386,9 +1518,7 @@ function ContactPropertiesRouter() {
   const upsertProperty = (prop: ContactProperty) => {
     const exists = properties.some((p) => p.id === prop.id);
     setProperties(
-      exists
-        ? properties.map((p) => (p.id === prop.id ? prop : p))
-        : [...properties, prop],
+      exists ? properties.map((p) => (p.id === prop.id ? prop : p)) : [...properties, prop],
     );
     toast.success(exists ? "Property updated" : "Property created");
   };
@@ -1396,9 +1526,7 @@ function ContactPropertiesRouter() {
   const handleBulkDelete = () => {
     const ids = Array.from(selected);
     const blocked = properties.filter((p) => ids.includes(p.id) && p.system);
-    const deletableIds = ids.filter(
-      (id) => !properties.find((p) => p.id === id)?.system,
-    );
+    const deletableIds = ids.filter((id) => !properties.find((p) => p.id === id)?.system);
     if (blocked.length > 0) {
       toast.error(
         `${blocked.length} system propert${blocked.length === 1 ? "y" : "ies"} cannot be deleted`,
@@ -1418,9 +1546,7 @@ function ContactPropertiesRouter() {
 
   const selectedIds = Array.from(selected);
   const singleSelectedId = selectedIds.length === 1 ? selectedIds[0] : null;
-  const anySystemSelected = selectedIds.some(
-    (id) => properties.find((p) => p.id === id)?.system,
-  );
+  const anySystemSelected = selectedIds.some((id) => properties.find((p) => p.id === id)?.system);
 
   return (
     <div className="space-y-5">
@@ -1516,7 +1642,10 @@ function ContactPropertiesRouter() {
                 </thead>
                 <tbody>
                   {paged.map((row) => (
-                    <tr key={row.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150">
+                    <tr
+                      key={row.id}
+                      className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors duration-150"
+                    >
                       <td className="px-5 py-3">
                         <Checkbox
                           checked={selected.has(row.id)}
@@ -1536,7 +1665,9 @@ function ContactPropertiesRouter() {
                           )}
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-xs font-mono text-muted-foreground">{row.key}</td>
+                      <td className="px-3 py-3 text-xs font-mono text-muted-foreground">
+                        {row.key}
+                      </td>
                       <td className="px-3 py-3">
                         <span className="inline-flex items-center rounded-md border border-border bg-white/[0.03] px-2 py-0.5 text-[11px]">
                           {PROPERTY_TYPE_LABELS[row.type]}

@@ -84,7 +84,9 @@ export type BroadcastMetrics = {
 };
 
 export function computeBroadcastMetrics(range?: DateRange, scale = 1): BroadcastMetrics {
-  const sent = broadcasts.filter((b) => b.status === "Sent" && (!range || inRange(b.sentAtDate ?? "", range)));
+  const sent = broadcasts.filter(
+    (b) => b.status === "Sent" && (!range || inRange(b.sentAtDate ?? "", range)),
+  );
   const reach = sent.reduce((s, b) => s + b.reach, 0);
   const delivered = sent.reduce((s, b) => s + b.delivered, 0);
   const read = sent.reduce((s, b) => s + b.read, 0);
@@ -148,7 +150,10 @@ export type OrdersAndSales = {
   dailySales: { date: string; sales: number }[];
 };
 
-export function computeOrdersAndSales(transactions: Transaction[], range?: DateRange): OrdersAndSales {
+export function computeOrdersAndSales(
+  transactions: Transaction[],
+  range?: DateRange,
+): OrdersAndSales {
   const scoped = range ? transactions.filter((t) => inRange(t.date, range)) : transactions;
   const totalOrders = scoped.length;
   const paid = scoped.filter((t) => t.status !== "Cancelled");
@@ -179,13 +184,23 @@ export function computeOrdersAndSales(transactions: Transaction[], range?: DateR
     .map(([brand, qty]) => ({ brand, qty }))
     .sort((a, b) => b.qty - a.qty);
 
-  const mostAddedToCart = Array.from(skuMap.values()).sort((a, b) => b.count - a.count).slice(0, 5);
+  const mostAddedToCart = Array.from(skuMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
 
   const dailySales = Array.from(salesByDay.entries())
     .map(([date, sales]) => ({ date, sales }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  return { totalOrders, totalTransactions, totalSales, totalQty, qtyByBrand, mostAddedToCart, dailySales };
+  return {
+    totalOrders,
+    totalTransactions,
+    totalSales,
+    totalQty,
+    qtyByBrand,
+    mostAddedToCart,
+    dailySales,
+  };
 }
 
 // ── E. Averages / Basket Economics ──────────────────────────────────────
@@ -200,7 +215,11 @@ export function computeAverages(orders: OrdersAndSales) {
 }
 
 // ── F. Funnel / Rate Metrics ────────────────────────────────────────────
-export function computeFunnelRates(broadcast: BroadcastMetrics, conversationsCount: number, transactionsCount: number) {
+export function computeFunnelRates(
+  broadcast: BroadcastMetrics,
+  conversationsCount: number,
+  transactionsCount: number,
+) {
   return {
     conversationRate: broadcast.reach ? broadcast.replied / broadcast.reach : 0,
     conversionRate: conversationsCount ? transactionsCount / conversationsCount : 0,

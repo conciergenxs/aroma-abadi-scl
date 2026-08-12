@@ -81,22 +81,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Aroma Abadi" },
-      { name: "description", content: "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp." },
+      {
+        name: "description",
+        content:
+          "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Aroma Abadi" },
-      { property: "og:description", content: "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp." },
+      {
+        property: "og:description",
+        content:
+          "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Aroma Abadi" },
-      { name: "twitter:description", content: "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac1d40d-352a-46f9-8ce0-f7f563bfbef4/id-preview-1aaafb04--18aae0dc-7724-43b7-a7e6-4600a28df4a5.lovable.app-1781583181369.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac1d40d-352a-46f9-8ce0-f7f563bfbef4/id-preview-1aaafb04--18aae0dc-7724-43b7-a7e6-4600a28df4a5.lovable.app-1781583181369.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Strategic Connect is a premium SaaS platform for enterprise brands to manage customer conversations across WhatsApp.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac1d40d-352a-46f9-8ce0-f7f563bfbef4/id-preview-1aaafb04--18aae0dc-7724-43b7-a7e6-4600a28df4a5.lovable.app-1781583181369.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac1d40d-352a-46f9-8ce0-f7f563bfbef4/id-preview-1aaafb04--18aae0dc-7724-43b7-a7e6-4600a28df4a5.lovable.app-1781583181369.png",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -135,7 +158,8 @@ function RootComponent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const authed = window.localStorage.getItem("scl_authed") === "1";
-    const isPublicRoute = pathname === "/auth" || pathname === "/access-denied" || pathname === "/invite/set-password";
+    const isPublicRoute =
+      pathname === "/auth" || pathname === "/access-denied" || pathname === "/invite/set-password";
     if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });
       return;
@@ -151,14 +175,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <Toaster
-        position="top-right"
-        richColors
-        closeButton
-        expand
-        duration={3500}
-        theme="light"
-      />
+      <Toaster position="top-right" richColors closeButton expand duration={3500} theme="light" />
     </QueryClientProvider>
   );
 }

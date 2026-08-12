@@ -1,5 +1,13 @@
 import { useRef, type ChangeEvent } from "react";
-import { Upload, FileText, Image as ImageIcon, FileSpreadsheet, File as FileIcon, X, Download } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Image as ImageIcon,
+  FileSpreadsheet,
+  File as FileIcon,
+  X,
+  Download,
+} from "lucide-react";
 import { fileToAttachment, type Attachment } from "./sku-store";
 import { toast } from "sonner";
 
@@ -12,7 +20,8 @@ export function formatBytes(n: number) {
 function iconFor(type: string) {
   if (type.startsWith("image/")) return ImageIcon;
   if (type.includes("pdf")) return FileText;
-  if (type.includes("sheet") || type.includes("excel") || type.includes("csv")) return FileSpreadsheet;
+  if (type.includes("sheet") || type.includes("excel") || type.includes("csv"))
+    return FileSpreadsheet;
   return FileIcon;
 }
 
@@ -53,14 +62,19 @@ export function MultiFileUploader({
         type="button"
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          handleFiles(e.dataTransfer.files);
+        }}
         className="w-full rounded-lg border border-dashed border-border bg-card/40 hover:bg-card/60 transition-colors px-4 py-6 flex flex-col items-center justify-center gap-2 text-center"
       >
         <div className="h-10 w-10 rounded-full bg-primary/10 grid place-items-center">
           <Upload className="h-5 w-5 text-primary" />
         </div>
         <div className="text-sm font-medium">{label}</div>
-        <div className="text-[11px] text-muted-foreground">Drag & drop or click to upload (multi-file)</div>
+        <div className="text-[11px] text-muted-foreground">
+          Drag & drop or click to upload (multi-file)
+        </div>
       </button>
       <input
         ref={inputRef}
@@ -81,7 +95,9 @@ export function MultiFileUploader({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium truncate">{f.fileName}</div>
-                  <div className="text-[10px] text-muted-foreground">{formatBytes(f.size)} · {f.fileType || "file"}</div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {formatBytes(f.size)} · {f.fileType || "file"}
+                  </div>
                 </div>
                 <a
                   href={f.url}

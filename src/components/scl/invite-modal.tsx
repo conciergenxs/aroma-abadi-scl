@@ -2,15 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { AI_AGENTS, type AIAgent } from "@/components/scl/agents";
 import whatsappAsset from "@/assets/whatsapp.png";
-import {
-  Bot,
-  Copy as CopyIcon,
-  Phone,
-  RefreshCw,
-  UserPlus,
-  X as XIcon,
-  Zap,
-} from "lucide-react";
+import { Bot, Copy as CopyIcon, Phone, RefreshCw, UserPlus, X as XIcon, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 // Module-level workspace agents store. Seeded with example agents so
@@ -50,7 +42,10 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 modal-backdrop" onMouseDown={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 modal-backdrop"
+      onMouseDown={onClose}
+    >
       <div
         onMouseDown={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-xl border border-border bg-popover shadow-2xl modal-content"
@@ -58,19 +53,32 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             <h3 className="text-sm font-semibold">Invite to workspace</h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Invite humans or connect an AI agent</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Invite humans or connect an AI agent
+            </p>
           </div>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 transition-colors duration-150">
+          <button
+            onClick={onClose}
+            className="grid h-7 w-7 place-items-center rounded hover:bg-gray-100 transition-colors duration-150"
+          >
             <XIcon className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 
         <div className="px-5 pt-3 border-b border-border">
           <div className="flex gap-1">
-            <TabBtn active={tab === "whatsapp"} onClick={() => setTab("whatsapp")} icon={<img src={whatsappAsset} alt="" className="h-3.5 w-3.5" />}>
+            <TabBtn
+              active={tab === "whatsapp"}
+              onClick={() => setTab("whatsapp")}
+              icon={<img src={whatsappAsset} alt="" className="h-3.5 w-3.5" />}
+            >
               Invite by WhatsApp
             </TabBtn>
-            <TabBtn active={tab === "agent"} onClick={() => setTab("agent")} icon={<Bot className="h-3.5 w-3.5" />}>
+            <TabBtn
+              active={tab === "agent"}
+              onClick={() => setTab("agent")}
+              icon={<Bot className="h-3.5 w-3.5" />}
+            >
               Connect Agent
             </TabBtn>
           </div>
@@ -154,13 +162,18 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
     return (
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          Invitation sent to <span className="text-foreground font-medium">{phone}</span> via WhatsApp, as <span className="text-foreground font-medium">{role}</span>. The link below is what they'd receive — opening it lets them set a password and land on the sign-in page.
+          Invitation sent to <span className="text-foreground font-medium">{phone}</span> via
+          WhatsApp, as <span className="text-foreground font-medium">{role}</span>. The link below
+          is what they'd receive — opening it lets them set a password and land on the sign-in page.
         </p>
         <Field label="Invite link">
           <div className="flex gap-2">
             <input readOnly value={sentLink} className={`${inputCls} font-mono`} />
             <button
-              onClick={() => { navigator.clipboard.writeText(sentLink); toast.success("Link copied to clipboard"); }}
+              onClick={() => {
+                navigator.clipboard.writeText(sentLink);
+                toast.success("Link copied to clipboard");
+              }}
               className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 transition-colors duration-150"
             >
               <CopyIcon className="h-3.5 w-3.5" /> Copy
@@ -168,7 +181,10 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
           </div>
         </Field>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150">
+          <button
+            onClick={onClose}
+            className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          >
             Done
           </button>
         </div>
@@ -191,7 +207,10 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
           />
         </div>
       </Field>
-      <Field label="Role" hint="Set in Roles & Permissions — this is what they'll be assigned on joining.">
+      <Field
+        label="Role"
+        hint="Set in Roles & Permissions — this is what they'll be assigned on joining."
+      >
         <select value={role} onChange={(e) => setRole(e.target.value)} className={inputCls}>
           <option>Member</option>
           <option>Admin</option>
@@ -199,7 +218,10 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
         </select>
       </Field>
       <div className="flex justify-end gap-2 pt-2">
-        <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 transition-colors duration-150">
+        <button
+          onClick={onClose}
+          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 transition-colors duration-150"
+        >
           Cancel
         </button>
         <button
@@ -258,7 +280,12 @@ function AgentTab({
   return (
     <div className="space-y-3">
       <Field label="Agent Name" required>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Returns AI" className={inputCls} />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Returns AI"
+          className={inputCls}
+        />
       </Field>
       <Field label="Description">
         <textarea
@@ -278,7 +305,11 @@ function AgentTab({
         />
       </Field>
       <Field label="Authentication Type">
-        <select value={authType} onChange={(e) => setAuthType(e.target.value as typeof authType)} className={inputCls}>
+        <select
+          value={authType}
+          onChange={(e) => setAuthType(e.target.value as typeof authType)}
+          className={inputCls}
+        >
           <option>None</option>
           <option>API Key</option>
           <option>Bearer Token</option>
@@ -302,7 +333,11 @@ function AgentTab({
           disabled={testing}
           className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 disabled:opacity-60 transition-colors duration-150"
         >
-          {testing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+          {testing ? (
+            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Zap className="h-3.5 w-3.5" />
+          )}
           Test Connection
         </button>
         <button

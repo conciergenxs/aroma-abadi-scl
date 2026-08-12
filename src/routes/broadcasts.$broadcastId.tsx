@@ -122,14 +122,17 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
               )}
             </ReadField>
             <ReadField label="Broadcast Name">{broadcast.name}</ReadField>
-            <ReadField label="Status"><StatusBadge status={broadcast.status} /></ReadField>
+            <ReadField label="Status">
+              <StatusBadge status={broadcast.status} />
+            </ReadField>
             <ReadField label="Broadcast Time">{broadcast.sentAt || "—"}</ReadField>
             <ReadField label="Send mode">
               {broadcast.sendMode === "schedule" ? "Scheduled" : "Send now"}
             </ReadField>
             {broadcast.sendMode === "schedule" && (
               <ReadField label="Scheduled For">
-                {[broadcast.scheduleDate, broadcast.scheduleTime].filter(Boolean).join(" · ") || "—"}
+                {[broadcast.scheduleDate, broadcast.scheduleTime].filter(Boolean).join(" · ") ||
+                  "—"}
               </ReadField>
             )}
             <ReadField label="Created By">{broadcast.createdBy ?? "—"}</ReadField>
@@ -221,15 +224,16 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
             </span>
           </div>
           <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
-            <PhoneFrame
-              channel={broadcast.channel}
-              senderName={channel?.name ?? "Your business"}
-            >
+            <PhoneFrame channel={broadcast.channel} senderName={channel?.name ?? "Your business"}>
               {broadcast.body ? (
                 <>
-                  <div className="whitespace-pre-wrap break-words">{renderWithVars(broadcast.body)}</div>
+                  <div className="whitespace-pre-wrap break-words">
+                    {renderWithVars(broadcast.body)}
+                  </div>
                   {broadcast.footer && (
-                    <div className="mt-2 text-[10px] text-muted-foreground/80">{broadcast.footer}</div>
+                    <div className="mt-2 text-[10px] text-muted-foreground/80">
+                      {broadcast.footer}
+                    </div>
                   )}
                 </>
               ) : (
@@ -278,7 +282,7 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
       let status: ContactRowStatus;
       if (broadcast.status !== "Sent") status = "Sent";
       else {
-        const r = (hash(c.id + broadcast.id + String(seed)) % 100);
+        const r = hash(c.id + broadcast.id + String(seed)) % 100;
         if (r < 6) status = "Failed";
         else if (r < 18) status = "Replied";
         else if (r < 60) status = "Read";
@@ -309,7 +313,11 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
   const visibleIds = recipientRows.map((r) => r.contact.id);
   const allSel = visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
   const toggleAll = () =>
-    setSelected(allSel ? selected.filter((id) => !visibleIds.includes(id)) : Array.from(new Set([...selected, ...visibleIds])));
+    setSelected(
+      allSel
+        ? selected.filter((id) => !visibleIds.includes(id))
+        : Array.from(new Set([...selected, ...visibleIds])),
+    );
   const toggleOne = (id: string) =>
     setSelected((p) => (p.includes(id) ? p.filter((s) => s !== id) : [...p, id]));
   const clearSelection = () => setSelected([]);
@@ -323,14 +331,15 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <div key={k.l} className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300">
+            <div
+              key={k.l}
+              className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
+            >
               <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">{k.l}</div>
                 <Icon className={`h-3.5 w-3.5 ${k.color}`} />
               </div>
-              <div className="mt-2 text-2xl font-semibold tabular-nums">
-                {fmtNum(k.v)}
-              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{fmtNum(k.v)}</div>
             </div>
           );
         })}
@@ -434,7 +443,10 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                           <span className="text-[11px] text-muted-foreground">—</span>
                         ) : (
                           contactGroups.map((g, idx) => {
-                            const tone = Object.values(TEMPLATE_GROUP_BADGE)[(idx + i) % Object.values(TEMPLATE_GROUP_BADGE).length];
+                            const tone =
+                              Object.values(TEMPLATE_GROUP_BADGE)[
+                                (idx + i) % Object.values(TEMPLATE_GROUP_BADGE).length
+                              ];
                             return (
                               <span
                                 key={g.id}
@@ -447,7 +459,9 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{contact.lastInteraction}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {contact.lastInteraction}
+                    </td>
                   </tr>
                 );
               })}
@@ -511,8 +525,8 @@ function StatusBadge({ status }: { status: Broadcast["status"] }) {
         status === "Sent"
           ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
           : status === "Scheduled"
-          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-          : "border-border bg-white/[0.04] text-muted-foreground"
+            ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+            : "border-border bg-white/[0.04] text-muted-foreground"
       }`}
     >
       {status}
@@ -529,7 +543,9 @@ function ContactStatusBadge({ status }: { status: ContactRowStatus }) {
     Failed: "border-red-500/30 bg-red-500/10 text-red-300",
   };
   return (
-    <span className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}>
+    <span
+      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}
+    >
       {status}
     </span>
   );
@@ -646,9 +662,7 @@ function ListPickerModal({
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
-  const pool = assignedOnly
-    ? lists.filter((l) => assignedListIds?.includes(l.id))
-    : lists;
+  const pool = assignedOnly ? lists.filter((l) => assignedListIds?.includes(l.id)) : lists;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

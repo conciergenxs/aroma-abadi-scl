@@ -48,18 +48,13 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
     const out: { key: string; title: string; items: typeof filtered }[] = [];
     if (starredItems.length > 0)
       out.push({ key: "starred", title: "Starred Templates", items: starredItems });
-    if (otherItems.length > 0)
-      out.push({ key: "all", title: "All Templates", items: otherItems });
+    if (otherItems.length > 0) out.push({ key: "all", title: "All Templates", items: otherItems });
     return out;
   }, [filtered, starred, cat]);
 
-  const orderedFiltered = useMemo(
-    () => sections.flatMap((s) => s.items),
-    [sections],
-  );
+  const orderedFiltered = useMemo(() => sections.flatMap((s) => s.items), [sections]);
 
-  const selected =
-    orderedFiltered.find((t) => t.id === selectedId) ?? orderedFiltered[0] ?? null;
+  const selected = orderedFiltered.find((t) => t.id === selectedId) ?? orderedFiltered[0] ?? null;
 
   useEffect(() => {
     if (open) {
@@ -73,11 +68,18 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.preventDefault(); onClose(); return; }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         if (orderedFiltered.length === 0) return;
         e.preventDefault();
-        const idx = Math.max(0, orderedFiltered.findIndex((t) => t.id === selected?.id));
+        const idx = Math.max(
+          0,
+          orderedFiltered.findIndex((t) => t.id === selected?.id),
+        );
         const next =
           e.key === "ArrowDown"
             ? (idx + 1) % orderedFiltered.length
@@ -99,7 +101,10 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-4xl h-[600px] max-h-[90vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
@@ -108,7 +113,9 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
           <FileText className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">Use a template</h2>
-          <span className="text-[11px] text-muted-foreground">Browse, search and insert reusable messages</span>
+          <span className="text-[11px] text-muted-foreground">
+            Browse, search and insert reusable messages
+          </span>
           <div className="ml-auto flex items-center gap-1.5">
             <Link
               to="/templates"
@@ -116,7 +123,10 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
             >
               Manage templates <ExternalLink className="h-3 w-3" />
             </Link>
-            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+            <button
+              onClick={onClose}
+              className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            >
               <XIcon className="h-4 w-4" />
             </button>
           </div>
@@ -170,9 +180,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                         <Star className="h-3 w-3 fill-current text-amber-300" />
                       )}
                       {section.title}
-                      <span className="text-muted-foreground/60">
-                        ({section.items.length})
-                      </span>
+                      <span className="text-muted-foreground/60">({section.items.length})</span>
                     </div>
                     <ul className="divide-y divide-border/60">
                       {section.items.map((t) => {
@@ -181,12 +189,18 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                           <li key={t.id}>
                             <button
                               onClick={() => setSelectedId(t.id)}
-                              onDoubleClick={() => { onInsert(t.body, t); onClose(); }}
+                              onDoubleClick={() => {
+                                onInsert(t.body, t);
+                                onClose();
+                              }}
                               className={`w-full text-left px-4 py-3 flex items-start gap-3 transition ${
                                 sel ? "bg-primary/10" : "hover:bg-gray-50"
                               }`}
                             >
-                              <ChannelIcon channel={t.channel} className="h-5 w-5 mt-0.5 shrink-0" />
+                              <ChannelIcon
+                                channel={t.channel}
+                                className="h-5 w-5 mt-0.5 shrink-0"
+                              />
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-[13px] font-medium truncate">{t.name}</span>
@@ -194,11 +208,18 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                                     {t.category}
                                   </span>
                                 </div>
-                                <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-2">{t.body}</p>
-                                <div className="mt-1 text-[10px] text-muted-foreground/70">Updated {t.updated}</div>
+                                <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-2">
+                                  {t.body}
+                                </p>
+                                <div className="mt-1 text-[10px] text-muted-foreground/70">
+                                  Updated {t.updated}
+                                </div>
                               </div>
                               <button
-                                onClick={(e) => { e.stopPropagation(); toggleStar(t.id); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleStar(t.id);
+                                }}
                                 className={`h-7 w-7 grid place-items-center rounded shrink-0 ${
                                   starred.has(t.id)
                                     ? "text-amber-300"
@@ -206,7 +227,9 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                                 }`}
                                 aria-label="Toggle favorite"
                               >
-                                <Star className={`h-3.5 w-3.5 ${starred.has(t.id) ? "fill-current" : ""}`} />
+                                <Star
+                                  className={`h-3.5 w-3.5 ${starred.has(t.id) ? "fill-current" : ""}`}
+                                />
                               </button>
                             </button>
                           </li>
@@ -235,13 +258,17 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 py-3.5">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">Preview</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">
+                    Preview
+                  </div>
                   <div className="rounded-lg border border-border bg-background/40 px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap">
                     {renderPreview(selected.body)}
                   </div>
                   {extractVars(selected.body).length > 0 && (
                     <>
-                      <div className="mt-4 text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">Variables</div>
+                      <div className="mt-4 text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">
+                        Variables
+                      </div>
                       <ul className="space-y-1">
                         {extractVars(selected.body).map((v) => (
                           <li key={v} className="text-[11px] text-muted-foreground">
@@ -255,7 +282,10 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                 </div>
                 <div className="px-4 py-3 border-t border-border/60">
                   <button
-                    onClick={() => { onInsert(selected.body, selected); onClose(); }}
+                    onClick={() => {
+                      onInsert(selected.body, selected);
+                      onClose();
+                    }}
                     className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                   >
                     Use template
@@ -263,7 +293,9 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                 </div>
               </>
             ) : (
-              <div className="flex-1 grid place-items-center text-xs text-muted-foreground">Select a template</div>
+              <div className="flex-1 grid place-items-center text-xs text-muted-foreground">
+                Select a template
+              </div>
             )}
           </div>
         </div>
@@ -284,7 +316,10 @@ function renderPreview(body: string) {
   const parts = body.split(/(\{\{[^}]+\}\})/g);
   return parts.map((p, i) =>
     /^\{\{[^}]+\}\}$/.test(p) ? (
-      <span key={i} className="rounded bg-primary/15 px-1 py-0.5 text-primary text-[12px] font-medium">
+      <span
+        key={i}
+        className="rounded bg-primary/15 px-1 py-0.5 text-primary text-[12px] font-medium"
+      >
         {p}
       </span>
     ) : (

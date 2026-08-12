@@ -64,7 +64,10 @@ export const DATE_RANGE_PRESETS: { label: string; value: DateRangeFilter }[] = [
 export const CUSTOM_RANGE_MIN = "2025-09-01";
 export const CUSTOM_RANGE_MAX = "2026-08-31";
 
-export function resolveMonthsBack(filter: DateRangeFilter, customRange: { start: string; end: string } | null): number {
+export function resolveMonthsBack(
+  filter: DateRangeFilter,
+  customRange: { start: string; end: string } | null,
+): number {
   if (filter === "all") return MONTHS.length;
   if (filter === "custom") {
     if (!customRange) return MONTHS.length;
@@ -81,8 +84,18 @@ export function resolveMonthsBack(filter: DateRangeFilter, customRange: { start:
 // rate/ranking data below is scaled by monthsBack/12 instead (same `scale`
 // trick overview-metrics.ts uses for records with no real per-day source). ─
 export const MONTHS = [
-  "Sep 25", "Oct 25", "Nov 25", "Dec 25", "Jan 26", "Feb 26",
-  "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26", "Aug 26",
+  "Sep 25",
+  "Oct 25",
+  "Nov 25",
+  "Dec 25",
+  "Jan 26",
+  "Feb 26",
+  "Mar 26",
+  "Apr 26",
+  "May 26",
+  "Jun 26",
+  "Jul 26",
+  "Aug 26",
 ];
 
 type MonthRow = {
@@ -97,8 +110,12 @@ type MonthRow = {
 const NEW_MEMBERS = [38, 40, 35, 46, 43, 45, 48, 51, 54, 47, 55, 53];
 const UPGRADES = [48, 55, 42, 58, 50, 53, 56, 61, 59, 47, 63, 54];
 const ELIGIBLE = [498, 512, 486, 527, 501, 515, 519, 533, 540, 508, 536, 522];
-const POINTS_ISSUED = [228000, 241000, 219000, 255000, 248000, 262000, 271000, 284000, 296000, 268000, 305000, 292000];
-const POINTS_REDEEMED = [108000, 122000, 101000, 131000, 126000, 138000, 145000, 152000, 158000, 140000, 163000, 149000];
+const POINTS_ISSUED = [
+  228000, 241000, 219000, 255000, 248000, 262000, 271000, 284000, 296000, 268000, 305000, 292000,
+];
+const POINTS_REDEEMED = [
+  108000, 122000, 101000, 131000, 126000, 138000, 145000, 152000, 158000, 140000, 163000, 149000,
+];
 
 export const MONTHLY: MonthRow[] = MONTHS.map((month, i) => ({
   month,
@@ -133,12 +150,42 @@ type TierKpis = {
 };
 
 const KPI_BY_TIER: Record<TierFilter, TierKpis> = {
-  All: { repeatPurchaseRate: 0.61, referralConversionRate: 0.24, pointsRedemptionRate: 0.51, tierUpgradeRate: 0.18 },
-  Bronze: { repeatPurchaseRate: 0.42, referralConversionRate: 0.15, pointsRedemptionRate: 0.33, tierUpgradeRate: 0.22 },
-  Silver: { repeatPurchaseRate: 0.58, referralConversionRate: 0.21, pointsRedemptionRate: 0.47, tierUpgradeRate: 0.19 },
-  Gold: { repeatPurchaseRate: 0.71, referralConversionRate: 0.29, pointsRedemptionRate: 0.58, tierUpgradeRate: 0.11 },
-  Platinum: { repeatPurchaseRate: 0.84, referralConversionRate: 0.37, pointsRedemptionRate: 0.68, tierUpgradeRate: 0.08 },
-  Icon: { repeatPurchaseRate: 0.91, referralConversionRate: 0.46, pointsRedemptionRate: 0.77, tierUpgradeRate: 0 },
+  All: {
+    repeatPurchaseRate: 0.61,
+    referralConversionRate: 0.24,
+    pointsRedemptionRate: 0.51,
+    tierUpgradeRate: 0.18,
+  },
+  Bronze: {
+    repeatPurchaseRate: 0.42,
+    referralConversionRate: 0.15,
+    pointsRedemptionRate: 0.33,
+    tierUpgradeRate: 0.22,
+  },
+  Silver: {
+    repeatPurchaseRate: 0.58,
+    referralConversionRate: 0.21,
+    pointsRedemptionRate: 0.47,
+    tierUpgradeRate: 0.19,
+  },
+  Gold: {
+    repeatPurchaseRate: 0.71,
+    referralConversionRate: 0.29,
+    pointsRedemptionRate: 0.58,
+    tierUpgradeRate: 0.11,
+  },
+  Platinum: {
+    repeatPurchaseRate: 0.84,
+    referralConversionRate: 0.37,
+    pointsRedemptionRate: 0.68,
+    tierUpgradeRate: 0.08,
+  },
+  Icon: {
+    repeatPurchaseRate: 0.91,
+    referralConversionRate: 0.46,
+    pointsRedemptionRate: 0.77,
+    tierUpgradeRate: 0,
+  },
 };
 
 export type SparkPoint = { month: string; value: number };
@@ -160,7 +207,10 @@ export function newMembersKpi(monthsBack: number, tier: TierFilter) {
   const current = applies ? sum(windowSlice.map((m) => m.newMembers)) : 0;
   const previous = hasPreviousPeriod ? sum(prevSlice.map((m) => m.newMembers)) : 0;
   const deltaPct = hasPreviousPeriod && previous > 0 ? (current - previous) / previous : 0;
-  const spark: SparkPoint[] = windowSlice.map((m) => ({ month: m.month, value: applies ? m.newMembers : 0 }));
+  const spark: SparkPoint[] = windowSlice.map((m) => ({
+    month: m.month,
+    value: applies ? m.newMembers : 0,
+  }));
   return { value: current, deltaPct, spark, applies, hasPreviousPeriod };
 }
 
@@ -170,7 +220,10 @@ export function tierUpgradeRateKpi(monthsBack: number, tier: TierFilter) {
   const hasPreviousPeriod = prevSlice.length === monthsBack;
   // Scale the tier-agnostic monthly trend by this tier's relative rate
   // (e.g. Platinum has nowhere left to upgrade to, so its ratio is 0).
-  const tierRatio = KPI_BY_TIER.All.tierUpgradeRate > 0 ? KPI_BY_TIER[tier].tierUpgradeRate / KPI_BY_TIER.All.tierUpgradeRate : 0;
+  const tierRatio =
+    KPI_BY_TIER.All.tierUpgradeRate > 0
+      ? KPI_BY_TIER[tier].tierUpgradeRate / KPI_BY_TIER.All.tierUpgradeRate
+      : 0;
   const rateOf = (rows: MonthRow[]) => {
     const upgrades = sum(rows.map((m) => m.upgrades));
     const eligible = sum(rows.map((m) => m.eligibleForReview));
@@ -179,7 +232,10 @@ export function tierUpgradeRateKpi(monthsBack: number, tier: TierFilter) {
   const current = rateOf(windowSlice);
   const previous = hasPreviousPeriod ? rateOf(prevSlice) : 0;
   const deltaPct = hasPreviousPeriod && previous > 0 ? (current - previous) / previous : 0;
-  const spark: SparkPoint[] = windowSlice.map((m) => ({ month: m.month, value: (m.upgrades / m.eligibleForReview) * tierRatio }));
+  const spark: SparkPoint[] = windowSlice.map((m) => ({
+    month: m.month,
+    value: (m.upgrades / m.eligibleForReview) * tierRatio,
+  }));
   return { value: current, deltaPct, spark, hasPreviousPeriod };
 }
 
@@ -229,7 +285,10 @@ export const TIER_MOVEMENT: TierFlow[] = [
   { from: "Icon", to: "Platinum", value: 4 },
 ];
 
-const UPGRADE_JOURNEY_BASE: { avgDaysToUpgrade: number; paths: { from: LoyaltyTier; to: LoyaltyTier; count: number; avgDays: number }[] } = {
+const UPGRADE_JOURNEY_BASE: {
+  avgDaysToUpgrade: number;
+  paths: { from: LoyaltyTier; to: LoyaltyTier; count: number; avgDays: number }[];
+} = {
   avgDaysToUpgrade: 47, // an average time-to-upgrade, not a count — stays constant.
   paths: [
     { from: "Bronze", to: "Silver", count: 320, avgDays: 38 },
@@ -240,7 +299,10 @@ const UPGRADE_JOURNEY_BASE: { avgDaysToUpgrade: number; paths: { from: LoyaltyTi
 };
 
 export function upgradeJourney(monthsBack: number) {
-  const paths = UPGRADE_JOURNEY_BASE.paths.map((p) => ({ ...p, count: scaleToWindow(p.count, monthsBack) }));
+  const paths = UPGRADE_JOURNEY_BASE.paths.map((p) => ({
+    ...p,
+    count: scaleToWindow(p.count, monthsBack),
+  }));
   return {
     totalUpgrades: paths.reduce((s, p) => s + p.count, 0),
     avgDaysToUpgrade: UPGRADE_JOURNEY_BASE.avgDaysToUpgrade,
@@ -250,7 +312,12 @@ export function upgradeJourney(monthsBack: number) {
 
 // "At Risk" was folded into "Decayed" — a member either maintained their
 // tier, is in a grace period, or has decayed; no separate at-risk bucket.
-export type MaintenanceRow = { tier: LoyaltyTier; maintained: number; gracePeriod: number; decayed: number };
+export type MaintenanceRow = {
+  tier: LoyaltyTier;
+  maintained: number;
+  gracePeriod: number;
+  decayed: number;
+};
 export const TIER_MAINTENANCE: MaintenanceRow[] = [
   { tier: "Bronze", maintained: 1180, gracePeriod: 140, decayed: 100 },
   { tier: "Silver", maintained: 640, gracePeriod: 110, decayed: 70 },
@@ -283,19 +350,50 @@ const BENEFIT_USAGE_BASE: { benefit: string; count: number }[] = [
 ];
 
 export function benefitUsage(monthsBack: number) {
-  return BENEFIT_USAGE_BASE
-    .map((b) => ({ benefit: b.benefit, count: scaleToWindow(b.count, monthsBack) }))
-    .sort((a, b) => b.count - a.count);
+  return BENEFIT_USAGE_BASE.map((b) => ({
+    benefit: b.benefit,
+    count: scaleToWindow(b.count, monthsBack),
+  })).sort((a, b) => b.count - a.count);
 }
 
 // Benefit uplift percentages — genuine rates, not counts, so they don't
 // scale with the Date Range window (same reasoning as the KPI rates above).
-export const BENEFIT_EFFECTIVENESS: { benefit: string; repeatPurchaseUplift: number; revenueUplift: number; retentionUplift: number }[] = [
-  { benefit: "Exclusive Product Access", repeatPurchaseUplift: 0.29, revenueUplift: 0.41, retentionUplift: 0.22 },
-  { benefit: "Double Points Event", repeatPurchaseUplift: 0.34, revenueUplift: 0.28, retentionUplift: 0.19 },
-  { benefit: "Birthday Gift", repeatPurchaseUplift: 0.22, revenueUplift: 0.14, retentionUplift: 0.31 },
-  { benefit: "Free Sample Set", repeatPurchaseUplift: 0.18, revenueUplift: 0.11, retentionUplift: 0.15 },
-  { benefit: "Free Shipping Voucher", repeatPurchaseUplift: 0.12, revenueUplift: 0.09, retentionUplift: 0.10 },
+export const BENEFIT_EFFECTIVENESS: {
+  benefit: string;
+  repeatPurchaseUplift: number;
+  revenueUplift: number;
+  retentionUplift: number;
+}[] = [
+  {
+    benefit: "Exclusive Product Access",
+    repeatPurchaseUplift: 0.29,
+    revenueUplift: 0.41,
+    retentionUplift: 0.22,
+  },
+  {
+    benefit: "Double Points Event",
+    repeatPurchaseUplift: 0.34,
+    revenueUplift: 0.28,
+    retentionUplift: 0.19,
+  },
+  {
+    benefit: "Birthday Gift",
+    repeatPurchaseUplift: 0.22,
+    revenueUplift: 0.14,
+    retentionUplift: 0.31,
+  },
+  {
+    benefit: "Free Sample Set",
+    repeatPurchaseUplift: 0.18,
+    revenueUplift: 0.11,
+    retentionUplift: 0.15,
+  },
+  {
+    benefit: "Free Shipping Voucher",
+    repeatPurchaseUplift: 0.12,
+    revenueUplift: 0.09,
+    retentionUplift: 0.1,
+  },
 ].sort((a, b) => b.revenueUplift - a.revenueUplift);
 
 // ── 3. Referral & Advocacy ───────────────────────────────────────────────
@@ -323,16 +421,76 @@ type AdvocateSeed = {
 };
 
 const TOP_ADVOCATES_SEED: AdvocateSeed[] = [
-  { contactId: "c16", tier: "Icon", photo: "https://i.pravatar.cc/150?img=47", referrals: { rolling12m: 14, allTime: 22 }, revenue: { rolling12m: 18_200_000, allTime: 29_400_000 } },
-  { contactId: "c6", tier: "Platinum", photo: "https://i.pravatar.cc/150?img=32", referrals: { rolling12m: 12, allTime: 19 }, revenue: { rolling12m: 15_600_000, allTime: 25_100_000 } },
-  { contactId: "c11", tier: "Gold", photo: "https://i.pravatar.cc/150?img=13", referrals: { rolling12m: 10, allTime: 17 }, revenue: { rolling12m: 12_400_000, allTime: 21_800_000 } },
-  { contactId: "c1", tier: "Gold", photo: "https://i.pravatar.cc/150?img=45", referrals: { rolling12m: 9, allTime: 14 }, revenue: { rolling12m: 11_100_000, allTime: 17_900_000 } },
-  { contactId: "c20", tier: "Gold", photo: "https://i.pravatar.cc/150?img=44", referrals: { rolling12m: 7, allTime: 12 }, revenue: { rolling12m: 8_600_000, allTime: 15_200_000 } },
-  { contactId: "c3", tier: "Silver", photo: "https://i.pravatar.cc/150?img=48", referrals: { rolling12m: 6, allTime: 10 }, revenue: { rolling12m: 6_900_000, allTime: 12_400_000 } },
-  { contactId: "c13", tier: "Silver", photo: "https://i.pravatar.cc/150?img=26", referrals: { rolling12m: 5, allTime: 8 }, revenue: { rolling12m: 5_700_000, allTime: 9_600_000 } },
-  { contactId: "c15", tier: "Silver", photo: "https://i.pravatar.cc/150?img=25", referrals: { rolling12m: 4, allTime: 7 }, revenue: { rolling12m: 4_400_000, allTime: 7_800_000 } },
-  { contactId: "c12", tier: "Bronze", photo: "https://i.pravatar.cc/150?img=20", referrals: { rolling12m: 3, allTime: 5 }, revenue: { rolling12m: 3_100_000, allTime: 5_200_000 } },
-  { contactId: "c7", tier: "Bronze", photo: "https://i.pravatar.cc/150?img=14", referrals: { rolling12m: 2, allTime: 4 }, revenue: { rolling12m: 2_000_000, allTime: 3_900_000 } },
+  {
+    contactId: "c16",
+    tier: "Icon",
+    photo: "https://i.pravatar.cc/150?img=47",
+    referrals: { rolling12m: 14, allTime: 22 },
+    revenue: { rolling12m: 18_200_000, allTime: 29_400_000 },
+  },
+  {
+    contactId: "c6",
+    tier: "Platinum",
+    photo: "https://i.pravatar.cc/150?img=32",
+    referrals: { rolling12m: 12, allTime: 19 },
+    revenue: { rolling12m: 15_600_000, allTime: 25_100_000 },
+  },
+  {
+    contactId: "c11",
+    tier: "Gold",
+    photo: "https://i.pravatar.cc/150?img=13",
+    referrals: { rolling12m: 10, allTime: 17 },
+    revenue: { rolling12m: 12_400_000, allTime: 21_800_000 },
+  },
+  {
+    contactId: "c1",
+    tier: "Gold",
+    photo: "https://i.pravatar.cc/150?img=45",
+    referrals: { rolling12m: 9, allTime: 14 },
+    revenue: { rolling12m: 11_100_000, allTime: 17_900_000 },
+  },
+  {
+    contactId: "c20",
+    tier: "Gold",
+    photo: "https://i.pravatar.cc/150?img=44",
+    referrals: { rolling12m: 7, allTime: 12 },
+    revenue: { rolling12m: 8_600_000, allTime: 15_200_000 },
+  },
+  {
+    contactId: "c3",
+    tier: "Silver",
+    photo: "https://i.pravatar.cc/150?img=48",
+    referrals: { rolling12m: 6, allTime: 10 },
+    revenue: { rolling12m: 6_900_000, allTime: 12_400_000 },
+  },
+  {
+    contactId: "c13",
+    tier: "Silver",
+    photo: "https://i.pravatar.cc/150?img=26",
+    referrals: { rolling12m: 5, allTime: 8 },
+    revenue: { rolling12m: 5_700_000, allTime: 9_600_000 },
+  },
+  {
+    contactId: "c15",
+    tier: "Silver",
+    photo: "https://i.pravatar.cc/150?img=25",
+    referrals: { rolling12m: 4, allTime: 7 },
+    revenue: { rolling12m: 4_400_000, allTime: 7_800_000 },
+  },
+  {
+    contactId: "c12",
+    tier: "Bronze",
+    photo: "https://i.pravatar.cc/150?img=20",
+    referrals: { rolling12m: 3, allTime: 5 },
+    revenue: { rolling12m: 3_100_000, allTime: 5_200_000 },
+  },
+  {
+    contactId: "c7",
+    tier: "Bronze",
+    photo: "https://i.pravatar.cc/150?img=14",
+    referrals: { rolling12m: 2, allTime: 4 },
+    revenue: { rolling12m: 2_000_000, allTime: 3_900_000 },
+  },
 ];
 
 export type Advocate = {
@@ -349,8 +507,7 @@ export type Advocate = {
  *  "recent window" figures scale down proportionally to monthsBack, same
  *  as every other count-type metric in this section. */
 export function topAdvocates(monthsBack: number, allTime: boolean, tier: TierFilter): Advocate[] {
-  return TOP_ADVOCATES_SEED
-    .filter((a) => tier === "All" || a.tier === tier)
+  return TOP_ADVOCATES_SEED.filter((a) => tier === "All" || a.tier === tier)
     .map((a) => {
       const contact = contacts.find((c) => c.id === a.contactId);
       return {
@@ -359,7 +516,9 @@ export function topAdvocates(monthsBack: number, allTime: boolean, tier: TierFil
         phone: contact?.phone ?? "",
         photo: a.photo,
         tier: a.tier,
-        referrals: allTime ? a.referrals.allTime : scaleToWindow(a.referrals.rolling12m, monthsBack),
+        referrals: allTime
+          ? a.referrals.allTime
+          : scaleToWindow(a.referrals.rolling12m, monthsBack),
         revenue: allTime ? a.revenue.allTime : scaleToWindow(a.revenue.rolling12m, monthsBack),
       };
     })

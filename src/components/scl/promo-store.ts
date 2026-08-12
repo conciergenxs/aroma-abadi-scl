@@ -42,21 +42,31 @@ export type PromoRule = {
 
 export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
   switch (kind) {
-    case "any-purchase": return { kind };
-    case "buy-item": return { kind, qty: 1, item: { kind: "any" } };
-    case "min-spend": return { kind, amount: 500000 };
-    case "first-purchase": return { kind };
-    case "referral-usage": return { kind };
+    case "any-purchase":
+      return { kind };
+    case "buy-item":
+      return { kind, qty: 1, item: { kind: "any" } };
+    case "min-spend":
+      return { kind, amount: 500000 };
+    case "first-purchase":
+      return { kind };
+    case "referral-usage":
+      return { kind };
   }
 }
 
 export function defaultReward(kind: PromoReward["kind"]): PromoReward {
   switch (kind) {
-    case "free-item": return { kind, qty: 1, sameAsPurchased: true, item: { kind: "any" } };
-    case "percent-off": return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
-    case "amount-off": return { kind, amount: 50000, timing: "immediate" };
-    case "free-shipping": return { kind };
-    case "bonus-points": return { kind, points: 100 };
+    case "free-item":
+      return { kind, qty: 1, sameAsPurchased: true, item: { kind: "any" } };
+    case "percent-off":
+      return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
+    case "amount-off":
+      return { kind, amount: 50000, timing: "immediate" };
+    case "free-shipping":
+      return { kind };
+    case "bonus-points":
+      return { kind, points: 100 };
   }
 }
 
@@ -74,18 +84,25 @@ function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
 
 function describeCondition(c: PromoCondition): string {
   switch (c.kind) {
-    case "any-purchase": return "Any Purchase";
-    case "buy-item": return `Buy ${c.qty} ${scopeLabel(c.item)}`;
-    case "min-spend": return `Spend min. ${fmtIDR(c.amount)}`;
-    case "first-purchase": return "Customer's First Purchase";
-    case "referral-usage": return "Referral Usage";
+    case "any-purchase":
+      return "Any Purchase";
+    case "buy-item":
+      return `Buy ${c.qty} ${scopeLabel(c.item)}`;
+    case "min-spend":
+      return `Spend min. ${fmtIDR(c.amount)}`;
+    case "first-purchase":
+      return "Customer's First Purchase";
+    case "referral-usage":
+      return "Referral Usage";
   }
 }
 
 function describeReward(r: PromoReward): string {
   switch (r.kind) {
     case "free-item":
-      return r.sameAsPurchased ? `Get ${r.qty} Same Item Free` : `Get ${r.qty} ${scopeLabel(r.item)} Free`;
+      return r.sameAsPurchased
+        ? `Get ${r.qty} Same Item Free`
+        : `Get ${r.qty} ${scopeLabel(r.item)} Free`;
     case "percent-off": {
       const cap = r.maxDiscount ? ` (max ${fmtIDR(r.maxDiscount)})` : "";
       return `Get ${r.percent}% Off ${scopeLabel(r.appliesTo, "Total Purchase")}${cap}`;
@@ -94,15 +111,18 @@ function describeReward(r: PromoReward): string {
       return r.timing === "next-purchase"
         ? `Get ${fmtIDR(r.amount)} Cashback for Next Purchase`
         : `Get ${fmtIDR(r.amount)} Off`;
-    case "free-shipping": return "Get Free Shipping";
-    case "bonus-points": return `Get ${r.points} Bonus Points`;
+    case "free-shipping":
+      return "Get Free Shipping";
+    case "bonus-points":
+      return `Get ${r.points} Bonus Points`;
   }
 }
 
 export function describePromoRule(rule: PromoRule): string {
-  const rewardText = rule.condition.kind === "referral-usage"
-    ? describeReward(rule.reward).replace(/^Get /, "Referrer & Referred Both Get ")
-    : describeReward(rule.reward);
+  const rewardText =
+    rule.condition.kind === "referral-usage"
+      ? describeReward(rule.reward).replace(/^Get /, "Referrer & Referred Both Get ")
+      : describeReward(rule.reward);
   return `${describeCondition(rule.condition)} → ${rewardText}`;
 }
 
@@ -165,7 +185,9 @@ export function downloadAssignedCodesCsv(promoCode: string, assignedCodes: Assig
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
   const header = ["Code", "Owner", "Status", "Redeemed At"].map(escape).join(",");
   const rows = assignedCodes.map((a) =>
-    [a.code, a.contactName ?? "Unassigned", a.redeemed ? "Redeemed" : "Not yet", a.redeemedAt ?? ""].map(escape).join(","),
+    [a.code, a.contactName ?? "Unassigned", a.redeemed ? "Redeemed" : "Not yet", a.redeemedAt ?? ""]
+      .map(escape)
+      .join(","),
   );
   const csv = [header, ...rows].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -220,19 +242,40 @@ function seed(): PromoCode[] {
       createdAt: "2026-05-28T09:00:00Z",
       redemptions: [
         {
-          id: "rdm-1a", contactId: t1000.customerId!, contactName: t1000.customerName,
-          transactionId: t1000.id, invoice: t1000.invoice, discountValue: Math.round(t1000.total * 0.2),
-          channel: "whatsapp", sourceName: "June Flash Sale", store: t1000.store, redeemedAt: t1000.date,
+          id: "rdm-1a",
+          contactId: t1000.customerId!,
+          contactName: t1000.customerName,
+          transactionId: t1000.id,
+          invoice: t1000.invoice,
+          discountValue: Math.round(t1000.total * 0.2),
+          channel: "whatsapp",
+          sourceName: "June Flash Sale",
+          store: t1000.store,
+          redeemedAt: t1000.date,
         },
         {
-          id: "rdm-1b", contactId: t1006.customerId!, contactName: t1006.customerName,
-          transactionId: t1006.id, invoice: t1006.invoice, discountValue: Math.round(t1006.total * 0.2),
-          channel: "whatsapp", sourceName: "VIP Customer Blast", store: t1006.store, redeemedAt: t1006.date,
+          id: "rdm-1b",
+          contactId: t1006.customerId!,
+          contactName: t1006.customerName,
+          transactionId: t1006.id,
+          invoice: t1006.invoice,
+          discountValue: Math.round(t1006.total * 0.2),
+          channel: "whatsapp",
+          sourceName: "VIP Customer Blast",
+          store: t1006.store,
+          redeemedAt: t1006.date,
         },
         {
-          id: "rdm-1c", contactId: t1012.customerId!, contactName: t1012.customerName,
-          transactionId: t1012.id, invoice: t1012.invoice, discountValue: Math.round(t1012.total * 0.2),
-          channel: "instagram", sourceName: "End of Month Promo", store: t1012.store, redeemedAt: t1012.date,
+          id: "rdm-1c",
+          contactId: t1012.customerId!,
+          contactName: t1012.customerName,
+          transactionId: t1012.id,
+          invoice: t1012.invoice,
+          discountValue: Math.round(t1012.total * 0.2),
+          channel: "instagram",
+          sourceName: "End of Month Promo",
+          store: t1012.store,
+          redeemedAt: t1012.date,
         },
       ],
     },
@@ -242,7 +285,11 @@ function seed(): PromoCode[] {
       name: "Sisley Rp150k Off",
       description: "Rp150,000 off any Sisley product. Single-use code issued per customer.",
       rule: {
-        condition: { kind: "buy-item", qty: 1, item: { kind: "specific", items: ["Sisley Real Flawless Foundation"] } },
+        condition: {
+          kind: "buy-item",
+          qty: 1,
+          item: { kind: "specific", items: ["Sisley Real Flawless Foundation"] },
+        },
         reward: { kind: "amount-off", amount: 150000, timing: "immediate" },
       },
       usageType: "one-to-one",
@@ -253,21 +300,57 @@ function seed(): PromoCode[] {
       createdAt: "2026-06-25T10:00:00Z",
       redemptions: [
         {
-          id: "rdm-2a", contactId: t1004.customerId!, contactName: t1004.customerName,
-          transactionId: t1004.id, invoice: t1004.invoice, discountValue: 150000,
-          channel: "instagram", sourceName: "Sisley Summer Sale", store: t1004.store, redeemedAt: t1004.date,
+          id: "rdm-2a",
+          contactId: t1004.customerId!,
+          contactName: t1004.customerName,
+          transactionId: t1004.id,
+          invoice: t1004.invoice,
+          discountValue: 150000,
+          channel: "instagram",
+          sourceName: "Sisley Summer Sale",
+          store: t1004.store,
+          redeemedAt: t1004.date,
         },
         {
-          id: "rdm-2b", contactId: t1005.customerId!, contactName: t1005.customerName,
-          transactionId: t1005.id, invoice: t1005.invoice, discountValue: 150000,
-          channel: "whatsapp", sourceName: "Abandoned Cart Reminder", store: t1005.store, redeemedAt: t1005.date,
+          id: "rdm-2b",
+          contactId: t1005.customerId!,
+          contactName: t1005.customerName,
+          transactionId: t1005.id,
+          invoice: t1005.invoice,
+          discountValue: 150000,
+          channel: "whatsapp",
+          sourceName: "Abandoned Cart Reminder",
+          store: t1005.store,
+          redeemedAt: t1005.date,
         },
       ],
       assignedCodes: [
-        { code: "SISLEY150K-C1", contactId: t1004.customerId!, contactName: t1004.customerName, redeemed: true, redeemedAt: t1004.date },
-        { code: "SISLEY150K-C2", contactId: t1005.customerId!, contactName: t1005.customerName, redeemed: true, redeemedAt: t1005.date },
-        { code: "SISLEY150K-C3", contactId: t1010.customerId!, contactName: t1010.customerName, redeemed: false },
-        { code: "SISLEY150K-C4", contactId: t1011.customerId!, contactName: t1011.customerName, redeemed: false },
+        {
+          code: "SISLEY150K-C1",
+          contactId: t1004.customerId!,
+          contactName: t1004.customerName,
+          redeemed: true,
+          redeemedAt: t1004.date,
+        },
+        {
+          code: "SISLEY150K-C2",
+          contactId: t1005.customerId!,
+          contactName: t1005.customerName,
+          redeemed: true,
+          redeemedAt: t1005.date,
+        },
+        {
+          code: "SISLEY150K-C3",
+          contactId: t1010.customerId!,
+          contactName: t1010.customerName,
+          redeemed: false,
+        },
+        {
+          code: "SISLEY150K-C4",
+          contactId: t1011.customerId!,
+          contactName: t1011.customerName,
+          redeemed: false,
+        },
       ],
     },
     {
@@ -287,14 +370,28 @@ function seed(): PromoCode[] {
       createdAt: "2026-04-27T09:00:00Z",
       redemptions: [
         {
-          id: "rdm-3a", contactId: t1001.customerId!, contactName: t1001.customerName,
-          transactionId: t1001.id, invoice: t1001.invoice, discountValue: Math.round(t1001.total * 0.1),
-          channel: "tiktok", sourceName: "New Arrival May", store: t1001.store, redeemedAt: t1001.date,
+          id: "rdm-3a",
+          contactId: t1001.customerId!,
+          contactName: t1001.customerName,
+          transactionId: t1001.id,
+          invoice: t1001.invoice,
+          discountValue: Math.round(t1001.total * 0.1),
+          channel: "tiktok",
+          sourceName: "New Arrival May",
+          store: t1001.store,
+          redeemedAt: t1001.date,
         },
         {
-          id: "rdm-3b", contactId: t1003.customerId!, contactName: t1003.customerName,
-          transactionId: t1003.id, invoice: t1003.invoice, discountValue: Math.round(t1003.total * 0.1),
-          channel: "whatsapp", sourceName: "All Contacts Blast", store: t1003.store, redeemedAt: t1003.date,
+          id: "rdm-3b",
+          contactId: t1003.customerId!,
+          contactName: t1003.customerName,
+          transactionId: t1003.id,
+          invoice: t1003.invoice,
+          discountValue: Math.round(t1003.total * 0.1),
+          channel: "whatsapp",
+          sourceName: "All Contacts Blast",
+          store: t1003.store,
+          redeemedAt: t1003.date,
         },
       ],
     },
@@ -304,7 +401,11 @@ function seed(): PromoCode[] {
       name: "Laura Mercier Rp50k Off",
       description: "Rp50,000 off any Laura Mercier product. No minimum purchase.",
       rule: {
-        condition: { kind: "buy-item", qty: 1, item: { kind: "specific", items: ["Laura Mercier Translucent Loose Setting Powder"] } },
+        condition: {
+          kind: "buy-item",
+          qty: 1,
+          item: { kind: "specific", items: ["Laura Mercier Translucent Loose Setting Powder"] },
+        },
         reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
       },
       usageType: "one-to-many",
@@ -325,7 +426,13 @@ function seed(): PromoCode[] {
         reward: {
           kind: "percent-off",
           percent: 30,
-          appliesTo: { kind: "specific", items: ["Rimmel Translucent Loose Setting Powder", "Rimmel Translucent Hydrating Setting Spray Ultra-Blur"] },
+          appliesTo: {
+            kind: "specific",
+            items: [
+              "Rimmel Translucent Loose Setting Powder",
+              "Rimmel Translucent Hydrating Setting Spray Ultra-Blur",
+            ],
+          },
           maxDiscount: null,
         },
       },
@@ -337,9 +444,16 @@ function seed(): PromoCode[] {
       createdAt: "2026-03-27T09:00:00Z",
       redemptions: [
         {
-          id: "rdm-5a", contactId: t1008.customerId!, contactName: t1008.customerName,
-          transactionId: t1008.id, invoice: t1008.invoice, discountValue: Math.round(t1008.total * 0.3),
-          channel: "instagram", sourceName: "April Loyalty Blast", store: t1008.store, redeemedAt: t1008.date,
+          id: "rdm-5a",
+          contactId: t1008.customerId!,
+          contactName: t1008.customerName,
+          transactionId: t1008.id,
+          invoice: t1008.invoice,
+          discountValue: Math.round(t1008.total * 0.3),
+          channel: "instagram",
+          sourceName: "April Loyalty Blast",
+          store: t1008.store,
+          redeemedAt: t1008.date,
         },
       ],
     },
@@ -347,9 +461,14 @@ function seed(): PromoCode[] {
       id: "promo-6",
       code: "DGBOGO",
       name: "Dolce & Gabbana Buy 1 Get 1",
-      description: "Buy any Caviar Hydra-Crème Lipstick, get a second one free. In-store and via WhatsApp order.",
+      description:
+        "Buy any Caviar Hydra-Crème Lipstick, get a second one free. In-store and via WhatsApp order.",
       rule: {
-        condition: { kind: "buy-item", qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } },
+        condition: {
+          kind: "buy-item",
+          qty: 1,
+          item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] },
+        },
         reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
       },
       usageType: "one-to-many",
@@ -360,19 +479,40 @@ function seed(): PromoCode[] {
       createdAt: "2026-07-08T08:30:00Z",
       redemptions: [
         {
-          id: "rdm-6a", contactId: t1002.customerId!, contactName: t1002.customerName,
-          transactionId: t1002.id, invoice: t1002.invoice, discountValue: 685000,
-          channel: "whatsapp", sourceName: "Point of Sale", store: t1002.store, redeemedAt: t1002.date,
+          id: "rdm-6a",
+          contactId: t1002.customerId!,
+          contactName: t1002.customerName,
+          transactionId: t1002.id,
+          invoice: t1002.invoice,
+          discountValue: 685000,
+          channel: "whatsapp",
+          sourceName: "Point of Sale",
+          store: t1002.store,
+          redeemedAt: t1002.date,
         },
         {
-          id: "rdm-6b", contactId: t1014.customerId!, contactName: t1014.customerName,
-          transactionId: t1014.id, invoice: t1014.invoice, discountValue: 685000,
-          channel: "instagram", sourceName: "Manual entry by BA", store: t1014.store, redeemedAt: t1014.date,
+          id: "rdm-6b",
+          contactId: t1014.customerId!,
+          contactName: t1014.customerName,
+          transactionId: t1014.id,
+          invoice: t1014.invoice,
+          discountValue: 685000,
+          channel: "instagram",
+          sourceName: "Manual entry by BA",
+          store: t1014.store,
+          redeemedAt: t1014.date,
         },
         {
-          id: "rdm-6c", contactId: t1020.customerId!, contactName: t1020.customerName,
-          transactionId: t1020.id, invoice: t1020.invoice, discountValue: 685000,
-          channel: "tiktok", sourceName: "Point of Sale", store: t1020.store, redeemedAt: t1020.date,
+          id: "rdm-6c",
+          contactId: t1020.customerId!,
+          contactName: t1020.customerName,
+          transactionId: t1020.id,
+          invoice: t1020.invoice,
+          discountValue: 685000,
+          channel: "tiktok",
+          sourceName: "Point of Sale",
+          store: t1020.store,
+          redeemedAt: t1020.date,
         },
       ],
     },
@@ -385,10 +525,16 @@ function seed(): PromoCode[] {
 const STORAGE_KEY = "aroma_promo_store_v6";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
-  return Array.isArray(promos) && promos.every(
-    (p) => p && typeof p === "object" && "rule" in p &&
-      (p as PromoCode).rule?.condition?.kind !== undefined &&
-      (p as PromoCode).rule?.reward?.kind !== undefined,
+  return (
+    Array.isArray(promos) &&
+    promos.every(
+      (p) =>
+        p &&
+        typeof p === "object" &&
+        "rule" in p &&
+        (p as PromoCode).rule?.condition?.kind !== undefined &&
+        (p as PromoCode).rule?.reward?.kind !== undefined,
+    )
   );
 }
 
@@ -413,18 +559,26 @@ function _load() {
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 function _save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos })); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
+  } catch {
+    /* ignore */
+  }
   _listeners.forEach((l) => l());
 }
 
 // ── Public store API ──────────────────────────────────────────────────────────
 
 export const promoStore = {
-  getPromos(): PromoCode[] { return _promos; },
+  getPromos(): PromoCode[] {
+    return _promos;
+  },
 
   addPromo(data: Omit<PromoCode, "id" | "redemptions">): string {
     const id = `promo-${Date.now()}`;
@@ -445,7 +599,9 @@ export const promoStore = {
 
   subscribe(cb: () => void) {
     _listeners.add(cb);
-    return () => { _listeners.delete(cb); };
+    return () => {
+      _listeners.delete(cb);
+    };
   },
 };
 

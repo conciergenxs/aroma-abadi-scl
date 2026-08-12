@@ -1,19 +1,52 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useSkuStore, skuStore, availableOdooProducts, type Brand, type Category, type SKU, type KnowledgeCard, type OdooProduct } from "@/components/scl/sku-store";
+import {
+  useSkuStore,
+  skuStore,
+  availableOdooProducts,
+  type Brand,
+  type Category,
+  type SKU,
+  type KnowledgeCard,
+  type OdooProduct,
+} from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
-import { Plus, Trash2, ChevronLeft, ChevronRight, Package, BookOpen, X, ImageIcon, Pencil, FolderOpen, Home, MoreHorizontal, ExternalLink, Camera } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  BookOpen,
+  X,
+  ImageIcon,
+  Pencil,
+  FolderOpen,
+  Home,
+  MoreHorizontal,
+  ExternalLink,
+  Camera,
+} from "lucide-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/sku")({
   head: () => ({
     meta: [
       { title: "SKU & Knowledge — Aroma Abadi" },
-      { name: "description", content: "Manage Brands, Product Categories, SKUs, and Knowledge Cards for all Aroma Abadi products." },
+      {
+        name: "description",
+        content:
+          "Manage Brands, Product Categories, SKUs, and Knowledge Cards for all Aroma Abadi products.",
+      },
     ],
   }),
   component: SkuPage,
@@ -29,7 +62,9 @@ type View =
  *  what actually gets stored (same approach BrandFormModal already uses). */
 function useImagePicker(onPick: (dataUrl: string) => void) {
   const fileRef = useRef<HTMLInputElement>(null);
-  function openPicker() { fileRef.current?.click(); }
+  function openPicker() {
+    fileRef.current?.click();
+  }
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = ""; // reset so picking the same file again still fires onChange
@@ -45,21 +80,35 @@ function SkuPage() {
   const { brands } = useSkuStore();
   const [view, setView] = useState<View>({ kind: "brands" });
   const [showBrandForm, setShowBrandForm] = useState(false);
-  const [importingSku, setImportingSku] = useState<{ product: OdooProduct; brandId: string; categoryId: string } | null>(null);
+  const [importingSku, setImportingSku] = useState<{
+    product: OdooProduct;
+    brandId: string;
+    categoryId: string;
+  } | null>(null);
 
   const brand = useMemo(
     () => (view.kind !== "brands" ? brands.find((b) => b.id === view.brandId) || null : null),
     [brands, view],
   );
   const category = useMemo(
-    () => (view.kind === "category" && brand ? brand.categories.find((c) => c.id === view.categoryId) || null : null),
+    () =>
+      view.kind === "category" && brand
+        ? brand.categories.find((c) => c.id === view.categoryId) || null
+        : null,
     [brand, view],
   );
 
   return (
-    <AppShell title="SKU & Knowledge" subtitle="Manage brands, categories, SKUs, and knowledge cards for Aroma Abadi products.">
+    <AppShell
+      title="SKU & Knowledge"
+      subtitle="Manage brands, categories, SKUs, and knowledge cards for Aroma Abadi products."
+    >
       {view.kind === "brands" && (
-        <BrandsOverview brands={brands} onOpen={(b) => setView({ kind: "brand", brandId: b.id })} onAdd={() => setShowBrandForm(true)} />
+        <BrandsOverview
+          brands={brands}
+          onOpen={(b) => setView({ kind: "brand", brandId: b.id })}
+          onAdd={() => setShowBrandForm(true)}
+        />
       )}
 
       {view.kind === "brand" && brand && (
@@ -76,14 +125,19 @@ function SkuPage() {
           category={category}
           onBack={() => setView({ kind: "brand", brandId: brand.id })}
           onBackToBrands={() => setView({ kind: "brands" })}
-          onPickProduct={(product) => setImportingSku({ product, brandId: brand.id, categoryId: category.id })}
-          />
+          onPickProduct={(product) =>
+            setImportingSku({ product, brandId: brand.id, categoryId: category.id })
+          }
+        />
       )}
 
       {showBrandForm && (
         <BrandFormModal
           onClose={() => setShowBrandForm(false)}
-          onCreated={(b) => { setView({ kind: "brand", brandId: b.id }); setShowBrandForm(false); }}
+          onCreated={(b) => {
+            setView({ kind: "brand", brandId: b.id });
+            setShowBrandForm(false);
+          }}
         />
       )}
       {importingSku && (
@@ -100,7 +154,15 @@ function SkuPage() {
 
 /* ---------------- Level 1: Brands Overview ---------------- */
 
-function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b: Brand) => void; onAdd: () => void }) {
+function BrandsOverview({
+  brands,
+  onOpen,
+  onAdd,
+}: {
+  brands: Brand[];
+  onOpen: (b: Brand) => void;
+  onAdd: () => void;
+}) {
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
@@ -113,9 +175,14 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Brands</div>
-          <div className="text-sm text-muted-foreground">Click a brand to view its categories and SKUs.</div>
+          <div className="text-sm text-muted-foreground">
+            Click a brand to view its categories and SKUs.
+          </div>
         </div>
-        <button onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150">
+        <button
+          onClick={onAdd}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+        >
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
       </div>
@@ -130,7 +197,12 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             >
               <div className="h-48 rounded-lg bg-white grid place-items-center overflow-hidden border border-border">
                 {b.logoUrl ? (
-                  <img src={b.logoUrl} alt={b.name} className="max-h-36 max-w-[90%] object-contain" loading="lazy" />
+                  <img
+                    src={b.logoUrl}
+                    alt={b.name}
+                    className="max-h-36 max-w-[90%] object-contain"
+                    loading="lazy"
+                  />
                 ) : (
                   <Package className="h-12 w-12 text-primary" />
                 )}
@@ -139,22 +211,33 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
               <div>
                 <div className="text-sm font-semibold truncate">{b.name}</div>
                 <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
-                  <span><span className="font-medium text-foreground">{b.categories.length}</span> Categories</span>
+                  <span>
+                    <span className="font-medium text-foreground">{b.categories.length}</span>{" "}
+                    Categories
+                  </span>
                   <span>·</span>
-                  <span><span className="font-medium text-foreground">{skuCount}</span> SKUs</span>
+                  <span>
+                    <span className="font-medium text-foreground">{skuCount}</span> SKUs
+                  </span>
                 </div>
               </div>
             </button>
           );
         })}
         {visible.length === 0 && (
-          <div className="col-span-full text-center py-10 text-sm text-muted-foreground">No brands yet.</div>
+          <div className="col-span-full text-center py-10 text-sm text-muted-foreground">
+            No brands yet.
+          </div>
         )}
       </div>
       {brands.length > 0 && (
         <div className="px-4 py-3 border-t border-border flex items-center justify-between text-sm">
           <div className="text-muted-foreground">
-            Showing <span className="text-foreground font-medium">{start + 1}–{end}</span> of <span className="text-foreground font-medium">{brands.length}</span> brands
+            Showing{" "}
+            <span className="text-foreground font-medium">
+              {start + 1}–{end}
+            </span>{" "}
+            of <span className="text-foreground font-medium">{brands.length}</span> brands
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -164,7 +247,9 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Prev
             </button>
-            <span className="px-2 text-muted-foreground">Page {safePage + 1} / {totalPages}</span>
+            <span className="px-2 text-muted-foreground">
+              Page {safePage + 1} / {totalPages}
+            </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
@@ -181,23 +266,44 @@ function BrandsOverview({ brands, onOpen, onAdd }: { brands: Brand[]; onOpen: (b
 
 /* ---------------- Level 2: Brand Detail ---------------- */
 
-function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: () => void; onOpenCategory: (c: Category) => void }) {
-  const { fileRef: logoFileRef, openPicker: openLogoPicker, handleChange: handleLogoChange } =
-    useImagePicker((dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }));
+function BrandDetail({
+  brand,
+  onBack,
+  onOpenCategory,
+}: {
+  brand: Brand;
+  onBack: () => void;
+  onOpenCategory: (c: Category) => void;
+}) {
+  const {
+    fileRef: logoFileRef,
+    openPicker: openLogoPicker,
+    handleChange: handleLogoChange,
+  } = useImagePicker((dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }));
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
-          <button onClick={onBack} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+          >
             <Home className="h-3.5 w-3.5" /> Brands
           </button>
           <ChevronRight className="h-3.5 w-3.5 opacity-50" />
           <span className="text-foreground font-medium">{brand.name}</span>
         </nav>
         <button
-          onClick={() => { if (confirm(`Delete brand "${brand.name}"?`)) { skuStore.removeBrand(brand.id); toast.success("Brand deleted"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150" title="Delete brand"
+          onClick={() => {
+            if (confirm(`Delete brand "${brand.name}"?`)) {
+              skuStore.removeBrand(brand.id);
+              toast.success("Brand deleted");
+              onBack();
+            }
+          }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
+          title="Delete brand"
         >
           <Trash2 className="h-4 w-4" /> Delete Brand
         </button>
@@ -206,8 +312,18 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
       <SectionCard>
         <div className="p-5 flex items-center gap-4">
           <div className="relative h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-            {brand.logoUrl ? <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" /> : <Package className="h-10 w-10 text-primary" />}
-            <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={handleLogoChange} />
+            {brand.logoUrl ? (
+              <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" />
+            ) : (
+              <Package className="h-10 w-10 text-primary" />
+            )}
+            <input
+              ref={logoFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoChange}
+            />
             <button
               type="button"
               onClick={openLogoPicker}
@@ -219,14 +335,20 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
           </div>
           <div>
             <div className="text-lg font-semibold">{brand.name}</div>
-            <div className="text-sm text-muted-foreground">{brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"} · {brand.brandKnowledge.length} brand knowledge {brand.brandKnowledge.length === 1 ? "document" : "documents"}</div>
+            <div className="text-sm text-muted-foreground">
+              {brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"}{" "}
+              · {brand.brandKnowledge.length} brand knowledge{" "}
+              {brand.brandKnowledge.length === 1 ? "document" : "documents"}
+            </div>
           </div>
         </div>
-
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title="Brand Knowledge" description="Brand guidelines, manifesto, tone of voice documents.">
+        <SectionCard
+          title="Brand Knowledge"
+          description="Brand guidelines, manifesto, tone of voice documents."
+        >
           <div className="p-4">
             <MultiFileUploader
               files={brand.brandKnowledge}
@@ -244,7 +366,12 @@ function BrandDetail({ brand, onBack, onOpenCategory }: { brand: Brand; onBack: 
         >
           <ul className="p-3 space-y-2">
             {brand.categories.map((c) => (
-              <CategoryRow key={c.id} brandId={brand.id} category={c} onOpen={() => onOpenCategory(c)} />
+              <CategoryRow
+                key={c.id}
+                brandId={brand.id}
+                category={c}
+                onOpen={() => onOpenCategory(c)}
+              />
             ))}
             {brand.categories.length === 0 && (
               <li className="text-center py-6 text-sm text-muted-foreground">No categories yet.</li>
@@ -260,28 +387,77 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"><Plus className="h-3.5 w-3.5" /> Category</button>;
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+      >
+        <Plus className="h-3.5 w-3.5" /> Category
+      </button>
+    );
   }
   return (
     <div className="flex items-center gap-1">
-      <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name..." className="h-8 rounded-md border border-border bg-card/60 px-2 text-sm" />
-      <button onClick={() => { if (!name.trim()) return; skuStore.addCategory(brandId, name.trim()); setName(""); setOpen(false); toast.success("Category added"); }}
-        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-[14px] font-medium">Add</button>
-      <button onClick={() => { setOpen(false); setName(""); }} className="h-8 w-8 grid place-items-center rounded-md border border-border"><X className="h-3.5 w-3.5" /></button>
+      <input
+        autoFocus
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Category name..."
+        className="h-8 rounded-md border border-border bg-card/60 px-2 text-sm"
+      />
+      <button
+        onClick={() => {
+          if (!name.trim()) return;
+          skuStore.addCategory(brandId, name.trim());
+          setName("");
+          setOpen(false);
+          toast.success("Category added");
+        }}
+        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-[14px] font-medium"
+      >
+        Add
+      </button>
+      <button
+        onClick={() => {
+          setOpen(false);
+          setName("");
+        }}
+        className="h-8 w-8 grid place-items-center rounded-md border border-border"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
 
-function CategoryRow({ brandId, category, onOpen }: { brandId: string; category: Category; onOpen: () => void }) {
-  const { fileRef, openPicker, handleChange } =
-    useImagePicker((dataUrl) => skuStore.updateCategory(brandId, category.id, { imageUrl: dataUrl }));
+function CategoryRow({
+  brandId,
+  category,
+  onOpen,
+}: {
+  brandId: string;
+  category: Category;
+  onOpen: () => void;
+}) {
+  const { fileRef, openPicker, handleChange } = useImagePicker((dataUrl) =>
+    skuStore.updateCategory(brandId, category.id, { imageUrl: dataUrl }),
+  );
 
   return (
     <li className="flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-card/40 hover:bg-card transition-colors">
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleChange}
+      />
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); openPicker(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          openPicker();
+        }}
         title="Upload category image"
         className="group relative h-10 w-10 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
       >
@@ -297,7 +473,11 @@ function CategoryRow({ brandId, category, onOpen }: { brandId: string; category:
       <button onClick={onOpen} className="flex-1 min-w-0 flex items-center gap-3 text-left">
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{category.name}</div>
-          <div className="text-xs text-muted-foreground">{category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} · {category.categoryKnowledge.length} {category.categoryKnowledge.length === 1 ? "document" : "documents"}</div>
+          <div className="text-xs text-muted-foreground">
+            {category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} ·{" "}
+            {category.categoryKnowledge.length}{" "}
+            {category.categoryKnowledge.length === 1 ? "document" : "documents"}
+          </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </button>
@@ -307,24 +487,46 @@ function CategoryRow({ brandId, category, onOpen }: { brandId: string; category:
 
 /* ---------------- Level 3: Category Detail ---------------- */
 
-function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands }: {
-  brand: Brand; category: Category; onBack: () => void; onBackToBrands: () => void; onPickProduct: (product: OdooProduct) => void;
+function CategoryDetail({
+  brand,
+  category,
+  onBack,
+  onPickProduct,
+  onBackToBrands,
+}: {
+  brand: Brand;
+  category: Category;
+  onBack: () => void;
+  onBackToBrands: () => void;
+  onPickProduct: (product: OdooProduct) => void;
 }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
-          <button onClick={onBackToBrands} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+          <button
+            onClick={onBackToBrands}
+            className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+          >
             <Home className="h-3.5 w-3.5" /> Brands
           </button>
           <ChevronRight className="h-3.5 w-3.5 opacity-50" />
-          <button onClick={onBack} className="hover:text-foreground transition-colors">{brand.name}</button>
+          <button onClick={onBack} className="hover:text-foreground transition-colors">
+            {brand.name}
+          </button>
           <ChevronRight className="h-3.5 w-3.5 opacity-50" />
           <span className="text-foreground font-medium">{category.name}</span>
         </nav>
         <button
-          onClick={() => { if (confirm(`Delete category "${category.name}"?`)) { skuStore.removeCategory(brand.id, category.id); toast.success("Category deleted"); onBack(); } }}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150" title="Delete"
+          onClick={() => {
+            if (confirm(`Delete category "${category.name}"?`)) {
+              skuStore.removeCategory(brand.id, category.id);
+              toast.success("Category deleted");
+              onBack();
+            }
+          }}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
+          title="Delete"
         >
           <Trash2 className="h-4 w-4" /> Delete Category
         </button>
@@ -351,13 +553,23 @@ function CategoryDetail({ brand, category, onBack, onPickProduct, onBackToBrands
           <SectionCard
             title="SKUs"
             description="Import products synced from Odoo, then upload a photo to complete each one."
-            action={<SkuSearchSelect categoryId={category.id} importedCodes={category.skus.map((s) => s.code)} onPick={onPickProduct} />}
+            action={
+              <SkuSearchSelect
+                categoryId={category.id}
+                importedCodes={category.skus.map((s) => s.code)}
+                onPick={onPickProduct}
+              />
+            }
           >
             <ul className="divide-y divide-border">
               {category.skus.map((s) => (
                 <SkuRow key={s.id} brand={brand} category={category} sku={s} />
               ))}
-              {category.skus.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No SKUs yet. Use the button above to add.</li>}
+              {category.skus.length === 0 && (
+                <li className="p-6 text-center text-sm text-muted-foreground">
+                  No SKUs yet. Use the button above to add.
+                </li>
+              )}
             </ul>
           </SectionCard>
         </div>
@@ -375,7 +587,11 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
     <li className="p-4">
       <div className="flex items-start gap-3">
         <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-          {sku.photoUrl ? <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <ImageIcon className="h-5 w-5 text-primary" />}
+          {sku.photoUrl ? (
+            <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+          ) : (
+            <ImageIcon className="h-5 w-5 text-primary" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -385,12 +601,17 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{sku.description}</div>
           <div className="mt-2 flex items-center gap-3 text-sm">
             <span className="font-semibold">{formatIDR(sku.price)}</span>
-            <span className="text-muted-foreground">{sku.knowledgeCards.length} knowledge card</span>
+            <span className="text-muted-foreground">
+              {sku.knowledgeCards.length} knowledge card
+            </span>
           </div>
         </div>
         <SkuMenu
           onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } })}
-          onDelete={() => { skuStore.removeSku(brand.id, category.id, sku.id); toast.success("SKU deleted"); }}
+          onDelete={() => {
+            skuStore.removeSku(brand.id, category.id, sku.id);
+            toast.success("SKU deleted");
+          }}
         />
       </div>
 
@@ -401,21 +622,29 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
             actions={
               <button
                 type="button"
-                onClick={() => { setEditing(null); setShowForm(true); }}
+                onClick={() => {
+                  setEditing(null);
+                  setShowForm(true);
+                }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Knowledge Card
               </button>
             }
           >
-            <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({sku.knowledgeCards.length})</span>
+            <span className="inline-flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({sku.knowledgeCards.length})
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <KnowledgeCards
               brandId={brand.id}
               categoryId={category.id}
               sku={sku}
-              onEdit={(k) => { setEditing(k); setShowForm(true); }}
+              onEdit={(k) => {
+                setEditing(k);
+                setShowForm(true);
+              }}
             />
           </AccordionContent>
         </AccordionItem>
@@ -424,12 +653,17 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
       {showForm && (
         <KnowledgeCardForm
           initial={editing}
-          onClose={() => { setShowForm(false); setEditing(null); }}
+          onClose={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
           onSubmit={(data) => {
-            if (editing) skuStore.updateKnowledgeCard(brand.id, category.id, sku.id, editing.id, data);
+            if (editing)
+              skuStore.updateKnowledgeCard(brand.id, category.id, sku.id, editing.id, data);
             else skuStore.addKnowledgeCard(brand.id, category.id, sku.id, data);
             toast.success(editing ? "Card updated" : "Card added");
-            setShowForm(false); setEditing(null);
+            setShowForm(false);
+            setEditing(null);
           }}
         />
       )}
@@ -442,14 +676,19 @@ function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
   return (
     <div ref={ref} className="relative shrink-0">
       <button
-        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((o) => !o);
+        }}
         className="h-8 w-8 grid place-items-center rounded border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors"
         title="Actions"
       >
@@ -457,13 +696,23 @@ function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () 
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-30 w-40 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
-          <button onClick={() => { onDetails(); setOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground">
+          <button
+            onClick={() => {
+              onDetails();
+              setOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground"
+          >
             <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
           </button>
           <div className="my-1 border-t border-border" />
-          <button onClick={() => { onDelete(); setOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-rose-50 transition-colors text-rose-600">
+          <button
+            onClick={() => {
+              onDelete();
+              setOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-rose-50 transition-colors text-rose-600"
+          >
             <Trash2 className="h-3.5 w-3.5" /> Delete
           </button>
         </div>
@@ -474,21 +723,38 @@ function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () 
 
 /* Select2-style search: pick a product from Odoo to import as a SKU here.
  * Already-imported products (matched by code) drop out of the list. */
-function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: string; importedCodes: string[]; onPick: (product: OdooProduct) => void }) {
+function SkuSearchSelect({
+  categoryId,
+  importedCodes,
+  onPick,
+}: {
+  categoryId: string;
+  importedCodes: string[];
+  onPick: (product: OdooProduct) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
 
-  const available = useMemo(() => availableOdooProducts(categoryId, importedCodes), [categoryId, importedCodes]);
+  const available = useMemo(
+    () => availableOdooProducts(categoryId, importedCodes),
+    [categoryId, importedCodes],
+  );
   const filtered = query
-    ? available.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()) || p.code.toLowerCase().includes(query.toLowerCase()))
+    ? available.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query.toLowerCase()) ||
+          p.code.toLowerCase().includes(query.toLowerCase()),
+      )
     : available;
 
   return (
@@ -516,7 +782,11 @@ function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: st
               <li key={product.odooId}>
                 <button
                   type="button"
-                  onClick={() => { onPick(product); setOpen(false); setQuery(""); }}
+                  onClick={() => {
+                    onPick(product);
+                    setOpen(false);
+                    setQuery("");
+                  }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm transition-colors duration-150"
                 >
                   <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
@@ -524,14 +794,18 @@ function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: st
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="truncate font-medium">{product.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{product.code} · {formatIDR(product.price)}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {product.code} · {formatIDR(product.price)}
+                    </div>
                   </div>
                 </button>
               </li>
             ))}
             {filtered.length === 0 && (
               <li className="px-3 py-4 text-center text-sm text-muted-foreground">
-                {available.length === 0 ? "All Odoo products for this category are already imported." : "Not found"}
+                {available.length === 0
+                  ? "All Odoo products for this category are already imported."
+                  : "Not found"}
               </li>
             )}
           </ul>
@@ -543,32 +817,72 @@ function SkuSearchSelect({ categoryId, importedCodes, onPick }: { categoryId: st
 
 /* Purely presentational — the "add" trigger lives beside the accordion
  * header in SkuRow, which also owns the shared add/edit form state. */
-function KnowledgeCards({ brandId, categoryId, sku, onEdit }: { brandId: string; categoryId: string; sku: SKU; onEdit: (card: KnowledgeCard) => void }) {
+function KnowledgeCards({
+  brandId,
+  categoryId,
+  sku,
+  onEdit,
+}: {
+  brandId: string;
+  categoryId: string;
+  sku: SKU;
+  onEdit: (card: KnowledgeCard) => void;
+}) {
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
       {sku.knowledgeCards.map((k, idx) => (
-        <div key={k.id} className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden">
-          {k.coverUrl && <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />}
+        <div
+          key={k.id}
+          className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden"
+        >
+          {k.coverUrl && (
+            <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />
+          )}
           <div className="p-3">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Knowledge {idx + 1}</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">
+              Knowledge {idx + 1}
+            </div>
             <div className="text-sm font-medium line-clamp-2">{k.title}</div>
             <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
             <div className="mt-2 flex items-center justify-end gap-2">
-              <button onClick={() => onEdit(k)} className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150">Edit</button>
+              <button
+                onClick={() => onEdit(k)}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                Edit
+              </button>
               <span className="text-xs text-muted-foreground">·</span>
-              <button onClick={() => { skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id); toast.success("Card deleted"); }} className="text-xs text-rose-500">Delete</button>
+              <button
+                onClick={() => {
+                  skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id);
+                  toast.success("Card deleted");
+                }}
+                className="text-xs text-rose-500"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
       ))}
-      {sku.knowledgeCards.length === 0 && <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>}
+      {sku.knowledgeCards.length === 0 && (
+        <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>
+      )}
     </div>
   );
 }
 
 /* ---------------- Modals (reused) ---------------- */
 
-function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeCard | null; onClose: () => void; onSubmit: (data: { title: string; text: string; coverUrl?: string }) => void }) {
+function KnowledgeCardForm({
+  initial,
+  onClose,
+  onSubmit,
+}: {
+  initial: KnowledgeCard | null;
+  onClose: () => void;
+  onSubmit: (data: { title: string; text: string; coverUrl?: string }) => void;
+}) {
   const [title, setTitle] = useState(initial?.title || "");
   const [text, setText] = useState(initial?.text || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
@@ -590,33 +904,91 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
   if (typeof document === "undefined") return null;
   return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
-      <form onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; onSubmit({ title, text, coverUrl: coverUrl || undefined }); }} className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!title.trim()) return;
+          onSubmit({ title, text, coverUrl: coverUrl || undefined });
+        }}
+        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content"
+      >
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">{initial ? "Edit Knowledge Card" : "Add Knowledge Card"}</div>
-          <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
+          <div className="text-sm font-semibold">
+            {initial ? "Edit Knowledge Card" : "Add Knowledge Card"}
+          </div>
+          <button type="button" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-4 space-y-3">
           <div>
             <div className="text-xs text-muted-foreground mb-1">Cover</div>
-            {coverUrl && <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickCover(f); }} />
+            {coverUrl && (
+              <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) pickCover(f);
+              }}
+            />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-3 h-8 text-[13px]">Choose Image</button>
-              {coverUrl && <button type="button" onClick={() => setCoverUrl("")} className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500">Remove Cover</button>}
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="rounded-md border border-border px-3 h-8 text-[13px]"
+              >
+                Choose Image
+              </button>
+              {coverUrl && (
+                <button
+                  type="button"
+                  onClick={() => setCoverUrl("")}
+                  className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
+                >
+                  Remove Cover
+                </button>
+              )}
             </div>
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Title</span>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Card title..." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Card title..."
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+            />
           </label>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Teks</span>
-            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Knowledge content..." className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm" />
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={5}
+              placeholder="Knowledge content..."
+              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm"
+            />
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px]">Cancel</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium">Save</button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 h-9 text-[14px]"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+          >
+            Save
+          </button>
         </div>
       </form>
     </div>,
@@ -624,7 +996,13 @@ function KnowledgeCardForm({ initial, onClose, onSubmit }: { initial: KnowledgeC
   );
 }
 
-function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated: (b: Brand) => void }) {
+function BrandFormModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: (b: Brand) => void;
+}) {
   const [name, setName] = useState("");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -638,46 +1016,110 @@ function BrandFormModal({ onClose, onCreated }: { onClose: () => void; onCreated
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <form
-        onSubmit={(e) => { e.preventDefault(); if (!name.trim()) return; const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined }); toast.success("Brand added"); onCreated(b); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!name.trim()) return;
+          const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined });
+          toast.success("Brand added");
+          onCreated(b);
+        }}
         className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add New Brand</div>
-          <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
+          <button type="button" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-4 space-y-3">
           <div>
             <div className="text-xs text-muted-foreground mb-1">Logo</div>
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
-                {logoUrl ? <img src={logoUrl} alt="" className="h-full w-full object-cover" /> : <Package className="h-5 w-5 text-primary" />}
+                {logoUrl ? (
+                  <img src={logoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <Package className="h-5 w-5 text-primary" />
+                )}
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickLogo(f); }} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-md border border-border px-2.5 h-8 text-[14px]">Upload Logo</button>
-              {logoUrl && <button type="button" onClick={() => setLogoUrl("")} className="text-[14px] text-rose-500">Remove</button>}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickLogo(f);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="rounded-md border border-border px-2.5 h-8 text-[14px]"
+              >
+                Upload Logo
+              </button>
+              {logoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setLogoUrl("")}
+                  className="text-[14px] text-rose-500"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Brand Name</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Brand name..." className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm" />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Brand name..."
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+            />
           </label>
-          <p className="text-xs text-muted-foreground">Brand Knowledge & Product Category can be set up after the brand is created.</p>
+          <p className="text-xs text-muted-foreground">
+            Brand Knowledge & Product Category can be set up after the brand is created.
+          </p>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px]">Cancel</button>
-          <button type="submit" className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium">Add Brand</button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 h-9 text-[14px]"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+          >
+            Add Brand
+          </button>
         </div>
       </form>
     </div>
   );
 }
 
-function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: string; categoryId: string; product: OdooProduct; onClose: () => void }) {
+function SkuFormModal({
+  brandId,
+  categoryId,
+  product,
+  onClose,
+}: {
+  brandId: string;
+  categoryId: string;
+  product: OdooProduct;
+  onClose: () => void;
+}) {
   const [photoUrl, setPhotoUrl] = useState("");
   const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
 
   // Everything but the photo comes straight from Odoo — read-only here.
-  const disabledInput = "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
+  const disabledInput =
+    "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
 
   function submit() {
     if (!photoUrl) return toast.error("Upload a product photo to continue.");
@@ -697,13 +1139,18 @@ function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: stri
       <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add SKU</div>
-          <button type="button" onClick={onClose}><X className="h-4 w-4" /></button>
+          <button type="button" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-4 space-y-3">
           {/* Odoo sync notice */}
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
-            <span>Product data is synced from Odoo and read-only. Odoo doesn't carry photography, so upload one below.</span>
+            <span>
+              Product data is synced from Odoo and read-only. Odoo doesn't carry photography, so
+              upload one below.
+            </span>
           </div>
           <div>
             <div className="text-xs text-muted-foreground mb-1">
@@ -711,10 +1158,24 @@ function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: stri
             </div>
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 text-primary/40" />}
+                {photoUrl ? (
+                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-5 w-5 text-primary/40" />
+                )}
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
-              <button type="button" onClick={openPicker} className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={openPicker}
+                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+              >
                 {photoUrl ? "Replace Photo" : "Upload Photo"}
               </button>
             </div>
@@ -735,11 +1196,22 @@ function SkuFormModal({ brandId, categoryId, product, onClose }: { brandId: stri
           </label>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Description</span>
-            <textarea disabled value={product.description} rows={4} className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none" />
+            <textarea
+              disabled
+              value={product.description}
+              rows={4}
+              className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none"
+            />
           </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150">Cancel</button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+          >
+            Cancel
+          </button>
           <button
             type="button"
             onClick={submit}

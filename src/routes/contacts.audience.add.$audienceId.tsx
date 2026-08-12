@@ -13,15 +13,28 @@ export const Route = createFileRoute("/contacts/audience/add/$audienceId")({
   component: AddToAudiencePage,
 });
 
-function SuccessView({ audienceName, count, onViewAudience, onBackToList }: { audienceName: string; count: number; onViewAudience: () => void; onBackToList: () => void }) {
+function SuccessView({
+  audienceName,
+  count,
+  onViewAudience,
+  onBackToList,
+}: {
+  audienceName: string;
+  count: number;
+  onViewAudience: () => void;
+  onBackToList: () => void;
+}) {
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
         <CheckCircle2 className="h-9 w-9 text-emerald-500" />
       </div>
-      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">Contacts Added!</h2>
+      <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">
+        Contacts Added!
+      </h2>
       <p className="mt-1.5 text-sm text-muted-foreground animate-fade-in">
-        {count} contact{count === 1 ? "" : "s"} added to <span className="font-semibold text-foreground">{audienceName}</span>.
+        {count} contact{count === 1 ? "" : "s"} added to{" "}
+        <span className="font-semibold text-foreground">{audienceName}</span>.
       </p>
       <div className="mt-6 flex items-center justify-center gap-3 animate-fade-in">
         <button
@@ -75,8 +88,15 @@ function AddToAudiencePage() {
 
   const handleAdd = () => {
     const contactIds = Array.from(staged);
-    if (contactIds.length === 0) { toast.error("Select at least one contact"); return; }
-    contactsStore.setContacts((cs) => cs.map((c) => (contactIds.includes(c.id) ? { ...c, listIds: [...c.listIds, audienceId] } : c)));
+    if (contactIds.length === 0) {
+      toast.error("Select at least one contact");
+      return;
+    }
+    contactsStore.setContacts((cs) =>
+      cs.map((c) =>
+        contactIds.includes(c.id) ? { ...c, listIds: [...c.listIds, audienceId] } : c,
+      ),
+    );
     toast.success("Contacts added");
     setAddedCount(contactIds.length);
   };
@@ -100,7 +120,12 @@ function AddToAudiencePage() {
   const eligibleCandidates = contacts.filter((c) => !c.deleted && !c.listIds.includes(audienceId));
 
   return (
-    <AppShell backTo="/contacts" title={`Add to ${audience.name}`} subtitle="Filter or search to bulk-add more contacts to this audience" noPadding>
+    <AppShell
+      backTo="/contacts"
+      title={`Add to ${audience.name}`}
+      subtitle="Filter or search to bulk-add more contacts to this audience"
+      noPadding
+    >
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6">
           <AudienceContactPicker

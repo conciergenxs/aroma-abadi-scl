@@ -8,12 +8,16 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
-  return () => { listeners.delete(cb); };
+  return () => {
+    listeners.delete(cb);
+  };
 };
 const getSnapshot = () => state;
 
 export const broadcastsStore = {
-  get state() { return state; },
+  get state() {
+    return state;
+  },
   add(b: Broadcast) {
     state = { broadcasts: [b, ...state.broadcasts] };
     emit();

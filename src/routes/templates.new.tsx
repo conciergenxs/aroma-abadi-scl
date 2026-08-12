@@ -8,11 +8,7 @@ import {
   useTemplatesStore,
   TEMPLATE_GROUP_DOT,
 } from "@/components/scl/templates-store";
-import {
-  connectedChannels,
-  TEMPLATE_LANGUAGES,
-  type Template,
-} from "@/components/scl/mock-data";
+import { connectedChannels, TEMPLATE_LANGUAGES, type Template } from "@/components/scl/mock-data";
 import { BrandPicker } from "@/components/scl/brand-picker";
 import { PromoCodePicker } from "@/components/scl/promo-code-picker";
 import type { Brand } from "@/components/scl/sku-store";
@@ -49,15 +45,31 @@ const CATEGORY_OPTIONS = [
 
 const HEADER_OPTIONS = [
   { value: "none", label: "None" },
-  { value: "text", label: "Text", icon: <FileText className="h-3.5 w-3.5 text-muted-foreground" /> },
-  { value: "image", label: "Image", icon: <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" /> },
+  {
+    value: "text",
+    label: "Text",
+    icon: <FileText className="h-3.5 w-3.5 text-muted-foreground" />,
+  },
+  {
+    value: "image",
+    label: "Image",
+    icon: <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" />,
+  },
   { value: "video", label: "Video", icon: <Video className="h-3.5 w-3.5 text-muted-foreground" /> },
 ];
 
 const BUTTON_OPTIONS = [
   { value: "none", label: "None" },
-  { value: "quick", label: "Quick Replies", icon: <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" /> },
-  { value: "cta", label: "Call to Action", icon: <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" /> },
+  {
+    value: "quick",
+    label: "Quick Replies",
+    icon: <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />,
+  },
+  {
+    value: "cta",
+    label: "Call to Action",
+    icon: <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />,
+  },
 ];
 
 function CreateTemplatePage() {
@@ -184,7 +196,11 @@ function CreateTemplatePage() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         {/* Left — form */}
         <div className="space-y-6">
-          <FormCard step={1} title="Settings" description="Identify the template and pick how it appears in your library.">
+          <FormCard
+            step={1}
+            title="Settings"
+            description="Identify the template and pick how it appears in your library."
+          >
             <Field label="Template Name" required>
               <input
                 value={name}
@@ -272,15 +288,24 @@ function CreateTemplatePage() {
                 )}
                 {(headerType === "image" || headerType === "video") && (
                   <div className="mt-2 rounded-md border border-dashed border-border bg-background/30 p-3 text-[11px] text-muted-foreground text-center">
-                    {headerType === "image" ? "Image" : "Video"} upload available after the template is created.
+                    {headerType === "image" ? "Image" : "Video"} upload available after the template
+                    is created.
                   </div>
                 )}
               </Field>
             </div>
           </FormCard>
 
-          <FormCard step={2} title="Content" description="Write the body, add variables and optional footer or buttons.">
-            <Field label="Message Body" required hint="Use {{variable}} tokens — they get replaced when sending.">
+          <FormCard
+            step={2}
+            title="Content"
+            description="Write the body, add variables and optional footer or buttons."
+          >
+            <Field
+              label="Message Body"
+              required
+              hint="Use {{variable}} tokens — they get replaced when sending."
+            >
               <textarea
                 ref={bodyRef}
                 value={body}
@@ -301,19 +326,24 @@ function CreateTemplatePage() {
                   onClick={() => setVarPopup("brands")}
                   className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                 >
-                  <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
+                  <AtSign className="h-3 w-3" /> Brands{" "}
+                  <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                 </button>
                 {/* Promo Code — opens the large PromoCodePicker modal below */}
                 <button
                   onClick={() => setVarPopup("promo")}
                   className="inline-flex items-center gap-1 rounded-md border border-border bg-white hover:bg-white px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                 >
-                  <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
+                  <AtSign className="h-3 w-3" /> Promo Code{" "}
+                  <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                 </button>
               </div>
             </Field>
 
-            <Field label="Footer (Optional)" hint="Short closing line, e.g. 'Reply STOP to opt out'.">
+            <Field
+              label="Footer (Optional)"
+              hint="Short closing line, e.g. 'Reply STOP to opt out'."
+            >
               <input
                 value={footer}
                 onChange={(e) => setFooter(e.target.value)}
@@ -351,7 +381,11 @@ function CreateTemplatePage() {
             </Field>
           </FormCard>
 
-          <FormCard step={3} title="Guidance" description="Reference these before submitting for approval.">
+          <FormCard
+            step={3}
+            title="Guidance"
+            description="Reference these before submitting for approval."
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <GuideBlock
                 icon={<Lightbulb className="h-3.5 w-3.5 text-amber-300" />}
@@ -406,7 +440,10 @@ function CreateTemplatePage() {
               </span>
             </div>
             <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
-              <PhoneFrame channel={channelKind} senderName={selectedChannel?.name ?? "Your business"}>
+              <PhoneFrame
+                channel={channelKind}
+                senderName={selectedChannel?.name ?? "Your business"}
+              >
                 {headerType === "text" && headerText && (
                   <div className="font-semibold text-[12px] mb-1.5">{headerText}</div>
                 )}
@@ -425,21 +462,27 @@ function CreateTemplatePage() {
                 ) : (
                   <div className="text-muted-foreground italic">Message body will appear here…</div>
                 )}
-                {footer && (
-                  <div className="mt-2 text-[10px] text-muted-foreground">{footer}</div>
-                )}
+                {footer && <div className="mt-2 text-[10px] text-muted-foreground">{footer}</div>}
               </PhoneFrame>
               {(buttonType === "quick" || buttonType === "cta") && buttonLabel && (
                 <div className="mx-auto mt-2 w-full max-w-[300px] px-3">
                   <button className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 h-9 text-sm text-primary">
-                    {buttonType === "cta" ? <ExternalLink className="h-3 w-3" /> : <Phone className="h-3 w-3" />}
+                    {buttonType === "cta" ? (
+                      <ExternalLink className="h-3 w-3" />
+                    ) : (
+                      <Phone className="h-3 w-3" />
+                    )}
                     {buttonLabel}
                   </button>
                 </div>
               )}
             </div>
             <div className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground">
-              {name ? <span className="font-medium text-foreground">{name}</span> : "Untitled template"}
+              {name ? (
+                <span className="font-medium text-foreground">{name}</span>
+              ) : (
+                "Untitled template"
+              )}
               {" · "}
               {category}
               {" · "}
@@ -559,9 +602,7 @@ function PhoneFrame({
           <ChannelIcon channel={channel} className="h-5 w-5" />
           <div className="min-w-0">
             <div className="text-[12px] font-semibold truncate">{senderName}</div>
-            <div className="text-[10px] text-muted-foreground">
-              {"WhatsApp Business"}
-            </div>
+            <div className="text-[10px] text-muted-foreground">{"WhatsApp Business"}</div>
           </div>
         </div>
         <div className="min-h-[180px] p-3 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]">

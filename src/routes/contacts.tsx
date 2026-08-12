@@ -1,6 +1,14 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
-import { AppShell, SectionCard, ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "@/components/scl/app-shell";
+import {
+  AppShell,
+  SectionCard,
+  ChannelDot,
+  LabelChip,
+  ListChip,
+  labelColorClass,
+  labelColorDot,
+} from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   type Contact,
@@ -25,10 +33,31 @@ import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import { toast } from "sonner";
 import {
-  Search, Plus, MoreHorizontal,
-  Users, UserCircle2, Inbox as InboxIcon, ChevronLeft, ChevronRight, Pencil, Trash2, X,
-  Tag as TagIcon, ListPlus, Check, Settings2, GripVertical, LayoutGrid, Rows3, Info,
-  Phone, Mail, Hash, Eye, EyeOff, Copy,
+  Search,
+  Plus,
+  MoreHorizontal,
+  Users,
+  UserCircle2,
+  Inbox as InboxIcon,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Trash2,
+  X,
+  Tag as TagIcon,
+  ListPlus,
+  Check,
+  Settings2,
+  GripVertical,
+  LayoutGrid,
+  Rows3,
+  Info,
+  Phone,
+  Mail,
+  Hash,
+  Eye,
+  EyeOff,
+  Copy,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
@@ -87,8 +116,7 @@ function ContactsPage() {
       // brand view: show all contacts (BA + customer) with this brand
       const brandId = activeView.slice(6);
       base = live.filter((c) => (c.brandIds ?? []).includes(brandId));
-    }
-    else base = live.filter((c) => c.listIds.includes(activeView));
+    } else base = live.filter((c) => c.listIds.includes(activeView));
     if (!query.trim()) return base;
     const q = query.toLowerCase();
     return base.filter(
@@ -100,8 +128,12 @@ function ContactsPage() {
   }, [contacts, activeView, query]);
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
-  useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
-  useEffect(() => { setPage(1); }, [activeView, query, perPage]);
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [totalPages, page]);
+  useEffect(() => {
+    setPage(1);
+  }, [activeView, query, perPage]);
 
   if (isChildRoute) return <Outlet />;
   const pageStart = (page - 1) * perPage;
@@ -116,7 +148,8 @@ function ContactsPage() {
 
   const labelById = (id: string) => labels.find((l) => l.id === id);
   const listById = (id: string) => lists.find((l) => l.id === id);
-  const activeList = activeView !== "all" && activeView !== "mine" ? listById(activeView) ?? null : null;
+  const activeList =
+    activeView !== "all" && activeView !== "mine" ? (listById(activeView) ?? null) : null;
   const liveContacts = contacts.filter((c) => !c.deleted);
   const myCount = liveContacts.filter((c) => !c.labelIds.includes("lb-ba")).length;
   const baCount = liveContacts.filter((c) => c.labelIds.includes("lb-ba")).length;
@@ -134,31 +167,60 @@ function ContactsPage() {
     );
 
   const bulkAddLabel = (lid: string) =>
-    setContacts((cs) => cs.map((c) => (selected.includes(c.id) && !c.labelIds.includes(lid) ? { ...c, labelIds: [...c.labelIds, lid] } : c)));
+    setContacts((cs) =>
+      cs.map((c) =>
+        selected.includes(c.id) && !c.labelIds.includes(lid)
+          ? { ...c, labelIds: [...c.labelIds, lid] }
+          : c,
+      ),
+    );
   const bulkRemoveLabel = (lid: string) =>
-    setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, labelIds: c.labelIds.filter((x) => x !== lid) } : c)));
+    setContacts((cs) =>
+      cs.map((c) =>
+        selected.includes(c.id) ? { ...c, labelIds: c.labelIds.filter((x) => x !== lid) } : c,
+      ),
+    );
   const bulkAddList = (lsId: string) =>
-    setContacts((cs) => cs.map((c) => (selected.includes(c.id) && !c.listIds.includes(lsId) ? { ...c, listIds: [...c.listIds, lsId] } : c)));
+    setContacts((cs) =>
+      cs.map((c) =>
+        selected.includes(c.id) && !c.listIds.includes(lsId)
+          ? { ...c, listIds: [...c.listIds, lsId] }
+          : c,
+      ),
+    );
   const addAllVisibleToList = (lsId: string) => {
     const ids = visibleContacts.map((c) => c.id);
-    setContacts((cs) => cs.map((c) => (ids.includes(c.id) && !c.listIds.includes(lsId) ? { ...c, listIds: [...c.listIds, lsId] } : c)));
+    setContacts((cs) =>
+      cs.map((c) =>
+        ids.includes(c.id) && !c.listIds.includes(lsId)
+          ? { ...c, listIds: [...c.listIds, lsId] }
+          : c,
+      ),
+    );
     const aud = lists.find((l) => l.id === lsId);
-    toast.success(`Added ${ids.length} contact${ids.length === 1 ? "" : "s"} to ${aud?.name ?? "audience"}`);
+    toast.success(
+      `Added ${ids.length} contact${ids.length === 1 ? "" : "s"} to ${aud?.name ?? "audience"}`,
+    );
   };
   const bulkRemoveList = (lsId: string) =>
-    setContacts((cs) => cs.map((c) => (selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c)));
+    setContacts((cs) =>
+      cs.map((c) =>
+        selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c,
+      ),
+    );
   const bulkDelete = () => {
     const count = selected.length;
     contactsStore.softDeleteContacts(selected);
     setSelected([]);
-    toast.success(
-      `Moved ${count} contact${count === 1 ? "" : "s"} to Recently Deleted`,
-    );
+    toast.success(`Moved ${count} contact${count === 1 ? "" : "s"} to Recently Deleted`);
   };
 
   const createList = () => {
     const name = newListName.trim();
-    if (!name) { toast.error("List name is required"); return; }
+    if (!name) {
+      toast.error("List name is required");
+      return;
+    }
     const id = `ls-${Date.now()}`;
     setLists((l) => [...l, { id, name }]);
     setNewListName("");
@@ -198,7 +260,15 @@ function ContactsPage() {
 
   return (
     <AppShell
-      title={activeView === "mine" ? "Customer Contacts" : activeView === "ba" ? "BA Contacts" : activeList ? activeList.name : "All Contacts"}
+      title={
+        activeView === "mine"
+          ? "Customer Contacts"
+          : activeView === "ba"
+            ? "BA Contacts"
+            : activeList
+              ? activeList.name
+              : "All Contacts"
+      }
       subtitle={
         activeList
           ? `${visibleContacts.length} contacts in this audience`
@@ -213,9 +283,14 @@ function ContactsPage() {
         <aside className="border-r border-border bg-background scl-grid-bg overflow-y-auto">
           <div className="p-3 space-y-1">
             <button
-              onClick={() => { setActiveView("all"); setSelected([]); }}
+              onClick={() => {
+                setActiveView("all");
+                setSelected([]);
+              }}
               className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                activeView === "all" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                activeView === "all"
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -224,9 +299,14 @@ function ContactsPage() {
               <span className="text-[10px] text-muted-foreground">{liveContacts.length}</span>
             </button>
             <button
-              onClick={() => { setActiveView("mine"); setSelected([]); }}
+              onClick={() => {
+                setActiveView("mine");
+                setSelected([]);
+              }}
               className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                activeView === "mine" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                activeView === "mine"
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -235,9 +315,14 @@ function ContactsPage() {
               <span className="text-[10px] text-muted-foreground">{myCount}</span>
             </button>
             <button
-              onClick={() => { setActiveView("ba"); setSelected([]); }}
+              onClick={() => {
+                setActiveView("ba");
+                setSelected([]);
+              }}
               className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                activeView === "ba" ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                activeView === "ba"
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -247,12 +332,18 @@ function ContactsPage() {
             </button>
           </div>
 
-          <BrandsNav activeView={activeView} setActiveView={setActiveView} setSelected={setSelected} />
+          <BrandsNav
+            activeView={activeView}
+            setActiveView={setActiveView}
+            setSelected={setSelected}
+          />
 
           {/* Audience section */}
           <div className="pt-3 border-t border-border mt-3 px-0">
             <div className="flex items-center justify-between px-3 mb-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Audience</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Audience
+              </span>
               <button
                 onClick={() => navigate({ to: "/contacts/audience/new" })}
                 className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
@@ -263,7 +354,10 @@ function ContactsPage() {
             {lists.map((l) => (
               <button
                 key={l.id}
-                onClick={() => { setActiveView(l.id); setSelected([]); }}
+                onClick={() => {
+                  setActiveView(l.id);
+                  setSelected([]);
+                }}
                 onDoubleClick={() => setAudienceModalId(l.id)}
                 className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-gray-50 flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
               >
@@ -271,10 +365,14 @@ function ContactsPage() {
                 <span className="truncate flex-1">{l.name}</span>
                 <span
                   className="text-[10px] text-muted-foreground/60 hover:text-primary cursor-pointer transition-colors duration-150"
-                  onClick={(e) => { e.stopPropagation(); setAudienceModalId(l.id); setAudienceSearch(""); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAudienceModalId(l.id);
+                    setAudienceSearch("");
+                  }}
                   title="Manage contacts"
                 >
-                  {contacts.filter(c => c.listIds.includes(l.id)).length}
+                  {contacts.filter((c) => c.listIds.includes(l.id)).length}
                 </span>
               </button>
             ))}
@@ -307,7 +405,9 @@ function ContactsPage() {
                 className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card transition-colors duration-150"
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
-                <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">{properties.length}</span>
+                <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                  {properties.length}
+                </span>
               </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
@@ -357,7 +457,12 @@ function ContactsPage() {
               >
                 <Trash2 className="h-3 w-3" /> Delete Contacts
               </button>
-              <button onClick={() => setSelected([])} className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150">Clear selection</button>
+              <button
+                onClick={() => setSelected([])}
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                Clear selection
+              </button>
             </div>
           )}
 
@@ -370,28 +475,32 @@ function ContactsPage() {
                 onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
               />
             ) : (
-            <SectionCard className="h-full flex flex-col">
-              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
-                <ContactsTable
-                  contacts={pageContacts}
-                  view={activeView}
-                  selected={selected}
-                  allSelected={allSelected}
-                  onSelectAll={() => setSelected(allSelected ? [] : pageContacts.map((c) => c.id))}
-                  onToggle={toggle}
-                  onOpen={(id) => navigate({ to: "/contacts/$contactId", params: { contactId: id } })}
-                  properties={properties}
+              <SectionCard className="h-full flex flex-col">
+                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
+                  <ContactsTable
+                    contacts={pageContacts}
+                    view={activeView}
+                    selected={selected}
+                    allSelected={allSelected}
+                    onSelectAll={() =>
+                      setSelected(allSelected ? [] : pageContacts.map((c) => c.id))
+                    }
+                    onToggle={toggle}
+                    onOpen={(id) =>
+                      navigate({ to: "/contacts/$contactId", params: { contactId: id } })
+                    }
+                    properties={properties}
+                  />
+                </div>
+                <TablePagination
+                  total={visibleContacts.length}
+                  page={page}
+                  perPage={perPage}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                  onPerPageChange={setPerPage}
                 />
-              </div>
-              <TablePagination
-                total={visibleContacts.length}
-                page={page}
-                perPage={perPage}
-                totalPages={totalPages}
-                onPageChange={setPage}
-                onPerPageChange={setPerPage}
-              />
-            </SectionCard>
+              </SectionCard>
             )}
           </div>
         </div>
@@ -401,116 +510,193 @@ function ContactsPage() {
         <ManagePropertiesModal
           properties={properties}
           onClose={() => setShowManageProps(false)}
-          onChange={(next) => { setProperties(next); toast.success("Property updated"); }}
+          onChange={(next) => {
+            setProperties(next);
+            toast.success("Property updated");
+          }}
         />
       )}
-      {audienceModalId && (() => {
-        const aud = lists.find(l => l.id === audienceModalId);
-        if (!aud) return null;
-        const q = audienceSearch.toLowerCase();
-        const nonBA = contacts.filter(c => !c.labelIds.includes("lb-ba") && (
-          !q || c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)
-        ));
-        const inAudCount = contacts.filter(c => c.listIds.includes(audienceModalId)).length;
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50 modal-backdrop" onClick={() => { setAudienceModalId(null); setInfoContact(null); }} />
-            <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-2xl p-5 space-y-4 modal-content">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold">{aud.name}</h2>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Select contacts to include in this audience</p>
+      {audienceModalId &&
+        (() => {
+          const aud = lists.find((l) => l.id === audienceModalId);
+          if (!aud) return null;
+          const q = audienceSearch.toLowerCase();
+          const nonBA = contacts.filter(
+            (c) =>
+              !c.labelIds.includes("lb-ba") &&
+              (!q || c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)),
+          );
+          const inAudCount = contacts.filter((c) => c.listIds.includes(audienceModalId)).length;
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/50 modal-backdrop"
+                onClick={() => {
+                  setAudienceModalId(null);
+                  setInfoContact(null);
+                }}
+              />
+              <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-2xl p-5 space-y-4 modal-content">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-sm font-semibold">{aud.name}</h2>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      Select contacts to include in this audience
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAudienceModalId(null);
+                      setInfoContact(null);
+                    }}
+                    className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              {/* Search */}
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1 min-w-0">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                  <input
-                    value={audienceSearch}
-                    onChange={e => setAudienceSearch(e.target.value)}
-                    placeholder="Search by name or phone..."
-                    className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-                  />
+                {/* Search */}
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 min-w-0">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    <input
+                      value={audienceSearch}
+                      onChange={(e) => setAudienceSearch(e.target.value)}
+                      placeholder="Search by name or phone..."
+                      className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                    />
+                  </div>
+                  <div className="w-px h-6 bg-border shrink-0" />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate({
+                        to: "/contacts/audience/add/$audienceId",
+                        params: { audienceId: audienceModalId },
+                      })
+                    }
+                    className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-md border border-primary/30 bg-primary/10 text-[11px] font-medium text-primary hover:bg-primary/15 transition-colors whitespace-nowrap"
+                  >
+                    <Plus className="h-3 w-3" /> Add More
+                  </button>
                 </div>
-                <div className="w-px h-6 bg-border shrink-0" />
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: "/contacts/audience/add/$audienceId", params: { audienceId: audienceModalId } })}
-                  className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-md border border-primary/30 bg-primary/10 text-[11px] font-medium text-primary hover:bg-primary/15 transition-colors whitespace-nowrap"
-                >
-                  <Plus className="h-3 w-3" /> Add More
-                </button>
-              </div>
-              {/* Contact list */}
-              <div className="max-h-64 overflow-y-auto space-y-0.5 border border-border rounded-lg bg-background">
-                {nonBA.length === 0 && (
-                  <div className="px-3 py-6 text-center text-xs text-muted-foreground">No contacts found</div>
-                )}
-                {nonBA.map(c => {
-                  const inList = c.listIds.includes(audienceModalId);
-                  return (
-                    <div key={c.id} className={`flex items-center gap-2.5 px-2.5 py-2 transition-colors ${inList ? "bg-primary/8" : ""}`}>
-                      <button type="button"
-                        onClick={() => setContacts(cs => cs.map(x => x.id === c.id
-                          ? { ...x, listIds: inList ? x.listIds.filter(id => id !== audienceModalId) : [...x.listIds, audienceModalId!] }
-                          : x))}
-                        className={`flex items-center gap-2.5 flex-1 min-w-0 text-left text-[12px] ${inList ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        <span className={`h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 border ${inList ? "bg-primary/20 border-primary/40 text-primary" : "bg-muted border-border"}`}>{c.avatar}</span>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-medium truncate">{c.name}</div>
-                          <div className="text-[10px] text-muted-foreground truncate">{c.phone}</div>
-                        </div>
-                        {inList && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setInfoContact(infoContact?.id === c.id ? null : c)}
-                        className={`h-6 w-6 grid place-items-center rounded shrink-0 transition-colors ${infoContact?.id === c.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-                        title="Contact info"
-                      >
-                        <Info className="h-3.5 w-3.5" />
-                      </button>
+                {/* Contact list */}
+                <div className="max-h-64 overflow-y-auto space-y-0.5 border border-border rounded-lg bg-background">
+                  {nonBA.length === 0 && (
+                    <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                      No contacts found
                     </div>
-                  );
-                })}
-              </div>
-              {/* Inline contact info panel */}
-              {infoContact && (
-                <div className="rounded-lg border border-border bg-background p-3 space-y-2 text-[12px]">
-                  <div className="flex items-center gap-2 font-semibold">
-                    <span className="h-7 w-7 rounded-full bg-muted border border-border flex items-center justify-center text-[10px] font-semibold">{infoContact.avatar}</span>
-                    {infoContact.name}
-                    {infoContact.lifecycleStage && (
-                      <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">{infoContact.lifecycleStage}</span>
-                    )}
-                  </div>
-                  <div className="space-y-1 text-muted-foreground">
-                    <div className="flex items-center gap-2"><Phone className="h-3 w-3 shrink-0" />{infoContact.phone}</div>
-                    {infoContact.email && <div className="flex items-center gap-2"><Mail className="h-3 w-3 shrink-0" />{infoContact.email}</div>}
-                    {infoContact.labelIds.length > 0 && (
-                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                        {infoContact.labelIds.map(lid => {
-                          const lbl = labels.find(l => l.id === lid);
-                          return lbl ? <span key={lid} className={`text-[10px] px-1.5 py-0.5 rounded-full border ${labelColorClass[lbl.color]}`}>{lbl.name}</span> : null;
-                        })}
+                  )}
+                  {nonBA.map((c) => {
+                    const inList = c.listIds.includes(audienceModalId);
+                    return (
+                      <div
+                        key={c.id}
+                        className={`flex items-center gap-2.5 px-2.5 py-2 transition-colors ${inList ? "bg-primary/8" : ""}`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContacts((cs) =>
+                              cs.map((x) =>
+                                x.id === c.id
+                                  ? {
+                                      ...x,
+                                      listIds: inList
+                                        ? x.listIds.filter((id) => id !== audienceModalId)
+                                        : [...x.listIds, audienceModalId!],
+                                    }
+                                  : x,
+                              ),
+                            )
+                          }
+                          className={`flex items-center gap-2.5 flex-1 min-w-0 text-left text-[12px] ${inList ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                          <span
+                            className={`h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 border ${inList ? "bg-primary/20 border-primary/40 text-primary" : "bg-muted border-border"}`}
+                          >
+                            {c.avatar}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium truncate">{c.name}</div>
+                            <div className="text-[10px] text-muted-foreground truncate">
+                              {c.phone}
+                            </div>
+                          </div>
+                          {inList && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setInfoContact(infoContact?.id === c.id ? null : c)}
+                          className={`h-6 w-6 grid place-items-center rounded shrink-0 transition-colors ${infoContact?.id === c.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          title="Contact info"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                    )}
-                  </div>
+                    );
+                  })}
                 </div>
-              )}
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{inAudCount} contact{inAudCount !== 1 ? "s" : ""} in this audience</span>
-                <button onClick={() => { setAudienceModalId(null); setInfoContact(null); }} className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors">Done</button>
+                {/* Inline contact info panel */}
+                {infoContact && (
+                  <div className="rounded-lg border border-border bg-background p-3 space-y-2 text-[12px]">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <span className="h-7 w-7 rounded-full bg-muted border border-border flex items-center justify-center text-[10px] font-semibold">
+                        {infoContact.avatar}
+                      </span>
+                      {infoContact.name}
+                      {infoContact.lifecycleStage && (
+                        <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                          {infoContact.lifecycleStage}
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-1 text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3 w-3 shrink-0" />
+                        {infoContact.phone}
+                      </div>
+                      {infoContact.email && (
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-3 w-3 shrink-0" />
+                          {infoContact.email}
+                        </div>
+                      )}
+                      {infoContact.labelIds.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                          {infoContact.labelIds.map((lid) => {
+                            const lbl = labels.find((l) => l.id === lid);
+                            return lbl ? (
+                              <span
+                                key={lid}
+                                className={`text-[10px] px-1.5 py-0.5 rounded-full border ${labelColorClass[lbl.color]}`}
+                              >
+                                {lbl.name}
+                              </span>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>
+                    {inAudCount} contact{inAudCount !== 1 ? "s" : ""} in this audience
+                  </span>
+                  <button
+                    onClick={() => {
+                      setAudienceModalId(null);
+                      setInfoContact(null);
+                    }}
+                    className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
@@ -524,7 +710,11 @@ function ContactsPage() {
 }
 
 // ── Brands Nav ────────────────────────────────────────────────────────────
-function BrandsNav({ activeView, setActiveView, setSelected }: {
+function BrandsNav({
+  activeView,
+  setActiveView,
+  setSelected,
+}: {
   activeView: string;
   setActiveView: (v: string) => void;
   setSelected: (s: string[]) => void;
@@ -548,9 +738,14 @@ function BrandsNav({ activeView, setActiveView, setSelected }: {
           return (
             <button
               key={brand.id}
-              onClick={() => { setActiveView(`brand:${brand.id}`); setSelected([]); }}
+              onClick={() => {
+                setActiveView(`brand:${brand.id}`);
+                setSelected([]);
+              }}
               className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                active
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -602,14 +797,14 @@ function ContactsTable({
   const { bas } = useBaStore();
   const { brands } = useSkuStore();
   const { transactions } = useTransactionsStore();
-  const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
+  const brandName = (id: string) =>
+    brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [revealTarget, setRevealTarget] = useState<BA | null>(null);
   // Manage Properties' Visible toggle governs which of these optional
   // columns render — a property missing from the list defaults to shown so
   // this never silently hides a column no one configured.
   const isVisible = (key: string) => properties.find((p) => p.key === key)?.visible !== false;
-
 
   // Last transaction per contact
   const lastTxByContact = useMemo(() => {
@@ -624,15 +819,17 @@ function ContactsTable({
     return map;
   }, [transactions]);
 
-  const thCls = "sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]";
+  const thCls =
+    "sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]";
   const tdCls = "px-4 py-3 whitespace-nowrap align-middle text-xs";
 
   const isBA = (c: Contact) => c.labelIds.includes("lb-ba");
-  const getBA = (c: Contact) => bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
+  const getBA = (c: Contact) =>
+    bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
 
   // Column layout per view, filtered further by Manage Properties' Visible toggle
-  const isBaView    = view === "ba";
-  const isMineView  = view === "mine";
+  const isBaView = view === "ba";
+  const isMineView = view === "mine";
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
   const showGender = (isAllOrBrand || isMineView) && isVisible("gender");
   const showPointBalance = isMineView && isVisible("point_balance");
@@ -646,12 +843,28 @@ function ContactsTable({
 
   // colSpan for empty state — base columns (checkbox, name, WA number, contact
   // type) plus whichever optional columns are currently toggled on
-  const colSpan = 4 + [showGender, showPointBalance, showLastTransaction, showBaBrand, showBaGender, showBaPosition, showBaStore, showBaCity, showBaPassword].filter(Boolean).length;
+  const colSpan =
+    4 +
+    [
+      showGender,
+      showPointBalance,
+      showLastTransaction,
+      showBaBrand,
+      showBaGender,
+      showBaPosition,
+      showBaStore,
+      showBaCity,
+      showBaPassword,
+    ].filter(Boolean).length;
 
   function toggleReveal(ba: BA | undefined) {
     if (!ba) return;
     if (revealed.has(ba.id)) {
-      setRevealed((s) => { const n = new Set(s); n.delete(ba.id); return n; });
+      setRevealed((s) => {
+        const n = new Set(s);
+        n.delete(ba.id);
+        return n;
+      });
       return;
     }
     setRevealTarget(ba);
@@ -659,111 +872,182 @@ function ContactsTable({
 
   return (
     <>
-    <table className="min-w-full text-sm">
-      <thead>
-        <tr>
-          <th className={`${thCls} w-10`}>
-            <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={allSelected} onChange={onSelectAll} />
-          </th>
-          <th className={thCls}>Name</th>
-          {showGender && <th className={thCls}>Gender</th>}
-          <th className={thCls}>WA Number</th>
-          <th className={thCls}>Contact Type</th>
-          {showPointBalance && <th className={thCls}>Point Balance</th>}
-          {showLastTransaction && <th className={thCls}>Last Transaction</th>}
-          {showBaBrand && <th className={thCls}>Brand</th>}
-          {showBaGender && <th className={thCls}>Gender</th>}
-          {showBaPosition && <th className={thCls}>Position</th>}
-          {showBaStore && <th className={thCls}>Store</th>}
-          {showBaCity && <th className={thCls}>City</th>}
-          {showBaPassword && <th className={thCls}>Password</th>}
-        </tr>
-      </thead>
-      <tbody className="stagger divide-y divide-border">
-        {contacts.map((c) => {
-          const ba = getBA(c);
-          return (
-            <tr key={c.id} className="hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => onOpen(c.id)}>
-              <td className={tdCls} onClick={(e) => e.stopPropagation()}>
-                <input type="checkbox" className="accent-[oklch(0.62_0.17_40)]" checked={selected.includes(c.id)} onChange={() => onToggle(c.id)} />
-              </td>
-              <td className={tdCls}>
-                <span className="font-medium text-foreground">{c.name}</span>
-              </td>
-              {showGender && (
-                <td className={tdCls}>{c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>
-              )}
-              <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
-              <td className={tdCls}><ContactTypeChip isBA={isBA(c)} /></td>
-              {showPointBalance && (
-                <td className={`${tdCls} tabular-nums`}>
-                  {c.pointBalance != null && c.pointBalance > 0
-                    ? <span className="text-foreground font-medium">{fmtNum(c.pointBalance)} pts</span>
-                    : <span className="text-muted-foreground">—</span>}
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr>
+            <th className={`${thCls} w-10`}>
+              <input
+                type="checkbox"
+                className="accent-[oklch(0.62_0.17_40)]"
+                checked={allSelected}
+                onChange={onSelectAll}
+              />
+            </th>
+            <th className={thCls}>Name</th>
+            {showGender && <th className={thCls}>Gender</th>}
+            <th className={thCls}>WA Number</th>
+            <th className={thCls}>Contact Type</th>
+            {showPointBalance && <th className={thCls}>Point Balance</th>}
+            {showLastTransaction && <th className={thCls}>Last Transaction</th>}
+            {showBaBrand && <th className={thCls}>Brand</th>}
+            {showBaGender && <th className={thCls}>Gender</th>}
+            {showBaPosition && <th className={thCls}>Position</th>}
+            {showBaStore && <th className={thCls}>Store</th>}
+            {showBaCity && <th className={thCls}>City</th>}
+            {showBaPassword && <th className={thCls}>Password</th>}
+          </tr>
+        </thead>
+        <tbody className="stagger divide-y divide-border">
+          {contacts.map((c) => {
+            const ba = getBA(c);
+            return (
+              <tr
+                key={c.id}
+                className="hover:bg-gray-50 cursor-pointer transition-colors"
+                onClick={() => onOpen(c.id)}
+              >
+                <td className={tdCls} onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    className="accent-[oklch(0.62_0.17_40)]"
+                    checked={selected.includes(c.id)}
+                    onChange={() => onToggle(c.id)}
+                  />
                 </td>
-              )}
-              {showLastTransaction && (() => {
-                const tx = lastTxByContact.get(c.id);
-                return (
-                  <td className={`${tdCls} text-[11px]`}>
-                    {tx ? (
-                      <div>
-                        <div className="text-foreground font-medium">{tx.invoice}</div>
-                        <div className="text-muted-foreground">{fmtDateEN(tx.date)}</div>
+                <td className={tdCls}>
+                  <span className="font-medium text-foreground">{c.name}</span>
+                </td>
+                {showGender && (
+                  <td className={tdCls}>
+                    {c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}
+                  </td>
+                )}
+                <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
+                <td className={tdCls}>
+                  <ContactTypeChip isBA={isBA(c)} />
+                </td>
+                {showPointBalance && (
+                  <td className={`${tdCls} tabular-nums`}>
+                    {c.pointBalance != null && c.pointBalance > 0 ? (
+                      <span className="text-foreground font-medium">
+                        {fmtNum(c.pointBalance)} pts
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                )}
+                {showLastTransaction &&
+                  (() => {
+                    const tx = lastTxByContact.get(c.id);
+                    return (
+                      <td className={`${tdCls} text-[11px]`}>
+                        {tx ? (
+                          <div>
+                            <div className="text-foreground font-medium">{tx.invoice}</div>
+                            <div className="text-muted-foreground">{fmtDateEN(tx.date)}</div>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                    );
+                  })()}
+                {showBaBrand && (
+                  <td className={tdCls}>
+                    {ba?.brandIds?.length ? (
+                      ba.brandIds.map(brandName).join(", ")
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                )}
+                {showBaGender && (
+                  <td className={tdCls}>
+                    {ba?.gender ?? <span className="text-muted-foreground">—</span>}
+                  </td>
+                )}
+                {showBaPosition && (
+                  <td className={tdCls}>
+                    {ba?.position ?? <span className="text-muted-foreground">—</span>}
+                  </td>
+                )}
+                {showBaStore && (
+                  <td className={tdCls}>
+                    {ba?.store ?? <span className="text-muted-foreground">—</span>}
+                  </td>
+                )}
+                {showBaCity && (
+                  <td className={tdCls}>
+                    {ba?.city ?? <span className="text-muted-foreground">—</span>}
+                  </td>
+                )}
+                {showBaPassword && (
+                  <td className={tdCls} onClick={(e) => e.stopPropagation()}>
+                    {ba ? (
+                      <div className="flex items-center gap-1.5">
+                        <code className="font-mono text-xs">
+                          {revealed.has(ba.id) ? ba.password : "••••••••••••"}
+                        </code>
+                        <button
+                          onClick={() => toggleReveal(ba)}
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          title={
+                            revealed.has(ba.id) ? "Hide" : "Show (requires your account password)"
+                          }
+                        >
+                          {revealed.has(ba.id) ? (
+                            <EyeOff className="h-3.5 w-3.5" />
+                          ) : (
+                            <Eye className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                        {revealed.has(ba.id) && (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(ba.password);
+                              toast.success("Password copied");
+                            }}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                            title="Copy"
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
                   </td>
-                );
-              })()}
-              {showBaBrand && <td className={tdCls}>{ba?.brandIds?.length ? ba.brandIds.map(brandName).join(", ") : <span className="text-muted-foreground">—</span>}</td>}
-              {showBaGender && <td className={tdCls}>{ba?.gender ?? <span className="text-muted-foreground">—</span>}</td>}
-              {showBaPosition && <td className={tdCls}>{ba?.position ?? <span className="text-muted-foreground">—</span>}</td>}
-              {showBaStore && <td className={tdCls}>{ba?.store ?? <span className="text-muted-foreground">—</span>}</td>}
-              {showBaCity && <td className={tdCls}>{ba?.city ?? <span className="text-muted-foreground">—</span>}</td>}
-              {showBaPassword && (
-                <td className={tdCls} onClick={(e) => e.stopPropagation()}>
-                  {ba ? (
-                    <div className="flex items-center gap-1.5">
-                      <code className="font-mono text-xs">{revealed.has(ba.id) ? ba.password : "••••••••••••"}</code>
-                      <button onClick={() => toggleReveal(ba)} className="text-muted-foreground hover:text-foreground transition-colors" title={revealed.has(ba.id) ? "Hide" : "Show (requires your account password)"}>
-                        {revealed.has(ba.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                      </button>
-                      {revealed.has(ba.id) && (
-                        <button onClick={() => { navigator.clipboard.writeText(ba.password); toast.success("Password copied"); }} className="text-muted-foreground hover:text-foreground transition-colors" title="Copy">
-                          <Copy className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  ) : <span className="text-muted-foreground">—</span>}
-                </td>
-              )}
+                )}
+              </tr>
+            );
+          })}
+          {contacts.length === 0 && (
+            <tr>
+              <td
+                colSpan={colSpan}
+                className="px-4 py-16 text-center text-xs text-muted-foreground"
+              >
+                <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
+                <div className="font-medium text-foreground">No contacts found</div>
+                <div className="mt-1">Try selecting another channel or clearing filters.</div>
+              </td>
             </tr>
-          );
-        })}
-        {contacts.length === 0 && (
-          <tr>
-            <td colSpan={colSpan} className="px-4 py-16 text-center text-xs text-muted-foreground">
-              <InboxIcon className="h-5 w-5 mx-auto mb-2 opacity-50" />
-              <div className="font-medium text-foreground">No contacts found</div>
-              <div className="mt-1">Try selecting another channel or clearing filters.</div>
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
+          )}
+        </tbody>
+      </table>
 
-    {revealTarget && (
-      <RevealPasswordModal
-        label={revealTarget.name}
-        onClose={() => setRevealTarget(null)}
-        onConfirmed={() => {
-          setRevealed((s) => new Set(s).add(revealTarget.id));
-          setRevealTarget(null);
-        }}
-      />
-    )}
+      {revealTarget && (
+        <RevealPasswordModal
+          label={revealTarget.name}
+          onClose={() => setRevealTarget(null)}
+          onConfirmed={() => {
+            setRevealed((s) => new Set(s).add(revealTarget.id));
+            setRevealTarget(null);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -778,7 +1062,11 @@ function renderPropertyCell(
     case "name":
       return <span className="font-sans text-xs font-normal text-foreground">{c.name}</span>;
     case "phone":
-      return <span className="font-sans text-xs font-normal text-muted-foreground tabular-nums">{c.phone}</span>;
+      return (
+        <span className="font-sans text-xs font-normal text-muted-foreground tabular-nums">
+          {c.phone}
+        </span>
+      );
     case "channel":
       return <ChannelDot channel={c.channel} />;
     case "labels":
@@ -825,12 +1113,24 @@ function renderPropertyCell(
       return <span className="text-xs text-muted-foreground">{c.lastInteraction}</span>;
     case "status":
       return (
-        <span className={`inline-flex items-center gap-1.5 text-xs ${
-          c.status === "Active" ? "text-emerald-300" : c.status === "Inactive" ? "text-muted-foreground" : "text-rose-300"
-        }`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${
-            c.status === "Active" ? "bg-emerald-400" : c.status === "Inactive" ? "bg-muted-foreground" : "bg-rose-400"
-          }`} />
+        <span
+          className={`inline-flex items-center gap-1.5 text-xs ${
+            c.status === "Active"
+              ? "text-emerald-300"
+              : c.status === "Inactive"
+                ? "text-muted-foreground"
+                : "text-rose-300"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              c.status === "Active"
+                ? "bg-emerald-400"
+                : c.status === "Inactive"
+                  ? "bg-muted-foreground"
+                  : "bg-rose-400"
+            }`}
+          />
           {c.status}
         </span>
       );
@@ -840,7 +1140,9 @@ function renderPropertyCell(
 }
 
 function ManagePropertiesModal({
-  properties, onClose, onChange,
+  properties,
+  onClose,
+  onChange,
 }: {
   properties: ContactProperty[];
   onClose: () => void;
@@ -853,8 +1155,7 @@ function ManagePropertiesModal({
   const toggleVisible = (id: string) =>
     onChange(properties.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
 
-  const deleteProp = (id: string) =>
-    onChange(properties.filter((p) => p.id !== id));
+  const deleteProp = (id: string) => onChange(properties.filter((p) => p.id !== id));
 
   const upsertProp = (prop: ContactProperty) => {
     const exists = properties.some((p) => p.id === prop.id);
@@ -875,21 +1176,35 @@ function ManagePropertiesModal({
   };
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop" onClick={onClose}>
-      <div className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop"
+      onClick={onClose}
+    >
+      <div
+        className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
             <div className="text-sm font-medium">Manage Properties</div>
-            <div className="text-[11px] text-muted-foreground">Reorder, show/hide, edit, or add contact properties.</div>
+            <div className="text-[11px] text-muted-foreground">
+              Reorder, show/hide, edit, or add contact properties.
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { setEditing(null); setShowAdd(true); }}
+              onClick={() => {
+                setEditing(null);
+                setShowAdd(true);
+              }}
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> Add Property
             </button>
-            <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+            <button
+              onClick={onClose}
+              className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -922,22 +1237,32 @@ function ManagePropertiesModal({
                   <td className="px-3 py-2 text-xs text-muted-foreground">{idx + 1}</td>
                   <td className="px-3 py-2">
                     <div className="text-sm">{p.name}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono">{p.key}{p.system ? " · default" : ""}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">
+                      {p.key}
+                      {p.system ? " · default" : ""}
+                    </div>
                   </td>
-                  <td className="px-3 py-2 text-xs text-muted-foreground">{PROPERTY_TYPE_LABELS[p.type]}</td>
+                  <td className="px-3 py-2 text-xs text-muted-foreground">
+                    {PROPERTY_TYPE_LABELS[p.type]}
+                  </td>
                   <td className="px-3 py-2">
                     <button
                       onClick={() => toggleVisible(p.id)}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${p.visible ? "bg-primary" : "bg-white/10"}`}
                       aria-label="toggle visible"
                     >
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${p.visible ? "translate-x-4" : "translate-x-0.5"}`} />
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${p.visible ? "translate-x-4" : "translate-x-0.5"}`}
+                      />
                     </button>
                   </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex items-center gap-1">
                       <button
-                        onClick={() => { setEditing(p); setShowAdd(true); }}
+                        onClick={() => {
+                          setEditing(p);
+                          setShowAdd(true);
+                        }}
                         className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
                         title="Edit"
                       >
@@ -964,20 +1289,35 @@ function ManagePropertiesModal({
       {showAdd && (
         <PropertyFormModal
           initial={editing}
-          onClose={() => { setShowAdd(false); setEditing(null); }}
-          onSave={(prop) => { upsertProp(prop); setShowAdd(false); setEditing(null); }}
+          onClose={() => {
+            setShowAdd(false);
+            setEditing(null);
+          }}
+          onSave={(prop) => {
+            upsertProp(prop);
+            setShowAdd(false);
+            setEditing(null);
+          }}
         />
       )}
     </div>
   );
 }
 
-
 function ListSidebarRow({
-  list, count, active, onSelect, onRename, onDelete,
+  list,
+  count,
+  active,
+  onSelect,
+  onRename,
+  onDelete,
 }: {
-  list: ContactList; count: number; active: boolean;
-  onSelect: () => void; onRename: (name: string) => void; onDelete: () => void;
+  list: ContactList;
+  count: number;
+  active: boolean;
+  onSelect: () => void;
+  onRename: (name: string) => void;
+  onDelete: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(list.name);
@@ -991,10 +1331,19 @@ function ListSidebarRow({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") { onRename(value.trim() || list.name); setEditing(false); }
-            if (e.key === "Escape") { setValue(list.name); setEditing(false); }
+            if (e.key === "Enter") {
+              onRename(value.trim() || list.name);
+              setEditing(false);
+            }
+            if (e.key === "Escape") {
+              setValue(list.name);
+              setEditing(false);
+            }
           }}
-          onBlur={() => { onRename(value.trim() || list.name); setEditing(false); }}
+          onBlur={() => {
+            onRename(value.trim() || list.name);
+            setEditing(false);
+          }}
           className="h-7 flex-1 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
         />
       </div>
@@ -1006,7 +1355,9 @@ function ListSidebarRow({
       <button
         onClick={onSelect}
         className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs transition ${
-          active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+          active
+            ? "bg-primary/15 text-foreground"
+            : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
         }`}
       >
         <span className="inline-flex items-center gap-2 truncate">
@@ -1018,7 +1369,10 @@ function ListSidebarRow({
           <span
             role="button"
             tabIndex={0}
-            onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenu((m) => !m);
+            }}
             className="opacity-0 group-hover:opacity-100 h-5 w-5 grid place-items-center rounded hover:bg-gray-100 transition-colors duration-150"
           >
             <MoreHorizontal className="h-3 w-3" />
@@ -1028,13 +1382,19 @@ function ListSidebarRow({
       {menu && (
         <div className="absolute right-2 top-full z-20 mt-1 w-36 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
           <button
-            onClick={() => { setMenu(false); setEditing(true); }}
+            onClick={() => {
+              setMenu(false);
+              setEditing(true);
+            }}
             className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
           >
             <Pencil className="h-3 w-3" /> Rename
           </button>
           <button
-            onClick={() => { setMenu(false); onDelete(); }}
+            onClick={() => {
+              setMenu(false);
+              onDelete();
+            }}
             className="w-full px-3 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 inline-flex items-center gap-2 transition-colors duration-150"
           >
             <Trash2 className="h-3 w-3" /> Delete
@@ -1046,7 +1406,10 @@ function ListSidebarRow({
 }
 
 function PickerPopover({
-  label, icon, items, onPick,
+  label,
+  icon,
+  items,
+  onPick,
 }: {
   label: string;
   icon: React.ReactNode;
@@ -1067,12 +1430,17 @@ function PickerPopover({
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute left-0 top-full z-20 mt-1 w-56 rounded-md border border-border bg-popover shadow-lg p-1 max-h-64 overflow-y-auto">
             {items.length === 0 && (
-              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">Nothing to pick</div>
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                Nothing to pick
+              </div>
             )}
             {items.map((it) => (
               <button
                 key={it.id}
-                onClick={() => { onPick(it.id); setOpen(false); }}
+                onClick={() => {
+                  onPick(it.id);
+                  setOpen(false);
+                }}
                 className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
               >
                 {it.color ? (
@@ -1091,7 +1459,11 @@ function PickerPopover({
 }
 
 function LabelManager({
-  labels, onCreate, onUpdate, onDelete, trigger,
+  labels,
+  onCreate,
+  onUpdate,
+  onDelete,
+  trigger,
 }: {
   labels: ContactLabel[];
   onCreate: (name: string, color: LabelColor) => string;
@@ -1106,24 +1478,32 @@ function LabelManager({
     <>
       <span onClick={() => setOpen(true)}>{trigger}</span>
       {open && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop" onClick={() => setOpen(false)}>
-          <div className="w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-sm font-medium">Manage labels</div>
-                <div className="text-[11px] text-muted-foreground">Create, edit, or remove labels.</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Create, edit, or remove labels.
+                </div>
               </div>
-              <button onClick={() => setOpen(false)} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+              <button
+                onClick={() => setOpen(false)}
+                className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="p-5 space-y-3 max-h-80 overflow-y-auto">
               {labels.map((l) => (
                 <div key={l.id} className="flex items-center gap-2">
-                  <ColorSwatch
-                    color={l.color}
-                    onChange={(c) => onUpdate(l.id, { color: c })}
-                  />
+                  <ColorSwatch color={l.color} onChange={(c) => onUpdate(l.id, { color: c })} />
                   <input
                     defaultValue={l.name}
                     onBlur={(e) => onUpdate(l.id, { name: e.target.value.trim() || l.name })}
@@ -1139,7 +1519,9 @@ function LabelManager({
               ))}
             </div>
             <div className="p-5 border-t border-border space-y-2">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">New label</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                New label
+              </div>
               <div className="flex items-center gap-2">
                 <ColorSwatch color={newColor} onChange={setNewColor} />
                 <input
@@ -1149,7 +1531,12 @@ function LabelManager({
                   className="h-8 flex-1 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
                 />
                 <button
-                  onClick={() => { if (newName.trim()) { onCreate(newName.trim(), newColor); setNewName(""); } }}
+                  onClick={() => {
+                    if (newName.trim()) {
+                      onCreate(newName.trim(), newColor);
+                      setNewName("");
+                    }
+                  }}
                   className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                 >
                   Add
@@ -1163,7 +1550,13 @@ function LabelManager({
   );
 }
 
-function ColorSwatch({ color, onChange }: { color: LabelColor; onChange: (c: LabelColor) => void }) {
+function ColorSwatch({
+  color,
+  onChange,
+}: {
+  color: LabelColor;
+  onChange: (c: LabelColor) => void;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
@@ -1180,7 +1573,10 @@ function ColorSwatch({ color, onChange }: { color: LabelColor; onChange: (c: Lab
             {COLORS.map((c) => (
               <button
                 key={c}
-                onClick={() => { onChange(c); setOpen(false); }}
+                onClick={() => {
+                  onChange(c);
+                  setOpen(false);
+                }}
                 className={`h-5 w-5 rounded-md border ${labelColorClass[c]} grid place-items-center`}
               >
                 {c === color && <Check className="h-3 w-3" />}
@@ -1194,7 +1590,14 @@ function ColorSwatch({ color, onChange }: { color: LabelColor; onChange: (c: Lab
 }
 
 function ContactDrawer({
-  contact, labels, lists, onClose, onToggleLabel, onToggleList, onCreateLabel, onDeleteLabel,
+  contact,
+  labels,
+  lists,
+  onClose,
+  onToggleLabel,
+  onToggleList,
+  onCreateLabel,
+  onDeleteLabel,
 }: {
   contact: Contact;
   labels: ContactLabel[];
@@ -1211,26 +1614,36 @@ function ContactDrawer({
       <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto glass animate-slide-in-right">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-medium">Contact details</div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="p-5 text-center border-b border-border">
           <div className="relative mx-auto h-16 w-16">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[15px] font-medium">{contact.avatar}</div>
+            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[15px] font-medium">
+              {contact.avatar}
+            </div>
             <ChannelIcon
               channel={contact.channel}
               className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] ring-2 ring-background shadow-sm"
             />
           </div>
           <div className="mt-3 text-sm font-medium">{contact.name}</div>
-          <div className="text-[11px] text-muted-foreground">{contact.phone}{contact.instagram ? ` · ${contact.instagram}` : ""}</div>
+          <div className="text-[11px] text-muted-foreground">
+            {contact.phone}
+            {contact.instagram ? ` · ${contact.instagram}` : ""}
+          </div>
         </div>
 
         <DrawerSection title="Labels">
           <div className="flex flex-wrap gap-1 mb-2">
-            {contact.labelIds.length === 0 && <span className="text-[11px] text-muted-foreground">No labels yet</span>}
+            {contact.labelIds.length === 0 && (
+              <span className="text-[11px] text-muted-foreground">No labels yet</span>
+            )}
             {contact.labelIds.map((id) => {
               const l = labels.find((x) => x.id === id);
               return l ? <LabelChip key={id} label={l} onRemove={() => onToggleLabel(id)} /> : null;
@@ -1247,22 +1660,32 @@ function ContactDrawer({
 
         <DrawerSection title="Audience">
           <div className="flex flex-wrap gap-1 mb-2">
-            {contact.listIds.length === 0 && <span className="text-[11px] text-muted-foreground">Not in any audience</span>}
+            {contact.listIds.length === 0 && (
+              <span className="text-[11px] text-muted-foreground">Not in any audience</span>
+            )}
             {contact.listIds.map((id) => {
               const l = lists.find((x) => x.id === id);
-              return l ? <ListChip key={id} name={l.name} onRemove={() => onToggleList(id)} /> : null;
+              return l ? (
+                <ListChip key={id} name={l.name} onRemove={() => onToggleList(id)} />
+              ) : null;
             })}
           </div>
           <Dropdown
             placeholder="Add to audience…"
             icon={<ListPlus className="h-3 w-3" />}
-            items={lists.map((l) => ({ id: l.id, name: l.name, selected: contact.listIds.includes(l.id) }))}
+            items={lists.map((l) => ({
+              id: l.id,
+              name: l.name,
+              selected: contact.listIds.includes(l.id),
+            }))}
             onPick={onToggleList}
           />
         </DrawerSection>
 
         <DrawerSection title="Details">
-          <DrawerRow label="Channel"><ChannelDot channel={contact.channel} /></DrawerRow>
+          <DrawerRow label="Channel">
+            <ChannelDot channel={contact.channel} />
+          </DrawerRow>
           <DrawerRow label="Status">{contact.status}</DrawerRow>
           <DrawerRow label="Last interaction">{contact.lastInteraction}</DrawerRow>
         </DrawerSection>
@@ -1289,7 +1712,10 @@ function DrawerRow({ label, children }: { label: string; children: React.ReactNo
 }
 
 function Dropdown({
-  placeholder, icon, items, onPick,
+  placeholder,
+  icon,
+  items,
+  onPick,
 }: {
   placeholder: string;
   icon: React.ReactNode;
@@ -1310,7 +1736,9 @@ function Dropdown({
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg p-1 max-h-56 overflow-y-auto">
             {items.length === 0 && (
-              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">Nothing available</div>
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                Nothing available
+              </div>
             )}
             {items.map((it) => (
               <button
@@ -1335,7 +1763,11 @@ function Dropdown({
 }
 
 function LabelPicker({
-  labels, selectedIds, onToggle, onCreate, onDelete,
+  labels,
+  selectedIds,
+  onToggle,
+  onCreate,
+  onDelete,
 }: {
   labels: ContactLabel[];
   selectedIds: string[];
@@ -1353,7 +1785,7 @@ function LabelPicker({
   const handleCreate = () => {
     const name = search.trim();
     if (!name) return;
-    const color = COLORS[(labels.length) % COLORS.length];
+    const color = COLORS[labels.length % COLORS.length];
     onCreate(name, color);
     setSearch("");
   };
@@ -1368,14 +1800,22 @@ function LabelPicker({
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => { setOpen(false); setSearch(""); }} />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => {
+              setOpen(false);
+              setSearch("");
+            }}
+          />
           <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
             <div className="p-1.5 border-b border-border">
               <input
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && canCreate) handleCreate(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && canCreate) handleCreate();
+                }}
                 placeholder="Search or create label…"
                 className="h-7 w-full rounded border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
@@ -1404,7 +1844,9 @@ function LabelPicker({
                 );
               })}
               {filtered.length === 0 && !canCreate && (
-                <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No labels</div>
+                <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                  No labels
+                </div>
               )}
               {canCreate && (
                 <button
@@ -1424,7 +1866,12 @@ function LabelPicker({
 }
 
 function TablePagination({
-  total, page, perPage, totalPages, onPageChange, onPerPageChange,
+  total,
+  page,
+  perPage,
+  totalPages,
+  onPageChange,
+  onPerPageChange,
 }: {
   total: number;
   page: number;
@@ -1437,7 +1884,9 @@ function TablePagination({
   const end = Math.min(page * perPage, total);
 
   const pages: (number | "…")[] = [];
-  const add = (n: number) => { if (!pages.includes(n)) pages.push(n); };
+  const add = (n: number) => {
+    if (!pages.includes(n)) pages.push(n);
+  };
   if (totalPages <= 7) {
     for (let i = 1; i <= totalPages; i++) add(i);
   } else {
@@ -1458,10 +1907,14 @@ function TablePagination({
           className="h-7 rounded-md border border-border bg-card/60 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
         >
           {[10, 20, 30, 40, 50].map((n) => (
-            <option key={n} value={n}>{n}</option>
+            <option key={n} value={n}>
+              {n}
+            </option>
           ))}
         </select>
-        <span className="ml-2">{start}–{end} of {total}</span>
+        <span className="ml-2">
+          {start}–{end} of {total}
+        </span>
       </div>
       <div className="flex items-center gap-1">
         <button
@@ -1473,7 +1926,9 @@ function TablePagination({
         </button>
         {pages.map((p, i) =>
           p === "…" ? (
-            <span key={`e-${i}`} className="px-1.5 text-muted-foreground">…</span>
+            <span key={`e-${i}`} className="px-1.5 text-muted-foreground">
+              …
+            </span>
           ) : (
             <button
               key={p}
@@ -1555,17 +2010,20 @@ function KanbanBoard({
           return (
             <div
               key={stage}
-              onDragOver={(e) => { e.preventDefault(); if (overStage !== stage) setOverStage(stage); }}
-              onDragLeave={() => { if (overStage === stage) setOverStage(null); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (overStage !== stage) setOverStage(stage);
+              }}
+              onDragLeave={() => {
+                if (overStage === stage) setOverStage(null);
+              }}
               onDrop={() => {
                 if (dragId) onMove(dragId, stage);
                 setDragId(null);
                 setOverStage(null);
               }}
               className={`flex flex-col w-72 shrink-0 rounded-lg border bg-card/40 transition self-stretch ${
-                isOver
-                  ? "border-primary/70 bg-primary/10 ring-1 ring-primary/40"
-                  : "border-border"
+                isOver ? "border-primary/70 bg-primary/10 ring-1 ring-primary/40" : "border-border"
               }`}
             >
               <div className="sticky top-0 z-10">
@@ -1585,11 +2043,19 @@ function KanbanBoard({
                   <div
                     key={c.id}
                     draggable
-                    onDragStart={(e) => { setDragId(c.id); e.dataTransfer.effectAllowed = "move"; }}
-                    onDragEnd={() => { setDragId(null); setOverStage(null); }}
+                    onDragStart={(e) => {
+                      setDragId(c.id);
+                      e.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragEnd={() => {
+                      setDragId(null);
+                      setOverStage(null);
+                    }}
                     onClick={() => onOpen(c.id)}
                     className={`group relative rounded-md border border-border bg-card/80 hover:bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 cursor-grab active:cursor-grabbing px-3 py-2.5 pr-8 transition ${
-                      dragId === c.id ? "opacity-60 shadow-xl ring-1 ring-primary/40 rotate-[0.5deg]" : ""
+                      dragId === c.id
+                        ? "opacity-60 shadow-xl ring-1 ring-primary/40 rotate-[0.5deg]"
+                        : ""
                     }`}
                   >
                     <span

@@ -75,16 +75,46 @@ function NewContactPage() {
   };
 
   const submitBA = () => {
-    if (!name.trim()) { toast.error("Name is required"); return; }
-    if (!phone.trim()) { toast.error("WA Number is required"); return; }
-    if (!gender) { toast.error("Gender is required"); return; }
-    if (brandIds.length === 0) { toast.error("Select at least one brand"); return; }
-    if (!position) { toast.error("Position is required"); return; }
-    if (!areaCoordinator.trim()) { toast.error("Area Coordinator is required"); return; }
-    if (!city) { toast.error("City is required"); return; }
-    if (!store) { toast.error("Store is required"); return; }
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    if (!phone.trim()) {
+      toast.error("WA Number is required");
+      return;
+    }
+    if (!gender) {
+      toast.error("Gender is required");
+      return;
+    }
+    if (brandIds.length === 0) {
+      toast.error("Select at least one brand");
+      return;
+    }
+    if (!position) {
+      toast.error("Position is required");
+      return;
+    }
+    if (!areaCoordinator.trim()) {
+      toast.error("Area Coordinator is required");
+      return;
+    }
+    if (!city) {
+      toast.error("City is required");
+      return;
+    }
+    if (!store) {
+      toast.error("Store is required");
+      return;
+    }
 
-    const initials = name.trim().split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+    const initials = name
+      .trim()
+      .split(" ")
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
     const contact: Contact = {
       id: `c-${Date.now()}`,
       name: name.trim(),
@@ -104,7 +134,11 @@ function NewContactPage() {
     contactsStore.addActivity(contact.id, "created", "BA Contact created");
 
     // Add to ba-store
-    const username = name.trim().toLowerCase().replace(/\s+/g, ".").replace(/[^a-z.]/g, "");
+    const username = name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ".")
+      .replace(/[^a-z.]/g, "");
     baStore.add({
       name: name.trim(),
       gender: gender as "Female" | "Male" | "Other",
@@ -122,10 +156,22 @@ function NewContactPage() {
   };
 
   const submitCustomer = () => {
-    if (!name.trim()) { toast.error("Name is required"); return; }
-    if (!phone.trim()) { toast.error("WA Number is required"); return; }
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    if (!phone.trim()) {
+      toast.error("WA Number is required");
+      return;
+    }
 
-    const initials = name.trim().split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+    const initials = name
+      .trim()
+      .split(" ")
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
     const contact: Contact = {
       id: `c-${Date.now()}`,
       name: name.trim(),
@@ -157,12 +203,13 @@ function NewContactPage() {
     return (
       <AppShell title="New Contact" backTo="/contacts" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
-
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
                 <h2 className="text-lg font-semibold">Select Contact Type</h2>
-                <p className="text-sm text-muted-foreground mt-1">The form will adapt based on the selected type.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  The form will adapt based on the selected type.
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {/* Customer */}
@@ -176,9 +223,13 @@ function NewContactPage() {
                   </div>
                   <div className="text-center">
                     <div className="text-sm font-semibold">Customer</div>
-                    <div className="text-[11px] text-muted-foreground mt-1">Customer who purchases Aroma Abadi products</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">
+                      Customer who purchases Aroma Abadi products
+                    </div>
                   </div>
-                  <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
+                  <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-sky-600 text-white border border-sky-700">
+                    Consumer
+                  </span>
                 </button>
 
                 {/* BA */}
@@ -192,9 +243,13 @@ function NewContactPage() {
                   </div>
                   <div className="text-center">
                     <div className="text-sm font-semibold">Beauty Ambassador</div>
-                    <div className="text-[11px] text-muted-foreground mt-1">BA who sells and promotes products in-store</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">
+                      BA who sells and promotes products in-store
+                    </div>
                   </div>
-                  <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
+                  <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-violet-600 text-white border border-violet-700">
+                    BA
+                  </span>
                 </button>
               </div>
             </div>
@@ -219,13 +274,21 @@ function NewContactPage() {
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
               <h1 className="text-sm font-medium">Create Beauty Ambassador</h1>
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">BA</span>
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">
+                BA
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] hover:bg-card transition-colors">
+              <button
+                onClick={() => navigate({ to: "/contacts" })}
+                className="h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] hover:bg-card transition-colors"
+              >
                 Cancel
               </button>
-              <button onClick={submitBA} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button
+                onClick={submitBA}
+                className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
                 <Plus className="h-3.5 w-3.5" /> Create BA
               </button>
             </div>
@@ -240,23 +303,48 @@ function NewContactPage() {
                       <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
                     </Field>
                     <Field label="WA Number" required>
-                      <Input value={phone} onChange={setPhone} placeholder="+62 811 1234 5678" type="tel" />
+                      <Input
+                        value={phone}
+                        onChange={setPhone}
+                        placeholder="+62 811 1234 5678"
+                        type="tel"
+                      />
                     </Field>
                     <Field label="Gender" required>
-                      <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
+                      <SimpleSelect
+                        value={gender}
+                        onChange={setGender}
+                        options={[
+                          { value: "", label: "Select gender…" },
+                          ...GENDERS.map((g) => ({ value: g, label: g })),
+                        ]}
+                      />
                     </Field>
                     <Field label="Position" required>
-                      <SimpleSelect value={position} onChange={setPosition} options={[{ value: "", label: "Select position…" }, ...POSITIONS.map((p) => ({ value: p, label: p }))]} />
+                      <SimpleSelect
+                        value={position}
+                        onChange={setPosition}
+                        options={[
+                          { value: "", label: "Select position…" },
+                          ...POSITIONS.map((p) => ({ value: p, label: p })),
+                        ]}
+                      />
                     </Field>
                     <Field label="Area Coordinator (ARCO)" required>
-                      <Input value={areaCoordinator} onChange={setAreaCoordinator} placeholder="Bagas Wirawan" />
+                      <Input
+                        value={areaCoordinator}
+                        onChange={setAreaCoordinator}
+                        placeholder="Bagas Wirawan"
+                      />
                     </Field>
                   </FormGrid>
                 </FormSection>
 
                 <FormSection title="Brand">
                   <div className="space-y-2">
-                    <p className="text-[11px] text-muted-foreground">Select one or more brands handled by this BA.</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Select one or more brands handled by this BA.
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {brands.map((b) => {
                         const on = brandIds.includes(b.id);
@@ -279,14 +367,27 @@ function NewContactPage() {
                 <FormSection title="Location">
                   <FormGrid>
                     <Field label="City" required>
-                      <SimpleSelect value={city} onChange={(v) => { setCity(v); setStore(""); }} options={[{ value: "", label: "Select city…" }, ...CITIES.map((c) => ({ value: c, label: c }))]} />
+                      <SimpleSelect
+                        value={city}
+                        onChange={(v) => {
+                          setCity(v);
+                          setStore("");
+                        }}
+                        options={[
+                          { value: "", label: "Select city…" },
+                          ...CITIES.map((c) => ({ value: c, label: c })),
+                        ]}
+                      />
                     </Field>
                     <Field label="Store" required>
                       <SimpleSelect
                         value={store}
                         onChange={setStore}
                         disabled={!city}
-                        options={[{ value: "", label: city ? "Select store…" : "Select city first" }, ...availableStores.map((s) => ({ value: s, label: s }))]}
+                        options={[
+                          { value: "", label: city ? "Select store…" : "Select city first" },
+                          ...availableStores.map((s) => ({ value: s, label: s })),
+                        ]}
                       />
                     </Field>
                   </FormGrid>
@@ -313,13 +414,21 @@ function NewContactPage() {
               <ArrowLeft className="h-4 w-4" />
             </button>
             <h1 className="text-sm font-medium">Create Customer</h1>
-            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-sky-600 text-white border border-sky-700">Consumer</span>
+            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-sky-600 text-white border border-sky-700">
+              Consumer
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate({ to: "/contacts" })} className="h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] hover:bg-card transition-colors">
+            <button
+              onClick={() => navigate({ to: "/contacts" })}
+              className="h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] hover:bg-card transition-colors"
+            >
               Cancel
             </button>
-            <button onClick={submitCustomer} className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+            <button
+              onClick={submitCustomer}
+              className="inline-flex items-center gap-1.5 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
               <Plus className="h-3.5 w-3.5" /> Create Customer
             </button>
           </div>
@@ -334,20 +443,39 @@ function NewContactPage() {
                     <Input value={name} onChange={setName} placeholder="Putri Anggraini" />
                   </Field>
                   <Field label="WA Number" required>
-                    <Input value={phone} onChange={setPhone} placeholder="+62 812 3456 7890" type="tel" />
+                    <Input
+                      value={phone}
+                      onChange={setPhone}
+                      placeholder="+62 812 3456 7890"
+                      type="tel"
+                    />
                   </Field>
                   <Field label="Gender">
-                    <SimpleSelect value={gender} onChange={setGender} options={[{ value: "", label: "Select gender…" }, ...GENDERS.map((g) => ({ value: g, label: g }))]} />
+                    <SimpleSelect
+                      value={gender}
+                      onChange={setGender}
+                      options={[
+                        { value: "", label: "Select gender…" },
+                        ...GENDERS.map((g) => ({ value: g, label: g })),
+                      ]}
+                    />
                   </Field>
                   <Field label="Point Balance">
-                    <Input value={pointBalance} onChange={setPointBalance} placeholder="0" type="number" />
+                    <Input
+                      value={pointBalance}
+                      onChange={setPointBalance}
+                      placeholder="0"
+                      type="number"
+                    />
                   </Field>
                 </FormGrid>
               </FormSection>
 
               <FormSection title="Brands" optional>
                 <div className="space-y-2">
-                  <p className="text-[11px] text-muted-foreground">Relevant product brands for this customer.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Relevant product brands for this customer.
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {brands.map((b) => {
                       const on = customerBrandIds.includes(b.id);
@@ -371,7 +499,11 @@ function NewContactPage() {
                 <LabelMultiSelect
                   labels={labels}
                   selectedIds={labelIds}
-                  onToggle={(id) => setLabelIds((ids) => ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id])}
+                  onToggle={(id) =>
+                    setLabelIds((ids) =>
+                      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                    )
+                  }
                   onCreate={handleCreateLabel}
                 />
               </FormSection>
@@ -385,12 +517,26 @@ function NewContactPage() {
 
 /* ── Layout helpers ───────────────────────────────────────────────────────── */
 
-function FormSection({ title, optional, children }: { title: string; optional?: boolean; children: React.ReactNode }) {
+function FormSection({
+  title,
+  optional,
+  children,
+}: {
+  title: string;
+  optional?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div className="p-5">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
-        {optional && <span className="text-[10px] text-muted-foreground/60 normal-case tracking-normal">(Optional)</span>}
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </span>
+        {optional && (
+          <span className="text-[10px] text-muted-foreground/60 normal-case tracking-normal">
+            (Optional)
+          </span>
+        )}
       </div>
       {children}
     </div>
@@ -401,18 +547,37 @@ function FormGrid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>;
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </div>
       {children}
     </div>
   );
 }
 
-function Input({ value, onChange, placeholder, type = "text" }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+function Input({
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
   return (
     <input
       type={type}
@@ -424,7 +589,17 @@ function Input({ value, onChange, placeholder, type = "text" }: { value: string;
   );
 }
 
-function SimpleSelect({ value, onChange, options, disabled }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; disabled?: boolean }) {
+function SimpleSelect({
+  value,
+  onChange,
+  options,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  disabled?: boolean;
+}) {
   return (
     <select
       value={value}
@@ -432,12 +607,26 @@ function SimpleSelect({ value, onChange, options, disabled }: { value: string; o
       disabled={disabled}
       className="h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-gray-50 transition-colors disabled:opacity-50"
     >
-      {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
     </select>
   );
 }
 
-function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels: ContactLabel[]; selectedIds: string[]; onToggle: (id: string) => void; onCreate: (name: string) => void }) {
+function LabelMultiSelect({
+  labels,
+  selectedIds,
+  onToggle,
+  onCreate,
+}: {
+  labels: ContactLabel[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  onCreate: (name: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -448,12 +637,23 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) { setOpen(false); setSearch(""); }
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
     };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen(false); setSearch(""); } };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
+    };
     document.addEventListener("mousedown", handler);
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("keydown", onKey); };
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   return (
@@ -468,10 +668,21 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
           const l = labels.find((x) => x.id === id);
           if (!l) return null;
           return (
-            <span key={id} className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]">
+            <span
+              key={id}
+              className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]"
+            >
               <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
               {l.name}
-              <span role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); onToggle(id); }} className="text-muted-foreground hover:text-foreground transition-colors duration-150">
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(id);
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
                 <X className="h-3 w-3" />
               </span>
             </span>
@@ -482,22 +693,50 @@ function LabelMultiSelect({ labels, selectedIds, onToggle, onCreate }: { labels:
       {open && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
-            <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }} placeholder="Search or create label…" className="h-7 w-full rounded border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canCreate) {
+                  onCreate(search.trim());
+                  setSearch("");
+                }
+              }}
+              placeholder="Search or create label…"
+              className="h-7 w-full rounded border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+            />
           </div>
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.map((l) => {
               const on = selectedIds.includes(l.id);
               return (
-                <button type="button" key={l.id} onClick={() => onToggle(l.id)} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150">
+                <button
+                  type="button"
+                  key={l.id}
+                  onClick={() => onToggle(l.id)}
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
+                >
                   <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
                   <span className="flex-1">{l.name}</span>
                   {on && <Check className="h-3 w-3 text-primary" />}
                 </button>
               );
             })}
-            {filtered.length === 0 && !canCreate && <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No labels found</div>}
+            {filtered.length === 0 && !canCreate && (
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                No labels found
+              </div>
+            )}
             {canCreate && (
-              <button type="button" onClick={() => { onCreate(search.trim()); setSearch(""); }} className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150">
+              <button
+                type="button"
+                onClick={() => {
+                  onCreate(search.trim());
+                  setSearch("");
+                }}
+                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
+              >
                 <Plus className="h-3 w-3 text-primary" />
                 Create <span className="font-medium text-foreground">"{search.trim()}"</span>
               </button>

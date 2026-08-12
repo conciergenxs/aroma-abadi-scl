@@ -8,13 +8,46 @@ import { useContactsStore, contactsStore } from "@/components/scl/contacts-store
 import { useSkuStore } from "@/components/scl/sku-store";
 
 // Promo codes registry (mirrors promo-codes page + new page data)
-const PROMO_REGISTRY: Record<string, { code: string; name: string; usageType: "one-to-one" | "one-to-many"; availableCodes: number }> = {
-  "promo-1": { code: "AROMA20",    name: "20% Off All Brand",          usageType: "one-to-many", availableCodes: 999 },
-  "promo-2": { code: "SISLEY150K", name: "Rp150.000 Off Sisley",       usageType: "one-to-one",  availableCodes: 500 },
-  "promo-3": { code: "BEAUTY10",   name: "10% Off New Arrival",        usageType: "one-to-many", availableCodes: 999 },
-  "promo-4": { code: "RIMMEL50K",  name: "Rimmel Rp50.000 Cashback",   usageType: "one-to-one",  availableCodes: 300 },
-  "promo-5": { code: "DGVIP25",    name: "VIP D&G 25% Off",            usageType: "one-to-one",  availableCodes: 150 },
-  "promo-6": { code: "BIRTHDAY30", name: "30% Birthday Gift",          usageType: "one-to-many", availableCodes: 999 },
+const PROMO_REGISTRY: Record<
+  string,
+  { code: string; name: string; usageType: "one-to-one" | "one-to-many"; availableCodes: number }
+> = {
+  "promo-1": {
+    code: "AROMA20",
+    name: "20% Off All Brand",
+    usageType: "one-to-many",
+    availableCodes: 999,
+  },
+  "promo-2": {
+    code: "SISLEY150K",
+    name: "Rp150.000 Off Sisley",
+    usageType: "one-to-one",
+    availableCodes: 500,
+  },
+  "promo-3": {
+    code: "BEAUTY10",
+    name: "10% Off New Arrival",
+    usageType: "one-to-many",
+    availableCodes: 999,
+  },
+  "promo-4": {
+    code: "RIMMEL50K",
+    name: "Rimmel Rp50.000 Cashback",
+    usageType: "one-to-one",
+    availableCodes: 300,
+  },
+  "promo-5": {
+    code: "DGVIP25",
+    name: "VIP D&G 25% Off",
+    usageType: "one-to-one",
+    availableCodes: 150,
+  },
+  "promo-6": {
+    code: "BIRTHDAY30",
+    name: "30% Birthday Gift",
+    usageType: "one-to-many",
+    availableCodes: 999,
+  },
 };
 import { useMemo, useRef, useState } from "react";
 import {
@@ -84,7 +117,7 @@ function CreateBroadcastPage() {
 
   const channelKind = selectedChannel?.channel ?? "whatsapp";
 
-  const previewBody = contentMode === "template" ? template?.body ?? "" : manualBody;
+  const previewBody = contentMode === "template" ? (template?.body ?? "") : manualBody;
 
   const valid =
     !!selectedChannel &&
@@ -127,15 +160,17 @@ function CreateBroadcastPage() {
       return;
     }
     if (kind !== "draft" && promoValidation && !promoValidation.ok) {
-      toast.error(`Not enough promo codes: ${promoValidation.available} available, ${promoValidation.audienceCount} recipients`);
+      toast.error(
+        `Not enough promo codes: ${promoValidation.available} available, ${promoValidation.audienceCount} recipients`,
+      );
       return;
     }
     const label =
       kind === "draft"
         ? "Draft saved"
         : kind === "schedule"
-        ? `Broadcast scheduled for ${scheduleDate} ${scheduleTime}`
-        : "Broadcast sent";
+          ? `Broadcast scheduled for ${scheduleDate} ${scheduleTime}`
+          : "Broadcast sent";
     toast.success(label);
     navigate({ to: "/broadcasts" });
   };
@@ -154,8 +189,8 @@ function CreateBroadcastPage() {
     // Count unique contacts across selected lists
     const allContacts = contactsStore.state.contacts;
     const contactIds = new Set<string>();
-    allContacts.forEach(c => {
-      if (c.listIds.some(lid => selectedLists.has(lid))) contactIds.add(c.id);
+    allContacts.forEach((c) => {
+      if (c.listIds.some((lid) => selectedLists.has(lid))) contactIds.add(c.id);
     });
     const audienceCount = contactIds.size;
     const available = promo.availableCodes;
@@ -257,7 +292,8 @@ function CreateBroadcastPage() {
                       )}
                       {audienceSummary.conditionCount > 0 && (
                         <div className="text-[11px] text-muted-foreground">
-                          {audienceSummary.conditionCount} condition{audienceSummary.conditionCount === 1 ? "" : "s"} applied
+                          {audienceSummary.conditionCount} condition
+                          {audienceSummary.conditionCount === 1 ? "" : "s"} applied
                         </div>
                       )}
                     </div>
@@ -281,7 +317,11 @@ function CreateBroadcastPage() {
           </FormCard>
 
           {/* Section 2 — Content */}
-          <FormCard step={2} title="Content" description="Pick a pre-approved template or compose a manual message.">
+          <FormCard
+            step={2}
+            title="Content"
+            description="Pick a pre-approved template or compose a manual message."
+          >
             <div className="inline-flex rounded-md border border-border bg-background/40 p-1">
               {(["template", "manual"] as const).map((m) => {
                 const sel = contentMode === m;
@@ -290,7 +330,9 @@ function CreateBroadcastPage() {
                     key={m}
                     onClick={() => setContentMode(m)}
                     className={`px-3 h-7 text-[12px] font-medium rounded ${
-                      sel ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      sel
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {m === "template" ? "Template" : "Manual"}
@@ -345,21 +387,34 @@ function CreateBroadcastPage() {
                       onClick={() => setVarPopup(varPopup === "brands" ? null : "brands")}
                       className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                     >
-                      <AtSign className="h-3 w-3" /> Brands <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
+                      <AtSign className="h-3 w-3" /> Brands{" "}
+                      <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                     </button>
                     {varPopup === "brands" && (
                       <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                         <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-                          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Brand</span>
-                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
+                          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                            Select Brand
+                          </span>
+                          <button
+                            onClick={() => setVarPopup(null)}
+                            className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
+                          >
+                            <XIcon className="h-3 w-3" />
+                          </button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
                           {brands.map((b) => (
-                            <button key={b.id} onClick={() => insertBrand(b.name)}
-                              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2">
+                            <button
+                              key={b.id}
+                              onClick={() => insertBrand(b.name)}
+                              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                            >
                               <Tag className="h-3 w-3 text-muted-foreground shrink-0" />
                               <span className="truncate">{b.name}</span>
-                              <code className="ml-auto text-[10px] text-muted-foreground/60 font-mono truncate">{"{{brands-" + b.name + "}}"}</code>
+                              <code className="ml-auto text-[10px] text-muted-foreground/60 font-mono truncate">
+                                {"{{brands-" + b.name + "}}"}
+                              </code>
                             </button>
                           ))}
                         </div>
@@ -372,19 +427,32 @@ function CreateBroadcastPage() {
                       onClick={() => setVarPopup(varPopup === "promo" ? null : "promo")}
                       className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 hover:bg-gray-50 px-2 h-7 text-[11px] text-muted-foreground transition-colors duration-150"
                     >
-                      <AtSign className="h-3 w-3" /> Promo Code <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
+                      <AtSign className="h-3 w-3" /> Promo Code{" "}
+                      <ChevronRight className="h-2.5 w-2.5 ml-0.5" />
                     </button>
                     {varPopup === "promo" && (
                       <div className="absolute top-full left-0 mt-1 w-60 rounded-lg border border-border bg-popover shadow-xl z-30 overflow-hidden animate-fade-in">
                         <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-                          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Select Promo Code</span>
-                          <button onClick={() => setVarPopup(null)} className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"><XIcon className="h-3 w-3" /></button>
+                          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                            Select Promo Code
+                          </span>
+                          <button
+                            onClick={() => setVarPopup(null)}
+                            className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
+                          >
+                            <XIcon className="h-3 w-3" />
+                          </button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
                           {Object.values(PROMO_REGISTRY).map((p) => (
-                            <button key={p.code} onClick={() => insertPromo(p.code)}
-                              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2">
-                              <span className="font-mono text-[10px] font-semibold bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 shrink-0">{p.code}</span>
+                            <button
+                              key={p.code}
+                              onClick={() => insertPromo(p.code)}
+                              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                            >
+                              <span className="font-mono text-[10px] font-semibold bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
+                                {p.code}
+                              </span>
                               <span className="truncate text-muted-foreground">{p.name}</span>
                             </button>
                           ))}
@@ -399,16 +467,21 @@ function CreateBroadcastPage() {
 
           {/* Promo code validation banner */}
           {promoValidation && (
-            <div className={`rounded-lg border px-4 py-3 text-[12px] flex items-start gap-3 ${promoValidation.ok ? "border-emerald-500/30 bg-emerald-500/8 text-emerald-700" : "border-rose-500/30 bg-rose-500/8 text-rose-700"}`}>
+            <div
+              className={`rounded-lg border px-4 py-3 text-[12px] flex items-start gap-3 ${promoValidation.ok ? "border-emerald-500/30 bg-emerald-500/8 text-emerald-700" : "border-rose-500/30 bg-rose-500/8 text-rose-700"}`}
+            >
               <span className="text-lg leading-none">{promoValidation.ok ? "✓" : "⚠"}</span>
               <div>
                 <div className="font-semibold mb-0.5">
                   {promoValidation.ok ? "Promo codes available" : "Not enough promo codes"}
                 </div>
                 <div className="text-[11px] opacity-80">
-                  Template uses <span className="font-mono font-semibold">{promoValidation.promo.code}</span> (1-to-1).{" "}
-                  {promoValidation.available} codes available · {promoValidation.audienceCount} recipients selected.
-                  {!promoValidation.ok && ` You need ${promoValidation.audienceCount - promoValidation.available} more unique codes.`}
+                  Template uses{" "}
+                  <span className="font-mono font-semibold">{promoValidation.promo.code}</span>{" "}
+                  (1-to-1). {promoValidation.available} codes available ·{" "}
+                  {promoValidation.audienceCount} recipients selected.
+                  {!promoValidation.ok &&
+                    ` You need ${promoValidation.audienceCount - promoValidation.available} more unique codes.`}
                 </div>
               </div>
             </div>
@@ -455,20 +528,33 @@ function CreateBroadcastPage() {
               </span>
             </div>
             <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
-              <PhoneFrame channel={channelKind} senderName={selectedChannel?.name ?? "Your business"}>
+              <PhoneFrame
+                channel={channelKind}
+                senderName={selectedChannel?.name ?? "Your business"}
+              >
                 {previewBody.trim() ? (
-                  <div className="whitespace-pre-wrap break-words">{renderWithVars(previewBody)}</div>
+                  <div className="whitespace-pre-wrap break-words">
+                    {renderWithVars(previewBody)}
+                  </div>
                 ) : (
-                  <div className="text-muted-foreground italic">Message preview will appear here…</div>
+                  <div className="text-muted-foreground italic">
+                    Message preview will appear here…
+                  </div>
                 )}
               </PhoneFrame>
             </div>
             <div className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground">
-              {name ? <span className="font-medium text-foreground">{name}</span> : "Untitled broadcast"}
+              {name ? (
+                <span className="font-medium text-foreground">{name}</span>
+              ) : (
+                "Untitled broadcast"
+              )}
               {" · "}
               {audienceSummary
                 ? `${audienceSummary.listNames.length} audience${audienceSummary.listNames.length === 1 ? "" : "s"}${
-                    audienceSummary.conditionCount ? ` · ${audienceSummary.conditionCount} condition(s)` : ""
+                    audienceSummary.conditionCount
+                      ? ` · ${audienceSummary.conditionCount} condition(s)`
+                      : ""
                   }`
                 : "No audience selected"}
             </div>
@@ -575,7 +661,9 @@ function RadioCard({
     <button
       onClick={onClick}
       className={`flex-1 text-left rounded-lg border p-3 transition ${
-        selected ? "border-primary/40 bg-primary/10" : "border-border bg-background/30 hover:bg-gray-50"
+        selected
+          ? "border-primary/40 bg-primary/10"
+          : "border-border bg-background/30 hover:bg-gray-50"
       }`}
     >
       <div className="flex items-center gap-2">
@@ -796,7 +884,10 @@ function AudienceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-2xl max-h-[88vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
@@ -806,7 +897,10 @@ function AudienceModal({
             <Users className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Choose Audience</h2>
           </div>
-          <button onClick={onClose} className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150">
+          <button
+            onClick={onClose}
+            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+          >
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -820,7 +914,9 @@ function AudienceModal({
                   key={t}
                   onClick={() => onTabChange(t)}
                   className={`px-3 h-7 text-[12px] font-medium rounded ${
-                    sel ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    sel
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {t === "list" ? "By Audience" : "By Condition"}
@@ -867,14 +963,18 @@ function AudienceModal({
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] font-medium truncate">{l.name}</div>
                         {l.description && (
-                          <div className="text-[11px] text-muted-foreground truncate">{l.description}</div>
+                          <div className="text-[11px] text-muted-foreground truncate">
+                            {l.description}
+                          </div>
                         )}
                       </div>
                     </label>
                   );
                 })}
                 {filtered.length === 0 && (
-                  <div className="px-3 py-8 text-center text-xs text-muted-foreground">No audience match.</div>
+                  <div className="px-3 py-8 text-center text-xs text-muted-foreground">
+                    No audience match.
+                  </div>
                 )}
               </div>
               <div className="text-[11px] text-muted-foreground">
@@ -884,11 +984,15 @@ function AudienceModal({
           ) : (
             <div className="space-y-3">
               <p className="text-[11px] text-muted-foreground">
-                Build an audience using your contact properties. New properties added in Contacts appear here automatically.
+                Build an audience using your contact properties. New properties added in Contacts
+                appear here automatically.
               </p>
               <div className="space-y-2">
                 {localConds.map((c) => (
-                  <div key={c.id} className="grid grid-cols-[1fr_140px_1fr_auto] gap-2 items-center">
+                  <div
+                    key={c.id}
+                    className="grid grid-cols-[1fr_140px_1fr_auto] gap-2 items-center"
+                  >
                     <select
                       value={c.propertyKey}
                       onChange={(e) => updateCondition(c.id, { propertyKey: e.target.value })}
@@ -902,7 +1006,9 @@ function AudienceModal({
                     </select>
                     <select
                       value={c.operator}
-                      onChange={(e) => updateCondition(c.id, { operator: e.target.value as Condition["operator"] })}
+                      onChange={(e) =>
+                        updateCondition(c.id, { operator: e.target.value as Condition["operator"] })
+                      }
                       className="h-9 rounded-md border border-border bg-background/40 px-2 text-[12px]"
                     >
                       <option value="is">is</option>

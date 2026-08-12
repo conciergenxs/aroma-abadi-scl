@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { fmtNum } from "@/lib/fmt";
 import { Info } from "lucide-react";
-import {
-  Tooltip as InfoTooltip, TooltipContent, TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip as InfoTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 /**
  * Shared dashboard building blocks — chart styling constants, stat tiles,
@@ -29,11 +27,17 @@ export const axisColor = "var(--muted-foreground)";
 export const gridColor = "var(--border)";
 export const cursorFill = "oklch(0.42 0.12 25 / 6%)";
 export const axisTick = { fontSize: 11, fill: "var(--muted-foreground)" };
-export const BRAND_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+export const BRAND_COLORS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+];
 
 // ── Type scale (kept to two sizes so every metric reads consistently) ──────
 export const VALUE_LG = "text-2xl font-semibold tracking-tight stat-value"; // primary tile numbers
-export const VALUE_SM = "text-xl font-semibold tracking-tight stat-value";  // header-corner badges
+export const VALUE_SM = "text-xl font-semibold tracking-tight stat-value"; // header-corner badges
 export const CAPTION = "text-[11px] font-medium uppercase tracking-wide text-muted-foreground";
 
 export function fmtPct(n: number, digits = 1) {
@@ -63,7 +67,17 @@ export function useRevealOnScroll<T extends HTMLElement>() {
   return { ref, inView };
 }
 
-export function Reveal({ innerRef, inView, children, className = "" }: { innerRef: React.Ref<HTMLDivElement>; inView: boolean; children: ReactNode; className?: string }) {
+export function Reveal({
+  innerRef,
+  inView,
+  children,
+  className = "",
+}: {
+  innerRef: React.Ref<HTMLDivElement>;
+  inView: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div
       ref={innerRef}
@@ -79,11 +93,18 @@ export function InfoHint({ text }: { text: string }) {
   return (
     <InfoTooltip>
       <TooltipTrigger asChild>
-        <button type="button" className="inline-flex text-muted-foreground/50 hover:text-primary transition-colors" aria-label="What is this metric?">
+        <button
+          type="button"
+          className="inline-flex text-muted-foreground/50 hover:text-primary transition-colors"
+          aria-label="What is this metric?"
+        >
           <Info className="h-3 w-3" />
         </button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-[240px] text-center leading-snug bg-popover text-popover-foreground border border-border shadow-lg">
+      <TooltipContent
+        side="top"
+        className="max-w-[240px] text-center leading-snug bg-popover text-popover-foreground border border-border shadow-lg"
+      >
         {text}
       </TooltipContent>
     </InfoTooltip>
@@ -93,8 +114,22 @@ export function InfoHint({ text }: { text: string }) {
 // ── Single-metric stat tile — `spark` optionally renders a small trend
 // chart (e.g. <Sparkline/>) to the right of the value. ─────────────────────
 export function MetricStat({
-  icon: Icon, label, value, sub, info, spark, accent,
-}: { icon?: React.ElementType; label: string; value: string; sub?: string; info: string; spark?: ReactNode; accent?: "up" | "down" }) {
+  icon: Icon,
+  label,
+  value,
+  sub,
+  info,
+  spark,
+  accent,
+}: {
+  icon?: React.ElementType;
+  label: string;
+  value: string;
+  sub?: string;
+  info: string;
+  spark?: ReactNode;
+  accent?: "up" | "down";
+}) {
   return (
     <div className="card-hover rounded-xl border border-border bg-card/60 p-4 glass relative overflow-hidden transition-all duration-300">
       <div className="flex items-center justify-between gap-2">
@@ -113,7 +148,9 @@ export function MetricStat({
         {spark && <div className="shrink-0">{spark}</div>}
       </div>
       {sub && (
-        <div className={`mt-1 text-[11px] ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}>
+        <div
+          className={`mt-1 text-[11px] ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}
+        >
           {sub}
         </div>
       )}
@@ -150,11 +187,16 @@ export function StepFunnel({ stages }: { stages: FunnelStage[] }) {
               <span className="text-xs font-medium text-foreground">{s.label}</span>
               <span className="text-xs tabular-nums text-muted-foreground">
                 {fmtNum(s.value)}
-                {dropPct !== null && <span className="ml-1.5 text-muted-foreground/70">({dropPct.toFixed(1)}%)</span>}
+                {dropPct !== null && (
+                  <span className="ml-1.5 text-muted-foreground/70">({dropPct.toFixed(1)}%)</span>
+                )}
               </span>
             </div>
             <div className="h-4 rounded-md bg-muted overflow-hidden">
-              <div className="h-full rounded-md animate-grow-x" style={{ width: `${widthPct}%`, background: s.color }} />
+              <div
+                className="h-full rounded-md animate-grow-x"
+                style={{ width: `${widthPct}%`, background: s.color }}
+              />
             </div>
           </div>
         );

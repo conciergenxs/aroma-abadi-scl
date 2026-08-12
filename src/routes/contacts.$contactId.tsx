@@ -47,7 +47,14 @@ import { useSkuStore } from "@/components/scl/sku-store";
 import { usePromoStore, type PromoRedemption } from "@/components/scl/promo-store";
 
 const SYSTEM_KEYS = new Set([
-  "name", "phone", "channel", "labels", "lists", "lastInteraction", "status", "email",
+  "name",
+  "phone",
+  "channel",
+  "labels",
+  "lists",
+  "lastInteraction",
+  "status",
+  "email",
 ]);
 const LABEL_COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
@@ -77,10 +84,14 @@ function ContactDetailPage() {
 
   const isBA = contact?.labelIds.includes("lb-ba") ?? false;
   const baRecord = useMemo(
-    () => contact ? bas.find((b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, "")) : undefined,
+    () =>
+      contact
+        ? bas.find((b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, ""))
+        : undefined,
     [bas, contact],
   );
-  const brandName = (id: string) => brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
+  const brandName = (id: string) =>
+    brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
 
   const customProps = useMemo(
     () => properties.filter((p) => !SYSTEM_KEYS.has(p.key) && !p.system),
@@ -216,7 +227,10 @@ function ContactDetailPage() {
       <AppShell backTo="/contacts" title="Contact" noPadding>
         <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center text-sm text-muted-foreground gap-3">
           <div>Contact not found.</div>
-          <Link to="/contacts" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/contacts"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ChevronLeft className="h-4 w-4" /> Contacts
           </Link>
         </div>
@@ -291,7 +305,12 @@ function ContactDetailPage() {
     contactsStore.setContacts((cs) =>
       cs.map((c) =>
         c.id === contact.id
-          ? { ...c, brandIds: has ? (c.brandIds ?? []).filter((x) => x !== brandId) : [...(c.brandIds ?? []), brandId] }
+          ? {
+              ...c,
+              brandIds: has
+                ? (c.brandIds ?? []).filter((x) => x !== brandId)
+                : [...(c.brandIds ?? []), brandId],
+            }
           : c,
       ),
     );
@@ -388,10 +407,16 @@ function ContactDetailPage() {
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <Link to="/inbox" className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card transition-colors">
+                <Link
+                  to="/inbox"
+                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] font-medium hover:bg-card transition-colors"
+                >
                   <ExternalLink className="h-3.5 w-3.5" /> See Inbox
                 </Link>
-                <button onClick={handleDelete} className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 transition-colors">
+                <button
+                  onClick={handleDelete}
+                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
+                >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>
               </div>
@@ -401,9 +426,27 @@ function ContactDetailPage() {
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
                 <div className="flex items-center gap-1">
-                  <TabButton active={tab === "activity"} onClick={() => setTab("activity")} icon={<ActivityIcon className="h-3.5 w-3.5" />} label="Activity Log" count={filteredActivities.length} />
-                  <TabButton active={tab === "transactions"} onClick={() => setTab("transactions")} icon={<ShoppingBag className="h-3.5 w-3.5" />} label="Transactions" count={filteredTransactions.length} />
-                  <TabButton active={tab === "redeemed"} onClick={() => setTab("redeemed")} icon={<Ticket className="h-3.5 w-3.5" />} label="Code Redeem" count={filteredRedemptions.length} />
+                  <TabButton
+                    active={tab === "activity"}
+                    onClick={() => setTab("activity")}
+                    icon={<ActivityIcon className="h-3.5 w-3.5" />}
+                    label="Activity Log"
+                    count={filteredActivities.length}
+                  />
+                  <TabButton
+                    active={tab === "transactions"}
+                    onClick={() => setTab("transactions")}
+                    icon={<ShoppingBag className="h-3.5 w-3.5" />}
+                    label="Transactions"
+                    count={filteredTransactions.length}
+                  />
+                  <TabButton
+                    active={tab === "redeemed"}
+                    onClick={() => setTab("redeemed")}
+                    icon={<Ticket className="h-3.5 w-3.5" />}
+                    label="Code Redeem"
+                    count={filteredRedemptions.length}
+                  />
                   <div className="ml-auto flex items-center gap-1.5 py-1.5">
                     <input
                       type="date"
@@ -421,7 +464,15 @@ function ContactDetailPage() {
                       title="To date"
                     />
                     {(dateFrom || dateTo) && (
-                      <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-150">Clear</button>
+                      <button
+                        onClick={() => {
+                          setDateFrom("");
+                          setDateTo("");
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-150"
+                      >
+                        Clear
+                      </button>
                     )}
                   </div>
                 </div>
@@ -433,9 +484,13 @@ function ContactDetailPage() {
                 <>
                   <div className="flex items-center gap-2 mb-4">
                     <ActivityIcon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity Log</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Activity Log
+                    </span>
                     {derivedActivities.length > 0 && (
-                      <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-muted-foreground">{derivedActivities.length}</span>
+                      <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-muted-foreground">
+                        {derivedActivities.length}
+                      </span>
                     )}
                   </div>
                   <ActivityTab activities={filteredActivities} />
@@ -443,7 +498,9 @@ function ContactDetailPage() {
               ) : (
                 <>
                   {tab === "activity" && <ActivityTab activities={filteredActivities} />}
-                  {tab === "transactions" && <TransactionsTab transactions={filteredTransactions} />}
+                  {tab === "transactions" && (
+                    <TransactionsTab transactions={filteredTransactions} />
+                  )}
                   {tab === "redeemed" && <RedeemedTab redemptions={filteredRedemptions} />}
                 </>
               )}
@@ -490,7 +547,9 @@ function InlineText({
 }) {
   const [draft, setDraft] = useState(value);
   const [editing, setEditing] = useState(false);
-  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
 
   if (editing) {
     return (
@@ -499,10 +558,18 @@ function InlineText({
         type={type}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => { setEditing(false); if (draft !== value) onCommit(draft); }}
+        onBlur={() => {
+          setEditing(false);
+          if (draft !== value) onCommit(draft);
+        }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") { (e.target as HTMLInputElement).blur(); }
-          if (e.key === "Escape") { setDraft(value); setEditing(false); }
+          if (e.key === "Enter") {
+            (e.target as HTMLInputElement).blur();
+          }
+          if (e.key === "Escape") {
+            setDraft(value);
+            setEditing(false);
+          }
         }}
         placeholder={placeholder}
         className={`w-full rounded-md border border-white/10 bg-white px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 ${className}`}
@@ -522,14 +589,30 @@ function InlineText({
 
 /* ============================== TABS ============================== */
 
-const LIFECYCLE_STAGES: LifecycleStage[] = ["New Lead","Contacted","Qualified","Pending Payment","Customer","Lost","No Reply"];
+const LIFECYCLE_STAGES: LifecycleStage[] = [
+  "New Lead",
+  "Contacted",
+  "Qualified",
+  "Pending Payment",
+  "Customer",
+  "Lost",
+  "No Reply",
+];
 
-function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; onChange: (s: LifecycleStage | null) => void }) {
+function LifecycleDropdown({
+  value,
+  onChange,
+}: {
+  value: LifecycleStage | null;
+  onChange: (s: LifecycleStage | null) => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -542,9 +625,7 @@ function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; 
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
-          style
-            ? style.badge
-            : "border-border text-muted-foreground hover:border-foreground/30"
+          style ? style.badge : "border-border text-muted-foreground hover:border-foreground/30"
         }`}
       >
         {value ?? "Set stage"}
@@ -559,7 +640,10 @@ function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; 
               <button
                 key={s}
                 type="button"
-                onClick={() => { onChange(active ? null : s); setOpen(false); }}
+                onClick={() => {
+                  onChange(active ? null : s);
+                  setOpen(false);
+                }}
                 className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-left hover:bg-gray-50 transition-colors ${active ? "font-semibold" : ""}`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
@@ -573,7 +657,10 @@ function LifecycleDropdown({ value, onChange }: { value: LifecycleStage | null; 
               <div className="my-1 border-t border-border" />
               <button
                 type="button"
-                onClick={() => { onChange(null); setOpen(false); }}
+                onClick={() => {
+                  onChange(null);
+                  setOpen(false);
+                }}
                 className="w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-left text-muted-foreground hover:bg-gray-50 hover:text-destructive transition-colors"
               >
                 <X className="h-3 w-3" /> Clear stage
@@ -629,17 +716,23 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
     <div className="space-y-6 max-w-3xl">
       {groups.map((g) => (
         <div key={g.key}>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">{g.label}</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
+            {g.label}
+          </div>
           <ol className="relative border-l border-border ml-1.5 space-y-3">
             {g.items.map((a) => (
               <li key={a.id} className="pl-4 relative">
-                <span className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${activityDot(a.type)}`} />
+                <span
+                  className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${activityDot(a.type)}`}
+                />
                 {a.type === "transaction" ? (
                   <TransactionActivityCard message={a.message} at={a.at} />
                 ) : (
                   <>
                     <div className="text-xs text-foreground whitespace-pre-line">{a.message}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">{formatTime(a.at)}</div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5">
+                      {formatTime(a.at)}
+                    </div>
                   </>
                 )}
               </li>
@@ -653,20 +746,31 @@ function ActivityTab({ activities }: { activities: ContactActivity[] }) {
 
 function activityDot(type: ContactActivity["type"]) {
   switch (type) {
-    case "created": return "bg-emerald-400";
-    case "lifecycle": return "bg-primary";
+    case "created":
+      return "bg-emerald-400";
+    case "lifecycle":
+      return "bg-primary";
     case "label_added":
-    case "label_removed": return "bg-pink-400";
+    case "label_removed":
+      return "bg-pink-400";
     case "list_added":
-    case "list_removed": return "bg-sky-400";
-    case "note": return "bg-amber-400";
-    case "transaction": return "bg-emerald-500";
-    default: return "bg-muted-foreground";
+    case "list_removed":
+      return "bg-sky-400";
+    case "note":
+      return "bg-amber-400";
+    case "transaction":
+      return "bg-emerald-500";
+    default:
+      return "bg-muted-foreground";
   }
 }
 
-function TransactionsTab({ transactions }: { transactions: import("@/components/scl/transactions-store").Transaction[] }) {
-  const [peekTx, setPeekTx] = useState<typeof transactions[0] | null>(null);
+function TransactionsTab({
+  transactions,
+}: {
+  transactions: import("@/components/scl/transactions-store").Transaction[];
+}) {
+  const [peekTx, setPeekTx] = useState<(typeof transactions)[0] | null>(null);
 
   if (transactions.length === 0) {
     return (
@@ -675,20 +779,32 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <ShoppingBag className="h-5 w-5 text-muted-foreground" />
         </div>
         <div className="text-sm text-foreground">No transactions yet.</div>
-        <div className="text-[11px] text-muted-foreground">Transactions from this contact will appear here.</div>
+        <div className="text-[11px] text-muted-foreground">
+          Transactions from this contact will appear here.
+        </div>
       </div>
     );
   }
 
-  const totalSpend = transactions.filter((t) => t.status !== "Cancelled").reduce((sum, t) => sum + t.total, 0);
+  const totalSpend = transactions
+    .filter((t) => t.status !== "Cancelled")
+    .reduce((sum, t) => sum + t.total, 0);
   const completedCount = transactions.filter((t) => t.status !== "Cancelled").length;
 
   // Favorite Brand
   const favoriteBrand = (() => {
     const counts: Record<string, number> = {};
-    for (const t of transactions) { counts[t.brandName] = (counts[t.brandName] ?? 0) + 1; }
-    let best = "N/A", bestCount = 0;
-    for (const [b, c] of Object.entries(counts)) { if (c > bestCount) { best = b; bestCount = c; } }
+    for (const t of transactions) {
+      counts[t.brandName] = (counts[t.brandName] ?? 0) + 1;
+    }
+    let best = "N/A",
+      bestCount = 0;
+    for (const [b, c] of Object.entries(counts)) {
+      if (c > bestCount) {
+        best = b;
+        bestCount = c;
+      }
+    }
     return best;
   })();
 
@@ -696,20 +812,32 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   const favoriteProduct = (() => {
     const counts: Record<string, number> = {};
     for (const t of transactions) {
-      for (const item of t.items) { counts[item.skuName] = (counts[item.skuName] ?? 0) + item.qty; }
+      for (const item of t.items) {
+        counts[item.skuName] = (counts[item.skuName] ?? 0) + item.qty;
+      }
     }
-    let best = "N/A", bestCount = 0;
-    for (const [p, c] of Object.entries(counts)) { if (c > bestCount) { best = p; bestCount = c; } }
+    let best = "N/A",
+      bestCount = 0;
+    for (const [p, c] of Object.entries(counts)) {
+      if (c > bestCount) {
+        best = p;
+        bestCount = c;
+      }
+    }
     return best;
   })();
 
   // Est. Purchase Time
   const estPurchaseTime = (() => {
     if (transactions.length < 2) return "N/A";
-    const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sorted = [...transactions].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
     let totalGap = 0;
     for (let i = 1; i < sorted.length; i++) {
-      totalGap += (new Date(sorted[i].date).getTime() - new Date(sorted[i - 1].date).getTime()) / (1000 * 60 * 60 * 24);
+      totalGap +=
+        (new Date(sorted[i].date).getTime() - new Date(sorted[i - 1].date).getTime()) /
+        (1000 * 60 * 60 * 24);
     }
     const avg = Math.round(totalGap / (sorted.length - 1));
     return `Per ${avg} Days`;
@@ -726,27 +854,44 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Transactions</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Total Transactions
+          </div>
           <div className="text-lg font-semibold mt-1">{transactions.length}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Spend</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Total Spend
+          </div>
           <div className="text-lg font-semibold mt-1">{formatIDR(totalSpend)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Completed</div>
-          <div className="text-lg font-semibold mt-1">{completedCount} <span className="text-xs font-normal text-muted-foreground">/ {transactions.length}</span></div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Completed
+          </div>
+          <div className="text-lg font-semibold mt-1">
+            {completedCount}{" "}
+            <span className="text-xs font-normal text-muted-foreground">
+              / {transactions.length}
+            </span>
+          </div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Favorite Brand</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Favorite Brand
+          </div>
           <div className="text-sm font-semibold mt-1 truncate">{favoriteBrand}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Favorite Product</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Favorite Product
+          </div>
           <div className="text-sm font-semibold mt-1 truncate">{favoriteProduct}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Est. Purchase Time</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Est. Purchase Time
+          </div>
           <div className="text-sm font-semibold mt-1">{estPurchaseTime}</div>
         </div>
       </div>
@@ -756,11 +901,21 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-white">
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Invoice</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Brands</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Items</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Total</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Status</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Invoice
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Brands
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Items
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Total
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -768,38 +923,51 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
               .slice()
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((t) => (
-              <tr key={t.id} onClick={() => setPeekTx(t)} className="hover:bg-gray-50 cursor-pointer transition-colors">
-                <td className="px-4 py-3">
-                  <div className="font-medium text-foreground text-xs">{t.invoice}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">
-                    {fmtDateEN(t.date)}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-1">
-                    {(t.brandNames ?? [t.brandName]).map((b) => (
-                      <span key={b} className="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-[10px] font-medium">{b}</span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-xs">
-                  <ul className="space-y-0.5">
-                    {t.items.map((i, idx) => (
-                      <li key={idx} className="text-foreground leading-snug">
-                        {i.skuName}
-                        <span className="text-muted-foreground"> ×{i.qty}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="px-4 py-3 text-xs font-medium text-foreground whitespace-nowrap">{formatIDR(t.total)}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}>
-                    {t.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                <tr
+                  key={t.id}
+                  onClick={() => setPeekTx(t)}
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-foreground text-xs">{t.invoice}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {fmtDateEN(t.date)}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {(t.brandNames ?? [t.brandName]).map((b) => (
+                        <span
+                          key={b}
+                          className="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-[10px] font-medium"
+                        >
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <ul className="space-y-0.5">
+                      {t.items.map((i, idx) => (
+                        <li key={idx} className="text-foreground leading-snug">
+                          {i.skuName}
+                          <span className="text-muted-foreground"> ×{i.qty}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium text-foreground whitespace-nowrap">
+                    {formatIDR(t.total)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}
+                    >
+                      {t.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -810,39 +978,76 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
           <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right shadow-2xl">
             <div className="p-5 border-b border-border flex items-start justify-between gap-3">
               <div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Invoice
+                </div>
                 <div className="text-base font-semibold">{peekTx.invoice}</div>
-                <div className="text-[11px] text-muted-foreground mt-1">{fmtDateTimeEN(peekTx.date)}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  {fmtDateTimeEN(peekTx.date)}
+                </div>
               </div>
-              <button onClick={() => setPeekTx(null)} className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors">
+              <button
+                onClick={() => setPeekTx(null)}
+                className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="p-5 space-y-4 text-sm">
-              <PeekRow label="Store"><span className="font-medium">{peekTx.store} · {peekTx.city}</span></PeekRow>
+              <PeekRow label="Store">
+                <span className="font-medium">
+                  {peekTx.store} · {peekTx.city}
+                </span>
+              </PeekRow>
               <PeekRow label="Brand">
                 <div className="flex flex-wrap gap-1">
                   {(peekTx.brandNames ?? [peekTx.brandName]).map((b) => (
-                    <span key={b} className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium">{b}</span>
+                    <span
+                      key={b}
+                      className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium"
+                    >
+                      {b}
+                    </span>
                   ))}
                 </div>
               </PeekRow>
-              <PeekRow label="BA"><span className="font-medium">{peekTx.baName}</span></PeekRow>
-              <PeekRow label="Payment Method"><span className="font-medium">{peekTx.paymentMethod}</span></PeekRow>
-              <PeekRow label="Status">
-                <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(peekTx.status)}`}>{peekTx.status}</span>
+              <PeekRow label="BA">
+                <span className="font-medium">{peekTx.baName}</span>
               </PeekRow>
-              {peekTx.note && <PeekRow label="BA Note"><span className="text-muted-foreground italic">{peekTx.note}</span></PeekRow>}
+              <PeekRow label="Payment Method">
+                <span className="font-medium">{peekTx.paymentMethod}</span>
+              </PeekRow>
+              <PeekRow label="Status">
+                <span
+                  className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(peekTx.status)}`}
+                >
+                  {peekTx.status}
+                </span>
+              </PeekRow>
+              {peekTx.note && (
+                <PeekRow label="BA Note">
+                  <span className="text-muted-foreground italic">{peekTx.note}</span>
+                </PeekRow>
+              )}
               <div>
-                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                  Items
+                </div>
                 <ul className="divide-y divide-border rounded-md border border-border overflow-hidden">
                   {peekTx.items.map((i, idx) => (
-                    <li key={idx} className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors">
+                    <li
+                      key={idx}
+                      className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                    >
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-[13px]">{i.skuName}</div>
-                        <div className="text-xs text-muted-foreground">{i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}
+                        </div>
                       </div>
-                      <div className="text-right font-medium tabular-nums text-sm">{formatIDR(i.unitPrice * i.qty)}</div>
+                      <div className="text-right font-medium tabular-nums text-sm">
+                        {formatIDR(i.unitPrice * i.qty)}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -859,17 +1064,30 @@ function TransactionsTab({ transactions }: { transactions: import("@/components/
   );
 }
 
-const REDEEM_CHANNEL_META: Record<PromoRedemption["channel"], { label: string; icon: typeof Instagram; badge: string }> = {
-  instagram: { label: "Instagram", icon: Instagram, badge: "border-fuchsia-700 bg-fuchsia-600 text-white" },
+const REDEEM_CHANNEL_META: Record<
+  PromoRedemption["channel"],
+  { label: string; icon: typeof Instagram; badge: string }
+> = {
+  instagram: {
+    label: "Instagram",
+    icon: Instagram,
+    badge: "border-fuchsia-700 bg-fuchsia-600 text-white",
+  },
   tiktok: { label: "TikTok", icon: Music2, badge: "border-slate-700 bg-slate-800 text-white" },
-  whatsapp: { label: "WhatsApp", icon: MessageCircle, badge: "border-emerald-700 bg-emerald-600 text-white" },
+  whatsapp: {
+    label: "WhatsApp",
+    icon: MessageCircle,
+    badge: "border-emerald-700 bg-emerald-600 text-white",
+  },
 };
 
 function RedeemChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
   const meta = REDEEM_CHANNEL_META[channel];
   const Icon = meta.icon;
   return (
-    <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}
+    >
       <Icon className="h-2.5 w-2.5" /> {meta.label}
     </span>
   );
@@ -883,7 +1101,9 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
           <Ticket className="h-5 w-5 text-muted-foreground" />
         </div>
         <div className="text-sm text-foreground">No promo codes redeemed yet.</div>
-        <div className="text-[11px] text-muted-foreground">Promo codes this contact has redeemed will appear here.</div>
+        <div className="text-[11px] text-muted-foreground">
+          Promo codes this contact has redeemed will appear here.
+        </div>
       </div>
     );
   }
@@ -895,11 +1115,15 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
       {/* Summary */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Redemptions</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Total Redemptions
+          </div>
           <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
         </div>
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Discount Received</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Total Discount Received
+          </div>
           <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
         </div>
       </div>
@@ -909,12 +1133,24 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-white">
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Promo Code</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Transaction</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Store</th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Channel</th>
-              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Discount</th>
-              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Redeemed</th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Promo Code
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Transaction
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Store
+              </th>
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Channel
+              </th>
+              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Discount
+              </th>
+              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+                Redeemed
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -922,16 +1158,24 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
               <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="font-medium text-foreground text-xs">{r.promoName}</div>
-                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{r.promoCode}</div>
+                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                    {r.promoCode}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-xs font-mono text-foreground/90">{r.invoice}</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">{r.sourceName}</div>
                 </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">{r.store}</td>
-                <td className="px-4 py-3"><RedeemChannelBadge channel={r.channel} /></td>
-                <td className="px-4 py-3 text-right text-xs font-medium text-foreground whitespace-nowrap">{formatIDR(r.discountValue)}</td>
-                <td className="px-4 py-3 text-right text-[11px] text-muted-foreground whitespace-nowrap">{fmtDateTimeEN(r.redeemedAt)}</td>
+                <td className="px-4 py-3">
+                  <RedeemChannelBadge channel={r.channel} />
+                </td>
+                <td className="px-4 py-3 text-right text-xs font-medium text-foreground whitespace-nowrap">
+                  {formatIDR(r.discountValue)}
+                </td>
+                <td className="px-4 py-3 text-right text-[11px] text-muted-foreground whitespace-nowrap">
+                  {fmtDateTimeEN(r.redeemedAt)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -944,7 +1188,9 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
 function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">{label}</span>
+      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">
+        {label}
+      </span>
       <div className="text-sm text-right">{children}</div>
     </div>
   );
@@ -959,8 +1205,8 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
     status === "Shipped"
       ? "border-emerald-700 bg-emerald-600 text-white"
       : status === "Cancelled"
-      ? "border-rose-700 bg-rose-600 text-white"
-      : "border-sky-700 bg-sky-600 text-white"; // Processed
+        ? "border-rose-700 bg-rose-600 text-white"
+        : "border-sky-700 bg-sky-600 text-white"; // Processed
   return (
     <div className="rounded-md border border-border bg-card/60 px-3 py-2.5 mt-1 mb-1 space-y-1.5">
       <div className="flex items-center justify-between gap-2">
@@ -969,7 +1215,11 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
           <span className="text-xs font-medium text-foreground">{invoice}</span>
           <span className="text-[10px] text-muted-foreground">· {brand}</span>
         </div>
-        <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium border ${statusColor}`}>{status}</span>
+        <span
+          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium border ${statusColor}`}
+        >
+          {status}
+        </span>
       </div>
       <div className="text-[11px] text-muted-foreground">{items}</div>
       <div className="flex items-center justify-between">
@@ -979,7 +1229,6 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
     </div>
   );
 }
-
 
 /* ============================== RIGHT PANEL ============================== */
 
@@ -1022,11 +1271,15 @@ function RightPanel({
               <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.username}</div>
             </FieldRow>
             <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Area Coordinator">
-              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.areaCoordinator || "—"}</div>
+              <div className="text-xs text-foreground/90 px-2 py-1">
+                {baRecord.areaCoordinator || "—"}
+              </div>
             </FieldRow>
             <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
               <div className="flex items-center gap-1.5 px-2 py-1">
-                <code className="font-mono text-xs text-foreground/90">{revealed ? baRecord.password : "••••••••••••"}</code>
+                <code className="font-mono text-xs text-foreground/90">
+                  {revealed ? baRecord.password : "••••••••••••"}
+                </code>
                 <button
                   onClick={() => (revealed ? setRevealed(false) : setShowConfirm(true))}
                   className="text-muted-foreground hover:text-foreground transition-colors"
@@ -1036,7 +1289,10 @@ function RightPanel({
                 </button>
                 {revealed && (
                   <button
-                    onClick={() => { navigator.clipboard.writeText(baRecord.password); toast.success("Password copied"); }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(baRecord.password);
+                      toast.success("Password copied");
+                    }}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                     title="Copy"
                   >
@@ -1050,7 +1306,10 @@ function RightPanel({
             <RevealPasswordModal
               label={baRecord.name}
               onClose={() => setShowConfirm(false)}
-              onConfirmed={() => { setRevealed(true); setShowConfirm(false); }}
+              onConfirmed={() => {
+                setRevealed(true);
+                setShowConfirm(false);
+              }}
             />
           )}
         </RightSection>
@@ -1132,7 +1391,6 @@ function RightPanel({
           onCreate={onCreateList}
         />
       </RightSection>
-
     </div>
   );
 }
@@ -1146,7 +1404,15 @@ function RightSection({ title, children }: { title: string; children: React.Reac
   );
 }
 
-function FieldRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function FieldRow({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="grid grid-cols-[80px_minmax(0,1fr)] items-center gap-2">
       <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
@@ -1167,19 +1433,15 @@ function PropertyField({
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
-  const inputCls = "h-8 w-full rounded-md border border-white/10 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30";
+  const inputCls =
+    "h-8 w-full rounded-md border border-white/10 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30";
   return (
     <div>
       <div className="text-[10px] text-muted-foreground mb-1">{property.name}</div>
       {(() => {
         switch (property.type) {
           case "multiline":
-            return (
-              <DraftTextarea
-                value={(value as string) ?? ""}
-                onCommit={(v) => onChange(v)}
-              />
-            );
+            return <DraftTextarea value={(value as string) ?? ""} onCommit={(v) => onChange(v)} />;
           case "number":
             return (
               <DraftInput
@@ -1196,7 +1458,9 @@ function PropertyField({
                 onClick={() => onChange(!value)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${value ? "bg-primary" : "bg-white/10"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${value ? "translate-x-4" : "translate-x-0.5"}`} />
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${value ? "translate-x-4" : "translate-x-0.5"}`}
+                />
               </button>
             );
           case "select":
@@ -1208,7 +1472,9 @@ function PropertyField({
               >
                 <option value="">—</option>
                 {(property.options ?? []).map((o) => (
-                  <option key={o} value={o}>{o}</option>
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
                 ))}
               </select>
             );
@@ -1222,7 +1488,9 @@ function PropertyField({
                     <button
                       type="button"
                       key={o}
-                      onClick={() => onChange(on ? selected.filter((x) => x !== o) : [...selected, o])}
+                      onClick={() =>
+                        onChange(on ? selected.filter((x) => x !== o) : [...selected, o])
+                      }
                       className={`rounded-md border px-1.5 py-0.5 text-[10px] ${
                         on
                           ? "border-primary/60 bg-primary/15 text-foreground"
@@ -1249,7 +1517,15 @@ function PropertyField({
             return (
               <DraftInput
                 value={(value as string) ?? ""}
-                type={property.type === "email" ? "email" : property.type === "phone" ? "tel" : property.type === "url" ? "url" : "text"}
+                type={
+                  property.type === "email"
+                    ? "email"
+                    : property.type === "phone"
+                      ? "tel"
+                      : property.type === "url"
+                        ? "url"
+                        : "text"
+                }
                 className={inputCls}
                 onCommit={(v) => onChange(v)}
               />
@@ -1272,38 +1548,46 @@ function DraftInput({
   className?: string;
 }) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
   return (
     <input
       type={type}
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
-      onBlur={() => { if (draft !== value) onCommit(draft); }}
+      onBlur={() => {
+        if (draft !== value) onCommit(draft);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-        if (e.key === "Escape") { setDraft(value); (e.target as HTMLInputElement).blur(); }
+        if (e.key === "Escape") {
+          setDraft(value);
+          (e.target as HTMLInputElement).blur();
+        }
       }}
       className={className}
     />
   );
 }
 
-function DraftTextarea({
-  value,
-  onCommit,
-}: {
-  value: string;
-  onCommit: (v: string) => void;
-}) {
+function DraftTextarea({ value, onCommit }: { value: string; onCommit: (v: string) => void }) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
   return (
     <textarea
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
-      onBlur={() => { if (draft !== value) onCommit(draft); }}
+      onBlur={() => {
+        if (draft !== value) onCommit(draft);
+      }}
       onKeyDown={(e) => {
-        if (e.key === "Escape") { setDraft(value); (e.target as HTMLTextAreaElement).blur(); }
+        if (e.key === "Escape") {
+          setDraft(value);
+          (e.target as HTMLTextAreaElement).blur();
+        }
       }}
       rows={2}
       className="w-full rounded-md border border-white/10 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
@@ -1334,12 +1618,23 @@ function LabelSelector({
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) { setOpen(false); setSearch(""); }
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
     };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen(false); setSearch(""); } };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const selected = labels.filter((l) => selectedIds.includes(l.id));
@@ -1354,7 +1649,11 @@ function LabelSelector({
           >
             <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
             {l.name}
-            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150">
+            <button
+              type="button"
+              onClick={() => onToggle(l.id)}
+              className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150"
+            >
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -1365,7 +1664,9 @@ function LabelSelector({
         onClick={() => setOpen((v) => !v)}
         className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
       >
-        <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add label</span>
+        <span className="inline-flex items-center gap-1">
+          <Plus className="h-3 w-3" /> Add label
+        </span>
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
@@ -1375,7 +1676,12 @@ function LabelSelector({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canCreate) {
+                  onCreate(search.trim());
+                  setSearch("");
+                }
+              }}
               placeholder="Search or create label…"
               className="h-7 w-full rounded border border-white/10 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
@@ -1399,7 +1705,10 @@ function LabelSelector({
             {canCreate && (
               <button
                 type="button"
-                onClick={() => { onCreate(search.trim()); setSearch(""); }}
+                onClick={() => {
+                  onCreate(search.trim());
+                  setSearch("");
+                }}
                 className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
               >
                 <Plus className="h-3 w-3 text-primary" />
@@ -1407,7 +1716,9 @@ function LabelSelector({
               </button>
             )}
             {filtered.length === 0 && !canCreate && (
-              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No labels</div>
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                No labels
+              </div>
             )}
           </div>
         </div>
@@ -1437,12 +1748,23 @@ function ListSelector({
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) { setOpen(false); setSearch(""); }
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
     };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen(false); setSearch(""); } };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const selected = lists.filter((l) => selectedIds.includes(l.id));
@@ -1457,7 +1779,11 @@ function ListSelector({
           >
             <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
             {l.name}
-            <button type="button" onClick={() => onToggle(l.id)} className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150">
+            <button
+              type="button"
+              onClick={() => onToggle(l.id)}
+              className="text-muted-foreground hover:text-foreground ml-0.5 transition-colors duration-150"
+            >
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -1468,7 +1794,9 @@ function ListSelector({
         onClick={() => setOpen((v) => !v)}
         className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
       >
-        <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add to list</span>
+        <span className="inline-flex items-center gap-1">
+          <Plus className="h-3 w-3" /> Add to list
+        </span>
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
@@ -1478,7 +1806,12 @@ function ListSelector({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && canCreate) { onCreate(search.trim()); setSearch(""); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canCreate) {
+                  onCreate(search.trim());
+                  setSearch("");
+                }
+              }}
               placeholder="Search or create list…"
               className="h-7 w-full rounded border border-white/10 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
@@ -1502,7 +1835,10 @@ function ListSelector({
             {canCreate && (
               <button
                 type="button"
-                onClick={() => { onCreate(search.trim()); setSearch(""); }}
+                onClick={() => {
+                  onCreate(search.trim());
+                  setSearch("");
+                }}
                 className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
               >
                 <Plus className="h-3 w-3 text-primary" />
@@ -1510,7 +1846,9 @@ function ListSelector({
               </button>
             )}
             {filtered.length === 0 && !canCreate && (
-              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">No lists</div>
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                No lists
+              </div>
             )}
           </div>
         </div>
@@ -1522,19 +1860,29 @@ function ListSelector({
 /* ============================== UTIL ============================== */
 
 function formatDate(iso: string) {
-  try { return fmtDateEN(iso); } catch { return iso; }
+  try {
+    return fmtDateEN(iso);
+  } catch {
+    return iso;
+  }
 }
 
 function formatTime(iso: string) {
-  try { return fmtDateTimeEN(iso); } catch { return iso; }
+  try {
+    return fmtDateTimeEN(iso);
+  } catch {
+    return iso;
+  }
 }
 
 function groupByDay(activities: ContactActivity[]) {
-  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today.getTime() - 86400000);
   const map = new Map<string, { key: string; label: string; items: ContactActivity[] }>();
   for (const a of activities) {
-    const d = new Date(a.at); d.setHours(0, 0, 0, 0);
+    const d = new Date(a.at);
+    d.setHours(0, 0, 0, 0);
     const key = d.toISOString();
     let label: string;
     if (d.getTime() === today.getTime()) label = "Today";
