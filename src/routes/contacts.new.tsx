@@ -134,6 +134,7 @@ function NewContactPage() {
       gender: (gender as "Female" | "Male" | "Other") || undefined,
       labelIds,
       listIds: [],
+      brandIds: customerBrandIds,
       lastInteraction: "Just now",
       status: "Active",
       avatar: initials || "CX",
