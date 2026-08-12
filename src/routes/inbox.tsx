@@ -884,14 +884,14 @@ function InboxPage() {
                     <button
                       type="button"
                       onClick={() => setAutopilot(active.id, true)}
-                      className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border px-3 text-[14px] text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
                     >
                       <Bot className="h-3.5 w-3.5" /> Back to Autopilot
                     </button>
                     <button
                       onClick={submitReply}
                       disabled={!replyText.trim()}
-                      className="inline-flex items-center gap-2 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center gap-2 h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className="h-3.5 w-3.5" /> Send
                     </button>
