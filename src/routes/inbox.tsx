@@ -434,7 +434,7 @@ function InboxPage() {
       else result.my += c.unread;
     }
     return result;
-  }, [contacts, conversations]);
+  }, [contacts]);
 
   const teamCounts = useMemo(() => {
     const map = new Map<string, number>();
