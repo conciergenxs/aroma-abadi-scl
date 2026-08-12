@@ -726,7 +726,7 @@ export function RolesPermissionsModule() {
                 <th className="px-4 py-2.5 text-left w-8" />
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {roles.map((r) => (
                 <tr
                   key={r.id}
