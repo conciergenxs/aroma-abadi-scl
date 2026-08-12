@@ -238,7 +238,6 @@ function InboxPage() {
     }
   };
   const copyToComposer = (text: string) => {
-    setComposerMode("reply");
     setReplyText(text);
     requestAnimationFrame(() => {
       composerRef.current?.focus();
@@ -248,69 +247,7 @@ function InboxPage() {
   };
 
   const insertTemplate = (body: string) => {
-    if (composerMode === "note") {
-      setNoteText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
-      requestAnimationFrame(() => noteRef.current?.focus());
-    } else {
-      setReplyText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
-    }
-  };
-
-  const mentionMatches = useMemo(() => {
-    if (mentionQuery === null) return [];
-    const q = mentionQuery.toLowerCase();
-    return TEAM_USERS.filter((u) => u.id !== "me" && u.name.toLowerCase().includes(q)).slice(0, 6);
-  }, [mentionQuery]);
-
-  const handleNoteChange = (e: { target: HTMLTextAreaElement }) => {
-    const v = e.target.value;
-    setNoteText(v);
-    const caret = e.target.selectionStart ?? v.length;
-    const upto = v.slice(0, caret);
-    const m = upto.match(/(?:^|\s)@(\w*)$/);
-    if (m) {
-      setMentionQuery(m[1]);
-      setMentionIndex(0);
-    } else {
-      setMentionQuery(null);
-    }
-  };
-
-  const insertMention = (user: TeamUser) => {
-    const el = noteRef.current;
-    const caret = el?.selectionStart ?? noteText.length;
-    const before = noteText.slice(0, caret).replace(/@(\w*)$/, `@${user.name} `);
-    const after = noteText.slice(caret);
-    const next = before + after;
-    setNoteText(next);
-    setMentionQuery(null);
-    requestAnimationFrame(() => {
-      el?.focus();
-      const pos = before.length;
-      el?.setSelectionRange(pos, pos);
-    });
-  };
-
-  const submitNote = () => {
-    const text = noteText.trim();
-    if (!text) return;
-    const mentions = Array.from(text.matchAll(/@([A-Za-z][A-Za-z ]*?)(?=\s|$|[.,!?])/g))
-      .map((m) => TEAM_USERS.find((u) => text.includes(`@${u.name}`))?.id)
-      .filter((x): x is string => Boolean(x));
-    const note: InternalNote = {
-      id: `n_${Date.now()}`,
-      authorId: "me",
-      text,
-      mentions: Array.from(new Set(mentions)),
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-    setNotesByConvo((prev) => ({ ...prev, [active.id]: [...(prev[active.id] ?? []), note] }));
-    setNoteText("");
-  };
-
-  const exitNoteMode = () => {
-    setComposerMode("reply");
-    setMentionQuery(null);
+    setReplyText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
   };
 
   const visible = useMemo(() => {
