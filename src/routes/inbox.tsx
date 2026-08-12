@@ -435,6 +435,7 @@ function InboxPage() {
   useEffect(() => {
     setSearchOpen(false);
     setSearchQuery("");
+    setComposerMode("reply");
   }, [active.id]);
   useEffect(() => {
     if (!activeMatchId) return;
