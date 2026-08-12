@@ -1172,7 +1172,7 @@ function PreviewStep({
       </SectionCard>
 
       <SectionCard title="Access Breakdown">
-        <div className="p-5 grid grid-cols-3 gap-3">
+        <div className="p-5 grid grid-cols-3 gap-3 stagger">
           <BreakdownTile label="Full Access" value={full} accent="emerald" />
           <BreakdownTile label="Limited Access" value={limited} accent="amber" />
           <BreakdownTile label="Disabled" value={disabled} accent="muted" />
