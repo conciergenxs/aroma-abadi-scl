@@ -93,6 +93,7 @@ function NewContactPage() {
       gender: gender as "Female" | "Male" | "Other",
       labelIds: ["lb-ba"],
       listIds: [],
+      brandIds,
       lastInteraction: "Just now",
       status: "Active",
       avatar: initials || "BA",
