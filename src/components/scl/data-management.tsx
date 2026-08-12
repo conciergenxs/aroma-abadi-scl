@@ -1640,7 +1640,7 @@ function ContactPropertiesRouter() {
                     <th className="px-3 py-2.5 text-left font-medium">Visible</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="stagger">
                   {paged.map((row) => (
                     <tr
                       key={row.id}
