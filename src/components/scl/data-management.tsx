@@ -688,7 +688,7 @@ function RecentlyDeletedContactsPage() {
                   <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border stagger">
                 {deletedContacts.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-5 py-3">
