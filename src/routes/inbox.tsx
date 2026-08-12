@@ -281,7 +281,11 @@ function InboxPage() {
       if (filters.stages.length) {
         if (!ct.lifecycleStage || !filters.stages.includes(ct.lifecycleStage)) return false;
       }
-      if (filters.unreadOnly && !isUnread(c)) return false;
+      if (filters.unreadOnly) {
+        const override = unreadOverrides[c.id];
+        const count = override === false ? 0 : override === true ? Math.max(c.unread, 1) : c.unread;
+        if (count === 0) return false;
+      }
       // Label filter (left nav)
       if (labelFilter && !ct.labelIds.includes(labelFilter)) return false;
       // Search
