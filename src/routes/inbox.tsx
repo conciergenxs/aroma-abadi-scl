@@ -184,13 +184,16 @@ function InboxPage() {
       else next.add(id);
       return next;
     });
-  const unreadCount = (c: Conversation) => {
-    const o = unreadOverrides[c.id];
-    if (o === false) return 0;
-    if (o === true) return Math.max(c.unread, 1);
-    return c.unread;
-  };
-  const isUnread = (c: Conversation) => unreadCount(c) > 0;
+  const unreadCount = useCallback(
+    (c: Conversation) => {
+      const o = unreadOverrides[c.id];
+      if (o === false) return 0;
+      if (o === true) return Math.max(c.unread, 1);
+      return c.unread;
+    },
+    [unreadOverrides],
+  );
+  const isUnread = useCallback((c: Conversation) => unreadCount(c) > 0, [unreadCount]);
   const markRead = (id: string) =>
     setUnreadOverrides((p) => ({ ...p, [id]: false }));
   const markUnread = (id: string) =>
