@@ -901,7 +901,7 @@ function PlanComparisonTable() {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border stagger">
             {comparisonRows.map((row) => (
               <tr key={row.feature} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-5 py-3 font-medium">{row.feature}</td>
