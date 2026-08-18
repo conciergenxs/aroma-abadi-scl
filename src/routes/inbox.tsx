@@ -811,6 +811,15 @@ function InboxPage() {
                         {ct.name}
                       </span>
                       <span className="flex items-center gap-1 shrink-0">
+                        {isAutopilot(c.id) && (
+                          <span
+                            title="Sent by Arma"
+                            className="flex items-center gap-0.5 text-[10px] text-primary"
+                          >
+                            <Bot className="h-3 w-3" />
+                            Arma
+                          </span>
+                        )}
                         <span
                           className={`text-[10px] tabular-nums ${unread ? "text-primary font-medium" : "text-muted-foreground/60"}`}
                         >
