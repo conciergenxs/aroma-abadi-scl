@@ -2063,6 +2063,12 @@ function MessageRow({
         <div
           className={`mt-1.5 flex items-center gap-1 text-[10px] ${isMe ? "text-primary-foreground/70 justify-end" : "text-muted-foreground/70"}`}
         >
+          {isMe && m.sentBy === "arma" && (
+            <span title="Sent by Arma" className="flex items-center gap-0.5 mr-auto">
+              <Bot className="h-3 w-3" />
+              Arma
+            </span>
+          )}
           <span>{m.time}</span>
           {isMe &&
             (m.status === "read" ? (
