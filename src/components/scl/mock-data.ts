@@ -749,6 +749,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Halo Putri! Shade 03 baru restock pagi ini. Mau aku reserve satu?",
       time: "10:23",
       status: "read",
@@ -762,6 +763,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m4",
       from: "me",
+      sentBy: "arma",
       text: "Sudah diaplikasikan. Link checkout privat: aroma.id/v/putri-22",
       time: "10:25",
       status: "read",
@@ -778,6 +780,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Halo Bagus! Mulai 24 pcs untuk harga reseller. Aku kirim katalognya ya.",
       time: "09:50",
       status: "delivered",
@@ -793,6 +796,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Siap! Aku kirim katalog corporate + harga bulk sekarang.",
       time: "Yesterday",
       status: "read",
@@ -810,6 +814,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Halo Dewi! Sisley lebih premium & fokus ke skincare-makeup hybrid, cocok untuk kulit mature. Rimmel lebih playful & terjangkau, target younger crowd. Kalau customernya 25–35 tahun, sarankan Sisley untuk daily luxury. Mau script lengkapnya?",
       time: "13:12",
       status: "read",
@@ -826,6 +831,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Glow Serum mengandung: Niacinamide 5% (pori-pori & cerah), Hyaluronic Acid (hidrasi), Vitamin C stabilized (antioksidan), dan Peptide Complex (anti-aging). Key selling point: cocok untuk semua skin type, non-comedogenic, hasil terlihat dalam 2 minggu.",
       time: "Yesterday",
       status: "read",
@@ -841,6 +847,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Bulan ini top seller: Velvet Rouge Shade 03 (Rosewood), Shade 07 (Burgundy), dan Shade 11 (Nude Mauve). Shade 03 paling cepat habis, stok di gudang tinggal 48 pcs.",
       time: "14:31",
       status: "read",
@@ -862,6 +869,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Untuk customer baru Laura Mercier: fokus pada 3 hal — (1) iconic Translucent Setting Powder yang viral, (2) Kaviar Stick untuk on-the-go touch up, (3) Flawless Lumiere Foundation yang buildable. Opening yang works: 'Kalau mau tampilan natural tapi tahan lama, Laura Mercier adalah jawabannya.'",
       time: "13:47",
       status: "delivered",
@@ -877,6 +885,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "12.12 berlaku untuk semua SKU kecuali limited edition & new arrival (< 30 hari). Diskon: 20% untuk single item, 30% untuk bundle 3 produk. Kode promo: ARMA1212. Valid 12 Des 00:00–23:59.",
       time: "Yesterday",
       status: "read",
@@ -898,6 +907,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Teknik upsell paling efektif: tawarkan setting powder + brush set sebagai 'completing the look'. Bundle harga juga works — kalau customer udah beli foundation Sisley, tawarkan Sisley Skincare untuk prep sebelum makeup.",
       time: "43m",
       status: "delivered",
@@ -913,6 +923,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Stay Matte: matte finish, cocok kulit berminyak, coverage medium. Lasting Finish: lebih buildable, semi-matte, tahan 25 jam. Customer dengan kombinasi skin → Lasting Finish. Kulit oily → Stay Matte.",
       time: "1h 58m",
       status: "read",
@@ -929,6 +940,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Restock dijadwalkan minggu depan. Aku sudah masukkan nama kamu di waitlist notif. Untuk customer yang minta, bisa tawarkan Laura Mercier Loose Setting Powder sebagai alternatif sementara.",
       time: "2h 58m",
       status: "read",
@@ -944,6 +956,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Gunakan script ini: 'Terima kasih feedbacknya! Warna mineral makeup memang bisa terlihat berbeda tergantung pencahayaan & undertone kulit. Boleh saya bantu carikan shade yang lebih pas dengan skin tone kamu?' Tawarkan swatch test jika di store.",
       time: "Yesterday",
       status: "read",
@@ -960,6 +973,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Opening yang works: 'Dior Beauty bukan sekedar makeup — ini adalah art. Setiap produk dirancang oleh creative director Dior untuk menonjolkan keindahan natural kamu.' Fokus pada 3 hero product: Rouge Dior Lipstick, Backstage Foundation, Airflash Setting Spray.",
       time: "Yesterday",
       status: "delivered",
@@ -975,6 +989,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "SOP retur Sisley: (1) Cek struk & kondisi produk, (2) Jika < 7 hari & sealed → full refund, (3) Jika sudah dibuka → exchange atau store credit, (4) Foto kondisi produk sebelum proses. Lapor ke supervisor jika nilai > 500rb.",
       time: "2d",
       status: "read",
@@ -990,6 +1005,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Target BA Junior: Rp 15–20 juta/bulan. Target BA Regular: Rp 25–35 juta/bulan. Senior BA: Rp 40–60 juta/bulan. Supervisor: Rp 75 juta+/bulan. Bonus berlaku jika melebihi target 10%.",
       time: "2d",
       status: "read",
@@ -1006,6 +1022,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Demo bareMinerals: (1) Mulai dengan Prep Step Primer, (2) Swirl-tap-buff foundation dengan kabuki brush gerakan melingkar, (3) Highlight dengan Luminizer, (4) Set dengan Mineral Veil. Key message: bebas paraben, cocok untuk sensitive skin.",
       time: "3d",
       status: "read",
@@ -1021,6 +1038,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Coba script ini: 'Saya paham kamu masih pertimbangkan. Rimmel Stay Matte ini best seller kami karena hasil matte-nya tahan seharian bahkan di cuaca panas. Kalau mau, aku bisa bantu pilih shade yang paling cocok untuk skin tone kamu.' Fokus pada social proof + personalisasi.",
       time: "2d",
       status: "read",
@@ -1037,6 +1055,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Pakai template ini: 'Halo [nama]! Kamu sempat lihat [produk DG/Dolce & Gabbana] kemarin. Stoknya terbatas nih — mau aku reserve dulu? Berlaku 24 jam 😊.' Kirim H+1 setelah mereka browse, open rate-nya tinggi banget.",
       time: "2h",
       status: "delivered",
@@ -1052,6 +1071,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Loose Powder: lebih ringan, airbrush finish, ideal untuk bake technique & full coverage look. Pressed Powder: lebih travel-friendly, touch-up on-the-go, finish lebih natural. Customer yang aktif di luar → sarankan Pressed. Home/studio use → Loose.",
       time: "Yesterday",
       status: "read",
@@ -1068,6 +1088,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Minimum stok bareMinerals per store: Original Foundation 6 SKU (masing-masing 3 pcs), Blush Color Infusion 4 variant (2 pcs each), Prep Step Primer 5 pcs, Mineral Veil 4 pcs. Total sekitar 30–35 pcs. Kalau stok < 50% trigger reorder ya.",
       time: "2d",
       status: "read",
@@ -1083,6 +1104,7 @@ export const threadsByContact: Record<string, Message[]> = {
     {
       id: "m2",
       from: "me",
+      sentBy: "arma",
       text: "Bulan ini belum ada bundling lintas brand. Yang ada: Sisley bundle — beli foundation + setting powder hemat 15%. Dior bundle — Rouge Dior + Backstage Foundation paket launch harga spesial. Kalau customer minta kombinasi keduanya, bisa custom quote ya.",
       time: "2d",
       status: "read",
