@@ -1018,12 +1018,6 @@ function InboxPage() {
                     <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150">
                       <Smile className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => setTemplatePickerOpen(true)}
-                      className="ml-1 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
-                    >
-                      Use template <ChevronDown className="h-3 w-3" />
-                    </button>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
