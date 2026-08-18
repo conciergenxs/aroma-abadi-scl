@@ -733,6 +733,9 @@ export type Message = {
   text: string;
   time: string;
   status?: "sent" | "delivered" | "read";
+  // Who authored this outgoing ("me") message — Arma's autopilot or a
+  // teammate after taking over. Irrelevant for incoming ("them") messages.
+  sentBy?: "arma" | "human";
 };
 
 export const threadsByContact: Record<string, Message[]> = {
