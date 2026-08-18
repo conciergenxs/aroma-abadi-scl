@@ -287,10 +287,6 @@ function InboxPage() {
     });
   };
 
-  const insertTemplate = (body: string) => {
-    setReplyText((t) => (t ? `${t}${t.endsWith("\n") ? "" : "\n"}${body}` : body));
-  };
-
   const visible = useMemo(() => {
     return conversations.filter((c) => {
       const ct = contacts.find((x) => x.id === c.contactId);
