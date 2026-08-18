@@ -798,6 +798,14 @@ function InboxPage() {
                         className={`absolute -top-0.5 -left-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-background ${stageColor.dot}`}
                       />
                     )}
+                    {isAutopilot(c.id) && (
+                      <span
+                        title="Arma is replying automatically"
+                        className="absolute -top-0.5 -right-0.5 h-[16px] w-[16px] rounded-full bg-primary ring-2 ring-background shadow-sm grid place-items-center"
+                      >
+                        <Bot className="h-2.5 w-2.5 text-primary-foreground" />
+                      </span>
+                    )}
                     <ChannelIcon
                       channel={c.channel}
                       className="absolute -bottom-0.5 -right-0.5 h-[16px] w-[16px] ring-2 ring-background shadow-sm"
