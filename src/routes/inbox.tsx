@@ -18,7 +18,6 @@ import { useContactsStore, contactsStore, getStageStyle } from "@/components/scl
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { ChannelIcon } from "@/components/scl/channel-badge";
-import { TemplatePicker } from "@/components/scl/template-picker";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
