@@ -1195,11 +1195,6 @@ function InboxPage() {
           </aside>
         </div>
       )}
-      <TemplatePicker
-        open={templatePickerOpen}
-        onClose={() => setTemplatePickerOpen(false)}
-        onInsert={insertTemplate}
-      />
       {forwardModalOpen && (
         <ForwardModal
           count={selectedMsgIds.size}
