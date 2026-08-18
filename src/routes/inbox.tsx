@@ -424,6 +424,10 @@ function InboxPage() {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       status: "delivered",
       replyTo: replyTarget,
+      // This composer only ever renders after a human has taken the
+      // conversation over from Autopilot — see the isAutopilot(...) ternary
+      // below — so every message sent through it is human-authored.
+      sentBy: "human",
     };
     setSentByConvo((prev) => ({ ...prev, [active.id]: [...(prev[active.id] ?? []), sent] }));
     setReplyText("");
