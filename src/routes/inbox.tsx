@@ -360,6 +360,7 @@ function InboxPage() {
       text: `Halo ${contact.name.split(" ")[0]}, terima kasih sudah menghubungi Aroma Abadi. Ada yang bisa kami bantu?`,
       time: "09:14",
       status: "read",
+      sentBy: "arma",
     };
     const follow: Message = {
       id: `gen-${contact.id}-3`,
