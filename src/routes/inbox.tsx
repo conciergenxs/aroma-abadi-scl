@@ -802,7 +802,7 @@ function InboxPage() {
                         title="Arma is replying automatically"
                         className="absolute -top-1 -right-1"
                       >
-                        <Bot className="h-3.5 w-3.5 text-primary drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.5)]" />
+                        <Bot className="h-3.5 w-3.5 text-primary" />
                       </span>
                     )}
                     <ChannelIcon
