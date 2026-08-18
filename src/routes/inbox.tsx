@@ -242,7 +242,6 @@ function InboxPage() {
   const [autopilotByConvo, setAutopilotByConvo] = useState<Record<string, boolean>>({});
   const isAutopilot = (id: string) => autopilotByConvo[id] !== false; // default = autopilot ON
   const setAutopilot = (id: string, v: boolean) => setAutopilotByConvo((p) => ({ ...p, [id]: v }));
-  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
 
   // ============== MESSAGE ACTIONS (reply / copy / forward) ==============
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
