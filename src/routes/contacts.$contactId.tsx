@@ -19,7 +19,6 @@ import {
   EyeOff,
   Copy,
   KeyRound,
-  BadgeCheck,
   Ticket,
   Instagram,
   Music2,
