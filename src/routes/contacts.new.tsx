@@ -39,15 +39,11 @@ function NewContactPage() {
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [position, setPosition] = useState("");
   const [areaCoordinator, setAreaCoordinator] = useState("");
-  const [city, setCity] = useState("");
-  const [store, setStore] = useState("");
 
   // Customer-specific
   const [pointBalance, setPointBalance] = useState("");
   const [customerBrandIds, setCustomerBrandIds] = useState<string[]>([]);
   const [labelIds, setLabelIds] = useState<string[]>([]);
-
-  const availableStores = city ? (STORES_BY_CITY[city] ?? []) : [];
 
   // Existing Area Coordinators, drawn from current BA records — kept
   // searchable (select2-style) since the roster can grow over time.
