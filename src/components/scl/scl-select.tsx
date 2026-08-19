@@ -98,7 +98,7 @@ export function SclSelect({
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search…"
+                placeholder={searchPlaceholder}
                 className="w-full h-9 bg-transparent pl-8 pr-3 text-[12px] focus:outline-none"
               />
             </div>
