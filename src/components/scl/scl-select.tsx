@@ -24,6 +24,8 @@ type Props = {
   /** Inline width on the trigger (e.g. "w-40"). */
   className?: string;
   searchable?: boolean;
+  /** Placeholder for the search input when `searchable` is set (defaults to "Search…"). */
+  searchPlaceholder?: string;
   ariaLabel?: string;
 };
 
