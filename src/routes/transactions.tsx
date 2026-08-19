@@ -233,7 +233,6 @@ function TransactionsPage() {
                   <Th>Invoice</Th>
                   <Th>Customer</Th>
                   <Th>BA</Th>
-                  <Th>Store / City</Th>
                   <Th>Brand</Th>
                   <Th>Items</Th>
                   <Th>Status</Th>
