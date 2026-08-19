@@ -17,17 +17,7 @@ export const Route = createFileRoute("/contacts/new")({
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 const POSITIONS = ["BA", "Senior BA", "Supervisor"];
-const GENDERS = ["Female", "Male", "Other"] as const;
-const CITIES = ["Jakarta", "Bandung", "Surabaya", "Medan", "Makassar", "Bali", "Yogyakarta"];
-const STORES_BY_CITY: Record<string, string[]> = {
-  Jakarta: ["Plaza Indonesia", "Grand Indonesia", "Pondok Indah Mall", "Central Park"],
-  Bandung: ["Paris van Java", "Trans Studio Mall", "Ciwalk", "23 Paskal"],
-  Surabaya: ["Pakuwon Mall", "Tunjungan Plaza", "Galaxy Mall"],
-  Medan: ["Sun Plaza", "Medan Fair Plaza"],
-  Makassar: ["Trans Studio Mall Makassar", "Mall Panakkukang"],
-  Bali: ["Beachwalk", "Discovery Mall"],
-  Yogyakarta: ["Malioboro Mall", "Hartono Mall"],
-};
+const GENDERS = ["Female", "Male"] as const;
 
 type ContactType = "ba" | "customer";
 
