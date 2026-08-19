@@ -59,6 +59,16 @@ function NewContactPage() {
 
   const availableStores = city ? (STORES_BY_CITY[city] ?? []) : [];
 
+  // Existing Area Coordinators, drawn from current BA records — kept
+  // searchable (select2-style) since the roster can grow over time.
+  const arcoOptions = useMemo(
+    () =>
+      Array.from(new Set(bas.map((b) => b.areaCoordinator).filter(Boolean)))
+        .sort()
+        .map((name) => ({ value: name, label: name })),
+    [bas],
+  );
+
   const brandName = (id: string) =>
     brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
 
