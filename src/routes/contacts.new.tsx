@@ -618,18 +618,21 @@ function SimpleSelect({
   disabled?: boolean;
 }) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-gray-50 transition-colors disabled:opacity-50"
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="h-9 w-full appearance-none rounded-md border border-gray-200 bg-white pl-2 pr-7 text-xs text-foreground focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 hover:bg-gray-50 transition-colors disabled:opacity-50"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+    </div>
   );
 }
 
