@@ -148,8 +148,10 @@ function NewContactPage() {
       username,
       waNumber: phone.trim(),
       brandIds,
-      city,
-      store,
+      // Location is no longer captured at creation time — leave blank,
+      // editable later from the BA directory if needed.
+      city: "",
+      store: "",
       position,
       areaCoordinator: areaCoordinator.trim(),
     });
