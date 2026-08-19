@@ -110,14 +110,6 @@ function NewContactPage() {
       toast.error("Area Coordinator is required");
       return;
     }
-    if (!city) {
-      toast.error("City is required");
-      return;
-    }
-    if (!store) {
-      toast.error("Store is required");
-      return;
-    }
 
     const initials = name
       .trim()
