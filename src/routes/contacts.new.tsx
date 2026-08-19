@@ -290,12 +290,9 @@ function NewContactPage() {
               <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
                 <FormSection title="Basic Information">
                   <FormGrid>
-                    <Field label="Full Name" required>
-                      <div className="md:col-span-2">
-                        <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
-                      </div>
+                    <Field label="Full Name" required className="md:col-span-2">
+                      <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
                     </Field>
-                    <div className="hidden md:block" />
                     <Field label="WA Number" required>
                       <Input
                         value={phone}
