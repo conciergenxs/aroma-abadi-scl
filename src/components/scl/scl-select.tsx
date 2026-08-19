@@ -43,6 +43,7 @@ export function SclSelect({
   width,
   className = "",
   searchable = false,
+  searchPlaceholder = "Search…",
   ariaLabel,
 }: Props) {
   const [open, setOpen] = useState(false);
