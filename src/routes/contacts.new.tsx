@@ -519,14 +519,16 @@ function FormGrid({ children }: { children: React.ReactNode }) {
 function Field({
   label,
   required,
+  className,
   children,
 }: {
   label: string;
   required?: boolean;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className={className}>
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
         {required && <span className="text-destructive ml-0.5">*</span>}
