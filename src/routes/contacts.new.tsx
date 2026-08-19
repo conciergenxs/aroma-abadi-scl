@@ -374,35 +374,6 @@ function NewContactPage() {
                     </div>
                   </div>
                 </FormSection>
-
-                <FormSection title="Location">
-                  <FormGrid>
-                    <Field label="City" required>
-                      <SimpleSelect
-                        value={city}
-                        onChange={(v) => {
-                          setCity(v);
-                          setStore("");
-                        }}
-                        options={[
-                          { value: "", label: "Select city…" },
-                          ...CITIES.map((c) => ({ value: c, label: c })),
-                        ]}
-                      />
-                    </Field>
-                    <Field label="Store" required>
-                      <SimpleSelect
-                        value={store}
-                        onChange={setStore}
-                        disabled={!city}
-                        options={[
-                          { value: "", label: city ? "Select store…" : "Select city first" },
-                          ...availableStores.map((s) => ({ value: s, label: s })),
-                        ]}
-                      />
-                    </Field>
-                  </FormGrid>
-                </FormSection>
               </div>
             </div>
           </div>
