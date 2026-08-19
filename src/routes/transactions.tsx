@@ -292,10 +292,6 @@ function TransactionsPage() {
                         </button>
                       </Td>
 
-                      <Td>
-                        {t.store} · <span className="text-muted-foreground">{t.city}</span>
-                      </Td>
-
                       {/* Multi-brand */}
                       <Td>
                         <div className="flex flex-wrap gap-1">
