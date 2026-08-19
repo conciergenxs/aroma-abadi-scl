@@ -291,8 +291,11 @@ function NewContactPage() {
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Full Name" required>
-                      <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
+                      <div className="md:col-span-2">
+                        <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
+                      </div>
                     </Field>
+                    <div className="hidden md:block" />
                     <Field label="WA Number" required>
                       <Input
                         value={phone}
@@ -301,39 +304,37 @@ function NewContactPage() {
                         type="tel"
                       />
                     </Field>
-                    <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <Field label="Gender" required>
-                        <SimpleSelect
-                          value={gender}
-                          onChange={setGender}
-                          options={[
-                            { value: "", label: "Select gender…" },
-                            ...GENDERS.map((g) => ({ value: g, label: g })),
-                          ]}
-                        />
-                      </Field>
-                      <Field label="Position" required>
-                        <SimpleSelect
-                          value={position}
-                          onChange={setPosition}
-                          options={[
-                            { value: "", label: "Select position…" },
-                            ...POSITIONS.map((p) => ({ value: p, label: p })),
-                          ]}
-                        />
-                      </Field>
-                      <Field label="Area Coordinator (ARCO)" required>
-                        <SclSelect
-                          value={areaCoordinator || null}
-                          onChange={setAreaCoordinator}
-                          options={arcoOptions}
-                          placeholder="Enter ARCO name.."
-                          searchable
-                          searchPlaceholder="Enter ARCO name.."
-                          ariaLabel="Area Coordinator"
-                        />
-                      </Field>
-                    </div>
+                    <Field label="Gender" required>
+                      <SimpleSelect
+                        value={gender}
+                        onChange={setGender}
+                        options={[
+                          { value: "", label: "Select gender…" },
+                          ...GENDERS.map((g) => ({ value: g, label: g })),
+                        ]}
+                      />
+                    </Field>
+                    <Field label="Position" required>
+                      <SimpleSelect
+                        value={position}
+                        onChange={setPosition}
+                        options={[
+                          { value: "", label: "Select position…" },
+                          ...POSITIONS.map((p) => ({ value: p, label: p })),
+                        ]}
+                      />
+                    </Field>
+                    <Field label="Area Coordinator (ARCO)" required>
+                      <SclSelect
+                        value={areaCoordinator || null}
+                        onChange={setAreaCoordinator}
+                        options={arcoOptions}
+                        placeholder="Enter ARCO name.."
+                        searchable
+                        searchPlaceholder="Enter ARCO name.."
+                        ariaLabel="Area Coordinator"
+                      />
+                    </Field>
                   </FormGrid>
                 </FormSection>
 
