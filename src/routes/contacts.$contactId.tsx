@@ -1160,10 +1160,10 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
                 <td className="px-4 py-3">
                   <RedeemChannelBadge channel={r.channel} />
                 </td>
-                <td className="px-4 py-3 text-right text-xs font-medium text-foreground whitespace-nowrap">
+                <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
                   {formatIDR(r.discountValue)}
                 </td>
-                <td className="px-4 py-3 text-right text-[11px] text-muted-foreground whitespace-nowrap">
+                <td className="px-4 py-3 text-left text-[11px] text-muted-foreground whitespace-nowrap">
                   {fmtDateTimeEN(r.redeemedAt)}
                 </td>
               </tr>
