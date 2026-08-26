@@ -1134,15 +1134,12 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
                 Transaction
               </th>
               <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Store
-              </th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
                 Channel
               </th>
-              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
                 Discount
               </th>
-              <th className="px-4 py-2.5 text-right text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
                 Redeemed
               </th>
             </tr>
