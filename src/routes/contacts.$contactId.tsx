@@ -993,11 +993,6 @@ function TransactionsTab({
               </button>
             </div>
             <div className="p-5 space-y-4 text-sm">
-              <PeekRow label="Store">
-                <span className="font-medium">
-                  {peekTx.store} · {peekTx.city}
-                </span>
-              </PeekRow>
               <PeekRow label="Brand">
                 <div className="flex flex-wrap gap-1">
                   {(peekTx.brandNames ?? [peekTx.brandName]).map((b) => (
