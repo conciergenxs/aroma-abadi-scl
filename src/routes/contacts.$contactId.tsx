@@ -1157,7 +1157,6 @@ function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
                   <div className="text-xs font-mono text-foreground/90">{r.invoice}</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">{r.sourceName}</div>
                 </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{r.store}</td>
                 <td className="px-4 py-3">
                   <RedeemChannelBadge channel={r.channel} />
                 </td>
