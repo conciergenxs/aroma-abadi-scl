@@ -787,14 +787,24 @@ function AudienceMultiSelect({
           const l = lists.find((x) => x.id === id);
           if (!l) return null;
           return (
-            <ListChip
+            <span
               key={id}
-              name={l.name}
-              onRemove={(e) => {
-                e.stopPropagation();
-                onToggle(id);
-              }}
-            />
+              className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]"
+            >
+              <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
+              {l.name}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(id);
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                <X className="h-3 w-3" />
+              </span>
+            </span>
           );
         })}
         <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
