@@ -72,6 +72,15 @@ function NewContactPage() {
     toast.success(`Label "${trimmed}" created`);
   };
 
+  const handleCreateList = (n: string) => {
+    const trimmed = n.trim();
+    if (!trimmed) return;
+    const id = `ls-${Date.now()}`;
+    contactsStore.setLists((l) => [...l, { id, name: trimmed }]);
+    setListIds((ids) => [...ids, id]);
+    toast.success(`Audience "${trimmed}" created`);
+  };
+
   const submitBA = () => {
     if (!name.trim()) {
       toast.error("Name is required");
