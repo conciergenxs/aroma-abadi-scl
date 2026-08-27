@@ -22,7 +22,7 @@ const GENDERS = ["Female", "Male"] as const;
 type ContactType = "ba" | "customer";
 
 function NewContactPage() {
-  const { labels } = useContactsStore();
+  const { labels, lists } = useContactsStore();
   const { bas } = useBaStore();
   const { brands } = useSkuStore();
   const navigate = useNavigate();
