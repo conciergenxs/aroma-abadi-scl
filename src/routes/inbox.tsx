@@ -1278,13 +1278,6 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
   );
 }
 
-function formatPropertyValue(v: unknown): string {
-  if (v === null || v === undefined || v === "") return "—";
-  if (typeof v === "boolean") return v ? "Yes" : "No";
-  if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
-  return String(v);
-}
-
 // ============================================================
 // Conversation Header (Sleekflow-inspired)
 // ============================================================
