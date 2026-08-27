@@ -1120,14 +1120,88 @@ function InboxPage() {
                 </div>
               </div>
 
-              <Section title="Labels">
+              <Section title="Contact Information">
+                <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
+                <InfoRow
+                  icon={<MessageSquare className="h-3 w-3" />}
+                  label="Channel"
+                  value="WhatsApp"
+                />
+                <InfoRow
+                  icon={
+                    <span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>
+                  }
+                  label="Last interaction"
+                  value={contact.lastInteraction}
+                />
+                {isBA ? (
+                  <>
+                    <InfoRow
+                      icon={<User2 className="h-3 w-3" />}
+                      label="Gender"
+                      value={contact.gender ?? "—"}
+                    />
+                    <InfoRow
+                      icon={<Briefcase className="h-3 w-3" />}
+                      label="Position"
+                      value={baRecord?.position ?? "—"}
+                    />
+                    <InfoRow
+                      icon={<MapPin className="h-3 w-3" />}
+                      label="Area Coordinator"
+                      value={baRecord?.areaCoordinator ?? "—"}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <InfoRow
+                      icon={<ShoppingBag className="h-3 w-3" />}
+                      label="Last Transaction"
+                      value={lastTransaction ? fmtDateEN(lastTransaction.date) : "—"}
+                    />
+                    <InfoRow
+                      icon={<User2 className="h-3 w-3" />}
+                      label="Gender"
+                      value={contact.gender ?? "—"}
+                    />
+                    <InfoRow
+                      icon={<Coins className="h-3 w-3" />}
+                      label="Point Balance"
+                      value={contact.pointBalance != null ? `${fmtNum(contact.pointBalance)} pts` : "—"}
+                    />
+                  </>
+                )}
+              </Section>
+
+              {!isBA && (
+                <Section title="Labels">
+                  <div className="flex flex-wrap gap-1">
+                    {contact.labelIds.length === 0 && (
+                      <span className="text-[11px] text-muted-foreground">No labels</span>
+                    )}
+                    {contact.labelIds.map((id) => {
+                      const l = labels.find((x) => x.id === id);
+                      return l ? <LabelChip key={id} label={l} /> : null;
+                    })}
+                  </div>
+                </Section>
+              )}
+
+              <Section title="Brands">
                 <div className="flex flex-wrap gap-1">
-                  {contact.labelIds.length === 0 && (
-                    <span className="text-[11px] text-muted-foreground">No labels</span>
+                  {(contact.brandIds ?? []).length === 0 && (
+                    <span className="text-[11px] text-muted-foreground">No brands assigned</span>
                   )}
-                  {contact.labelIds.map((id) => {
-                    const l = labels.find((x) => x.id === id);
-                    return l ? <LabelChip key={id} label={l} /> : null;
+                  {(contact.brandIds ?? []).map((id) => {
+                    const b = brands.find((x) => x.id === id);
+                    return b ? (
+                      <span
+                        key={id}
+                        className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                      >
+                        {b.name}
+                      </span>
+                    ) : null;
                   })}
                 </div>
               </Section>
@@ -1142,71 +1216,6 @@ function InboxPage() {
                     return l ? <ListChip key={id} name={l.name} /> : null;
                   })}
                 </div>
-              </Section>
-
-              <Section title="Contact Information">
-                <InfoRow
-                  icon={<Mail className="h-3 w-3" />}
-                  label="Email"
-                  value={contact.email ?? "—"}
-                />
-                <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
-                <InfoRow
-                  icon={<MessageSquare className="h-3 w-3" />}
-                  label="Channel"
-                  value="WhatsApp"
-                />
-                <InfoRow
-                  icon={
-                    <span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>
-                  }
-                  label="Last interaction"
-                  value={contact.lastInteraction}
-                />
-              </Section>
-
-              <Section title="Contact Properties">
-                {(() => {
-                  const SYS = new Set([
-                    "name",
-                    "phone",
-                    "channel",
-                    "labels",
-                    "lists",
-                    "lastInteraction",
-                    "status",
-                    "email",
-                  ]);
-                  const custom = properties.filter((p) => !p.system && !SYS.has(p.key));
-                  if (custom.length === 0) {
-                    return (
-                      <div className="text-[11px] text-muted-foreground">
-                        No custom properties. Add them in Manage Properties.
-                      </div>
-                    );
-                  }
-                  return (
-                    <div className="space-y-2">
-                      {custom.map((p) => {
-                        const v = contact.customFields?.[p.key];
-                        const display = formatPropertyValue(v);
-                        return (
-                          <div
-                            key={p.id}
-                            className="flex items-start justify-between gap-3 text-xs"
-                          >
-                            <span className="text-muted-foreground">{p.name}</span>
-                            <span
-                              className={`text-right break-words ${display === "—" ? "text-muted-foreground" : "text-foreground"}`}
-                            >
-                              {display}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
               </Section>
             </div>
           </aside>
