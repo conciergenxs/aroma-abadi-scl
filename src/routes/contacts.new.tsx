@@ -732,3 +732,127 @@ function LabelMultiSelect({
     </div>
   );
 }
+
+function AudienceMultiSelect({
+  lists,
+  selectedIds,
+  onToggle,
+  onCreate,
+}: {
+  lists: { id: string; name: string }[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  onCreate: (name: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const filtered = lists.filter((l) => l.name.toLowerCase().includes(search.toLowerCase()));
+  const exact = lists.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
+  const canCreate = search.trim().length > 0 && !exact;
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative" ref={wrapRef}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full min-h-9 flex flex-wrap items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs hover:bg-gray-50 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors"
+      >
+        {selectedIds.length === 0 && (
+          <span className="text-muted-foreground">Select audience…</span>
+        )}
+        {selectedIds.map((id) => {
+          const l = lists.find((x) => x.id === id);
+          if (!l) return null;
+          return (
+            <ListChip
+              key={id}
+              name={l.name}
+              onRemove={(e) => {
+                e.stopPropagation();
+                onToggle(id);
+              }}
+            />
+          );
+        })}
+        <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
+          <div className="p-1.5 border-b border-border">
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canCreate) {
+                  onCreate(search.trim());
+                  setSearch("");
+                }
+              }}
+              placeholder="Search or create audience…"
+              className="h-7 w-full rounded border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto p-1">
+            {filtered.map((l) => {
+              const on = selectedIds.includes(l.id);
+              return (
+                <button
+                  type="button"
+                  key={l.id}
+                  onClick={() => onToggle(l.id)}
+                  className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
+                >
+                  <span className="h-1.5 w-1.5 rounded-sm bg-primary/70" />
+                  <span className="flex-1">{l.name}</span>
+                  {on && <Check className="h-3 w-3 text-primary" />}
+                </button>
+              );
+            })}
+            {filtered.length === 0 && !canCreate && (
+              <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
+                No audiences found
+              </div>
+            )}
+            {canCreate && (
+              <button
+                type="button"
+                onClick={() => {
+                  onCreate(search.trim());
+                  setSearch("");
+                }}
+                className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 border-t border-border mt-1 pt-2 transition-colors duration-150"
+              >
+                <Plus className="h-3 w-3 text-primary" />
+                Create <span className="font-medium text-foreground">"{search.trim()}"</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
