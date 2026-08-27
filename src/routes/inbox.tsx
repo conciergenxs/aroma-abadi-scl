@@ -349,6 +349,13 @@ function InboxPage() {
   const active =
     sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
   const contact = contacts.find((c) => c.id === active.contactId)!;
+  const isBA = contact.labelIds.includes("lb-ba");
+  const baRecord = bas.find(
+    (b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, ""),
+  );
+  const lastTransaction = transactions
+    .filter((t) => t.customerId === contact.id)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   const thread: Message[] = useMemo(() => {
     const existing = threadsByContact[contact.id];
     if (existing && existing.length) return existing;
