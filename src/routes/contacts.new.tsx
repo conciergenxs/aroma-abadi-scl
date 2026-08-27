@@ -487,6 +487,19 @@ function NewContactPage() {
                   onCreate={handleCreateLabel}
                 />
               </FormSection>
+
+              <FormSection title="Audience" optional>
+                <AudienceMultiSelect
+                  lists={lists}
+                  selectedIds={listIds}
+                  onToggle={(id) =>
+                    setListIds((ids) =>
+                      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                    )
+                  }
+                  onCreate={handleCreateList}
+                />
+              </FormSection>
             </div>
           </div>
         </div>
