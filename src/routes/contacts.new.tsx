@@ -7,7 +7,7 @@ import { type Contact, type ContactLabel, type LabelColor } from "@/components/s
 import { contactsStore, useContactsStore } from "@/components/scl/contacts-store";
 import { useBaStore, baStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { labelColorDot } from "@/components/scl/app-shell";
+import { labelColorDot, ListChip } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
 
 export const Route = createFileRoute("/contacts/new")({
