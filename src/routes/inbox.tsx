@@ -1165,7 +1165,9 @@ function InboxPage() {
                     <InfoRow
                       icon={<Coins className="h-3 w-3" />}
                       label="Point Balance"
-                      value={contact.pointBalance != null ? `${fmtNum(contact.pointBalance)} pts` : "—"}
+                      value={
+                        contact.pointBalance != null ? `${fmtNum(contact.pointBalance)} pts` : "—"
+                      }
                     />
                   </>
                 )}
