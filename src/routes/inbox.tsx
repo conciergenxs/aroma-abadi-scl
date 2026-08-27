@@ -1128,7 +1128,7 @@ function InboxPage() {
                 />
                 <InfoRow
                   icon={<Clock className="h-3 w-3" />}
-                  label="Last interaction"
+                  label="Last Interaction"
                   value={contact.lastInteraction}
                 />
                 {isBA ? (
