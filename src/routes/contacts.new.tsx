@@ -44,6 +44,7 @@ function NewContactPage() {
   const [pointBalance, setPointBalance] = useState("");
   const [customerBrandIds, setCustomerBrandIds] = useState<string[]>([]);
   const [labelIds, setLabelIds] = useState<string[]>([]);
+  const [listIds, setListIds] = useState<string[]>([]);
 
   // Existing Area Coordinators, drawn from current BA records — kept
   // searchable (select2-style) since the roster can grow over time.
