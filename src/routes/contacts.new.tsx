@@ -180,7 +180,7 @@ function NewContactPage() {
       channel: "whatsapp",
       gender: (gender as "Female" | "Male" | "Other") || undefined,
       labelIds,
-      listIds: [],
+      listIds,
       brandIds: customerBrandIds,
       lastInteraction: "Just now",
       status: "Active",
