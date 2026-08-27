@@ -46,6 +46,7 @@ import {
   MapPin,
   ShoppingBag,
   Coins,
+  Clock,
   ExternalLink,
   UserPlus,
   X as XIcon,
