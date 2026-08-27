@@ -41,8 +41,6 @@ import {
   UserX,
   MessageSquare,
   Info,
-  Building2,
-  Mail,
   User2,
   Briefcase,
   MapPin,
