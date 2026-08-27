@@ -111,7 +111,10 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  const { contacts, labels, lists, properties, lifecycleStages } = useContactsStore();
+  const { contacts, labels, lists, lifecycleStages } = useContactsStore();
+  const { bas } = useBaStore();
+  const { transactions } = useTransactionsStore();
+  const { brands } = useSkuStore();
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ kind: "view", value: "my" });
   const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [search, setSearch] = useState("");
