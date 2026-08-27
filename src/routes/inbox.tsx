@@ -1126,9 +1126,7 @@ function InboxPage() {
                   value="WhatsApp"
                 />
                 <InfoRow
-                  icon={
-                    <span className="h-3 w-3 grid place-items-center text-muted-foreground">·</span>
-                  }
+                  icon={<Clock className="h-3 w-3" />}
                   label="Last interaction"
                   value={contact.lastInteraction}
                 />
