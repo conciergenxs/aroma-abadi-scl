@@ -194,6 +194,10 @@ function NewContactPage() {
       const l = labels.find((x) => x.id === id);
       if (l) contactsStore.addActivity(contact.id, "label_added", `Added label "${l.name}"`);
     });
+    listIds.forEach((id) => {
+      const l = lists.find((x) => x.id === id);
+      if (l) contactsStore.addActivity(contact.id, "list_added", `Added to list "${l.name}"`);
+    });
 
     toast.success("Customer Contact created successfully");
     navigate({ to: "/contacts/$contactId", params: { contactId: contact.id } });
