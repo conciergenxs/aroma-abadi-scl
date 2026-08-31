@@ -365,10 +365,12 @@ export function PromoFormActionBar({
   onCancel,
   onSubmit,
   submitLabel,
+  disabled,
 }: {
   onCancel: () => void;
   onSubmit: () => void;
   submitLabel: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between">
@@ -382,7 +384,9 @@ export function PromoFormActionBar({
       <button
         type="button"
         onClick={onSubmit}
-        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+        disabled={disabled}
+        title={disabled ? "Fill in the required fields to continue" : undefined}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary transition-colors"
       >
         {submitLabel}
       </button>
