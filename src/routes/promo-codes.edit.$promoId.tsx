@@ -31,6 +31,18 @@ function EditPromoCodePage() {
   const [form, setForm] = useState<PromoFormState | null>(() =>
     promo ? promoFormFromExisting(promo) : null,
   );
+  // `promos` loads from localStorage a tick after mount (see usePromoStore),
+  // so on a fresh page load `promo` can still be undefined when the lazy
+  // initializer above runs, leaving `form` stuck at null forever — even
+  // once `promo` resolves on a later render. Adopt it the first time it
+  // becomes available, but only once, so this doesn't clobber in-progress
+  // edits if the store updates again afterward for an unrelated reason.
+  const initializedRef = useRef(promo != null);
+  useEffect(() => {
+    if (initializedRef.current || !promo) return;
+    initializedRef.current = true;
+    setForm(promoFormFromExisting(promo));
+  }, [promo]);
 
   if (!promo || !form) {
     return (
