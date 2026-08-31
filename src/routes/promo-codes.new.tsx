@@ -138,6 +138,7 @@ function NewPromoCodePage() {
           onCancel={() => navigate({ to: "/promo-codes" })}
           onSubmit={handleConfirmClick}
           submitLabel="Confirm Promo Code"
+          disabled={!!validatePromoForm(form)}
         />
       </div>
 
