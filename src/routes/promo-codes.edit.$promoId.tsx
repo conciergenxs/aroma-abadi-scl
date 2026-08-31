@@ -65,6 +65,7 @@ function EditPromoCodePage() {
           onCancel={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
           onSubmit={handleSave}
           submitLabel="Save Changes"
+          disabled={!!validatePromoForm(form)}
         />
       </div>
     </AppShell>
