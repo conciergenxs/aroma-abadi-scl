@@ -166,6 +166,59 @@ function CreateBroadcastPage() {
       );
       return;
     }
+
+    // Reach = unique contacts across the selected lists. Condition-based
+    // audiences aren't matched here (no shared condition-evaluator exists
+    // yet), so we're honest about that in the label rather than guessing.
+    const listContactIds = new Set<string>();
+    contactsStore.state.contacts.forEach((c) => {
+      if (c.listIds.some((lid) => selectedLists.has(lid))) listContactIds.add(c.id);
+    });
+    const reach = listContactIds.size;
+    const audienceLabel = audienceSummary
+      ? audienceSummary.listNames.length > 0
+        ? `${audienceSummary.listNames.join(", ")} · ${reach.toLocaleString("en-US")}`
+        : `Custom filter (${audienceSummary.conditionCount} condition${audienceSummary.conditionCount === 1 ? "" : "s"})`
+      : "—";
+
+    const status: Broadcast["status"] =
+      kind === "draft" ? "Draft" : kind === "schedule" ? "Scheduled" : "Sent";
+    const now = new Date();
+    const nowLabel = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+    const id = `b-${now.getTime()}`;
+    broadcastsStore.add({
+      id,
+      name: name.trim() || "Untitled broadcast",
+      channel: channelKind,
+      audience: audienceLabel,
+      reach,
+      delivered: status === "Sent" ? reach : 0,
+      read: 0,
+      clicks: 0,
+      sentAt:
+        status === "Sent"
+          ? `Today · ${nowLabel}`
+          : status === "Scheduled"
+            ? `${scheduleDate} · ${scheduleTime}`
+            : "—",
+      sentAtDate: status === "Sent" ? now.toISOString().slice(0, 10) : undefined,
+      status,
+      channelId,
+      listIds: Array.from(selectedLists),
+      totalAudience: reach,
+      sendMode,
+      scheduleDate: sendMode === "schedule" ? scheduleDate : undefined,
+      scheduleTime: sendMode === "schedule" ? scheduleTime : undefined,
+      createdBy: "Aria Kapoor",
+      createdAt: `Today · ${nowLabel}`,
+      contentMode,
+      templateId: templateId ?? undefined,
+      body: previewBody,
+      replied: 0,
+      failed: 0,
+    });
+
     const label =
       kind === "draft"
         ? "Draft saved"
