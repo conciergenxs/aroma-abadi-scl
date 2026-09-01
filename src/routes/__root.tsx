@@ -162,9 +162,6 @@ function RootComponent() {
     if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });
     }
-    // Promo Codes' own routes carry a beforeLoad guard that redirects away
-    // under LITE_MODE — handled at the route level (not here) so the page
-    // never mounts/hydrates in the first place.
   }, [pathname, router]);
 
   return (
