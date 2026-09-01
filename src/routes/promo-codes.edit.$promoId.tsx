@@ -14,9 +14,6 @@ import {
 } from "@/components/scl/promo-form-fields";
 
 export const Route = createFileRoute("/promo-codes/edit/$promoId")({
-  beforeLoad: () => {
-    if (LITE_MODE) throw redirect({ to: "/", replace: true });
-  },
   head: () => ({ meta: [{ title: "Edit Promo Code — SCL" }] }),
   component: EditPromoCodePage,
 });
