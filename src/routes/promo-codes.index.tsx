@@ -1,7 +1,6 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
-import { LITE_MODE } from "@/lib/feature-flags";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useState, useMemo, useRef } from "react";
 import {
