@@ -20,9 +20,6 @@ import {
 import { PromoCodeSetupModal } from "@/components/scl/promo-code-setup-modal";
 
 export const Route = createFileRoute("/promo-codes/new")({
-  beforeLoad: () => {
-    if (LITE_MODE) throw redirect({ to: "/", replace: true });
-  },
   head: () => ({ meta: [{ title: "New Promo Code — SCL" }] }),
   component: NewPromoCodePage,
 });
