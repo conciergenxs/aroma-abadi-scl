@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
-import { connectedChannels, type Template } from "@/components/scl/mock-data";
+import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { useSkuStore } from "@/components/scl/sku-store";
+import { broadcastsStore } from "@/components/scl/broadcasts-store";
 
 // Promo codes registry (mirrors promo-codes page + new page data)
 const PROMO_REGISTRY: Record<
