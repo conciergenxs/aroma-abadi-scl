@@ -43,9 +43,6 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/promo-codes/$promoId/")({
-  beforeLoad: () => {
-    if (LITE_MODE) throw redirect({ to: "/", replace: true });
-  },
   head: () => ({ meta: [{ title: "Promo Code — Aroma Abadi" }] }),
   component: PromoDetailPage,
 });
