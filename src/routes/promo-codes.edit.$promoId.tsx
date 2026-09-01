@@ -1,6 +1,5 @@
-import { createFileRoute, redirect, useNavigate, useParams } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
-import { LITE_MODE } from "@/lib/feature-flags";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { promoStore, usePromoStore } from "@/components/scl/promo-store";
