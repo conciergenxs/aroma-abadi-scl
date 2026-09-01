@@ -3,9 +3,39 @@ import { broadcasts as seedBroadcasts, type Broadcast } from "./mock-data";
 
 type State = { broadcasts: Broadcast[] };
 
-let state: State = { broadcasts: [...seedBroadcasts] };
+const STORAGE_KEY = "aroma_broadcasts_store_v1";
+
+function seed(): Broadcast[] {
+  return [...seedBroadcasts];
+}
+
+function load(): State {
+  if (typeof window === "undefined") return { broadcasts: seed() };
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    /* ignore */
+  }
+  const initial = { broadcasts: seed() };
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  } catch {
+    /* ignore */
+  }
+  return initial;
+}
+
+let state: State = load();
 const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
+const emit = () => {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
+  listeners.forEach((l) => l());
+};
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
   return () => {
@@ -13,6 +43,14 @@ const subscribe = (cb: () => void) => {
   };
 };
 const getSnapshot = () => state;
+
+// What SSR actually rendered (server has no localStorage) — a stable
+// reference distinct from `state` so useSyncExternalStore can detect that
+// the client's real (localStorage-backed) value differs and correctly
+// re-render after hydration, instead of leaving stale server-rendered DOM
+// stuck on screen. See ba-store.ts / promo-store.ts for the same fix.
+const SERVER_SNAPSHOT: State = { broadcasts: seed() };
+const getServerSnapshot = () => SERVER_SNAPSHOT;
 
 export const broadcastsStore = {
   get state() {
@@ -50,5 +88,5 @@ export const broadcastsStore = {
 };
 
 export function useBroadcastsStore(): State {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
