@@ -250,6 +250,7 @@ function seed(): Brand[] {
             {
               id: "sku-dg-caviar-42",
               categoryId: "cat-dg-lip",
+              kind: "sku",
               name: "Caviar Hydra-Crème Lipstick 42g",
               code: "DG-CHC-42",
               price: 685000,
