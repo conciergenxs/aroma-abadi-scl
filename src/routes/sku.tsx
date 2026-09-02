@@ -313,12 +313,12 @@ function BrandDetail({
       </div>
 
       <SectionCard>
-        <div className="p-5 flex items-center gap-4">
-          <div className="relative h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+        <div className="p-3 flex items-center gap-3">
+          <div className="relative h-14 w-14 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {brand.logoUrl ? (
-              <img src={brand.logoUrl} alt="" className="max-h-24 max-w-[85%] object-contain" />
+              <img src={brand.logoUrl} alt="" className="max-h-11 max-w-[85%] object-contain" />
             ) : (
-              <Package className="h-10 w-10 text-primary" />
+              <Package className="h-5 w-5 text-primary" />
             )}
             <input
               ref={logoFileRef}
@@ -331,14 +331,14 @@ function BrandDetail({
               type="button"
               onClick={openLogoPicker}
               title="Change brand logo"
-              className="absolute bottom-1.5 right-1.5 h-7 w-7 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+              className="absolute bottom-0.5 right-0.5 h-5 w-5 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
             >
-              <Camera className="h-3.5 w-3.5" />
+              <Camera className="h-2.5 w-2.5" />
             </button>
           </div>
           <div>
-            <div className="text-lg font-semibold">{brand.name}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm font-semibold">{brand.name}</div>
+            <div className="text-xs text-muted-foreground">
               {brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"}{" "}
               · {brand.brandKnowledge.length} brand knowledge{" "}
               {brand.brandKnowledge.length === 1 ? "document" : "documents"}
