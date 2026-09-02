@@ -559,6 +559,12 @@ function CategoryDetail({
   onBackToBrands: () => void;
   onPickProduct: (product: OdooProduct) => void;
 }) {
+  const {
+    fileRef: imageFileRef,
+    openPicker: openImagePicker,
+    handleChange: handleImageChange,
+  } = useImagePicker((dataUrl) => skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }));
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -590,6 +596,41 @@ function CategoryDetail({
           <Trash2 className="h-4 w-4" /> Delete Category
         </button>
       </div>
+
+      <SectionCard>
+        <div className="p-5 flex items-center gap-4">
+          <div className="relative h-28 w-28 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+            {category.imageUrl ? (
+              <img src={category.imageUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <FolderOpen className="h-10 w-10 text-primary" />
+            )}
+            <input
+              ref={imageFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            <button
+              type="button"
+              onClick={openImagePicker}
+              title="Change category photo"
+              className="absolute bottom-1.5 right-1.5 h-7 w-7 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div>
+            <div className="text-lg font-semibold">{category.name}</div>
+            <div className="text-sm text-muted-foreground">
+              {category.skus.length} card{category.skus.length !== 1 ? "s" : ""} ·{" "}
+              {category.categoryKnowledge.length}{" "}
+              {category.categoryKnowledge.length === 1 ? "document" : "documents"}
+            </div>
+          </div>
+        </div>
+      </SectionCard>
 
       {/* 30% / 70% layout */}
       <div className="flex gap-4 min-h-0">
