@@ -803,34 +803,34 @@ function AddModuleMenu({
         </button>
 
         {step === "choose" && (
-          <div className="absolute right-0 top-10 z-30 w-64 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right p-1">
-            <button
-              type="button"
-              onClick={() => setStep("sku")}
-              className="w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150"
-            >
-              <Package className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <div className="min-w-0">
+          <div className="absolute right-0 top-10 z-30 w-80 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right p-2">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setStep("sku")}
+                className="flex flex-col items-start gap-1.5 rounded-lg border border-border px-3 py-3 text-left hover:bg-gray-50 hover:border-primary/30 transition-colors duration-150"
+              >
+                <Package className="h-4 w-4 text-primary" />
                 <div className="text-sm font-medium">Add SKU</div>
-                <div className="text-[11px] text-muted-foreground">Sync a product from Odoo</div>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setStep("closed");
-                setGeneralOpen(true);
-              }}
-              className="w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150"
-            >
-              <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <div className="min-w-0">
-                <div className="text-sm font-medium">General Knowledge</div>
-                <div className="text-[11px] text-muted-foreground">
-                  Manually add a reference module — no code or price
+                <div className="text-[11px] text-muted-foreground leading-snug">
+                  Sync a product from Odoo
                 </div>
-              </div>
-            </button>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("closed");
+                  setGeneralOpen(true);
+                }}
+                className="flex flex-col items-start gap-1.5 rounded-lg border border-border px-3 py-3 text-left hover:bg-gray-50 hover:border-primary/30 transition-colors duration-150"
+              >
+                <BookOpen className="h-4 w-4 text-primary" />
+                <div className="text-sm font-medium">General Knowledge</div>
+                <div className="text-[11px] text-muted-foreground leading-snug">
+                  Manually add a reference module
+                </div>
+              </button>
+            </div>
           </div>
         )}
 
