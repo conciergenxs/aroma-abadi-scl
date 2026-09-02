@@ -656,7 +656,7 @@ export const skuStore = {
     };
     emit();
   },
-  addSku(
+  addModule(
     brandId: string,
     categoryId: string,
     input: Omit<SKU, "id" | "categoryId" | "knowledgeCards">,
