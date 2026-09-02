@@ -182,9 +182,15 @@ function SkuDetailPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-lg font-semibold">{sku.name}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 font-mono">{sku.code}</div>
+                {sku.kind === "sku" && (
+                  <div className="text-xs text-muted-foreground mt-0.5 font-mono">{sku.code}</div>
+                )}
               </div>
-              <div className="text-xl font-bold text-primary shrink-0">{formatIDR(sku.price)}</div>
+              {sku.kind === "sku" && (
+                <div className="text-xl font-bold text-primary shrink-0">
+                  {formatIDR(sku.price!)}
+                </div>
+              )}
             </div>
             {sku.description && (
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-3xl">
