@@ -652,7 +652,7 @@ function CategoryDetail({
         <div className="flex-1 min-w-0">
           <SectionCard
             title="Cards"
-            description="Import products synced from Odoo, or add a General Knowledge module for reference material that isn't a product."
+            description="Products from Odoo plus manually authored reference modules."
             action={
               <AddModuleMenu
                 categoryId={category.id}
@@ -665,16 +665,7 @@ function CategoryDetail({
               />
             }
           >
-            <ul className="divide-y divide-border">
-              {category.skus.map((s) => (
-                <SkuRow key={s.id} brand={brand} category={category} sku={s} />
-              ))}
-              {category.skus.length === 0 && (
-                <li className="p-6 text-center text-sm text-muted-foreground">
-                  No cards yet. Use the button above to add a SKU or a General Knowledge module.
-                </li>
-              )}
-            </ul>
+            <CardsList brand={brand} category={category} />
           </SectionCard>
         </div>
       </div>
