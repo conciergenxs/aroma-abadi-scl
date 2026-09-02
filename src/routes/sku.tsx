@@ -708,16 +708,20 @@ function SkuMenu({
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-30 w-40 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
-          <button
-            onClick={() => {
-              onDetails();
-              setOpen(false);
-            }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground"
-          >
-            <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
-          </button>
-          <div className="my-1 border-t border-border" />
+          {onDetails && (
+            <>
+              <button
+                onClick={() => {
+                  onDetails();
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground"
+              >
+                <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
+              </button>
+              <div className="my-1 border-t border-border" />
+            </>
+          )}
           <button
             onClick={() => {
               onDelete();
