@@ -324,6 +324,7 @@ function seed(): Brand[] {
             {
               id: "sku-sisley-feather",
               categoryId: "cat-sisley-powder",
+              kind: "sku",
               name: "Real Flawless Feather Matte Powder Foundation",
               code: "SIS-FMP-10",
               price: 1850000,
