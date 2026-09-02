@@ -477,7 +477,7 @@ function CategoryRow({
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{category.name}</div>
           <div className="text-xs text-muted-foreground">
-            {category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} ·{" "}
+            {category.skus.length} card{category.skus.length !== 1 ? "s" : ""} ·{" "}
             {category.categoryKnowledge.length}{" "}
             {category.categoryKnowledge.length === 1 ? "document" : "documents"}
           </div>
