@@ -673,6 +673,70 @@ function CategoryDetail({
   );
 }
 
+type CardsFilter = "all" | "sku" | "general";
+
+/* Chip row to switch between All / SKUs / General Knowledge, sitting right
+ * below the "Cards" description — filters the same underlying list rather
+ * than being separate tabs, so nothing here changes what data exists. */
+function CardsList({ brand, category }: { brand: Brand; category: Category }) {
+  const [filter, setFilter] = useState<CardsFilter>("all");
+  const counts = {
+    all: category.skus.length,
+    sku: category.skus.filter((s) => s.kind === "sku").length,
+    general: category.skus.filter((s) => s.kind === "general").length,
+  };
+  const filtered = category.skus.filter((s) => filter === "all" || s.kind === filter);
+  const emptyLabel =
+    filter === "sku"
+      ? "No SKUs yet."
+      : filter === "general"
+        ? "No General Knowledge modules yet."
+        : "No cards yet. Use the button above to add a SKU or a General Knowledge module.";
+
+  return (
+    <>
+      <div className="flex items-center gap-1.5 px-5 py-3 border-b border-border">
+        {(
+          [
+            { key: "all", label: "All" },
+            { key: "sku", label: "SKUs" },
+            { key: "general", label: "General Knowledge" },
+          ] as const
+        ).map((opt) => {
+          const active = filter === opt.key;
+          return (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setFilter(opt.key)}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors duration-150 ${
+                active
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground hover:bg-gray-50"
+              }`}
+            >
+              {opt.label}
+              <span
+                className={`rounded-full px-1.5 text-[10px] ${active ? "bg-primary/15" : "bg-black/5"}`}
+              >
+                {counts[opt.key]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <ul className="divide-y divide-border">
+        {filtered.map((s) => (
+          <SkuRow key={s.id} brand={brand} category={category} sku={s} />
+        ))}
+        {filtered.length === 0 && (
+          <li className="p-6 text-center text-sm text-muted-foreground">{emptyLabel}</li>
+        )}
+      </ul>
+    </>
+  );
+}
+
 function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sku: SKU }) {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
