@@ -1123,7 +1123,8 @@ function SkuFormModal({
 
   function submit() {
     if (!photoUrl) return toast.error("Upload a product photo to continue.");
-    skuStore.addSku(brandId, categoryId, {
+    skuStore.addModule(brandId, categoryId, {
+      kind: "sku",
       name: product.name,
       code: product.code,
       price: product.price,
