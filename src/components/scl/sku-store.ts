@@ -589,8 +589,15 @@ export const skuStore = {
     };
     emit();
   },
-  addCategory(brandId: string, name: string) {
-    const cat: Category = { id: uid("cat"), brandId, name, categoryKnowledge: [], skus: [] };
+  addCategory(brandId: string, name: string, imageUrl?: string) {
+    const cat: Category = {
+      id: uid("cat"),
+      brandId,
+      name,
+      imageUrl,
+      categoryKnowledge: [],
+      skus: [],
+    };
     state = {
       brands: state.brands.map((b) =>
         b.id === brandId ? { ...b, categories: [...b.categories, cat] } : b,
