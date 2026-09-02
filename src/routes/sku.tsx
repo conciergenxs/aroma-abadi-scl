@@ -389,46 +389,102 @@ function BrandDetail({
 function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  if (!open) {
-    return (
+  const [imageUrl, setImageUrl] = useState("");
+  const { fileRef, openPicker, handleChange } = useImagePicker(setImageUrl);
+  const ref = useRef<HTMLDivElement>(null);
+
+  function close() {
+    setOpen(false);
+    setName("");
+    setImageUrl("");
+  }
+
+  function submit() {
+    if (!name.trim()) return;
+    skuStore.addCategory(brandId, name.trim(), imageUrl || undefined);
+    toast.success("Category added");
+    close();
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(true)}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
         className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Category
       </button>
-    );
-  }
-  return (
-    <div className="flex items-center gap-1">
-      <input
-        autoFocus
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Category name..."
-        className="h-8 rounded-md border border-border bg-card/60 px-2 text-sm"
-      />
-      <button
-        onClick={() => {
-          if (!name.trim()) return;
-          skuStore.addCategory(brandId, name.trim());
-          setName("");
-          setOpen(false);
-          toast.success("Category added");
-        }}
-        className="h-8 rounded-md bg-primary text-primary-foreground px-2.5 text-[14px] font-medium"
-      >
-        Add
-      </button>
-      <button
-        onClick={() => {
-          setOpen(false);
-          setName("");
-        }}
-        className="h-8 w-8 grid place-items-center rounded-md border border-border"
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
+      {open && (
+        <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right p-3 space-y-3">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleChange}
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={openPicker}
+              title="Upload category image"
+              className="group relative h-12 w-12 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
+            >
+              {imageUrl ? (
+                <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <FolderOpen className="h-5 w-5 text-primary" />
+              )}
+              <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+                <Camera className="h-3.5 w-3.5 text-white" />
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={openPicker}
+              className="text-[13px] text-primary hover:underline"
+            >
+              {imageUrl ? "Replace photo" : "Upload photo"}
+            </button>
+          </div>
+          <input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") submit();
+            }}
+            placeholder="Category name..."
+            className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={close}
+              className="h-8 rounded-md border border-border px-3 text-[13px] hover:bg-gray-50 transition-colors duration-150"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={submit}
+              className="h-8 rounded-md bg-primary text-primary-foreground px-3 text-[13px] font-medium hover:opacity-90 transition-opacity duration-150"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
