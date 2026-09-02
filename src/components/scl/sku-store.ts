@@ -30,12 +30,18 @@ export type KnowledgeCard = {
   text: string;
 };
 
+// A category's card list holds two kinds of entries: real, purchasable
+// products synced from Odoo ("sku", with a code + price) and manually
+// authored reference modules with no code/price ("general" — e.g. a care
+// guide or FAQ that isn't itself a product). Both carry their own photo,
+// description, and Knowledge Cards, so they share this one shape.
 export type SKU = {
   id: string;
   categoryId: string;
+  kind: "sku" | "general";
   name: string;
-  code: string;
-  price: number;
+  code?: string;
+  price?: number;
   photoUrl?: string;
   description: string;
   knowledgeCards: KnowledgeCard[];
