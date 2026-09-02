@@ -395,6 +395,7 @@ function seed(): Brand[] {
             {
               id: "sku-rimmel-spray",
               categoryId: "cat-rimmel-spray",
+              kind: "sku",
               name: "Translucent Hydrating Setting Spray Ultra-Blur",
               code: "RIM-THS-100",
               price: 215000,
