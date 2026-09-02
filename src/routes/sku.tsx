@@ -678,7 +678,13 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
 }
 
 /* 3-dot action menu for each SKU row */
-function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () => void }) {
+function SkuMenu({
+  onDetails,
+  onDelete,
+}: {
+  onDetails?: () => void;
+  onDelete: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
