@@ -563,7 +563,9 @@ function CategoryDetail({
     fileRef: imageFileRef,
     openPicker: openImagePicker,
     handleChange: handleImageChange,
-  } = useImagePicker((dataUrl) => skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }));
+  } = useImagePicker((dataUrl) =>
+    skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }),
+  );
 
   return (
     <div className="space-y-4">
