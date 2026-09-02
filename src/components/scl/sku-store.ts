@@ -291,6 +291,7 @@ function seed(): Brand[] {
             {
               id: "sku-sisley-real-flawless",
               categoryId: "cat-sisley-foundation",
+              kind: "sku",
               name: "Real Flawless Foundation",
               code: "SIS-RFF-30",
               price: 2450000,
