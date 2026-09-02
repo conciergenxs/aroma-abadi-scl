@@ -362,6 +362,7 @@ function seed(): Brand[] {
             {
               id: "sku-rimmel-translucent-powder",
               categoryId: "cat-rimmel-powder",
+              kind: "sku",
               name: "Translucent Loose Setting Powder",
               code: "RIM-TLS-25",
               price: 189000,
