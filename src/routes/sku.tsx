@@ -894,7 +894,7 @@ function AddModuleMenu({
         <button
           type="button"
           onClick={() => setStep((s) => (s === "closed" ? "choose" : "closed"))}
-          className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Add Module
         </button>
