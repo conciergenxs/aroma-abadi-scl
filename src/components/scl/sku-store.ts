@@ -430,6 +430,7 @@ function seed(): Brand[] {
             {
               id: "sku-laura-translucent",
               categoryId: "cat-laura-powder",
+              kind: "sku",
               name: "Translucent Loose Setting Powder",
               code: "LM-TLS-29",
               price: 745000,
