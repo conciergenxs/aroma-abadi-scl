@@ -534,8 +534,7 @@ function CategoryRow({
           <div className="text-sm font-medium">{category.name}</div>
           <div className="text-xs text-muted-foreground">
             {category.skus.length} card{category.skus.length !== 1 ? "s" : ""} ·{" "}
-            {category.categoryKnowledge.length}{" "}
-            {category.categoryKnowledge.length === 1 ? "document" : "documents"}
+            {category.categoryKnowledge.length} category knowledge
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
