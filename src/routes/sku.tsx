@@ -727,29 +727,37 @@ function SkuMenu({ onDetails, onDelete }: { onDetails: () => void; onDelete: () 
   );
 }
 
-/* Select2-style search: pick a product from Odoo to import as a SKU here.
- * Already-imported products (matched by code) drop out of the list. */
-function SkuSearchSelect({
+/* "+ Add Module" — first choose a kind (SKU synced from Odoo, or a manually
+ * authored General Knowledge module), then either search Odoo (select2-style,
+ * already-imported products drop out of the list) or fill in the General
+ * Knowledge form. */
+function AddModuleMenu({
   categoryId,
   importedCodes,
-  onPick,
+  onPickProduct,
+  onAddGeneral,
 }: {
   categoryId: string;
   importedCodes: string[];
-  onPick: (product: OdooProduct) => void;
+  onPickProduct: (product: OdooProduct) => void;
+  onAddGeneral: (input: { name: string; description: string; photoUrl?: string }) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<"closed" | "choose" | "sku">("closed");
+  const [generalOpen, setGeneralOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (step === "closed") return;
     const h = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setStep("closed");
+        setQuery("");
+      }
     };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
-  }, [open]);
+  }, [step]);
 
   const available = useMemo(
     () => availableOdooProducts(categoryId, importedCodes),
@@ -764,59 +772,219 @@ function SkuSearchSelect({
     : available;
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
-      >
-        <Plus className="h-3.5 w-3.5" /> Add SKU
-      </button>
-      {open && (
-        <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right">
-          <div className="p-2 border-b border-border">
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search product from Odoo…"
-              className="w-full h-8 rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
+    <>
+      <div ref={ref} className="relative">
+        <button
+          type="button"
+          onClick={() => setStep((s) => (s === "closed" ? "choose" : "closed"))}
+          className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2.5 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+        >
+          <Plus className="h-3.5 w-3.5" /> Add Module
+        </button>
+
+        {step === "choose" && (
+          <div className="absolute right-0 top-10 z-30 w-64 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right p-1">
+            <button
+              type="button"
+              onClick={() => setStep("sku")}
+              className="w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150"
+            >
+              <Package className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Add SKU</div>
+                <div className="text-[11px] text-muted-foreground">Sync a product from Odoo</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setStep("closed");
+                setGeneralOpen(true);
+              }}
+              className="w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150"
+            >
+              <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <div className="text-sm font-medium">General Knowledge</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Manually add a reference module — no code or price
+                </div>
+              </div>
+            </button>
           </div>
-          <ul className="max-h-52 overflow-y-auto py-1">
-            {filtered.map((product) => (
-              <li key={product.odooId}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onPick(product);
-                    setOpen(false);
-                    setQuery("");
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm transition-colors duration-150"
-                >
-                  <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                    <ImageIcon className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate font-medium">{product.name}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      {product.code} · {formatIDR(product.price)}
+        )}
+
+        {step === "sku" && (
+          <div className="absolute right-0 top-10 z-30 w-72 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right">
+            <div className="p-2 border-b border-border flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setStep("choose")}
+                aria-label="Back"
+                className="h-7 w-7 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors duration-150 shrink-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search product from Odoo…"
+                className="flex-1 h-8 rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+            <ul className="max-h-52 overflow-y-auto py-1">
+              {filtered.map((product) => (
+                <li key={product.odooId}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onPickProduct(product);
+                      setStep("closed");
+                      setQuery("");
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 text-sm transition-colors duration-150"
+                  >
+                    <div className="h-8 w-8 rounded bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                      <ImageIcon className="h-4 w-4 text-primary" />
                     </div>
-                  </div>
-                </button>
-              </li>
-            ))}
-            {filtered.length === 0 && (
-              <li className="px-3 py-4 text-center text-sm text-muted-foreground">
-                {available.length === 0
-                  ? "All Odoo products for this category are already imported."
-                  : "Not found"}
-              </li>
-            )}
-          </ul>
-        </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate font-medium">{product.name}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {product.code} · {formatIDR(product.price)}
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              ))}
+              {filtered.length === 0 && (
+                <li className="px-3 py-4 text-center text-sm text-muted-foreground">
+                  {available.length === 0
+                    ? "All Odoo products for this category are already imported."
+                    : "Not found"}
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {generalOpen && (
+        <GeneralKnowledgeFormModal
+          onClose={() => setGeneralOpen(false)}
+          onSubmit={(input) => {
+            onAddGeneral(input);
+            setGeneralOpen(false);
+          }}
+        />
       )}
+    </>
+  );
+}
+
+/* General Knowledge module form — same shape as the Odoo SKU form (photo +
+ * name + description) but every field is typed in by hand since there's no
+ * source-of-truth product record; no code or price, because it isn't a
+ * purchasable item. */
+function GeneralKnowledgeFormModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (input: { name: string; description: string; photoUrl?: string }) => void;
+}) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
+
+  function submit() {
+    if (!name.trim()) return toast.error("Name is required.");
+    onSubmit({ name: name.trim(), description: description.trim(), photoUrl: photoUrl || undefined });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
+      <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <div className="text-sm font-semibold">Add General Knowledge</div>
+          <button type="button" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="flex items-start gap-2 rounded-md bg-primary/5 border border-primary/20 px-3 py-2.5 text-[12px] text-muted-foreground">
+            <BookOpen className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
+            <span>
+              Reference material only — General Knowledge modules have no code or price and never
+              appear as purchasable products.
+            </span>
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Photo</div>
+            <div className="flex items-center gap-3">
+              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-5 w-5 text-primary/40" />
+                )}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={openPicker}
+                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+              >
+                {photoUrl ? "Replace Photo" : "Upload Photo"}
+              </button>
+            </div>
+          </div>
+          <label className="block">
+            <span className="block text-xs text-muted-foreground mb-1">
+              Name <span className="text-rose-500">*</span>
+            </span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Skin Prep Routine Guide"
+              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </label>
+          <label className="block">
+            <span className="block text-xs text-muted-foreground mb-1">Description</span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              placeholder="What this module covers…"
+              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </label>
+        </div>
+        <div className="p-4 border-t border-border flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={submit}
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
+          >
+            Add Module
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
