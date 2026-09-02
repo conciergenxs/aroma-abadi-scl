@@ -903,7 +903,11 @@ function GeneralKnowledgeFormModal({
     onSubmit({ name: name.trim(), description: description.trim(), photoUrl: photoUrl || undefined });
   }
 
-  return (
+  // Portaled to <body> — this is triggered from AddModuleMenu, which lives
+  // inside the "Cards" SectionCard's `.glass` (backdrop-filter) subtree; see
+  // KnowledgeCardForm above for why that requires a portal.
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
