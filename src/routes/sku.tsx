@@ -559,9 +559,7 @@ function CategoryDetail({
             action={
               <AddModuleMenu
                 categoryId={category.id}
-                importedCodes={category.skus
-                  .filter((s) => s.kind === "sku")
-                  .map((s) => s.code!)}
+                importedCodes={category.skus.filter((s) => s.kind === "sku").map((s) => s.code!)}
                 onPickProduct={onPickProduct}
                 onAddGeneral={(input) => {
                   skuStore.addModule(brand.id, category.id, { kind: "general", ...input });
@@ -696,13 +694,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
 }
 
 /* 3-dot action menu for each SKU row */
-function SkuMenu({
-  onDetails,
-  onDelete,
-}: {
-  onDetails?: () => void;
-  onDelete: () => void;
-}) {
+function SkuMenu({ onDetails, onDelete }: { onDetails?: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -928,7 +920,11 @@ function GeneralKnowledgeFormModal({
 
   function submit() {
     if (!name.trim()) return toast.error("Name is required.");
-    onSubmit({ name: name.trim(), description: description.trim(), photoUrl: photoUrl || undefined });
+    onSubmit({
+      name: name.trim(),
+      description: description.trim(),
+      photoUrl: photoUrl || undefined,
+    });
   }
 
   // Portaled to <body> — this is triggered from AddModuleMenu, which lives
