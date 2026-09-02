@@ -471,6 +471,7 @@ function seed(): Brand[] {
             {
               id: "sku-bm-color-infusion",
               categoryId: "cat-bm-blush",
+              kind: "sku",
               name: "Blush Color Infusion",
               code: "BM-BCI-06",
               price: 425000,
