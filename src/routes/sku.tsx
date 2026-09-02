@@ -548,16 +548,22 @@ function CategoryDetail({
           </SectionCard>
         </div>
 
-        {/* RIGHT 70% — SKUs */}
+        {/* RIGHT 70% — Cards (SKUs synced from Odoo + manually authored General Knowledge modules) */}
         <div className="flex-1 min-w-0">
           <SectionCard
-            title="SKUs"
-            description="Import products synced from Odoo, then upload a photo to complete each one."
+            title="Cards"
+            description="Import products synced from Odoo, or add a General Knowledge module for reference material that isn't a product."
             action={
-              <SkuSearchSelect
+              <AddModuleMenu
                 categoryId={category.id}
-                importedCodes={category.skus.map((s) => s.code)}
-                onPick={onPickProduct}
+                importedCodes={category.skus
+                  .filter((s) => s.kind === "sku")
+                  .map((s) => s.code!)}
+                onPickProduct={onPickProduct}
+                onAddGeneral={(input) => {
+                  skuStore.addModule(brand.id, category.id, { kind: "general", ...input });
+                  toast.success("General Knowledge module added");
+                }}
               />
             }
           >
@@ -567,7 +573,7 @@ function CategoryDetail({
               ))}
               {category.skus.length === 0 && (
                 <li className="p-6 text-center text-sm text-muted-foreground">
-                  No SKUs yet. Use the button above to add.
+                  No cards yet. Use the button above to add a SKU or a General Knowledge module.
                 </li>
               )}
             </ul>
