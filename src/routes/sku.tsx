@@ -750,34 +750,33 @@ function CardsList({ brand, category }: { brand: Brand; category: Category }) {
           <li className="p-6 text-center text-sm text-muted-foreground">{emptyLabel}</li>
         )}
       </ul>
-      <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
-        <span>
-          {filtered.length === 0 ? "0" : `${fromIdx}–${toIdx}`} of {filtered.length} card
-          {filtered.length !== 1 ? "s" : ""}
+      <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
+        <span>Showing: {filtered.length} data</span>
+        <span className="text-center">
+          {filtered.length === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data
         </span>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={safePage <= 1}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            <span>
-              {safePage} / {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={safePage >= totalPages}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-end gap-1.5">
+          {totalPages > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </>
   );
