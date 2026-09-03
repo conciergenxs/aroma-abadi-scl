@@ -680,8 +680,11 @@ type CardsFilter = "all" | "sku" | "general";
 /* Chip row to switch between All / SKUs / General Knowledge, sitting right
  * below the "Cards" description — filters the same underlying list rather
  * than being separate tabs, so nothing here changes what data exists. */
+const CARDS_PAGE_SIZE = 5;
+
 function CardsList({ brand, category }: { brand: Brand; category: Category }) {
   const [filter, setFilter] = useState<CardsFilter>("all");
+  const [page, setPage] = useState(1);
   const counts = {
     all: category.skus.length,
     sku: category.skus.filter((s) => s.kind === "sku").length,
@@ -694,6 +697,18 @@ function CardsList({ brand, category }: { brand: Brand; category: Category }) {
       : filter === "general"
         ? "No General Knowledge modules yet."
         : "No cards yet. Use the button above to add a SKU or a General Knowledge module.";
+
+  // Reset to page 1 whenever the filter (or category) changes, so pagination
+  // never lands on a page that no longer exists for the new result set.
+  useEffect(() => {
+    setPage(1);
+  }, [filter, category.id]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * CARDS_PAGE_SIZE + 1;
+  const toIdx = Math.min(safePage * CARDS_PAGE_SIZE, filtered.length);
+  const paged = filtered.slice((safePage - 1) * CARDS_PAGE_SIZE, safePage * CARDS_PAGE_SIZE);
 
   return (
     <>
@@ -728,13 +743,42 @@ function CardsList({ brand, category }: { brand: Brand; category: Category }) {
         })}
       </div>
       <ul className="divide-y divide-border">
-        {filtered.map((s) => (
+        {paged.map((s) => (
           <SkuRow key={s.id} brand={brand} category={category} sku={s} />
         ))}
         {filtered.length === 0 && (
           <li className="p-6 text-center text-sm text-muted-foreground">{emptyLabel}</li>
         )}
       </ul>
+      <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
+        <span>
+          {filtered.length === 0 ? "0" : `${fromIdx}–${toIdx}`} of {filtered.length} card
+          {filtered.length !== 1 ? "s" : ""}
+        </span>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage <= 1}
+              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <span>
+              {safePage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage >= totalPages}
+              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 }
