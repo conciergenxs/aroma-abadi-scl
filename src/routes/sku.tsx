@@ -655,8 +655,10 @@ function CategoryDetail({
             description="Products from Odoo plus manually authored reference modules."
             action={
               <AddModuleMenu
-                categoryId={category.id}
-                importedCodes={category.skus.filter((s) => s.kind === "sku").map((s) => s.code!)}
+                importedCodes={brand.categories
+                  .flatMap((c) => c.skus)
+                  .filter((s) => s.kind === "sku")
+                  .map((s) => s.code!)}
                 onPickProduct={onPickProduct}
                 onAddGeneral={(input) => {
                   skuStore.addModule(brand.id, category.id, { kind: "general", ...input });
