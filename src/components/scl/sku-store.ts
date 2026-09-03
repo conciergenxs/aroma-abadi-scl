@@ -213,9 +213,11 @@ export const ODOO_CATALOG: OdooProduct[] = [
   },
 ];
 
-/** Odoo products for a category, minus ones already imported as SKUs there. */
-export function availableOdooProducts(categoryId: string, importedCodes: string[]): OdooProduct[] {
-  return ODOO_CATALOG.filter((p) => p.categoryId === categoryId && !importedCodes.includes(p.code));
+/** Every Odoo product in the database, minus ones already imported as SKUs
+ *  somewhere. The picker isn't restricted to the current category — Odoo is
+ *  the source of truth, not this app's category tree. */
+export function availableOdooProducts(importedCodes: string[]): OdooProduct[] {
+  return ODOO_CATALOG.filter((p) => !importedCodes.includes(p.code));
 }
 
 const STORAGE_KEY = "aroma_sku_store_v3";
