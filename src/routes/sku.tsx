@@ -1085,58 +1085,79 @@ function OdooProductPickerModal({
   );
 }
 
-/* General Knowledge module form — same shape as the Odoo SKU form (photo +
- * name + description) but every field is typed in by hand since there's no
- * source-of-truth product record; no code or price, because it isn't a
- * purchasable item. */
-function GeneralKnowledgeFormModal({
+/* "+ Add Module" trigger + form — used identically at both Brand and
+ * Category level. A module has a cover photo, name, description, and its
+ * own Knowledge Cards; it's reference material, not a purchasable SKU. */
+function AddModuleButton({
+  onSubmit,
+}: {
+  onSubmit: (input: { name: string; description: string; coverUrl?: string }) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+      >
+        <Plus className="h-3.5 w-3.5" /> Add Module
+      </button>
+      {open && (
+        <ModuleFormModal
+          onClose={() => setOpen(false)}
+          onSubmit={(input) => {
+            onSubmit(input);
+            setOpen(false);
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+function ModuleFormModal({
   onClose,
   onSubmit,
 }: {
   onClose: () => void;
-  onSubmit: (input: { name: string; description: string; photoUrl?: string }) => void;
+  onSubmit: (input: { name: string; description: string; coverUrl?: string }) => void;
 }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
-  const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
+  const [coverUrl, setCoverUrl] = useState("");
+  const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
 
   function submit() {
     if (!name.trim()) return toast.error("Name is required.");
     onSubmit({
       name: name.trim(),
       description: description.trim(),
-      photoUrl: photoUrl || undefined,
+      coverUrl: coverUrl || undefined,
     });
   }
 
-  // Portaled to <body> — this is triggered from AddModuleMenu, which lives
-  // inside the "Cards" SectionCard's `.glass` (backdrop-filter) subtree; see
-  // KnowledgeCardForm above for why that requires a portal.
+  // Portaled to <body> — this is triggered from a SectionCard's `.glass`
+  // (backdrop-filter) subtree; see KnowledgeCardForm below for why that
+  // requires a portal.
   if (typeof document === "undefined") return null;
   return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">Add General Knowledge</div>
+          <div className="text-sm font-semibold">Add Module</div>
           <button type="button" onClick={onClose}>
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="p-4 space-y-3">
-          <div className="flex items-start gap-2 rounded-md bg-primary/5 border border-primary/20 px-3 py-2.5 text-[12px] text-muted-foreground">
-            <BookOpen className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
-            <span>
-              Reference material only — General Knowledge modules have no code or price and never
-              appear as purchasable products.
-            </span>
-          </div>
           <div>
-            <div className="text-xs text-muted-foreground mb-1">Photo</div>
+            <div className="text-xs text-muted-foreground mb-1">Cover</div>
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                {coverUrl ? (
+                  <img src={coverUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-primary/40" />
                 )}
@@ -1153,7 +1174,7 @@ function GeneralKnowledgeFormModal({
                 onClick={openPicker}
                 className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
               >
-                {photoUrl ? "Replace Photo" : "Upload Photo"}
+                {coverUrl ? "Replace Photo" : "Upload Photo"}
               </button>
             </div>
           </div>
@@ -1198,6 +1219,139 @@ function GeneralKnowledgeFormModal({
       </div>
     </div>,
     document.body,
+  );
+}
+
+/* List of Modules at a Brand or Category level — same row shape as SkuRow
+ * (cover, name, description, Knowledge Cards accordion) minus code/price/
+ * details-link, since a module isn't a purchasable product. */
+function ModuleList({
+  modules,
+  onRemove,
+  onAddCard,
+  onUpdateCard,
+  onRemoveCard,
+}: {
+  modules: Module[];
+  onRemove: (moduleId: string) => void;
+  onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
+  onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
+  onRemoveCard: (moduleId: string, cardId: string) => void;
+}) {
+  return (
+    <ul className="divide-y divide-border">
+      {modules.map((m) => (
+        <ModuleRow
+          key={m.id}
+          module={m}
+          onRemove={() => onRemove(m.id)}
+          onAddCard={(card) => onAddCard(m.id, card)}
+          onUpdateCard={(cardId, patch) => onUpdateCard(m.id, cardId, patch)}
+          onRemoveCard={(cardId) => onRemoveCard(m.id, cardId)}
+        />
+      ))}
+      {modules.length === 0 && (
+        <li className="p-6 text-center text-sm text-muted-foreground">No modules yet.</li>
+      )}
+    </ul>
+  );
+}
+
+function ModuleRow({
+  module,
+  onRemove,
+  onAddCard,
+  onUpdateCard,
+  onRemoveCard,
+}: {
+  module: Module;
+  onRemove: () => void;
+  onAddCard: (card: Omit<KnowledgeCard, "id">) => void;
+  onUpdateCard: (cardId: string, patch: Partial<KnowledgeCard>) => void;
+  onRemoveCard: (cardId: string) => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<KnowledgeCard | null>(null);
+
+  return (
+    <li className="p-4">
+      <div className="flex items-start gap-3">
+        <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+          {module.coverUrl ? (
+            <img src={module.coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+          ) : (
+            <BookOpen className="h-5 w-5 text-primary" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium">{module.name}</div>
+          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{module.description}</div>
+          <div className="mt-2 text-sm text-muted-foreground">
+            {module.knowledgeCards.length} knowledge card
+            {module.knowledgeCards.length === 1 ? "" : "s"}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          title="Delete module"
+          className="h-8 w-8 grid place-items-center rounded border border-border hover:bg-rose-50 text-muted-foreground hover:text-rose-600 transition-colors shrink-0"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+
+      <Accordion type="single" collapsible className="mt-3">
+        <AccordionItem value={module.id} className="border-border">
+          <AccordionTrigger
+            className="text-sm hover:no-underline py-2 transition-colors duration-150"
+            actions={
+              <button
+                type="button"
+                onClick={() => {
+                  setEditing(null);
+                  setShowForm(true);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+              >
+                <Plus className="h-3.5 w-3.5" /> Knowledge Card
+              </button>
+            }
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({module.knowledgeCards.length})
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <KnowledgeCards
+              cards={module.knowledgeCards}
+              onEdit={(k) => {
+                setEditing(k);
+                setShowForm(true);
+              }}
+              onRemove={onRemoveCard}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {showForm && (
+        <KnowledgeCardForm
+          initial={editing}
+          onClose={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
+          onSubmit={(data) => {
+            if (editing) onUpdateCard(editing.id, data);
+            else onAddCard(data);
+            toast.success(editing ? "Card updated" : "Card added");
+            setShowForm(false);
+            setEditing(null);
+          }}
+        />
+      )}
+    </li>
   );
 }
 
