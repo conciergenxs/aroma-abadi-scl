@@ -184,9 +184,7 @@ function SkuDetailPage() {
                 <div className="text-lg font-semibold">{sku.name}</div>
                 <div className="text-xs text-muted-foreground mt-0.5 font-mono">{sku.code}</div>
               </div>
-              <div className="text-xl font-bold text-primary shrink-0">
-                {formatIDR(sku.price)}
-              </div>
+              <div className="text-xl font-bold text-primary shrink-0">{formatIDR(sku.price)}</div>
             </div>
             {sku.description && (
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-3xl">

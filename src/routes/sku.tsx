@@ -398,7 +398,9 @@ function BrandDetail({
             skuStore.removeBrandModule(brand.id, moduleId);
             toast.success("Module deleted");
           }}
-          onAddCard={(moduleId, card) => skuStore.addBrandModuleKnowledgeCard(brand.id, moduleId, card)}
+          onAddCard={(moduleId, card) =>
+            skuStore.addBrandModuleKnowledgeCard(brand.id, moduleId, card)
+          }
           onUpdateCard={(moduleId, cardId, patch) =>
             skuStore.updateBrandModuleKnowledgeCard(brand.id, moduleId, cardId, patch)
           }
@@ -712,7 +714,13 @@ function CategoryDetail({
             skuStore.addCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, card)
           }
           onUpdateCard={(moduleId, cardId, patch) =>
-            skuStore.updateCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId, patch)
+            skuStore.updateCategoryModuleKnowledgeCard(
+              brand.id,
+              category.id,
+              moduleId,
+              cardId,
+              patch,
+            )
           }
           onRemoveCard={(moduleId, cardId) =>
             skuStore.removeCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId)
@@ -850,7 +858,9 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
                 setEditing(k);
                 setShowForm(true);
               }}
-              onRemove={(cardId) => skuStore.removeKnowledgeCard(brand.id, category.id, sku.id, cardId)}
+              onRemove={(cardId) =>
+                skuStore.removeKnowledgeCard(brand.id, category.id, sku.id, cardId)
+              }
             />
           </AccordionContent>
         </AccordionItem>
@@ -1278,14 +1288,21 @@ function ModuleRow({
       <div className="flex items-start gap-3">
         <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
           {module.coverUrl ? (
-            <img src={module.coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+            <img
+              src={module.coverUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
           ) : (
             <BookOpen className="h-5 w-5 text-primary" />
           )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{module.name}</div>
-          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{module.description}</div>
+          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">
+            {module.description}
+          </div>
           <div className="mt-2 text-sm text-muted-foreground">
             {module.knowledgeCards.length} knowledge card
             {module.knowledgeCards.length === 1 ? "" : "s"}

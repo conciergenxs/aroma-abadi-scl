@@ -98,9 +98,7 @@ function useSkuItems(): SkuItem[] {
   return useMemo(
     () =>
       brands.flatMap((b) =>
-        b.categories.flatMap((c) =>
-          c.skus.map((s) => ({ name: s.name, brand: b.name })),
-        ),
+        b.categories.flatMap((c) => c.skus.map((s) => ({ name: s.name, brand: b.name }))),
       ),
     [brands],
   );

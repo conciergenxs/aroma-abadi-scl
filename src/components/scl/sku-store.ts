@@ -816,9 +816,7 @@ export const skuStore = {
                   : {
                       ...c,
                       modules: c.modules.map((m) =>
-                        m.id !== moduleId
-                          ? m
-                          : { ...m, knowledgeCards: [...m.knowledgeCards, kc] },
+                        m.id !== moduleId ? m : { ...m, knowledgeCards: [...m.knowledgeCards, kc] },
                       ),
                     },
               ),
