@@ -1355,22 +1355,21 @@ function ModuleRow({
   );
 }
 
-/* Purely presentational — the "add" trigger lives beside the accordion
- * header in SkuRow, which also owns the shared add/edit form state. */
+/* Purely presentational and reused for both SKUs and Modules — the "add"
+ * trigger lives beside the accordion header in the caller, which also owns
+ * the shared add/edit form state and knows where to persist a delete. */
 function KnowledgeCards({
-  brandId,
-  categoryId,
-  sku,
+  cards,
   onEdit,
+  onRemove,
 }: {
-  brandId: string;
-  categoryId: string;
-  sku: SKU;
+  cards: KnowledgeCard[];
   onEdit: (card: KnowledgeCard) => void;
+  onRemove: (cardId: string) => void;
 }) {
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
-      {sku.knowledgeCards.map((k, idx) => (
+      {cards.map((k, idx) => (
         <div
           key={k.id}
           className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden"
@@ -1394,7 +1393,7 @@ function KnowledgeCards({
               <span className="text-xs text-muted-foreground">·</span>
               <button
                 onClick={() => {
-                  skuStore.removeKnowledgeCard(brandId, categoryId, sku.id, k.id);
+                  onRemove(k.id);
                   toast.success("Card deleted");
                 }}
                 className="text-xs text-rose-500"
@@ -1405,7 +1404,7 @@ function KnowledgeCards({
           </div>
         </div>
       ))}
-      {sku.knowledgeCards.length === 0 && (
+      {cards.length === 0 && (
         <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>
       )}
     </div>
