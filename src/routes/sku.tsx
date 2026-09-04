@@ -1215,7 +1215,7 @@ function OdooProductPickerModal({
             disabled={safePage <= 1}
             className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
           >
-            <ChevronLeft className="h-3.5 w-3.5" /> Previous Page
+            <ChevronLeft className="h-3.5 w-3.5" /> Previous
           </button>
           <span>
             Showing {paged.length} item{paged.length === 1 ? "" : "s"} from {filtered.length} item
