@@ -102,10 +102,7 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
           ) : (
             <div className="grid grid-cols-2 gap-2 stagger">
               {paged.map((b) => {
-                const skuCount = b.categories.reduce(
-                  (s, c) => s + c.skus.filter((x) => x.kind === "sku").length,
-                  0,
-                );
+                const skuCount = b.categories.reduce((s, c) => s + c.skus.length, 0);
                 return (
                   <button
                     key={b.id}
