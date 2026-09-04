@@ -99,7 +99,7 @@ function useSkuItems(): SkuItem[] {
     () =>
       brands.flatMap((b) =>
         b.categories.flatMap((c) =>
-          c.skus.filter((s) => s.kind === "sku").map((s) => ({ name: s.name, brand: b.name })),
+          c.skus.map((s) => ({ name: s.name, brand: b.name })),
         ),
       ),
     [brands],
