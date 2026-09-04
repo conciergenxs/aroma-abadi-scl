@@ -1382,12 +1382,14 @@ const MODULE_PAGE_SIZE = 4;
 
 function ModuleList({
   modules,
+  onAddModule,
   onRemove,
   onAddCard,
   onUpdateCard,
   onRemoveCard,
 }: {
   modules: Module[];
+  onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
   onRemove: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
