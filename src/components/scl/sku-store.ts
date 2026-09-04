@@ -675,14 +675,51 @@ function seed(): Brand[] {
       name: "Laura Mercier",
       logoUrl: logoLaura,
       brandKnowledge: [mockPdf("Laura Mercier Heritage Deck.pdf", 540)],
-      modules: [],
+      modules: [
+        {
+          id: "mod-lm-b-1",
+          name: "Laura Mercier Founder Story",
+          coverUrl: kc1,
+          description: "The makeup-artist origin story behind the brand's flawless-face philosophy.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-lm-b-1-1",
+              coverUrl: kc2,
+              title: "Backstage Roots",
+              text: "Founded by a celebrity makeup artist, the brand's products were originally built for backstage and editorial work.",
+            },
+          ],
+        },
+        {
+          id: "mod-lm-b-2",
+          name: "Flawless Face Philosophy",
+          coverUrl: kc4,
+          description: "The skin-first, second-skin finish approach across the range.",
+          knowledgeCards: [],
+        },
+      ],
       categories: [
         {
           id: "cat-laura-powder",
           brandId: "brand-laura",
           name: "Powder",
           categoryKnowledge: [mockPdf("Translucent Powder Iconic Guide.pdf", 460)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-lm-pwd-1",
+              name: "Iconic Powder Heritage Guide",
+              coverUrl: kc3,
+              description: "Why this powder became the brand's best-selling, most-imitated product.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-lm-pwd-2",
+              name: "Soft-Focus Finish Technique",
+              coverUrl: kc1,
+              description: "Application tips for the blurred, photo-ready finish.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-laura-translucent",
