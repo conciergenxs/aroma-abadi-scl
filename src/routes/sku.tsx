@@ -454,19 +454,30 @@ function BrandDetail({
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard
-          title="Brand Knowledge"
-          description="Brand guidelines, manifesto, tone of voice documents."
-        >
-          <div className="p-4">
-            <MultiFileUploader
-              files={brand.brandKnowledge}
-              onAdd={(atts) => skuStore.addBrandKnowledge(brand.id, atts)}
-              onRemove={(id) => skuStore.removeBrandKnowledge(brand.id, id)}
-              label="Upload Brand Knowledge"
-            />
-          </div>
-        </SectionCard>
+        <KnowledgeModuleCard
+          level="brand"
+          knowledgeFiles={brand.brandKnowledge}
+          onAddKnowledge={(atts) => skuStore.addBrandKnowledge(brand.id, atts)}
+          onRemoveKnowledge={(id) => skuStore.removeBrandKnowledge(brand.id, id)}
+          modules={brand.modules}
+          onAddModule={(input) => {
+            skuStore.addBrandModule(brand.id, input);
+            toast.success("Module added");
+          }}
+          onRemoveModule={(moduleId) => {
+            skuStore.removeBrandModule(brand.id, moduleId);
+            toast.success("Module deleted");
+          }}
+          onAddCard={(moduleId, card) =>
+            skuStore.addBrandModuleKnowledgeCard(brand.id, moduleId, card)
+          }
+          onUpdateCard={(moduleId, cardId, patch) =>
+            skuStore.updateBrandModuleKnowledgeCard(brand.id, moduleId, cardId, patch)
+          }
+          onRemoveCard={(moduleId, cardId) =>
+            skuStore.removeBrandModuleKnowledgeCard(brand.id, moduleId, cardId)
+          }
+        />
 
         <SectionCard
           title="Product Categories"
@@ -488,36 +499,6 @@ function BrandDetail({
           </ul>
         </SectionCard>
       </div>
-
-      <SectionCard
-        title="Brand Modules"
-        description="Reference modules — brand story, care guides, FAQs — that live at the brand level."
-        action={
-          <AddModuleButton
-            onSubmit={(input) => {
-              skuStore.addBrandModule(brand.id, input);
-              toast.success("Module added");
-            }}
-          />
-        }
-      >
-        <ModuleList
-          modules={brand.modules}
-          onRemove={(moduleId) => {
-            skuStore.removeBrandModule(brand.id, moduleId);
-            toast.success("Module deleted");
-          }}
-          onAddCard={(moduleId, card) =>
-            skuStore.addBrandModuleKnowledgeCard(brand.id, moduleId, card)
-          }
-          onUpdateCard={(moduleId, cardId, patch) =>
-            skuStore.updateBrandModuleKnowledgeCard(brand.id, moduleId, cardId, patch)
-          }
-          onRemoveCard={(moduleId, cardId) =>
-            skuStore.removeBrandModuleKnowledgeCard(brand.id, moduleId, cardId)
-          }
-        />
-      </SectionCard>
     </div>
   );
 }
