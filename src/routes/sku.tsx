@@ -379,6 +379,34 @@ function BrandDetail({
           </ul>
         </SectionCard>
       </div>
+
+      <SectionCard
+        title="Brand Modules"
+        description="Reference modules — brand story, care guides, FAQs — that live at the brand level."
+        action={
+          <AddModuleButton
+            onSubmit={(input) => {
+              skuStore.addBrandModule(brand.id, input);
+              toast.success("Module added");
+            }}
+          />
+        }
+      >
+        <ModuleList
+          modules={brand.modules}
+          onRemove={(moduleId) => {
+            skuStore.removeBrandModule(brand.id, moduleId);
+            toast.success("Module deleted");
+          }}
+          onAddCard={(moduleId, card) => skuStore.addBrandModuleKnowledgeCard(brand.id, moduleId, card)}
+          onUpdateCard={(moduleId, cardId, patch) =>
+            skuStore.updateBrandModuleKnowledgeCard(brand.id, moduleId, cardId, patch)
+          }
+          onRemoveCard={(moduleId, cardId) =>
+            skuStore.removeBrandModuleKnowledgeCard(brand.id, moduleId, cardId)
+          }
+        />
+      </SectionCard>
     </div>
   );
 }
