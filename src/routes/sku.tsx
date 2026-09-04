@@ -845,13 +845,12 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           </AccordionTrigger>
           <AccordionContent>
             <KnowledgeCards
-              brandId={brand.id}
-              categoryId={category.id}
-              sku={sku}
+              cards={sku.knowledgeCards}
               onEdit={(k) => {
                 setEditing(k);
                 setShowForm(true);
               }}
+              onRemove={(cardId) => skuStore.removeKnowledgeCard(brand.id, category.id, sku.id, cardId)}
             />
           </AccordionContent>
         </AccordionItem>
