@@ -29,6 +29,7 @@ import {
   MoreHorizontal,
   ExternalLink,
   Camera,
+  Search,
 } from "lucide-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
