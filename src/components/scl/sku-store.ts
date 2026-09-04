@@ -292,12 +292,14 @@ function seed(): Brand[] {
       name: "Sisley",
       logoUrl: logoSisley,
       brandKnowledge: [mockPdf("Sisley Phyto-Cosmetology Overview.pdf", 720)],
+      modules: [],
       categories: [
         {
           id: "cat-sisley-foundation",
           brandId: "brand-sisley",
           name: "Foundation",
           categoryKnowledge: [mockPdf("Foundation Shade Matching Guide.pdf", 510)],
+          modules: [],
           skus: [
             {
               id: "sku-sisley-real-flawless",
