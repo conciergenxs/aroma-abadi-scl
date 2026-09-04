@@ -260,7 +260,6 @@ function seed(): Brand[] {
             {
               id: "sku-dg-caviar-42",
               categoryId: "cat-dg-lip",
-              kind: "sku",
               name: "Caviar Hydra-Crème Lipstick 42g",
               code: "DG-CHC-42",
               price: 685000,
@@ -301,7 +300,6 @@ function seed(): Brand[] {
             {
               id: "sku-sisley-real-flawless",
               categoryId: "cat-sisley-foundation",
-              kind: "sku",
               name: "Real Flawless Foundation",
               code: "SIS-RFF-30",
               price: 2450000,
@@ -334,7 +332,6 @@ function seed(): Brand[] {
             {
               id: "sku-sisley-feather",
               categoryId: "cat-sisley-powder",
-              kind: "sku",
               name: "Real Flawless Feather Matte Powder Foundation",
               code: "SIS-FMP-10",
               price: 1850000,
@@ -372,7 +369,6 @@ function seed(): Brand[] {
             {
               id: "sku-rimmel-translucent-powder",
               categoryId: "cat-rimmel-powder",
-              kind: "sku",
               name: "Translucent Loose Setting Powder",
               code: "RIM-TLS-25",
               price: 189000,
@@ -405,7 +401,6 @@ function seed(): Brand[] {
             {
               id: "sku-rimmel-spray",
               categoryId: "cat-rimmel-spray",
-              kind: "sku",
               name: "Translucent Hydrating Setting Spray Ultra-Blur",
               code: "RIM-THS-100",
               price: 215000,
@@ -440,7 +435,6 @@ function seed(): Brand[] {
             {
               id: "sku-laura-translucent",
               categoryId: "cat-laura-powder",
-              kind: "sku",
               name: "Translucent Loose Setting Powder",
               code: "LM-TLS-29",
               price: 745000,
@@ -481,7 +475,6 @@ function seed(): Brand[] {
             {
               id: "sku-bm-color-infusion",
               categoryId: "cat-bm-blush",
-              kind: "sku",
               name: "Blush Color Infusion",
               code: "BM-BCI-06",
               price: 425000,
