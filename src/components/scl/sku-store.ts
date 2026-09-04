@@ -284,7 +284,8 @@ function seed(): Brand[] {
           id: "mod-dg-b-3",
           name: "Seasonal Campaign Playbook",
           coverUrl: kc3,
-          description: "Key visuals, talking points, and promotional windows for the current campaign.",
+          description:
+            "Key visuals, talking points, and promotional windows for the current campaign.",
           knowledgeCards: [],
         },
         {
@@ -322,7 +323,8 @@ function seed(): Brand[] {
               id: "mod-dg-lip-1",
               name: "Lip Shade-Matching Guide",
               coverUrl: kc3,
-              description: "How to match undertones and pick the right shade family for each customer.",
+              description:
+                "How to match undertones and pick the right shade family for each customer.",
               knowledgeCards: [
                 {
                   id: "kc-mod-dg-lip-1-1",
@@ -414,7 +416,8 @@ function seed(): Brand[] {
           id: "mod-sis-b-2",
           name: "Botanical Ingredient Sourcing",
           coverUrl: kc1,
-          description: "Where key plant extracts come from and how sourcing supports the brand story.",
+          description:
+            "Where key plant extracts come from and how sourcing supports the brand story.",
           knowledgeCards: [],
         },
         {
@@ -505,7 +508,8 @@ function seed(): Brand[] {
               id: "mod-sis-pwd-2",
               name: "Blurring Technology Explainer",
               coverUrl: kc2,
-              description: "How the soft-focus particles work and how to describe the effect to customers.",
+              description:
+                "How the soft-focus particles work and how to describe the effect to customers.",
               knowledgeCards: [],
             },
           ],
@@ -559,7 +563,8 @@ function seed(): Brand[] {
           id: "mod-rim-b-2",
           name: "Affordable Glam Positioning Guide",
           coverUrl: kc2,
-          description: "How to pitch Rimmel against premium counters without undercutting the brand.",
+          description:
+            "How to pitch Rimmel against premium counters without undercutting the brand.",
           knowledgeCards: [],
         },
         {
@@ -588,7 +593,8 @@ function seed(): Brand[] {
               id: "mod-rim-pwd-2",
               name: "Oily Skin Recommendation Guide",
               coverUrl: kc1,
-              description: "Talking points for customers asking about oil control and touch-up frequency.",
+              description:
+                "Talking points for customers asking about oil control and touch-up frequency.",
               knowledgeCards: [],
             },
             {
@@ -643,7 +649,8 @@ function seed(): Brand[] {
               id: "mod-rim-spr-2",
               name: "Humidity & Climate Performance Notes",
               coverUrl: kc3,
-              description: "How the formula performs in Jakarta's humidity versus air-conditioned malls.",
+              description:
+                "How the formula performs in Jakarta's humidity versus air-conditioned malls.",
               knowledgeCards: [],
             },
           ],
@@ -680,7 +687,8 @@ function seed(): Brand[] {
           id: "mod-lm-b-1",
           name: "Laura Mercier Founder Story",
           coverUrl: kc1,
-          description: "The makeup-artist origin story behind the brand's flawless-face philosophy.",
+          description:
+            "The makeup-artist origin story behind the brand's flawless-face philosophy.",
           knowledgeCards: [
             {
               id: "kc-mod-lm-b-1-1",
@@ -709,7 +717,8 @@ function seed(): Brand[] {
               id: "mod-lm-pwd-1",
               name: "Iconic Powder Heritage Guide",
               coverUrl: kc3,
-              description: "Why this powder became the brand's best-selling, most-imitated product.",
+              description:
+                "Why this powder became the brand's best-selling, most-imitated product.",
               knowledgeCards: [],
             },
             {
