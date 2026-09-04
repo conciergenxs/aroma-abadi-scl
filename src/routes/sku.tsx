@@ -322,32 +322,29 @@ function KnowledgeModuleCard({
       title={mode === "knowledge" ? copy.knowledgeTitle : copy.moduleTitle}
       description={mode === "knowledge" ? copy.knowledgeDescription : copy.moduleDescription}
       action={
-        <div className="flex flex-col items-end gap-1.5">
-          <div className="inline-flex items-center rounded-full border border-border bg-card/40 p-0.5">
-            <button
-              type="button"
-              onClick={() => setMode("knowledge")}
-              className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
-                mode === "knowledge"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Knowledge
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("module")}
-              className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
-                mode === "module"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Module
-            </button>
-          </div>
-          {mode === "module" && <AddModuleButton onSubmit={onAddModule} />}
+        <div className="inline-flex items-center rounded-full border border-border bg-card/40 p-0.5">
+          <button
+            type="button"
+            onClick={() => setMode("knowledge")}
+            className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
+              mode === "knowledge"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Knowledge
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("module")}
+            className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
+              mode === "module"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Module
+          </button>
         </div>
       }
     >
@@ -363,6 +360,7 @@ function KnowledgeModuleCard({
       ) : (
         <ModuleList
           modules={modules}
+          onAddModule={onAddModule}
           onRemove={onRemoveModule}
           onAddCard={onAddCard}
           onUpdateCard={onUpdateCard}
