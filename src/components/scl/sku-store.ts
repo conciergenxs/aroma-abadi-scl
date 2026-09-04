@@ -395,14 +395,72 @@ function seed(): Brand[] {
       name: "Sisley",
       logoUrl: logoSisley,
       brandKnowledge: [mockPdf("Sisley Phyto-Cosmetology Overview.pdf", 720)],
-      modules: [],
+      modules: [
+        {
+          id: "mod-sis-b-1",
+          name: "Phyto-Cosmetology Philosophy",
+          coverUrl: kc4,
+          description: "The botanical science approach that underpins every Sisley formula.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-sis-b-1-1",
+              coverUrl: kc2,
+              title: "Plant-Based Actives",
+              text: "Sisley blends botanical extracts with skincare actives so makeup doubles as skin treatment.",
+            },
+          ],
+        },
+        {
+          id: "mod-sis-b-2",
+          name: "Botanical Ingredient Sourcing",
+          coverUrl: kc1,
+          description: "Where key plant extracts come from and how sourcing supports the brand story.",
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-sis-b-3",
+          name: "Sisley Spa Partnership Guide",
+          coverUrl: kc3,
+          description: "Cross-referral etiquette between counter sales and partner spa treatments.",
+          knowledgeCards: [],
+        },
+      ],
       categories: [
         {
           id: "cat-sisley-foundation",
           brandId: "brand-sisley",
           name: "Foundation",
           categoryKnowledge: [mockPdf("Foundation Shade Matching Guide.pdf", 510)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-sis-fdn-1",
+              name: "Foundation Shade-Matching Workflow",
+              coverUrl: kc2,
+              description: "A step-by-step shade-matching process for the foundation range.",
+              knowledgeCards: [
+                {
+                  id: "kc-mod-sis-fdn-1-1",
+                  coverUrl: kc4,
+                  title: "Three-Point Check",
+                  text: "Test on jaw, neck, and chest — the shade should disappear into all three under natural light.",
+                },
+              ],
+            },
+            {
+              id: "mod-sis-fdn-2",
+              name: "Skincare-Makeup Hybrid Benefits",
+              coverUrl: kc1,
+              description: "Skin-benefit talking points to pair with coverage and finish claims.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-sis-fdn-3",
+              name: "SPF & Sun Protection Talking Points",
+              coverUrl: kc3,
+              description: "How to explain SPF coverage without overstating sun protection claims.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-sisley-real-flawless",
