@@ -540,14 +540,65 @@ function seed(): Brand[] {
         mockPdf("Rimmel London Brand Story.pdf", 380),
         mockPdf("Rimmel Product Catalog 2026.pdf", 1200),
       ],
-      modules: [],
+      modules: [
+        {
+          id: "mod-rim-b-1",
+          name: "Rimmel London Brand Story",
+          coverUrl: kc1,
+          description: "The brand's London heritage and affordable-glam positioning.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-rim-b-1-1",
+              coverUrl: kc3,
+              title: "Since 1834",
+              text: "Rimmel London is one of the oldest cosmetics brands, known for democratizing trend-led makeup.",
+            },
+          ],
+        },
+        {
+          id: "mod-rim-b-2",
+          name: "Affordable Glam Positioning Guide",
+          coverUrl: kc2,
+          description: "How to pitch Rimmel against premium counters without undercutting the brand.",
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-rim-b-3",
+          name: "Influencer Collaboration Brief",
+          coverUrl: kc4,
+          description: "Current collab campaigns and how BAs can reference them in-store.",
+          knowledgeCards: [],
+        },
+      ],
       categories: [
         {
           id: "cat-rimmel-powder",
           brandId: "brand-rimmel",
           name: "Powder",
           categoryKnowledge: [mockPdf("Setting Powder Best Practice.pdf", 220)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-rim-pwd-1",
+              name: "Powder Finish Comparison Guide",
+              coverUrl: kc3,
+              description: "Matte vs. two-way powder — when to recommend each.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-rim-pwd-2",
+              name: "Oily Skin Recommendation Guide",
+              coverUrl: kc1,
+              description: "Talking points for customers asking about oil control and touch-up frequency.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-rim-pwd-3",
+              name: "Bundle & Cross-Sell Suggestions",
+              coverUrl: kc4,
+              description: "Which setting spray and base products pair naturally with each powder.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-rimmel-translucent-powder",
