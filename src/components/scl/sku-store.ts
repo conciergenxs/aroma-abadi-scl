@@ -404,6 +404,7 @@ function seed(): Brand[] {
           brandId: "brand-rimmel",
           name: "Setting Spray",
           categoryKnowledge: [mockPdf("Setting Spray Knowledge.pdf", 190)],
+          modules: [],
           skus: [
             {
               id: "sku-rimmel-spray",
