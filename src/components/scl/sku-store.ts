@@ -605,6 +605,85 @@ export const skuStore = {
     };
     emit();
   },
+  addBrandModule(brandId: string, input: Omit<Module, "id" | "knowledgeCards">) {
+    const mod: Module = { id: uid("mod"), knowledgeCards: [], ...input };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId ? { ...b, modules: [...b.modules, mod] } : b,
+      ),
+    };
+    emit();
+    return mod;
+  },
+  removeBrandModule(brandId: string, moduleId: string) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id === brandId ? { ...b, modules: b.modules.filter((m) => m.id !== moduleId) } : b,
+      ),
+    };
+    emit();
+  },
+  addBrandModuleKnowledgeCard(brandId: string, moduleId: string, card: Omit<KnowledgeCard, "id">) {
+    const kc: KnowledgeCard = { id: uid("kc"), ...card };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              modules: b.modules.map((m) =>
+                m.id !== moduleId ? m : { ...m, knowledgeCards: [...m.knowledgeCards, kc] },
+              ),
+            },
+      ),
+    };
+    emit();
+    return kc;
+  },
+  updateBrandModuleKnowledgeCard(
+    brandId: string,
+    moduleId: string,
+    cardId: string,
+    patch: Partial<KnowledgeCard>,
+  ) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              modules: b.modules.map((m) =>
+                m.id !== moduleId
+                  ? m
+                  : {
+                      ...m,
+                      knowledgeCards: m.knowledgeCards.map((k) =>
+                        k.id === cardId ? { ...k, ...patch } : k,
+                      ),
+                    },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
+  removeBrandModuleKnowledgeCard(brandId: string, moduleId: string, cardId: string) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              modules: b.modules.map((m) =>
+                m.id !== moduleId
+                  ? m
+                  : { ...m, knowledgeCards: m.knowledgeCards.filter((k) => k.id !== cardId) },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
   addCategory(brandId: string, name: string, imageUrl?: string) {
     const cat: Category = {
       id: uid("cat"),
