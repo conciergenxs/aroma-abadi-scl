@@ -273,7 +273,7 @@ type KnowledgeModuleMode = "knowledge" | "module";
 const KNOWLEDGE_MODULE_COPY = {
   brand: {
     knowledgeTitle: "Brand Knowledge",
-    knowledgeDescription: "Brand guidelines, manifesto, tone of voice documents.",
+    knowledgeDescription: "Guidelines, manifesto & tone of voice.",
     knowledgeLabel: "Upload Brand Knowledge",
     moduleTitle: "Brand Modules",
     moduleDescription: "Brand-level story, care guides & FAQs.",
