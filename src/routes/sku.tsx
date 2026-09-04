@@ -276,16 +276,14 @@ const KNOWLEDGE_MODULE_COPY = {
     knowledgeDescription: "Brand guidelines, manifesto, tone of voice documents.",
     knowledgeLabel: "Upload Brand Knowledge",
     moduleTitle: "Brand Modules",
-    moduleDescription:
-      "Reference modules — brand story, care guides, FAQs — that live at the brand level.",
+    moduleDescription: "Brand-level story, care guides & FAQs.",
   },
   category: {
     knowledgeTitle: "Category Knowledge",
     knowledgeDescription: "Playbook & category guidelines.",
     knowledgeLabel: "Upload Category Knowledge",
     moduleTitle: "Category Modules",
-    moduleDescription:
-      "Reference modules — care guides, ingredient FAQs — specific to this category.",
+    moduleDescription: "Category-level care guides & FAQs.",
   },
 } as const;
 
