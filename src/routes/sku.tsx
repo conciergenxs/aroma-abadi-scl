@@ -1418,7 +1418,12 @@ function ModuleList({
 
   return (
     <>
-      <ListSearchBar value={query} onChange={setQuery} placeholder="Search modules…" />
+      <ListSearchBar
+        value={query}
+        onChange={setQuery}
+        placeholder="Search modules…"
+        action={<AddModuleButton onSubmit={onAddModule} />}
+      />
       <ul className="divide-y divide-border">
         {paged.map((m) => (
           <ModuleRow
