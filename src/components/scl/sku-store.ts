@@ -250,12 +250,14 @@ function seed(): Brand[] {
         mockPdf("D&G Beauty Brand Manifesto.pdf", 620),
         mockPdf("D&G Tone of Voice Guideline.pdf", 410),
       ],
+      modules: [],
       categories: [
         {
           id: "cat-dg-lip",
           brandId: "brand-dg",
           name: "Lip",
           categoryKnowledge: [mockPdf("Lip Category Playbook.pdf", 340)],
+          modules: [],
           skus: [
             {
               id: "sku-dg-caviar-42",
