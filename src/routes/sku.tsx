@@ -1378,6 +1378,8 @@ function ModuleFormModal({
 /* List of Modules at a Brand or Category level — same row shape as SkuRow
  * (cover, name, description, Knowledge Cards accordion) minus code/price/
  * details-link, since a module isn't a purchasable product. */
+const MODULE_PAGE_SIZE = 4;
+
 function ModuleList({
   modules,
   onRemove,
@@ -1391,22 +1393,57 @@ function ModuleList({
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
   onRemoveCard: (moduleId: string, cardId: string) => void;
 }) {
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return modules;
+    return modules.filter(
+      (m) => m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q),
+    );
+  }, [modules, query]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / MODULE_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * MODULE_PAGE_SIZE + 1;
+  const toIdx = Math.min(safePage * MODULE_PAGE_SIZE, filtered.length);
+  const paged = filtered.slice((safePage - 1) * MODULE_PAGE_SIZE, safePage * MODULE_PAGE_SIZE);
+
   return (
-    <ul className="divide-y divide-border">
-      {modules.map((m) => (
-        <ModuleRow
-          key={m.id}
-          module={m}
-          onRemove={() => onRemove(m.id)}
-          onAddCard={(card) => onAddCard(m.id, card)}
-          onUpdateCard={(cardId, patch) => onUpdateCard(m.id, cardId, patch)}
-          onRemoveCard={(cardId) => onRemoveCard(m.id, cardId)}
-        />
-      ))}
-      {modules.length === 0 && (
-        <li className="p-6 text-center text-sm text-muted-foreground">No modules yet.</li>
-      )}
-    </ul>
+    <>
+      <ListSearchBar value={query} onChange={setQuery} placeholder="Search modules…" />
+      <ul className="divide-y divide-border">
+        {paged.map((m) => (
+          <ModuleRow
+            key={m.id}
+            module={m}
+            onRemove={() => onRemove(m.id)}
+            onAddCard={(card) => onAddCard(m.id, card)}
+            onUpdateCard={(cardId, patch) => onUpdateCard(m.id, cardId, patch)}
+            onRemoveCard={(cardId) => onRemoveCard(m.id, cardId)}
+          />
+        ))}
+        {filtered.length === 0 && (
+          <li className="p-6 text-center text-sm text-muted-foreground">
+            {modules.length === 0 ? "No modules yet." : "No modules match your search."}
+          </li>
+        )}
+      </ul>
+      <ListPaginationFooter
+        totalCount={filtered.length}
+        fromIdx={fromIdx}
+        toIdx={toIdx}
+        currentPage={safePage}
+        totalPages={totalPages}
+        onPrev={() => setPage((p) => Math.max(1, p - 1))}
+        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+      />
+    </>
   );
 }
 
