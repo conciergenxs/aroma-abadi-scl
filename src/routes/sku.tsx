@@ -188,10 +188,7 @@ function BrandsOverview({
       </div>
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger">
         {visible.map((b) => {
-          const skuCount = b.categories.reduce(
-            (a, c) => a + c.skus.filter((s) => s.kind === "sku").length,
-            0,
-          );
+          const skuCount = b.categories.reduce((a, c) => a + c.skus.length, 0);
           return (
             <button
               key={b.id}
