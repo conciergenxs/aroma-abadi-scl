@@ -332,6 +332,7 @@ function seed(): Brand[] {
           brandId: "brand-sisley",
           name: "Powder",
           categoryKnowledge: [mockPdf("Powder Finish 101.pdf", 280)],
+          modules: [],
           skus: [
             {
               id: "sku-sisley-feather",
