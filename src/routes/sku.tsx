@@ -1001,7 +1001,7 @@ function OdooProductPickerModal({
     safePage * ODOO_PICKER_PAGE_SIZE,
   );
 
-  // Portaled to <body> for the same reason as KnowledgeCardForm / GeneralKnowledgeFormModal.
+  // Portaled to <body> for the same reason as KnowledgeCardForm / ModuleFormModal.
   if (typeof document === "undefined") return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 modal-backdrop">
