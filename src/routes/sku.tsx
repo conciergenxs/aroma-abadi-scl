@@ -23,7 +23,6 @@ import {
   BookOpen,
   X,
   ImageIcon,
-  Pencil,
   FolderOpen,
   Home,
   MoreHorizontal,
