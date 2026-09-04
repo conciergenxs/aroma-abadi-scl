@@ -475,12 +475,14 @@ function seed(): Brand[] {
       name: "BareMinerals",
       logoUrl: logoBM,
       brandKnowledge: [mockPdf("BareMinerals Clean Beauty Pledge.pdf", 320)],
+      modules: [],
       categories: [
         {
           id: "cat-bm-blush",
           brandId: "brand-bm",
           name: "Blush",
           categoryKnowledge: [mockPdf("Blush Application Guide.pdf", 260)],
+          modules: [],
           skus: [
             {
               id: "sku-bm-color-infusion",
