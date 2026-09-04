@@ -268,6 +268,113 @@ function BrandsOverview({
 
 /* ---------------- Level 2: Brand Detail ---------------- */
 
+type KnowledgeModuleMode = "knowledge" | "module";
+
+const KNOWLEDGE_MODULE_COPY = {
+  brand: {
+    knowledgeTitle: "Brand Knowledge",
+    knowledgeDescription: "Brand guidelines, manifesto, tone of voice documents.",
+    knowledgeLabel: "Upload Brand Knowledge",
+    moduleTitle: "Brand Modules",
+    moduleDescription:
+      "Reference modules — brand story, care guides, FAQs — that live at the brand level.",
+  },
+  category: {
+    knowledgeTitle: "Category Knowledge",
+    knowledgeDescription: "Playbook & category guidelines.",
+    knowledgeLabel: "Upload Category Knowledge",
+    moduleTitle: "Category Modules",
+    moduleDescription:
+      "Reference modules — care guides, ingredient FAQs — specific to this category.",
+  },
+} as const;
+
+/* Brand and Category both need a "Knowledge" (file attachments) view and a
+ * "Module" (reference modules with their own Knowledge Cards) view. Rather
+ * than two separate SectionCards competing for vertical space, they share
+ * one card with a Knowledge/Module toggle in the header. */
+function KnowledgeModuleCard({
+  level,
+  knowledgeFiles,
+  onAddKnowledge,
+  onRemoveKnowledge,
+  modules,
+  onAddModule,
+  onRemoveModule,
+  onAddCard,
+  onUpdateCard,
+  onRemoveCard,
+}: {
+  level: "brand" | "category";
+  knowledgeFiles: Attachment[];
+  onAddKnowledge: (atts: Attachment[]) => void;
+  onRemoveKnowledge: (id: string) => void;
+  modules: Module[];
+  onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onRemoveModule: (moduleId: string) => void;
+  onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
+  onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
+  onRemoveCard: (moduleId: string, cardId: string) => void;
+}) {
+  const [mode, setMode] = useState<KnowledgeModuleMode>("knowledge");
+  const copy = KNOWLEDGE_MODULE_COPY[level];
+
+  return (
+    <SectionCard
+      title={mode === "knowledge" ? copy.knowledgeTitle : copy.moduleTitle}
+      description={mode === "knowledge" ? copy.knowledgeDescription : copy.moduleDescription}
+      action={
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center rounded-full border border-border bg-card/40 p-0.5">
+            <button
+              type="button"
+              onClick={() => setMode("knowledge")}
+              className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
+                mode === "knowledge"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Knowledge
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("module")}
+              className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
+                mode === "module"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Module
+            </button>
+          </div>
+          {mode === "module" && <AddModuleButton onSubmit={onAddModule} />}
+        </div>
+      }
+    >
+      {mode === "knowledge" ? (
+        <div className="p-4">
+          <MultiFileUploader
+            files={knowledgeFiles}
+            onAdd={onAddKnowledge}
+            onRemove={onRemoveKnowledge}
+            label={copy.knowledgeLabel}
+          />
+        </div>
+      ) : (
+        <ModuleList
+          modules={modules}
+          onRemove={onRemoveModule}
+          onAddCard={onAddCard}
+          onUpdateCard={onUpdateCard}
+          onRemoveCard={onRemoveCard}
+        />
+      )}
+    </SectionCard>
+  );
+}
+
 function BrandDetail({
   brand,
   onBack,
