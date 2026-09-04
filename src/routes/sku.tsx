@@ -11,6 +11,7 @@ import {
   type Module,
   type KnowledgeCard,
   type OdooProduct,
+  type Attachment,
 } from "@/components/scl/sku-store";
 import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
