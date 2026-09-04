@@ -673,112 +673,89 @@ function CategoryDetail({
           </SectionCard>
         </div>
 
-        {/* RIGHT 70% — Cards (SKUs synced from Odoo + manually authored General Knowledge modules) */}
+        {/* RIGHT 70% — SKUs synced from Odoo */}
         <div className="flex-1 min-w-0">
           <SectionCard
-            title="Cards"
-            description="Products from Odoo plus manually authored reference modules."
+            title="SKUs"
+            description="Products synced from Odoo."
             action={
-              <AddModuleMenu
-                importedCodes={brand.categories
-                  .flatMap((c) => c.skus)
-                  .filter((s) => s.kind === "sku")
-                  .map((s) => s.code!)}
+              <AddSkuButton
+                importedCodes={brand.categories.flatMap((c) => c.skus).map((s) => s.code)}
                 onPickProduct={onPickProduct}
-                onAddGeneral={(input) => {
-                  skuStore.addModule(brand.id, category.id, { kind: "general", ...input });
-                  toast.success("General Knowledge module added");
-                }}
               />
             }
           >
-            <CardsList brand={brand} category={category} />
+            <SkuList brand={brand} category={category} />
           </SectionCard>
         </div>
       </div>
+
+      <SectionCard
+        title="Category Modules"
+        description="Reference modules — care guides, ingredient FAQs — specific to this category."
+        action={
+          <AddModuleButton
+            onSubmit={(input) => {
+              skuStore.addCategoryModule(brand.id, category.id, input);
+              toast.success("Module added");
+            }}
+          />
+        }
+      >
+        <ModuleList
+          modules={category.modules}
+          onRemove={(moduleId) => {
+            skuStore.removeCategoryModule(brand.id, category.id, moduleId);
+            toast.success("Module deleted");
+          }}
+          onAddCard={(moduleId, card) =>
+            skuStore.addCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, card)
+          }
+          onUpdateCard={(moduleId, cardId, patch) =>
+            skuStore.updateCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId, patch)
+          }
+          onRemoveCard={(moduleId, cardId) =>
+            skuStore.removeCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId)
+          }
+        />
+      </SectionCard>
     </div>
   );
 }
 
-type CardsFilter = "all" | "sku" | "general";
+const SKU_PAGE_SIZE = 5;
 
-/* Chip row to switch between All / SKUs / General Knowledge, sitting right
- * below the "Cards" description — filters the same underlying list rather
- * than being separate tabs, so nothing here changes what data exists. */
-const CARDS_PAGE_SIZE = 5;
-
-function CardsList({ brand, category }: { brand: Brand; category: Category }) {
-  const [filter, setFilter] = useState<CardsFilter>("all");
+function SkuList({ brand, category }: { brand: Brand; category: Category }) {
   const [page, setPage] = useState(1);
-  const counts = {
-    all: category.skus.length,
-    sku: category.skus.filter((s) => s.kind === "sku").length,
-    general: category.skus.filter((s) => s.kind === "general").length,
-  };
-  const filtered = category.skus.filter((s) => filter === "all" || s.kind === filter);
-  const emptyLabel =
-    filter === "sku"
-      ? "No SKUs yet."
-      : filter === "general"
-        ? "No General Knowledge modules yet."
-        : "No cards yet. Use the button above to add a SKU or a General Knowledge module.";
 
-  // Reset to page 1 whenever the filter (or category) changes, so pagination
-  // never lands on a page that no longer exists for the new result set.
+  // Reset to page 1 whenever the category changes, so pagination never
+  // lands on a page that no longer exists for the new result set.
   useEffect(() => {
     setPage(1);
-  }, [filter, category.id]);
+  }, [category.id]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(category.skus.length / SKU_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * CARDS_PAGE_SIZE + 1;
-  const toIdx = Math.min(safePage * CARDS_PAGE_SIZE, filtered.length);
-  const paged = filtered.slice((safePage - 1) * CARDS_PAGE_SIZE, safePage * CARDS_PAGE_SIZE);
+  const fromIdx = category.skus.length === 0 ? 0 : (safePage - 1) * SKU_PAGE_SIZE + 1;
+  const toIdx = Math.min(safePage * SKU_PAGE_SIZE, category.skus.length);
+  const paged = category.skus.slice((safePage - 1) * SKU_PAGE_SIZE, safePage * SKU_PAGE_SIZE);
 
   return (
     <>
-      <div className="flex items-center gap-1.5 px-5 py-3 border-b border-border">
-        {(
-          [
-            { key: "all", label: "All" },
-            { key: "sku", label: "SKUs" },
-            { key: "general", label: "General Knowledge" },
-          ] as const
-        ).map((opt) => {
-          const active = filter === opt.key;
-          return (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => setFilter(opt.key)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors duration-150 ${
-                active
-                  ? "border-primary/40 bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:text-foreground hover:bg-gray-50"
-              }`}
-            >
-              {opt.label}
-              <span
-                className={`rounded-full px-1.5 text-[10px] ${active ? "bg-primary/15" : "bg-black/5"}`}
-              >
-                {counts[opt.key]}
-              </span>
-            </button>
-          );
-        })}
-      </div>
       <ul className="divide-y divide-border">
         {paged.map((s) => (
           <SkuRow key={s.id} brand={brand} category={category} sku={s} />
         ))}
-        {filtered.length === 0 && (
-          <li className="p-6 text-center text-sm text-muted-foreground">{emptyLabel}</li>
+        {category.skus.length === 0 && (
+          <li className="p-6 text-center text-sm text-muted-foreground">
+            No SKUs yet. Use the button above to add one from Odoo.
+          </li>
         )}
       </ul>
       <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
-        <span>Showing: {filtered.length} data</span>
+        <span>Showing: {category.skus.length} data</span>
         <span className="text-center">
-          {filtered.length === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data
+          {category.skus.length === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data
         </span>
         <div className="flex items-center justify-end gap-1.5">
           {totalPages > 1 && (
