@@ -572,6 +572,7 @@ export const skuStore = {
       name: input.name,
       logoUrl: input.logoUrl,
       brandKnowledge: [],
+      modules: [],
       categories: [],
     };
     state = { brands: [brand, ...state.brands] };
