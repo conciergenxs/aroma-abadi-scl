@@ -1227,7 +1227,7 @@ function OdooProductPickerModal({
             disabled={safePage >= totalPages}
             className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
           >
-            Next Page <ChevronRight className="h-3.5 w-3.5" />
+            Next <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
