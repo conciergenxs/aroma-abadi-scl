@@ -1207,29 +1207,28 @@ function OdooProductPickerModal({
             </li>
           )}
         </ul>
-        {totalPages > 1 && (
-          <div className="p-3 border-t border-border flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground shrink-0">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={safePage <= 1}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            <span>
-              {safePage} / {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={safePage >= totalPages}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
+        <div className="p-3 border-t border-border flex items-center justify-between gap-2 text-[12px] text-muted-foreground shrink-0">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={safePage <= 1}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" /> Previous Page
+          </button>
+          <span>
+            Showing {paged.length} item{paged.length === 1 ? "" : "s"} from {filtered.length} item
+            {filtered.length === 1 ? "" : "s"}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={safePage >= totalPages}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 h-8 disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+          >
+            Next Page <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
     </div>,
     document.body,
