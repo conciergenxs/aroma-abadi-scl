@@ -759,6 +759,142 @@ export const skuStore = {
     };
     emit();
   },
+  addCategoryModule(
+    brandId: string,
+    categoryId: string,
+    input: Omit<Module, "id" | "knowledgeCards">,
+  ) {
+    const mod: Module = { id: uid("mod"), knowledgeCards: [], ...input };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId ? c : { ...c, modules: [...c.modules, mod] },
+              ),
+            },
+      ),
+    };
+    emit();
+    return mod;
+  },
+  removeCategoryModule(brandId: string, categoryId: string, moduleId: string) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : { ...c, modules: c.modules.filter((m) => m.id !== moduleId) },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
+  addCategoryModuleKnowledgeCard(
+    brandId: string,
+    categoryId: string,
+    moduleId: string,
+    card: Omit<KnowledgeCard, "id">,
+  ) {
+    const kc: KnowledgeCard = { id: uid("kc"), ...card };
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      modules: c.modules.map((m) =>
+                        m.id !== moduleId
+                          ? m
+                          : { ...m, knowledgeCards: [...m.knowledgeCards, kc] },
+                      ),
+                    },
+              ),
+            },
+      ),
+    };
+    emit();
+    return kc;
+  },
+  updateCategoryModuleKnowledgeCard(
+    brandId: string,
+    categoryId: string,
+    moduleId: string,
+    cardId: string,
+    patch: Partial<KnowledgeCard>,
+  ) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      modules: c.modules.map((m) =>
+                        m.id !== moduleId
+                          ? m
+                          : {
+                              ...m,
+                              knowledgeCards: m.knowledgeCards.map((k) =>
+                                k.id === cardId ? { ...k, ...patch } : k,
+                              ),
+                            },
+                      ),
+                    },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
+  removeCategoryModuleKnowledgeCard(
+    brandId: string,
+    categoryId: string,
+    moduleId: string,
+    cardId: string,
+  ) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      modules: c.modules.map((m) =>
+                        m.id !== moduleId
+                          ? m
+                          : {
+                              ...m,
+                              knowledgeCards: m.knowledgeCards.filter((k) => k.id !== cardId),
+                            },
+                      ),
+                    },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
   addSku(
     brandId: string,
     categoryId: string,
