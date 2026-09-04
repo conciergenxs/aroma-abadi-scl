@@ -808,14 +808,16 @@ function ListSearchBar({
   value,
   onChange,
   placeholder,
+  action,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
+  action?: ReactNode;
 }) {
   return (
-    <div className="p-3 border-b border-border">
-      <div className="relative">
+    <div className="p-3 border-b border-border flex items-center gap-2">
+      <div className="relative flex-1 min-w-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
         <input
           value={value}
@@ -824,6 +826,7 @@ function ListSearchBar({
           className="w-full h-9 rounded-md border border-border bg-card/60 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
         />
       </div>
+      {action}
     </div>
   );
 }
