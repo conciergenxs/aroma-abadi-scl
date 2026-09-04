@@ -931,94 +931,35 @@ function SkuMenu({ onDetails, onDelete }: { onDetails?: () => void; onDelete: ()
   );
 }
 
-/* "+ Add Module" — first choose a kind (SKU synced from Odoo, or a manually
- * authored General Knowledge module), then either open the Odoo product
- * picker overlay (select2-style search + pagination across the whole
- * catalog) or fill in the General Knowledge form. */
-function AddModuleMenu({
+/* "+ Add SKU" — opens the Odoo product picker overlay (select2-style search
+ * + pagination across the whole catalog). */
+function AddSkuButton({
   importedCodes,
   onPickProduct,
-  onAddGeneral,
 }: {
   importedCodes: string[];
   onPickProduct: (product: OdooProduct) => void;
-  onAddGeneral: (input: { name: string; description: string; photoUrl?: string }) => void;
 }) {
-  const [choiceOpen, setChoiceOpen] = useState(false);
-  const [skuPickerOpen, setSkuPickerOpen] = useState(false);
-  const [generalOpen, setGeneralOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!choiceOpen) return;
-    const h = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setChoiceOpen(false);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [choiceOpen]);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <div ref={ref} className="relative">
-        <button
-          type="button"
-          onClick={() => setChoiceOpen((v) => !v)}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
-        >
-          <Plus className="h-3.5 w-3.5" /> Add Module
-        </button>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+      >
+        <Plus className="h-3.5 w-3.5" /> Add SKU
+      </button>
 
-        {choiceOpen && (
-          <div className="absolute right-0 top-10 z-30 w-64 rounded-xl border border-border bg-background shadow-xl overflow-hidden animate-scale-in origin-top-right p-2 space-y-2">
-            <button
-              type="button"
-              onClick={() => {
-                setChoiceOpen(false);
-                setSkuPickerOpen(true);
-              }}
-              className="w-full flex flex-col items-start gap-0.5 rounded-lg border border-border px-3 py-2.5 text-left hover:bg-gray-50 hover:border-primary/30 transition-colors duration-150"
-            >
-              <div className="text-sm font-medium">Add SKU</div>
-              <div className="text-[11px] text-muted-foreground leading-snug">
-                Sync a product from Odoo
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setChoiceOpen(false);
-                setGeneralOpen(true);
-              }}
-              className="w-full flex flex-col items-start gap-0.5 rounded-lg border border-border px-3 py-2.5 text-left hover:bg-gray-50 hover:border-primary/30 transition-colors duration-150"
-            >
-              <div className="text-sm font-medium">General Knowledge</div>
-              <div className="text-[11px] text-muted-foreground leading-snug">
-                Manually add a reference module
-              </div>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {skuPickerOpen && (
+      {open && (
         <OdooProductPickerModal
           importedCodes={importedCodes}
           onPick={(product) => {
             onPickProduct(product);
-            setSkuPickerOpen(false);
+            setOpen(false);
           }}
-          onClose={() => setSkuPickerOpen(false)}
-        />
-      )}
-
-      {generalOpen && (
-        <GeneralKnowledgeFormModal
-          onClose={() => setGeneralOpen(false)}
-          onSubmit={(input) => {
-            onAddGeneral(input);
-            setGeneralOpen(false);
-          }}
+          onClose={() => setOpen(false)}
         />
       )}
     </>
