@@ -433,12 +433,14 @@ function seed(): Brand[] {
       name: "Laura Mercier",
       logoUrl: logoLaura,
       brandKnowledge: [mockPdf("Laura Mercier Heritage Deck.pdf", 540)],
+      modules: [],
       categories: [
         {
           id: "cat-laura-powder",
           brandId: "brand-laura",
           name: "Powder",
           categoryKnowledge: [mockPdf("Translucent Powder Iconic Guide.pdf", 460)],
+          modules: [],
           skus: [
             {
               id: "sku-laura-translucent",
