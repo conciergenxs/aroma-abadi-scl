@@ -250,14 +250,117 @@ function seed(): Brand[] {
         mockPdf("D&G Beauty Brand Manifesto.pdf", 620),
         mockPdf("D&G Tone of Voice Guideline.pdf", 410),
       ],
-      modules: [],
+      modules: [
+        {
+          id: "mod-dg-b-1",
+          name: "D&G House Codes & Heritage",
+          coverUrl: kc1,
+          description:
+            "The brand's visual language, Sicilian motifs, and storytelling pillars for BA scripting.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-dg-b-1-1",
+              coverUrl: kc3,
+              title: "Sicilian Motifs",
+              text: "Lemon, lace, and majolica tile patterns recur across packaging and counter displays — reference them when describing the brand story.",
+            },
+          ],
+        },
+        {
+          id: "mod-dg-b-2",
+          name: "Counter Display Standards",
+          coverUrl: kc2,
+          description: "Merchandising layout, lighting, and tester placement for D&G counters.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-dg-b-2-1",
+              coverUrl: kc4,
+              title: "Tester Rotation",
+              text: "Replace testers every 4 weeks or sooner if visibly used; keep them capped between demonstrations.",
+            },
+          ],
+        },
+        {
+          id: "mod-dg-b-3",
+          name: "Seasonal Campaign Playbook",
+          coverUrl: kc3,
+          description: "Key visuals, talking points, and promotional windows for the current campaign.",
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-dg-b-4",
+          name: "VIP Gifting Protocol",
+          coverUrl: kc4,
+          description:
+            "Eligibility, gift-with-purchase tiers, and packaging standards for top-spend customers.",
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-dg-b-5",
+          name: "Ambassador Program Brief",
+          coverUrl: kc1,
+          description:
+            "How the loyalty ambassador tier works and what BAs should highlight to customers.",
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-dg-b-6",
+          name: "Sustainable Packaging Initiative",
+          coverUrl: kc2,
+          description: "Refillable packaging options and the brand's sustainability commitments.",
+          knowledgeCards: [],
+        },
+      ],
       categories: [
         {
           id: "cat-dg-lip",
           brandId: "brand-dg",
           name: "Lip",
           categoryKnowledge: [mockPdf("Lip Category Playbook.pdf", 340)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-dg-lip-1",
+              name: "Lip Shade-Matching Guide",
+              coverUrl: kc3,
+              description: "How to match undertones and pick the right shade family for each customer.",
+              knowledgeCards: [
+                {
+                  id: "kc-mod-dg-lip-1-1",
+                  coverUrl: kc1,
+                  title: "Undertone Test",
+                  text: "Compare the bullet against the inner wrist — warm undertones lean coral-red, cool undertones lean berry-pink.",
+                },
+              ],
+            },
+            {
+              id: "mod-dg-lip-2",
+              name: "Application Technique Cheat Sheet",
+              coverUrl: kc2,
+              description: "Step-by-step application for a precise, long-wearing lip line.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-dg-lip-3",
+              name: "Caviar Complex Ingredient Spotlight",
+              coverUrl: kc4,
+              description: "What the caviar essence formula does and how to explain it simply.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-dg-lip-4",
+              name: "Longevity & Wear Claims",
+              coverUrl: kc1,
+              description: "Tested wear times and how they compare across the lip range.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-dg-lip-5",
+              name: "Holiday Lip Gift Set Guide",
+              coverUrl: kc3,
+              description: "Seasonal bundling suggestions and gift-set contents.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-dg-caviar-42",
