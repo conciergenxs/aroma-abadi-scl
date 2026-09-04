@@ -631,7 +631,22 @@ function seed(): Brand[] {
           brandId: "brand-rimmel",
           name: "Setting Spray",
           categoryKnowledge: [mockPdf("Setting Spray Knowledge.pdf", 190)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-rim-spr-1",
+              name: "Setting Spray Application Technique",
+              coverUrl: kc2,
+              description: "Distance, number of spritzes, and drying time for best results.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-rim-spr-2",
+              name: "Humidity & Climate Performance Notes",
+              coverUrl: kc3,
+              description: "How the formula performs in Jakarta's humidity versus air-conditioned malls.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-rimmel-spray",
