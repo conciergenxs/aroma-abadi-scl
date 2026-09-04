@@ -680,7 +680,7 @@ export const skuStore = {
     };
     emit();
   },
-  addModule(
+  addSku(
     brandId: string,
     categoryId: string,
     input: Omit<SKU, "id" | "categoryId" | "knowledgeCards">,
