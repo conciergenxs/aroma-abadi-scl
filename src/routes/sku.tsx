@@ -8,6 +8,7 @@ import {
   type Brand,
   type Category,
   type SKU,
+  type Module,
   type KnowledgeCard,
   type OdooProduct,
 } from "@/components/scl/sku-store";
