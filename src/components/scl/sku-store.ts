@@ -364,12 +364,14 @@ function seed(): Brand[] {
         mockPdf("Rimmel London Brand Story.pdf", 380),
         mockPdf("Rimmel Product Catalog 2026.pdf", 1200),
       ],
+      modules: [],
       categories: [
         {
           id: "cat-rimmel-powder",
           brandId: "brand-rimmel",
           name: "Powder",
           categoryKnowledge: [mockPdf("Setting Powder Best Practice.pdf", 220)],
+          modules: [],
           skus: [
             {
               id: "sku-rimmel-translucent-powder",
