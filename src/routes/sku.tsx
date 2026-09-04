@@ -801,37 +801,23 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            {sku.kind === "sku" ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                <Package className="h-2.5 w-2.5" /> SKU
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-600">
-                <BookOpen className="h-2.5 w-2.5" /> General Knowledge
-              </span>
-            )}
             <div className="text-sm font-medium">{sku.name}</div>
-            {sku.kind === "sku" && (
-              <span className="text-xs text-muted-foreground">{sku.code}</span>
-            )}
+            <span className="text-xs text-muted-foreground">{sku.code}</span>
           </div>
           <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{sku.description}</div>
           <div className="mt-2 flex items-center gap-3 text-sm">
-            {sku.kind === "sku" && <span className="font-semibold">{formatIDR(sku.price!)}</span>}
+            <span className="font-semibold">{formatIDR(sku.price)}</span>
             <span className="text-muted-foreground">
               {sku.knowledgeCards.length} knowledge card
+              {sku.knowledgeCards.length === 1 ? "" : "s"}
             </span>
           </div>
         </div>
         <SkuMenu
-          onDetails={
-            sku.kind === "sku"
-              ? () => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } })
-              : undefined
-          }
+          onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } })}
           onDelete={() => {
             skuStore.removeSku(brand.id, category.id, sku.id);
-            toast.success(sku.kind === "sku" ? "SKU deleted" : "Module deleted");
+            toast.success("SKU deleted");
           }}
         />
       </div>
