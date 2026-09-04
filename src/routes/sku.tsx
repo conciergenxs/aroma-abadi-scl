@@ -749,24 +749,44 @@ function CategoryDetail({
         </div>
       </SectionCard>
 
-      {/* 30% / 70% layout */}
+      {/* 50% / 50% layout */}
       <div className="flex gap-4 min-h-0">
-        {/* LEFT 30% — Category Knowledge */}
-        <div className="w-[30%] shrink-0">
-          <SectionCard title="Category Knowledge" description="Playbook & category guidelines.">
-            <div className="p-4">
-              <MultiFileUploader
-                files={category.categoryKnowledge}
-                onAdd={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
-                onRemove={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
-                label="Upload Category Knowledge"
-              />
-            </div>
-          </SectionCard>
+        {/* LEFT 50% — Category Knowledge / Category Modules toggle */}
+        <div className="w-1/2 min-w-0">
+          <KnowledgeModuleCard
+            level="category"
+            knowledgeFiles={category.categoryKnowledge}
+            onAddKnowledge={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
+            onRemoveKnowledge={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
+            modules={category.modules}
+            onAddModule={(input) => {
+              skuStore.addCategoryModule(brand.id, category.id, input);
+              toast.success("Module added");
+            }}
+            onRemoveModule={(moduleId) => {
+              skuStore.removeCategoryModule(brand.id, category.id, moduleId);
+              toast.success("Module deleted");
+            }}
+            onAddCard={(moduleId, card) =>
+              skuStore.addCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, card)
+            }
+            onUpdateCard={(moduleId, cardId, patch) =>
+              skuStore.updateCategoryModuleKnowledgeCard(
+                brand.id,
+                category.id,
+                moduleId,
+                cardId,
+                patch,
+              )
+            }
+            onRemoveCard={(moduleId, cardId) =>
+              skuStore.removeCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId)
+            }
+          />
         </div>
 
-        {/* RIGHT 70% — SKUs synced from Odoo */}
-        <div className="flex-1 min-w-0">
+        {/* RIGHT 50% — SKUs synced from Odoo */}
+        <div className="w-1/2 min-w-0">
           <SectionCard
             title="SKUs"
             description="Products synced from Odoo."
@@ -781,42 +801,81 @@ function CategoryDetail({
           </SectionCard>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <SectionCard
-        title="Category Modules"
-        description="Reference modules — care guides, ingredient FAQs — specific to this category."
-        action={
-          <AddModuleButton
-            onSubmit={(input) => {
-              skuStore.addCategoryModule(brand.id, category.id, input);
-              toast.success("Module added");
-            }}
-          />
-        }
-      >
-        <ModuleList
-          modules={category.modules}
-          onRemove={(moduleId) => {
-            skuStore.removeCategoryModule(brand.id, category.id, moduleId);
-            toast.success("Module deleted");
-          }}
-          onAddCard={(moduleId, card) =>
-            skuStore.addCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, card)
-          }
-          onUpdateCard={(moduleId, cardId, patch) =>
-            skuStore.updateCategoryModuleKnowledgeCard(
-              brand.id,
-              category.id,
-              moduleId,
-              cardId,
-              patch,
-            )
-          }
-          onRemoveCard={(moduleId, cardId) =>
-            skuStore.removeCategoryModuleKnowledgeCard(brand.id, category.id, moduleId, cardId)
-          }
+/* Shared "Search…" bar above both the SKU list and the Module list. */
+function ListSearchBar({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="p-3 border-b border-border">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full h-9 rounded-md border border-border bg-card/60 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
         />
-      </SectionCard>
+      </div>
+    </div>
+  );
+}
+
+/* Shared 3-column pagination footer — "Showing: XX data" (left) ·
+ * "X-X data" (center) · Prev/Next icon buttons (right) — used by both the
+ * SKU list and the Module list. */
+function ListPaginationFooter({
+  totalCount,
+  fromIdx,
+  toIdx,
+  currentPage,
+  totalPages,
+  onPrev,
+  onNext,
+}: {
+  totalCount: number;
+  fromIdx: number;
+  toIdx: number;
+  currentPage: number;
+  totalPages: number;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  return (
+    <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
+      <span>Showing: {totalCount} data</span>
+      <span className="text-center">{totalCount === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data</span>
+      <div className="flex items-center justify-end gap-1.5">
+        {totalPages > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={onPrev}
+              disabled={currentPage <= 1}
+              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={currentPage >= totalPages}
+              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -824,60 +883,54 @@ function CategoryDetail({
 const SKU_PAGE_SIZE = 5;
 
 function SkuList({ brand, category }: { brand: Brand; category: Category }) {
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
-  // Reset to page 1 whenever the category changes, so pagination never
-  // lands on a page that no longer exists for the new result set.
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return category.skus;
+    return category.skus.filter(
+      (s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q),
+    );
+  }, [category.skus, query]);
+
+  // Reset to page 1 whenever the category or search query changes, so
+  // pagination never lands on a page that no longer exists for the new
+  // result set.
   useEffect(() => {
     setPage(1);
-  }, [category.id]);
+  }, [category.id, query]);
 
-  const totalPages = Math.max(1, Math.ceil(category.skus.length / SKU_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / SKU_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const fromIdx = category.skus.length === 0 ? 0 : (safePage - 1) * SKU_PAGE_SIZE + 1;
-  const toIdx = Math.min(safePage * SKU_PAGE_SIZE, category.skus.length);
-  const paged = category.skus.slice((safePage - 1) * SKU_PAGE_SIZE, safePage * SKU_PAGE_SIZE);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * SKU_PAGE_SIZE + 1;
+  const toIdx = Math.min(safePage * SKU_PAGE_SIZE, filtered.length);
+  const paged = filtered.slice((safePage - 1) * SKU_PAGE_SIZE, safePage * SKU_PAGE_SIZE);
 
   return (
     <>
+      <ListSearchBar value={query} onChange={setQuery} placeholder="Search SKUs…" />
       <ul className="divide-y divide-border">
         {paged.map((s) => (
           <SkuRow key={s.id} brand={brand} category={category} sku={s} />
         ))}
-        {category.skus.length === 0 && (
+        {filtered.length === 0 && (
           <li className="p-6 text-center text-sm text-muted-foreground">
-            No SKUs yet. Use the button above to add one from Odoo.
+            {category.skus.length === 0
+              ? "No SKUs yet. Use the button above to add one from Odoo."
+              : "No SKUs match your search."}
           </li>
         )}
       </ul>
-      <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
-        <span>Showing: {category.skus.length} data</span>
-        <span className="text-center">
-          {category.skus.length === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data
-        </span>
-        <div className="flex items-center justify-end gap-1.5">
-          {totalPages > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={safePage <= 1}
-                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={safePage >= totalPages}
-                className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      <ListPaginationFooter
+        totalCount={filtered.length}
+        fromIdx={fromIdx}
+        toIdx={toIdx}
+        currentPage={safePage}
+        totalPages={totalPages}
+        onPrev={() => setPage((p) => Math.max(1, p - 1))}
+        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+      />
     </>
   );
 }
