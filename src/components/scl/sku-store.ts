@@ -228,7 +228,7 @@ export function availableOdooProducts(importedCodes: string[]): OdooProduct[] {
   return ODOO_CATALOG.filter((p) => !importedCodes.includes(p.code));
 }
 
-const STORAGE_KEY = "aroma_sku_store_v4";
+const STORAGE_KEY = "aroma_sku_store_v5";
 
 function mockPdf(name: string, kb = 480): Attachment {
   return {
