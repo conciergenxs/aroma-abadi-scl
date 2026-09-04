@@ -612,6 +612,7 @@ export const skuStore = {
       name,
       imageUrl,
       categoryKnowledge: [],
+      modules: [],
       skus: [],
     };
     state = {
