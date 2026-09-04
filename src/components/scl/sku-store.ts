@@ -754,14 +754,51 @@ function seed(): Brand[] {
       name: "BareMinerals",
       logoUrl: logoBM,
       brandKnowledge: [mockPdf("BareMinerals Clean Beauty Pledge.pdf", 320)],
-      modules: [],
+      modules: [
+        {
+          id: "mod-bm-b-1",
+          name: "Clean Beauty Pledge Overview",
+          coverUrl: kc4,
+          description: "What 'clean' means for BareMinerals and which ingredients are excluded.",
+          knowledgeCards: [
+            {
+              id: "kc-mod-bm-b-1-1",
+              coverUrl: kc1,
+              title: "Excluded Ingredients",
+              text: "No parabens, talc, or synthetic fragrance across the mineral makeup range.",
+            },
+          ],
+        },
+        {
+          id: "mod-bm-b-2",
+          name: "Mineral Formula Ingredient Guide",
+          coverUrl: kc2,
+          description: "The core minerals used and their benefits for sensitive skin.",
+          knowledgeCards: [],
+        },
+      ],
       categories: [
         {
           id: "cat-bm-blush",
           brandId: "brand-bm",
           name: "Blush",
           categoryKnowledge: [mockPdf("Blush Application Guide.pdf", 260)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-bm-bl-1",
+              name: "Blush Placement Guide by Face Shape",
+              coverUrl: kc3,
+              description: "Where to apply for round, oval, square, and heart face shapes.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-bm-bl-2",
+              name: "Buildable Color Payoff Technique",
+              coverUrl: kc4,
+              description: "Layering technique for sheer-to-full color without patchiness.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-bm-color-infusion",
