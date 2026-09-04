@@ -493,7 +493,22 @@ function seed(): Brand[] {
           brandId: "brand-sisley",
           name: "Powder",
           categoryKnowledge: [mockPdf("Powder Finish 101.pdf", 280)],
-          modules: [],
+          modules: [
+            {
+              id: "mod-sis-pwd-1",
+              name: "Setting Powder Application Guide",
+              coverUrl: kc4,
+              description: "Puff vs. brush application and how each affects finish.",
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-sis-pwd-2",
+              name: "Blurring Technology Explainer",
+              coverUrl: kc2,
+              description: "How the soft-focus particles work and how to describe the effect to customers.",
+              knowledgeCards: [],
+            },
+          ],
           skus: [
             {
               id: "sku-sisley-feather",
