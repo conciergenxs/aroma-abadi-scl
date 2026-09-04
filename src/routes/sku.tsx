@@ -322,7 +322,7 @@ function KnowledgeModuleCard({
       title={mode === "knowledge" ? copy.knowledgeTitle : copy.moduleTitle}
       description={mode === "knowledge" ? copy.knowledgeDescription : copy.moduleDescription}
       action={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-end gap-1.5">
           <div className="inline-flex items-center rounded-full border border-border bg-card/40 p-0.5">
             <button
               type="button"
