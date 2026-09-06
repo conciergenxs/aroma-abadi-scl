@@ -940,6 +940,19 @@ export const skuStore = {
     emit();
     return mod;
   },
+  updateBrandModule(brandId: string, moduleId: string, patch: Partial<Module>) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              modules: b.modules.map((m) => (m.id === moduleId ? { ...m, ...patch } : m)),
+            },
+      ),
+    };
+    emit();
+  },
   removeBrandModule(brandId: string, moduleId: string) {
     state = {
       brands: state.brands.map((b) =>
