@@ -47,7 +47,6 @@ export type SKU = {
 // at (Brand, Category); each level owns its own list.
 export type Module = {
   id: string;
-  tags: string[];
   name: string;
   coverUrl?: string;
   description: string;
