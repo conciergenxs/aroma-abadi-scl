@@ -24,6 +24,7 @@ import {
   BookOpen,
   X,
   ImageIcon,
+  Pencil,
   FolderOpen,
   Home,
   MoreHorizontal,
@@ -298,6 +299,7 @@ function KnowledgeModuleCard({
   onRemoveKnowledge,
   modules,
   onAddModule,
+  onUpdateModule,
   onRemoveModule,
   onAddCard,
   onUpdateCard,
@@ -309,6 +311,10 @@ function KnowledgeModuleCard({
   onRemoveKnowledge: (id: string) => void;
   modules: Module[];
   onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onUpdateModule: (
+    moduleId: string,
+    patch: { name: string; description: string; coverUrl?: string },
+  ) => void;
   onRemoveModule: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -361,6 +367,7 @@ function KnowledgeModuleCard({
         <ModuleList
           modules={modules}
           onAddModule={onAddModule}
+          onUpdateModule={onUpdateModule}
           onRemove={onRemoveModule}
           onAddCard={onAddCard}
           onUpdateCard={onUpdateCard}
@@ -459,6 +466,10 @@ function BrandDetail({
           onAddModule={(input) => {
             skuStore.addBrandModule(brand.id, input);
             toast.success("Module added");
+          }}
+          onUpdateModule={(moduleId, patch) => {
+            skuStore.updateBrandModule(brand.id, moduleId, patch);
+            toast.success("Module updated");
           }}
           onRemoveModule={(moduleId) => {
             skuStore.removeBrandModule(brand.id, moduleId);
@@ -759,6 +770,10 @@ function CategoryDetail({
               skuStore.addCategoryModule(brand.id, category.id, input);
               toast.success("Module added");
             }}
+            onUpdateModule={(moduleId, patch) => {
+              skuStore.updateCategoryModule(brand.id, category.id, moduleId, patch);
+              toast.success("Module updated");
+            }}
             onRemoveModule={(moduleId) => {
               skuStore.removeCategoryModule(brand.id, category.id, moduleId);
               toast.success("Module deleted");
@@ -938,6 +953,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
+  const [editingPhoto, setEditingPhoto] = useState(false);
 
   return (
     <li className="p-4">
@@ -963,12 +979,24 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
             </span>
           </div>
         </div>
-        <SkuMenu
-          onDetails={() => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } })}
-          onDelete={() => {
-            skuStore.removeSku(brand.id, category.id, sku.id);
-            toast.success("SKU deleted");
-          }}
+        <RowActionMenu
+          actions={[
+            {
+              label: "See Details",
+              icon: ExternalLink,
+              onClick: () => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } }),
+            },
+            { label: "Edit Photo", icon: ImageIcon, onClick: () => setEditingPhoto(true) },
+            {
+              label: "Delete",
+              icon: Trash2,
+              danger: true,
+              onClick: () => {
+                skuStore.removeSku(brand.id, category.id, sku.id);
+                toast.success("SKU deleted");
+              },
+            },
+          ]}
         />
       </div>
 
@@ -1025,12 +1053,32 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           }}
         />
       )}
+
+      {editingPhoto && (
+        <SkuPhotoModal
+          sku={sku}
+          onClose={() => setEditingPhoto(false)}
+          onSubmit={(photoUrl) => {
+            skuStore.updateSku(brand.id, category.id, sku.id, { photoUrl });
+            toast.success("SKU photo updated");
+            setEditingPhoto(false);
+          }}
+        />
+      )}
     </li>
   );
 }
 
-/* 3-dot action menu for each SKU row */
-function SkuMenu({ onDetails, onDelete }: { onDetails?: () => void; onDelete: () => void }) {
+type RowAction = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+  /** Renders in red and gets a separator above it — for destructive actions. */
+  danger?: boolean;
+};
+
+/* 3-dot action menu shared by SKU rows and Module rows. */
+function RowActionMenu({ actions }: { actions: RowAction[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -1053,33 +1101,114 @@ function SkuMenu({ onDetails, onDelete }: { onDetails?: () => void; onDelete: ()
         <MoreHorizontal className="h-4 w-4" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-30 w-40 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
-          {onDetails && (
-            <>
+        <div className="absolute right-0 top-full mt-1 z-30 w-44 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
+          {actions.map((action, i) => (
+            <div key={action.label}>
+              {i > 0 && action.danger && <div className="my-1 border-t border-border" />}
               <button
                 onClick={() => {
-                  onDetails();
+                  action.onClick();
                   setOpen(false);
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-gray-50 transition-colors text-foreground"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left transition-colors ${
+                  action.danger
+                    ? "hover:bg-rose-50 text-rose-600"
+                    : "hover:bg-gray-50 text-foreground"
+                }`}
               >
-                <ExternalLink className="h-3.5 w-3.5 text-primary" /> See Details
+                <action.icon className={`h-3.5 w-3.5 ${action.danger ? "" : "text-primary"}`} />
+                {action.label}
               </button>
-              <div className="my-1 border-t border-border" />
-            </>
-          )}
-          <button
-            onClick={() => {
-              onDelete();
-              setOpen(false);
-            }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-rose-50 transition-colors text-rose-600"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </button>
+            </div>
+          ))}
         </div>
       )}
     </div>
+  );
+}
+
+/* Only the photo is editable — name, code, price and description are synced
+ * from Odoo and read-only here. */
+function SkuPhotoModal({
+  sku,
+  onClose,
+  onSubmit,
+}: {
+  sku: SKU;
+  onClose: () => void;
+  onSubmit: (photoUrl: string) => void;
+}) {
+  const [photoUrl, setPhotoUrl] = useState(sku.photoUrl || "");
+  const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
+
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
+      <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <div className="text-sm font-semibold">Edit SKU Photo</div>
+          <button type="button" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
+            <span className="shrink-0 mt-0.5">ℹ️</span>
+            <span>
+              Only the photo can be changed — name, code, price and description are synced from
+              Odoo.
+            </span>
+          </div>
+          <div className="text-sm font-medium">{sku.name}</div>
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Product Photo</div>
+            <div className="flex items-center gap-3">
+              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-5 w-5 text-primary/40" />
+                )}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={openPicker}
+                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+              >
+                {photoUrl ? "Replace Photo" : "Upload Photo"}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 border-t border-border flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!photoUrl) return toast.error("Upload a product photo to continue.");
+              onSubmit(photoUrl);
+            }}
+            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -1268,16 +1397,20 @@ function AddModuleButton({
   );
 }
 
+/* Shared by "Add Module" and the row menu's "Edit" — pass `initial` to
+ * pre-fill it and it switches to edit copy. */
 function ModuleFormModal({
+  initial,
   onClose,
   onSubmit,
 }: {
+  initial?: Module | null;
   onClose: () => void;
   onSubmit: (input: { name: string; description: string; coverUrl?: string }) => void;
 }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [coverUrl, setCoverUrl] = useState("");
+  const [name, setName] = useState(initial?.name || "");
+  const [description, setDescription] = useState(initial?.description || "");
+  const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
 
   function submit() {
@@ -1297,7 +1430,7 @@ function ModuleFormModal({
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">Add Module</div>
+          <div className="text-sm font-semibold">{initial ? "Edit Module" : "Add Module"}</div>
           <button type="button" onClick={onClose}>
             <X className="h-4 w-4" />
           </button>
@@ -1364,7 +1497,7 @@ function ModuleFormModal({
             onClick={submit}
             className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
-            Add Module
+            {initial ? "Save Changes" : "Add Module"}
           </button>
         </div>
       </div>
@@ -1381,6 +1514,7 @@ const MODULE_PAGE_SIZE = 4;
 function ModuleList({
   modules,
   onAddModule,
+  onUpdateModule,
   onRemove,
   onAddCard,
   onUpdateCard,
@@ -1388,6 +1522,10 @@ function ModuleList({
 }: {
   modules: Module[];
   onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onUpdateModule: (
+    moduleId: string,
+    patch: { name: string; description: string; coverUrl?: string },
+  ) => void;
   onRemove: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -1427,6 +1565,7 @@ function ModuleList({
           <ModuleRow
             key={m.id}
             module={m}
+            onEdit={(patch) => onUpdateModule(m.id, patch)}
             onRemove={() => onRemove(m.id)}
             onAddCard={(card) => onAddCard(m.id, card)}
             onUpdateCard={(cardId, patch) => onUpdateCard(m.id, cardId, patch)}
@@ -1454,12 +1593,14 @@ function ModuleList({
 
 function ModuleRow({
   module,
+  onEdit,
   onRemove,
   onAddCard,
   onUpdateCard,
   onRemoveCard,
 }: {
   module: Module;
+  onEdit: (patch: { name: string; description: string; coverUrl?: string }) => void;
   onRemove: () => void;
   onAddCard: (card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -1467,6 +1608,7 @@ function ModuleRow({
 }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
+  const [editingModule, setEditingModule] = useState(false);
 
   return (
     <li className="p-4">
@@ -1488,19 +1630,13 @@ function ModuleRow({
           <div className="text-sm text-muted-foreground mt-1 line-clamp-2">
             {module.description}
           </div>
-          <div className="mt-2 text-sm text-muted-foreground">
-            {module.knowledgeCards.length} knowledge card
-            {module.knowledgeCards.length === 1 ? "" : "s"}
-          </div>
         </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          title="Delete module"
-          className="h-8 w-8 grid place-items-center rounded border border-border hover:bg-rose-50 text-muted-foreground hover:text-rose-600 transition-colors shrink-0"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <RowActionMenu
+          actions={[
+            { label: "Edit", icon: Pencil, onClick: () => setEditingModule(true) },
+            { label: "Delete", icon: Trash2, danger: true, onClick: onRemove },
+          ]}
+        />
       </div>
 
       <Accordion type="single" collapsible className="mt-3">
@@ -1550,6 +1686,17 @@ function ModuleRow({
             toast.success(editing ? "Card updated" : "Card added");
             setShowForm(false);
             setEditing(null);
+          }}
+        />
+      )}
+
+      {editingModule && (
+        <ModuleFormModal
+          initial={module}
+          onClose={() => setEditingModule(false)}
+          onSubmit={(patch) => {
+            onEdit(patch);
+            setEditingModule(false);
           }}
         />
       )}

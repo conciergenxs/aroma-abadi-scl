@@ -1118,6 +1118,31 @@ export const skuStore = {
     emit();
     return mod;
   },
+  updateCategoryModule(
+    brandId: string,
+    categoryId: string,
+    moduleId: string,
+    patch: Partial<Module>,
+  ) {
+    state = {
+      brands: state.brands.map((b) =>
+        b.id !== brandId
+          ? b
+          : {
+              ...b,
+              categories: b.categories.map((c) =>
+                c.id !== categoryId
+                  ? c
+                  : {
+                      ...c,
+                      modules: c.modules.map((m) => (m.id === moduleId ? { ...m, ...patch } : m)),
+                    },
+              ),
+            },
+      ),
+    };
+    emit();
+  },
   removeCategoryModule(brandId: string, categoryId: string, moduleId: string) {
     state = {
       brands: state.brands.map((b) =>
