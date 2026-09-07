@@ -27,6 +27,7 @@ export type KnowledgeCard = {
   id: string;
   coverUrl?: string;
   title: string;
+  subtitle?: string;
   text: string;
 };
 
