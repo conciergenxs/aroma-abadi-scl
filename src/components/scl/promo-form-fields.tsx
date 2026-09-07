@@ -161,7 +161,7 @@ export function PromoFormFields({
       </div>
 
       {/* Audience Segment + Max Usage */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Audience Segment</label>
           <AudienceSegmentPicker
@@ -214,7 +214,7 @@ export function PromoFormFields({
       </div>
 
       {/* Start / End Date+Time */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Start Date &amp; Time</label>
           <input

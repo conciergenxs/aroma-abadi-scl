@@ -166,7 +166,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 min-h-0 grid grid-cols-[1fr_320px]">
+        <div className="flex-1 min-h-0 grid grid-cols-[1fr_320px] animate-fade-in">
           {/* List */}
           <div className="overflow-y-auto border-r border-border/60">
             {orderedFiltered.length === 0 ? (

@@ -20,6 +20,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Package,
   BookOpen,
   X,
@@ -419,11 +420,11 @@ function BrandDetail({
 
       <SectionCard>
         <div className="p-3 flex items-center gap-3">
-          <div className="relative h-14 w-14 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {brand.logoUrl ? (
-              <img src={brand.logoUrl} alt="" className="max-h-11 max-w-[85%] object-contain" />
+              <img src={brand.logoUrl} alt="" className="max-h-16 max-w-[85%] object-contain" />
             ) : (
-              <Package className="h-5 w-5 text-primary" />
+              <Package className="h-7 w-7 text-primary" />
             )}
             <input
               ref={logoFileRef}
@@ -731,11 +732,11 @@ function CategoryDetail({
 
       <SectionCard>
         <div className="p-3 flex items-center gap-3">
-          <div className="relative h-14 w-14 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {category.imageUrl ? (
               <img src={category.imageUrl} alt="" className="h-full w-full object-cover" />
             ) : (
-              <FolderOpen className="h-5 w-5 text-primary" />
+              <FolderOpen className="h-7 w-7 text-primary" />
             )}
             <input
               ref={imageFileRef}
@@ -877,17 +878,22 @@ function ListPaginationFooter({
     <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
       <label className="inline-flex items-center gap-1.5">
         Showing:
-        <select
-          value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="h-7 rounded border border-border bg-card/60 px-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-        >
-          {PAGE_SIZE_OPTIONS.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <span className="relative inline-flex items-center">
+          {/* appearance-none + our own chevron, so the gap either side of it is
+           * ours to set rather than the browser's. */}
+          <select
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="h-7 appearance-none rounded border border-border bg-card/60 pl-2 pr-6 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 h-3 w-3 text-muted-foreground" />
+        </span>
         data
       </label>
       <span className="text-center">{totalCount === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data</span>
@@ -1906,13 +1912,13 @@ function KnowledgeCardForm({
                   <img
                     src={coverUrl}
                     alt=""
-                    className="w-24 aspect-video object-cover rounded-md border border-border shrink-0"
+                    className="w-32 aspect-video object-cover rounded-md border border-border shrink-0"
                   />
                 )}
                 <div className="min-w-0">
                   {/* Before a pick: a labelled CTA. After: the label is redundant
                    * next to the preview, so both actions collapse to icons. */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
                     {coverUrl ? (
                       <>
                         <button
@@ -1974,15 +1980,17 @@ function KnowledgeCardForm({
 
           <div className="w-px bg-border shrink-0" />
 
-          <div className="flex-1 min-w-0 p-4">
-            <label className="block">
+          {/* The row is items-stretch, so this column matches the left one's
+           * height; the textarea then flexes to fill it, landing its bottom
+           * edge level with the Subtitle field opposite. */}
+          <div className="flex-1 min-w-0 p-4 flex flex-col">
+            <label className="flex flex-1 min-h-0 flex-col">
               <span className="block text-xs text-muted-foreground mb-1">Content</span>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                rows={9}
                 placeholder="Knowledge content..."
-                className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
+                className="w-full flex-1 min-h-0 rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
               />
             </label>
           </div>

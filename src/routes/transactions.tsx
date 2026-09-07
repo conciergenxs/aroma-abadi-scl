@@ -131,7 +131,7 @@ function TransactionsPage() {
     <AppShell title="Transaction Records" subtitle="Sales transactions per store, BA, and brand">
       <div className="space-y-5">
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 stagger">
           <StatCard label="Today's Revenue" value={formatIDR(revenue)} icon={Wallet} />
           <StatCard label="Today's Transactions" value={fmtNum(todayTx.length)} icon={Receipt} />
           <StatCard label="Today's AOV" value={formatIDR(aov)} icon={TrendingUp} />
@@ -452,7 +452,7 @@ function StatCard({
   icon: typeof Receipt;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/60 glass p-4 flex items-start gap-3 hover:shadow-md transition-shadow">
+    <div className="rounded-xl border border-border bg-card/60 glass p-4 flex items-start gap-3 lift-sm">
       <div className="h-9 w-9 rounded-md bg-primary/10 grid place-items-center">
         <Icon className="h-4 w-4 text-primary" />
       </div>
