@@ -97,6 +97,7 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
  * behind a corner tooltip on the photo once the record exists. */
 const BRAND_PHOTO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
 const CATEGORY_PHOTO_HINT = "Recommended: 9:16 ratio (1080×1920px).";
+const SKU_PHOTO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
 
 /* Small "i" badge pinned to the top-right of an existing brand/category photo —
  * surfaces the recommended size at the moment you go to replace the image.
@@ -116,7 +117,7 @@ function PhotoRatioHint({ text }: { text: string }) {
             <Info className="h-2.5 w-2.5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[150px] text-center leading-snug">
+        <TooltipContent side="top" className="max-w-[180px] text-center leading-snug">
           {text}
         </TooltipContent>
       </Tooltip>
@@ -1232,13 +1233,16 @@ function SkuPhotoModal({
                 className="hidden"
                 onChange={handleChange}
               />
-              <button
-                type="button"
-                onClick={openPicker}
-                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
-              >
-                {photoUrl ? "Replace Photo" : "Upload Photo"}
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+                >
+                  {photoUrl ? "Replace Photo" : "Upload Photo"}
+                </button>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">{SKU_PHOTO_HINT}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -2190,13 +2194,16 @@ function SkuFormModal({
                 className="hidden"
                 onChange={handleChange}
               />
-              <button
-                type="button"
-                onClick={openPicker}
-                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
-              >
-                {photoUrl ? "Replace Photo" : "Upload Photo"}
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+                >
+                  {photoUrl ? "Replace Photo" : "Upload Photo"}
+                </button>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">{SKU_PHOTO_HINT}</p>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
