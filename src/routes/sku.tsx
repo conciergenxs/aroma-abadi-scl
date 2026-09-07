@@ -75,7 +75,19 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
     e.target.value = ""; // reset so picking the same file again still fires onChange
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => onPick(String(reader.result));
+    reader.onerror = () => toast.error("Could not read that file.");
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      // accept="image/*" lets the OS picker offer formats the browser cannot
+      // actually decode — HEIC from an iPhone being the common one — which
+      // would render as a broken preview. Decode it first and only commit
+      // the URL once we know it displays.
+      const probe = new window.Image();
+      probe.onload = () => onPick(dataUrl);
+      probe.onerror = () =>
+        toast.error("That image format can't be displayed. Try a JPG, PNG, or WebP.");
+      probe.src = dataUrl;
+    };
     reader.readAsDataURL(file);
   }
   return { fileRef, openPicker, handleChange };
@@ -104,7 +116,7 @@ function PhotoRatioHint({ text }: { text: string }) {
             <Info className="h-2.5 w-2.5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[220px] text-center leading-snug">
+        <TooltipContent side="top" className="max-w-[150px] text-center leading-snug">
           {text}
         </TooltipContent>
       </Tooltip>
@@ -1850,13 +1862,7 @@ function KnowledgeCardForm({
   const [subtitle, setSubtitle] = useState(initial?.subtitle || "");
   const [text, setText] = useState(initial?.text || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  function pickCover(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => setCoverUrl(String(reader.result));
-    reader.readAsDataURL(file);
-  }
+  const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
 
   // Portaled to <body> — this form can be opened from deep inside a
   // SectionCard/Accordion tree, and any ancestor's `backdrop-filter`
@@ -1900,10 +1906,7 @@ function KnowledgeCardForm({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) pickCover(f);
-                }}
+                onChange={handleChange}
               />
               {/* Once picked, the preview sits inline — to the left of the
                * buttons and the size note rather than stacked above them. */}
@@ -1923,7 +1926,7 @@ function KnowledgeCardForm({
                       <>
                         <button
                           type="button"
-                          onClick={() => fileRef.current?.click()}
+                          onClick={openPicker}
                           title="Replace image"
                           aria-label="Replace image"
                           className="h-8 w-8 grid place-items-center rounded-md border border-border hover:bg-gray-50 transition-colors duration-150"
@@ -1943,7 +1946,7 @@ function KnowledgeCardForm({
                     ) : (
                       <button
                         type="button"
-                        onClick={() => fileRef.current?.click()}
+                        onClick={openPicker}
                         className="rounded-md border border-border px-3 h-8 text-[13px]"
                       >
                         Choose Image
@@ -2025,13 +2028,7 @@ function BrandFormModal({
 }) {
   const [name, setName] = useState("");
   const [logoUrl, setLogoUrl] = useState<string>("");
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  function pickLogo(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => setLogoUrl(String(reader.result));
-    reader.readAsDataURL(file);
-  }
+  const { fileRef, openPicker, handleChange } = useImagePicker(setLogoUrl);
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
@@ -2067,16 +2064,13 @@ function BrandFormModal({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) pickLogo(f);
-                }}
+                onChange={handleChange}
               />
               <div>
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => fileRef.current?.click()}
+                    onClick={openPicker}
                     className="rounded-md border border-border px-2.5 h-8 text-[14px]"
                   >
                     Upload Logo
