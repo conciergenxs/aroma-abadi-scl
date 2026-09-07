@@ -850,6 +850,7 @@ function ListPaginationFooter({
 function SkuList({ brand, category }: { brand: Brand; category: Category }) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -866,11 +867,11 @@ function SkuList({ brand, category }: { brand: Brand; category: Category }) {
     setPage(1);
   }, [category.id, query]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / SKU_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * SKU_PAGE_SIZE + 1;
-  const toIdx = Math.min(safePage * SKU_PAGE_SIZE, filtered.length);
-  const paged = filtered.slice((safePage - 1) * SKU_PAGE_SIZE, safePage * SKU_PAGE_SIZE);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const toIdx = Math.min(safePage * pageSize, filtered.length);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <>
@@ -888,13 +889,18 @@ function SkuList({ brand, category }: { brand: Brand; category: Category }) {
         )}
       </ul>
       <ListPaginationFooter
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
         totalCount={filtered.length}
         fromIdx={fromIdx}
         toIdx={toIdx}
         currentPage={safePage}
         totalPages={totalPages}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+        onPrev={() => setPage(Math.max(1, safePage - 1))}
+        onNext={() => setPage(Math.min(totalPages, safePage + 1))}
       />
     </>
   );
@@ -1460,8 +1466,6 @@ function ModuleFormModal({
 /* List of Modules at a Brand or Category level — same row shape as SkuRow
  * (cover, name, description, Knowledge Cards accordion) minus code/price/
  * details-link, since a module isn't a purchasable product. */
-const MODULE_PAGE_SIZE = 4;
-
 function ModuleList({
   modules,
   onUpdateModule,
@@ -1482,6 +1486,7 @@ function ModuleList({
 }) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -1495,11 +1500,11 @@ function ModuleList({
     setPage(1);
   }, [query]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / MODULE_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * MODULE_PAGE_SIZE + 1;
-  const toIdx = Math.min(safePage * MODULE_PAGE_SIZE, filtered.length);
-  const paged = filtered.slice((safePage - 1) * MODULE_PAGE_SIZE, safePage * MODULE_PAGE_SIZE);
+  const fromIdx = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const toIdx = Math.min(safePage * pageSize, filtered.length);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <>
@@ -1523,13 +1528,18 @@ function ModuleList({
         )}
       </ul>
       <ListPaginationFooter
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
         totalCount={filtered.length}
         fromIdx={fromIdx}
         toIdx={toIdx}
         currentPage={safePage}
         totalPages={totalPages}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+        onPrev={() => setPage(Math.max(1, safePage - 1))}
+        onNext={() => setPage(Math.min(totalPages, safePage + 1))}
       />
     </>
   );
