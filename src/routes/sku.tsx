@@ -269,34 +269,21 @@ function BrandsOverview({
 
 /* ---------------- Level 2: Brand Detail ---------------- */
 
-type KnowledgeModuleMode = "knowledge" | "module";
-
-const KNOWLEDGE_MODULE_COPY = {
+const MODULE_CARD_COPY = {
   brand: {
-    knowledgeTitle: "Brand Knowledge",
-    knowledgeDescription: "Guidelines, manifesto & tone of voice.",
-    knowledgeLabel: "Upload Brand Knowledge",
-    moduleTitle: "Brand Modules",
-    moduleDescription: "Brand-level story, care guides & FAQs.",
+    title: "Brand Modules",
+    description: "Brand-level story, care guides & FAQs.",
   },
   category: {
-    knowledgeTitle: "Category Knowledge",
-    knowledgeDescription: "Playbook & category guidelines.",
-    knowledgeLabel: "Upload Category Knowledge",
-    moduleTitle: "Category Modules",
-    moduleDescription: "Category-level care guides & FAQs.",
+    title: "Category Modules",
+    description: "Category-level care guides & FAQs.",
   },
 } as const;
 
-/* Brand and Category both need a "Knowledge" (file attachments) view and a
- * "Module" (reference modules with their own Knowledge Cards) view. Rather
- * than two separate SectionCards competing for vertical space, they share
- * one card with a Knowledge/Module toggle in the header. */
-function KnowledgeModuleCard({
+/* Modules section for a Brand or a Category — the list owns its own search
+ * bar, "+ Add Module" trigger and pagination. */
+function ModulesCard({
   level,
-  knowledgeFiles,
-  onAddKnowledge,
-  onRemoveKnowledge,
   modules,
   onAddModule,
   onUpdateModule,
@@ -306,9 +293,6 @@ function KnowledgeModuleCard({
   onRemoveCard,
 }: {
   level: "brand" | "category";
-  knowledgeFiles: Attachment[];
-  onAddKnowledge: (atts: Attachment[]) => void;
-  onRemoveKnowledge: (id: string) => void;
   modules: Module[];
   onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
   onUpdateModule: (
@@ -320,60 +304,19 @@ function KnowledgeModuleCard({
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
   onRemoveCard: (moduleId: string, cardId: string) => void;
 }) {
-  const [mode, setMode] = useState<KnowledgeModuleMode>("knowledge");
-  const copy = KNOWLEDGE_MODULE_COPY[level];
+  const copy = MODULE_CARD_COPY[level];
 
   return (
-    <SectionCard
-      title={mode === "knowledge" ? copy.knowledgeTitle : copy.moduleTitle}
-      description={mode === "knowledge" ? copy.knowledgeDescription : copy.moduleDescription}
-      action={
-        <div className="inline-flex items-center rounded-full border border-border bg-card/40 p-0.5">
-          <button
-            type="button"
-            onClick={() => setMode("knowledge")}
-            className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
-              mode === "knowledge"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Knowledge
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("module")}
-            className={`px-3 h-7 rounded-full text-[12px] font-medium transition-colors duration-150 ${
-              mode === "module"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Module
-          </button>
-        </div>
-      }
-    >
-      {mode === "knowledge" ? (
-        <div className="p-4">
-          <MultiFileUploader
-            files={knowledgeFiles}
-            onAdd={onAddKnowledge}
-            onRemove={onRemoveKnowledge}
-            label={copy.knowledgeLabel}
-          />
-        </div>
-      ) : (
-        <ModuleList
-          modules={modules}
-          onAddModule={onAddModule}
-          onUpdateModule={onUpdateModule}
-          onRemove={onRemoveModule}
-          onAddCard={onAddCard}
-          onUpdateCard={onUpdateCard}
-          onRemoveCard={onRemoveCard}
-        />
-      )}
+    <SectionCard title={copy.title} description={copy.description}>
+      <ModuleList
+        modules={modules}
+        onAddModule={onAddModule}
+        onUpdateModule={onUpdateModule}
+        onRemove={onRemoveModule}
+        onAddCard={onAddCard}
+        onUpdateCard={onUpdateCard}
+        onRemoveCard={onRemoveCard}
+      />
     </SectionCard>
   );
 }
