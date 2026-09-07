@@ -301,7 +301,7 @@ function NewContactPage() {
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-2xl mx-auto">
-              <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+              <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 animate-fade-in">
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Full Name" required className="md:col-span-2">
@@ -416,7 +416,7 @@ function NewContactPage() {
 
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+            <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 animate-fade-in">
               <FormSection title="Basic Information">
                 <FormGrid>
                   <Field label="Full Name" required>
@@ -537,7 +537,7 @@ function FormSection({
 }
 
 function FormGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>;
+  return <div className="grid grid-cols-1 md:grid-cols-2 gap-4 stagger">{children}</div>;
 }
 
 function Field({

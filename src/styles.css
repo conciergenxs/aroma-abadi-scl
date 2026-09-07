@@ -611,3 +611,129 @@ tbody tr:hover td {
 .stat-value {
   animation: count-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Micro-interaction layer
+   Global polish that applies app-wide without touching component markup,
+   plus a few opt-in utilities to sprinkle where a page needs more life.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ---- Keyboard focus ring ----
+   Mouse users keep the clean look (:focus-visible only fires for keyboard),
+   while tab-navigation gets a clear, consistent target indicator. */
+
+:where(button, [role="button"], a, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---- List rows ----
+   The app's list idiom is `ul.divide-y > li`; give those rows the same
+   hover feedback table rows already get. */
+
+ul.divide-y > li {
+  transition:
+    background-color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+ul.divide-y > li:hover {
+  background-color: oklch(0.42 0.12 25 / 3.5%);
+}
+
+/* ---- Press feedback ---- */
+
+.card-hover:active {
+  transform: translateY(-1px) scale(0.995);
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ---- Subtle hover lift for compact cards / tiles ---- */
+
+.lift-sm {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.lift-sm:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.42 0.12 25 / 28%);
+  box-shadow: 0 6px 18px oklch(0 0 0 / 10%);
+}
+
+/* ---- Icon nudges ---- */
+
+.icon-nudge svg {
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.icon-nudge:hover svg {
+  transform: translateX(2px);
+}
+.icon-pop svg {
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.icon-pop:hover svg {
+  transform: scale(1.15);
+}
+
+/* ---- Images fade in once decoded, instead of popping ---- */
+
+.img-fade {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* ---- Toggle / checkbox / radio feedback ---- */
+
+input[type="checkbox"],
+input[type="radio"] {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+input[type="checkbox"]:active,
+input[type="radio"]:active {
+  transform: scale(0.9);
+}
+
+/* ---- Disabled states ease in rather than snap ---- */
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  transition: opacity 0.15s ease;
+}
+
+/* ---- Smooth in-page scrolling ---- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---- Accessibility: honour reduced-motion ----
+   Everything above (and every existing animation) collapses to a near-instant
+   state change for users who ask their OS to minimise motion. Kept last so it
+   overrides every rule in this file. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card-hover:hover,
+  .lift-sm:hover {
+    transform: none;
+  }
+  .icon-nudge:hover svg,
+  .icon-pop:hover svg {
+    transform: none;
+  }
+}

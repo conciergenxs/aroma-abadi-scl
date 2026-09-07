@@ -96,7 +96,7 @@ function WhatsAppDetail() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Hero card */}
-      <div className="rounded-xl border border-border bg-card/60 glass p-6 flex items-start gap-5">
+      <div className="rounded-xl border border-border bg-card/60 glass p-6 flex items-start gap-5 lift-sm">
         <ChannelIcon channel="whatsapp" className="h-14 w-14" />
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-semibold">WhatsApp Business API</h2>
@@ -407,7 +407,7 @@ function OptInTab() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-border bg-card/40 p-5">
+      <div className="rounded-xl border border-border bg-card/40 p-5 lift-sm">
         <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
           <span className="text-foreground font-medium">Message Opt-In</span> allows businesses to
           re-engage customers outside the 24-hour messaging window using approved WhatsApp

@@ -1910,21 +1910,37 @@ function KnowledgeCardForm({
                   />
                 )}
                 <div className="min-w-0">
+                  {/* Before a pick: a labelled CTA. After: the label is redundant
+                   * next to the preview, so both actions collapse to icons. */}
                   <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => fileRef.current?.click()}
-                      className="rounded-md border border-border px-3 h-8 text-[13px]"
-                    >
-                      Choose Image
-                    </button>
-                    {coverUrl && (
+                    {coverUrl ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => fileRef.current?.click()}
+                          title="Replace image"
+                          aria-label="Replace image"
+                          className="h-8 w-8 grid place-items-center rounded-md border border-border hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          <Camera className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCoverUrl("")}
+                          title="Remove cover"
+                          aria-label="Remove cover"
+                          className="h-8 w-8 grid place-items-center rounded-md border border-border text-rose-500 hover:bg-rose-50 transition-colors duration-150"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => setCoverUrl("")}
-                        className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
+                        onClick={() => fileRef.current?.click()}
+                        className="rounded-md border border-border px-3 h-8 text-[13px]"
                       >
-                        Remove Cover
+                        Choose Image
                       </button>
                     )}
                   </div>
@@ -1964,7 +1980,7 @@ function KnowledgeCardForm({
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                rows={8}
+                rows={9}
                 placeholder="Knowledge content..."
                 className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
               />

@@ -193,7 +193,7 @@ function CreateTemplatePage() {
         <h1 className="text-xl font-semibold tracking-tight">Create New Template</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start page-enter">
         {/* Left — form */}
         <div className="space-y-6">
           <FormCard
@@ -429,7 +429,7 @@ function CreateTemplatePage() {
 
         {/* Right — sticky preview */}
         <div className="lg:sticky lg:top-6">
-          <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
+          <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden animate-fade-in">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <ChannelIcon channel={channelKind} className="h-4 w-4" />

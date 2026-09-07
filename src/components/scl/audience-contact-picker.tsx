@@ -219,7 +219,7 @@ export function AudienceContactPicker({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 stagger">
         <div>
           <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
             Total Spend
@@ -275,7 +275,7 @@ export function AudienceContactPicker({
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_340px] gap-4">
+      <div className="grid grid-cols-[1fr_340px] gap-4 animate-fade-in">
         {/* LEFT: search + browse list */}
         <div className="rounded-lg border border-border overflow-hidden">
           <div className="p-3 border-b border-border bg-card/40">

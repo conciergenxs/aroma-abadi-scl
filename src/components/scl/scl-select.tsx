@@ -78,7 +78,11 @@ export function SclSelect({
             {selected?.label ?? placeholder}
           </span>
         </span>
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       <FloatingMenu
@@ -90,7 +94,7 @@ export function SclSelect({
         }}
         width={width}
       >
-        <div className="rounded-md border border-border bg-popover shadow-xl overflow-hidden">
+        <div className="rounded-md border border-border bg-popover shadow-xl overflow-hidden animate-scale-in origin-top">
           {searchable && (
             <div className="relative border-b border-border">
               <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
