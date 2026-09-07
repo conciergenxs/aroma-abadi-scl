@@ -95,9 +95,9 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
 
 /* Recommended source-image sizes, shown under the upload CTA when creating and
  * behind a corner tooltip on the photo once the record exists. */
-const BRAND_PHOTO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
-const CATEGORY_PHOTO_HINT = "Recommended: 9:16 ratio (1080×1920px).";
-const SKU_PHOTO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
+const BRAND_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
+const CATEGORY_PHOTO_HINT = "Recommended: 9:16 ratio\n(1080×1920px).";
+const SKU_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
 
 /* Small "i" badge pinned to the top-right of an existing brand/category photo —
  * surfaces the recommended size at the moment you go to replace the image.
@@ -117,7 +117,10 @@ function PhotoRatioHint({ text }: { text: string }) {
             <Info className="h-2.5 w-2.5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[180px] text-center leading-snug">
+        <TooltipContent
+          side="top"
+          className="max-w-[200px] whitespace-pre-line text-center leading-snug"
+        >
           {text}
         </TooltipContent>
       </Tooltip>
