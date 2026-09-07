@@ -11,9 +11,7 @@ import {
   type Module,
   type KnowledgeCard,
   type OdooProduct,
-  type Attachment,
 } from "@/components/scl/sku-store";
-import { MultiFileUploader } from "@/components/scl/multi-file-uploader";
 import { formatIDR } from "@/components/scl/transactions-store";
 import {
   Plus,
@@ -392,19 +390,15 @@ function BrandDetail({
             <div className="text-sm font-semibold">{brand.name}</div>
             <div className="text-xs text-muted-foreground">
               {brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"}{" "}
-              · {brand.brandKnowledge.length} brand knowledge{" "}
-              {brand.brandKnowledge.length === 1 ? "document" : "documents"}
+              · {brand.modules.length} {brand.modules.length === 1 ? "module" : "modules"}
             </div>
           </div>
         </div>
       </SectionCard>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <KnowledgeModuleCard
+        <ModulesCard
           level="brand"
-          knowledgeFiles={brand.brandKnowledge}
-          onAddKnowledge={(atts) => skuStore.addBrandKnowledge(brand.id, atts)}
-          onRemoveKnowledge={(id) => skuStore.removeBrandKnowledge(brand.id, id)}
           modules={brand.modules}
           onAddModule={(input) => {
             skuStore.addBrandModule(brand.id, input);
@@ -600,8 +594,8 @@ function CategoryRow({
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{category.name}</div>
           <div className="text-xs text-muted-foreground">
-            {category.skus.length} card{category.skus.length !== 1 ? "s" : ""} ·{" "}
-            {category.categoryKnowledge.length} category knowledge
+            {category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} ·{" "}
+            {category.modules.length} {category.modules.length === 1 ? "module" : "modules"}
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -692,8 +686,8 @@ function CategoryDetail({
           <div>
             <div className="text-sm font-semibold">{category.name}</div>
             <div className="text-xs text-muted-foreground">
-              {category.skus.length} card{category.skus.length !== 1 ? "s" : ""} ·{" "}
-              {category.categoryKnowledge.length} category knowledge
+              {category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} ·{" "}
+              {category.modules.length} {category.modules.length === 1 ? "module" : "modules"}
             </div>
           </div>
         </div>
@@ -701,13 +695,10 @@ function CategoryDetail({
 
       {/* 50% / 50% layout */}
       <div className="flex gap-4 min-h-0">
-        {/* LEFT 50% — Category Knowledge / Category Modules toggle */}
+        {/* LEFT 50% — Category Modules */}
         <div className="w-1/2 min-w-0">
-          <KnowledgeModuleCard
+          <ModulesCard
             level="category"
-            knowledgeFiles={category.categoryKnowledge}
-            onAddKnowledge={(atts) => skuStore.addCategoryKnowledge(brand.id, category.id, atts)}
-            onRemoveKnowledge={(id) => skuStore.removeCategoryKnowledge(brand.id, category.id, id)}
             modules={category.modules}
             onAddModule={(input) => {
               skuStore.addCategoryModule(brand.id, category.id, input);

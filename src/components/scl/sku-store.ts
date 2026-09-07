@@ -58,7 +58,6 @@ export type Category = {
   brandId: string;
   name: string;
   imageUrl?: string;
-  categoryKnowledge: Attachment[];
   modules: Module[];
   skus: SKU[];
 };
@@ -67,7 +66,6 @@ export type Brand = {
   id: string;
   logoUrl?: string;
   name: string;
-  brandKnowledge: Attachment[];
   modules: Module[];
   categories: Category[];
 };
@@ -230,26 +228,12 @@ export function availableOdooProducts(importedCodes: string[]): OdooProduct[] {
 
 const STORAGE_KEY = "aroma_sku_store_v5";
 
-function mockPdf(name: string, kb = 480): Attachment {
-  return {
-    id: `att-${name.replace(/\W+/g, "-").toLowerCase()}-${Math.random().toString(36).slice(2, 6)}`,
-    fileName: name,
-    fileType: "application/pdf",
-    size: kb * 1024,
-    url: "#",
-  };
-}
-
 function seed(): Brand[] {
   return [
     {
       id: "brand-dg",
       name: "Dolce & Gabbana",
       logoUrl: logoDG,
-      brandKnowledge: [
-        mockPdf("D&G Beauty Brand Manifesto.pdf", 620),
-        mockPdf("D&G Tone of Voice Guideline.pdf", 410),
-      ],
       modules: [
         {
           id: "mod-dg-b-1",
@@ -317,7 +301,6 @@ function seed(): Brand[] {
           id: "cat-dg-lip",
           brandId: "brand-dg",
           name: "Lip",
-          categoryKnowledge: [mockPdf("Lip Category Playbook.pdf", 340)],
           modules: [
             {
               id: "mod-dg-lip-1",
@@ -396,7 +379,6 @@ function seed(): Brand[] {
       id: "brand-sisley",
       name: "Sisley",
       logoUrl: logoSisley,
-      brandKnowledge: [mockPdf("Sisley Phyto-Cosmetology Overview.pdf", 720)],
       modules: [
         {
           id: "mod-sis-b-1",
@@ -433,7 +415,6 @@ function seed(): Brand[] {
           id: "cat-sisley-foundation",
           brandId: "brand-sisley",
           name: "Foundation",
-          categoryKnowledge: [mockPdf("Foundation Shade Matching Guide.pdf", 510)],
           modules: [
             {
               id: "mod-sis-fdn-1",
@@ -495,7 +476,6 @@ function seed(): Brand[] {
           id: "cat-sisley-powder",
           brandId: "brand-sisley",
           name: "Powder",
-          categoryKnowledge: [mockPdf("Powder Finish 101.pdf", 280)],
           modules: [
             {
               id: "mod-sis-pwd-1",
@@ -540,10 +520,6 @@ function seed(): Brand[] {
       id: "brand-rimmel",
       name: "Rimmel",
       logoUrl: logoRimmel,
-      brandKnowledge: [
-        mockPdf("Rimmel London Brand Story.pdf", 380),
-        mockPdf("Rimmel Product Catalog 2026.pdf", 1200),
-      ],
       modules: [
         {
           id: "mod-rim-b-1",
@@ -580,7 +556,6 @@ function seed(): Brand[] {
           id: "cat-rimmel-powder",
           brandId: "brand-rimmel",
           name: "Powder",
-          categoryKnowledge: [mockPdf("Setting Powder Best Practice.pdf", 220)],
           modules: [
             {
               id: "mod-rim-pwd-1",
@@ -636,7 +611,6 @@ function seed(): Brand[] {
           id: "cat-rimmel-spray",
           brandId: "brand-rimmel",
           name: "Setting Spray",
-          categoryKnowledge: [mockPdf("Setting Spray Knowledge.pdf", 190)],
           modules: [
             {
               id: "mod-rim-spr-1",
@@ -681,7 +655,6 @@ function seed(): Brand[] {
       id: "brand-laura",
       name: "Laura Mercier",
       logoUrl: logoLaura,
-      brandKnowledge: [mockPdf("Laura Mercier Heritage Deck.pdf", 540)],
       modules: [
         {
           id: "mod-lm-b-1",
@@ -711,7 +684,6 @@ function seed(): Brand[] {
           id: "cat-laura-powder",
           brandId: "brand-laura",
           name: "Powder",
-          categoryKnowledge: [mockPdf("Translucent Powder Iconic Guide.pdf", 460)],
           modules: [
             {
               id: "mod-lm-pwd-1",
@@ -762,7 +734,6 @@ function seed(): Brand[] {
       id: "brand-bm",
       name: "BareMinerals",
       logoUrl: logoBM,
-      brandKnowledge: [mockPdf("BareMinerals Clean Beauty Pledge.pdf", 320)],
       modules: [
         {
           id: "mod-bm-b-1",
@@ -791,7 +762,6 @@ function seed(): Brand[] {
           id: "cat-bm-blush",
           brandId: "brand-bm",
           name: "Blush",
-          categoryKnowledge: [mockPdf("Blush Application Guide.pdf", 260)],
           modules: [
             {
               id: "mod-bm-bl-1",
@@ -896,7 +866,6 @@ export const skuStore = {
       id: uid("brand"),
       name: input.name,
       logoUrl: input.logoUrl,
-      brandKnowledge: [],
       modules: [],
       categories: [],
     };
@@ -910,24 +879,6 @@ export const skuStore = {
   },
   removeBrand(brandId: string) {
     state = { brands: state.brands.filter((b) => b.id !== brandId) };
-    emit();
-  },
-  addBrandKnowledge(brandId: string, files: Attachment[]) {
-    state = {
-      brands: state.brands.map((b) =>
-        b.id === brandId ? { ...b, brandKnowledge: [...b.brandKnowledge, ...files] } : b,
-      ),
-    };
-    emit();
-  },
-  removeBrandKnowledge(brandId: string, fileId: string) {
-    state = {
-      brands: state.brands.map((b) =>
-        b.id === brandId
-          ? { ...b, brandKnowledge: b.brandKnowledge.filter((a) => a.id !== fileId) }
-          : b,
-      ),
-    };
     emit();
   },
   addBrandModule(brandId: string, input: Omit<Module, "id" | "knowledgeCards">) {
@@ -1028,7 +979,6 @@ export const skuStore = {
       brandId,
       name,
       imageUrl,
-      categoryKnowledge: [],
       modules: [],
       skus: [],
     };
@@ -1058,40 +1008,6 @@ export const skuStore = {
           : {
               ...b,
               categories: b.categories.map((c) => (c.id !== categoryId ? c : { ...c, ...patch })),
-            },
-      ),
-    };
-    emit();
-  },
-  addCategoryKnowledge(brandId: string, categoryId: string, files: Attachment[]) {
-    state = {
-      brands: state.brands.map((b) =>
-        b.id !== brandId
-          ? b
-          : {
-              ...b,
-              categories: b.categories.map((c) =>
-                c.id !== categoryId
-                  ? c
-                  : { ...c, categoryKnowledge: [...c.categoryKnowledge, ...files] },
-              ),
-            },
-      ),
-    };
-    emit();
-  },
-  removeCategoryKnowledge(brandId: string, categoryId: string, fileId: string) {
-    state = {
-      brands: state.brands.map((b) =>
-        b.id !== brandId
-          ? b
-          : {
-              ...b,
-              categories: b.categories.map((c) =>
-                c.id !== categoryId
-                  ? c
-                  : { ...c, categoryKnowledge: c.categoryKnowledge.filter((a) => a.id !== fileId) },
-              ),
             },
       ),
     };
