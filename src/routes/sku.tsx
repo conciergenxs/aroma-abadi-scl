@@ -1889,9 +1889,6 @@ function KnowledgeCardForm({
           <div className="w-[42%] shrink-0 p-4 space-y-3">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Cover</div>
-              {coverUrl && (
-                <img src={coverUrl} alt="" className="w-full h-28 object-cover rounded-md mb-2" />
-              )}
               <input
                 ref={fileRef}
                 type="file"
@@ -1902,27 +1899,40 @@ function KnowledgeCardForm({
                   if (f) pickCover(f);
                 }}
               />
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="rounded-md border border-border px-3 h-8 text-[13px]"
-                >
-                  Choose Image
-                </button>
+              {/* Once picked, the preview sits inline — to the left of the
+               * buttons and the size note rather than stacked above them. */}
+              <div className="flex items-start gap-3">
                 {coverUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setCoverUrl("")}
-                    className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
-                  >
-                    Remove Cover
-                  </button>
+                  <img
+                    src={coverUrl}
+                    alt=""
+                    className="w-24 aspect-video object-cover rounded-md border border-border shrink-0"
+                  />
                 )}
+                <div className="min-w-0">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="rounded-md border border-border px-3 h-8 text-[13px]"
+                    >
+                      Choose Image
+                    </button>
+                    {coverUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setCoverUrl("")}
+                        className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
+                      >
+                        Remove Cover
+                      </button>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    Recommended: 16:9 ratio (1920×1080px).
+                  </p>
+                </div>
               </div>
-              <p className="mt-1.5 text-[11px] text-muted-foreground">
-                Recommended: 16:9 ratio (1920×1080px).
-              </p>
             </div>
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Title</span>
@@ -1935,11 +1945,13 @@ function KnowledgeCardForm({
             </label>
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Subtitle</span>
-              <input
+              {/* Two rows tall and fixed there — newlines allowed, no resizing. */}
+              <textarea
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
+                rows={2}
                 placeholder="Card subtitle..."
-                className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+                className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
               />
             </label>
           </div>
