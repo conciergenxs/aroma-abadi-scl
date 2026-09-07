@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect, type ReactNode } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import {
@@ -305,10 +305,13 @@ function ModulesCard({
   const copy = MODULE_CARD_COPY[level];
 
   return (
-    <SectionCard title={copy.title} description={copy.description}>
+    <SectionCard
+      title={copy.title}
+      description={copy.description}
+      action={<AddModuleButton onSubmit={onAddModule} />}
+    >
       <ModuleList
         modules={modules}
-        onAddModule={onAddModule}
         onUpdateModule={onUpdateModule}
         onRemove={onRemoveModule}
         onAddCard={onAddCard}
@@ -755,16 +758,14 @@ function ListSearchBar({
   value,
   onChange,
   placeholder,
-  action,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
-  action?: ReactNode;
 }) {
   return (
-    <div className="p-3 border-b border-border flex items-center gap-2">
-      <div className="relative flex-1 min-w-0">
+    <div className="p-3 border-b border-border">
+      <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
         <input
           value={value}
@@ -773,7 +774,6 @@ function ListSearchBar({
           className="w-full h-9 rounded-md border border-border bg-card/60 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
         />
       </div>
-      {action}
     </div>
   );
 }
@@ -1314,7 +1314,7 @@ function AddModuleButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Add Module
       </button>
@@ -1447,7 +1447,6 @@ const MODULE_PAGE_SIZE = 4;
 
 function ModuleList({
   modules,
-  onAddModule,
   onUpdateModule,
   onRemove,
   onAddCard,
@@ -1455,7 +1454,6 @@ function ModuleList({
   onRemoveCard,
 }: {
   modules: Module[];
-  onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
   onUpdateModule: (
     moduleId: string,
     patch: { name: string; description: string; coverUrl?: string },
@@ -1488,12 +1486,7 @@ function ModuleList({
 
   return (
     <>
-      <ListSearchBar
-        value={query}
-        onChange={setQuery}
-        placeholder="Search modules…"
-        action={<AddModuleButton onSubmit={onAddModule} />}
-      />
+      <ListSearchBar value={query} onChange={setQuery} placeholder="Search modules…" />
       <ul className="divide-y divide-border">
         {paged.map((m) => (
           <ModuleRow
