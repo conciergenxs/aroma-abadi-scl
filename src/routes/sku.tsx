@@ -13,6 +13,7 @@ import {
   type OdooProduct,
 } from "@/components/scl/sku-store";
 import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatIDR } from "@/components/scl/transactions-store";
 import {
   Plus,
@@ -30,6 +31,7 @@ import {
   ExternalLink,
   Camera,
   Search,
+  Info,
 } from "lucide-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
@@ -76,6 +78,37 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
     reader.readAsDataURL(file);
   }
   return { fileRef, openPicker, handleChange };
+}
+
+/* Recommended source-image sizes, shown under the upload CTA when creating and
+ * behind a corner tooltip on the photo once the record exists. */
+const BRAND_PHOTO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
+const CATEGORY_PHOTO_HINT = "Recommended: 9:16 ratio (1080×1920px).";
+
+/* Small "i" badge pinned to the top-right of an existing brand/category photo —
+ * surfaces the recommended size at the moment you go to replace the image.
+ * TooltipProvider isn't mounted app-wide (only the Overview page has one), so
+ * each hint carries its own. TooltipContent portals itself, so the `.glass`
+ * SectionCards on this page can't clip it. */
+function PhotoRatioHint({ text }: { text: string }) {
+  return (
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            aria-label={text}
+            className="absolute top-0.5 right-0.5 h-4 w-4 grid place-items-center rounded-full border border-border bg-background/90 text-muted-foreground hover:text-primary transition-colors duration-150"
+          >
+            <Info className="h-2.5 w-2.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[220px] text-center leading-snug">
+          {text}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }
 
 /* ConfirmDialog renders a position:fixed overlay, but the SectionCards on this
@@ -407,6 +440,7 @@ function BrandDetail({
             >
               <Camera className="h-2.5 w-2.5" />
             </button>
+            <PhotoRatioHint text={BRAND_PHOTO_HINT} />
           </div>
           <div>
             <div className="text-sm font-semibold">{brand.name}</div>
@@ -532,13 +566,16 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
                 <Camera className="h-3.5 w-3.5 text-white" />
               </span>
             </button>
-            <button
-              type="button"
-              onClick={openPicker}
-              className="text-[13px] text-primary hover:underline"
-            >
-              {imageUrl ? "Replace photo" : "Upload photo"}
-            </button>
+            <div>
+              <button
+                type="button"
+                onClick={openPicker}
+                className="text-[13px] text-primary hover:underline"
+              >
+                {imageUrl ? "Replace photo" : "Upload photo"}
+              </button>
+              <p className="mt-1 text-[11px] text-muted-foreground">{CATEGORY_PHOTO_HINT}</p>
+            </div>
           </div>
           <input
             autoFocus
@@ -600,7 +637,7 @@ function CategoryRow({
           e.stopPropagation();
           openPicker();
         }}
-        title="Upload category image"
+        title={`Change category photo — ${CATEGORY_PHOTO_HINT}`}
         className="group relative h-10 w-10 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
       >
         {category.imageUrl ? (
@@ -715,6 +752,7 @@ function CategoryDetail({
             >
               <Camera className="h-2.5 w-2.5" />
             </button>
+            <PhotoRatioHint text={CATEGORY_PHOTO_HINT} />
           </div>
           <div>
             <div className="text-sm font-semibold">{category.name}</div>
@@ -1050,6 +1088,20 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           }}
         />
       )}
+
+      <DeleteConfirmDialog
+        open={confirmDelete}
+        title={`Delete "${sku.name}"?`}
+        description={`This removes the SKU and its ${sku.knowledgeCards.length} knowledge card${
+          sku.knowledgeCards.length === 1 ? "" : "s"
+        } from this category. This can't be undone.`}
+        confirmLabel="Delete SKU"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          skuStore.removeSku(brand.id, category.id, sku.id);
+          toast.success("SKU deleted");
+        }}
+      />
     </li>
   );
 }
@@ -1596,6 +1648,7 @@ function ModuleRow({
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingModule, setEditingModule] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <li className="p-4">
@@ -1621,7 +1674,12 @@ function ModuleRow({
         <RowActionMenu
           actions={[
             { label: "Edit", icon: Pencil, onClick: () => setEditingModule(true) },
-            { label: "Delete", icon: Trash2, danger: true, onClick: onRemove },
+            {
+              label: "Delete",
+              icon: Trash2,
+              danger: true,
+              onClick: () => setConfirmDelete(true),
+            },
           ]}
         />
       </div>
@@ -1687,6 +1745,17 @@ function ModuleRow({
           }}
         />
       )}
+
+      <DeleteConfirmDialog
+        open={confirmDelete}
+        title={`Delete "${module.name}"?`}
+        description={`This removes the module and its ${module.knowledgeCards.length} knowledge card${
+          module.knowledgeCards.length === 1 ? "" : "s"
+        }. This can't be undone.`}
+        confirmLabel="Delete Module"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={onRemove}
+      />
     </li>
   );
 }
@@ -1703,6 +1772,8 @@ function KnowledgeCards({
   onEdit: (card: KnowledgeCard) => void;
   onRemove: (cardId: string) => void;
 }) {
+  const [pendingDelete, setPendingDelete] = useState<KnowledgeCard | null>(null);
+
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
       {cards.map((k, idx) => (
@@ -1730,13 +1801,7 @@ function KnowledgeCards({
                 Edit
               </button>
               <span className="text-xs text-muted-foreground">·</span>
-              <button
-                onClick={() => {
-                  onRemove(k.id);
-                  toast.success("Card deleted");
-                }}
-                className="text-xs text-rose-500"
-              >
+              <button onClick={() => setPendingDelete(k)} className="text-xs text-rose-500">
                 Delete
               </button>
             </div>
@@ -1746,6 +1811,20 @@ function KnowledgeCards({
       {cards.length === 0 && (
         <div className="text-sm text-muted-foreground italic py-2">No knowledge cards yet.</div>
       )}
+
+      <DeleteConfirmDialog
+        open={pendingDelete !== null}
+        title={`Delete "${pendingDelete?.title ?? ""}"?`}
+        description="This knowledge card will be removed. This can't be undone."
+        confirmLabel="Delete Card"
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) {
+            onRemove(pendingDelete.id);
+            toast.success("Card deleted");
+          }
+        }}
+      />
     </div>
   );
 }
@@ -1957,22 +2036,27 @@ function BrandFormModal({
                   if (f) pickLogo(f);
                 }}
               />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="rounded-md border border-border px-2.5 h-8 text-[14px]"
-              >
-                Upload Logo
-              </button>
-              {logoUrl && (
-                <button
-                  type="button"
-                  onClick={() => setLogoUrl("")}
-                  className="text-[14px] text-rose-500"
-                >
-                  Remove
-                </button>
-              )}
+              <div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="rounded-md border border-border px-2.5 h-8 text-[14px]"
+                  >
+                    Upload Logo
+                  </button>
+                  {logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setLogoUrl("")}
+                      className="text-[14px] text-rose-500"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">{BRAND_PHOTO_HINT}</p>
+              </div>
             </div>
           </div>
           <label className="block">
