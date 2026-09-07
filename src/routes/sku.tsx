@@ -12,6 +12,7 @@ import {
   type KnowledgeCard,
   type OdooProduct,
 } from "@/components/scl/sku-store";
+import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
 import { formatIDR } from "@/components/scl/transactions-store";
 import {
   Plus,
@@ -75,6 +76,15 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
     reader.readAsDataURL(file);
   }
   return { fileRef, openPicker, handleChange };
+}
+
+/* ConfirmDialog renders a position:fixed overlay, but the SectionCards on this
+ * page use backdrop-filter (`.glass`), which makes them the containing block
+ * for fixed descendants and would clip the overlay to the card. Portaling to
+ * <body> escapes that — same reason every other modal here is portaled. */
+function DeleteConfirmDialog(props: ConfirmDialogProps) {
+  if (typeof document === "undefined" || !props.open) return null;
+  return createPortal(<ConfirmDialog {...props} />, document.body);
 }
 
 function SkuPage() {
@@ -336,9 +346,24 @@ function BrandDetail({
     openPicker: openLogoPicker,
     handleChange: handleLogoChange,
   } = useImagePicker((dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }));
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="space-y-4">
+      <DeleteConfirmDialog
+        open={confirmDelete}
+        title={`Delete "${brand.name}"?`}
+        description={`This removes the brand along with its ${brand.categories.length} categor${
+          brand.categories.length === 1 ? "y" : "ies"
+        } and ${brand.modules.length} module${brand.modules.length === 1 ? "" : "s"}. This can't be undone.`}
+        confirmLabel="Delete Brand"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          skuStore.removeBrand(brand.id);
+          toast.success("Brand deleted");
+          onBack();
+        }}
+      />
       <div className="flex items-center justify-between">
         <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
           <button
@@ -351,13 +376,7 @@ function BrandDetail({
           <span className="text-foreground font-medium">{brand.name}</span>
         </nav>
         <button
-          onClick={() => {
-            if (confirm(`Delete brand "${brand.name}"?`)) {
-              skuStore.removeBrand(brand.id);
-              toast.success("Brand deleted");
-              onBack();
-            }
-          }}
+          onClick={() => setConfirmDelete(true)}
           className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
           title="Delete brand"
         >
@@ -629,9 +648,26 @@ function CategoryDetail({
   } = useImagePicker((dataUrl) =>
     skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }),
   );
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="space-y-4">
+      <DeleteConfirmDialog
+        open={confirmDelete}
+        title={`Delete "${category.name}"?`}
+        description={`This removes the category along with its ${category.skus.length} SKU${
+          category.skus.length === 1 ? "" : "s"
+        } and ${category.modules.length} module${
+          category.modules.length === 1 ? "" : "s"
+        }. This can't be undone.`}
+        confirmLabel="Delete Category"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          skuStore.removeCategory(brand.id, category.id);
+          toast.success("Category deleted");
+          onBack();
+        }}
+      />
       <div className="flex items-center justify-between">
         <nav className="flex items-center gap-1 text-sm text-muted-foreground animate-fade-in">
           <button
@@ -648,13 +684,7 @@ function CategoryDetail({
           <span className="text-foreground font-medium">{category.name}</span>
         </nav>
         <button
-          onClick={() => {
-            if (confirm(`Delete category "${category.name}"?`)) {
-              skuStore.removeCategory(brand.id, category.id);
-              toast.success("Category deleted");
-              onBack();
-            }
-          }}
+          onClick={() => setConfirmDelete(true)}
           className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
           title="Delete"
         >
@@ -911,6 +941,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingPhoto, setEditingPhoto] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <li className="p-4">
@@ -948,10 +979,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
               label: "Delete",
               icon: Trash2,
               danger: true,
-              onClick: () => {
-                skuStore.removeSku(brand.id, category.id, sku.id);
-                toast.success("SKU deleted");
-              },
+              onClick: () => setConfirmDelete(true),
             },
           ]}
         />
@@ -1410,13 +1438,18 @@ function ModuleFormModal({
                 className="hidden"
                 onChange={handleChange}
               />
-              <button
-                type="button"
-                onClick={openPicker}
-                className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
-              >
-                {coverUrl ? "Replace Photo" : "Upload Photo"}
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  className="rounded-md border border-border px-2.5 h-8 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+                >
+                  {coverUrl ? "Replace Photo" : "Upload Photo"}
+                </button>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  Recommended: 1:1 ratio (1080×1080px).
+                </p>
+              </div>
             </div>
           </div>
           <label className="block">
@@ -1685,6 +1718,9 @@ function KnowledgeCards({
               Knowledge {idx + 1}
             </div>
             <div className="text-sm font-medium line-clamp-2">{k.title}</div>
+            {k.subtitle && (
+              <div className="text-[11px] text-muted-foreground/80 line-clamp-1">{k.subtitle}</div>
+            )}
             <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
             <div className="mt-2 flex items-center justify-end gap-2">
               <button
@@ -1723,9 +1759,10 @@ function KnowledgeCardForm({
 }: {
   initial: KnowledgeCard | null;
   onClose: () => void;
-  onSubmit: (data: { title: string; text: string; coverUrl?: string }) => void;
+  onSubmit: (data: { title: string; subtitle?: string; text: string; coverUrl?: string }) => void;
 }) {
   const [title, setTitle] = useState(initial?.title || "");
+  const [subtitle, setSubtitle] = useState(initial?.subtitle || "");
   const [text, setText] = useState(initial?.text || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -1750,9 +1787,14 @@ function KnowledgeCardForm({
         onSubmit={(e) => {
           e.preventDefault();
           if (!title.trim()) return;
-          onSubmit({ title, text, coverUrl: coverUrl || undefined });
+          onSubmit({
+            title,
+            subtitle: subtitle.trim() || undefined,
+            text,
+            coverUrl: coverUrl || undefined,
+          });
         }}
-        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content"
+        className="w-full max-w-3xl bg-background border border-border rounded-xl overflow-hidden modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">
@@ -1762,60 +1804,81 @@ function KnowledgeCardForm({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-4 space-y-3">
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Cover</div>
-            {coverUrl && (
-              <img src={coverUrl} alt="" className="w-full h-32 object-cover rounded-md mb-2" />
-            )}
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) pickCover(f);
-              }}
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="rounded-md border border-border px-3 h-8 text-[13px]"
-              >
-                Choose Image
-              </button>
+        {/* Two columns: cover + title + subtitle on the left, content on the
+         * right, split by a vertical separator. */}
+        <div className="flex items-stretch">
+          <div className="w-[42%] shrink-0 p-4 space-y-3">
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Cover</div>
               {coverUrl && (
+                <img src={coverUrl} alt="" className="w-full h-28 object-cover rounded-md mb-2" />
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickCover(f);
+                }}
+              />
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setCoverUrl("")}
-                  className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
+                  onClick={() => fileRef.current?.click()}
+                  className="rounded-md border border-border px-3 h-8 text-[13px]"
                 >
-                  Remove Cover
+                  Choose Image
                 </button>
-              )}
+                {coverUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setCoverUrl("")}
+                    className="rounded-md border border-border px-3 h-8 text-[13px] text-rose-500"
+                  >
+                    Remove Cover
+                  </button>
+                )}
+              </div>
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                Recommended: 16:9 ratio (1920×1080px).
+              </p>
             </div>
+            <label className="block">
+              <span className="block text-xs text-muted-foreground mb-1">Title</span>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Card title..."
+                className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+              />
+            </label>
+            <label className="block">
+              <span className="block text-xs text-muted-foreground mb-1">Subtitle</span>
+              <input
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+                placeholder="Card subtitle..."
+                className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+              />
+            </label>
           </div>
-          <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Title</span>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Card title..."
-              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
-            />
-          </label>
-          <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Content</span>
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={5}
-              placeholder="Knowledge content..."
-              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm"
-            />
-          </label>
+
+          <div className="w-px bg-border shrink-0" />
+
+          <div className="flex-1 min-w-0 p-4">
+            <label className="block">
+              <span className="block text-xs text-muted-foreground mb-1">Content</span>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={8}
+                placeholder="Knowledge content..."
+                className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
+              />
+            </label>
+          </div>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button
