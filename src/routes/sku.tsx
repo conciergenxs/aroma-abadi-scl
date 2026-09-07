@@ -781,7 +781,12 @@ function ListSearchBar({
 /* Shared 3-column pagination footer — "Showing: XX data" (left) ·
  * "X-X data" (center) · Prev/Next icon buttons (right) — used by both the
  * SKU list and the Module list. */
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
+const DEFAULT_PAGE_SIZE = 5;
+
 function ListPaginationFooter({
+  pageSize,
+  onPageSizeChange,
   totalCount,
   fromIdx,
   toIdx,
@@ -790,6 +795,8 @@ function ListPaginationFooter({
   onPrev,
   onNext,
 }: {
+  pageSize: number;
+  onPageSizeChange: (size: number) => void;
   totalCount: number;
   fromIdx: number;
   toIdx: number;
@@ -800,35 +807,45 @@ function ListPaginationFooter({
 }) {
   return (
     <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
-      <span>Showing: {totalCount} data</span>
+      <label className="inline-flex items-center gap-1.5">
+        Showing:
+        <select
+          value={pageSize}
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          className="h-7 rounded border border-border bg-card/60 px-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+        >
+          {PAGE_SIZE_OPTIONS.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+        data
+      </label>
       <span className="text-center">{totalCount === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data</span>
       <div className="flex items-center justify-end gap-1.5">
-        {totalPages > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={onPrev}
-              disabled={currentPage <= 1}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={onNext}
-              disabled={currentPage >= totalPages}
-              className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </>
-        )}
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={currentPage <= 1}
+          title="Previous page"
+          className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={currentPage >= totalPages}
+          title="Next page"
+          className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
 }
-
-const SKU_PAGE_SIZE = 5;
 
 function SkuList({ brand, category }: { brand: Brand; category: Category }) {
   const [query, setQuery] = useState("");
