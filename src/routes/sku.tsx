@@ -1000,7 +1000,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
-  const [editingPhoto, setEditingPhoto] = useState(false);
+  const [editingSku, setEditingSku] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -1021,10 +1021,6 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{sku.description}</div>
           <div className="mt-2 flex items-center gap-3 text-sm">
             <span className="font-semibold">{formatIDR(sku.price)}</span>
-            <span className="text-muted-foreground">
-              {sku.knowledgeCards.length} knowledge card
-              {sku.knowledgeCards.length === 1 ? "" : "s"}
-            </span>
           </div>
         </div>
         <RowActionMenu
@@ -1034,7 +1030,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
               icon: ExternalLink,
               onClick: () => navigate({ to: "/sku-detail/$skuId", params: { skuId: sku.id } }),
             },
-            { label: "Edit Photo", icon: ImageIcon, onClick: () => setEditingPhoto(true) },
+            { label: "Edit", icon: Pencil, onClick: () => setEditingSku(true) },
             {
               label: "Delete",
               icon: Trash2,
@@ -1063,7 +1059,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
             }
           >
             <span className="inline-flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards
+              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({sku.knowledgeCards.length})
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -1099,14 +1095,14 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
         />
       )}
 
-      {editingPhoto && (
-        <SkuPhotoModal
+      {editingSku && (
+        <SkuEditModal
           sku={sku}
-          onClose={() => setEditingPhoto(false)}
-          onSubmit={(photoUrl) => {
-            skuStore.updateSku(brand.id, category.id, sku.id, { photoUrl });
-            toast.success("SKU photo updated");
-            setEditingPhoto(false);
+          onClose={() => setEditingSku(false)}
+          onSubmit={(patch) => {
+            skuStore.updateSku(brand.id, category.id, sku.id, patch);
+            toast.success("SKU updated");
+            setEditingSku(false);
           }}
         />
       )}
@@ -1186,18 +1182,19 @@ function RowActionMenu({ actions }: { actions: RowAction[] }) {
   );
 }
 
-/* Only the photo is editable — name, code, price and description are synced
- * from Odoo and read-only here. */
-function SkuPhotoModal({
+/* Photo and description are editable here; name, code and price stay as Odoo
+ * supplied them. */
+function SkuEditModal({
   sku,
   onClose,
   onSubmit,
 }: {
   sku: SKU;
   onClose: () => void;
-  onSubmit: (photoUrl: string) => void;
+  onSubmit: (patch: { photoUrl: string; description: string }) => void;
 }) {
   const [photoUrl, setPhotoUrl] = useState(sku.photoUrl || "");
+  const [description, setDescription] = useState(sku.description);
   const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
 
   if (typeof document === "undefined") return null;
@@ -1205,7 +1202,7 @@ function SkuPhotoModal({
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <div className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden shadow-xl modal-content">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">Edit SKU Photo</div>
+          <div className="text-sm font-semibold">Edit SKU</div>
           <button type="button" onClick={onClose}>
             <X className="h-4 w-4" />
           </button>
@@ -1214,8 +1211,8 @@ function SkuPhotoModal({
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
             <span>
-              Only the photo can be changed — name, code, price and description are synced from
-              Odoo.
+              Name, code and price are synced from Odoo. The photo and description can be edited
+              here.
             </span>
           </div>
           <div className="text-sm font-medium">{sku.name}</div>
@@ -1248,6 +1245,16 @@ function SkuPhotoModal({
               </div>
             </div>
           </div>
+          <label className="block">
+            <span className="block text-xs text-muted-foreground mb-1">Description</span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              placeholder="Product description..."
+              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button
@@ -1261,7 +1268,7 @@ function SkuPhotoModal({
             type="button"
             onClick={() => {
               if (!photoUrl) return toast.error("Upload a product photo to continue.");
-              onSubmit(photoUrl);
+              onSubmit({ photoUrl, description: description.trim() });
             }}
             className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
@@ -2120,9 +2127,10 @@ function SkuFormModal({
   onClose: () => void;
 }) {
   const [photoUrl, setPhotoUrl] = useState("");
+  const [description, setDescription] = useState(product.description);
   const { fileRef, openPicker, handleChange } = useImagePicker(setPhotoUrl);
 
-  // Everything but the photo comes straight from Odoo — read-only here.
+  // Name, code and price come straight from Odoo — read-only here.
   const disabledInput =
     "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
 
@@ -2132,7 +2140,7 @@ function SkuFormModal({
       name: product.name,
       code: product.code,
       price: product.price,
-      description: product.description,
+      description: description.trim(),
       photoUrl,
     });
     toast.success("SKU added");
@@ -2153,8 +2161,8 @@ function SkuFormModal({
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
             <span>
-              Product data is synced from Odoo and read-only. Odoo doesn't carry photography, so
-              upload one below.
+              Name, code and price are synced from Odoo and read-only. Odoo doesn't carry
+              photography, so upload a photo below — the description can be edited too.
             </span>
           </div>
           <div>
@@ -2205,8 +2213,8 @@ function SkuFormModal({
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">Description</span>
             <textarea
-              disabled
-              value={product.description}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               rows={4}
               className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none"
             />
