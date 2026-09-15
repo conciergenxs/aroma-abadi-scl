@@ -160,9 +160,14 @@ export function PromoFormFields({
         </div>
       </div>
 
-      {/* Audience Segment + Max Usage */}
-      <div className="grid grid-cols-2 gap-4 stagger">
-        <div>
+      {/* Audience Segment + Max Usage.
+          The row and the audience cell carry their own z-index because
+          `.stagger > *` animates with `fade-up ... both`, whose translateY
+          persists and makes every cell its own stacking context — so the
+          picker's dropdown z-40 could not escape its cell, and the Start/End
+          Date row below (later in the DOM) painted straight over it. */}
+      <div className="relative z-20 grid grid-cols-2 gap-4 stagger">
+        <div className="relative z-10">
           <label className={labelCls}>Audience Segment</label>
           <AudienceSegmentPicker
             audiences={audiences}
