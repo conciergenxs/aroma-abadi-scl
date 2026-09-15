@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Check,
@@ -265,6 +265,31 @@ function AudienceSegmentPicker({
   onChange: (ids: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Closes on an outside click via a document listener rather than a
+  // full-screen backdrop: `.stagger > *` keeps a transform after animating,
+  // and a transformed ancestor becomes the containing block for fixed
+  // children — so the old `fixed inset-0` backdrop only ever covered this
+  // one cell, leaving clicks anywhere else on the form unable to dismiss it.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
   const label =
     selectedIds.length === 0
       ? "Any Audience"
@@ -277,7 +302,7 @@ function AudienceSegmentPicker({
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={rootRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -291,50 +316,47 @@ function AudienceSegmentPicker({
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       </button>
       {open && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute z-40 mt-1 w-full min-w-[240px] max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-xl">
-            <button
-              type="button"
-              onClick={() => onChange([])}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-left hover:bg-muted ${selectedIds.length === 0 ? "text-primary font-medium" : ""}`}
-            >
-              Any Audience {selectedIds.length === 0 && <Check className="h-3.5 w-3.5" />}
-            </button>
-            <div className="my-1 border-t border-border" />
-            {audiences.length === 0 ? (
-              <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">
-                No audiences yet — create one below
-              </p>
-            ) : (
-              audiences.map((a) => {
-                const checked = selectedIds.includes(a.id);
-                return (
-                  <label
-                    key={a.id}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggle(a.id)}
-                      className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
-                    />
-                    <span className="truncate">{a.name}</span>
-                  </label>
-                );
-              })
-            )}
-            <div className="my-1 border-t border-border" />
-            <Link
-              to="/contacts/audience/new"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-[13px] text-primary hover:bg-muted transition-colors duration-150"
-            >
-              <Plus className="h-3.5 w-3.5 shrink-0" /> Create New Audience
-            </Link>
-          </div>
-        </>
+        <div className="absolute z-40 mt-1 w-full min-w-[240px] max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-xl">
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-left hover:bg-muted ${selectedIds.length === 0 ? "text-primary font-medium" : ""}`}
+          >
+            Any Audience {selectedIds.length === 0 && <Check className="h-3.5 w-3.5" />}
+          </button>
+          <div className="my-1 border-t border-border" />
+          {audiences.length === 0 ? (
+            <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">
+              No audiences yet — create one below
+            </p>
+          ) : (
+            audiences.map((a) => {
+              const checked = selectedIds.includes(a.id);
+              return (
+                <label
+                  key={a.id}
+                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggle(a.id)}
+                    className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
+                  />
+                  <span className="truncate">{a.name}</span>
+                </label>
+              );
+            })
+          )}
+          <div className="my-1 border-t border-border" />
+          <Link
+            to="/contacts/audience/new"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-[13px] text-primary hover:bg-muted transition-colors duration-150"
+          >
+            <Plus className="h-3.5 w-3.5 shrink-0" /> Create New Audience
+          </Link>
+        </div>
       )}
       {selectedIds.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1">
