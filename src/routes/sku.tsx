@@ -1048,7 +1048,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
       <Accordion type="single" collapsible className="mt-3">
         <AccordionItem value={sku.id} className="border-border">
           <AccordionTrigger
-            className="text-sm hover:no-underline py-2 transition-colors duration-150"
+            className="text-[13px] hover:no-underline py-2 transition-colors duration-150"
             actions={
               <button
                 type="button"
@@ -1058,12 +1058,12 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
                 }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
               >
-                <Plus className="h-3.5 w-3.5" /> Knowledge Card
+                <Plus className="h-3.5 w-3.5" /> Add New
               </button>
             }
           >
             <span className="inline-flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({sku.knowledgeCards.length})
+              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -1671,6 +1671,9 @@ function ModuleRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{module.name}</div>
+          <div className="mt-0.5 text-xs text-muted-foreground">
+            {module.knowledgeCards.length} card{module.knowledgeCards.length === 1 ? "" : "s"}
+          </div>
         </div>
         <RowActionMenu
           actions={[
@@ -1688,7 +1691,7 @@ function ModuleRow({
       <Accordion type="single" collapsible className="mt-3">
         <AccordionItem value={module.id} className="border-border">
           <AccordionTrigger
-            className="text-sm hover:no-underline py-2 transition-colors duration-150"
+            className="text-[13px] hover:no-underline py-2 transition-colors duration-150"
             actions={
               <button
                 type="button"
@@ -1698,12 +1701,12 @@ function ModuleRow({
                 }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
               >
-                <Plus className="h-3.5 w-3.5" /> Knowledge Card
+                <Plus className="h-3.5 w-3.5" /> Add New
               </button>
             }
           >
             <span className="inline-flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards ({module.knowledgeCards.length})
+              <BookOpen className="h-3.5 w-3.5" /> Knowledge Cards
             </span>
           </AccordionTrigger>
           <AccordionContent>
