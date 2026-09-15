@@ -42,7 +42,7 @@ export type SKU = {
   knowledgeCards: KnowledgeCard[];
 };
 
-// A reference module — cover photo, title, description, and its own
+// A reference module — cover photo, a name, and its own
 // Knowledge Cards — for content that isn't a purchasable product (a care
 // guide, an FAQ, brand story, etc). Same shape at every level it can live
 // at (Brand, Category); each level owns its own list.
@@ -50,7 +50,6 @@ export type Module = {
   id: string;
   name: string;
   coverUrl?: string;
-  description: string;
   knowledgeCards: KnowledgeCard[];
 };
 
@@ -240,8 +239,6 @@ function seed(): Brand[] {
           id: "mod-dg-b-1",
           name: "D&G House Codes & Heritage",
           coverUrl: kc1,
-          description:
-            "The brand's visual language, Sicilian motifs, and storytelling pillars for BA scripting.",
           knowledgeCards: [
             {
               id: "kc-mod-dg-b-1-1",
@@ -255,7 +252,6 @@ function seed(): Brand[] {
           id: "mod-dg-b-2",
           name: "Counter Display Standards",
           coverUrl: kc2,
-          description: "Merchandising layout, lighting, and tester placement for D&G counters.",
           knowledgeCards: [
             {
               id: "kc-mod-dg-b-2-1",
@@ -269,31 +265,24 @@ function seed(): Brand[] {
           id: "mod-dg-b-3",
           name: "Seasonal Campaign Playbook",
           coverUrl: kc3,
-          description:
-            "Key visuals, talking points, and promotional windows for the current campaign.",
           knowledgeCards: [],
         },
         {
           id: "mod-dg-b-4",
           name: "VIP Gifting Protocol",
           coverUrl: kc4,
-          description:
-            "Eligibility, gift-with-purchase tiers, and packaging standards for top-spend customers.",
           knowledgeCards: [],
         },
         {
           id: "mod-dg-b-5",
           name: "Ambassador Program Brief",
           coverUrl: kc1,
-          description:
-            "How the loyalty ambassador tier works and what BAs should highlight to customers.",
           knowledgeCards: [],
         },
         {
           id: "mod-dg-b-6",
           name: "Sustainable Packaging Initiative",
           coverUrl: kc2,
-          description: "Refillable packaging options and the brand's sustainability commitments.",
           knowledgeCards: [],
         },
       ],
@@ -307,8 +296,6 @@ function seed(): Brand[] {
               id: "mod-dg-lip-1",
               name: "Lip Shade-Matching Guide",
               coverUrl: kc3,
-              description:
-                "How to match undertones and pick the right shade family for each customer.",
               knowledgeCards: [
                 {
                   id: "kc-mod-dg-lip-1-1",
@@ -322,28 +309,24 @@ function seed(): Brand[] {
               id: "mod-dg-lip-2",
               name: "Application Technique Cheat Sheet",
               coverUrl: kc2,
-              description: "Step-by-step application for a precise, long-wearing lip line.",
               knowledgeCards: [],
             },
             {
               id: "mod-dg-lip-3",
               name: "Caviar Complex Ingredient Spotlight",
               coverUrl: kc4,
-              description: "What the caviar essence formula does and how to explain it simply.",
               knowledgeCards: [],
             },
             {
               id: "mod-dg-lip-4",
               name: "Longevity & Wear Claims",
               coverUrl: kc1,
-              description: "Tested wear times and how they compare across the lip range.",
               knowledgeCards: [],
             },
             {
               id: "mod-dg-lip-5",
               name: "Holiday Lip Gift Set Guide",
               coverUrl: kc3,
-              description: "Seasonal bundling suggestions and gift-set contents.",
               knowledgeCards: [],
             },
           ],
@@ -385,7 +368,6 @@ function seed(): Brand[] {
           id: "mod-sis-b-1",
           name: "Phyto-Cosmetology Philosophy",
           coverUrl: kc4,
-          description: "The botanical science approach that underpins every Sisley formula.",
           knowledgeCards: [
             {
               id: "kc-mod-sis-b-1-1",
@@ -399,15 +381,12 @@ function seed(): Brand[] {
           id: "mod-sis-b-2",
           name: "Botanical Ingredient Sourcing",
           coverUrl: kc1,
-          description:
-            "Where key plant extracts come from and how sourcing supports the brand story.",
           knowledgeCards: [],
         },
         {
           id: "mod-sis-b-3",
           name: "Sisley Spa Partnership Guide",
           coverUrl: kc3,
-          description: "Cross-referral etiquette between counter sales and partner spa treatments.",
           knowledgeCards: [],
         },
       ],
@@ -421,7 +400,6 @@ function seed(): Brand[] {
               id: "mod-sis-fdn-1",
               name: "Foundation Shade-Matching Workflow",
               coverUrl: kc2,
-              description: "A step-by-step shade-matching process for the foundation range.",
               knowledgeCards: [
                 {
                   id: "kc-mod-sis-fdn-1-1",
@@ -435,14 +413,12 @@ function seed(): Brand[] {
               id: "mod-sis-fdn-2",
               name: "Skincare-Makeup Hybrid Benefits",
               coverUrl: kc1,
-              description: "Skin-benefit talking points to pair with coverage and finish claims.",
               knowledgeCards: [],
             },
             {
               id: "mod-sis-fdn-3",
               name: "SPF & Sun Protection Talking Points",
               coverUrl: kc3,
-              description: "How to explain SPF coverage without overstating sun protection claims.",
               knowledgeCards: [],
             },
           ],
@@ -482,15 +458,12 @@ function seed(): Brand[] {
               id: "mod-sis-pwd-1",
               name: "Setting Powder Application Guide",
               coverUrl: kc4,
-              description: "Puff vs. brush application and how each affects finish.",
               knowledgeCards: [],
             },
             {
               id: "mod-sis-pwd-2",
               name: "Blurring Technology Explainer",
               coverUrl: kc2,
-              description:
-                "How the soft-focus particles work and how to describe the effect to customers.",
               knowledgeCards: [],
             },
           ],
@@ -526,7 +499,6 @@ function seed(): Brand[] {
           id: "mod-rim-b-1",
           name: "Rimmel London Brand Story",
           coverUrl: kc1,
-          description: "The brand's London heritage and affordable-glam positioning.",
           knowledgeCards: [
             {
               id: "kc-mod-rim-b-1-1",
@@ -540,15 +512,12 @@ function seed(): Brand[] {
           id: "mod-rim-b-2",
           name: "Affordable Glam Positioning Guide",
           coverUrl: kc2,
-          description:
-            "How to pitch Rimmel against premium counters without undercutting the brand.",
           knowledgeCards: [],
         },
         {
           id: "mod-rim-b-3",
           name: "Influencer Collaboration Brief",
           coverUrl: kc4,
-          description: "Current collab campaigns and how BAs can reference them in-store.",
           knowledgeCards: [],
         },
       ],
@@ -562,22 +531,18 @@ function seed(): Brand[] {
               id: "mod-rim-pwd-1",
               name: "Powder Finish Comparison Guide",
               coverUrl: kc3,
-              description: "Matte vs. two-way powder — when to recommend each.",
               knowledgeCards: [],
             },
             {
               id: "mod-rim-pwd-2",
               name: "Oily Skin Recommendation Guide",
               coverUrl: kc1,
-              description:
-                "Talking points for customers asking about oil control and touch-up frequency.",
               knowledgeCards: [],
             },
             {
               id: "mod-rim-pwd-3",
               name: "Bundle & Cross-Sell Suggestions",
               coverUrl: kc4,
-              description: "Which setting spray and base products pair naturally with each powder.",
               knowledgeCards: [],
             },
           ],
@@ -617,15 +582,12 @@ function seed(): Brand[] {
               id: "mod-rim-spr-1",
               name: "Setting Spray Application Technique",
               coverUrl: kc2,
-              description: "Distance, number of spritzes, and drying time for best results.",
               knowledgeCards: [],
             },
             {
               id: "mod-rim-spr-2",
               name: "Humidity & Climate Performance Notes",
               coverUrl: kc3,
-              description:
-                "How the formula performs in Jakarta's humidity versus air-conditioned malls.",
               knowledgeCards: [],
             },
           ],
@@ -661,8 +623,6 @@ function seed(): Brand[] {
           id: "mod-lm-b-1",
           name: "Laura Mercier Founder Story",
           coverUrl: kc1,
-          description:
-            "The makeup-artist origin story behind the brand's flawless-face philosophy.",
           knowledgeCards: [
             {
               id: "kc-mod-lm-b-1-1",
@@ -676,7 +636,6 @@ function seed(): Brand[] {
           id: "mod-lm-b-2",
           name: "Flawless Face Philosophy",
           coverUrl: kc4,
-          description: "The skin-first, second-skin finish approach across the range.",
           knowledgeCards: [],
         },
       ],
@@ -690,15 +649,12 @@ function seed(): Brand[] {
               id: "mod-lm-pwd-1",
               name: "Iconic Powder Heritage Guide",
               coverUrl: kc3,
-              description:
-                "Why this powder became the brand's best-selling, most-imitated product.",
               knowledgeCards: [],
             },
             {
               id: "mod-lm-pwd-2",
               name: "Soft-Focus Finish Technique",
               coverUrl: kc1,
-              description: "Application tips for the blurred, photo-ready finish.",
               knowledgeCards: [],
             },
           ],
@@ -740,7 +696,6 @@ function seed(): Brand[] {
           id: "mod-bm-b-1",
           name: "Clean Beauty Pledge Overview",
           coverUrl: kc4,
-          description: "What 'clean' means for BareMinerals and which ingredients are excluded.",
           knowledgeCards: [
             {
               id: "kc-mod-bm-b-1-1",
@@ -754,7 +709,6 @@ function seed(): Brand[] {
           id: "mod-bm-b-2",
           name: "Mineral Formula Ingredient Guide",
           coverUrl: kc2,
-          description: "The core minerals used and their benefits for sensitive skin.",
           knowledgeCards: [],
         },
       ],
@@ -768,14 +722,12 @@ function seed(): Brand[] {
               id: "mod-bm-bl-1",
               name: "Blush Placement Guide by Face Shape",
               coverUrl: kc3,
-              description: "Where to apply for round, oval, square, and heart face shapes.",
               knowledgeCards: [],
             },
             {
               id: "mod-bm-bl-2",
               name: "Buildable Color Payoff Technique",
               coverUrl: kc4,
-              description: "Layering technique for sheer-to-full color without patchiness.",
               knowledgeCards: [],
             },
           ],

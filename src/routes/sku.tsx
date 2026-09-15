@@ -356,10 +356,7 @@ function ModulesCard({
   level: "brand" | "category";
   modules: Module[];
   onAddModule: (input: ModuleInput) => void;
-  onUpdateModule: (
-    moduleId: string,
-    patch: ModuleInput,
-  ) => void;
+  onUpdateModule: (moduleId: string, patch: ModuleInput) => void;
   onRemoveModule: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -1433,11 +1430,7 @@ function OdooProductPickerModal({
 /* "+ Add Module" trigger + form — used identically at both Brand and
  * Category level. A module has a cover photo, a name, and its
  * own Knowledge Cards; it's reference material, not a purchasable SKU. */
-function AddModuleButton({
-  onSubmit,
-}: {
-  onSubmit: (input: ModuleInput) => void;
-}) {
+function AddModuleButton({ onSubmit }: { onSubmit: (input: ModuleInput) => void }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -1576,10 +1569,7 @@ function ModuleList({
   onRemoveCard,
 }: {
   modules: Module[];
-  onUpdateModule: (
-    moduleId: string,
-    patch: ModuleInput,
-  ) => void;
+  onUpdateModule: (moduleId: string, patch: ModuleInput) => void;
   onRemove: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (moduleId: string, cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -1592,9 +1582,7 @@ function ModuleList({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return modules;
-    return modules.filter(
-      (m) => m.name.toLowerCase().includes(q),
-    );
+    return modules.filter((m) => m.name.toLowerCase().includes(q));
   }, [modules, query]);
 
   useEffect(() => {
