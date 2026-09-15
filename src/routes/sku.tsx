@@ -1265,10 +1265,7 @@ function SkuEditModal({
           </button>
           <button
             type="button"
-            onClick={() => {
-              if (!photoUrl) return toast.error("Upload a product photo to continue.");
-              onSubmit({ photoUrl, description: description.trim() });
-            }}
+            onClick={() => onSubmit({ photoUrl, description: description.trim() })}
             className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
             Save Changes
@@ -2134,13 +2131,12 @@ function SkuFormModal({
     "h-9 w-full rounded-md border border-gray-200 bg-gray-100 px-2.5 text-sm text-gray-500 cursor-not-allowed select-none";
 
   function submit() {
-    if (!photoUrl) return toast.error("Upload a product photo to continue.");
     skuStore.addSku(brandId, categoryId, {
       name: product.name,
       code: product.code,
       price: product.price,
       description: description.trim(),
-      photoUrl,
+      photoUrl: photoUrl || undefined,
     });
     toast.success("SKU added");
     onClose();
@@ -2164,9 +2160,7 @@ function SkuFormModal({
             </span>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground mb-1">
-              Product Photo <span className="text-rose-500">*</span>
-            </div>
+            <div className="text-xs text-muted-foreground mb-1">Product Photo</div>
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                 {photoUrl ? (
