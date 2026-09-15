@@ -327,6 +327,9 @@ function BrandsOverview({
 
 /* ---------------- Level 2: Brand Detail ---------------- */
 
+/* Fields a user supplies when adding/editing a module. */
+type ModuleInput = Omit<Module, "id" | "knowledgeCards">;
+
 const MODULE_CARD_COPY = {
   brand: {
     title: "Brand Modules",
@@ -352,10 +355,10 @@ function ModulesCard({
 }: {
   level: "brand" | "category";
   modules: Module[];
-  onAddModule: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onAddModule: (input: ModuleInput) => void;
   onUpdateModule: (
     moduleId: string,
-    patch: { name: string; description: string; coverUrl?: string },
+    patch: ModuleInput,
   ) => void;
   onRemoveModule: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
@@ -1428,12 +1431,12 @@ function OdooProductPickerModal({
 }
 
 /* "+ Add Module" trigger + form — used identically at both Brand and
- * Category level. A module has a cover photo, name, description, and its
+ * Category level. A module has a cover photo, a name, and its
  * own Knowledge Cards; it's reference material, not a purchasable SKU. */
 function AddModuleButton({
   onSubmit,
 }: {
-  onSubmit: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onSubmit: (input: ModuleInput) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -1468,10 +1471,9 @@ function ModuleFormModal({
 }: {
   initial?: Module | null;
   onClose: () => void;
-  onSubmit: (input: { name: string; description: string; coverUrl?: string }) => void;
+  onSubmit: (input: ModuleInput) => void;
 }) {
   const [name, setName] = useState(initial?.name || "");
-  const [description, setDescription] = useState(initial?.description || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
 
@@ -1479,7 +1481,6 @@ function ModuleFormModal({
     if (!name.trim()) return toast.error("Name is required.");
     onSubmit({
       name: name.trim(),
-      description: description.trim(),
       coverUrl: coverUrl || undefined,
     });
   }
@@ -1540,16 +1541,6 @@ function ModuleFormModal({
               className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </label>
-          <label className="block">
-            <span className="block text-xs text-muted-foreground mb-1">Description</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              placeholder="What this module covers…"
-              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </label>
         </div>
         <div className="p-4 border-t border-border flex justify-end gap-2">
           <button
@@ -1574,7 +1565,7 @@ function ModuleFormModal({
 }
 
 /* List of Modules at a Brand or Category level — same row shape as SkuRow
- * (cover, name, description, Knowledge Cards accordion) minus code/price/
+ * (cover, name, Knowledge Cards accordion) minus code/price/
  * details-link, since a module isn't a purchasable product. */
 function ModuleList({
   modules,
@@ -1587,7 +1578,7 @@ function ModuleList({
   modules: Module[];
   onUpdateModule: (
     moduleId: string,
-    patch: { name: string; description: string; coverUrl?: string },
+    patch: ModuleInput,
   ) => void;
   onRemove: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
@@ -1602,7 +1593,7 @@ function ModuleList({
     const q = query.trim().toLowerCase();
     if (!q) return modules;
     return modules.filter(
-      (m) => m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q),
+      (m) => m.name.toLowerCase().includes(q),
     );
   }, [modules, query]);
 
@@ -1664,7 +1655,7 @@ function ModuleRow({
   onRemoveCard,
 }: {
   module: Module;
-  onEdit: (patch: { name: string; description: string; coverUrl?: string }) => void;
+  onEdit: (patch: ModuleInput) => void;
   onRemove: () => void;
   onAddCard: (card: Omit<KnowledgeCard, "id">) => void;
   onUpdateCard: (cardId: string, patch: Partial<KnowledgeCard>) => void;
@@ -1692,9 +1683,6 @@ function ModuleRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{module.name}</div>
-          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">
-            {module.description}
-          </div>
         </div>
         <RowActionMenu
           actions={[
