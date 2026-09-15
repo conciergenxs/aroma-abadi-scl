@@ -1211,8 +1211,7 @@ function SkuEditModal({
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
             <span>
-              Name, code and price are synced from Odoo. The photo and description can be edited
-              here.
+              Name, code and price are synced from Odoo. Photo and description can be edited here.
             </span>
           </div>
           <div className="text-sm font-medium">{sku.name}</div>
@@ -1252,7 +1251,7 @@ function SkuEditModal({
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Product description..."
-              className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
+              className="w-full rounded-md border border-border bg-white px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </label>
         </div>
@@ -2132,7 +2131,7 @@ function SkuFormModal({
 
   // Name, code and price come straight from Odoo — read-only here.
   const disabledInput =
-    "h-9 w-full rounded-md border border-border bg-gray-50 px-2.5 text-sm text-muted-foreground cursor-not-allowed select-none";
+    "h-9 w-full rounded-md border border-gray-200 bg-gray-100 px-2.5 text-sm text-gray-500 cursor-not-allowed select-none";
 
   function submit() {
     if (!photoUrl) return toast.error("Upload a product photo to continue.");
@@ -2161,8 +2160,7 @@ function SkuFormModal({
           <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2.5 text-[12px] text-amber-700">
             <span className="shrink-0 mt-0.5">ℹ️</span>
             <span>
-              Name, code and price are synced from Odoo and read-only. Odoo doesn't carry
-              photography, so upload a photo below — the description can be edited too.
+              Name, code and price are synced from Odoo. Add a photo and edit the description below.
             </span>
           </div>
           <div>
@@ -2216,7 +2214,8 @@ function SkuFormModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              className="w-full rounded-md border border-border bg-gray-50 px-2.5 py-2 text-sm text-muted-foreground cursor-not-allowed select-none resize-none"
+              placeholder="Product description..."
+              className="w-full rounded-md border border-border bg-white px-2.5 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </label>
         </div>
