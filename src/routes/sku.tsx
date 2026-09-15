@@ -1657,7 +1657,7 @@ function ModuleRow({
   return (
     <li className="p-4">
       <div className="flex items-start gap-3">
-        <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+        <div className="h-10 w-10 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
           {module.coverUrl ? (
             <img
               src={module.coverUrl}
@@ -1666,7 +1666,7 @@ function ModuleRow({
               loading="lazy"
             />
           ) : (
-            <BookOpen className="h-5 w-5 text-primary" />
+            <BookOpen className="h-4 w-4 text-primary" />
           )}
         </div>
         <div className="flex-1 min-w-0">
