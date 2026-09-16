@@ -370,9 +370,6 @@ function PromoDetailPage() {
                       <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Transaction
                       </th>
-                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Store
-                      </th>
                       <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Discount
                       </th>
@@ -399,7 +396,6 @@ function PromoDetailPage() {
                           </div>
                           <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
                         </td>
-                        <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
                         <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">
                           {fmtIDR(r.discountValue)}
                         </td>

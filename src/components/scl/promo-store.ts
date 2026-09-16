@@ -208,11 +208,11 @@ function downloadCsv(filename: string, csv: string) {
 // shared code, so the log of who redeemed it is what's worth exporting.
 export function downloadRedemptionsCsv(promoCode: string, redemptions: PromoRedemption[]) {
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
-  const header = ["Customer", "Invoice", "Source", "Store", "Discount", "Redeemed At"]
+  const header = ["Customer", "Invoice", "Source", "Discount", "Redeemed At"]
     .map(escape)
     .join(",");
   const rows = redemptions.map((r) =>
-    [r.contactName, r.invoice, r.sourceName, r.store, String(r.discountValue), r.redeemedAt]
+    [r.contactName, r.invoice, r.sourceName, String(r.discountValue), r.redeemedAt]
       .map(escape)
       .join(","),
   );
