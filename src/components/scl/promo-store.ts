@@ -157,10 +157,10 @@ export type PromoCode = {
   rule: PromoRule;
   usageType: "one-to-one" | "one-to-many";
   maxUsage: number | null;
+  /** How many times one customer may redeem this promo. null = no per-customer cap. */
+  limitPerUser: number | null;
   startDate: string;
   endDate: string;
-  /** Contact audiences (from Contacts) this promo is restricted to. Empty/absent = everyone. */
-  audienceIds?: string[];
   createdBy: { name: string; jobTitle: string };
   createdAt: string;
   redemptions: PromoRedemption[];
@@ -189,16 +189,34 @@ export function downloadAssignedCodesCsv(promoCode: string, assignedCodes: Assig
       .map(escape)
       .join(","),
   );
-  const csv = [header, ...rows].join("\n");
+  downloadCsv(`${promoCode || "promo"}-codes.csv`, [header, ...rows].join("\n"));
+}
+
+function downloadCsv(filename: string, csv: string) {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${promoCode || "promo"}-codes.csv`;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+// The 1-to-Many counterpart of the download above: those promos have a single
+// shared code, so the log of who redeemed it is what's worth exporting.
+export function downloadRedemptionsCsv(promoCode: string, redemptions: PromoRedemption[]) {
+  const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  const header = ["Customer", "Invoice", "Source", "Store", "Discount", "Redeemed At"]
+    .map(escape)
+    .join(",");
+  const rows = redemptions.map((r) =>
+    [r.contactName, r.invoice, r.sourceName, r.store, String(r.discountValue), r.redeemedAt]
+      .map(escape)
+      .join(","),
+  );
+  downloadCsv(`${promoCode || "promo"}-redemptions.csv`, [header, ...rows].join("\n"));
 }
 
 // Cross-reference the transactions store so redemption logs point at real,
@@ -236,6 +254,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: 500,
+      limitPerUser: 1,
       startDate: "2026-06-01T00:00",
       endDate: "2026-08-31T23:59",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
@@ -294,6 +313,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-one",
       maxUsage: 200,
+      limitPerUser: 1,
       startDate: "2026-07-01T00:00",
       endDate: "2026-08-15T23:59",
       createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
@@ -364,6 +384,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: null,
+      limitPerUser: 2,
       startDate: "2026-05-01T00:00",
       endDate: "2026-05-31T23:59",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
@@ -410,6 +431,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: 100,
+      limitPerUser: 1,
       startDate: "2026-07-05T00:00",
       endDate: "2026-08-20T23:59",
       createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
@@ -438,6 +460,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: 300,
+      limitPerUser: null,
       startDate: "2026-04-01T00:00",
       endDate: "2026-04-30T23:59",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
@@ -473,6 +496,7 @@ function seed(): PromoCode[] {
       },
       usageType: "one-to-many",
       maxUsage: 150,
+      limitPerUser: 3,
       startDate: "2026-07-10T00:00",
       endDate: "2026-08-10T23:59",
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
@@ -522,7 +546,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v6";
+const STORAGE_KEY = "aroma_promo_store_v7";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
