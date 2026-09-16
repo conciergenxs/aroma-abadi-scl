@@ -3,7 +3,6 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { promoStore, usePromoStore } from "@/components/scl/promo-store";
-import { useContactsStore } from "@/components/scl/contacts-store";
 import {
   PromoFormFields,
   PromoFormActionBar,
@@ -22,7 +21,6 @@ function EditPromoCodePage() {
   const { promoId } = useParams({ from: "/promo-codes/edit/$promoId" });
   const navigate = useNavigate();
   const { promos } = usePromoStore();
-  const { lists } = useContactsStore();
   const promo = promos.find((p) => p.id === promoId);
   const [form, setForm] = useState<PromoFormState | null>(() =>
     promo ? promoFormFromExisting(promo) : null,
@@ -67,7 +65,7 @@ function EditPromoCodePage() {
     <AppShell backTo={detailPath} title={`Edit — ${promo.code}`} noPadding>
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6">
-          <PromoFormFields form={form} setForm={setForm} audiences={lists} />
+          <PromoFormFields form={form} setForm={setForm} />
         </div>
         <PromoFormActionBar
           onCancel={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}

@@ -8,7 +8,6 @@ import {
   downloadAssignedCodesCsv,
   type AssignedCode,
 } from "@/components/scl/promo-store";
-import { useContactsStore } from "@/components/scl/contacts-store";
 import {
   PromoFormFields,
   PromoFormActionBar,
@@ -81,7 +80,6 @@ function SuccessView({
 
 function NewPromoCodePage() {
   const navigate = useNavigate();
-  const { lists } = useContactsStore();
   const [form, setForm] = useState<PromoFormState>(() => emptyPromoForm());
   const [settingCode, setSettingCode] = useState(false);
   const [created, setCreated] = useState<CreatedPromo | null>(null);
@@ -128,7 +126,7 @@ function NewPromoCodePage() {
     <AppShell backTo="/promo-codes" title="New Promo Code" noPadding>
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6">
-          <PromoFormFields form={form} setForm={setForm} audiences={lists} />
+          <PromoFormFields form={form} setForm={setForm} />
         </div>
         <PromoFormActionBar
           onCancel={() => navigate({ to: "/promo-codes" })}

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
 import { fmtDateTimeEN, fmtNum, fmtIDR } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   CheckCircle2,
   XCircle,
@@ -12,22 +12,18 @@ import {
   Wallet,
   Percent,
   Ticket,
-  Instagram,
-  Music2,
-  MessageCircle,
   Download,
   Copy,
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import {
   usePromoStore,
   promoStore,
   describePromoRule,
   getPromoStatus,
   downloadAssignedCodesCsv,
-  type PromoRedemption,
+  downloadRedemptionsCsv,
   type AssignedCode,
   type PromoStatus,
 } from "@/components/scl/promo-store";
@@ -83,42 +79,6 @@ function UsageTypeBadge({ type }: { type: "one-to-one" | "one-to-many" }) {
   );
 }
 
-const CHANNEL_META: Record<
-  PromoRedemption["channel"],
-  { label: string; icon: typeof Instagram; badge: string; chartColor: string }
-> = {
-  instagram: {
-    label: "Instagram",
-    icon: Instagram,
-    badge: "border-fuchsia-700 bg-fuchsia-600 text-white",
-    chartColor: "var(--chart-2)",
-  },
-  tiktok: {
-    label: "TikTok",
-    icon: Music2,
-    badge: "border-slate-700 bg-slate-800 text-white",
-    chartColor: "var(--chart-3)",
-  },
-  whatsapp: {
-    label: "WhatsApp",
-    icon: MessageCircle,
-    badge: "border-emerald-700 bg-emerald-600 text-white",
-    chartColor: "var(--chart-1)",
-  },
-};
-
-function ChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
-  const meta = CHANNEL_META[channel];
-  const Icon = meta.icon;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}
-    >
-      <Icon className="h-2.5 w-2.5" /> {meta.label}
-    </span>
-  );
-}
-
 function CopyCodeButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
@@ -156,15 +116,6 @@ function StatTile({
     </div>
   );
 }
-
-const chartTooltipStyle = {
-  background: "var(--popover)",
-  border: "1px solid var(--border)",
-  borderRadius: 10,
-  fontSize: 12,
-  padding: "8px 12px",
-  boxShadow: "0 8px 24px oklch(0.2 0.02 30 / 12%)",
-};
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
@@ -239,11 +190,6 @@ function PromoDetailPage() {
   const [redemptionPageSize, setRedemptionPageSize] = useState(10);
   const [codesPage, setCodesPage] = useState(1);
   const [codesPageSize, setCodesPageSize] = useState(10);
-  // recharts renders differently server- vs. client-side (no ResizeObserver
-  // during SSR), which throws off hydration — only mount it after the client
-  // has taken over, matching the pattern already used on the Overview page.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
   const promo = promos.find((p) => p.id === promoId);
 
@@ -270,17 +216,12 @@ function PromoDetailPage() {
   const uniqueCustomers = new Set(redemptions.map((r) => r.contactId)).size;
   const usageRate = promo.maxUsage ? Math.round((redemptions.length / promo.maxUsage) * 100) : null;
 
-  const channelCounts = redemptions.reduce<Record<string, number>>((acc, r) => {
-    acc[r.channel] = (acc[r.channel] ?? 0) + 1;
-    return acc;
-  }, {});
-  const channelData = (Object.keys(CHANNEL_META) as PromoRedemption["channel"][])
-    .filter((c) => channelCounts[c])
-    .map((c) => ({
-      name: CHANNEL_META[c].label,
-      value: channelCounts[c],
-      color: CHANNEL_META[c].chartColor,
-    }));
+  // 1-to-1 exports its individual codes; 1-to-Many has only one shared code,
+  // so its exportable artefact is the redemption log instead.
+  const canDownload =
+    promo.usageType === "one-to-one"
+      ? (promo.assignedCodes?.length ?? 0) > 0
+      : redemptions.length > 0;
 
   const pagedRedemptions = redemptions.slice(
     (redemptionPage - 1) * redemptionPageSize,
@@ -309,10 +250,19 @@ function PromoDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {promo.usageType === "one-to-one" && (promo.assignedCodes?.length ?? 0) > 0 && (
+              {canDownload && (
                 <>
                   <button
-                    onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
+                    onClick={() =>
+                      promo.usageType === "one-to-one"
+                        ? downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])
+                        : downloadRedemptionsCsv(promo.code, redemptions)
+                    }
+                    title={
+                      promo.usageType === "one-to-one"
+                        ? "Download every individual code"
+                        : "Download the redemption log"
+                    }
                     className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-600 px-4 h-9 text-[14px] font-medium text-white hover:bg-emerald-700 transition-colors"
                   >
                     <Download className="h-3.5 w-3.5" /> Download .csv
@@ -346,17 +296,8 @@ function PromoDetailPage() {
             </div>
           </div>
 
-          {promo.description && (
-            <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-                Description
-              </div>
-              <p className="text-sm text-foreground/90">{promo.description}</p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-3 gap-4 pt-1">
-            <div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 pt-1">
+            <div className="sm:col-span-2">
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
                 Period
               </div>
@@ -375,6 +316,16 @@ function PromoDetailPage() {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                Limit Per User
+              </div>
+              <div className="text-[13px]">
+                {promo.limitPerUser == null
+                  ? "Unlimited"
+                  : `${fmtNum(promo.limitPerUser)} ${promo.limitPerUser === 1 ? "use" : "uses"}`}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
                 Created
               </div>
               <div className="text-[13px]">{fmtDateTimeEN(promo.createdAt)}</div>
@@ -382,74 +333,20 @@ function PromoDetailPage() {
           </div>
         </div>
 
-        {/* Insight tiles + channel donut — side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 grid grid-cols-2 gap-4 stagger">
-            <StatTile
-              label="Redemptions"
-              icon={Ticket}
-              value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`}
-            />
-            <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
-            <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
-            <StatTile
-              label="Usage Rate"
-              icon={Percent}
-              value={usageRate == null ? "Unlimited" : `${usageRate}%`}
-            />
-          </div>
-          <div className="rounded-xl border border-border bg-card/40 p-4 flex flex-col">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-              Redemptions by Channel
-            </div>
-            {channelData.length === 0 ? (
-              <div className="flex-1 grid place-items-center text-[12px] text-muted-foreground italic py-6">
-                No redemptions yet
-              </div>
-            ) : (
-              <>
-                <div className="h-32">
-                  {mounted && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Tooltip
-                          contentStyle={chartTooltipStyle}
-                          formatter={(v: number, n: string) => [fmtNum(Number(v)), n]}
-                        />
-                        <Pie
-                          data={channelData}
-                          dataKey="value"
-                          nameKey="name"
-                          innerRadius={34}
-                          outerRadius={54}
-                          paddingAngle={2}
-                          strokeWidth={0}
-                          isAnimationActive
-                          animationDuration={600}
-                        >
-                          {channelData.map((d) => (
-                            <Cell key={d.name} fill={d.color} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-                <div className="mt-2 space-y-1">
-                  {channelData.map((d) => (
-                    <div key={d.name} className="flex items-center gap-1.5 text-[11px]">
-                      <span
-                        className="h-2 w-2 rounded-sm shrink-0"
-                        style={{ background: d.color }}
-                      />
-                      <span className="flex-1 text-muted-foreground truncate">{d.name}</span>
-                      <span className="font-semibold text-foreground tabular-nums">{d.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+        {/* Insight tiles */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+          <StatTile
+            label="Redemptions"
+            icon={Ticket}
+            value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`}
+          />
+          <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
+          <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
+          <StatTile
+            label="Usage Rate"
+            icon={Percent}
+            value={usageRate == null ? "Unlimited" : `${usageRate}%`}
+          />
         </div>
 
         {/* Redemption Log */}
@@ -475,9 +372,6 @@ function PromoDetailPage() {
                       </th>
                       <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Store
-                      </th>
-                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Channel
                       </th>
                       <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Discount
@@ -506,9 +400,6 @@ function PromoDetailPage() {
                           <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
                         </td>
                         <td className="px-5 py-2.5 text-[12px] text-muted-foreground">{r.store}</td>
-                        <td className="px-5 py-2.5">
-                          <ChannelBadge channel={r.channel} />
-                        </td>
                         <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">
                           {fmtIDR(r.discountValue)}
                         </td>

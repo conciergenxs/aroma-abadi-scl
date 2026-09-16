@@ -1,16 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import {
-  Check,
-  ChevronDown,
-  Users,
-  X as XIcon,
-  Infinity as InfinityIcon,
-  Plus,
-} from "lucide-react";
+import { useRef } from "react";
+import { Infinity as InfinityIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultRule, type PromoRule, type PromoCode } from "./promo-store";
-import type { ContactList } from "./mock-data";
 
 // ── Shared promo form — used by the Create page and the Edit page so the
 // field set can never drift out of sync between them. ──
@@ -22,11 +13,12 @@ export type PromoFormState = {
   usageType: "one-to-many" | "one-to-one";
   maxUsage: string;
   maxUsageUnlimited: boolean;
+  /** How many times one customer may redeem this promo. */
+  limitPerUser: string;
+  limitPerUserUnlimited: boolean;
   startDate: string;
   endDate: string;
   rule: PromoRule;
-  /** Contact audiences this promo is restricted to. Empty = everyone. */
-  audienceIds: string[];
 };
 
 export function emptyPromoForm(): PromoFormState {
@@ -37,10 +29,11 @@ export function emptyPromoForm(): PromoFormState {
     usageType: "one-to-many",
     maxUsage: "",
     maxUsageUnlimited: true,
+    limitPerUser: "",
+    limitPerUserUnlimited: true,
     startDate: "",
     endDate: "",
     rule: defaultRule(),
-    audienceIds: [],
   };
 }
 
@@ -52,10 +45,11 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
     usageType: promo.usageType,
     maxUsage: promo.maxUsage?.toString() ?? "",
     maxUsageUnlimited: promo.maxUsage == null,
+    limitPerUser: promo.limitPerUser?.toString() ?? "",
+    limitPerUserUnlimited: promo.limitPerUser == null,
     startDate: promo.startDate,
     endDate: promo.endDate,
     rule: promo.rule,
-    audienceIds: promo.audienceIds ?? [],
   };
 }
 
@@ -78,9 +72,9 @@ export function promoFormToPayload(
   | "rule"
   | "usageType"
   | "maxUsage"
+  | "limitPerUser"
   | "startDate"
   | "endDate"
-  | "audienceIds"
 > {
   return {
     code: form.code.trim().toUpperCase(),
@@ -89,9 +83,10 @@ export function promoFormToPayload(
     rule: form.rule,
     usageType: form.usageType,
     maxUsage: form.maxUsageUnlimited ? null : form.maxUsage ? Number(form.maxUsage) : null,
+    limitPerUser:
+      form.limitPerUserUnlimited || !form.limitPerUser ? null : Number(form.limitPerUser),
     startDate: form.startDate,
     endDate: form.endDate,
-    audienceIds: form.audienceIds,
   };
 }
 
@@ -104,11 +99,9 @@ export const PROMO_CODE_MAX_LENGTH = 20;
 export function PromoFormFields({
   form,
   setForm,
-  audiences,
 }: {
   form: PromoFormState;
   setForm: (f: PromoFormState) => void;
-  audiences: ContactList[];
 }) {
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
@@ -160,22 +153,9 @@ export function PromoFormFields({
         </div>
       </div>
 
-      {/* Audience Segment + Max Usage.
-          The row and the audience cell carry their own z-index because
-          `.stagger > *` animates with `fade-up ... both`, whose translateY
-          persists and makes every cell its own stacking context — so the
-          picker's dropdown z-40 could not escape its cell, and the Start/End
-          Date row below (later in the DOM) painted straight over it. */}
-      <div className="relative z-20 grid grid-cols-2 gap-4 stagger">
-        <div className="relative z-10">
-          <label className={labelCls}>Audience Segment</label>
-          <AudienceSegmentPicker
-            audiences={audiences}
-            selectedIds={form.audienceIds}
-            onChange={(ids) => set("audienceIds", ids)}
-          />
-        </div>
-
+      {/* Max Usage + Limit Per User — a total cap and a per-customer cap,
+          each with the same "Unlimited" escape hatch. */}
+      <div className="grid grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Max Usage</label>
           <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
@@ -216,6 +196,44 @@ export function PromoFormFields({
             </label>
           </div>
         </div>
+
+        <div>
+          <label className={labelCls}>Limit Per User</label>
+          <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
+            <div className="relative flex-1 min-w-0 h-full">
+              <input
+                type="number"
+                value={form.limitPerUser}
+                disabled={form.limitPerUserUnlimited}
+                onChange={(e) => set("limitPerUser", e.target.value)}
+                placeholder={form.limitPerUserUnlimited ? "" : "e.g. 1"}
+                min={1}
+                className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
+              />
+              {form.limitPerUserUnlimited && (
+                <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
+                  <InfinityIcon className="h-4 w-4" />
+                </div>
+              )}
+            </div>
+            <div className="w-px h-5 bg-border shrink-0" />
+            <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.limitPerUserUnlimited}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    limitPerUserUnlimited: e.target.checked,
+                    limitPerUser: e.target.checked ? "" : form.limitPerUser,
+                  })
+                }
+                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
+              />
+              Unlimited
+            </label>
+          </div>
+        </div>
       </div>
 
       {/* Start / End Date+Time */}
@@ -251,136 +269,6 @@ export function PromoFormFields({
         <label className={labelCls}>Promo Rule</label>
         <PromoRuleBuilder rule={form.rule} onChange={(r) => set("rule", r)} />
       </div>
-    </div>
-  );
-}
-
-function AudienceSegmentPicker({
-  audiences,
-  selectedIds,
-  onChange,
-}: {
-  audiences: ContactList[];
-  selectedIds: string[];
-  onChange: (ids: string[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  // Closes on an outside click via a document listener rather than a
-  // full-screen backdrop: `.stagger > *` keeps a transform after animating,
-  // and a transformed ancestor becomes the containing block for fixed
-  // children — so the old `fixed inset-0` backdrop only ever covered this
-  // one cell, leaving clicks anywhere else on the form unable to dismiss it.
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    document.addEventListener("touchstart", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-      document.removeEventListener("touchstart", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open]);
-
-  const label =
-    selectedIds.length === 0
-      ? "Any Audience"
-      : selectedIds.length === 1
-        ? (audiences.find((a) => a.id === selectedIds[0])?.name ?? "1 audience")
-        : `${selectedIds.length} audiences`;
-
-  const toggle = (id: string) => {
-    onChange(selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]);
-  };
-
-  return (
-    <div className="relative" ref={rootRef}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="h-9 w-full flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-sm text-left hover:bg-muted/40 transition-colors"
-      >
-        <span
-          className={`truncate flex items-center gap-1.5 ${selectedIds.length ? "text-foreground" : "text-muted-foreground"}`}
-        >
-          <Users className="h-3.5 w-3.5 shrink-0" /> {label}
-        </span>
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-      </button>
-      {open && (
-        <div className="absolute z-40 mt-1 w-full min-w-[240px] max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-xl">
-          <button
-            type="button"
-            onClick={() => onChange([])}
-            className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-left hover:bg-muted ${selectedIds.length === 0 ? "text-primary font-medium" : ""}`}
-          >
-            Any Audience {selectedIds.length === 0 && <Check className="h-3.5 w-3.5" />}
-          </button>
-          <div className="my-1 border-t border-border" />
-          {audiences.length === 0 ? (
-            <p className="px-3 py-4 text-[12px] text-muted-foreground text-center italic">
-              No audiences yet — create one below
-            </p>
-          ) : (
-            audiences.map((a) => {
-              const checked = selectedIds.includes(a.id);
-              return (
-                <label
-                  key={a.id}
-                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggle(a.id)}
-                    className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
-                  />
-                  <span className="truncate">{a.name}</span>
-                </label>
-              );
-            })
-          )}
-          <div className="my-1 border-t border-border" />
-          <Link
-            to="/contacts/audience/new"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-[13px] text-primary hover:bg-muted transition-colors duration-150"
-          >
-            <Plus className="h-3.5 w-3.5 shrink-0" /> Create New Audience
-          </Link>
-        </div>
-      )}
-      {selectedIds.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          {selectedIds.map((id) => {
-            const a = audiences.find((x) => x.id === id);
-            if (!a) return null;
-            return (
-              <span
-                key={id}
-                className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 pl-2 pr-1 h-5 text-[10px] text-foreground"
-              >
-                {a.name}
-                <button
-                  type="button"
-                  onClick={() => toggle(id)}
-                  className="h-3.5 w-3.5 grid place-items-center rounded-full hover:bg-primary/20 transition-colors duration-150"
-                >
-                  <XIcon className="h-2.5 w-2.5" />
-                </button>
-              </span>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
