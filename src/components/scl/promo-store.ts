@@ -254,15 +254,9 @@ export function getPromoStatus(promo: { startDate: string; endDate: string }): P
 // Lets 1-to-1 codes be shared anywhere outside the app (email, chat, print).
 export function downloadAssignedCodesCsv(promoCode: string, assignedCodes: AssignedCode[]) {
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
-  const header = ["Code", "Recipient", "Sent Via", "Status", "Redeemed At"].map(escape).join(",");
+  const header = ["Code", "Recipient", "Status", "Redeemed At"].map(escape).join(",");
   const rows = assignedCodes.map((a) =>
-    [
-      a.code,
-      a.contactName ?? "Unassigned",
-      a.broadcastName ?? "—",
-      a.redeemed ? "Redeemed" : "Not yet",
-      a.redeemedAt ?? "",
-    ]
+    [a.code, a.contactName ?? "Unassigned", a.redeemed ? "Redeemed" : "Not yet", a.redeemedAt ?? ""]
       .map(escape)
       .join(","),
   );

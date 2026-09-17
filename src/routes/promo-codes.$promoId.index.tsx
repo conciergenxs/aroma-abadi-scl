@@ -475,9 +475,6 @@ function PromoDetailPage() {
                           Recipient
                         </th>
                         <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          Sent Via
-                        </th>
-                        <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                           Status
                         </th>
                         <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -514,19 +511,6 @@ function PromoDetailPage() {
                               <span className="text-[13px] text-muted-foreground italic">
                                 Unassigned
                               </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-2.5">
-                            {a.broadcastId ? (
-                              <Link
-                                to="/broadcasts/$broadcastId"
-                                params={{ broadcastId: a.broadcastId }}
-                                className="text-[12px] text-primary hover:underline transition-colors duration-150"
-                              >
-                                {a.broadcastName ?? "Broadcast"}
-                              </Link>
-                            ) : (
-                              <span className="text-[12px] text-muted-foreground">—</span>
                             )}
                           </td>
                           <td className="px-5 py-2.5">
