@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SclSelect, type SclSelectOption } from "./scl-select";
 import type { Contact } from "./mock-data";
 import { formatIDR, type Transaction } from "./transactions-store";
@@ -156,22 +157,26 @@ export function AudienceContactPicker({
   brands,
   staged,
   onToggle,
+  onSetMany,
 }: {
   candidates: Contact[];
   transactions: Transaction[];
   brands: string[];
   staged: Set<string>;
   onToggle: (id: string) => void;
+  /** Select or clear many contacts at once — powers "select all matching". */
+  onSetMany: (ids: string[], selected: boolean) => void;
 }) {
   const [search, setSearch] = useState("");
+  const [stagedSearch, setStagedSearch] = useState("");
   const [minTotalSpend, setMinTotalSpend] = useState("0");
   const [minMonthlySpend, setMinMonthlySpend] = useState("0");
   const [brandFilter, setBrandFilter] = useState("all");
   const [minFrequency, setMinFrequency] = useState("0");
   const [browsePage, setBrowsePage] = useState(1);
-  const [browsePageSize, setBrowsePageSize] = useState(8);
+  const [browsePageSize, setBrowsePageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [stagedPage, setStagedPage] = useState(1);
-  const [stagedPageSize, setStagedPageSize] = useState(8);
+  const [stagedPageSize, setStagedPageSize] = useState(PAGE_SIZE_OPTIONS[1]);
 
   const nonBa = useMemo(
     () => candidates.filter((c) => !c.labelIds.includes("lb-ba")),
@@ -201,16 +206,35 @@ export function AudienceContactPicker({
     });
   }, [nonBa, statsById, search, minTotalSpend, minMonthlySpend, minFrequency, brandFilter]);
 
+  // Clamp both pages: removing the last contact on a page, or a search that
+  // narrows the list, must not strand the view on an empty page.
+  const safeBrowsePage = Math.min(browsePage, Math.max(1, Math.ceil(eligible.length / browsePageSize)));
   const pagedEligible = eligible.slice(
-    (browsePage - 1) * browsePageSize,
-    browsePage * browsePageSize,
+    (safeBrowsePage - 1) * browsePageSize,
+    safeBrowsePage * browsePageSize,
   );
 
-  const stagedContacts = nonBa.filter((c) => staged.has(c.id));
-  const pagedStaged = stagedContacts.slice(
-    (stagedPage - 1) * stagedPageSize,
-    stagedPage * stagedPageSize,
+  const allStaged = nonBa.filter((c) => staged.has(c.id));
+  const stagedQuery = stagedSearch.trim().toLowerCase();
+  const stagedContacts = stagedQuery
+    ? allStaged.filter(
+        (c) => c.name.toLowerCase().includes(stagedQuery) || c.phone.toLowerCase().includes(stagedQuery),
+      )
+    : allStaged;
+  const safeStagedPage = Math.min(
+    stagedPage,
+    Math.max(1, Math.ceil(stagedContacts.length / stagedPageSize)),
   );
+  const pagedStaged = stagedContacts.slice(
+    (safeStagedPage - 1) * stagedPageSize,
+    safeStagedPage * stagedPageSize,
+  );
+
+  // "Select all" acts on everything the current filters + search match, not
+  // just the visible page.
+  const eligibleSelected = eligible.filter((c) => staged.has(c.id)).length;
+  const allEligibleSelected = eligible.length > 0 && eligibleSelected === eligible.length;
+  const someEligibleSelected = eligibleSelected > 0 && !allEligibleSelected;
 
   const brandOptions: SclSelectOption[] = [
     { value: "all", label: "Any Brand" },
@@ -278,8 +302,8 @@ export function AudienceContactPicker({
       <div className="grid grid-cols-[1fr_340px] gap-4 animate-fade-in">
         {/* LEFT: search + browse list */}
         <div className="rounded-lg border border-border overflow-hidden">
-          <div className="p-3 border-b border-border bg-card/40">
-            <div className="relative">
+          <div className="p-3 border-b border-border bg-card/40 flex items-center gap-3">
+            <div className="relative flex-1 min-w-0">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
               <input
                 value={search}
@@ -288,9 +312,31 @@ export function AudienceContactPicker({
                   setBrowsePage(1);
                 }}
                 placeholder="Search by name or phone..."
-                className="w-full h-9 rounded-md border border-border bg-background pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="w-full h-9 rounded-md border border-border bg-background pl-8 pr-3 text-sm transition-shadow focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
             </div>
+            <label
+              className={`shrink-0 inline-flex items-center gap-2 h-9 rounded-md border px-3 text-[12px] font-medium transition-colors ${
+                eligible.length === 0
+                  ? "border-border text-muted-foreground/50 cursor-not-allowed"
+                  : allEligibleSelected
+                    ? "border-primary/40 bg-primary/10 text-foreground cursor-pointer"
+                    : "border-border bg-background text-foreground hover:bg-muted cursor-pointer"
+              }`}
+              title="Select every contact that matches the current filters and search"
+            >
+              <Checkbox
+                checked={allEligibleSelected ? true : someEligibleSelected ? "indeterminate" : false}
+                disabled={eligible.length === 0}
+                onCheckedChange={() =>
+                  onSetMany(
+                    eligible.map((c) => c.id),
+                    !allEligibleSelected,
+                  )
+                }
+              />
+              Select all {eligible.length} matching
+            </label>
           </div>
           <div className="min-h-[360px]">
             {pagedEligible.length === 0 ? (
@@ -342,7 +388,7 @@ export function AudienceContactPicker({
             )}
           </div>
           <Pager
-            page={browsePage}
+            page={safeBrowsePage}
             setPage={setBrowsePage}
             pageSize={browsePageSize}
             setPageSize={setBrowsePageSize}
@@ -352,20 +398,50 @@ export function AudienceContactPicker({
 
         {/* RIGHT: staged/selected panel */}
         <div className="rounded-lg border border-border overflow-hidden flex flex-col">
-          <div className="p-3 border-b border-border bg-card/40">
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Selected ({staged.size})
+          <div className="p-3 border-b border-border bg-card/40 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Selected ({allStaged.length})
+              </div>
+              {allStaged.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onSetMany(
+                      allStaged.map((c) => c.id),
+                      false,
+                    )
+                  }
+                  className="press text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <input
+                value={stagedSearch}
+                onChange={(e) => {
+                  setStagedSearch(e.target.value);
+                  setStagedPage(1);
+                }}
+                placeholder="Check if someone is selected..."
+                className="w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-[12px] transition-shadow focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
             </div>
           </div>
-          <div className="min-h-[360px] flex-1">
+          <div className="flex-1">
             {pagedStaged.length === 0 ? (
-              <p className="px-3 py-12 text-[12px] text-muted-foreground text-center italic">
-                No contacts selected yet
+              <p className="px-3 py-12 text-[12px] text-muted-foreground text-center italic animate-fade-in">
+                {allStaged.length === 0
+                  ? "No contacts selected yet"
+                  : `No selected contact matches "${stagedSearch}"`}
               </p>
             ) : (
               <div className="divide-y divide-border/60">
                 {pagedStaged.map((c) => (
-                  <div key={c.id} className="flex items-center gap-2 px-3 py-2">
+                  <div key={c.id} className="flex items-center gap-2 px-3 py-2 animate-fade-in">
                     <span className="h-6 w-6 rounded-full bg-primary/15 border border-primary/30 grid place-items-center text-[9px] font-semibold shrink-0">
                       {c.avatar}
                     </span>
@@ -383,7 +459,7 @@ export function AudienceContactPicker({
             )}
           </div>
           <Pager
-            page={stagedPage}
+            page={safeStagedPage}
             setPage={setStagedPage}
             pageSize={stagedPageSize}
             setPageSize={setStagedPageSize}

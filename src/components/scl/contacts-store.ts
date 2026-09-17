@@ -9,6 +9,7 @@ import {
   type ContactLabel,
   type ContactList,
 } from "./mock-data";
+import { referralCodeFor, uniqueCode } from "@/lib/codes";
 
 export type PropertyType =
   | "text"
@@ -328,12 +329,29 @@ type Updater<T> = T | ((current: T) => T);
 const resolve = <T>(u: Updater<T>, current: T): T =>
   typeof u === "function" ? (u as (c: T) => T)(current) : u;
 
+/** Give any customer who doesn't have one yet a join date and a permanent,
+ * unique referral code. Existing codes are never touched — a code is issued
+ * once and stays with the customer. */
+function withReferralCodes(contacts: Contact[]): Contact[] {
+  const taken = new Set(contacts.map((c) => c.referralCode).filter((c): c is string => !!c));
+  let changed = false;
+  const next = contacts.map((c) => {
+    if (c.referralCode || c.labelIds.includes("lb-ba")) return c;
+    changed = true;
+    const joinedAt = c.joinedAt ?? new Date().toISOString();
+    const referralCode = uniqueCode(referralCodeFor(c.name, joinedAt), taken);
+    taken.add(referralCode);
+    return { ...c, joinedAt, referralCode };
+  });
+  return changed ? next : contacts;
+}
+
 export const contactsStore = {
   get state() {
     return state;
   },
   setContacts(u: Updater<Contact[]>) {
-    state = { ...state, contacts: resolve(u, state.contacts) };
+    state = { ...state, contacts: withReferralCodes(resolve(u, state.contacts)) };
     emit();
   },
   setLabels(u: Updater<ContactLabel[]>) {
