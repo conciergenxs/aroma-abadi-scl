@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { Infinity as InfinityIcon } from "lucide-react";
+import { Infinity as InfinityIcon, Megaphone } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
-import { defaultRule, type PromoRule, type PromoCode } from "./promo-store";
+import { defaultCodeFormat, defaultRule, type PromoRule, type PromoCode } from "./promo-store";
 
 // ── Shared promo form — used by the Create page and the Edit page so the
 // field set can never drift out of sync between them. ──
@@ -16,6 +16,8 @@ export type PromoFormState = {
   /** How many times one customer may redeem this promo. */
   limitPerUser: string;
   limitPerUserUnlimited: boolean;
+  /** 1-to-1 only: the per-recipient code pattern, set in the code step. */
+  codeFormat: string;
   startDate: string;
   endDate: string;
   rule: PromoRule;
@@ -31,6 +33,7 @@ export function emptyPromoForm(): PromoFormState {
     maxUsageUnlimited: true,
     limitPerUser: "",
     limitPerUserUnlimited: true,
+    codeFormat: "",
     startDate: "",
     endDate: "",
     rule: defaultRule(),
@@ -47,6 +50,7 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
     maxUsageUnlimited: promo.maxUsage == null,
     limitPerUser: promo.limitPerUser?.toString() ?? "",
     limitPerUserUnlimited: promo.limitPerUser == null,
+    codeFormat: promo.codeFormat ?? "",
     startDate: promo.startDate,
     endDate: promo.endDate,
     rule: promo.rule,
@@ -56,9 +60,8 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
 export function validatePromoForm(form: PromoFormState): string | null {
   if (!form.name.trim()) return "Promo Name is required";
   if (!form.startDate || !form.endDate) return "Start and End dates are required";
-  if (form.usageType === "one-to-one" && (form.maxUsageUnlimited || !form.maxUsage.trim())) {
-    return "Max Usage is required for 1-to-1 codes";
-  }
+  // 1-to-1 deliberately has no usage caps: how many codes exist is decided by
+  // how many recipients a Broadcast sends it to.
   return null;
 }
 
@@ -73,18 +76,33 @@ export function promoFormToPayload(
   | "usageType"
   | "maxUsage"
   | "limitPerUser"
+  | "codeFormat"
   | "startDate"
   | "endDate"
 > {
+  const oneToOne = form.usageType === "one-to-one";
+  const code = form.code.trim().toUpperCase();
   return {
-    code: form.code.trim().toUpperCase(),
+    code,
     name: form.name.trim(),
     description: form.description.trim(),
     rule: form.rule,
     usageType: form.usageType,
-    maxUsage: form.maxUsageUnlimited ? null : form.maxUsage ? Number(form.maxUsage) : null,
-    limitPerUser:
-      form.limitPerUserUnlimited || !form.limitPerUser ? null : Number(form.limitPerUser),
+    // Usage caps belong to 1-to-Many; a 1-to-1 promo is bounded by its
+    // Broadcast recipients and each code is single-use by definition.
+    maxUsage: oneToOne
+      ? null
+      : form.maxUsageUnlimited
+        ? null
+        : form.maxUsage
+          ? Number(form.maxUsage)
+          : null,
+    limitPerUser: oneToOne
+      ? null
+      : form.limitPerUserUnlimited || !form.limitPerUser
+        ? null
+        : Number(form.limitPerUser),
+    codeFormat: oneToOne ? form.codeFormat || defaultCodeFormat(code) : undefined,
     startDate: form.startDate,
     endDate: form.endDate,
   };
@@ -109,15 +127,7 @@ export function PromoFormFields({
   const set = <K extends keyof PromoFormState>(key: K, val: PromoFormState[K]) =>
     setForm({ ...form, [key]: val });
 
-  const setUsageType = (t: PromoFormState["usageType"]) => {
-    // 1-to-1 needs a concrete count to generate that many individual codes,
-    // so Unlimited can't apply there — force it off when switching in.
-    setForm({
-      ...form,
-      usageType: t,
-      maxUsageUnlimited: t === "one-to-one" ? false : form.maxUsageUnlimited,
-    });
-  };
+  const setUsageType = (t: PromoFormState["usageType"]) => setForm({ ...form, usageType: t });
 
   return (
     <div className="space-y-4">
@@ -153,8 +163,19 @@ export function PromoFormFields({
         </div>
       </div>
 
-      {/* Max Usage + Limit Per User — a total cap and a per-customer cap,
-          each with the same "Unlimited" escape hatch. */}
+      {/* Max Usage + Limit Per User — a total cap and a per-customer cap, each
+          with the same "Unlimited" escape hatch. 1-to-1 has neither: its size
+          is whatever Broadcast sends, and each code works once. */}
+      {form.usageType === "one-to-one" ? (
+        <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground">
+          <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
+          <span>
+            <span className="font-medium text-foreground">Recipients come from Broadcast.</span>{" "}
+            You set the code pattern here; who receives a code — and therefore how many exist — is
+            decided when a Broadcast goes out. Each code can be used once by its owner.
+          </span>
+        </div>
+      ) : (
       <div className="grid grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Max Usage</label>
@@ -176,13 +197,10 @@ export function PromoFormFields({
               )}
             </div>
             <div className="w-px h-5 bg-border shrink-0" />
-            <label
-              className={`flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground ${form.usageType === "one-to-one" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
-            >
+            <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.maxUsageUnlimited}
-                disabled={form.usageType === "one-to-one"}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -190,7 +208,7 @@ export function PromoFormFields({
                     maxUsage: e.target.checked ? "" : form.maxUsage,
                   })
                 }
-                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 disabled:cursor-not-allowed"
+                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
               />
               Unlimited
             </label>
@@ -235,6 +253,7 @@ export function PromoFormFields({
           </div>
         </div>
       </div>
+      )}
 
       {/* Start / End Date+Time */}
       <div className="grid grid-cols-2 gap-4 stagger">

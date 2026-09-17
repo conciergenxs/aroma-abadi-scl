@@ -1,13 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Download } from "lucide-react";
-import {
-  promoStore,
-  downloadAssignedCodesCsv,
-  type AssignedCode,
-} from "@/components/scl/promo-store";
+import { CheckCircle2, FileText } from "lucide-react";
+import { promoStore } from "@/components/scl/promo-store";
 import {
   PromoFormFields,
   PromoFormActionBar,
@@ -23,7 +19,7 @@ export const Route = createFileRoute("/promo-codes/new")({
   component: NewPromoCodePage,
 });
 
-type CreatedPromo = { id: string; code: string; name: string; assignedCodes?: AssignedCode[] };
+type CreatedPromo = { id: string; code: string; name: string; oneToOne: boolean };
 
 function SuccessView({
   promo,
@@ -34,7 +30,6 @@ function SuccessView({
   onViewDetails: () => void;
   onBackToList: () => void;
 }) {
-  const hasIndividualCodes = (promo.assignedCodes?.length ?? 0) > 0;
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
@@ -65,14 +60,22 @@ function SuccessView({
           Back to Promo Codes
         </button>
       </div>
-      {hasIndividualCodes && (
-        <button
-          type="button"
-          onClick={() => downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])}
+      {promo.oneToOne && (
+        <p className="mt-4 mx-auto max-w-sm text-[12px] text-muted-foreground animate-fade-in">
+          Each recipient gets their own code. Add{" "}
+          <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+            {`{{promo-${promo.code}}}`}
+          </code>{" "}
+          to a Template, then send it as a Broadcast to decide who receives one.
+        </p>
+      )}
+      {promo.oneToOne && (
+        <Link
+          to="/templates/new"
           className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline animate-fade-in transition-colors duration-150"
         >
-          <Download className="h-3.5 w-3.5" /> Download individual codes (.csv) to share
-        </button>
+          <FileText className="h-3.5 w-3.5" /> Create the Template
+        </Link>
       )}
     </div>
   );
@@ -93,17 +96,21 @@ function NewPromoCodePage() {
     setSettingCode(true);
   };
 
-  const handleLaunch = (code: string, assignedCodes?: AssignedCode[]) => {
-    const payload = promoFormToPayload({ ...form, code });
+  const handleLaunch = (code: string, codeFormat?: string) => {
+    const payload = promoFormToPayload({ ...form, code, codeFormat: codeFormat ?? "" });
     const id = promoStore.addPromo({
       ...payload,
-      assignedCodes,
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: new Date().toISOString(),
     });
     toast.success("Promo code created");
     setSettingCode(false);
-    setCreated({ id, code: payload.code, name: payload.name, assignedCodes });
+    setCreated({
+      id,
+      code: payload.code,
+      name: payload.name,
+      oneToOne: form.usageType === "one-to-one",
+    });
   };
 
   if (created) {

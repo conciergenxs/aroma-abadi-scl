@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { Wand2, X } from "lucide-react";
-import type { PromoCondition, PromoReward, AssignedCode } from "./promo-store";
+import { Megaphone, Wand2, X } from "lucide-react";
+import type { PromoCondition, PromoReward } from "./promo-store";
+import { CODE_INITIALS_TOKEN, defaultCodeFormat, fillCodeFormat } from "./promo-store";
 import { type PromoFormState, PROMO_CODE_MAX_LENGTH } from "./promo-form-fields";
 
 const CONDITION_CODE: Record<PromoCondition["kind"], string> = {
@@ -8,7 +9,6 @@ const CONDITION_CODE: Record<PromoCondition["kind"], string> = {
   "buy-item": "BUY",
   "min-spend": "SPD",
   "first-purchase": "1ST",
-  "referral-usage": "REF",
 };
 
 const REWARD_CODE: Record<PromoReward["kind"], string> = {
@@ -33,15 +33,9 @@ export function generatePromoCodeSuggestion(form: PromoFormState): string {
   return `${namePrefix}${start}-${end}-${ruleCode}`.slice(0, PROMO_CODE_MAX_LENGTH);
 }
 
-function generateIndividualCodes(baseCode: string, count: number): AssignedCode[] {
-  const digits = String(count).length;
-  return Array.from({ length: count }, (_, i) => ({
-    code: `${baseCode}-${String(i + 1).padStart(digits, "0")}`,
-    redeemed: false,
-  }));
-}
-
-const PAGE_SIZE = 10;
+// Seeded customers, used purely to show what the pattern produces for a real
+// name before any Broadcast has gone out.
+const SAMPLE_NAMES = ["Putri Anggraini", "Bayu Hartanto", "Citra Halim"];
 
 export function PromoCodeSetupModal({
   form,
@@ -50,32 +44,24 @@ export function PromoCodeSetupModal({
 }: {
   form: PromoFormState;
   onCancel: () => void;
-  onConfirm: (code: string, assignedCodes?: AssignedCode[]) => void;
+  onConfirm: (code: string, codeFormat?: string) => void;
 }) {
   const suggested = useMemo(() => generatePromoCodeSuggestion(form), [form]);
   const [code, setCode] = useState(form.code.trim() || suggested);
-  const [page, setPage] = useState(1);
-
   const isOneToOne = form.usageType === "one-to-one";
-  const maxUsage = Number(form.maxUsage) || 0;
-
-  const individualCodes = useMemo(
-    () =>
-      isOneToOne && code.trim() ? generateIndividualCodes(code.trim().toUpperCase(), maxUsage) : [],
-    [isOneToOne, code, maxUsage],
-  );
-
-  const totalPages = Math.max(1, Math.ceil(individualCodes.length / PAGE_SIZE));
-  const pagedCodes = individualCodes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // The pattern follows the base code until someone edits it by hand, at which
+  // point their version sticks.
+  const [formatEdited, setFormatEdited] = useState(false);
+  const [format, setFormat] = useState(form.codeFormat || defaultCodeFormat(code));
+  const effectiveFormat = formatEdited ? format : defaultCodeFormat(code.trim().toUpperCase());
 
   const handleCodeChange = (val: string) => {
     setCode(val.toUpperCase().slice(0, PROMO_CODE_MAX_LENGTH));
-    setPage(1);
   };
 
   const handleConfirm = () => {
     if (!code.trim()) return;
-    onConfirm(code.trim().toUpperCase(), isOneToOne ? individualCodes : undefined);
+    onConfirm(code.trim().toUpperCase(), isOneToOne ? effectiveFormat : undefined);
   };
 
   return (
@@ -91,7 +77,7 @@ export function PromoCodeSetupModal({
             <h2 className="text-sm font-semibold text-foreground">Set Promo Code</h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {isOneToOne
-                ? "Suggested from your promo details — this becomes the prefix for each individual code"
+                ? "Suggested from your promo details — every recipient's code is minted from this"
                 : "Suggested from your promo details, editable if you'd like something else"}
             </p>
           </div>
@@ -130,69 +116,53 @@ export function PromoCodeSetupModal({
         </div>
 
         {isOneToOne && (
-          <div className="flex-1 overflow-y-auto">
-            {code.trim() ? (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border sticky top-0 bg-card">
-                        <th className="px-4 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          Code
-                        </th>
-                        <th className="px-4 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          #
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60">
-                      {pagedCodes.map((c, i) => (
-                        <tr key={c.code}>
-                          <td className="px-4 py-1.5">
-                            <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
-                              {c.code}
-                            </code>
-                          </td>
-                          <td className="px-4 py-1.5 text-right text-[11px] text-muted-foreground">
-                            {(page - 1) * PAGE_SIZE + i + 1}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-border">
-                  <span className="text-[11px] text-muted-foreground">
-                    {individualCodes.length} codes total (read-only, generated from max usage)
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page <= 1}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
-                    >
-                      ‹
-                    </button>
-                    <span className="text-[11px] text-muted-foreground px-1">
-                      {page} / {totalPages}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page >= totalPages}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
-                    >
-                      ›
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <p className="px-4 py-8 text-[13px] text-muted-foreground text-center italic">
-                Enter a code above to preview the {maxUsage} generated codes
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div>
+              <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
+                Code Format
+              </label>
+              <input
+                value={effectiveFormat}
+                onChange={(e) => {
+                  setFormatEdited(true);
+                  setFormat(e.target.value.toUpperCase());
+                }}
+                placeholder={`SUMMER20-${CODE_INITIALS_TOKEN}`}
+                className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm font-mono tracking-wide text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                Leave{" "}
+                <code className="font-mono font-semibold text-primary bg-primary/10 border border-primary/20 rounded px-1">
+                  {CODE_INITIALS_TOKEN}
+                </code>{" "}
+                where each recipient's initials should go — Broadcast fills it in per person.
               </p>
-            )}
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/20 overflow-hidden">
+              <div className="px-3 py-2 border-b border-border text-[10px] uppercase tracking-wide text-muted-foreground">
+                Example
+              </div>
+              <ul className="divide-y divide-border/60">
+                {SAMPLE_NAMES.map((name) => (
+                  <li key={name} className="flex items-center justify-between gap-3 px-3 py-2">
+                    <span className="text-[12px] text-muted-foreground truncate">{name}</span>
+                    <code className="font-mono text-[12px] font-semibold bg-card border border-border rounded px-1.5 py-0.5 shrink-0">
+                      {fillCodeFormat(effectiveFormat, name)}
+                    </code>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex items-start gap-2.5 rounded-md border border-border bg-card/60 px-3 py-2.5 text-[11px] text-muted-foreground">
+              <Megaphone className="h-3.5 w-3.5 shrink-0 mt-px text-primary" />
+              <span>
+                Next: put this promo's code variable in a <strong>Template</strong>, then send it as
+                a <strong>Broadcast</strong> — that's where you choose who receives a code, and the
+                codes appear on this promo's detail page.
+              </span>
+            </div>
           </div>
         )}
 

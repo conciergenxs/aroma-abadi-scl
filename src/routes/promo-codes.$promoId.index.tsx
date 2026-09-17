@@ -24,6 +24,7 @@ import {
   getPromoStatus,
   downloadAssignedCodesCsv,
   downloadRedemptionsCsv,
+  defaultCodeFormat,
   type AssignedCode,
   type PromoStatus,
 } from "@/components/scl/promo-store";
@@ -214,20 +215,23 @@ function PromoDetailPage() {
   );
   const totalDiscountValue = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
   const uniqueCustomers = new Set(redemptions.map((r) => r.contactId)).size;
-  const usageRate = promo.maxUsage ? Math.round((redemptions.length / promo.maxUsage) * 100) : null;
+  const isOneToOne = promo.usageType === "one-to-one";
+  const assignedCodes: AssignedCode[] = promo.assignedCodes ?? [];
+  // 1-to-1 has no usage cap — its denominator is how many recipients a
+  // Broadcast has actually sent codes to.
+  const usageDenominator = isOneToOne ? assignedCodes.length || null : promo.maxUsage;
+  const usageRate = usageDenominator
+    ? Math.round((redemptions.length / usageDenominator) * 100)
+    : null;
 
   // 1-to-1 exports its individual codes; 1-to-Many has only one shared code,
   // so its exportable artefact is the redemption log instead.
-  const canDownload =
-    promo.usageType === "one-to-one"
-      ? (promo.assignedCodes?.length ?? 0) > 0
-      : redemptions.length > 0;
+  const canDownload = isOneToOne ? assignedCodes.length > 0 : redemptions.length > 0;
 
   const pagedRedemptions = redemptions.slice(
     (redemptionPage - 1) * redemptionPageSize,
     redemptionPage * redemptionPageSize,
   );
-  const assignedCodes: AssignedCode[] = promo.assignedCodes ?? [];
   const pagedCodes = assignedCodes.slice(
     (codesPage - 1) * codesPageSize,
     codesPage * codesPageSize,
@@ -254,14 +258,12 @@ function PromoDetailPage() {
                 <>
                   <button
                     onClick={() =>
-                      promo.usageType === "one-to-one"
-                        ? downloadAssignedCodesCsv(promo.code, promo.assignedCodes ?? [])
+                      isOneToOne
+                        ? downloadAssignedCodesCsv(promo.code, assignedCodes)
                         : downloadRedemptionsCsv(promo.code, redemptions)
                     }
                     title={
-                      promo.usageType === "one-to-one"
-                        ? "Download every individual code"
-                        : "Download the redemption log"
+                      isOneToOne ? "Download every recipient's code" : "Download the redemption log"
                     }
                     className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-600 px-4 h-9 text-[14px] font-medium text-white hover:bg-emerald-700 transition-colors"
                   >
@@ -306,24 +308,37 @@ function PromoDetailPage() {
                 {promo.endDate ? fmtDateTimeEN(promo.endDate) : "—"}
               </div>
             </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-                Max Usage
+            {isOneToOne ? (
+              <div className="sm:col-span-2">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                  Code Format
+                </div>
+                <div className="text-[13px] font-mono">
+                  {promo.codeFormat ?? defaultCodeFormat(promo.code)}
+                </div>
               </div>
-              <div className="text-[13px]">
-                {promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-                Limit Per User
-              </div>
-              <div className="text-[13px]">
-                {promo.limitPerUser == null
-                  ? "Unlimited"
-                  : `${fmtNum(promo.limitPerUser)} ${promo.limitPerUser === 1 ? "use" : "uses"}`}
-              </div>
-            </div>
+            ) : (
+              <>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                    Max Usage
+                  </div>
+                  <div className="text-[13px]">
+                    {promo.maxUsage == null ? "Unlimited" : fmtNum(promo.maxUsage)}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                    Limit Per User
+                  </div>
+                  <div className="text-[13px]">
+                    {promo.limitPerUser == null
+                      ? "Unlimited"
+                      : `${fmtNum(promo.limitPerUser)} ${promo.limitPerUser === 1 ? "use" : "uses"}`}
+                  </div>
+                </div>
+              </>
+            )}
             <div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
                 Created
@@ -338,7 +353,11 @@ function PromoDetailPage() {
           <StatTile
             label="Redemptions"
             icon={Ticket}
-            value={`${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`}
+            value={
+              isOneToOne
+                ? `${fmtNum(redemptions.length)}${assignedCodes.length ? ` / ${fmtNum(assignedCodes.length)}` : ""}`
+                : `${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`
+            }
           />
           <StatTile label="Discount Given" icon={Wallet} value={fmtIDR(totalDiscountValue)} />
           <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
@@ -418,82 +437,121 @@ function PromoDetailPage() {
           )}
         </SectionCard>
 
-        {/* Assigned Codes — 1-to-1 promos only */}
-        {promo.usageType === "one-to-one" && assignedCodes.length > 0 && (
+        {/* Recipients — 1-to-1 promos only. Populated by Broadcast, never here. */}
+        {isOneToOne && (
           <SectionCard
-            title={`Individual Codes (${assignedCodes.length})`}
-            description="Each unique code and who it was issued to"
+            title={`Recipients (${assignedCodes.length})`}
+            description="Every code this promo has issued, who received it, and whether they've used it"
           >
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Code
-                    </th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Owner
-                    </th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Redeemed
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60 stagger">
-                  {pagedCodes.map((a) => (
-                    <tr key={a.code} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-5 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
-                            {a.code}
-                          </code>
-                          <CopyCodeButton code={a.code} />
-                        </div>
-                      </td>
-                      <td className="px-5 py-2.5">
-                        {a.contactId ? (
-                          <Link
-                            to="/contacts/$contactId"
-                            params={{ contactId: a.contactId }}
-                            className="text-[13px] font-medium text-primary hover:underline transition-colors duration-150"
-                          >
-                            {a.contactName}
-                          </Link>
-                        ) : (
-                          <span className="text-[13px] text-muted-foreground italic">
-                            Unassigned
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-2.5">
-                        {a.redeemed ? (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white">
-                            <CheckCircle2 className="h-2.5 w-2.5" /> Redeemed
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-400 bg-slate-500 px-2 py-0.5 text-[10px] font-medium text-white">
-                            <Clock className="h-2.5 w-2.5" /> Not yet
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">
-                        {a.redeemedAt ? fmtDateTimeEN(a.redeemedAt) : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <TableFooterPagination
-              page={codesPage}
-              setPage={setCodesPage}
-              pageSize={codesPageSize}
-              setPageSize={setCodesPageSize}
-              total={assignedCodes.length}
-            />
+            {assignedCodes.length === 0 ? (
+              <div className="p-5 text-[12px] text-muted-foreground">
+                <p className="italic">No codes issued yet.</p>
+                <p className="mt-1.5 not-italic">
+                  Put{" "}
+                  <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+                    {`{{promo-${promo.code}}}`}
+                  </code>{" "}
+                  in a{" "}
+                  <Link to="/templates/new" className="text-primary hover:underline">
+                    Template
+                  </Link>
+                  , then send it as a{" "}
+                  <Link to="/broadcasts/new" className="text-primary hover:underline">
+                    Broadcast
+                  </Link>{" "}
+                  — recipients and their codes show up here.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Code
+                        </th>
+                        <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Recipient
+                        </th>
+                        <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Sent Via
+                        </th>
+                        <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Status
+                        </th>
+                        <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Redeemed
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60 stagger">
+                      {pagedCodes.map((a) => (
+                        <tr key={a.code} className="hover:bg-muted/30 transition-colors">
+                          <td className="px-5 py-2.5">
+                            <div className="flex items-center gap-1.5">
+                              <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                                {a.code}
+                              </code>
+                              <CopyCodeButton code={a.code} />
+                            </div>
+                          </td>
+                          <td className="px-5 py-2.5">
+                            {a.contactId ? (
+                              <Link
+                                to="/contacts/$contactId"
+                                params={{ contactId: a.contactId }}
+                                className="text-[13px] font-medium text-primary hover:underline transition-colors duration-150"
+                              >
+                                {a.contactName}
+                              </Link>
+                            ) : (
+                              <span className="text-[13px] text-muted-foreground italic">
+                                Unassigned
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-5 py-2.5">
+                            {a.broadcastId ? (
+                              <Link
+                                to="/broadcasts/$broadcastId"
+                                params={{ broadcastId: a.broadcastId }}
+                                className="text-[12px] text-primary hover:underline transition-colors duration-150"
+                              >
+                                {a.broadcastName ?? "Broadcast"}
+                              </Link>
+                            ) : (
+                              <span className="text-[12px] text-muted-foreground">—</span>
+                            )}
+                          </td>
+                          <td className="px-5 py-2.5">
+                            {a.redeemed ? (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                                <CheckCircle2 className="h-2.5 w-2.5" /> Redeemed
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-400 bg-slate-500 px-2 py-0.5 text-[10px] font-medium text-white">
+                                <Clock className="h-2.5 w-2.5" /> Not yet
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">
+                            {a.redeemedAt ? fmtDateTimeEN(a.redeemedAt) : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <TableFooterPagination
+                  page={codesPage}
+                  setPage={setCodesPage}
+                  pageSize={codesPageSize}
+                  setPageSize={setCodesPageSize}
+                  total={assignedCodes.length}
+                />
+              </>
+            )}
           </SectionCard>
         )}
       </div>

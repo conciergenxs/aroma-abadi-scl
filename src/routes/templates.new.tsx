@@ -78,6 +78,7 @@ function CreateTemplatePage() {
 
   // Variable popup state
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
+  const [promoCodeId, setPromoCodeId] = useState<string | undefined>(undefined);
 
   // Settings
   const [name, setName] = useState("");
@@ -133,6 +134,10 @@ function CreateTemplatePage() {
 
   const valid = name.trim().length > 0 && body.trim().length > 0;
 
+  // Cleared again if the token is edited back out of the body, so the link
+  // can't outlive the variable it stands for.
+  const linkedPromoId = promoCodeId && /\{\{promo-[^}]+\}\}/.test(body) ? promoCodeId : undefined;
+
   const insertVariable = (token: string) => {
     const el = bodyRef.current;
     if (!el) {
@@ -156,6 +161,7 @@ function CreateTemplatePage() {
 
   const insertPromo = (promo: PromoCode) => {
     insertVariable(`{{promo-${promo.code}}}`);
+    setPromoCodeId(promo.id);
     setVarPopup(null);
   };
 
@@ -182,6 +188,7 @@ function CreateTemplatePage() {
       body: body.trim(),
       groupId: groupId === "none" ? undefined : groupId,
       language,
+      promoCodeId: linkedPromoId,
     });
     toast.success(kind === "draft" ? "Draft saved" : "Template submitted for review");
     navigate({ to: "/templates" });

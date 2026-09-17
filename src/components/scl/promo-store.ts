@@ -174,7 +174,46 @@ export type AssignedCode = {
   contactName?: string;
   redeemed: boolean;
   redeemedAt?: string;
+  /** The Broadcast that issued this code — 1-to-1 recipients are chosen there,
+   * never on the promo itself. */
+  broadcastId?: string;
+  broadcastName?: string;
+  sentAt?: string;
 };
+
+/** The slot inside a 1-to-1 code format that Broadcast fills with the
+ * recipient's initials, so every customer gets their own code off one pattern. */
+export const CODE_INITIALS_TOKEN = "####";
+
+/** Four letters standing in for a person: two from each of the first two words
+ * of their name ("Putri Anggraini" -> PUAN), or the first four letters of a
+ * single-word name, padded with X so the slot is always exactly four wide. */
+export function initialsFor(name: string): string {
+  const words = name
+    .replace(/[^A-Za-z ]/g, "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (words.length === 0) return "XXXX";
+  const base =
+    words.length === 1 ? words[0].slice(0, 4) : words[0].slice(0, 2) + words[1].slice(0, 2);
+  return `${base}XXXX`.slice(0, 4).toUpperCase();
+}
+
+export function defaultCodeFormat(code: string): string {
+  return `${code}-${CODE_INITIALS_TOKEN}`;
+}
+
+/** Turn a format into one person's code. Falls back to appending the initials
+ * when the format has lost its slot, so a hand-edited format can't silently
+ * hand the same code to everyone. */
+export function fillCodeFormat(format: string, name: string): string {
+  const initials = initialsFor(name);
+  const filled = format.includes(CODE_INITIALS_TOKEN)
+    ? format.replace(CODE_INITIALS_TOKEN, initials)
+    : `${format}-${initials}`;
+  return filled.toUpperCase();
+}
 
 export type PromoCode = {
   id: string;
@@ -183,9 +222,14 @@ export type PromoCode = {
   description: string;
   rule: PromoRule;
   usageType: "one-to-one" | "one-to-many";
+  /** 1-to-Many only — a 1-to-1 promo is capped by how many recipients a
+   * Broadcast sends it to, so both of these stay null there. */
   maxUsage: number | null;
   /** How many times one customer may redeem this promo. null = no per-customer cap. */
   limitPerUser: number | null;
+  /** 1-to-1 only: the pattern each recipient's code is minted from, e.g.
+   * "SISLEY150K-####". See CODE_INITIALS_TOKEN. */
+  codeFormat?: string;
   startDate: string;
   endDate: string;
   createdBy: { name: string; jobTitle: string };
@@ -210,9 +254,15 @@ export function getPromoStatus(promo: { startDate: string; endDate: string }): P
 // Lets 1-to-1 codes be shared anywhere outside the app (email, chat, print).
 export function downloadAssignedCodesCsv(promoCode: string, assignedCodes: AssignedCode[]) {
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
-  const header = ["Code", "Owner", "Status", "Redeemed At"].map(escape).join(",");
+  const header = ["Code", "Recipient", "Sent Via", "Status", "Redeemed At"].map(escape).join(",");
   const rows = assignedCodes.map((a) =>
-    [a.code, a.contactName ?? "Unassigned", a.redeemed ? "Redeemed" : "Not yet", a.redeemedAt ?? ""]
+    [
+      a.code,
+      a.contactName ?? "Unassigned",
+      a.broadcastName ?? "—",
+      a.redeemed ? "Redeemed" : "Not yet",
+      a.redeemedAt ?? "",
+    ]
       .map(escape)
       .join(","),
   );
@@ -331,14 +381,14 @@ function seed(): PromoCode[] {
       rule: {
         condition: {
           kind: "buy-item",
-          qty: 1,
-          item: { kind: "specific", items: ["Sisley Real Flawless Foundation"] },
+          group: { join: "and", lines: [{ qty: 1, item: { kind: "any-in-brand", brand: "Sisley" } }] },
         },
         reward: { kind: "amount-off", amount: 150000, timing: "immediate" },
       },
       usageType: "one-to-one",
-      maxUsage: 200,
-      limitPerUser: 1,
+      maxUsage: null,
+      limitPerUser: null,
+      codeFormat: "SISLEY150K-####",
       startDate: "2026-07-01T00:00",
       endDate: "2026-08-15T23:59",
       createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
@@ -369,32 +419,46 @@ function seed(): PromoCode[] {
           redeemedAt: t1005.date,
         },
       ],
+      // Issued by a Broadcast — the last four characters are each recipient's
+      // initials, minted from codeFormat above.
       assignedCodes: [
         {
-          code: "SISLEY150K-C1",
+          code: `SISLEY150K-${initialsFor(t1004.customerName)}`,
           contactId: t1004.customerId!,
           contactName: t1004.customerName,
           redeemed: true,
           redeemedAt: t1004.date,
+          broadcastId: "b2",
+          broadcastName: "Sisley Summer Sale",
+          sentAt: "2026-07-02T09:00:00Z",
         },
         {
-          code: "SISLEY150K-C2",
+          code: `SISLEY150K-${initialsFor(t1005.customerName)}`,
           contactId: t1005.customerId!,
           contactName: t1005.customerName,
           redeemed: true,
           redeemedAt: t1005.date,
+          broadcastId: "b2",
+          broadcastName: "Sisley Summer Sale",
+          sentAt: "2026-07-02T09:00:00Z",
         },
         {
-          code: "SISLEY150K-C3",
+          code: `SISLEY150K-${initialsFor(t1010.customerName)}`,
           contactId: t1010.customerId!,
           contactName: t1010.customerName,
           redeemed: false,
+          broadcastId: "b2",
+          broadcastName: "Sisley Summer Sale",
+          sentAt: "2026-07-02T09:00:00Z",
         },
         {
-          code: "SISLEY150K-C4",
+          code: `SISLEY150K-${initialsFor(t1011.customerName)}`,
           contactId: t1011.customerId!,
           contactName: t1011.customerName,
           redeemed: false,
+          broadcastId: "b2",
+          broadcastName: "Sisley Summer Sale",
+          sentAt: "2026-07-02T09:00:00Z",
         },
       ],
     },
@@ -449,8 +513,10 @@ function seed(): PromoCode[] {
       rule: {
         condition: {
           kind: "buy-item",
-          qty: 1,
-          item: { kind: "specific", items: ["Laura Mercier Translucent Loose Setting Powder"] },
+          group: {
+            join: "and",
+            lines: [{ qty: 1, item: { kind: "specific", items: ["Translucent Loose Setting Powder"] } }],
+          },
         },
         reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
       },
@@ -514,10 +580,12 @@ function seed(): PromoCode[] {
       rule: {
         condition: {
           kind: "buy-item",
-          qty: 1,
-          item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] },
+          group: {
+            join: "and",
+            lines: [{ qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } }],
+          },
         },
-        reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
+        reward: { kind: "free-item", sameAsPurchased: true, group: { join: "and", lines: [{ qty: 1, item: { kind: "any" } }] } },
       },
       usageType: "one-to-many",
       maxUsage: 150,
@@ -571,7 +639,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v7";
+const STORAGE_KEY = "aroma_promo_store_v8";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
@@ -638,6 +706,36 @@ export const promoStore = {
 
   updatePromo(id: string, data: Partial<Omit<PromoCode, "id" | "redemptions" | "assignedCodes">>) {
     _promos = _promos.map((p) => (p.id === id ? { ...p, ...data } : p));
+    _save();
+  },
+
+  /** Record the codes a Broadcast just handed out. Re-sending the same
+   * broadcast replaces its previous batch rather than duplicating it, and
+   * codes already redeemed keep their redemption. */
+  assignCodesFromBroadcast(
+    promoId: string,
+    broadcast: { id: string; name: string; sentAt: string },
+    entries: { contactId: string; contactName: string; code: string }[],
+  ) {
+    _promos = _promos.map((p) => {
+      if (p.id !== promoId) return p;
+      const kept = (p.assignedCodes ?? []).filter((a) => a.broadcastId !== broadcast.id);
+      const previous = new Map((p.assignedCodes ?? []).map((a) => [a.contactId, a]));
+      const issued: AssignedCode[] = entries.map((e) => {
+        const before = previous.get(e.contactId);
+        return {
+          code: e.code,
+          contactId: e.contactId,
+          contactName: e.contactName,
+          redeemed: before?.redeemed ?? false,
+          redeemedAt: before?.redeemedAt,
+          broadcastId: broadcast.id,
+          broadcastName: broadcast.name,
+          sentAt: broadcast.sentAt,
+        };
+      });
+      return { ...p, assignedCodes: [...kept, ...issued] };
+    });
     _save();
   },
 

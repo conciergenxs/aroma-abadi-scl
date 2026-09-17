@@ -1,12 +1,15 @@
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Check, Search, X } from "lucide-react";
+import { ChevronDown, Check, Plus, Search, X } from "lucide-react";
 import { useSkuStore } from "./sku-store";
 import {
   type PromoRule,
   type PromoCondition,
   type PromoReward,
   type PromoItemScope,
+  type PromoItemGroup,
+  MAX_ITEM_LINES,
+  itemLine,
   defaultCondition,
   defaultReward,
   describePromoRule,
@@ -20,31 +23,46 @@ import {
 // item-specific % off with a cap, etc.) instead of being limited to a fixed
 // catalog of promo "types".
 
-const CONDITION_OPTIONS: { kind: PromoCondition["kind"]; label: string }[] = [
+// Referral is no longer a promo condition — it has its own page, where one
+// global setting governs every user's referral code.
+const CONDITION_OPTIONS: SegmentedOption<PromoCondition["kind"]>[] = [
   { kind: "any-purchase", label: "Any Purchase" },
   { kind: "buy-item", label: "Buy Item(s)" },
   { kind: "min-spend", label: "Minimum Spend" },
   { kind: "first-purchase", label: "First Purchase" },
-  { kind: "referral-usage", label: "Referral Usage" },
 ];
 
-const REWARD_OPTIONS: { kind: PromoReward["kind"]; label: string }[] = [
+const REWARD_OPTIONS: SegmentedOption<PromoReward["kind"]>[] = [
   { kind: "free-item", label: "Free Item(s)" },
   { kind: "percent-off", label: "% Discount" },
   { kind: "amount-off", label: "Rp Discount" },
   { kind: "free-shipping", label: "Free Shipping" },
-  { kind: "bonus-points", label: "Bonus Points" },
+  {
+    kind: "bonus-points",
+    label: "Bonus Points",
+    disabled: true,
+    disabledReason: "Loyalty points are awarded by the loyalty programme, not by promo codes.",
+  },
 ];
 
 // One preset per genuinely distinct condition × reward pairing — not variations
 // on the same pairing (e.g. "Buy 2 Get 1" is just a qty tweak of "Buy 1 Get 1",
 // which the qty field already covers, so it isn't a separate preset).
-const PRESETS: { label: string; build: () => PromoRule }[] = [
+const PRESETS: {
+  label: string;
+  build: () => PromoRule;
+  disabled?: boolean;
+  disabledReason?: string;
+}[] = [
   {
     label: "Buy 1 Get 1 Free",
     build: () => ({
-      condition: { kind: "buy-item", qty: 1, item: { kind: "any" } },
-      reward: { kind: "free-item", qty: 1, sameAsPurchased: true, item: { kind: "any" } },
+      condition: { kind: "buy-item", group: { join: "and", lines: [itemLine()] } },
+      reward: {
+        kind: "free-item",
+        sameAsPurchased: true,
+        group: { join: "and", lines: [itemLine()] },
+      },
     }),
   },
   {
@@ -57,12 +75,12 @@ const PRESETS: { label: string; build: () => PromoRule }[] = [
   {
     label: "Rp Off This Purchase",
     build: () => ({
-      condition: { kind: "buy-item", qty: 1, item: { kind: "any" } },
+      condition: { kind: "buy-item", group: { join: "and", lines: [itemLine()] } },
       reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
     }),
   },
   {
-    label: "Cashback Next Purchase",
+    label: "Rp Off Next Purchase",
     build: () => ({
       condition: { kind: "any-purchase" },
       reward: { kind: "amount-off", amount: 50000, timing: "next-purchase" },
@@ -84,6 +102,8 @@ const PRESETS: { label: string; build: () => PromoRule }[] = [
   },
   {
     label: "Bonus Points on Purchase",
+    disabled: true,
+    disabledReason: "Loyalty points are awarded by the loyalty programme, not by promo codes.",
     build: () => ({
       condition: { kind: "any-purchase" },
       reward: { kind: "bonus-points", points: 100 },
@@ -394,12 +414,19 @@ function InlineCurrency({
   );
 }
 
+type SegmentedOption<T extends string> = {
+  kind: T;
+  label: string;
+  disabled?: boolean;
+  disabledReason?: string;
+};
+
 function Segmented<T extends string>({
   options,
   value,
   onChange,
 }: {
-  options: { kind: T; label: string }[];
+  options: SegmentedOption<T>[];
   value: T;
   onChange: (v: T) => void;
 }) {
@@ -409,14 +436,112 @@ function Segmented<T extends string>({
         <button
           key={opt.kind}
           type="button"
+          disabled={opt.disabled}
+          title={opt.disabled ? opt.disabledReason : undefined}
           onClick={() => {
             if (opt.kind !== value) onChange(opt.kind);
           }}
-          className={`px-2.5 h-7 text-[11px] font-medium rounded transition-colors ${value === opt.kind ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          className={`px-2.5 h-7 text-[11px] font-medium rounded transition-colors ${
+            value === opt.kind
+              ? "bg-primary text-primary-foreground"
+              : opt.disabled
+                ? "text-muted-foreground/40 cursor-not-allowed line-through decoration-muted-foreground/40"
+                : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           {opt.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+// ── Buy/Get item group — up to MAX_ITEM_LINES "N x item" rows sharing one
+// and/or. The join chip sits between rows where the reading eye expects the
+// word, and says what it means in plain language underneath, because the
+// people building promos here are merchandisers, not engineers. ──
+function ItemGroupEditor({
+  group,
+  onChange,
+  items,
+  verb,
+}: {
+  group: PromoItemGroup;
+  onChange: (g: PromoItemGroup) => void;
+  items: SkuItem[];
+  verb: "buy" | "get";
+}) {
+  const lines = group.lines.length ? group.lines : [itemLine()];
+  const atMax = lines.length >= MAX_ITEM_LINES;
+
+  const setLine = (i: number, next: Partial<(typeof lines)[number]>) =>
+    onChange({ ...group, lines: lines.map((l, idx) => (idx === i ? { ...l, ...next } : l)) });
+
+  const explanation =
+    verb === "buy"
+      ? group.join === "and"
+        ? "Customer has to buy every item listed."
+        : "Customer only has to buy one of these items."
+      : group.join === "and"
+        ? "Customer gets every item listed."
+        : "Customer picks one of these items.";
+
+  return (
+    <div className="space-y-1.5">
+      {lines.map((line, i) => (
+        <div key={i}>
+          {i > 0 && (
+            <div className="flex items-center gap-2 py-0.5">
+              <button
+                type="button"
+                onClick={() => onChange({ ...group, join: group.join === "and" ? "or" : "and" })}
+                title="Switch between and / or"
+                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 h-6 text-[11px] font-semibold text-foreground hover:bg-primary/25 transition-colors"
+              >
+                {group.join}
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </button>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <InlineNumber value={line.qty} onChange={(v) => setLine(i, { qty: v })} />
+            <span className="text-muted-foreground text-[12px]">x</span>
+            <ItemScopeEditor
+              scope={line.item}
+              onChange={(item) => setLine(i, { item })}
+              items={items}
+            />
+            {lines.length > 1 && (
+              <button
+                type="button"
+                onClick={() => onChange({ ...group, lines: lines.filter((_, idx) => idx !== i) })}
+                title="Remove this item"
+                className="h-7 w-7 grid place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+
+      <div className="flex items-center gap-2 pt-0.5">
+        <button
+          type="button"
+          disabled={atMax}
+          onClick={() => onChange({ ...group, lines: [...lines, itemLine()] })}
+          title={atMax ? `Up to ${MAX_ITEM_LINES} items` : undefined}
+          className="inline-flex items-center gap-1 rounded-md border border-dashed border-primary/40 px-2 h-7 text-[11px] font-medium text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
+        >
+          <Plus className="h-3 w-3" /> Add item
+        </button>
+        <span className="text-[10.5px] text-muted-foreground">
+          {atMax ? `Maximum ${MAX_ITEM_LINES} items` : `Up to ${MAX_ITEM_LINES} items`}
+        </span>
+      </div>
+
+      {lines.length > 1 && <p className="text-[10.5px] text-muted-foreground">{explanation}</p>}
     </div>
   );
 }
@@ -437,48 +562,40 @@ function ConditionEditor({
         value={condition.kind}
         onChange={(kind) => onChange(defaultCondition(kind))}
       />
-      <div
-        key={condition.kind}
-        className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in"
-      >
-        <span className="text-muted-foreground">When</span>
-        {condition.kind === "any-purchase" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
-            customer makes any purchase
-          </span>
-        )}
-        {condition.kind === "buy-item" && (
-          <>
-            <span className="text-muted-foreground">customer buys</span>
-            <InlineNumber
-              value={condition.qty}
-              onChange={(v) => onChange({ ...condition, qty: v })}
-            />
-            <ItemScopeEditor
-              scope={condition.item}
-              onChange={(s) => onChange({ ...condition, item: s })}
+      <div key={condition.kind} className="text-[13px] leading-8 animate-fade-in">
+        {condition.kind === "buy-item" ? (
+          <div className="space-y-1.5">
+            <span className="text-muted-foreground">When customer buys</span>
+            <ItemGroupEditor
+              group={condition.group}
+              onChange={(group) => onChange({ ...condition, group })}
               items={items}
+              verb="buy"
             />
-          </>
-        )}
-        {condition.kind === "min-spend" && (
-          <>
-            <span className="text-muted-foreground">customer spends at least</span>
-            <InlineCurrency
-              value={condition.amount}
-              onChange={(v) => onChange({ ...condition, amount: v })}
-            />
-          </>
-        )}
-        {condition.kind === "first-purchase" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
-            customer makes their first purchase
-          </span>
-        )}
-        {condition.kind === "referral-usage" && (
-          <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
-            a referred customer redeems their referral code
-          </span>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-muted-foreground">When</span>
+            {condition.kind === "any-purchase" && (
+              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+                customer makes any purchase
+              </span>
+            )}
+            {condition.kind === "min-spend" && (
+              <>
+                <span className="text-muted-foreground">customer spends at least</span>
+                <InlineCurrency
+                  value={condition.amount}
+                  onChange={(v) => onChange({ ...condition, amount: v })}
+                />
+              </>
+            )}
+            {condition.kind === "first-purchase" && (
+              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+                customer makes their first purchase
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -489,12 +606,10 @@ function RewardEditor({
   reward,
   onChange,
   items,
-  bothSides = false,
 }: {
   reward: PromoReward;
   onChange: (r: PromoReward) => void;
   items: SkuItem[];
-  bothSides?: boolean;
 }) {
   return (
     <div className="space-y-2">
@@ -507,32 +622,25 @@ function RewardEditor({
         key={reward.kind}
         className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in"
       >
-        <span className="text-muted-foreground">
-          {bothSides ? "Referrer & Referred both get" : "Get"}
-        </span>
-        {reward.kind === "free-item" && (
+        <span className="text-muted-foreground">Get</span>
+        {reward.kind === "free-item" && reward.sameAsPurchased && (
           <>
-            <InlineNumber value={reward.qty} onChange={(v) => onChange({ ...reward, qty: v })} />
-            {reward.sameAsPurchased ? (
-              <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
-                Same Item
-              </span>
-            ) : (
-              <ItemScopeEditor
-                scope={reward.item}
-                onChange={(s) => onChange({ ...reward, item: s })}
-                items={items}
-              />
-            )}
+            <InlineNumber
+              value={reward.group.lines[0]?.qty ?? 1}
+              onChange={(v) =>
+                onChange({ ...reward, group: { ...reward.group, lines: [itemLine(v)] } })
+              }
+            />
+            <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
+              Same Item
+            </span>
             <span className="text-muted-foreground">free</span>
             <button
               type="button"
-              onClick={() => onChange({ ...reward, sameAsPurchased: !reward.sameAsPurchased })}
+              onClick={() => onChange({ ...reward, sameAsPurchased: false })}
               className="ml-1 text-[11px] text-primary hover:underline transition-colors duration-150"
             >
-              {reward.sameAsPurchased
-                ? "use a different item instead"
-                : "use the same item instead"}
+              pick specific items instead
             </button>
           </>
         )}
@@ -566,7 +674,7 @@ function RewardEditor({
               className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
             >
               <option value="immediate">off (this purchase)</option>
-              <option value="next-purchase">cashback (next purchase)</option>
+              <option value="next-purchase">off (next purchase)</option>
             </select>
           </>
         )}
@@ -586,6 +694,23 @@ function RewardEditor({
           </>
         )}
       </div>
+      {reward.kind === "free-item" && !reward.sameAsPurchased && (
+        <div className="space-y-1.5">
+          <ItemGroupEditor
+            group={reward.group}
+            onChange={(group) => onChange({ ...reward, group })}
+            items={items}
+            verb="get"
+          />
+          <button
+            type="button"
+            onClick={() => onChange({ ...reward, sameAsPurchased: true })}
+            className="text-[11px] text-primary hover:underline transition-colors duration-150"
+          >
+            give the same item they bought instead
+          </button>
+        </div>
+      )}
       {reward.kind === "percent-off" && (
         <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
           <span>Max discount cap (optional):</span>
@@ -639,7 +764,6 @@ export function PromoRuleBuilder({
               reward={rule.reward}
               onChange={(reward) => onChange({ ...rule, reward })}
               items={items}
-              bothSides={rule.condition.kind === "referral-usage"}
             />
           </div>
         </div>
@@ -654,8 +778,14 @@ export function PromoRuleBuilder({
             <button
               key={p.label}
               type="button"
+              disabled={p.disabled}
+              title={p.disabled ? p.disabledReason : undefined}
               onClick={() => onChange(p.build())}
-              className="rounded-full border border-border bg-card/60 px-3 h-7 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+              className={`rounded-full border px-3 h-7 text-[11px] font-medium transition-colors ${
+                p.disabled
+                  ? "border-border/60 bg-card/30 text-muted-foreground/40 line-through decoration-muted-foreground/40 cursor-not-allowed"
+                  : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
+              }`}
             >
               {p.label}
             </button>
