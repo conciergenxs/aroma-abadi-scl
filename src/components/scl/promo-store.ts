@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { fmtIDR } from "@/lib/fmt";
 import { transactionsStore } from "./transactions-store";
+import { initialsFor } from "@/lib/codes";
+
+export { initialsFor };
 
 export type PromoStatus = "active" | "expired" | "inactive";
 
@@ -184,21 +187,6 @@ export type AssignedCode = {
 /** The slot inside a 1-to-1 code format that Broadcast fills with the
  * recipient's initials, so every customer gets their own code off one pattern. */
 export const CODE_INITIALS_TOKEN = "####";
-
-/** Four letters standing in for a person: two from each of the first two words
- * of their name ("Putri Anggraini" -> PUAN), or the first four letters of a
- * single-word name, padded with X so the slot is always exactly four wide. */
-export function initialsFor(name: string): string {
-  const words = name
-    .replace(/[^A-Za-z ]/g, "")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (words.length === 0) return "XXXX";
-  const base =
-    words.length === 1 ? words[0].slice(0, 4) : words[0].slice(0, 2) + words[1].slice(0, 2);
-  return `${base}XXXX`.slice(0, 4).toUpperCase();
-}
 
 export function defaultCodeFormat(code: string): string {
   return `${code}-${CODE_INITIALS_TOKEN}`;

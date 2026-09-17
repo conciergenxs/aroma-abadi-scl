@@ -92,6 +92,11 @@ export type Contact = {
   deleted?: boolean;
   deletedAt?: string;
   pointBalance?: number;
+  /** When the customer joined — drives their referral code. */
+  joinedAt?: string;
+  /** Permanent referral code, issued once at join: initials + join month/year
+   * (e.g. PUAN0724). Customers only — BAs don't refer. */
+  referralCode?: string;
 };
 
 const avatars = [
@@ -167,6 +172,8 @@ export const contacts: Contact[] = [
     avatar: avatars[0],
     ownerId: "arma",
     pointBalance: 4820,
+    joinedAt: "2024-07-03T09:00:00Z",
+    referralCode: "PUAN0724",
   },
   {
     id: "c2",
@@ -182,6 +189,8 @@ export const contacts: Contact[] = [
     avatar: avatars[1],
     ownerId: "arma",
     pointBalance: 1250,
+    joinedAt: "2024-03-08T09:00:00Z",
+    referralCode: "BAPR0324",
   },
   {
     id: "c3",
@@ -197,6 +206,8 @@ export const contacts: Contact[] = [
     avatar: avatars[2],
     ownerId: "arma",
     pointBalance: 3670,
+    joinedAt: "2025-01-13T09:00:00Z",
+    referralCode: "SIRA0125",
   },
   {
     id: "c5",
@@ -212,6 +223,8 @@ export const contacts: Contact[] = [
     avatar: avatars[4],
     ownerId: "arma",
     pointBalance: 580,
+    joinedAt: "2025-10-18T09:00:00Z",
+    referralCode: "RIMA1025",
   },
   {
     id: "c6",
@@ -227,6 +240,8 @@ export const contacts: Contact[] = [
     avatar: avatars[5],
     ownerId: "arma",
     pointBalance: 7200,
+    joinedAt: "2026-05-23T09:00:00Z",
+    referralCode: "INPE0526",
   },
   {
     id: "c7",
@@ -242,6 +257,8 @@ export const contacts: Contact[] = [
     avatar: avatars[6],
     ownerId: "arma",
     pointBalance: 990,
+    joinedAt: "2024-06-04T09:00:00Z",
+    referralCode: "ANSA0624",
   },
   {
     id: "c9",
@@ -257,6 +274,8 @@ export const contacts: Contact[] = [
     avatar: avatars[8],
     ownerId: "arma",
     pointBalance: 2100,
+    joinedAt: "2025-02-09T09:00:00Z",
+    referralCode: "CIHA0225",
   },
   {
     id: "c11",
@@ -272,6 +291,8 @@ export const contacts: Contact[] = [
     avatar: avatars[10],
     ownerId: "arma",
     pointBalance: 5430,
+    joinedAt: "2024-05-14T09:00:00Z",
+    referralCode: "BAHA0524",
   },
   {
     id: "c12",
@@ -287,6 +308,8 @@ export const contacts: Contact[] = [
     avatar: avatars[11],
     ownerId: "arma",
     pointBalance: 1880,
+    joinedAt: "2024-06-19T09:00:00Z",
+    referralCode: "NASA0624",
   },
   {
     id: "c13",
@@ -302,6 +325,8 @@ export const contacts: Contact[] = [
     avatar: avatars[12],
     ownerId: "arma",
     pointBalance: 3200,
+    joinedAt: "2024-04-24T09:00:00Z",
+    referralCode: "AYFI0424",
   },
   {
     id: "c14",
@@ -317,6 +342,8 @@ export const contacts: Contact[] = [
     avatar: avatars[13],
     ownerId: "arma",
     pointBalance: 760,
+    joinedAt: "2024-11-05T09:00:00Z",
+    referralCode: "YUPR1124",
   },
   {
     id: "c15",
@@ -332,6 +359,8 @@ export const contacts: Contact[] = [
     avatar: avatars[14],
     ownerId: "arma",
     pointBalance: 2340,
+    joinedAt: "2025-03-10T09:00:00Z",
+    referralCode: "TIHA0325",
   },
   {
     id: "c16",
@@ -347,6 +376,8 @@ export const contacts: Contact[] = [
     avatar: avatars[15],
     ownerId: "arma",
     pointBalance: 6100,
+    joinedAt: "2024-08-15T09:00:00Z",
+    referralCode: "LIWU0824",
   },
   {
     id: "c17",
@@ -362,6 +393,8 @@ export const contacts: Contact[] = [
     avatar: avatars[16],
     ownerId: "arma",
     pointBalance: 420,
+    joinedAt: "2024-02-20T09:00:00Z",
+    referralCode: "GASA0224",
   },
   {
     id: "c18",
@@ -377,6 +410,8 @@ export const contacts: Contact[] = [
     avatar: avatars[17],
     ownerId: "arma",
     pointBalance: 1560,
+    joinedAt: "2024-09-25T09:00:00Z",
+    referralCode: "NIKU0924",
   },
   {
     id: "c19",
@@ -392,6 +427,8 @@ export const contacts: Contact[] = [
     avatar: avatars[18],
     ownerId: "arma",
     pointBalance: 870,
+    joinedAt: "2025-04-06T09:00:00Z",
+    referralCode: "FARA0425",
   },
   {
     id: "c20",
@@ -407,6 +444,8 @@ export const contacts: Contact[] = [
     avatar: avatars[19],
     ownerId: "arma",
     pointBalance: 4100,
+    joinedAt: "2025-11-11T09:00:00Z",
+    referralCode: "ZAAU1125",
   },
   {
     id: "c21",
@@ -422,6 +461,8 @@ export const contacts: Contact[] = [
     avatar: avatars[20],
     ownerId: "arma",
     pointBalance: 290,
+    joinedAt: "2026-06-16T09:00:00Z",
+    referralCode: "MIRA0626",
   },
   {
     id: "c22",
@@ -437,6 +478,8 @@ export const contacts: Contact[] = [
     avatar: avatars[21],
     ownerId: "arma",
     pointBalance: 1730,
+    joinedAt: "2024-11-21T09:00:00Z",
+    referralCode: "DIPU1124",
   },
 
   // ── BA Contacts ────────────────────────────────────────────────────
@@ -454,6 +497,7 @@ export const contacts: Contact[] = [
     avatar: avatars[3],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-02-26T09:00:00Z",
   },
   {
     id: "c8",
@@ -469,6 +513,7 @@ export const contacts: Contact[] = [
     avatar: avatars[7],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-09-07T09:00:00Z",
   },
   {
     id: "c10",
@@ -484,6 +529,7 @@ export const contacts: Contact[] = [
     avatar: avatars[9],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2026-04-12T09:00:00Z",
   },
   {
     id: "c23",
@@ -499,6 +545,7 @@ export const contacts: Contact[] = [
     avatar: avatars[22],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-05-17T09:00:00Z",
   },
   {
     id: "c24",
@@ -514,6 +561,7 @@ export const contacts: Contact[] = [
     avatar: avatars[23],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-12-22T09:00:00Z",
   },
   {
     id: "c25",
@@ -529,6 +577,7 @@ export const contacts: Contact[] = [
     avatar: avatars[24],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-07-03T09:00:00Z",
   },
   {
     id: "c26",
@@ -544,6 +593,7 @@ export const contacts: Contact[] = [
     avatar: avatars[25],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2026-02-08T09:00:00Z",
   },
   {
     id: "c27",
@@ -559,6 +609,7 @@ export const contacts: Contact[] = [
     avatar: avatars[26],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-03-13T09:00:00Z",
   },
   {
     id: "c28",
@@ -574,6 +625,7 @@ export const contacts: Contact[] = [
     avatar: avatars[27],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-10-18T09:00:00Z",
   },
   {
     id: "c29",
@@ -589,6 +641,7 @@ export const contacts: Contact[] = [
     avatar: avatars[28],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-05-23T09:00:00Z",
   },
   {
     id: "c30",
@@ -604,6 +657,7 @@ export const contacts: Contact[] = [
     avatar: avatars[29],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-12-04T09:00:00Z",
   },
   {
     id: "c31",
@@ -619,6 +673,7 @@ export const contacts: Contact[] = [
     avatar: avatars[30],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-01-09T09:00:00Z",
   },
   {
     id: "c32",
@@ -634,6 +689,7 @@ export const contacts: Contact[] = [
     avatar: avatars[31],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-08-14T09:00:00Z",
   },
   {
     id: "c33",
@@ -649,6 +705,7 @@ export const contacts: Contact[] = [
     avatar: avatars[32],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-03-19T09:00:00Z",
   },
   {
     id: "c34",
@@ -664,6 +721,7 @@ export const contacts: Contact[] = [
     avatar: avatars[33],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-10-24T09:00:00Z",
   },
   {
     id: "c35",
@@ -679,6 +737,7 @@ export const contacts: Contact[] = [
     avatar: avatars[34],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2026-05-05T09:00:00Z",
   },
   {
     id: "c36",
@@ -694,6 +753,7 @@ export const contacts: Contact[] = [
     avatar: avatars[35],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2024-06-10T09:00:00Z",
   },
   {
     id: "c37",
@@ -709,6 +769,7 @@ export const contacts: Contact[] = [
     avatar: avatars[36],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-01-15T09:00:00Z",
   },
   {
     id: "c38",
@@ -724,6 +785,7 @@ export const contacts: Contact[] = [
     avatar: avatars[37],
     ownerId: "arma",
     pointBalance: 0,
+    joinedAt: "2025-08-20T09:00:00Z",
   },
 ];
 
