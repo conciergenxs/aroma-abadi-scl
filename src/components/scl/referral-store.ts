@@ -130,7 +130,10 @@ function seed(): ReferralSeason[] {
           referredName: "Fani Oktaviani",
           transactionId: "tx-1004",
           invoice: "AA-82204",
-          items: ["Real Flawless Feather Matte Powder Foundation", "Translucent Loose Setting Powder"],
+          items: [
+            "Real Flawless Feather Matte Powder Foundation",
+            "Translucent Loose Setting Powder",
+          ],
           orderValue: 2150000,
           discountValue: 215000,
           usedAt: "2026-07-25T09:35:00Z",
@@ -276,7 +279,8 @@ function isCurrentShape(seasons: unknown): seasons is ReferralSeason[] {
   return (
     Array.isArray(seasons) &&
     seasons.every(
-      (s) => s && typeof s === "object" && "promoId" in s && Array.isArray((s as ReferralSeason).uses),
+      (s) =>
+        s && typeof s === "object" && "promoId" in s && Array.isArray((s as ReferralSeason).uses),
     )
   );
 }

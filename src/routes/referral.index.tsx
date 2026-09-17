@@ -26,11 +26,7 @@ import {
   type ReferralSeason,
   type ReferralStatus,
 } from "@/components/scl/referral-store";
-import {
-  usePromoStore,
-  describePromoRule,
-  type PromoCode,
-} from "@/components/scl/promo-store";
+import { usePromoStore, describePromoRule, type PromoCode } from "@/components/scl/promo-store";
 import { PromoCodePicker } from "@/components/scl/promo-code-picker";
 import {
   AlertDialog,
