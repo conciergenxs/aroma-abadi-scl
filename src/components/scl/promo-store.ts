@@ -10,7 +10,7 @@ export type PromoStatus = "active" | "expired" | "inactive";
 // ── Rule model — a composable Condition × Reward engine ───────────────────────
 // Not a fixed catalog of promo "types" (that was the Odoo-style limitation).
 // Any Condition can pair with any Reward, and every X/Y/Z slot inside each one
-// (item, quantity, amount, percent, cap, timing) is independently editable —
+// (item, quantity, amount, percent, cap) is independently editable —
 // so the same builder can express any promo shape: Buy 1 Get 1, Buy 2 Get 1
 // different item, min-spend cashback, item-specific % off with a cap, etc.
 
@@ -53,8 +53,9 @@ export type PromoCondition =
 export type PromoReward =
   | { kind: "free-item"; sameAsPurchased: boolean; group: PromoItemGroup }
   | { kind: "percent-off"; percent: number; appliesTo: PromoItemScope; maxDiscount: number | null }
-  // "next-purchase" is a discount voucher for the next visit, never cashback.
-  | { kind: "amount-off"; amount: number; timing: "immediate" | "next-purchase" }
+  // Always off the purchase being made — there's no wallet or points balance
+  // to carry value into a later order.
+  | { kind: "amount-off"; amount: number }
   | { kind: "free-shipping" }
   // Loyalty points are owned by the loyalty programme, not by promo codes —
   // kept in the model for existing data but switched off in the builder.
@@ -85,7 +86,7 @@ export function defaultReward(kind: PromoReward["kind"]): PromoReward {
     case "percent-off":
       return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
     case "amount-off":
-      return { kind, amount: 50000, timing: "immediate" };
+      return { kind, amount: 50000 };
     case "free-shipping":
       return { kind };
     case "bonus-points":
@@ -142,9 +143,7 @@ function describeReward(r: PromoReward): string {
       return `Get ${r.percent}% Off ${scopeLabel(r.appliesTo, "Total Purchase")}${cap}`;
     }
     case "amount-off":
-      return r.timing === "next-purchase"
-        ? `Get ${fmtIDR(r.amount)} Off Next Purchase`
-        : `Get ${fmtIDR(r.amount)} Off`;
+      return `Get ${fmtIDR(r.amount)} Off`;
     case "free-shipping":
       return "Get Free Shipping";
     case "bonus-points":
@@ -368,7 +367,7 @@ function seed(): PromoCode[] {
             lines: [{ qty: 1, item: { kind: "any-in-brand", brand: "Sisley" } }],
           },
         },
-        reward: { kind: "amount-off", amount: 150000, timing: "immediate" },
+        reward: { kind: "amount-off", amount: 150000 },
       },
       usageType: "one-to-one",
       maxUsage: null,
@@ -505,7 +504,7 @@ function seed(): PromoCode[] {
             ],
           },
         },
-        reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
+        reward: { kind: "amount-off", amount: 50000 },
       },
       usageType: "one-to-many",
       maxUsage: 100,
@@ -632,7 +631,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v8";
+const STORAGE_KEY = "aroma_promo_store_v9";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (

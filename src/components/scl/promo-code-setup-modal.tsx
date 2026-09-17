@@ -89,9 +89,20 @@ export function PromoCodeSetupModal({
         </div>
 
         <div className="p-4 space-y-1 border-b border-border shrink-0">
-          <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
-            Promo Code
-          </label>
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
+              Promo Code
+            </label>
+            <span
+              className={`text-[10px] tabular-nums transition-colors duration-200 ${
+                PROMO_CODE_MAX_LENGTH - code.length <= 3
+                  ? "text-amber-600 font-medium"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {PROMO_CODE_MAX_LENGTH - code.length} characters left
+            </span>
+          </div>
           <div className="flex items-center gap-1.5">
             <input
               autoFocus
@@ -108,9 +119,6 @@ export function PromoCodeSetupModal({
             >
               <Wand2 className="h-3.5 w-3.5" />
             </button>
-          </div>
-          <div className="text-[10px] text-muted-foreground text-right">
-            {PROMO_CODE_MAX_LENGTH - code.length} characters left
           </div>
         </div>
 

@@ -134,7 +134,18 @@ export function PromoFormFields({
       {/* Promo Name + Usage Type */}
       <div className="flex items-start gap-4">
         <div className="flex-1 min-w-0">
-          <label className={labelCls}>Promo Name</label>
+          <div className="flex items-baseline justify-between gap-2">
+            <label className={labelCls}>Promo Name</label>
+            <span
+              className={`text-[10px] tabular-nums transition-colors duration-200 ${
+                PROMO_NAME_MAX_LENGTH - form.name.length <= 5
+                  ? "text-amber-600 font-medium"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {PROMO_NAME_MAX_LENGTH - form.name.length} characters left
+            </span>
+          </div>
           <input
             value={form.name}
             onChange={(e) => set("name", e.target.value.slice(0, PROMO_NAME_MAX_LENGTH))}
@@ -142,9 +153,6 @@ export function PromoFormFields({
             placeholder="e.g. Summer 20% Off"
             className={inputCls}
           />
-          <div className="mt-1 text-[10px] text-muted-foreground text-right">
-            {PROMO_NAME_MAX_LENGTH - form.name.length} characters left
-          </div>
         </div>
         <div className="shrink-0">
           <label className={labelCls}>Usage Type</label>

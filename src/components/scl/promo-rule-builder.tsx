@@ -18,7 +18,7 @@ import {
 // ── Sentence-builder UI for promo rules ────────────────────────────────────────
 // A promo is "When [Condition] → Get [Reward]". Condition and Reward are each
 // picked independently and every slot inside them (item, qty, amount, percent,
-// cap, timing) is freely editable — so this single builder can express any
+// cap) is freely editable — so this single builder can express any
 // promo shape (Buy 1 Get 1, Buy 2 Get 1 of a different item, min-spend cashback,
 // item-specific % off with a cap, etc.) instead of being limited to a fixed
 // catalog of promo "types".
@@ -73,17 +73,10 @@ const PRESETS: {
     }),
   },
   {
-    label: "Rp Off This Purchase",
+    label: "Rp Off Purchase",
     build: () => ({
       condition: { kind: "buy-item", group: { join: "and", lines: [itemLine()] } },
-      reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
-    }),
-  },
-  {
-    label: "Rp Off Next Purchase",
-    build: () => ({
-      condition: { kind: "any-purchase" },
-      reward: { kind: "amount-off", amount: 50000, timing: "next-purchase" },
+      reward: { kind: "amount-off", amount: 50000 },
     }),
   },
   {
@@ -674,16 +667,7 @@ function RewardEditor({
               value={reward.amount}
               onChange={(v) => onChange({ ...reward, amount: v })}
             />
-            <select
-              value={reward.timing}
-              onChange={(e) =>
-                onChange({ ...reward, timing: e.target.value as "immediate" | "next-purchase" })
-              }
-              className="h-8 rounded-md border border-primary/30 bg-primary/10 px-2 text-[13px] font-medium focus:outline-none"
-            >
-              <option value="immediate">off (this purchase)</option>
-              <option value="next-purchase">off (next purchase)</option>
-            </select>
+            <span className="text-muted-foreground">off</span>
           </>
         )}
         {reward.kind === "free-shipping" && (
