@@ -1,41 +1,31 @@
 import { useState, useEffect } from "react";
-import { fmtIDR } from "@/lib/fmt";
-import { initialsFor, CODE_INITIALS_TOKEN } from "./promo-store";
 
 // ── Referral programme ────────────────────────────────────────────────────────
-// Referral is NOT a promo code. A promo code is one campaign artefact handed to
-// people; referral is a standing programme where every customer carries their
-// own code. So the rules live here, once, and apply to every customer for the
-// length of a season — the only things that vary per customer are the code
-// itself and how many people they brought in.
-
-/** What one side of a referral earns. Points deliberately aren't an option:
- * loyalty points are the loyalty programme's business, not referral's. */
-export type ReferralBenefit =
-  | { kind: "percent"; percent: number; maxDiscount: number | null }
-  | { kind: "amount"; amount: number };
+// Referral codes are NOT configured here. Every customer is issued a permanent
+// code the moment they join — their initials plus the month/year they joined —
+// and it never changes. What this page decides is far smaller and applies to
+// everyone at once: WHEN referral is switched on, and WHICH promo the referred
+// customer gets while it runs.
 
 export type ReferralStatus = "active" | "scheduled" | "ended";
 
-/** One referral hand-off: who invited whom, on which code, and whether it
- * turned into a purchase. */
-export type Referral = {
+/** One use of a referral code: who referred whom, and the purchase it drove. */
+export type ReferralUse = {
   id: string;
   referrerId: string;
   referrerName: string;
-  referredName: string;
-  /** Set once the invited person exists as a contact. */
-  referredId?: string;
+  /** The referrer's permanent code — recorded as used, never edited here. */
   code: string;
-  /** "invited" = code shared but not yet used. "converted" = it drove a sale. */
-  status: "invited" | "converted";
-  invitedAt: string;
-  convertedAt?: string;
-  /** Basket value of the converting purchase. */
-  orderValue?: number;
-  /** Rupiah value actually given away to each side. */
-  referrerReward: number;
-  referredReward: number;
+  referredId?: string;
+  referredName: string;
+  /** The transaction the referred customer made. */
+  transactionId: string;
+  invoice: string;
+  items: string[];
+  orderValue: number;
+  /** Rupiah taken off by the season's promo. */
+  discountValue: number;
+  usedAt: string;
 };
 
 export type ReferralSeason = {
@@ -43,28 +33,14 @@ export type ReferralSeason = {
   name: string;
   startDate: string;
   endDate: string;
-  /** Pattern every customer's code is minted from — the #### slot becomes
-   * their initials, exactly like 1-to-1 promo codes. */
-  codeFormat: string;
-  referrerBenefit: ReferralBenefit;
-  referredBenefit: ReferralBenefit;
-  /** Minimum basket before a referral counts. null = any purchase counts. */
-  minSpend: number | null;
-  /** How many successful referrals one customer can be rewarded for. */
-  maxUsesPerReferrer: number | null;
-  /** Ceiling across the whole season. */
-  maxTotalUses: number | null;
+  /** The promo every referral redeems while this season runs. One setting,
+   * applied to every customer without exception. */
+  promoId: string;
   notes?: string;
   createdBy: { name: string; jobTitle: string };
   createdAt: string;
-  referrals: Referral[];
+  uses: ReferralUse[];
 };
-
-export function describeBenefit(b: ReferralBenefit): string {
-  if (b.kind === "amount") return `${fmtIDR(b.amount)} off`;
-  const cap = b.maxDiscount ? ` (max ${fmtIDR(b.maxDiscount)})` : "";
-  return `${b.percent}% off${cap}`;
-}
 
 /** Status is derived from the clock, never stored, so it can't go stale. */
 export function getSeasonStatus(season: { startDate: string; endDate: string }): ReferralStatus {
@@ -78,204 +54,151 @@ export function getSeasonStatus(season: { startDate: string; endDate: string }):
   return "active";
 }
 
-/** One customer's code for a season. Two customers sharing initials get a
- * numeric suffix, so a code always points at exactly one person. */
-export function referralCodesFor(
-  season: Pick<ReferralSeason, "codeFormat">,
-  people: { id: string; name: string }[],
-): Map<string, string> {
-  const used = new Set<string>();
-  const out = new Map<string, string>();
-  people.forEach((p) => {
-    const base = (
-      season.codeFormat.includes(CODE_INITIALS_TOKEN)
-        ? season.codeFormat.replace(CODE_INITIALS_TOKEN, initialsFor(p.name))
-        : `${season.codeFormat}-${initialsFor(p.name)}`
-    ).toUpperCase();
-    let code = base;
-    for (let n = 2; used.has(code); n += 1) code = `${base}${n}`;
-    used.add(code);
-    out.set(p.id, code);
-  });
-  return out;
-}
-
 export type SeasonReport = {
-  invited: number;
-  converted: number;
-  conversionRate: number;
+  uses: number;
+  referrers: number;
   revenue: number;
-  rewardGiven: number;
-  topReferrers: { id: string; name: string; invited: number; converted: number; reward: number }[];
+  discountGiven: number;
 };
 
 export function seasonReport(season: ReferralSeason): SeasonReport {
-  const converted = season.referrals.filter((r) => r.status === "converted");
-  const byReferrer = new Map<string, SeasonReport["topReferrers"][number]>();
-  season.referrals.forEach((r) => {
-    const row = byReferrer.get(r.referrerId) ?? {
-      id: r.referrerId,
-      name: r.referrerName,
-      invited: 0,
-      converted: 0,
-      reward: 0,
-    };
-    row.invited += 1;
-    if (r.status === "converted") {
-      row.converted += 1;
-      row.reward += r.referrerReward;
-    }
-    byReferrer.set(r.referrerId, row);
-  });
   return {
-    invited: season.referrals.length,
-    converted: converted.length,
-    conversionRate: season.referrals.length
-      ? Math.round((converted.length / season.referrals.length) * 100)
-      : 0,
-    revenue: converted.reduce((sum, r) => sum + (r.orderValue ?? 0), 0),
-    rewardGiven: converted.reduce((sum, r) => sum + r.referrerReward + r.referredReward, 0),
-    topReferrers: [...byReferrer.values()].sort(
-      (a, b) => b.converted - a.converted || b.invited - a.invited,
-    ),
+    uses: season.uses.length,
+    referrers: new Set(season.uses.map((u) => u.referrerId)).size,
+    revenue: season.uses.reduce((sum, u) => sum + u.orderValue, 0),
+    discountGiven: season.uses.reduce((sum, u) => sum + u.discountValue, 0),
   };
 }
 
-export function emptySeason(): Omit<ReferralSeason, "id" | "createdAt" | "referrals"> {
+export function emptySeason(): Omit<ReferralSeason, "id" | "createdAt" | "uses"> {
   return {
     name: "",
     startDate: "",
     endDate: "",
-    codeFormat: `AROMA-${CODE_INITIALS_TOKEN}`,
-    referrerBenefit: { kind: "amount", amount: 50000 },
-    referredBenefit: { kind: "percent", percent: 10, maxDiscount: null },
-    minSpend: 250000,
-    maxUsesPerReferrer: 5,
-    maxTotalUses: null,
+    promoId: "",
     notes: "",
     createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
   };
 }
 
 // ── Seed ──────────────────────────────────────────────────────────────────────
+// Codes follow the permanent convention: initials + join month/year.
 
 function seed(): ReferralSeason[] {
-  const pct = (v: number) => ({ kind: "percent" as const, percent: v, maxDiscount: null });
-  const rp = (v: number) => ({ kind: "amount" as const, amount: v });
-
   return [
     {
       id: "rs-2",
       name: "Beauty Club Referral — Q3",
       startDate: "2026-07-01T00:00",
       endDate: "2026-09-30T23:59",
-      codeFormat: `AROMA-${CODE_INITIALS_TOKEN}`,
-      referrerBenefit: rp(50000),
-      referredBenefit: pct(15),
-      minSpend: 250000,
-      maxUsesPerReferrer: 5,
-      maxTotalUses: 500,
-      notes: "Runs alongside the Beauty Club tier push. Reward is credited after the friend pays.",
+      promoId: "promo-3",
+      notes: "Referred customers redeem the New Arrivals promo. Reward lands after they pay.",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
       createdAt: "2026-06-24T09:00:00Z",
-      referrals: [
+      uses: [
         {
-          id: "rf-201",
+          id: "ru-201",
           referrerId: "c1",
           referrerName: "Putri Anggraini",
+          code: "PUAN0724",
           referredName: "Alya Rahmadhani",
-          code: "AROMA-PUAN",
-          status: "converted",
-          invitedAt: "2026-07-04T10:12:00Z",
-          convertedAt: "2026-07-06T14:20:00Z",
+          transactionId: "tx-1000",
+          invoice: "AA-82200",
+          items: ["Caviar Hydra-Crème Lipstick 42g", "Blush Color Infusion"],
           orderValue: 1250000,
-          referrerReward: 50000,
-          referredReward: 187500,
+          discountValue: 125000,
+          usedAt: "2026-07-06T14:20:00Z",
         },
         {
-          id: "rf-202",
+          id: "ru-202",
           referrerId: "c1",
           referrerName: "Putri Anggraini",
+          code: "PUAN0724",
           referredName: "Gita Permatasari",
-          code: "AROMA-PUAN",
-          status: "converted",
-          invitedAt: "2026-07-18T08:40:00Z",
-          convertedAt: "2026-07-19T16:05:00Z",
+          transactionId: "tx-1012",
+          invoice: "AA-82212",
+          items: ["Real Flawless Foundation"],
           orderValue: 680000,
-          referrerReward: 50000,
-          referredReward: 102000,
+          discountValue: 68000,
+          usedAt: "2026-07-19T16:05:00Z",
         },
         {
-          id: "rf-203",
+          id: "ru-203",
           referrerId: "c3",
           referrerName: "Siti Rahmawati",
+          code: "SIRA0125",
           referredName: "Fani Oktaviani",
-          code: "AROMA-SIRA",
-          status: "converted",
-          invitedAt: "2026-07-22T11:00:00Z",
-          convertedAt: "2026-07-25T09:35:00Z",
+          transactionId: "tx-1004",
+          invoice: "AA-82204",
+          items: ["Real Flawless Feather Matte Powder Foundation", "Translucent Loose Setting Powder"],
           orderValue: 2150000,
-          referrerReward: 50000,
-          referredReward: 322500,
+          discountValue: 215000,
+          usedAt: "2026-07-25T09:35:00Z",
         },
         {
-          id: "rf-204",
-          referrerId: "c3",
-          referrerName: "Siti Rahmawati",
-          referredName: "Rara Anindita",
-          code: "AROMA-SIRA",
-          status: "invited",
-          invitedAt: "2026-08-02T13:15:00Z",
-          referrerReward: 0,
-          referredReward: 0,
-        },
-        {
-          id: "rf-205",
+          id: "ru-204",
           referrerId: "c15",
           referrerName: "Tiara Hapsari",
+          code: "TIHA0325",
           referredName: "Melati Puspa",
-          code: "AROMA-TIHA",
-          status: "converted",
-          invitedAt: "2026-08-05T09:20:00Z",
-          convertedAt: "2026-08-08T19:45:00Z",
+          transactionId: "tx-1010",
+          invoice: "AA-82210",
+          items: ["Translucent Hydrating Setting Spray Ultra-Blur"],
           orderValue: 940000,
-          referrerReward: 50000,
-          referredReward: 141000,
+          discountValue: 94000,
+          usedAt: "2026-08-08T19:45:00Z",
         },
         {
-          id: "rf-206",
-          referrerId: "c16",
-          referrerName: "Lina Wulandari",
-          referredName: "Hana Syifa",
-          code: "AROMA-LIWU",
-          status: "invited",
-          invitedAt: "2026-08-14T15:30:00Z",
-          referrerReward: 0,
-          referredReward: 0,
-        },
-        {
-          id: "rf-207",
+          id: "ru-205",
           referrerId: "c22",
           referrerName: "Dian Puspita",
+          code: "DIPU1124",
           referredName: "Kirana Dewi",
-          code: "AROMA-DIPU",
-          status: "converted",
-          invitedAt: "2026-08-21T10:05:00Z",
-          convertedAt: "2026-08-23T12:40:00Z",
+          transactionId: "tx-1011",
+          invoice: "AA-82211",
+          items: ["Caviar Hydra-Crème Lipstick 42g"],
           orderValue: 1480000,
-          referrerReward: 50000,
-          referredReward: 222000,
+          discountValue: 148000,
+          usedAt: "2026-08-23T12:40:00Z",
         },
         {
-          id: "rf-208",
+          id: "ru-206",
+          referrerId: "c16",
+          referrerName: "Lina Wulandari",
+          code: "LIWU0824",
+          referredName: "Hana Syifa",
+          transactionId: "tx-1006",
+          invoice: "AA-82206",
+          items: ["Blush Color Infusion", "Real Flawless Foundation"],
+          orderValue: 1370000,
+          discountValue: 137000,
+          usedAt: "2026-08-29T11:15:00Z",
+        },
+        {
+          id: "ru-207",
           referrerId: "c9",
           referrerName: "Citra Halim",
+          code: "CIHA0225",
           referredName: "Nabila Ayu",
-          code: "AROMA-CIHA",
-          status: "invited",
-          invitedAt: "2026-09-02T08:10:00Z",
-          referrerReward: 0,
-          referredReward: 0,
+          transactionId: "tx-1001",
+          invoice: "AA-82201",
+          items: ["Translucent Loose Setting Powder"],
+          orderValue: 760000,
+          discountValue: 76000,
+          usedAt: "2026-09-02T08:10:00Z",
+        },
+        {
+          id: "ru-208",
+          referrerId: "c3",
+          referrerName: "Siti Rahmawati",
+          code: "SIRA0125",
+          referredName: "Rara Anindita",
+          transactionId: "tx-1005",
+          invoice: "AA-82205",
+          items: ["Real Flawless Foundation", "Translucent Hydrating Setting Spray Ultra-Blur"],
+          orderValue: 1920000,
+          discountValue: 192000,
+          usedAt: "2026-09-08T13:15:00Z",
         },
       ],
     },
@@ -284,52 +207,49 @@ function seed(): ReferralSeason[] {
       name: "Launch Referral — Q2",
       startDate: "2026-04-01T00:00",
       endDate: "2026-06-30T23:59",
-      codeFormat: `AROMA-${CODE_INITIALS_TOKEN}`,
-      referrerBenefit: rp(35000),
-      referredBenefit: pct(10),
-      minSpend: 150000,
-      maxUsesPerReferrer: 3,
-      maxTotalUses: 300,
-      notes: "First run of the programme — kept the rewards small while we learned the numbers.",
+      promoId: "promo-4",
+      notes: "First run of the programme — a flat Rp50.000 off for the referred customer.",
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
       createdAt: "2026-03-20T09:00:00Z",
-      referrals: [
+      uses: [
         {
-          id: "rf-101",
+          id: "ru-101",
           referrerId: "c2",
           referrerName: "Bagus Pratama",
+          code: "BAPR0324",
           referredName: "Yoga Prasetya",
-          code: "AROMA-BAPR",
-          status: "converted",
-          invitedAt: "2026-04-11T10:00:00Z",
-          convertedAt: "2026-04-13T11:25:00Z",
+          transactionId: "tx-1008",
+          invoice: "AA-82208",
+          items: ["Translucent Loose Setting Powder"],
           orderValue: 520000,
-          referrerReward: 35000,
-          referredReward: 52000,
+          discountValue: 50000,
+          usedAt: "2026-04-13T11:25:00Z",
         },
         {
-          id: "rf-102",
+          id: "ru-102",
           referrerId: "c11",
           referrerName: "Bayu Hartanto",
+          code: "BAHA0524",
           referredName: "Dimas Argya",
-          code: "AROMA-BAHA",
-          status: "converted",
-          invitedAt: "2026-05-02T14:30:00Z",
-          convertedAt: "2026-05-04T10:15:00Z",
+          transactionId: "tx-1002",
+          invoice: "AA-82202",
+          items: ["Caviar Hydra-Crème Lipstick 42g", "Real Flawless Foundation"],
           orderValue: 1130000,
-          referrerReward: 35000,
-          referredReward: 113000,
+          discountValue: 50000,
+          usedAt: "2026-05-04T10:15:00Z",
         },
         {
-          id: "rf-103",
+          id: "ru-103",
           referrerId: "c12",
           referrerName: "Nadya Salsabila",
+          code: "NASA0624",
           referredName: "Intan Maharani",
-          code: "AROMA-NASA",
-          status: "invited",
-          invitedAt: "2026-06-19T09:45:00Z",
-          referrerReward: 0,
-          referredReward: 0,
+          transactionId: "tx-1003",
+          invoice: "AA-82203",
+          items: ["Blush Color Infusion"],
+          orderValue: 430000,
+          discountValue: 50000,
+          usedAt: "2026-06-19T09:45:00Z",
         },
       ],
     },
@@ -338,34 +258,25 @@ function seed(): ReferralSeason[] {
       name: "Holiday Referral — Q4",
       startDate: "2026-10-01T00:00",
       endDate: "2026-12-31T23:59",
-      codeFormat: `AROMAXMAS-${CODE_INITIALS_TOKEN}`,
-      referrerBenefit: pct(20),
-      referredBenefit: pct(20),
-      minSpend: 500000,
-      maxUsesPerReferrer: 10,
-      maxTotalUses: null,
-      notes: "Both sides get the same reward for the gifting season.",
+      promoId: "promo-1",
+      notes: "Gifting season — referred customers get the 20% off promo.",
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: "2026-09-10T09:00:00Z",
-      referrals: [],
+      uses: [],
     },
   ];
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
-// Bump this whenever the ReferralSeason shape changes, so a browser holding an
-// older shape re-seeds instead of rendering stale data against new code.
-const STORAGE_KEY = "aroma_referral_store_v1";
+// Bump when the ReferralSeason shape changes, so a browser holding an older
+// shape re-seeds instead of rendering stale data against new code.
+const STORAGE_KEY = "aroma_referral_store_v2";
 
 function isCurrentShape(seasons: unknown): seasons is ReferralSeason[] {
   return (
     Array.isArray(seasons) &&
     seasons.every(
-      (s) =>
-        s &&
-        typeof s === "object" &&
-        "codeFormat" in s &&
-        Array.isArray((s as ReferralSeason).referrals),
+      (s) => s && typeof s === "object" && "promoId" in s && Array.isArray((s as ReferralSeason).uses),
     )
   );
 }
@@ -406,14 +317,14 @@ export const referralStore = {
     return _seasons;
   },
 
-  addSeason(data: Omit<ReferralSeason, "id" | "referrals" | "createdAt">): string {
+  addSeason(data: Omit<ReferralSeason, "id" | "uses" | "createdAt">): string {
     const id = `rs-${Date.now()}`;
-    _seasons = [{ ...data, id, createdAt: new Date().toISOString(), referrals: [] }, ..._seasons];
+    _seasons = [{ ...data, id, createdAt: new Date().toISOString(), uses: [] }, ..._seasons];
     _save();
     return id;
   },
 
-  updateSeason(id: string, data: Partial<Omit<ReferralSeason, "id" | "referrals">>) {
+  updateSeason(id: string, data: Partial<Omit<ReferralSeason, "id" | "uses">>) {
     _seasons = _seasons.map((s) => (s.id === id ? { ...s, ...data } : s));
     _save();
   },

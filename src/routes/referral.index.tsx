@@ -8,9 +8,9 @@ import {
   XCircle,
   Plus,
   Users,
-  Gift,
-  Percent,
+  Ticket,
   Wallet,
+  Percent,
   Pencil,
   Trash2,
   X,
@@ -20,15 +20,18 @@ import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
 import {
   useReferralStore,
   referralStore,
-  describeBenefit,
   getSeasonStatus,
   seasonReport,
   emptySeason,
-  type ReferralBenefit,
   type ReferralSeason,
   type ReferralStatus,
 } from "@/components/scl/referral-store";
-import { CODE_INITIALS_TOKEN } from "@/components/scl/promo-store";
+import {
+  usePromoStore,
+  describePromoRule,
+  type PromoCode,
+} from "@/components/scl/promo-store";
+import { PromoCodePicker } from "@/components/scl/promo-code-picker";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,7 +68,7 @@ export function SeasonStatusBadge({ status }: { status: ReferralStatus }) {
   );
 }
 
-function StatTile({
+export function StatTile({
   label,
   value,
   icon: Icon,
@@ -87,16 +90,19 @@ function StatTile({
 function ReferralPage() {
   const navigate = useNavigate();
   const { seasons } = useReferralStore();
+  const { promos } = usePromoStore();
   const [editing, setEditing] = useState<ReferralSeason | "new" | null>(null);
   const [deleting, setDeleting] = useState<ReferralSeason | null>(null);
 
+  const promoOf = (id: string) => promos.find((p) => p.id === id) ?? null;
   const active = seasons.find((s) => getSeasonStatus(s) === "active") ?? null;
   const activeReport = useMemo(() => (active ? seasonReport(active) : null), [active]);
+  const activePromo = active ? promoOf(active.promoId) : null;
 
   return (
     <AppShell
       title="Referral"
-      subtitle="One programme, one set of rules — every customer gets their own code"
+      subtitle="Every customer already has a permanent referral code — this decides when it works, and what it gives"
       actions={
         <button
           onClick={() => setEditing("new")}
@@ -131,33 +137,46 @@ function ReferralPage() {
 
             <div className="rounded-lg border border-dashed border-primary/30 bg-primary/[0.04] px-4 py-3">
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-                How it works
+                Applies to every customer
               </div>
               <div className="text-sm font-medium text-foreground">
-                A friend buys with a customer's code → the friend gets{" "}
-                {describeBenefit(active.referredBenefit)}, the customer who referred them gets{" "}
-                {describeBenefit(active.referrerBenefit)}
-                {active.minSpend ? ` on baskets from ${fmtIDR(active.minSpend)}` : ""}.
+                {activePromo ? (
+                  <>
+                    A referred customer redeems{" "}
+                    <Link
+                      to="/promo-codes/$promoId"
+                      params={{ promoId: activePromo.id }}
+                      className="font-mono text-primary hover:underline"
+                    >
+                      {activePromo.code}
+                    </Link>{" "}
+                    — {describePromoRule(activePromo.rule)}
+                  </>
+                ) : (
+                  <span className="text-muted-foreground italic">
+                    No promo linked to this season yet.
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-              <StatTile label="Invites" icon={Users} value={fmtNum(activeReport.invited)} />
-              <StatTile label="Converted" icon={Gift} value={fmtNum(activeReport.converted)} />
-              <StatTile
-                label="Conversion"
-                icon={Percent}
-                value={`${activeReport.conversionRate}%`}
-              />
+              <StatTile label="Referrals Used" icon={Ticket} value={fmtNum(activeReport.uses)} />
+              <StatTile label="Referrers" icon={Users} value={fmtNum(activeReport.referrers)} />
               <StatTile label="Revenue" icon={Wallet} value={fmtIDR(activeReport.revenue)} />
+              <StatTile
+                label="Discount Given"
+                icon={Percent}
+                value={fmtIDR(activeReport.discountGiven)}
+              />
             </div>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-card/20 px-5 py-8 text-center">
             <p className="text-sm font-medium text-foreground">No referral season is running</p>
             <p className="mt-1 text-[12px] text-muted-foreground">
-              Start a season to switch referral on — every customer's code works for as long as it
-              runs.
+              Referral codes only earn something while a season is active. Start one to switch the
+              programme on for every customer at once.
             </p>
           </div>
         )}
@@ -165,7 +184,7 @@ function ReferralPage() {
         {/* Every season, past and planned */}
         <SectionCard
           title={`Seasons (${seasons.length})`}
-          description="Each season sets the rules for the period it covers"
+          description="When referral runs, and which promo a referred customer gets"
         >
           {seasons.length === 0 ? (
             <p className="p-5 text-[12px] text-muted-foreground italic">No seasons yet.</p>
@@ -174,14 +193,7 @@ function ReferralPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    {[
-                      "Season",
-                      "Period",
-                      "Friend gets",
-                      "Referrer gets",
-                      "Referrals",
-                      "Status",
-                    ].map((h) => (
+                    {["Season", "Period", "Promo", "Referrals Used", "Status"].map((h) => (
                       <th
                         key={h}
                         className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
@@ -194,7 +206,7 @@ function ReferralPage() {
                 </thead>
                 <tbody className="divide-y divide-border/60 stagger">
                   {seasons.map((s) => {
-                    const report = seasonReport(s);
+                    const promo = promoOf(s.promoId);
                     return (
                       <tr
                         key={s.id}
@@ -203,24 +215,27 @@ function ReferralPage() {
                         }
                         className="hover:bg-muted/30 transition-colors cursor-pointer"
                       >
-                        <td className="px-5 py-2.5">
-                          <div className="text-[13px] font-medium text-foreground">{s.name}</div>
-                          <code className="text-[11px] text-muted-foreground font-mono">
-                            {s.codeFormat}
-                          </code>
+                        <td className="px-5 py-2.5 text-[13px] font-medium text-foreground">
+                          {s.name}
                         </td>
                         <td className="px-5 py-2.5 text-[12px] text-muted-foreground whitespace-nowrap">
                           {fmtDateEN(s.startDate)} — {fmtDateEN(s.endDate)}
                         </td>
-                        <td className="px-5 py-2.5 text-[12px]">
-                          {describeBenefit(s.referredBenefit)}
+                        <td className="px-5 py-2.5">
+                          {promo ? (
+                            <>
+                              <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                                {promo.code}
+                              </code>
+                              <div className="mt-0.5 text-[11px] text-muted-foreground truncate max-w-[260px]">
+                                {describePromoRule(promo.rule)}
+                              </div>
+                            </>
+                          ) : (
+                            <span className="text-[12px] text-muted-foreground italic">—</span>
+                          )}
                         </td>
-                        <td className="px-5 py-2.5 text-[12px]">
-                          {describeBenefit(s.referrerBenefit)}
-                        </td>
-                        <td className="px-5 py-2.5 text-[12px]">
-                          {fmtNum(report.converted)} / {fmtNum(report.invited)}
-                        </td>
+                        <td className="px-5 py-2.5 text-[13px]">{fmtNum(s.uses.length)}</td>
                         <td className="px-5 py-2.5">
                           <SeasonStatusBadge status={getSeasonStatus(s)} />
                         </td>
@@ -290,77 +305,11 @@ function ReferralPage() {
   );
 }
 
-// ── Season form ───────────────────────────────────────────────────────────────
+// ── Season form — period + the promo it hands out, nothing else ───────────────
 
 const inputCls =
   "h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40";
 const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1";
-
-function BenefitEditor({
-  label,
-  hint,
-  value,
-  onChange,
-}: {
-  label: string;
-  hint: string;
-  value: ReferralBenefit;
-  onChange: (b: ReferralBenefit) => void;
-}) {
-  return (
-    <div>
-      <label className={labelCls}>{label}</label>
-      <div className="flex items-center gap-2">
-        <div className="inline-flex h-9 items-center rounded-md border border-border bg-muted/40 p-0.5 gap-0.5 shrink-0">
-          {(
-            [
-              { kind: "percent", label: "%" },
-              { kind: "amount", label: "Rp" },
-            ] as const
-          ).map((opt) => (
-            <button
-              key={opt.kind}
-              type="button"
-              onClick={() =>
-                onChange(
-                  opt.kind === "percent"
-                    ? { kind: "percent", percent: 10, maxDiscount: null }
-                    : { kind: "amount", amount: 50000 },
-                )
-              }
-              className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${
-                value.kind === opt.kind
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        {value.kind === "percent" ? (
-          <input
-            type="number"
-            min={1}
-            max={100}
-            value={value.percent}
-            onChange={(e) => onChange({ ...value, percent: Number(e.target.value) || 0 })}
-            className={inputCls}
-          />
-        ) : (
-          <input
-            type="number"
-            min={0}
-            value={value.amount}
-            onChange={(e) => onChange({ kind: "amount", amount: Number(e.target.value) || 0 })}
-            className={inputCls}
-          />
-        )}
-      </div>
-      <p className="mt-1 text-[10.5px] text-muted-foreground">{hint}</p>
-    </div>
-  );
-}
 
 function SeasonFormModal({
   season,
@@ -369,53 +318,34 @@ function SeasonFormModal({
   season: ReferralSeason | null;
   onClose: () => void;
 }) {
-  const [form, setForm] = useState(() =>
-    season
-      ? {
-          name: season.name,
-          startDate: season.startDate,
-          endDate: season.endDate,
-          codeFormat: season.codeFormat,
-          referrerBenefit: season.referrerBenefit,
-          referredBenefit: season.referredBenefit,
-          minSpend: season.minSpend?.toString() ?? "",
-          maxUsesPerReferrer: season.maxUsesPerReferrer?.toString() ?? "",
-          maxTotalUses: season.maxTotalUses?.toString() ?? "",
-          notes: season.notes ?? "",
-        }
-      : (() => {
-          const e = emptySeason();
-          return {
-            name: e.name,
-            startDate: e.startDate,
-            endDate: e.endDate,
-            codeFormat: e.codeFormat,
-            referrerBenefit: e.referrerBenefit,
-            referredBenefit: e.referredBenefit,
-            minSpend: e.minSpend?.toString() ?? "",
-            maxUsesPerReferrer: e.maxUsesPerReferrer?.toString() ?? "",
-            maxTotalUses: e.maxTotalUses?.toString() ?? "",
-            notes: e.notes ?? "",
-          };
-        })(),
-  );
+  const { promos } = usePromoStore();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [form, setForm] = useState(() => {
+    const base = season ?? emptySeason();
+    return {
+      name: base.name,
+      startDate: base.startDate,
+      endDate: base.endDate,
+      promoId: base.promoId,
+      notes: base.notes ?? "",
+    };
+  });
 
+  const promo = promos.find((p) => p.id === form.promoId) ?? null;
   const set = <K extends keyof typeof form>(key: K, val: (typeof form)[K]) =>
     setForm({ ...form, [key]: val });
 
   const submit = () => {
     if (!form.name.trim()) return toast.error("Season name is required");
     if (!form.startDate || !form.endDate) return toast.error("Start and End dates are required");
+    if (new Date(form.endDate) < new Date(form.startDate))
+      return toast.error("End date must be after the start date");
+    if (!form.promoId) return toast.error("Choose the promo a referral gives");
     const payload = {
       name: form.name.trim(),
       startDate: form.startDate,
       endDate: form.endDate,
-      codeFormat: form.codeFormat.trim().toUpperCase() || `AROMA-${CODE_INITIALS_TOKEN}`,
-      referrerBenefit: form.referrerBenefit,
-      referredBenefit: form.referredBenefit,
-      minSpend: form.minSpend ? Number(form.minSpend) : null,
-      maxUsesPerReferrer: form.maxUsesPerReferrer ? Number(form.maxUsesPerReferrer) : null,
-      maxTotalUses: form.maxTotalUses ? Number(form.maxTotalUses) : null,
+      promoId: form.promoId,
       notes: form.notes.trim() || undefined,
     };
     if (season) {
@@ -433,170 +363,129 @@ function SeasonFormModal({
 
   if (typeof document === "undefined") return null;
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-backdrop"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="w-full max-w-2xl max-h-[88vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
-        <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">
-              {season ? "Edit Referral Season" : "New Referral Season"}
-            </h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              These rules apply to every customer's referral code while the season runs.
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div>
-            <label className={labelCls}>Season Name</label>
-            <input
-              autoFocus
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
-              placeholder="e.g. Beauty Club Referral — Q3"
-              className={inputCls}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-backdrop"
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
+        <div className="w-full max-w-lg max-h-[88vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
+          <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
             <div>
-              <label className={labelCls}>Starts</label>
-              <input
-                type="datetime-local"
-                value={form.startDate}
-                max={form.endDate || undefined}
-                onChange={(e) => set("startDate", e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className={labelCls}>Ends</label>
-              <input
-                type="datetime-local"
-                value={form.endDate}
-                min={form.startDate || undefined}
-                onChange={(e) => set("endDate", e.target.value)}
-                className={inputCls}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <BenefitEditor
-              label="Friend gets"
-              hint="Applied to the friend's first purchase."
-              value={form.referredBenefit}
-              onChange={(b) => set("referredBenefit", b)}
-            />
-            <BenefitEditor
-              label="Referrer gets"
-              hint="Credited once the friend has paid."
-              value={form.referrerBenefit}
-              onChange={(b) => set("referrerBenefit", b)}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className={labelCls}>Minimum Spend</label>
-              <input
-                type="number"
-                min={0}
-                value={form.minSpend}
-                onChange={(e) => set("minSpend", e.target.value)}
-                placeholder="No minimum"
-                className={inputCls}
-              />
-              <p className="mt-1 text-[10.5px] text-muted-foreground">
-                Basket size before a referral counts.
+              <h2 className="text-sm font-semibold text-foreground">
+                {season ? "Edit Referral Season" : "New Referral Season"}
+              </h2>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Applies to every customer's referral code the moment it starts.
               </p>
             </div>
+            <button
+              onClick={onClose}
+              className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
             <div>
-              <label className={labelCls}>Max Per Referrer</label>
+              <label className={labelCls}>Season Name</label>
               <input
-                type="number"
-                min={1}
-                value={form.maxUsesPerReferrer}
-                onChange={(e) => set("maxUsesPerReferrer", e.target.value)}
-                placeholder="Unlimited"
+                autoFocus
+                value={form.name}
+                onChange={(e) => set("name", e.target.value)}
+                placeholder="e.g. Beauty Club Referral — Q3"
                 className={inputCls}
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Starts</label>
+                <input
+                  type="datetime-local"
+                  value={form.startDate}
+                  max={form.endDate || undefined}
+                  onChange={(e) => set("startDate", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Ends</label>
+                <input
+                  type="datetime-local"
+                  value={form.endDate}
+                  min={form.startDate || undefined}
+                  onChange={(e) => set("endDate", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelCls}>Promo a referral gives</label>
+              <button
+                type="button"
+                onClick={() => setPickerOpen(true)}
+                className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/40 transition-colors"
+              >
+                {promo ? (
+                  <>
+                    <code className="font-mono text-[13px] font-semibold">{promo.code}</code>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {describePromoRule(promo.rule)}
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-sm text-muted-foreground">Choose a promo code…</span>
+                )}
+              </button>
               <p className="mt-1 text-[10.5px] text-muted-foreground">
-                Rewarded referrals per customer.
+                What the referred customer redeems while this season runs.
               </p>
             </div>
+
             <div>
-              <label className={labelCls}>Max This Season</label>
-              <input
-                type="number"
-                min={1}
-                value={form.maxTotalUses}
-                onChange={(e) => set("maxTotalUses", e.target.value)}
-                placeholder="Unlimited"
-                className={inputCls}
+              <label className={labelCls}>Notes</label>
+              <textarea
+                value={form.notes}
+                onChange={(e) => set("notes", e.target.value)}
+                rows={2}
+                placeholder="Anything the team should know about this season..."
+                className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
-              <p className="mt-1 text-[10.5px] text-muted-foreground">Ceiling across everyone.</p>
             </div>
           </div>
 
-          <div>
-            <label className={labelCls}>Code Format</label>
-            <input
-              value={form.codeFormat}
-              onChange={(e) => set("codeFormat", e.target.value.toUpperCase())}
-              placeholder={`AROMA-${CODE_INITIALS_TOKEN}`}
-              className={`${inputCls} font-mono tracking-wide`}
-            />
-            <p className="mt-1 text-[10.5px] text-muted-foreground">
-              Every customer gets their own code from this pattern —{" "}
-              <code className="font-mono font-semibold text-primary bg-primary/10 border border-primary/20 rounded px-1">
-                {CODE_INITIALS_TOKEN}
-              </code>{" "}
-              becomes their initials.
-            </p>
+          <div className="p-3 border-t border-border flex items-center justify-end gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-9 px-4 rounded-md border border-border text-[14px] text-foreground hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={submit}
+              className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
+            >
+              {season ? "Save Changes" : "Create Season"}
+            </button>
           </div>
-
-          <div>
-            <label className={labelCls}>Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => set("notes", e.target.value)}
-              rows={2}
-              placeholder="Anything the team should know about this season..."
-              className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </div>
-        </div>
-
-        <div className="p-3 border-t border-border flex items-center justify-end gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-9 px-4 rounded-md border border-border text-[14px] text-foreground hover:bg-muted transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={submit}
-            className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
-          >
-            {season ? "Save Changes" : "Create Season"}
-          </button>
         </div>
       </div>
-    </div>,
+
+      <PromoCodePicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(p: PromoCode) => {
+          set("promoId", p.id);
+          setPickerOpen(false);
+        }}
+      />
+    </>,
     document.body,
   );
 }
