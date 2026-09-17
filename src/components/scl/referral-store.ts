@@ -1,29 +1,33 @@
 import { useState, useEffect } from "react";
+import { contacts as seedContacts } from "./mock-data";
+import { transactionsStore } from "./transactions-store";
+import { promoStore, discountFor, type PromoRule } from "./promo-store";
 
 // ── Referral programme ────────────────────────────────────────────────────────
-// Referral codes are NOT configured here. Every customer is issued a permanent
-// code the moment they join — their initials plus the month/year they joined —
-// and it never changes. What this page decides is far smaller and applies to
-// everyone at once: WHEN referral is switched on, and WHICH promo the referred
-// customer gets while it runs.
+// Referral codes are never configured here: every customer is issued a
+// permanent code when they join (initials + join month/year) and it stays with
+// them. A season decides two things only, for everyone at once — WHEN referral
+// is switched on, and WHAT the referred customer gets. That "what" is a promo
+// rule built right here, with no code of its own, because the code a customer
+// types is always their referrer's personal one.
 
 export type ReferralStatus = "active" | "scheduled" | "ended";
 
-/** One use of a referral code: who referred whom, and the purchase it drove. */
+/** One referral code used on an ARMA order. */
 export type ReferralUse = {
   id: string;
   referrerId: string;
   referrerName: string;
-  /** The referrer's permanent code — recorded as used, never edited here. */
+  /** The referrer's permanent code, as typed by the referred customer. */
   code: string;
-  referredId?: string;
+  referredId: string;
   referredName: string;
-  /** The transaction the referred customer made. */
+  /** The referred customer's ARMA order the code was used on. */
   transactionId: string;
   invoice: string;
-  items: string[];
+  items: { name: string; qty: number }[];
   orderValue: number;
-  /** Rupiah taken off by the season's promo. */
+  /** Rupiah the season's rule took off that order. */
   discountValue: number;
   usedAt: string;
 };
@@ -33,9 +37,8 @@ export type ReferralSeason = {
   name: string;
   startDate: string;
   endDate: string;
-  /** The promo every referral redeems while this season runs. One setting,
-   * applied to every customer without exception. */
-  promoId: string;
+  /** Applies to every referral while the season runs. */
+  rule: PromoRule;
   notes?: string;
   createdBy: { name: string; jobTitle: string };
   createdAt: string;
@@ -70,217 +73,175 @@ export function seasonReport(season: ReferralSeason): SeasonReport {
   };
 }
 
-export function emptySeason(): Omit<ReferralSeason, "id" | "createdAt" | "uses"> {
+export type ReferralUseWithSeason = ReferralUse & { seasonId: string; seasonName: string };
+
+/** Everything referral-related about one customer: whose code they used, and
+ * who has used theirs. */
+export function referralActivityFor(seasons: ReferralSeason[], contactId: string) {
+  const all: ReferralUseWithSeason[] = seasons.flatMap((s) =>
+    s.uses.map((u) => ({ ...u, seasonId: s.id, seasonName: s.name })),
+  );
   return {
-    name: "",
-    startDate: "",
-    endDate: "",
-    promoId: "",
-    notes: "",
-    createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
+    usedCode: all.find((u) => u.referredId === contactId) ?? null,
+    referred: all
+      .filter((u) => u.referrerId === contactId)
+      .sort((a, b) => +new Date(b.usedAt) - +new Date(a.usedAt)),
   };
 }
 
 // ── Seed ──────────────────────────────────────────────────────────────────────
-// Codes follow the permanent convention: initials + join month/year.
+// Built from the real ARMA orders so every referral points at a transaction
+// that exists, made by the customer it names.
+
+/** Parse a datetime-local season boundary as Jakarta time, so the server and
+ * the browser assign each seeded order to the same season. */
+function wib(datetimeLocal: string) {
+  return new Date(`${datetimeLocal}:00+07:00`).getTime();
+}
 
 function seed(): ReferralSeason[] {
-  return [
+  const seasons: ReferralSeason[] = [
     {
-      id: "rs-2",
-      name: "Beauty Club Referral — Q3",
-      startDate: "2026-07-01T00:00",
-      endDate: "2026-09-30T23:59",
-      promoId: "promo-3",
-      notes: "Referred customers redeem the New Arrivals promo. Reward lands after they pay.",
-      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
-      createdAt: "2026-06-24T09:00:00Z",
-      uses: [
-        {
-          id: "ru-201",
-          referrerId: "c1",
-          referrerName: "Putri Anggraini",
-          code: "PUAN0724",
-          referredName: "Alya Rahmadhani",
-          transactionId: "tx-1000",
-          invoice: "AA-82200",
-          items: ["Caviar Hydra-Crème Lipstick 42g", "Blush Color Infusion"],
-          orderValue: 1250000,
-          discountValue: 125000,
-          usedAt: "2026-07-06T14:20:00Z",
-        },
-        {
-          id: "ru-202",
-          referrerId: "c1",
-          referrerName: "Putri Anggraini",
-          code: "PUAN0724",
-          referredName: "Gita Permatasari",
-          transactionId: "tx-1012",
-          invoice: "AA-82212",
-          items: ["Real Flawless Foundation"],
-          orderValue: 680000,
-          discountValue: 68000,
-          usedAt: "2026-07-19T16:05:00Z",
-        },
-        {
-          id: "ru-203",
-          referrerId: "c3",
-          referrerName: "Siti Rahmawati",
-          code: "SIRA0125",
-          referredName: "Fani Oktaviani",
-          transactionId: "tx-1004",
-          invoice: "AA-82204",
-          items: [
-            "Real Flawless Feather Matte Powder Foundation",
-            "Translucent Loose Setting Powder",
-          ],
-          orderValue: 2150000,
-          discountValue: 215000,
-          usedAt: "2026-07-25T09:35:00Z",
-        },
-        {
-          id: "ru-204",
-          referrerId: "c15",
-          referrerName: "Tiara Hapsari",
-          code: "TIHA0325",
-          referredName: "Melati Puspa",
-          transactionId: "tx-1010",
-          invoice: "AA-82210",
-          items: ["Translucent Hydrating Setting Spray Ultra-Blur"],
-          orderValue: 940000,
-          discountValue: 94000,
-          usedAt: "2026-08-08T19:45:00Z",
-        },
-        {
-          id: "ru-205",
-          referrerId: "c22",
-          referrerName: "Dian Puspita",
-          code: "DIPU1124",
-          referredName: "Kirana Dewi",
-          transactionId: "tx-1011",
-          invoice: "AA-82211",
-          items: ["Caviar Hydra-Crème Lipstick 42g"],
-          orderValue: 1480000,
-          discountValue: 148000,
-          usedAt: "2026-08-23T12:40:00Z",
-        },
-        {
-          id: "ru-206",
-          referrerId: "c16",
-          referrerName: "Lina Wulandari",
-          code: "LIWU0824",
-          referredName: "Hana Syifa",
-          transactionId: "tx-1006",
-          invoice: "AA-82206",
-          items: ["Blush Color Infusion", "Real Flawless Foundation"],
-          orderValue: 1370000,
-          discountValue: 137000,
-          usedAt: "2026-08-29T11:15:00Z",
-        },
-        {
-          id: "ru-207",
-          referrerId: "c9",
-          referrerName: "Citra Halim",
-          code: "CIHA0225",
-          referredName: "Nabila Ayu",
-          transactionId: "tx-1001",
-          invoice: "AA-82201",
-          items: ["Translucent Loose Setting Powder"],
-          orderValue: 760000,
-          discountValue: 76000,
-          usedAt: "2026-09-02T08:10:00Z",
-        },
-        {
-          id: "ru-208",
-          referrerId: "c3",
-          referrerName: "Siti Rahmawati",
-          code: "SIRA0125",
-          referredName: "Rara Anindita",
-          transactionId: "tx-1005",
-          invoice: "AA-82205",
-          items: ["Real Flawless Foundation", "Translucent Hydrating Setting Spray Ultra-Blur"],
-          orderValue: 1920000,
-          discountValue: 192000,
-          usedAt: "2026-09-08T13:15:00Z",
-        },
-      ],
+      id: "rs-q1-2027",
+      name: "New Year Referral — Q1 2027",
+      startDate: "2027-01-01T00:00",
+      endDate: "2027-03-31T23:59",
+      rule: {
+        condition: { kind: "min-spend", amount: 400000 },
+        reward: { kind: "amount-off", amount: 100000 },
+      },
+      notes: "Bigger flat reward to restart referrals after the holidays.",
+      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
+      createdAt: "2026-09-12T09:00:00Z",
+      uses: [],
     },
     {
-      id: "rs-1",
-      name: "Launch Referral — Q2",
-      startDate: "2026-04-01T00:00",
-      endDate: "2026-06-30T23:59",
-      promoId: "promo-4",
-      notes: "First run of the programme — a flat Rp50.000 off for the referred customer.",
-      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
-      createdAt: "2026-03-20T09:00:00Z",
-      uses: [
-        {
-          id: "ru-101",
-          referrerId: "c2",
-          referrerName: "Bagus Pratama",
-          code: "BAPR0324",
-          referredName: "Yoga Prasetya",
-          transactionId: "tx-1008",
-          invoice: "AA-82208",
-          items: ["Translucent Loose Setting Powder"],
-          orderValue: 520000,
-          discountValue: 50000,
-          usedAt: "2026-04-13T11:25:00Z",
-        },
-        {
-          id: "ru-102",
-          referrerId: "c11",
-          referrerName: "Bayu Hartanto",
-          code: "BAHA0524",
-          referredName: "Dimas Argya",
-          transactionId: "tx-1002",
-          invoice: "AA-82202",
-          items: ["Caviar Hydra-Crème Lipstick 42g", "Real Flawless Foundation"],
-          orderValue: 1130000,
-          discountValue: 50000,
-          usedAt: "2026-05-04T10:15:00Z",
-        },
-        {
-          id: "ru-103",
-          referrerId: "c12",
-          referrerName: "Nadya Salsabila",
-          code: "NASA0624",
-          referredName: "Intan Maharani",
-          transactionId: "tx-1003",
-          invoice: "AA-82203",
-          items: ["Blush Color Infusion"],
-          orderValue: 430000,
-          discountValue: 50000,
-          usedAt: "2026-06-19T09:45:00Z",
-        },
-      ],
-    },
-    {
-      id: "rs-3",
+      id: "rs-q4",
       name: "Holiday Referral — Q4",
       startDate: "2026-10-01T00:00",
       endDate: "2026-12-31T23:59",
-      promoId: "promo-1",
-      notes: "Gifting season — referred customers get the 20% off promo.",
+      rule: {
+        condition: { kind: "any-purchase" },
+        reward: {
+          kind: "percent-off",
+          percent: 20,
+          appliesTo: { kind: "any" },
+          maxDiscount: 250000,
+        },
+      },
+      notes: "Gifting season — a referred friend gets 20% off their order.",
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: "2026-09-10T09:00:00Z",
       uses: [],
     },
+    {
+      id: "rs-q3",
+      name: "Beauty Club Referral — Q3",
+      startDate: "2026-07-23T00:00",
+      endDate: "2026-09-30T23:59",
+      rule: {
+        condition: { kind: "any-purchase" },
+        reward: {
+          kind: "percent-off",
+          percent: 10,
+          appliesTo: { kind: "any" },
+          maxDiscount: 200000,
+        },
+      },
+      notes: "Runs alongside the Beauty Club tier push.",
+      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
+      createdAt: "2026-07-20T09:00:00Z",
+      uses: [],
+    },
+    {
+      id: "rs-kickoff",
+      name: "Summer Kickoff Referral",
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-07-22T23:59",
+      rule: {
+        condition: { kind: "min-spend", amount: 300000 },
+        reward: { kind: "amount-off", amount: 75000 },
+      },
+      notes: "First season after ARMA checkout went live.",
+      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
+      createdAt: "2026-06-26T09:00:00Z",
+      uses: [],
+    },
+    {
+      id: "rs-q2",
+      name: "Launch Referral — Q2",
+      startDate: "2026-04-01T00:00",
+      endDate: "2026-06-30T23:59",
+      rule: {
+        condition: { kind: "any-purchase" },
+        reward: { kind: "amount-off", amount: 50000 },
+      },
+      notes: "Ran before ARMA checkout went live, so no referral orders were recorded.",
+      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
+      createdAt: "2026-03-20T09:00:00Z",
+      uses: [],
+    },
   ];
+
+  const codeOf = new Map(seedContacts.map((c) => [c.id, c.referralCode]));
+  const nameOf = new Map(seedContacts.map((c) => [c.id, c.name]));
+  const referrerPool = ["c1", "c3", "c15", "c22", "c9", "c16", "c11", "c12", "c2", "c6"];
+
+  // An order that already redeemed a promo code didn't also use a referral.
+  const promoOrders = new Set(
+    promoStore.getPromos().flatMap((p) => p.redemptions.map((r) => r.transactionId)),
+  );
+  const referredAlready = new Set<string>();
+  const orders = [...transactionsStore.state.transactions]
+    .filter((t) => t.customerId && t.status !== "Cancelled" && !promoOrders.has(t.id))
+    .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+
+  let turn = 0;
+  for (const t of orders) {
+    const referredId = t.customerId!;
+    // Each customer can only ever be referred once — on their first such order.
+    if (referredAlready.has(referredId)) continue;
+    const at = new Date(t.date).getTime();
+    const season = seasons.find((s) => at >= wib(s.startDate) && at <= wib(s.endDate));
+    if (!season) continue;
+
+    let referrerId = referrerPool[turn % referrerPool.length];
+    if (referrerId === referredId) referrerId = referrerPool[(turn + 1) % referrerPool.length];
+    turn += 1;
+
+    const code = codeOf.get(referrerId);
+    if (!code) continue;
+    const minSpend = season.rule.condition.kind === "min-spend" ? season.rule.condition.amount : 0;
+    if (t.total < minSpend) continue;
+
+    referredAlready.add(referredId);
+    season.uses.push({
+      id: `ru-${t.id}`,
+      referrerId,
+      referrerName: nameOf.get(referrerId) ?? referrerId,
+      code,
+      referredId,
+      referredName: t.customerName,
+      transactionId: t.id,
+      invoice: t.invoice,
+      items: t.items.map((i) => ({ name: i.skuName, qty: i.qty })),
+      orderValue: t.total,
+      discountValue: discountFor(season.rule, t.total),
+      usedAt: t.date,
+    });
+  }
+  return seasons;
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
-// Bump when the ReferralSeason shape changes, so a browser holding an older
-// shape re-seeds instead of rendering stale data against new code.
-const STORAGE_KEY = "aroma_referral_store_v2";
+// v3: seasons carry their own promo rule and uses point at real ARMA orders.
+const STORAGE_KEY = "aroma_referral_store_v3";
 
 function isCurrentShape(seasons: unknown): seasons is ReferralSeason[] {
   return (
     Array.isArray(seasons) &&
     seasons.every(
-      (s) =>
-        s && typeof s === "object" && "promoId" in s && Array.isArray((s as ReferralSeason).uses),
+      (s) => s && typeof s === "object" && "rule" in s && Array.isArray((s as ReferralSeason).uses),
     )
   );
 }

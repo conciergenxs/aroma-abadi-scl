@@ -92,8 +92,7 @@ function SkuDetailPage() {
         (t) =>
           t.invoice.toLowerCase().includes(q) ||
           t.customerName.toLowerCase().includes(q) ||
-          t.baName.toLowerCase().includes(q) ||
-          t.store.toLowerCase().includes(q),
+          t.city.toLowerCase().includes(q),
       );
     }
     return list;
@@ -349,16 +348,7 @@ function SkuDetailPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50/60">
-                      {[
-                        "Invoice",
-                        "Customer",
-                        "BA",
-                        "Store",
-                        "City",
-                        "Qty",
-                        "Subtotal",
-                        "Status",
-                      ].map((h) => (
+                      {["Invoice", "Customer", "Ship To", "Qty", "Subtotal", "Status"].map((h) => (
                         <th
                           key={h}
                           className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground ${h === "Qty" || h === "Subtotal" ? "text-right" : "text-left"}`}
@@ -380,10 +370,6 @@ function SkuDetailPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3 text-[13px]">{t.customerName}</td>
-                          <td className="px-4 py-3 text-[13px] text-muted-foreground">
-                            {t.baName}
-                          </td>
-                          <td className="px-4 py-3 text-[13px] text-muted-foreground">{t.store}</td>
                           <td className="px-4 py-3 text-[13px] text-muted-foreground">{t.city}</td>
                           <td className="px-4 py-3 text-right text-[13px] font-medium tabular-nums">
                             {line.qty}

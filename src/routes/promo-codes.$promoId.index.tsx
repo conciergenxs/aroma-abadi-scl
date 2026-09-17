@@ -28,9 +28,11 @@ import {
   downloadAssignedCodesCsv,
   downloadRedemptionsCsv,
   defaultCodeFormat,
+  rewardSummary,
   type AssignedCode,
   type PromoStatus,
 } from "@/components/scl/promo-store";
+import { REWARD_ICONS } from "@/components/scl/reward-icons";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -236,41 +238,7 @@ function PromoDetailPage() {
   // so its exportable artefact is the redemption log instead.
   const canDownload = isOneToOne ? assignedCodes.length > 0 : redemptions.length > 0;
 
-  // "Discount Given" only means something for a discount. Every other reward
-  // gives away something else, so the tile reports that instead.
-  const rewardMetric = (() => {
-    const reward = promo.rule.reward;
-    if (reward.kind === "free-item") {
-      // The rule says how much comes free per redemption: every line for an
-      // "and" group, one chosen line for an "or" group.
-      const qtys = reward.group.lines.map((l) => l.qty);
-      const perRedemption =
-        reward.group.join === "and"
-          ? qtys.reduce((a, b) => a + b, 0)
-          : Math.max(1, ...(qtys.length ? qtys : [1]));
-      return {
-        label: "Items Given Free",
-        icon: Gift,
-        value: fmtNum(redemptions.length * perRedemption),
-        title: `${perRedemption} item${perRedemption === 1 ? "" : "s"} per redemption, from the promo rule`,
-      };
-    }
-    if (reward.kind === "free-shipping") {
-      return {
-        label: "Shipping Covered",
-        icon: Truck,
-        value: fmtIDR(totalDiscountValue),
-      };
-    }
-    if (reward.kind === "bonus-points") {
-      return {
-        label: "Points Awarded",
-        icon: Sparkles,
-        value: fmtNum(reward.points * redemptions.length),
-      };
-    }
-    return { label: "Discount Given", icon: Wallet, value: fmtIDR(totalDiscountValue) };
-  })();
+  const rewardMetric = rewardSummary(promo.rule, redemptions.length, totalDiscountValue);
 
   const pagedRedemptions = redemptions.slice(
     (redemptionPage - 1) * redemptionPageSize,
@@ -405,7 +373,7 @@ function PromoDetailPage() {
           />
           <StatTile
             label={rewardMetric.label}
-            icon={rewardMetric.icon}
+            icon={REWARD_ICONS[rewardMetric.kind]}
             value={rewardMetric.value}
             title={rewardMetric.title}
           />

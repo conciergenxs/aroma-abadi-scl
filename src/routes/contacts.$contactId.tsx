@@ -20,8 +20,7 @@ import {
   Copy,
   KeyRound,
   Ticket,
-  Instagram,
-  Music2,
+  Share2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -44,6 +43,11 @@ import { useBaStore, type BA } from "@/components/scl/ba-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { usePromoStore, type PromoRedemption } from "@/components/scl/promo-store";
+import {
+  useReferralStore,
+  referralActivityFor,
+  type ReferralUseWithSeason,
+} from "@/components/scl/referral-store";
 
 const SYSTEM_KEYS = new Set([
   "name",
@@ -220,6 +224,25 @@ function ContactDetailPage() {
       return true;
     });
   }, [contactRedemptions, dateFrom, dateTo]);
+
+  // Referral: whose code this customer used, and who has used theirs.
+  const { seasons } = useReferralStore();
+  const filteredReferral = useMemo(() => {
+    if (!contact) return { usedCode: null, referred: [] as ReferralUseWithSeason[] };
+    const activity = referralActivityFor(seasons, contact.id);
+    const inRange = (iso: string) => {
+      const d = iso.slice(0, 10);
+      return !(dateFrom && d < dateFrom) && !(dateTo && d > dateTo);
+    };
+    return {
+      usedCode: activity.usedCode && inRange(activity.usedCode.usedAt) ? activity.usedCode : null,
+      referred: activity.referred.filter((u) => inRange(u.usedAt)),
+    };
+  }, [seasons, contact, dateFrom, dateTo]);
+  const redeemCount =
+    filteredRedemptions.length +
+    (filteredReferral.usedCode ? 1 : 0) +
+    filteredReferral.referred.length;
 
   if (!contact) {
     return (
@@ -444,7 +467,7 @@ function ContactDetailPage() {
                     onClick={() => setTab("redeemed")}
                     icon={<Ticket className="h-3.5 w-3.5" />}
                     label="Code Redeem"
-                    count={filteredRedemptions.length}
+                    count={redeemCount}
                   />
                   <div className="ml-auto flex items-center gap-1.5 py-1.5">
                     <input
@@ -500,7 +523,14 @@ function ContactDetailPage() {
                   {tab === "transactions" && (
                     <TransactionsTab transactions={filteredTransactions} />
                   )}
-                  {tab === "redeemed" && <RedeemedTab redemptions={filteredRedemptions} />}
+                  {tab === "redeemed" && (
+                    <RedeemedTab
+                      redemptions={filteredRedemptions}
+                      usedCode={filteredReferral.usedCode}
+                      referred={filteredReferral.referred}
+                      referralCode={contact.referralCode}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -1005,8 +1035,8 @@ function TransactionsTab({
                   ))}
                 </div>
               </PeekRow>
-              <PeekRow label="BA">
-                <span className="font-medium">{peekTx.baName}</span>
+              <PeekRow label="Ordered Via">
+                <span className="font-medium">ARMA · WhatsApp</span>
               </PeekRow>
               <PeekRow label="Payment Method">
                 <span className="font-medium">{peekTx.paymentMethod}</span>
@@ -1019,7 +1049,7 @@ function TransactionsTab({
                 </span>
               </PeekRow>
               {peekTx.note && (
-                <PeekRow label="BA Note">
+                <PeekRow label="Order Note">
                   <span className="text-muted-foreground italic">{peekTx.note}</span>
                 </PeekRow>
               )}
@@ -1058,119 +1088,214 @@ function TransactionsTab({
   );
 }
 
-const REDEEM_CHANNEL_META: Record<
-  PromoRedemption["channel"],
-  { label: string; icon: typeof Instagram; badge: string }
-> = {
-  instagram: {
-    label: "Instagram",
-    icon: Instagram,
-    badge: "border-fuchsia-700 bg-fuchsia-600 text-white",
-  },
-  tiktok: { label: "TikTok", icon: Music2, badge: "border-slate-700 bg-slate-800 text-white" },
-  whatsapp: {
-    label: "WhatsApp",
-    icon: MessageCircle,
-    badge: "border-emerald-700 bg-emerald-600 text-white",
-  },
-};
-
-function RedeemChannelBadge({ channel }: { channel: PromoRedemption["channel"] }) {
-  const meta = REDEEM_CHANNEL_META[channel];
-  const Icon = meta.icon;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium border ${meta.badge}`}
-    >
-      <Icon className="h-2.5 w-2.5" /> {meta.label}
-    </span>
-  );
-}
-
-function RedeemedTab({ redemptions }: { redemptions: ContactRedemption[] }) {
-  if (redemptions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
-        <div className="h-12 w-12 rounded-full bg-white border border-border grid place-items-center">
-          <Ticket className="h-5 w-5 text-muted-foreground" />
-        </div>
-        <div className="text-sm text-foreground">No promo codes redeemed yet.</div>
-        <div className="text-[11px] text-muted-foreground">
-          Promo codes this contact has redeemed will appear here.
-        </div>
-      </div>
-    );
-  }
-
+function RedeemedTab({
+  redemptions,
+  usedCode,
+  referred,
+  referralCode,
+}: {
+  redemptions: ContactRedemption[];
+  usedCode: ReferralUseWithSeason | null;
+  referred: ReferralUseWithSeason[];
+  referralCode?: string;
+}) {
   const totalDiscount = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
+  const th =
+    "px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium";
 
   return (
-    <div className="max-w-3xl space-y-4">
-      {/* Summary */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Total Redemptions
+    <div className="max-w-3xl space-y-8">
+      {/* ── Referral ─────────────────────────────────────────────────────── */}
+      <section className="space-y-3 animate-fade-in">
+        <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Share2 className="h-3.5 w-3.5" /> Referral
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger">
+          <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Used a referral code
+            </div>
+            {usedCode ? (
+              <div className="mt-1.5 space-y-1 text-[12px]">
+                <div>
+                  Referred by{" "}
+                  <Link
+                    to="/contacts/$contactId"
+                    params={{ contactId: usedCode.referrerId }}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {usedCode.referrerName}
+                  </Link>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
+                  <code className="font-mono text-[11px] text-foreground bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                    {usedCode.code}
+                  </code>
+                  <Link
+                    to="/transactions"
+                    search={{ tx: usedCode.transactionId }}
+                    className="font-mono text-primary hover:underline"
+                  >
+                    {usedCode.invoice}
+                  </Link>
+                  <span>−{formatIDR(usedCode.discountValue)}</span>
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {usedCode.seasonName} · {fmtDateTimeEN(usedCode.usedAt)}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1.5 text-[12px] text-muted-foreground italic">
+                Hasn't used anyone's referral code.
+              </p>
+            )}
           </div>
-          <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
-        </div>
-        <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Total Discount Received
-          </div>
-          <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-white">
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Promo Code
-              </th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Transaction
-              </th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Channel
-              </th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Discount
-              </th>
-              <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-                Redeemed
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border stagger">
-            {redemptions.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3">
-                  <div className="font-medium text-foreground text-xs">{r.promoName}</div>
-                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                    {r.promoCode}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="text-xs font-mono text-foreground/90">{r.invoice}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">{r.sourceName}</div>
-                </td>
-                <td className="px-4 py-3">
-                  <RedeemChannelBadge channel={r.channel} />
-                </td>
-                <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
-                  {formatIDR(r.discountValue)}
-                </td>
-                <td className="px-4 py-3 text-left text-[11px] text-muted-foreground whitespace-nowrap">
-                  {fmtDateTimeEN(r.redeemedAt)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Their code
+            </div>
+            <div className="mt-1.5 flex items-center gap-2">
+              <code className="font-mono text-[14px] font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2 py-0.5">
+                {referralCode ?? "—"}
+              </code>
+              {referralCode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(referralCode);
+                    toast.success("Referral code copied");
+                  }}
+                  title="Copy"
+                  className="press icon-pop text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="mt-1.5 text-[12px] text-muted-foreground">
+              Used by <span className="font-semibold text-foreground">{referred.length}</span>{" "}
+              customer
+              {referred.length === 1 ? "" : "s"}
+            </div>
+          </div>
+        </div>
+
+        {referred.length > 0 && (
+          <div className="rounded-lg border border-border overflow-hidden animate-fade-in">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-white">
+                  <th className={th}>Used by</th>
+                  <th className={th}>Transaction</th>
+                  <th className={th}>Order</th>
+                  <th className={th}>Used</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border stagger">
+                {referred.map((u) => (
+                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3">
+                      <Link
+                        to="/contacts/$contactId"
+                        params={{ contactId: u.referredId }}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        {u.referredName}
+                      </Link>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">{u.seasonName}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        to="/transactions"
+                        search={{ tx: u.transactionId }}
+                        className="text-xs font-mono text-primary hover:underline"
+                      >
+                        {u.invoice}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
+                      {formatIDR(u.orderValue)}
+                    </td>
+                    <td className="px-4 py-3 text-[11px] text-muted-foreground whitespace-nowrap">
+                      {fmtDateTimeEN(u.usedAt)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* ── Promo codes ──────────────────────────────────────────────────── */}
+      <section className="space-y-3 animate-fade-in">
+        <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Ticket className="h-3.5 w-3.5" /> Promo Codes
+        </h3>
+        {redemptions.length === 0 ? (
+          <p className="text-[12px] text-muted-foreground italic">No promo codes redeemed yet.</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 stagger">
+              <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Total Redemptions
+                </div>
+                <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
+              </div>
+              <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Total Discount Received
+                </div>
+                <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-white">
+                    <th className={th}>Promo Code</th>
+                    <th className={th}>Transaction</th>
+                    <th className={th}>Discount</th>
+                    <th className={th}>Redeemed</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border stagger">
+                  {redemptions.map((r) => (
+                    <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-foreground text-xs">{r.promoName}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                          {r.promoCode}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          to="/transactions"
+                          search={{ tx: r.transactionId }}
+                          className="text-xs font-mono text-primary hover:underline"
+                        >
+                          {r.invoice}
+                        </Link>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">
+                          {r.sourceName}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
+                        {formatIDR(r.discountValue)}
+                      </td>
+                      <td className="px-4 py-3 text-left text-[11px] text-muted-foreground whitespace-nowrap">
+                        {fmtDateTimeEN(r.redeemedAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 }
@@ -1319,6 +1444,31 @@ function RightPanel({
               <span className="capitalize">{contact.channel}</span>
             </div>
           </FieldRow>
+          {contact.referralCode && (
+            <FieldRow icon={<Share2 className="h-3.5 w-3.5" />} label="Referral">
+              <div className="flex items-center gap-1.5 px-2 py-1">
+                <code className="font-mono text-xs font-semibold tracking-wide text-foreground bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">
+                  {contact.referralCode}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(contact.referralCode ?? "");
+                    toast.success("Referral code copied");
+                  }}
+                  className="press icon-pop text-muted-foreground hover:text-foreground transition-colors"
+                  title="Copy referral code"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
+                {contact.joinedAt && (
+                  <span className="text-[10px] text-muted-foreground truncate">
+                    joined {fmtDateEN(contact.joinedAt)}
+                  </span>
+                )}
+              </div>
+            </FieldRow>
+          )}
         </div>
       </RightSection>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fmtIDR } from "@/lib/fmt";
+import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { transactionsStore } from "./transactions-store";
 import { initialsFor } from "@/lib/codes";
 
@@ -155,6 +155,53 @@ export function describePromoRule(rule: PromoRule): string {
   return `${describeCondition(rule.condition)} → ${describeReward(rule.reward)}`;
 }
 
+// ── What a reward hands out, in the unit that fits it ─────────────────────────
+// "Discount Given" means nothing for a free item or free shipping, so reports
+// describe each reward in its own terms. Shared by promo and referral reports.
+
+export type RewardSummary = {
+  kind: "discount" | "items" | "shipping" | "points";
+  label: string;
+  value: string;
+  title?: string;
+};
+
+export function rewardSummary(rule: PromoRule, count: number, totalValue: number): RewardSummary {
+  const reward = rule.reward;
+  if (reward.kind === "free-item") {
+    // Every line of an "and" group comes free; an "or" group gives one line.
+    const qtys = reward.group.lines.map((l) => l.qty);
+    const perUse =
+      reward.group.join === "and"
+        ? qtys.reduce((a, b) => a + b, 0)
+        : Math.max(1, ...(qtys.length ? qtys : [1]));
+    return {
+      kind: "items",
+      label: "Items Given Free",
+      value: fmtNum(count * perUse),
+      title: `${perUse} item${perUse === 1 ? "" : "s"} per use, from the rule`,
+    };
+  }
+  if (reward.kind === "free-shipping") {
+    return { kind: "shipping", label: "Shipping Covered", value: fmtIDR(totalValue) };
+  }
+  if (reward.kind === "bonus-points") {
+    return { kind: "points", label: "Points Awarded", value: fmtNum(reward.points * count) };
+  }
+  return { kind: "discount", label: "Discount Given", value: fmtIDR(totalValue) };
+}
+
+/** Rupiah a rule takes off an order of `orderValue`. */
+export function discountFor(rule: PromoRule, orderValue: number): number {
+  const r = rule.reward;
+  if (r.kind === "percent-off") {
+    const off = Math.round((orderValue * r.percent) / 100);
+    return r.maxDiscount ? Math.min(off, r.maxDiscount) : off;
+  }
+  if (r.kind === "amount-off") return Math.min(r.amount, orderValue);
+  return 0;
+}
+
 // ── Redemption + ownership model ───────────────────────────────────────────────
 
 export type PromoRedemption = {
@@ -164,9 +211,9 @@ export type PromoRedemption = {
   transactionId: string;
   invoice: string;
   discountValue: number;
-  channel: "instagram" | "tiktok" | "whatsapp";
+  /** The ARMA conversation or broadcast the code was redeemed from — every
+   * redemption happens in an ARMA chat on WhatsApp. */
   sourceName: string;
-  store: string;
   redeemedAt: string;
 };
 
@@ -323,9 +370,7 @@ function seed(): PromoCode[] {
           transactionId: t1000.id,
           invoice: t1000.invoice,
           discountValue: Math.round(t1000.total * 0.2),
-          channel: "whatsapp",
           sourceName: "June Flash Sale",
-          store: t1000.store,
           redeemedAt: t1000.date,
         },
         {
@@ -335,9 +380,7 @@ function seed(): PromoCode[] {
           transactionId: t1006.id,
           invoice: t1006.invoice,
           discountValue: Math.round(t1006.total * 0.2),
-          channel: "whatsapp",
           sourceName: "VIP Customer Blast",
-          store: t1006.store,
           redeemedAt: t1006.date,
         },
         {
@@ -347,9 +390,7 @@ function seed(): PromoCode[] {
           transactionId: t1012.id,
           invoice: t1012.invoice,
           discountValue: Math.round(t1012.total * 0.2),
-          channel: "instagram",
           sourceName: "End of Month Promo",
-          store: t1012.store,
           redeemedAt: t1012.date,
         },
       ],
@@ -385,9 +426,7 @@ function seed(): PromoCode[] {
           transactionId: t1004.id,
           invoice: t1004.invoice,
           discountValue: 150000,
-          channel: "instagram",
           sourceName: "Sisley Summer Sale",
-          store: t1004.store,
           redeemedAt: t1004.date,
         },
         {
@@ -397,9 +436,7 @@ function seed(): PromoCode[] {
           transactionId: t1005.id,
           invoice: t1005.invoice,
           discountValue: 150000,
-          channel: "whatsapp",
           sourceName: "Abandoned Cart Reminder",
-          store: t1005.store,
           redeemedAt: t1005.date,
         },
       ],
@@ -470,9 +507,7 @@ function seed(): PromoCode[] {
           transactionId: t1001.id,
           invoice: t1001.invoice,
           discountValue: Math.round(t1001.total * 0.1),
-          channel: "tiktok",
           sourceName: "New Arrival May",
-          store: t1001.store,
           redeemedAt: t1001.date,
         },
         {
@@ -482,9 +517,7 @@ function seed(): PromoCode[] {
           transactionId: t1003.id,
           invoice: t1003.invoice,
           discountValue: Math.round(t1003.total * 0.1),
-          channel: "whatsapp",
           sourceName: "All Contacts Blast",
-          store: t1003.store,
           redeemedAt: t1003.date,
         },
       ],
@@ -550,9 +583,7 @@ function seed(): PromoCode[] {
           transactionId: t1008.id,
           invoice: t1008.invoice,
           discountValue: Math.round(t1008.total * 0.3),
-          channel: "instagram",
           sourceName: "April Loyalty Blast",
-          store: t1008.store,
           redeemedAt: t1008.date,
         },
       ],
@@ -594,9 +625,7 @@ function seed(): PromoCode[] {
           transactionId: t1002.id,
           invoice: t1002.invoice,
           discountValue: 685000,
-          channel: "whatsapp",
-          sourceName: "Point of Sale",
-          store: t1002.store,
+          sourceName: "Lipstick BOGO Blast",
           redeemedAt: t1002.date,
         },
         {
@@ -606,9 +635,7 @@ function seed(): PromoCode[] {
           transactionId: t1014.id,
           invoice: t1014.invoice,
           discountValue: 685000,
-          channel: "instagram",
-          sourceName: "Manual entry by BA",
-          store: t1014.store,
+          sourceName: "ARMA Product Consult",
           redeemedAt: t1014.date,
         },
         {
@@ -618,9 +645,7 @@ function seed(): PromoCode[] {
           transactionId: t1020.id,
           invoice: t1020.invoice,
           discountValue: 685000,
-          channel: "tiktok",
-          sourceName: "Point of Sale",
-          store: t1020.store,
+          sourceName: "Lipstick BOGO Blast",
           redeemedAt: t1020.date,
         },
       ],
@@ -631,7 +656,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v9";
+const STORAGE_KEY = "aroma_promo_store_v10";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (

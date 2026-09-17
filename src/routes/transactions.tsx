@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import {
   useTransactionsStore,
@@ -21,6 +21,10 @@ import {
 import { contacts } from "@/components/scl/mock-data";
 
 export const Route = createFileRoute("/transactions")({
+  // ?tx=<id> opens that order straight away — used by links from elsewhere
+  // (e.g. a referral's transaction).
+  validateSearch: (search: Record<string, unknown>): { tx?: string } =>
+    typeof search.tx === "string" ? { tx: search.tx } : {},
   head: () => ({
     meta: [
       { title: "Transaction Records — Aroma Abadi" },
@@ -41,11 +45,16 @@ function TransactionsPage() {
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
-  const [store, setStore] = useState<string>("all");
   const [brand, setBrand] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [open, setOpen] = useState<Transaction | null>(null);
+  const { tx: linkedTx } = Route.useSearch();
+  useEffect(() => {
+    if (!linkedTx) return;
+    const match = transactions.find((t) => t.id === linkedTx);
+    if (match) setOpen(match);
+  }, [linkedTx, transactions]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -53,26 +62,16 @@ function TransactionsPage() {
     () => Array.from(new Set(transactions.map((t) => t.city))).sort(),
     [transactions],
   );
-  const stores = useMemo(() => {
-    const src = city === "all" ? transactions : transactions.filter((t) => t.city === city);
-    return Array.from(new Set(src.map((t) => t.store))).sort();
-  }, [transactions, city]);
   const brands = useMemo(() => {
     const set = new Set<string>();
     transactions.forEach((t) => t.brandNames.forEach((b) => set.add(b)));
     return Array.from(set).sort();
   }, [transactions]);
 
-  const handleCityChange = (v: string) => {
-    setCity(v);
-    setStore("all");
-  };
-
   const filtered = useMemo(
     () =>
       transactions.filter((t) => {
         if (city !== "all" && t.city !== city) return false;
-        if (store !== "all" && t.store !== store) return false;
         if (brand !== "all" && !t.brandNames.includes(brand)) return false;
         if (dateFrom) {
           const txDate = new Date(t.date);
@@ -93,14 +92,13 @@ function TransactionsPage() {
           if (
             !t.invoice.toLowerCase().includes(q) &&
             !t.customerName.toLowerCase().includes(q) &&
-            !t.baName.toLowerCase().includes(q) &&
-            !t.store.toLowerCase().includes(q)
+            !t.items.some((i) => i.skuName.toLowerCase().includes(q))
           )
             return false;
         }
         return true;
       }),
-    [transactions, city, store, brand, dateFrom, dateTo, search],
+    [transactions, city, brand, dateFrom, dateTo, search],
   );
 
   const safePageSize = pageSize === 0 ? filtered.length || 1 : pageSize;
@@ -149,30 +147,19 @@ function TransactionsPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Search invoice, customer, BA, store…"
+                placeholder="Search invoice, customer or item…"
                 className="h-8 w-64 max-w-full rounded-md border border-gray-200 bg-white pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 transition-shadow"
               />
             </div>
             <Select
               value={city}
               onChange={(v) => {
-                handleCityChange(v);
+                setCity(v);
                 setPage(1);
               }}
               options={[
-                { value: "all", label: "All Cities" },
+                { value: "all", label: "All Ship-to Cities" },
                 ...cities.map((c) => ({ value: c, label: c })),
-              ]}
-            />
-            <Select
-              value={store}
-              onChange={(v) => {
-                setStore(v);
-                setPage(1);
-              }}
-              options={[
-                { value: "all", label: "All Stores" },
-                ...stores.map((s) => ({ value: s, label: s })),
               ]}
             />
             <Select
@@ -232,7 +219,6 @@ function TransactionsPage() {
                 <tr className="border-b border-border">
                   <Th>Invoice</Th>
                   <Th>Customer</Th>
-                  <Th>BA</Th>
                   <Th>Brand</Th>
                   <Th>Items</Th>
                   <Th>Status</Th>
@@ -269,26 +255,6 @@ function TransactionsPage() {
                           className={`text-left transition-colors ${contactMatch ? "hover:text-primary hover:underline underline-offset-2 cursor-pointer" : "cursor-default"}`}
                         >
                           {t.customerName}
-                        </button>
-                      </Td>
-
-                      {/* BA — clickable */}
-                      <Td>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const ba = contacts.find(
-                              (c) => c.labelIds.includes("lb-ba") && c.name === t.baName,
-                            );
-                            if (ba)
-                              navigate({
-                                to: "/contacts/$contactId",
-                                params: { contactId: ba.id },
-                              });
-                          }}
-                          className="text-left text-muted-foreground hover:text-primary hover:underline underline-offset-2 transition-colors cursor-pointer"
-                        >
-                          {t.baName}
                         </button>
                       </Td>
 
@@ -536,26 +502,11 @@ function TxDrawer({
               {tx.customerName}
             </button>
           </Row>
-          <Row label="BA">
-            <button
-              onClick={() => {
-                const ba = contacts.find(
-                  (c) => c.labelIds.includes("lb-ba") && c.name === tx.baName,
-                );
-                if (ba) {
-                  onClose();
-                  navigate({ to: "/contacts/$contactId", params: { contactId: ba.id } });
-                }
-              }}
-              className="font-medium hover:text-primary hover:underline underline-offset-2 transition-colors"
-            >
-              {tx.baName}
-            </button>
+          <Row label="Ordered Via">
+            <span className="font-medium">ARMA · WhatsApp</span>
           </Row>
-          <Row label="Store">
-            <span className="font-medium">
-              {tx.store} · {tx.city}
-            </span>
+          <Row label="Ship To">
+            <span className="font-medium">{tx.city}</span>
           </Row>
           <Row label="Brand">
             <div className="flex flex-wrap gap-1">
@@ -580,7 +531,7 @@ function TxDrawer({
             </span>
           </Row>
           {tx.note && (
-            <Row label="BA Note">
+            <Row label="Order Note">
               <span className="text-muted-foreground italic">{tx.note}</span>
             </Row>
           )}

@@ -10,14 +10,16 @@ export type TxLine = {
   unitPrice: number;
 };
 
+/** An order placed through ARMA, the WhatsApp AI assistant. That is the only
+ * place transactions come from — there are no in-store or BA-recorded sales —
+ * so an order has a delivery city but no store and no BA. */
 export type Transaction = {
   id: string;
   invoice: string;
   date: string;
   customerId?: string;
   customerName: string;
-  baName: string;
-  store: string;
+  /** Where the order ships to. */
   city: string;
   brandName: string;
   brandNames: string[];
@@ -30,22 +32,7 @@ export type Transaction = {
 
 function seed(): Transaction[] {
   const items: Transaction[] = [];
-  const stores: { city: string; store: string }[] = [
-    { city: "Jakarta", store: "Plaza Indonesia" },
-    { city: "Jakarta", store: "Pondok Indah Mall" },
-    { city: "Bandung", store: "Paris van Java" },
-    { city: "Bandung", store: "Trans Studio Mall" },
-    { city: "Surabaya", store: "Pakuwon Mall" },
-  ];
-  const bas = [
-    "Dewi Lestari",
-    "Maya Kusuma",
-    "Reza Wijaya",
-    "Hesti Andriani",
-    "Indra Wahyudi",
-    "Wulan Sari",
-    "Kevin Nugroho",
-  ];
+  const cities = ["Jakarta", "Jakarta", "Bandung", "Surabaya", "Tangerang"];
   // skuIndices: indices into skus[] that match each customer's brand(s)
   const customers: { id: string; name: string; skuIndices: number[] }[] = [
     { id: "c1", name: "Putri Anggraini", skuIndices: [1, 2, 0] }, // sisley + dg
@@ -119,8 +106,6 @@ function seed(): Transaction[] {
   const BASE_EPOCH = 1785369600000; // 2026-07-30 00:00:00 UTC — fixed, never changes; kept anchored to "today" so the Overview date picker's range actually reaches the present
   for (let i = 0; i < 36; i++) {
     const d = new Date(BASE_EPOCH - i * 8 * 3600 * 1000);
-    const s = stores[i % stores.length];
-    const ba = bas[i % bas.length];
     const cust = customers[i % customers.length];
     const lineCount = 1 + (i % 3);
     const lines: TxLine[] = [];
@@ -148,22 +133,21 @@ function seed(): Transaction[] {
       date: d.toISOString(),
       customerId: cust.id,
       customerName: cust.name,
-      baName: ba,
-      store: s.store,
-      city: s.city,
+      city: cities[i % cities.length],
       brandName: brandNames[0],
       brandNames,
       items: lines,
       total,
       paymentMethod: payments[i % payments.length],
       status: statuses[i % statuses.length],
-      note: i % 5 === 0 ? "Customer minta sample shade lain." : undefined,
+      note: i % 5 === 0 ? "Customer minta sample shade lain lewat ARMA." : undefined,
     });
   }
   return items;
 }
 
-const STORAGE_KEY = "aroma_tx_store_v11";
+// v12: orders are ARMA-only — BA and store were dropped from the shape.
+const STORAGE_KEY = "aroma_tx_store_v12";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
