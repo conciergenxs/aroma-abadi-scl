@@ -3,7 +3,10 @@ import { broadcasts as seedBroadcasts, type Broadcast } from "./mock-data";
 
 type State = { broadcasts: Broadcast[] };
 
-const STORAGE_KEY = "aroma_broadcasts_store_v1";
+// Bump when the seeded broadcasts or the Broadcast shape change — v2 added the
+// Sisley personal-codes send that promo-2's recipient codes point at, plus the
+// promoCodeId/recipientCodes fields.
+const STORAGE_KEY = "aroma_broadcasts_store_v2";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];

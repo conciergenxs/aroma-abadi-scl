@@ -14,7 +14,7 @@ import {
   fillCodeFormat,
 } from "@/components/scl/promo-store";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   CalendarClock,
@@ -127,8 +127,12 @@ function CreateBroadcastPage() {
       toast.error("Please complete all required fields");
       return;
     }
-    if (kind !== "draft" && linkedPromo && duplicateCodes.size > 0) {
-      toast.error("Every recipient needs a unique promo code");
+    if (kind !== "draft" && linkedPromo && (duplicateCodes.size > 0 || blankCodes > 0)) {
+      toast.error(
+        blankCodes > 0
+          ? "Every recipient needs a promo code"
+          : "Every recipient needs a unique promo code",
+      );
       return;
     }
 
@@ -184,7 +188,7 @@ function CreateBroadcastPage() {
       contentMode,
       templateId: templateId ?? undefined,
       promoCodeId: linkedPromo?.id,
-      recipientCodes: recipientCodes.length ? recipientCodes : undefined,
+      recipientCodes: status === "Sent" && recipientCodes.length ? recipientCodes : undefined,
       body: previewBody,
       replied: 0,
       failed: 0,
@@ -250,6 +254,12 @@ function CreateBroadcastPage() {
 
   const codeFor = (contactId: string) =>
     codeOverrides[contactId] ?? generatedCodes.get(contactId) ?? "";
+
+  // Hand-edited codes belong to the promo they were typed for — switching to a
+  // template with a different promo must not carry them across.
+  useEffect(() => setCodeOverrides({}), [linkedPromo?.id]);
+
+  const blankCodes = recipients.filter((c) => !codeFor(c.id).trim()).length;
 
   const duplicateCodes = useMemo(() => {
     const seen = new Map<string, number>();
@@ -642,7 +652,7 @@ function CreateBroadcastPage() {
             {sendMode === "schedule" ? (
               <button
                 onClick={() => submit("schedule")}
-                disabled={!valid || duplicateCodes.size > 0}
+                disabled={!valid || duplicateCodes.size > 0 || blankCodes > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
@@ -650,7 +660,7 @@ function CreateBroadcastPage() {
             ) : (
               <button
                 onClick={() => submit("send")}
-                disabled={!valid || duplicateCodes.size > 0}
+                disabled={!valid || duplicateCodes.size > 0 || blankCodes > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast

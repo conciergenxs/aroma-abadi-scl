@@ -330,9 +330,19 @@ function PromoCodesPage() {
                     <span className="text-[13px] font-semibold text-foreground">
                       {promo.redemptions.length}
                     </span>
-                    {promo.maxUsage && (
-                      <span className="text-[10px] text-muted-foreground"> / {promo.maxUsage}</span>
-                    )}
+                    {promo.usageType === "one-to-one"
+                      ? (promo.assignedCodes?.length ?? 0) > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {" "}
+                            / {promo.assignedCodes?.length}
+                          </span>
+                        )
+                      : promo.maxUsage && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {" "}
+                            / {promo.maxUsage}
+                          </span>
+                        )}
                   </td>
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end">

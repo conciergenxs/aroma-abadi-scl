@@ -78,7 +78,7 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
 export function defaultReward(kind: PromoReward["kind"]): PromoReward {
   switch (kind) {
     case "free-item":
-      return { kind, sameAsPurchased: true, group: itemGroup() };
+      return { kind, sameAsPurchased: false, group: itemGroup() };
     case "percent-off":
       return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
     case "amount-off":

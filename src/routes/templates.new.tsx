@@ -12,7 +12,7 @@ import { connectedChannels, TEMPLATE_LANGUAGES, type Template } from "@/componen
 import { BrandPicker } from "@/components/scl/brand-picker";
 import { PromoCodePicker } from "@/components/scl/promo-code-picker";
 import type { Brand } from "@/components/scl/sku-store";
-import type { PromoCode } from "@/components/scl/promo-store";
+import { usePromoStore, type PromoCode } from "@/components/scl/promo-store";
 import {
   Save,
   Send,
@@ -78,7 +78,6 @@ function CreateTemplatePage() {
 
   // Variable popup state
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
-  const [promoCodeId, setPromoCodeId] = useState<string | undefined>(undefined);
 
   // Settings
   const [name, setName] = useState("");
@@ -134,9 +133,18 @@ function CreateTemplatePage() {
 
   const valid = name.trim().length > 0 && body.trim().length > 0;
 
-  // Cleared again if the token is edited back out of the body, so the link
-  // can't outlive the variable it stands for.
-  const linkedPromoId = promoCodeId && /\{\{promo-[^}]+\}\}/.test(body) ? promoCodeId : undefined;
+  // Read the link straight from the body so it can never disagree with it:
+  // deleting a token unlinks it, and typing one by hand links it. A 1-to-1
+  // promo wins when there are several, because that's the one Broadcast
+  // has to mint per-recipient codes for.
+  const { promos } = usePromoStore();
+  const linkedPromoId = (() => {
+    const codes = [...body.matchAll(/\{\{promo-([^}]+)\}\}/g)].map((m) => m[1].trim());
+    const found = codes
+      .map((code) => promos.find((p) => p.code === code))
+      .filter((p): p is PromoCode => !!p);
+    return (found.find((p) => p.usageType === "one-to-one") ?? found[0])?.id;
+  })();
 
   const insertVariable = (token: string) => {
     const el = bodyRef.current;
@@ -161,7 +169,6 @@ function CreateTemplatePage() {
 
   const insertPromo = (promo: PromoCode) => {
     insertVariable(`{{promo-${promo.code}}}`);
-    setPromoCodeId(promo.id);
     setVarPopup(null);
   };
 
