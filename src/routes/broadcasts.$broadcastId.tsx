@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { fmtNum } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useBroadcastsStore } from "@/components/scl/broadcasts-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
+import { usePromoStore } from "@/components/scl/promo-store";
 import { useTemplatesStore, TEMPLATE_GROUP_BADGE } from "@/components/scl/templates-store";
 import { connectedChannels, type Broadcast } from "@/components/scl/mock-data";
 import { useMemo, useState } from "react";
@@ -92,6 +93,9 @@ function BroadcastDetailPage() {
 /* --------------------------------- Details -------------------------------- */
 
 function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
+  const { promos } = usePromoStore();
+  const issuedCodes = broadcast.recipientCodes ?? [];
+  const promo = promos.find((p) => p.id === broadcast.promoCodeId) ?? null;
   const { lists } = useContactsStore();
   const { templates } = useTemplatesStore();
   const channel = connectedChannels.find((c) => c.id === broadcast.channelId);
@@ -163,6 +167,52 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
             </ReadField>
           </ReadGrid>
         </Section>
+
+        {issuedCodes.length > 0 && (
+          <Section title={`Promo Codes Issued (${issuedCodes.length})`}>
+            {promo && (
+              <p className="text-[12px] text-muted-foreground mb-3">
+                Each recipient received their own{" "}
+                <Link
+                  to="/promo-codes/$promoId"
+                  params={{ promoId: promo.id }}
+                  className="font-mono font-semibold text-primary hover:underline"
+                >
+                  {promo.code}
+                </Link>{" "}
+                code — the last four characters are their initials.
+              </p>
+            )}
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="max-h-64 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-card">
+                    <tr className="border-b border-border">
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Recipient
+                      </th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Code
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {issuedCodes.map((r) => (
+                      <tr key={r.contactId}>
+                        <td className="px-3 py-1.5 text-[12px]">{r.contactName}</td>
+                        <td className="px-3 py-1.5">
+                          <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                            {r.code}
+                          </code>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </Section>
+        )}
 
         <Section title="Content">
           <ReadGrid>

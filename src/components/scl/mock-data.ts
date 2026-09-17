@@ -1517,6 +1517,10 @@ export type Broadcast = {
   createdAt?: string;
   contentMode?: "template" | "manual";
   templateId?: string;
+  /** Set when the template carries a 1-to-1 promo: which promo was handed out,
+   * and the individual code each recipient received. */
+  promoCodeId?: string;
+  recipientCodes?: { contactId: string; contactName: string; code: string }[];
   body?: string;
   footer?: string;
   buttons?: { label: string; kind: "quick_reply" | "url" | "phone" }[];

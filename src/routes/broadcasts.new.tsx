@@ -7,49 +7,13 @@ import { useTemplatesStore } from "@/components/scl/templates-store";
 import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { broadcastsStore } from "@/components/scl/broadcasts-store";
+import {
+  usePromoStore,
+  promoStore,
+  defaultCodeFormat,
+  fillCodeFormat,
+} from "@/components/scl/promo-store";
 
-// Promo codes registry (mirrors promo-codes page + new page data)
-const PROMO_REGISTRY: Record<
-  string,
-  { code: string; name: string; usageType: "one-to-one" | "one-to-many"; availableCodes: number }
-> = {
-  "promo-1": {
-    code: "AROMA20",
-    name: "20% Off All Brand",
-    usageType: "one-to-many",
-    availableCodes: 999,
-  },
-  "promo-2": {
-    code: "SISLEY150K",
-    name: "Rp150.000 Off Sisley",
-    usageType: "one-to-one",
-    availableCodes: 500,
-  },
-  "promo-3": {
-    code: "BEAUTY10",
-    name: "10% Off New Arrival",
-    usageType: "one-to-many",
-    availableCodes: 999,
-  },
-  "promo-4": {
-    code: "RIMMEL50K",
-    name: "Rimmel Rp50.000 Cashback",
-    usageType: "one-to-one",
-    availableCodes: 300,
-  },
-  "promo-5": {
-    code: "DGVIP25",
-    name: "VIP D&G 25% Off",
-    usageType: "one-to-one",
-    availableCodes: 150,
-  },
-  "promo-6": {
-    code: "BIRTHDAY30",
-    name: "30% Birthday Gift",
-    usageType: "one-to-many",
-    availableCodes: 999,
-  },
-};
 import { useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
@@ -89,9 +53,10 @@ type Condition = {
 
 function CreateBroadcastPage() {
   const navigate = useNavigate();
-  const { lists } = useContactsStore();
+  const { lists, contacts } = useContactsStore();
   const { templates } = useTemplatesStore();
   const { brands } = useSkuStore();
+  const { promos } = usePromoStore();
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
 
   // Section 1
@@ -114,6 +79,8 @@ function CreateBroadcastPage() {
   const template = templates.find((t) => t.id === templateId) ?? null;
   const [manualBody, setManualBody] = useState("");
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  /** Hand-edited recipient codes, keyed by contact id. */
+  const [codeOverrides, setCodeOverrides] = useState<Record<string, string>>({});
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const channelKind = selectedChannel?.channel ?? "whatsapp";
@@ -160,10 +127,8 @@ function CreateBroadcastPage() {
       toast.error("Please complete all required fields");
       return;
     }
-    if (kind !== "draft" && promoValidation && !promoValidation.ok) {
-      toast.error(
-        `Not enough promo codes: ${promoValidation.available} available, ${promoValidation.audienceCount} recipients`,
-      );
+    if (kind !== "draft" && linkedPromo && duplicateCodes.size > 0) {
+      toast.error("Every recipient needs a unique promo code");
       return;
     }
 
@@ -187,6 +152,10 @@ function CreateBroadcastPage() {
     const nowLabel = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
     const id = `b-${now.getTime()}`;
+    const recipientCodes = linkedPromo
+      ? recipients.map((c) => ({ contactId: c.id, contactName: c.name, code: codeFor(c.id) }))
+      : [];
+
     broadcastsStore.add({
       id,
       name: name.trim() || "Untitled broadcast",
@@ -214,10 +183,22 @@ function CreateBroadcastPage() {
       createdAt: `Today · ${nowLabel}`,
       contentMode,
       templateId: templateId ?? undefined,
+      promoCodeId: linkedPromo?.id,
+      recipientCodes: recipientCodes.length ? recipientCodes : undefined,
       body: previewBody,
       replied: 0,
       failed: 0,
     });
+
+    // Codes only exist once they've actually gone out — a draft or a schedule
+    // hasn't handed anything to anyone yet.
+    if (linkedPromo && status === "Sent" && recipientCodes.length) {
+      promoStore.assignCodesFromBroadcast(
+        linkedPromo.id,
+        { id, name: name.trim() || "Untitled broadcast", sentAt: now.toISOString() },
+        recipientCodes,
+      );
+    }
 
     const label =
       kind === "draft"
@@ -235,23 +216,50 @@ function CreateBroadcastPage() {
     return { listNames, conditionCount: conditions.length };
   }, [lists, selectedLists, conditions]);
 
-  // Promo code validation
-  const promoValidation = useMemo(() => {
+  // ── 1-to-1 promo codes ────────────────────────────────────────────────────
+  // A 1-to-1 promo doesn't know its own recipients: the template names the
+  // promo, and this is where we decide who gets it. Every recipient's code is
+  // minted from the promo's format, with the #### slot filled by their
+  // initials — and made unique if two people share initials.
+  const linkedPromo = useMemo(() => {
     if (contentMode !== "template" || !template?.promoCodeId) return null;
-    const promo = PROMO_REGISTRY[template.promoCodeId];
-    if (!promo || promo.usageType !== "one-to-one") return null;
-    // Count unique contacts across selected lists
-    const allContacts = contactsStore.state.contacts;
-    const contactIds = new Set<string>();
-    allContacts.forEach((c) => {
-      if (c.listIds.some((lid) => selectedLists.has(lid))) contactIds.add(c.id);
+    const promo = promos.find((p) => p.id === template.promoCodeId);
+    return promo && promo.usageType === "one-to-one" ? promo : null;
+  }, [contentMode, template, promos]);
+
+  const recipients = useMemo(() => {
+    if (!linkedPromo) return [];
+    return contacts.filter((c) => c.listIds.some((lid) => selectedLists.has(lid)));
+  }, [linkedPromo, contacts, selectedLists]);
+
+  const generatedCodes = useMemo(() => {
+    if (!linkedPromo) return new Map<string, string>();
+    const format = linkedPromo.codeFormat ?? defaultCodeFormat(linkedPromo.code);
+    const used = new Set<string>();
+    const out = new Map<string, string>();
+    recipients.forEach((c) => {
+      const base = fillCodeFormat(format, c.name);
+      let code = base;
+      // Two "Putri Anggraini"-shaped names would otherwise collide on PUAN.
+      for (let n = 2; used.has(code); n += 1) code = `${base}${n}`;
+      used.add(code);
+      out.set(c.id, code);
     });
-    const audienceCount = contactIds.size;
-    const available = promo.availableCodes;
-    if (audienceCount === 0) return null;
-    const ok = available >= audienceCount;
-    return { promo, audienceCount, available, ok };
-  }, [contentMode, template, selectedLists]);
+    return out;
+  }, [linkedPromo, recipients]);
+
+  const codeFor = (contactId: string) =>
+    codeOverrides[contactId] ?? generatedCodes.get(contactId) ?? "";
+
+  const duplicateCodes = useMemo(() => {
+    const seen = new Map<string, number>();
+    recipients.forEach((c) => {
+      const code = codeFor(c.id).trim().toUpperCase();
+      if (code) seen.set(code, (seen.get(code) ?? 0) + 1);
+    });
+    return new Set([...seen].filter(([, n]) => n > 1).map(([code]) => code));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipients, generatedCodes, codeOverrides]);
 
   return (
     <AppShell backTo="/broadcasts">
@@ -498,7 +506,7 @@ function CreateBroadcastPage() {
                           </button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
-                          {Object.values(PROMO_REGISTRY).map((p) => (
+                          {promos.map((p) => (
                             <button
                               key={p.code}
                               onClick={() => insertPromo(p.code)}
@@ -519,26 +527,108 @@ function CreateBroadcastPage() {
             )}
           </FormCard>
 
-          {/* Promo code validation banner */}
-          {promoValidation && (
-            <div
-              className={`rounded-lg border px-4 py-3 text-[12px] flex items-start gap-3 ${promoValidation.ok ? "border-emerald-500/30 bg-emerald-500/8 text-emerald-700" : "border-rose-500/30 bg-rose-500/8 text-rose-700"}`}
+          {/* Section 3 — one unique promo code per recipient */}
+          {linkedPromo && (
+            <FormCard
+              step={3}
+              title="Promo codes for each recipient"
+              description="This template carries a 1-to-1 promo, so everyone gets their own code."
             >
-              <span className="text-lg leading-none">{promoValidation.ok ? "✓" : "⚠"}</span>
-              <div>
-                <div className="font-semibold mb-0.5">
-                  {promoValidation.ok ? "Promo codes available" : "Not enough promo codes"}
-                </div>
-                <div className="text-[11px] opacity-80">
-                  Template uses{" "}
-                  <span className="font-mono font-semibold">{promoValidation.promo.code}</span>{" "}
-                  (1-to-1). {promoValidation.available} codes available ·{" "}
-                  {promoValidation.audienceCount} recipients selected.
-                  {!promoValidation.ok &&
-                    ` You need ${promoValidation.audienceCount - promoValidation.available} more unique codes.`}
-                </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
+                <span>
+                  Promo{" "}
+                  <Link
+                    to="/promo-codes/$promoId"
+                    params={{ promoId: linkedPromo.id }}
+                    className="font-mono font-semibold text-primary hover:underline"
+                  >
+                    {linkedPromo.code}
+                  </Link>
+                </span>
+                <span>
+                  Format{" "}
+                  <span className="font-mono text-foreground">
+                    {linkedPromo.codeFormat ?? defaultCodeFormat(linkedPromo.code)}
+                  </span>
+                </span>
+                <span>
+                  {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
+                </span>
               </div>
-            </div>
+
+              {recipients.length === 0 ? (
+                <p className="mt-3 text-[12px] text-muted-foreground italic">
+                  Choose an audience above and each contact's code appears here.
+                </p>
+              ) : (
+                <>
+                  <div className="mt-3 rounded-lg border border-border overflow-hidden">
+                    <div className="max-h-72 overflow-y-auto">
+                      <table className="w-full text-sm">
+                        <thead className="sticky top-0 bg-card">
+                          <tr className="border-b border-border">
+                            <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Recipient
+                            </th>
+                            <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Their code
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/60">
+                          {recipients.map((c) => {
+                            const code = codeFor(c.id);
+                            const dupe = duplicateCodes.has(code.trim().toUpperCase());
+                            return (
+                              <tr key={c.id}>
+                                <td className="px-3 py-1.5 text-[12px] truncate">{c.name}</td>
+                                <td className="px-3 py-1.5">
+                                  <input
+                                    value={code}
+                                    onChange={(e) =>
+                                      setCodeOverrides((o) => ({
+                                        ...o,
+                                        [c.id]: e.target.value.toUpperCase(),
+                                      }))
+                                    }
+                                    className={`h-7 w-full max-w-[260px] rounded border bg-background px-2 font-mono text-[12px] focus:outline-none focus:ring-1 ${
+                                      dupe
+                                        ? "border-rose-400 focus:ring-rose-300"
+                                        : "border-border focus:ring-primary/40"
+                                    }`}
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[11px] text-muted-foreground">
+                      The last four characters are each recipient's initials. Edit any code you'd
+                      rather set by hand.
+                    </p>
+                    {Object.keys(codeOverrides).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setCodeOverrides({})}
+                        className="text-[11px] text-primary hover:underline transition-colors duration-150"
+                      >
+                        Reset to the default format
+                      </button>
+                    )}
+                  </div>
+                  {duplicateCodes.size > 0 && (
+                    <p className="mt-1.5 text-[11px] text-rose-600">
+                      {duplicateCodes.size} code{duplicateCodes.size === 1 ? " is" : "s are"} used
+                      more than once — every recipient needs their own.
+                    </p>
+                  )}
+                </>
+              )}
+            </FormCard>
           )}
 
           {/* Save actions */}
@@ -552,7 +642,7 @@ function CreateBroadcastPage() {
             {sendMode === "schedule" ? (
               <button
                 onClick={() => submit("schedule")}
-                disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
+                disabled={!valid || duplicateCodes.size > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
@@ -560,7 +650,7 @@ function CreateBroadcastPage() {
             ) : (
               <button
                 onClick={() => submit("send")}
-                disabled={!valid || (promoValidation !== null && !promoValidation.ok)}
+                disabled={!valid || duplicateCodes.size > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast
