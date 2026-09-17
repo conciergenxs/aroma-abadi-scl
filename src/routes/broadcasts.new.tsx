@@ -12,6 +12,7 @@ import {
   promoStore,
   defaultCodeFormat,
   fillCodeFormat,
+  getPromoStatus,
 } from "@/components/scl/promo-store";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -127,11 +128,13 @@ function CreateBroadcastPage() {
       toast.error("Please complete all required fields");
       return;
     }
-    if (kind !== "draft" && linkedPromo && (duplicateCodes.size > 0 || blankCodes > 0)) {
+    if (kind !== "draft" && linkedPromo && (duplicateCodes.size > 0 || codeProblems > 0)) {
       toast.error(
         blankCodes > 0
           ? "Every recipient needs a promo code"
-          : "Every recipient needs a unique promo code",
+          : conflictingCodes > 0
+            ? "Some codes are already used by another active code"
+            : "Every recipient needs a unique promo code",
       );
       return;
     }
@@ -225,11 +228,16 @@ function CreateBroadcastPage() {
   // promo, and this is where we decide who gets it. Every recipient's code is
   // minted from the promo's format, with the #### slot filled by their
   // initials — and made unique if two people share initials.
+  // The message itself — template or manual — says which promo goes out, so
+  // calling a 1-to-1 code by hand works exactly like picking a template.
   const linkedPromo = useMemo(() => {
-    if (contentMode !== "template" || !template?.promoCodeId) return null;
-    const promo = promos.find((p) => p.id === template.promoCodeId);
-    return promo && promo.usageType === "one-to-one" ? promo : null;
-  }, [contentMode, template, promos]);
+    const codes = [...previewBody.matchAll(/\{\{promo-([^}]+)\}\}/g)].map((m) => m[1].trim());
+    for (const code of codes) {
+      const promo = promos.find((p) => p.code === code);
+      if (promo?.usageType === "one-to-one") return promo;
+    }
+    return null;
+  }, [previewBody, promos]);
 
   const recipients = useMemo(() => {
     if (!linkedPromo) return [];
@@ -260,6 +268,53 @@ function CreateBroadcastPage() {
   useEffect(() => setCodeOverrides({}), [linkedPromo?.id]);
 
   const blankCodes = recipients.filter((c) => !codeFor(c.id).trim()).length;
+
+  // A code can be anything, as long as nothing else live answers to it: other
+  // active promos, codes already issued elsewhere, or a customer's referral
+  // code. Codes this broadcast is about to re-issue to the same people don't
+  // count against it.
+  const activeCodeOwners = useMemo(() => {
+    const recipientIds = new Set(recipients.map((c) => c.id));
+    const owners = new Map<string, string>();
+    promos.forEach((p) => {
+      if (getPromoStatus(p) !== "active") return;
+      if (p.usageType === "one-to-many") owners.set(p.code.toUpperCase(), `promo ${p.code}`);
+      (p.assignedCodes ?? []).forEach((a) => {
+        if (p.id === linkedPromo?.id && a.contactId && recipientIds.has(a.contactId)) return;
+        owners.set(a.code.toUpperCase(), `promo ${p.code}`);
+      });
+    });
+    contacts.forEach((c) => {
+      if (c.referralCode) owners.set(c.referralCode.toUpperCase(), `${c.name}'s referral code`);
+    });
+    return owners;
+  }, [promos, contacts, recipients, linkedPromo]);
+
+  const conflictFor = (contactId: string) =>
+    activeCodeOwners.get(codeFor(contactId).trim().toUpperCase());
+  const conflictingCodes = recipients.filter((c) => !!conflictFor(c.id)).length;
+
+  // Recipient table — searchable and paged, since an audience can be large.
+  const [codeQuery, setCodeQuery] = useState("");
+  const [codePage, setCodePage] = useState(1);
+  const [codePageSize, setCodePageSize] = useState(10);
+  const matchingRecipients = useMemo(() => {
+    const q = codeQuery.trim().toLowerCase();
+    if (!q) return recipients;
+    return recipients.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (codeOverrides[c.id] ?? generatedCodes.get(c.id) ?? "").toLowerCase().includes(q),
+    );
+  }, [recipients, codeQuery, codeOverrides, generatedCodes]);
+  const codeTotalPages = Math.max(1, Math.ceil(matchingRecipients.length / codePageSize));
+  const safeCodePage = Math.min(codePage, codeTotalPages);
+  const pagedRecipients = matchingRecipients.slice(
+    (safeCodePage - 1) * codePageSize,
+    safeCodePage * codePageSize,
+  );
+
+  const codeProblems = blankCodes + conflictingCodes;
 
   const duplicateCodes = useMemo(() => {
     const seen = new Map<string, number>();
@@ -543,7 +598,7 @@ function CreateBroadcastPage() {
               <FormCard
                 step={3}
                 title="Promo codes for each recipient"
-                description="This template carries a 1-to-1 promo, so everyone gets their own code."
+                description="Each code defaults to the promo in your message, with #### replaced by the recipient's initials. Change any code to whatever you like, as long as no other active code uses it."
               >
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
                   <span>
@@ -557,7 +612,7 @@ function CreateBroadcastPage() {
                     </Link>
                   </span>
                   <span>
-                    Format{" "}
+                    Default{" "}
                     <span className="font-mono text-foreground">
                       {linkedPromo.codeFormat ?? defaultCodeFormat(linkedPromo.code)}
                     </span>
@@ -565,6 +620,15 @@ function CreateBroadcastPage() {
                   <span>
                     {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
                   </span>
+                  {Object.keys(codeOverrides).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCodeOverrides({})}
+                      className="press ml-auto text-[12px] text-primary hover:underline transition-colors duration-150 animate-fade-in"
+                    >
+                      Reset all to default
+                    </button>
+                  )}
                 </div>
 
                 {recipients.length === 0 ? (
@@ -572,78 +636,141 @@ function CreateBroadcastPage() {
                     Choose an audience above and each contact's code appears here.
                   </p>
                 ) : (
-                  <>
-                    <div className="mt-3 rounded-lg border border-border overflow-hidden">
-                      <div className="max-h-72 overflow-y-auto">
-                        <table className="w-full text-sm">
-                          <thead className="sticky top-0 bg-card">
-                            <tr className="border-b border-border">
-                              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Recipient
-                              </th>
-                              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Their code
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-border/60">
-                            {recipients.map((c) => {
-                              const code = codeFor(c.id);
-                              const dupe =
-                                !code.trim() || duplicateCodes.has(code.trim().toUpperCase());
-                              return (
-                                <tr key={c.id}>
-                                  <td className="px-3 py-1.5 text-[12px] truncate">{c.name}</td>
-                                  <td className="px-3 py-1.5">
-                                    <input
-                                      value={code}
-                                      onChange={(e) =>
-                                        setCodeOverrides((o) => ({
-                                          ...o,
-                                          [c.id]: e.target.value.toUpperCase(),
-                                        }))
-                                      }
-                                      className={`h-7 w-full max-w-[260px] rounded border bg-background px-2 font-mono text-[12px] transition-colors duration-150 focus:outline-none focus:ring-1 ${
-                                        dupe
-                                          ? "border-rose-400 focus:ring-rose-300"
-                                          : "border-border focus:ring-primary/40"
-                                      }`}
-                                    />
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                  <div className="mt-3 rounded-lg border border-border overflow-hidden">
+                    <div className="p-2.5 border-b border-border bg-card/40">
+                      <div className="relative">
+                        <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                        <input
+                          value={codeQuery}
+                          onChange={(e) => {
+                            setCodeQuery(e.target.value);
+                            setCodePage(1);
+                          }}
+                          placeholder="Search recipient or code..."
+                          className="h-8 w-full rounded-md border border-border bg-background pl-8 pr-3 text-[12px] transition-shadow focus:outline-none focus:ring-1 focus:ring-primary/40"
+                        />
                       </div>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[11px] text-muted-foreground">
-                        The last four characters are each recipient's initials. Edit any code you'd
-                        rather set by hand.
-                      </p>
-                      {Object.keys(codeOverrides).length > 0 && (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Recipient
+                          </th>
+                          <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Their code
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        key={`${safeCodePage}-${codePageSize}`}
+                        className="divide-y divide-border/60 stagger"
+                      >
+                        {pagedRecipients.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={2}
+                              className="px-3 py-6 text-center text-[12px] text-muted-foreground italic"
+                            >
+                              No recipient matches "{codeQuery}"
+                            </td>
+                          </tr>
+                        ) : (
+                          pagedRecipients.map((c) => {
+                            const code = codeFor(c.id);
+                            const blank = !code.trim();
+                            const dupe = !blank && duplicateCodes.has(code.trim().toUpperCase());
+                            const owner = !blank ? conflictFor(c.id) : undefined;
+                            const problem = blank
+                              ? "Needs a code"
+                              : dupe
+                                ? "Same code as another recipient"
+                                : owner
+                                  ? `Already used by ${owner}`
+                                  : null;
+                            return (
+                              <tr key={c.id}>
+                                <td className="px-3 py-1.5 text-[12px] align-top pt-2.5">
+                                  {c.name}
+                                </td>
+                                <td className="px-3 py-1.5">
+                                  <input
+                                    value={code}
+                                    onChange={(e) =>
+                                      setCodeOverrides((o) => ({
+                                        ...o,
+                                        [c.id]: e.target.value.toUpperCase(),
+                                      }))
+                                    }
+                                    className={`h-7 w-full max-w-[260px] rounded border bg-background px-2 font-mono text-[12px] transition-colors duration-150 focus:outline-none focus:ring-1 ${
+                                      problem
+                                        ? "border-rose-400 focus:ring-rose-300"
+                                        : "border-border focus:ring-primary/40"
+                                    }`}
+                                  />
+                                  {problem && (
+                                    <div className="mt-0.5 text-[10.5px] text-rose-600 animate-fade-in">
+                                      {problem}
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-t border-border text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <span>Rows per page</span>
+                        <select
+                          value={codePageSize}
+                          onChange={(e) => {
+                            setCodePageSize(Number(e.target.value));
+                            setCodePage(1);
+                          }}
+                          className="h-6 rounded border border-border bg-card px-1 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+                        >
+                          {[5, 10, 25, 50].map((n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {(codeProblems > 0 || duplicateCodes.size > 0) && (
+                          <span className="text-rose-600 font-medium animate-fade-in">
+                            {codeProblems + duplicateCodes.size} to fix
+                          </span>
+                        )}
+                        <span>
+                          {matchingRecipients.length === 0
+                            ? "0 of 0"
+                            : `${(safeCodePage - 1) * codePageSize + 1}–${Math.min(
+                                safeCodePage * codePageSize,
+                                matchingRecipients.length,
+                              )} of ${matchingRecipients.length}`}
+                        </span>
                         <button
                           type="button"
-                          onClick={() => setCodeOverrides({})}
-                          className="text-[11px] text-primary hover:underline transition-colors duration-150 animate-fade-in"
+                          onClick={() => setCodePage(Math.max(1, safeCodePage - 1))}
+                          disabled={safeCodePage <= 1}
+                          className="press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
                         >
-                          Reset to the default format
+                          ‹
                         </button>
-                      )}
+                        <button
+                          type="button"
+                          onClick={() => setCodePage(Math.min(codeTotalPages, safeCodePage + 1))}
+                          disabled={safeCodePage >= codeTotalPages}
+                          className="press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                        >
+                          ›
+                        </button>
+                      </div>
                     </div>
-                    {blankCodes > 0 && (
-                      <p className="mt-1.5 text-[11px] text-rose-600 animate-fade-in">
-                        {blankCodes} recipient{blankCodes === 1 ? " has" : "s have"} no code yet.
-                      </p>
-                    )}
-                    {duplicateCodes.size > 0 && (
-                      <p className="mt-1.5 text-[11px] text-rose-600 animate-fade-in">
-                        {duplicateCodes.size} code{duplicateCodes.size === 1 ? " is" : "s are"} used
-                        more than once — every recipient needs their own.
-                      </p>
-                    )}
-                  </>
+                  </div>
                 )}
               </FormCard>
             </div>
@@ -660,7 +787,7 @@ function CreateBroadcastPage() {
             {sendMode === "schedule" ? (
               <button
                 onClick={() => submit("schedule")}
-                disabled={!valid || duplicateCodes.size > 0 || blankCodes > 0}
+                disabled={!valid || duplicateCodes.size > 0 || codeProblems > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
@@ -668,7 +795,7 @@ function CreateBroadcastPage() {
             ) : (
               <button
                 onClick={() => submit("send")}
-                disabled={!valid || duplicateCodes.size > 0 || blankCodes > 0}
+                disabled={!valid || duplicateCodes.size > 0 || codeProblems > 0}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast
@@ -1088,6 +1215,7 @@ function AudienceModal({
           </div>
           <Link
             to="/contacts/audience/new"
+            search={{ from: "broadcast" }}
             className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
           >
             <Plus className="h-3.5 w-3.5" /> Add New Audience

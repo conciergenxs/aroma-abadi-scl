@@ -61,21 +61,21 @@ function SuccessView({
         </button>
       </div>
       {promo.oneToOne && (
-        <p className="mt-4 mx-auto max-w-sm text-[12px] text-muted-foreground animate-fade-in">
-          Each recipient gets their own code. Add{" "}
-          <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
-            {`{{promo-${promo.code}}}`}
-          </code>{" "}
-          to a Template, then send it as a Broadcast to decide who receives one.
-        </p>
-      )}
-      {promo.oneToOne && (
-        <Link
-          to="/templates/new"
-          className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline animate-fade-in transition-colors duration-150"
-        >
-          <FileText className="h-3.5 w-3.5" /> Create the Template
-        </Link>
+        <div className="mt-12 pt-8 border-t border-border animate-fade-in">
+          <p className="text-[13px] text-muted-foreground">
+            Next, use{" "}
+            <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+              {`{{promo-${promo.code}}}`}
+            </code>{" "}
+            in a Template.
+          </p>
+          <Link
+            to="/templates/new"
+            className="press icon-pop mt-3 inline-flex items-center gap-2 text-[15px] font-semibold text-primary underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors duration-150"
+          >
+            <FileText className="h-4 w-4" /> Create the Template
+          </Link>
+        </div>
       )}
     </div>
   );

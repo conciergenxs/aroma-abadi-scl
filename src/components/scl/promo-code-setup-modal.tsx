@@ -116,23 +116,24 @@ export function PromoCodeSetupModal({
 
         {isOneToOne && (
           <div className="flex-1 overflow-y-auto p-4 animate-fade-in">
-            <div className="flex items-start gap-2.5 rounded-md border border-border bg-card/60 px-3 py-2.5 text-[12px] text-muted-foreground">
-              <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
-              <div className="space-y-1.5">
-                <p>
-                  Your <strong className="text-foreground">Template</strong> uses the code set here
-                  —{" "}
-                  <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
-                    {`{{promo-${code.trim().toUpperCase() || "CODE"}}}`}
-                  </code>
-                  .
-                </p>
-                <p>
-                  In <strong className="text-foreground">Broadcast</strong> each recipient gets
-                  their own version of it, and you can replace any recipient's code there
-                  completely.
-                </p>
-              </div>
+            <div className="rounded-md border border-border bg-card/60 px-3 py-2.5 text-[12px] text-muted-foreground space-y-1.5">
+              <p>
+                Your <strong className="text-foreground">Template</strong> uses{" "}
+                <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+                  {`{{promo-${code.trim().toUpperCase() || "CODE"}}}`}
+                </code>
+                .
+              </p>
+              <p>
+                In <strong className="text-foreground">Broadcast</strong>, each recipient gets{" "}
+                <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+                  {code.trim().toUpperCase() || "CODE"}-####
+                </code>{" "}
+                by default — only <strong className="text-foreground">####</strong> changes, filled
+                with their initials. You can also replace a code with anything (e.g.{" "}
+                <span className="font-mono text-foreground">COOKIES2103</span>), as long as no other
+                active code uses it.
+              </p>
             </div>
           </div>
         )}

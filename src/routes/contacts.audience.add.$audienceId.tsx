@@ -76,6 +76,14 @@ function AddToAudiencePage() {
     });
   };
 
+  const setMany = (ids: string[], selected: boolean) => {
+    setStaged((s) => {
+      const next = new Set(s);
+      ids.forEach((id) => (selected ? next.add(id) : next.delete(id)));
+      return next;
+    });
+  };
+
   if (!audience) {
     return (
       <AppShell backTo="/contacts" title="Add Contacts">
@@ -134,6 +142,7 @@ function AddToAudiencePage() {
             brands={brands.map((b) => b.name)}
             staged={staged}
             onToggle={toggle}
+            onSetMany={setMany}
           />
         </div>
 

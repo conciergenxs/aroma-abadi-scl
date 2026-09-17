@@ -208,7 +208,10 @@ export function AudienceContactPicker({
 
   // Clamp both pages: removing the last contact on a page, or a search that
   // narrows the list, must not strand the view on an empty page.
-  const safeBrowsePage = Math.min(browsePage, Math.max(1, Math.ceil(eligible.length / browsePageSize)));
+  const safeBrowsePage = Math.min(
+    browsePage,
+    Math.max(1, Math.ceil(eligible.length / browsePageSize)),
+  );
   const pagedEligible = eligible.slice(
     (safeBrowsePage - 1) * browsePageSize,
     safeBrowsePage * browsePageSize,
@@ -218,7 +221,8 @@ export function AudienceContactPicker({
   const stagedQuery = stagedSearch.trim().toLowerCase();
   const stagedContacts = stagedQuery
     ? allStaged.filter(
-        (c) => c.name.toLowerCase().includes(stagedQuery) || c.phone.toLowerCase().includes(stagedQuery),
+        (c) =>
+          c.name.toLowerCase().includes(stagedQuery) || c.phone.toLowerCase().includes(stagedQuery),
       )
     : allStaged;
   const safeStagedPage = Math.min(
@@ -326,7 +330,9 @@ export function AudienceContactPicker({
               title="Select every contact that matches the current filters and search"
             >
               <Checkbox
-                checked={allEligibleSelected ? true : someEligibleSelected ? "indeterminate" : false}
+                checked={
+                  allEligibleSelected ? true : someEligibleSelected ? "indeterminate" : false
+                }
                 disabled={eligible.length === 0}
                 onCheckedChange={() =>
                   onSetMany(

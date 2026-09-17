@@ -8,8 +8,19 @@ import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import { AudienceContactPicker } from "@/components/scl/audience-contact-picker";
 
+// Where the user opened this page from, so "back" returns them there instead
+// of always dropping them on Contacts (e.g. mid-way through a Broadcast).
+type AudienceOrigin = "contacts" | "broadcast";
+
+const ORIGINS: Record<AudienceOrigin, { path: "/contacts" | "/broadcasts/new"; label: string }> = {
+  contacts: { path: "/contacts", label: "Back to Contacts" },
+  broadcast: { path: "/broadcasts/new", label: "Back to Broadcast" },
+};
+
 export const Route = createFileRoute("/contacts/audience/new")({
   head: () => ({ meta: [{ title: "New Audience — SCL" }] }),
+  validateSearch: (search: Record<string, unknown>): { from?: AudienceOrigin } =>
+    search.from === "broadcast" ? { from: "broadcast" } : {},
   component: NewAudiencePage,
 });
 
@@ -18,11 +29,13 @@ type CreatedAudience = { id: string; name: string; count: number };
 function SuccessView({
   audience,
   onViewAudience,
-  onBackToList,
+  onBack,
+  backLabel,
 }: {
   audience: CreatedAudience;
   onViewAudience: () => void;
-  onBackToList: () => void;
+  onBack: () => void;
+  backLabel: string;
 }) {
   return (
     <div className="max-w-md mx-auto text-center py-20">
@@ -40,16 +53,16 @@ function SuccessView({
         <button
           type="button"
           onClick={onViewAudience}
-          className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors"
+          className="press rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:bg-primary/90 transition-colors"
         >
           View Audience
         </button>
         <button
           type="button"
-          onClick={onBackToList}
-          className="rounded-md border border-border px-4 h-9 text-[14px] text-foreground hover:bg-muted transition-colors"
+          onClick={onBack}
+          className="press rounded-md border border-border px-4 h-9 text-[14px] text-foreground hover:bg-muted transition-colors"
         >
-          Back to Contacts
+          {backLabel}
         </button>
       </div>
     </div>
@@ -64,6 +77,16 @@ function NewAudiencePage() {
   const [name, setName] = useState("");
   const [staged, setStaged] = useState<Set<string>>(new Set());
   const [created, setCreated] = useState<CreatedAudience | null>(null);
+  const { from } = Route.useSearch();
+  const origin = ORIGINS[from ?? "contacts"];
+
+  const setMany = (ids: string[], selected: boolean) => {
+    setStaged((s) => {
+      const next = new Set(s);
+      ids.forEach((id) => (selected ? next.add(id) : next.delete(id)));
+      return next;
+    });
+  };
 
   const toggle = (id: string) => {
     setStaged((s) => {
@@ -93,12 +116,13 @@ function NewAudiencePage() {
 
   if (created) {
     return (
-      <AppShell backTo="/contacts" title="New Audience" noPadding>
+      <AppShell backTo={origin.path} title="New Audience" noPadding>
         <div className="p-6">
           <SuccessView
             audience={created}
             onViewAudience={() => navigate({ to: "/contacts", search: { audience: created.id } })}
-            onBackToList={() => navigate({ to: "/contacts" })}
+            onBack={() => navigate({ to: origin.path })}
+            backLabel={origin.label}
           />
         </div>
       </AppShell>
@@ -107,7 +131,7 @@ function NewAudiencePage() {
 
   return (
     <AppShell
-      backTo="/contacts"
+      backTo={origin.path}
       title="New Audience"
       subtitle="Name your audience, then filter or search to bulk-add contacts"
       noPadding
@@ -133,14 +157,15 @@ function NewAudiencePage() {
             brands={brands.map((b) => b.name)}
             staged={staged}
             onToggle={toggle}
+            onSetMany={setMany}
           />
         </div>
 
         <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between">
           <button
             type="button"
-            onClick={() => navigate({ to: "/contacts" })}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+            onClick={() => navigate({ to: origin.path })}
+            className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
           >
             Cancel
           </button>
