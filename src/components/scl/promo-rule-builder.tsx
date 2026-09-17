@@ -445,7 +445,7 @@ function Segmented<T extends string>({
             value === opt.kind
               ? "bg-primary text-primary-foreground"
               : opt.disabled
-                ? "text-muted-foreground/40 cursor-not-allowed line-through decoration-muted-foreground/40"
+                ? "text-muted-foreground/40 cursor-not-allowed"
                 : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -456,10 +456,10 @@ function Segmented<T extends string>({
   );
 }
 
-// ── Buy/Get item group — up to MAX_ITEM_LINES "N x item" rows sharing one
-// and/or. The join chip sits between rows where the reading eye expects the
-// word, and says what it means in plain language underneath, because the
-// people building promos here are merchandisers, not engineers. ──
+// ── Buy/Get item group — pick and/or once for the whole group, then set the
+// quantity and SKU of each item inline. One join for the group (not per pair)
+// keeps the rule unambiguous: mixed and/or chains need operator precedence to
+// read correctly, which is exactly what trips up non-technical staff. ──
 function ItemGroupEditor({
   group,
   onChange,
@@ -480,33 +480,36 @@ function ItemGroupEditor({
   const explanation =
     verb === "buy"
       ? group.join === "and"
-        ? "Customer has to buy every item listed."
-        : "Customer only has to buy one of these items."
+        ? "Customer has to buy every item below."
+        : "Buying any one of the items below is enough."
       : group.join === "and"
-        ? "Customer gets every item listed."
-        : "Customer picks one of these items.";
+        ? "Customer gets every item below."
+        : "Customer picks one of the items below.";
 
   return (
-    <div className="space-y-1.5">
-      {lines.map((line, i) => (
-        <div key={i}>
-          {i > 0 && (
-            <div className="flex items-center gap-2 py-0.5">
-              <button
-                type="button"
-                onClick={() => onChange({ ...group, join: group.join === "and" ? "or" : "and" })}
-                title="Switch between and / or"
-                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 h-6 text-[11px] font-semibold text-foreground hover:bg-primary/25 transition-colors"
-              >
-                {group.join}
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </button>
-              <span className="h-px flex-1 bg-border" />
-            </div>
-          )}
-          <div className="flex flex-wrap items-center gap-1.5">
+    <div className="rounded-lg border border-border bg-card/40 p-2.5 space-y-2">
+      {/* The and/or picker governs the whole group — set it first, then fill
+          in the amounts and SKUs below. */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Condition</span>
+        <Segmented
+          options={[
+            { kind: "and", label: "and" },
+            { kind: "or", label: "or" },
+          ]}
+          value={group.join}
+          onChange={(join) => onChange({ ...group, join })}
+        />
+        <span className="text-[10.5px] text-muted-foreground">{explanation}</span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-y-2">
+        {lines.map((line, i) => (
+          <span key={i} className="inline-flex items-center gap-1">
+            {i > 0 && (
+              <span className="mx-2.5 text-[12px] font-semibold text-primary">{group.join}</span>
+            )}
             <InlineNumber value={line.qty} onChange={(v) => setLine(i, { qty: v })} />
-            <span className="text-muted-foreground text-[12px]">x</span>
             <ItemScopeEditor
               scope={line.item}
               onChange={(item) => setLine(i, { item })}
@@ -516,32 +519,28 @@ function ItemGroupEditor({
               <button
                 type="button"
                 onClick={() => onChange({ ...group, lines: lines.filter((_, idx) => idx !== i) })}
-                title="Remove this item"
-                className="h-7 w-7 grid place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                title="Remove this SKU"
+                className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-3 w-3" />
               </button>
             )}
-          </div>
-        </div>
-      ))}
-
-      <div className="flex items-center gap-2 pt-0.5">
+          </span>
+        ))}
         <button
           type="button"
           disabled={atMax}
           onClick={() => onChange({ ...group, lines: [...lines, itemLine()] })}
-          title={atMax ? `Up to ${MAX_ITEM_LINES} items` : undefined}
-          className="inline-flex items-center gap-1 rounded-md border border-dashed border-primary/40 px-2 h-7 text-[11px] font-medium text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
+          title={atMax ? `Up to ${MAX_ITEM_LINES} SKUs` : "Add another SKU"}
+          className="ml-2 h-8 w-8 grid place-items-center rounded-md border border-dashed border-primary/40 text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
         >
-          <Plus className="h-3 w-3" /> Add item
+          <Plus className="h-3.5 w-3.5" />
         </button>
-        <span className="text-[10.5px] text-muted-foreground">
-          {atMax ? `Maximum ${MAX_ITEM_LINES} items` : `Up to ${MAX_ITEM_LINES} items`}
-        </span>
       </div>
 
-      {lines.length > 1 && <p className="text-[10.5px] text-muted-foreground">{explanation}</p>}
+      <p className="text-[10.5px] text-muted-foreground">
+        {atMax ? `Maximum ${MAX_ITEM_LINES} SKUs` : `Up to ${MAX_ITEM_LINES} SKUs`}
+      </p>
     </div>
   );
 }
@@ -783,7 +782,7 @@ export function PromoRuleBuilder({
               onClick={() => onChange(p.build())}
               className={`rounded-full border px-3 h-7 text-[11px] font-medium transition-colors ${
                 p.disabled
-                  ? "border-border/60 bg-card/30 text-muted-foreground/40 line-through decoration-muted-foreground/40 cursor-not-allowed"
+                  ? "border-border/60 bg-card/30 text-muted-foreground/40 cursor-not-allowed"
                   : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
               }`}
             >

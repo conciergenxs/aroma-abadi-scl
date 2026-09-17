@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Infinity as InfinityIcon, Megaphone } from "lucide-react";
+import { Infinity as InfinityIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultCodeFormat, defaultRule, type PromoRule, type PromoCode } from "./promo-store";
 
@@ -167,13 +167,9 @@ export function PromoFormFields({
           with the same "Unlimited" escape hatch. 1-to-1 has neither: its size
           is whatever Broadcast sends, and each code works once. */}
       {form.usageType === "one-to-one" ? (
-        <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground">
-          <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
-          <span>
-            <span className="font-medium text-foreground">Recipients come from Broadcast.</span> You
-            set the code pattern here; who receives a code — and therefore how many exist — is
-            decided when a Broadcast goes out. Each code can be used once by its owner.
-          </span>
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground">
+          <span className="font-medium text-foreground">Recipients are chosen in Broadcast</span> —
+          each one gets their own single-use code.
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 stagger">

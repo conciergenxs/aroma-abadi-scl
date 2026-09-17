@@ -49,11 +49,6 @@ export function PromoCodeSetupModal({
   const suggested = useMemo(() => generatePromoCodeSuggestion(form), [form]);
   const [code, setCode] = useState(form.code.trim() || suggested);
   const isOneToOne = form.usageType === "one-to-one";
-  // The pattern follows the base code until someone edits it by hand, at which
-  // point their version sticks.
-  const [formatEdited, setFormatEdited] = useState(false);
-  const [format, setFormat] = useState(form.codeFormat || defaultCodeFormat(code));
-  const effectiveFormat = formatEdited ? format : defaultCodeFormat(code.trim().toUpperCase());
 
   const handleCodeChange = (val: string) => {
     setCode(val.toUpperCase().slice(0, PROMO_CODE_MAX_LENGTH));
@@ -61,7 +56,11 @@ export function PromoCodeSetupModal({
 
   const handleConfirm = () => {
     if (!code.trim()) return;
-    onConfirm(code.trim().toUpperCase(), isOneToOne ? effectiveFormat : undefined);
+    const trimmed = code.trim().toUpperCase();
+    // 1-to-1 recipients still get a personal code, but the pattern is derived
+    // here rather than configured — Broadcast is where individual codes are
+    // actually edited.
+    onConfirm(trimmed, isOneToOne ? defaultCodeFormat(trimmed) : undefined);
   };
 
   return (
@@ -77,7 +76,7 @@ export function PromoCodeSetupModal({
             <h2 className="text-sm font-semibold text-foreground">Set Promo Code</h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {isOneToOne
-                ? "Suggested from your promo details — every recipient's code is minted from this"
+                ? "Suggested from your promo details — this is the code your Template will use"
                 : "Suggested from your promo details, editable if you'd like something else"}
             </p>
           </div>
@@ -116,52 +115,24 @@ export function PromoCodeSetupModal({
         </div>
 
         {isOneToOne && (
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            <div>
-              <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
-                Code Format
-              </label>
-              <input
-                value={effectiveFormat}
-                onChange={(e) => {
-                  setFormatEdited(true);
-                  setFormat(e.target.value.toUpperCase());
-                }}
-                placeholder={`SUMMER20-${CODE_INITIALS_TOKEN}`}
-                className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm font-mono tracking-wide text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
-              />
-              <p className="mt-1.5 text-[11px] text-muted-foreground">
-                Leave{" "}
-                <code className="font-mono font-semibold text-primary bg-primary/10 border border-primary/20 rounded px-1">
-                  {CODE_INITIALS_TOKEN}
-                </code>{" "}
-                where each recipient's initials should go — Broadcast fills it in per person.
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/20 overflow-hidden">
-              <div className="px-3 py-2 border-b border-border text-[10px] uppercase tracking-wide text-muted-foreground">
-                Example
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex items-start gap-2.5 rounded-md border border-border bg-card/60 px-3 py-2.5 text-[12px] text-muted-foreground">
+              <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
+              <div className="space-y-1.5">
+                <p>
+                  Your <strong className="text-foreground">Template</strong> uses the code set here
+                  —{" "}
+                  <code className="font-mono text-foreground bg-muted border border-border rounded px-1">
+                    {`{{promo-${code.trim().toUpperCase() || "CODE"}}}`}
+                  </code>
+                  .
+                </p>
+                <p>
+                  In <strong className="text-foreground">Broadcast</strong> each recipient gets
+                  their own version of it, and you can replace any recipient's code there
+                  completely.
+                </p>
               </div>
-              <ul className="divide-y divide-border/60">
-                {SAMPLE_NAMES.map((name) => (
-                  <li key={name} className="flex items-center justify-between gap-3 px-3 py-2">
-                    <span className="text-[12px] text-muted-foreground truncate">{name}</span>
-                    <code className="font-mono text-[12px] font-semibold bg-card border border-border rounded px-1.5 py-0.5 shrink-0">
-                      {fillCodeFormat(effectiveFormat, name)}
-                    </code>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex items-start gap-2.5 rounded-md border border-border bg-card/60 px-3 py-2.5 text-[11px] text-muted-foreground">
-              <Megaphone className="h-3.5 w-3.5 shrink-0 mt-px text-primary" />
-              <span>
-                Next: put this promo's code variable in a <strong>Template</strong>, then send it as
-                a <strong>Broadcast</strong> — that's where you choose who receives a code, and the
-                codes appear on this promo's detail page.
-              </span>
             </div>
           </div>
         )}
