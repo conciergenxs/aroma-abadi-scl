@@ -16,23 +16,45 @@ export type PromoItemScope =
   | { kind: "any-in-brand"; brand: string }
   | { kind: "specific"; items: string[] };
 
+/** One "N x item" line inside a Buy/Get group. */
+export type PromoItemLine = { qty: number; item: PromoItemScope };
+
+/** Up to MAX_ITEM_LINES lines sharing ONE join, so "buy 2 soap and 1 shampoo"
+ * and "get 1 free, choose soap or shampoo" are both expressible. The join is
+ * per group rather than per pair on purpose: mixed and/or chains need operator
+ * precedence to read correctly, which is exactly what confuses non-technical
+ * users — a single join can only ever mean one thing. */
+export type PromoItemGroup = { join: "and" | "or"; lines: PromoItemLine[] };
+
+export const MAX_ITEM_LINES = 5;
+
+export function itemLine(qty = 1, item: PromoItemScope = { kind: "any" }): PromoItemLine {
+  return { qty, item };
+}
+
+export function itemGroup(
+  lines: PromoItemLine[] = [itemLine()],
+  join: PromoItemGroup["join"] = "and",
+): PromoItemGroup {
+  return { join, lines };
+}
+
 // X — what the customer must do to qualify
 export type PromoCondition =
   | { kind: "any-purchase" }
-  | { kind: "buy-item"; qty: number; item: PromoItemScope }
+  | { kind: "buy-item"; group: PromoItemGroup }
   | { kind: "min-spend"; amount: number }
-  | { kind: "first-purchase" }
-  // A referred customer redeems their referral code — the Y reward below
-  // is paid out to both sides of the referral (referrer + referred), not
-  // just the purchasing customer, see describePromoRule.
-  | { kind: "referral-usage" };
+  | { kind: "first-purchase" };
 
 // Y — what the customer gets
 export type PromoReward =
-  | { kind: "free-item"; qty: number; sameAsPurchased: boolean; item: PromoItemScope }
+  | { kind: "free-item"; sameAsPurchased: boolean; group: PromoItemGroup }
   | { kind: "percent-off"; percent: number; appliesTo: PromoItemScope; maxDiscount: number | null }
+  // "next-purchase" is a discount voucher for the next visit, never cashback.
   | { kind: "amount-off"; amount: number; timing: "immediate" | "next-purchase" }
   | { kind: "free-shipping" }
+  // Loyalty points are owned by the loyalty programme, not by promo codes —
+  // kept in the model for existing data but switched off in the builder.
   | { kind: "bonus-points"; points: number };
 
 export type PromoRule = {
@@ -45,12 +67,10 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
     case "any-purchase":
       return { kind };
     case "buy-item":
-      return { kind, qty: 1, item: { kind: "any" } };
+      return { kind, group: itemGroup() };
     case "min-spend":
       return { kind, amount: 500000 };
     case "first-purchase":
-      return { kind };
-    case "referral-usage":
       return { kind };
   }
 }
@@ -58,7 +78,7 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
 export function defaultReward(kind: PromoReward["kind"]): PromoReward {
   switch (kind) {
     case "free-item":
-      return { kind, qty: 1, sameAsPurchased: true, item: { kind: "any" } };
+      return { kind, sameAsPurchased: true, group: itemGroup() };
     case "percent-off":
       return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
     case "amount-off":
@@ -82,34 +102,45 @@ function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
   return `${scope.items[0]} +${scope.items.length - 1} more`;
 }
 
+/** "2 Soap and 1 Shampoo" / "1 Soap or 1 Shampoo" — the join reads as plain
+ * English so the preview sentence stays legible to non-technical staff. */
+export function describeItemGroup(g: PromoItemGroup): string {
+  const parts = g.lines.map((l) => `${l.qty} ${scopeLabel(l.item)}`);
+  if (parts.length === 0) return "Any Item";
+  return parts.join(g.join === "and" ? " and " : " or ");
+}
+
 function describeCondition(c: PromoCondition): string {
   switch (c.kind) {
     case "any-purchase":
       return "Any Purchase";
     case "buy-item":
-      return `Buy ${c.qty} ${scopeLabel(c.item)}`;
+      return `Buy ${describeItemGroup(c.group)}`;
     case "min-spend":
       return `Spend min. ${fmtIDR(c.amount)}`;
     case "first-purchase":
       return "Customer's First Purchase";
-    case "referral-usage":
-      return "Referral Usage";
   }
 }
 
 function describeReward(r: PromoReward): string {
   switch (r.kind) {
-    case "free-item":
-      return r.sameAsPurchased
-        ? `Get ${r.qty} Same Item Free`
-        : `Get ${r.qty} ${scopeLabel(r.item)} Free`;
+    case "free-item": {
+      if (r.sameAsPurchased) return `Get ${r.group.lines[0]?.qty ?? 1} Same Item Free`;
+      const body = describeItemGroup(r.group);
+      // An "or" group on the reward side means the customer picks one of the
+      // listed items, so say so rather than leaving "A or B" ambiguous.
+      return r.group.join === "or" && r.group.lines.length > 1
+        ? `Get ${body} Free (choose 1)`
+        : `Get ${body} Free`;
+    }
     case "percent-off": {
       const cap = r.maxDiscount ? ` (max ${fmtIDR(r.maxDiscount)})` : "";
       return `Get ${r.percent}% Off ${scopeLabel(r.appliesTo, "Total Purchase")}${cap}`;
     }
     case "amount-off":
       return r.timing === "next-purchase"
-        ? `Get ${fmtIDR(r.amount)} Cashback for Next Purchase`
+        ? `Get ${fmtIDR(r.amount)} Off Next Purchase`
         : `Get ${fmtIDR(r.amount)} Off`;
     case "free-shipping":
       return "Get Free Shipping";
@@ -119,11 +150,7 @@ function describeReward(r: PromoReward): string {
 }
 
 export function describePromoRule(rule: PromoRule): string {
-  const rewardText =
-    rule.condition.kind === "referral-usage"
-      ? describeReward(rule.reward).replace(/^Get /, "Referrer & Referred Both Get ")
-      : describeReward(rule.reward);
-  return `${describeCondition(rule.condition)} → ${rewardText}`;
+  return `${describeCondition(rule.condition)} → ${describeReward(rule.reward)}`;
 }
 
 // ── Redemption + ownership model ───────────────────────────────────────────────
