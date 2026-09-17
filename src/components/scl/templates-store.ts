@@ -12,14 +12,46 @@ type State = {
   starred: string[];
 };
 
-let state: State = {
-  templates: [...seedTemplates],
-  groups: [...initialTemplateGroups],
-  starred: ["tp2", "tp4"],
-};
+// Bump when the Template shape changes so browsers holding an older shape
+// re-seed instead of rendering stale records against new code.
+const STORAGE_KEY = "aroma_templates_store_v1";
+
+function seedState(): State {
+  return {
+    templates: [...seedTemplates],
+    groups: [...initialTemplateGroups],
+    starred: ["tp2", "tp4"],
+  };
+}
+
+// Templates have to outlive a reload: a promo code is put into a template and
+// only then sent as a broadcast, and that journey crosses page loads.
+function load(): State {
+  if (typeof window === "undefined") return seedState();
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed?.templates) && Array.isArray(parsed?.groups)) return parsed;
+    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seedState()));
+  } catch {
+    /* ignore */
+  }
+  return seedState();
+}
+
+let state: State = load();
 
 const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
+const emit = () => {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
+  listeners.forEach((l) => l());
+};
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
   return () => {
@@ -27,6 +59,13 @@ const subscribe = (cb: () => void) => {
   };
 };
 const getSnapshot = () => state;
+
+// What SSR rendered (no localStorage on the server) — a stable reference
+// distinct from `state`, so hydration notices the difference and re-renders
+// instead of leaving the server's markup on screen. Same fix as
+// broadcasts-store.ts / promo-store.ts.
+const SERVER_SNAPSHOT: State = seedState();
+const getServerSnapshot = () => SERVER_SNAPSHOT;
 
 const GROUP_COLORS: TemplateGroup["color"][] = [
   "pink",
@@ -131,7 +170,7 @@ export const templatesStore = {
 };
 
 export function useTemplatesStore(): State {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export const TEMPLATE_GROUP_DOT: Record<TemplateGroup["color"], string> = {

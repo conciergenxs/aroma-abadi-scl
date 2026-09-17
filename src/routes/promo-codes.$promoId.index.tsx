@@ -487,7 +487,12 @@ function PromoDetailPage() {
                     </thead>
                     <tbody className="divide-y divide-border/60 stagger">
                       {pagedCodes.map((a) => (
-                        <tr key={a.code} className="hover:bg-muted/30 transition-colors">
+                        // A hand-edited code could collide across broadcasts;
+                        // the person it belongs to can't.
+                        <tr
+                          key={`${a.contactId ?? "unassigned"}-${a.code}`}
+                          className="hover:bg-muted/30 transition-colors"
+                        >
                           <td className="px-5 py-2.5">
                             <div className="flex items-center gap-1.5">
                               <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">

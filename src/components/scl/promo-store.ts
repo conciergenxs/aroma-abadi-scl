@@ -720,9 +720,12 @@ export const promoStore = {
     _save();
   },
 
-  /** Record the codes a Broadcast just handed out. Re-sending the same
-   * broadcast replaces its previous batch rather than duplicating it, and
-   * codes already redeemed keep their redemption. */
+  /** Record the codes a Broadcast just handed out.
+   *
+   * One person holds exactly one code per promo, so a later broadcast that
+   * reaches somebody who already has a code REPLACES it rather than adding a
+   * second — except when they have already redeemed theirs, which is a fact
+   * about the past and must not be rewritten. */
   assignCodesFromBroadcast(
     promoId: string,
     broadcast: { id: string; name: string; sentAt: string },
@@ -730,22 +733,28 @@ export const promoStore = {
   ) {
     _promos = _promos.map((p) => {
       if (p.id !== promoId) return p;
-      const kept = (p.assignedCodes ?? []).filter((a) => a.broadcastId !== broadcast.id);
-      const previous = new Map((p.assignedCodes ?? []).map((a) => [a.contactId, a]));
-      const issued: AssignedCode[] = entries.map((e) => {
-        const before = previous.get(e.contactId);
-        return {
+      const existing = p.assignedCodes ?? [];
+      const byContact = new Map<string, AssignedCode>();
+      existing.forEach((a) => {
+        if (a.contactId) byContact.set(a.contactId, a);
+      });
+      entries.forEach((e) => {
+        const before = byContact.get(e.contactId);
+        if (before?.redeemed) return;
+        byContact.set(e.contactId, {
           code: e.code,
           contactId: e.contactId,
           contactName: e.contactName,
-          redeemed: before?.redeemed ?? false,
-          redeemedAt: before?.redeemedAt,
+          redeemed: false,
           broadcastId: broadcast.id,
           broadcastName: broadcast.name,
           sentAt: broadcast.sentAt,
-        };
+        });
       });
-      return { ...p, assignedCodes: [...kept, ...issued] };
+      // Codes with no contact attached can't be matched up, so carry them over
+      // untouched rather than dropping them.
+      const unassigned = existing.filter((a) => !a.contactId);
+      return { ...p, assignedCodes: [...unassigned, ...byContact.values()] };
     });
     _save();
   },
