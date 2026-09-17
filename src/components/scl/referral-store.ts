@@ -194,12 +194,14 @@ function seed(): ReferralSeason[] {
   const referredAlready = new Set<string>();
   const orders = [...transactionsStore.state.transactions]
     .filter((t) => t.customerId && t.status !== "Cancelled" && !promoOrders.has(t.id))
-    .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+    // Newest first, so the season running now gets its referrals before older
+    // seasons use up the same customers.
+    .sort((a, b) => +new Date(b.date) - +new Date(a.date));
 
   let turn = 0;
   for (const t of orders) {
     const referredId = t.customerId!;
-    // Each customer can only ever be referred once — on their first such order.
+    // Each customer can only ever be referred once.
     if (referredAlready.has(referredId)) continue;
     const at = new Date(t.date).getTime();
     const season = seasons.find((s) => at >= wib(s.startDate) && at <= wib(s.endDate));
@@ -235,7 +237,7 @@ function seed(): ReferralSeason[] {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 // v3: seasons carry their own promo rule and uses point at real ARMA orders.
-const STORAGE_KEY = "aroma_referral_store_v3";
+const STORAGE_KEY = "aroma_referral_store_v4";
 
 function isCurrentShape(seasons: unknown): seasons is ReferralSeason[] {
   return (
