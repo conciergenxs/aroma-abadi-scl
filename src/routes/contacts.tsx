@@ -88,6 +88,8 @@ function ContactsPage() {
   const [showManageProps, setShowManageProps] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
+  const [audiencePage, setAudiencePage] = useState(1);
+  const safeAudiencePage = clampPage(audiencePage, lists.length);
   const [infoContact, setInfoContact] = useState<Contact | null>(null);
   const { audience: audienceParam } = Route.useSearch();
   const [activeView, setActiveView] = useState<string>(() => audienceParam ?? "all"); // "all" | "mine" | listId | brand:id
@@ -351,31 +353,39 @@ function ContactsPage() {
                 <Plus className="h-3 w-3" />
               </button>
             </div>
-            {lists.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => {
-                  setActiveView(l.id);
-                  setSelected([]);
-                }}
-                onDoubleClick={() => setAudienceModalId(l.id)}
-                className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-gray-50 flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <Users className="h-3 w-3 shrink-0" />
-                <span className="truncate flex-1">{l.name}</span>
-                <span
-                  className="text-[10px] text-muted-foreground/60 hover:text-primary cursor-pointer transition-colors duration-150"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setAudienceModalId(l.id);
-                    setAudienceSearch("");
-                  }}
-                  title="Manage contacts"
-                >
-                  {contacts.filter((c) => c.listIds.includes(l.id)).length}
-                </span>
-              </button>
-            ))}
+            <div key={safeAudiencePage} className="stagger">
+              {lists
+                .slice(
+                  (safeAudiencePage - 1) * SIDEBAR_PAGE_SIZE,
+                  safeAudiencePage * SIDEBAR_PAGE_SIZE,
+                )
+                .map((l) => (
+                  <button
+                    key={l.id}
+                    onClick={() => {
+                      setActiveView(l.id);
+                      setSelected([]);
+                    }}
+                    onDoubleClick={() => setAudienceModalId(l.id)}
+                    className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-gray-50 flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Users className="h-3 w-3 shrink-0" />
+                    <span className="truncate flex-1">{l.name}</span>
+                    <span
+                      className="text-[10px] text-muted-foreground/60 hover:text-primary cursor-pointer transition-colors duration-150"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAudienceModalId(l.id);
+                        setAudienceSearch("");
+                      }}
+                      title="Manage contacts"
+                    >
+                      {contacts.filter((c) => c.listIds.includes(l.id)).length}
+                    </span>
+                  </button>
+                ))}
+            </div>
+            <SidebarPager page={safeAudiencePage} total={lists.length} onChange={setAudiencePage} />
           </div>
         </aside>
 
@@ -709,6 +719,55 @@ function ContactsPage() {
   );
 }
 
+// ── Sidebar pager — 5 per page keeps both lists short enough to scan ─────────
+const SIDEBAR_PAGE_SIZE = 5;
+
+function SidebarPager({
+  page,
+  total,
+  onChange,
+}: {
+  page: number;
+  total: number;
+  onChange: (page: number) => void;
+}) {
+  const pages = Math.max(1, Math.ceil(total / SIDEBAR_PAGE_SIZE));
+  const from = total === 0 ? 0 : (page - 1) * SIDEBAR_PAGE_SIZE + 1;
+  const to = Math.min(page * SIDEBAR_PAGE_SIZE, total);
+  return (
+    <div className="flex items-center justify-between px-3 pt-2 text-[10px] text-muted-foreground">
+      <span className="tabular-nums">
+        {from}–{to} of {total}
+      </span>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => onChange(page - 1)}
+          disabled={page <= 1}
+          aria-label="Previous page"
+          className="press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(page + 1)}
+          disabled={page >= pages}
+          aria-label="Next page"
+          className="press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Clamp a page so a shrinking list never strands the view on an empty page. */
+function clampPage(page: number, total: number) {
+  return Math.min(page, Math.max(1, Math.ceil(total / SIDEBAR_PAGE_SIZE)));
+}
+
 // ── Brands Nav ────────────────────────────────────────────────────────────
 function BrandsNav({
   activeView,
@@ -726,13 +785,20 @@ function BrandsNav({
   const countForBrand = (brandId: string) =>
     liveContacts.filter((c) => (c.brandIds ?? []).includes(brandId)).length;
 
+  const [page, setPage] = useState(1);
+  const safePage = clampPage(page, brands.length);
+  const pagedBrands = brands.slice(
+    (safePage - 1) * SIDEBAR_PAGE_SIZE,
+    safePage * SIDEBAR_PAGE_SIZE,
+  );
+
   return (
     <>
       <div className="px-3 pt-2 pb-1 flex items-center justify-between">
         <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Brands</div>
       </div>
-      <div className="px-3 pb-3 space-y-0.5">
-        {brands.map((brand) => {
+      <div key={safePage} className="px-3 space-y-0.5 stagger">
+        {pagedBrands.map((brand) => {
           const count = countForBrand(brand.id);
           const active = activeView === `brand:${brand.id}`;
           return (
@@ -756,6 +822,9 @@ function BrandsNav({
             </button>
           );
         })}
+      </div>
+      <div className="pb-3">
+        <SidebarPager page={safePage} total={brands.length} onChange={setPage} />
       </div>
     </>
   );

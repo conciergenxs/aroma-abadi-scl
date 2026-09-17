@@ -48,7 +48,11 @@ function computeStats(contactId: string, transactions: Transaction[]): ContactSt
     return { totalSpend: 0, avgMonthlySpend: 0, brands, frequencyPerMonth: 0, orderCount: 0 };
   }
   const firstPurchase = Math.min(...txs.map((t) => new Date(t.date).getTime()));
-  const monthsActive = Math.max(1, (Date.now() - firstPurchase) / (1000 * 60 * 60 * 24 * 30));
+  // Measured against the start of today rather than this exact millisecond, so
+  // the server render and the browser's hydration compute the same averages.
+  const DAY = 1000 * 60 * 60 * 24;
+  const today = Math.floor(Date.now() / DAY) * DAY;
+  const monthsActive = Math.max(1, (today - firstPurchase) / (DAY * 30));
   return {
     totalSpend,
     avgMonthlySpend: totalSpend / monthsActive,
