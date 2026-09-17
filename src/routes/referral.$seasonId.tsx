@@ -136,13 +136,13 @@ function SeasonReportPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search name, code, invoice or item…"
-                className="h-8 w-[280px] rounded-md border border-border bg-card pl-8 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-8 w-[280px] rounded-md border border-border bg-card pl-8 pr-3 text-[13px] transition-all duration-200 focus:w-[320px] focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40"
               />
             </div>
           }
         >
           {filtered.length === 0 ? (
-            <p className="p-5 text-[12px] text-muted-foreground italic">
+            <p className="p-5 text-[12px] text-muted-foreground italic animate-fade-in">
               {season.uses.length === 0
                 ? "Nobody has used a referral code in this season yet."
                 : `No referral matches "${query}".`}
@@ -169,7 +169,10 @@ function SeasonReportPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/60 stagger">
+                  <tbody
+                    key={`${safePage}-${pageSize}`}
+                    className="divide-y divide-border/60 stagger"
+                  >
                     {paged.map((u) => (
                       <tr key={u.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-5 py-2.5">
@@ -235,7 +238,7 @@ function SeasonReportPage() {
                       type="button"
                       onClick={() => setPage(Math.max(1, safePage - 1))}
                       disabled={safePage <= 1}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                      className="press h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
                     >
                       ‹
                     </button>
@@ -243,7 +246,7 @@ function SeasonReportPage() {
                       type="button"
                       onClick={() => setPage(Math.min(totalPages, safePage + 1))}
                       disabled={safePage >= totalPages}
-                      className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                      className="press h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
                     >
                       ›
                     </button>

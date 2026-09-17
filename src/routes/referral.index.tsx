@@ -102,7 +102,7 @@ function ReferralPage() {
       actions={
         <button
           onClick={() => setEditing("new")}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> New Season
         </button>
@@ -125,7 +125,7 @@ function ReferralPage() {
               <Link
                 to="/referral/$seasonId"
                 params={{ seasonId: active.id }}
-                className="shrink-0 rounded-md border border-border px-4 h-9 inline-flex items-center text-[14px] hover:bg-muted transition-colors"
+                className="press shrink-0 rounded-md border border-border px-4 h-9 inline-flex items-center text-[14px] hover:bg-muted hover:border-primary/40 transition-colors"
               >
                 View report
               </Link>
@@ -168,7 +168,7 @@ function ReferralPage() {
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border bg-card/20 px-5 py-8 text-center">
+          <div className="rounded-xl border border-dashed border-border bg-card/20 px-5 py-8 text-center animate-fade-in">
             <p className="text-sm font-medium text-foreground">No referral season is running</p>
             <p className="mt-1 text-[12px] text-muted-foreground">
               Referral codes only earn something while a season is active. Start one to switch the
@@ -242,7 +242,7 @@ function ReferralPage() {
                               e.stopPropagation();
                               setEditing(s);
                             }}
-                            className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            className="press h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
@@ -252,7 +252,7 @@ function ReferralPage() {
                               e.stopPropagation();
                               setDeleting(s);
                             }}
-                            className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            className="press h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -314,6 +314,7 @@ function SeasonFormModal({
   season: ReferralSeason | null;
   onClose: () => void;
 }) {
+  const { seasons } = useReferralStore();
   const { promos } = usePromoStore();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [form, setForm] = useState(() => {
@@ -337,6 +338,18 @@ function SeasonFormModal({
     if (new Date(form.endDate) < new Date(form.startDate))
       return toast.error("End date must be after the start date");
     if (!form.promoId) return toast.error("Choose the promo a referral gives");
+    // One setting applies to every customer at a time, so two seasons can't
+    // run over the same days — otherwise nobody could say which promo a
+    // referral redeems.
+    const start = new Date(form.startDate).getTime();
+    const end = new Date(form.endDate).getTime();
+    const clash = seasons.find(
+      (s) =>
+        s.id !== season?.id &&
+        start <= new Date(s.endDate).getTime() &&
+        end >= new Date(s.startDate).getTime(),
+    );
+    if (clash) return toast.error(`These dates overlap "${clash.name}"`);
     const payload = {
       name: form.name.trim(),
       startDate: form.startDate,
@@ -424,15 +437,15 @@ function SeasonFormModal({
               <button
                 type="button"
                 onClick={() => setPickerOpen(true)}
-                className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/40 transition-colors"
+                className="press w-full rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/40 hover:border-primary/40 transition-colors"
               >
                 {promo ? (
-                  <>
+                  <div key={promo.id} className="animate-fade-in">
                     <code className="font-mono text-[13px] font-semibold">{promo.code}</code>
                     <div className="mt-0.5 text-[11px] text-muted-foreground">
                       {describePromoRule(promo.rule)}
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <span className="text-sm text-muted-foreground">Choose a promo code…</span>
                 )}
@@ -465,7 +478,7 @@ function SeasonFormModal({
             <button
               type="button"
               onClick={submit}
-              className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
+              className="press h-9 px-4 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
             >
               {season ? "Save Changes" : "Create Season"}
             </button>

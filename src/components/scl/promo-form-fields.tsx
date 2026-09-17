@@ -167,12 +167,12 @@ export function PromoFormFields({
           with the same "Unlimited" escape hatch. 1-to-1 has neither: its size
           is whatever Broadcast sends, and each code works once. */}
       {form.usageType === "one-to-one" ? (
-        <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground">
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground animate-fade-in">
           <span className="font-medium text-foreground">Recipients are chosen in Broadcast</span> —
           each one gets their own single-use code.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 stagger">
+        <div className="grid grid-cols-2 gap-4 stagger animate-fade-in">
           <div>
             <label className={labelCls}>Max Usage</label>
             <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">

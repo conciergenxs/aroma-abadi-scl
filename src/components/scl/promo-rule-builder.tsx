@@ -182,7 +182,7 @@ function ItemScopeEditor({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex max-w-[220px] items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium text-foreground hover:bg-primary/15 transition-colors align-middle"
+        className="press inline-flex max-w-[220px] items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium text-foreground hover:bg-primary/15 hover:border-primary/50 transition-colors align-middle"
       >
         <span className="truncate">{label}</span>
         <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
@@ -441,7 +441,7 @@ function Segmented<T extends string>({
           onClick={() => {
             if (opt.kind !== value) onChange(opt.kind);
           }}
-          className={`px-2.5 h-7 text-[11px] font-medium rounded transition-colors ${
+          className={`press px-2.5 h-7 text-[11px] font-medium rounded transition-all duration-150 ${
             value === opt.kind
               ? "bg-primary text-primary-foreground"
               : opt.disabled
@@ -500,14 +500,21 @@ function ItemGroupEditor({
           value={group.join}
           onChange={(join) => onChange({ ...group, join })}
         />
-        <span className="text-[10.5px] text-muted-foreground">{explanation}</span>
+        <span key={group.join} className="text-[10.5px] text-muted-foreground animate-fade-in">
+          {explanation}
+        </span>
       </div>
 
       <div className="flex flex-wrap items-center gap-y-2">
         {lines.map((line, i) => (
-          <span key={i} className="inline-flex items-center gap-1">
+          <span key={i} className="inline-flex items-center gap-1 animate-scale-in">
             {i > 0 && (
-              <span className="mx-2.5 text-[12px] font-semibold text-primary">{group.join}</span>
+              <span
+                key={group.join}
+                className="mx-2.5 text-[12px] font-semibold text-primary animate-fade-in"
+              >
+                {group.join}
+              </span>
             )}
             <InlineNumber value={line.qty} onChange={(v) => setLine(i, { qty: v })} />
             <ItemScopeEditor
@@ -520,7 +527,7 @@ function ItemGroupEditor({
                 type="button"
                 onClick={() => onChange({ ...group, lines: lines.filter((_, idx) => idx !== i) })}
                 title="Remove this SKU"
-                className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                className="press h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -532,14 +539,16 @@ function ItemGroupEditor({
           disabled={atMax}
           onClick={() => onChange({ ...group, lines: [...lines, itemLine()] })}
           title={atMax ? `Up to ${MAX_ITEM_LINES} SKUs` : "Add another SKU"}
-          className="ml-2 h-8 w-8 grid place-items-center rounded-md border border-dashed border-primary/40 text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
+          className="press icon-pop ml-2 h-8 w-8 grid place-items-center rounded-md border border-dashed border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/70 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <p className="text-[10.5px] text-muted-foreground">
-        {atMax ? `Maximum ${MAX_ITEM_LINES} SKUs` : `Up to ${MAX_ITEM_LINES} SKUs`}
+      <p
+        className={`text-[10.5px] transition-colors duration-200 ${atMax ? "text-primary font-medium" : "text-muted-foreground"}`}
+      >
+        {atMax ? `Maximum ${MAX_ITEM_LINES} SKUs reached` : `Up to ${MAX_ITEM_LINES} SKUs`}
       </p>
     </div>
   );
@@ -780,7 +789,7 @@ export function PromoRuleBuilder({
               disabled={p.disabled}
               title={p.disabled ? p.disabledReason : undefined}
               onClick={() => onChange(p.build())}
-              className={`rounded-full border px-3 h-7 text-[11px] font-medium transition-colors ${
+              className={`press rounded-full border px-3 h-7 text-[11px] font-medium transition-all duration-150 ${
                 p.disabled
                   ? "border-border/60 bg-card/30 text-muted-foreground/40 cursor-not-allowed"
                   : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"

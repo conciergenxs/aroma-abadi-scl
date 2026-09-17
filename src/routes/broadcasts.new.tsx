@@ -539,106 +539,114 @@ function CreateBroadcastPage() {
 
           {/* Section 3 — one unique promo code per recipient */}
           {linkedPromo && (
-            <FormCard
-              step={3}
-              title="Promo codes for each recipient"
-              description="This template carries a 1-to-1 promo, so everyone gets their own code."
-            >
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
-                <span>
-                  Promo{" "}
-                  <Link
-                    to="/promo-codes/$promoId"
-                    params={{ promoId: linkedPromo.id }}
-                    className="font-mono font-semibold text-primary hover:underline"
-                  >
-                    {linkedPromo.code}
-                  </Link>
-                </span>
-                <span>
-                  Format{" "}
-                  <span className="font-mono text-foreground">
-                    {linkedPromo.codeFormat ?? defaultCodeFormat(linkedPromo.code)}
+            <div key={linkedPromo.id} className="animate-slide-up">
+              <FormCard
+                step={3}
+                title="Promo codes for each recipient"
+                description="This template carries a 1-to-1 promo, so everyone gets their own code."
+              >
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
+                  <span>
+                    Promo{" "}
+                    <Link
+                      to="/promo-codes/$promoId"
+                      params={{ promoId: linkedPromo.id }}
+                      className="font-mono font-semibold text-primary hover:underline"
+                    >
+                      {linkedPromo.code}
+                    </Link>
                   </span>
-                </span>
-                <span>
-                  {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
-                </span>
-              </div>
+                  <span>
+                    Format{" "}
+                    <span className="font-mono text-foreground">
+                      {linkedPromo.codeFormat ?? defaultCodeFormat(linkedPromo.code)}
+                    </span>
+                  </span>
+                  <span>
+                    {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
+                  </span>
+                </div>
 
-              {recipients.length === 0 ? (
-                <p className="mt-3 text-[12px] text-muted-foreground italic">
-                  Choose an audience above and each contact's code appears here.
-                </p>
-              ) : (
-                <>
-                  <div className="mt-3 rounded-lg border border-border overflow-hidden">
-                    <div className="max-h-72 overflow-y-auto">
-                      <table className="w-full text-sm">
-                        <thead className="sticky top-0 bg-card">
-                          <tr className="border-b border-border">
-                            <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Recipient
-                            </th>
-                            <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Their code
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/60">
-                          {recipients.map((c) => {
-                            const code = codeFor(c.id);
-                            const dupe = duplicateCodes.has(code.trim().toUpperCase());
-                            return (
-                              <tr key={c.id}>
-                                <td className="px-3 py-1.5 text-[12px] truncate">{c.name}</td>
-                                <td className="px-3 py-1.5">
-                                  <input
-                                    value={code}
-                                    onChange={(e) =>
-                                      setCodeOverrides((o) => ({
-                                        ...o,
-                                        [c.id]: e.target.value.toUpperCase(),
-                                      }))
-                                    }
-                                    className={`h-7 w-full max-w-[260px] rounded border bg-background px-2 font-mono text-[12px] focus:outline-none focus:ring-1 ${
-                                      dupe
-                                        ? "border-rose-400 focus:ring-rose-300"
-                                        : "border-border focus:ring-primary/40"
-                                    }`}
-                                  />
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                {recipients.length === 0 ? (
+                  <p className="mt-3 text-[12px] text-muted-foreground italic">
+                    Choose an audience above and each contact's code appears here.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-3 rounded-lg border border-border overflow-hidden">
+                      <div className="max-h-72 overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="sticky top-0 bg-card">
+                            <tr className="border-b border-border">
+                              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Recipient
+                              </th>
+                              <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Their code
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/60">
+                            {recipients.map((c) => {
+                              const code = codeFor(c.id);
+                              const dupe =
+                                !code.trim() || duplicateCodes.has(code.trim().toUpperCase());
+                              return (
+                                <tr key={c.id}>
+                                  <td className="px-3 py-1.5 text-[12px] truncate">{c.name}</td>
+                                  <td className="px-3 py-1.5">
+                                    <input
+                                      value={code}
+                                      onChange={(e) =>
+                                        setCodeOverrides((o) => ({
+                                          ...o,
+                                          [c.id]: e.target.value.toUpperCase(),
+                                        }))
+                                      }
+                                      className={`h-7 w-full max-w-[260px] rounded border bg-background px-2 font-mono text-[12px] transition-colors duration-150 focus:outline-none focus:ring-1 ${
+                                        dupe
+                                          ? "border-rose-400 focus:ring-rose-300"
+                                          : "border-border focus:ring-primary/40"
+                                      }`}
+                                    />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-[11px] text-muted-foreground">
-                      The last four characters are each recipient's initials. Edit any code you'd
-                      rather set by hand.
-                    </p>
-                    {Object.keys(codeOverrides).length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setCodeOverrides({})}
-                        className="text-[11px] text-primary hover:underline transition-colors duration-150"
-                      >
-                        Reset to the default format
-                      </button>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[11px] text-muted-foreground">
+                        The last four characters are each recipient's initials. Edit any code you'd
+                        rather set by hand.
+                      </p>
+                      {Object.keys(codeOverrides).length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setCodeOverrides({})}
+                          className="text-[11px] text-primary hover:underline transition-colors duration-150 animate-fade-in"
+                        >
+                          Reset to the default format
+                        </button>
+                      )}
+                    </div>
+                    {blankCodes > 0 && (
+                      <p className="mt-1.5 text-[11px] text-rose-600 animate-fade-in">
+                        {blankCodes} recipient{blankCodes === 1 ? " has" : "s have"} no code yet.
+                      </p>
                     )}
-                  </div>
-                  {duplicateCodes.size > 0 && (
-                    <p className="mt-1.5 text-[11px] text-rose-600">
-                      {duplicateCodes.size} code{duplicateCodes.size === 1 ? " is" : "s are"} used
-                      more than once — every recipient needs their own.
-                    </p>
-                  )}
-                </>
-              )}
-            </FormCard>
+                    {duplicateCodes.size > 0 && (
+                      <p className="mt-1.5 text-[11px] text-rose-600 animate-fade-in">
+                        {duplicateCodes.size} code{duplicateCodes.size === 1 ? " is" : "s are"} used
+                        more than once — every recipient needs their own.
+                      </p>
+                    )}
+                  </>
+                )}
+              </FormCard>
+            </div>
           )}
 
           {/* Save actions */}

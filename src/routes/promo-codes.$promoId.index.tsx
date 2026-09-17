@@ -309,7 +309,7 @@ function PromoDetailPage() {
                     title={
                       isOneToOne ? "Download every recipient's code" : "Download the redemption log"
                     }
-                    className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-600 px-4 h-9 text-[14px] font-medium text-white hover:bg-emerald-700 transition-colors"
+                    className="press icon-pop inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-600 px-4 h-9 text-[14px] font-medium text-white hover:bg-emerald-700 transition-colors"
                   >
                     <Download className="h-3.5 w-3.5" /> Download .csv
                   </button>
@@ -320,13 +320,13 @@ function PromoDetailPage() {
                 onClick={() =>
                   navigate({ to: "/promo-codes/edit/$promoId", params: { promoId: promo.id } })
                 }
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit
               </button>
               <button
                 onClick={() => setConfirmingDelete(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
+                className="press icon-pop inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Delete
               </button>
@@ -493,7 +493,7 @@ function PromoDetailPage() {
             description="Every code this promo has issued, who received it, and whether they've used it"
           >
             {assignedCodes.length === 0 ? (
-              <div className="p-5 text-[12px] text-muted-foreground">
+              <div className="p-5 text-[12px] text-muted-foreground animate-fade-in">
                 <p className="italic">No codes issued yet.</p>
                 <p className="mt-1.5 not-italic">
                   Put{" "}

@@ -104,7 +104,7 @@ export function PromoCodeSetupModal({
               type="button"
               title="Reset to suggested code"
               onClick={() => handleCodeChange(suggested)}
-              className="h-9 w-9 shrink-0 grid place-items-center rounded-md border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              className="press icon-pop h-9 w-9 shrink-0 grid place-items-center rounded-md border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
             >
               <Wand2 className="h-3.5 w-3.5" />
             </button>
@@ -115,7 +115,7 @@ export function PromoCodeSetupModal({
         </div>
 
         {isOneToOne && (
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 animate-fade-in">
             <div className="flex items-start gap-2.5 rounded-md border border-border bg-card/60 px-3 py-2.5 text-[12px] text-muted-foreground">
               <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
               <div className="space-y-1.5">
