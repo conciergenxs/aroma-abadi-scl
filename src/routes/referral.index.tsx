@@ -174,16 +174,21 @@ function ReferralPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    {["Season", "Period", "Friend gets", "Referrer gets", "Referrals", "Status"].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
-                        >
-                          {h}
-                        </th>
-                      ),
-                    )}
+                    {[
+                      "Season",
+                      "Period",
+                      "Friend gets",
+                      "Referrer gets",
+                      "Referrals",
+                      "Status",
+                    ].map((h) => (
+                      <th
+                        key={h}
+                        className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
+                      >
+                        {h}
+                      </th>
+                    ))}
                     <th className="px-5 py-2.5" />
                   </tr>
                 </thead>
@@ -357,7 +362,13 @@ function BenefitEditor({
   );
 }
 
-function SeasonFormModal({ season, onClose }: { season: ReferralSeason | null; onClose: () => void }) {
+function SeasonFormModal({
+  season,
+  onClose,
+}: {
+  season: ReferralSeason | null;
+  onClose: () => void;
+}) {
   const [form, setForm] = useState(() =>
     season
       ? {
@@ -535,9 +546,7 @@ function SeasonFormModal({ season, onClose }: { season: ReferralSeason | null; o
                 placeholder="Unlimited"
                 className={inputCls}
               />
-              <p className="mt-1 text-[10.5px] text-muted-foreground">
-                Ceiling across everyone.
-              </p>
+              <p className="mt-1 text-[10.5px] text-muted-foreground">Ceiling across everyone.</p>
             </div>
           </div>
 

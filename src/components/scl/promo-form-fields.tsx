@@ -170,89 +170,89 @@ export function PromoFormFields({
         <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground">
           <Megaphone className="h-4 w-4 shrink-0 mt-px text-primary" />
           <span>
-            <span className="font-medium text-foreground">Recipients come from Broadcast.</span>{" "}
-            You set the code pattern here; who receives a code — and therefore how many exist — is
+            <span className="font-medium text-foreground">Recipients come from Broadcast.</span> You
+            set the code pattern here; who receives a code — and therefore how many exist — is
             decided when a Broadcast goes out. Each code can be used once by its owner.
           </span>
         </div>
       ) : (
-      <div className="grid grid-cols-2 gap-4 stagger">
-        <div>
-          <label className={labelCls}>Max Usage</label>
-          <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
-            <div className="relative flex-1 min-w-0 h-full">
-              <input
-                type="number"
-                value={form.maxUsage}
-                disabled={form.maxUsageUnlimited}
-                onChange={(e) => set("maxUsage", e.target.value)}
-                placeholder={form.maxUsageUnlimited ? "" : "e.g. 500"}
-                min={1}
-                className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
-              />
-              {form.maxUsageUnlimited && (
-                <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
-                  <InfinityIcon className="h-4 w-4" />
-                </div>
-              )}
+        <div className="grid grid-cols-2 gap-4 stagger">
+          <div>
+            <label className={labelCls}>Max Usage</label>
+            <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
+              <div className="relative flex-1 min-w-0 h-full">
+                <input
+                  type="number"
+                  value={form.maxUsage}
+                  disabled={form.maxUsageUnlimited}
+                  onChange={(e) => set("maxUsage", e.target.value)}
+                  placeholder={form.maxUsageUnlimited ? "" : "e.g. 500"}
+                  min={1}
+                  className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
+                />
+                {form.maxUsageUnlimited && (
+                  <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
+                    <InfinityIcon className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+              <div className="w-px h-5 bg-border shrink-0" />
+              <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.maxUsageUnlimited}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      maxUsageUnlimited: e.target.checked,
+                      maxUsage: e.target.checked ? "" : form.maxUsage,
+                    })
+                  }
+                  className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
+                />
+                Unlimited
+              </label>
             </div>
-            <div className="w-px h-5 bg-border shrink-0" />
-            <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.maxUsageUnlimited}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    maxUsageUnlimited: e.target.checked,
-                    maxUsage: e.target.checked ? "" : form.maxUsage,
-                  })
-                }
-                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
-              />
-              Unlimited
-            </label>
           </div>
-        </div>
 
-        <div>
-          <label className={labelCls}>Limit Per User</label>
-          <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
-            <div className="relative flex-1 min-w-0 h-full">
-              <input
-                type="number"
-                value={form.limitPerUser}
-                disabled={form.limitPerUserUnlimited}
-                onChange={(e) => set("limitPerUser", e.target.value)}
-                placeholder={form.limitPerUserUnlimited ? "" : "e.g. 1"}
-                min={1}
-                className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
-              />
-              {form.limitPerUserUnlimited && (
-                <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
-                  <InfinityIcon className="h-4 w-4" />
-                </div>
-              )}
+          <div>
+            <label className={labelCls}>Limit Per User</label>
+            <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
+              <div className="relative flex-1 min-w-0 h-full">
+                <input
+                  type="number"
+                  value={form.limitPerUser}
+                  disabled={form.limitPerUserUnlimited}
+                  onChange={(e) => set("limitPerUser", e.target.value)}
+                  placeholder={form.limitPerUserUnlimited ? "" : "e.g. 1"}
+                  min={1}
+                  className="w-full h-full bg-transparent text-sm text-foreground focus:outline-none disabled:cursor-not-allowed"
+                />
+                {form.limitPerUserUnlimited && (
+                  <div className="absolute inset-0 flex items-center pointer-events-none text-muted-foreground animate-fade-in">
+                    <InfinityIcon className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+              <div className="w-px h-5 bg-border shrink-0" />
+              <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.limitPerUserUnlimited}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      limitPerUserUnlimited: e.target.checked,
+                      limitPerUser: e.target.checked ? "" : form.limitPerUser,
+                    })
+                  }
+                  className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
+                />
+                Unlimited
+              </label>
             </div>
-            <div className="w-px h-5 bg-border shrink-0" />
-            <label className="flex items-center gap-1.5 shrink-0 text-[11px] text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.limitPerUserUnlimited}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    limitPerUserUnlimited: e.target.checked,
-                    limitPerUser: e.target.checked ? "" : form.limitPerUser,
-                  })
-                }
-                className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5"
-              />
-              Unlimited
-            </label>
           </div>
         </div>
-      </div>
       )}
 
       {/* Start / End Date+Time */}

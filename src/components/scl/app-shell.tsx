@@ -37,6 +37,7 @@ import {
   CheckCheck,
   X as XIcon,
   Tag,
+  Share2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -125,6 +126,7 @@ type NavItem = {
     | "/sku"
     | "/ba"
     | "/promo-codes"
+    | "/referral"
     | "/settings";
   label: string;
   icon: typeof LayoutDashboard;
@@ -140,6 +142,7 @@ const topNav: NavItem[] = [
   { to: "/sku", label: "SKU & Knowledge", icon: Package },
   { to: "/transactions", label: "Transactions", icon: Receipt },
   { to: "/promo-codes", label: "Promo Codes", icon: Tag },
+  { to: "/referral", label: "Referral", icon: Share2 },
 ];
 const bottomNav: NavItem[] = [{ to: "/settings", label: "Settings", icon: Settings }];
 

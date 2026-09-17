@@ -1492,6 +1492,19 @@ export const templates: Template[] = [
     rejectionReason:
       "Content uses all-caps and excessive promotional language, which violates WhatsApp Business policy.",
   },
+  {
+    id: "tp-sisley-1to1",
+    name: "Sisley Personal Code",
+    category: "Marketing",
+    channel: "whatsapp",
+    status: "Approved",
+    updated: "3d ago",
+    body: "Hi {{name}}, ini kode khusus kamu: {{promo-SISLEY150K}} — potongan Rp150.000 untuk produk Sisley. Kode ini hanya bisa dipakai olehmu ya!",
+    groupId: "tg-promotions",
+    language: "id_ID",
+    // 1-to-1: Broadcast mints one code per recipient from this promo.
+    promoCodeId: "promo-2",
+  },
 ];
 
 export type Broadcast = {
@@ -1554,6 +1567,37 @@ export const broadcasts: Broadcast[] = [
     buttons: [{ label: "Belanja sekarang", kind: "url" }],
     replied: 824,
     failed: 28,
+  },
+  {
+    id: "b-sisley-1to1",
+    name: "Sisley Summer Sale — Personal Codes",
+    channel: "whatsapp",
+    audience: "VIP Customers · 4",
+    reach: 4,
+    delivered: 4,
+    read: 4,
+    clicks: 3,
+    sentAt: "02 Jul 2026 · 09:00",
+    sentAtDate: "2026-07-02",
+    status: "Sent",
+    channelId: "wa-main",
+    listIds: ["ls-vip"],
+    totalAudience: 4,
+    sendMode: "now",
+    createdBy: "Noor Hassan",
+    createdAt: "02 Jul 2026 · 08:30",
+    contentMode: "template",
+    templateId: "tp-sisley-1to1",
+    promoCodeId: "promo-2",
+    recipientCodes: [
+      { contactId: "c3", contactName: "Siti Rahmawati", code: "SISLEY150K-SIRA" },
+      { contactId: "c6", contactName: "Indah Permata", code: "SISLEY150K-INPE" },
+      { contactId: "c15", contactName: "Tiara Hapsari", code: "SISLEY150K-TIHA" },
+      { contactId: "c22", contactName: "Dian Puspita", code: "SISLEY150K-DIPU" },
+    ],
+    body: "Hi {{name}}, ini kode khusus kamu: {{promo-SISLEY150K}} — potongan Rp150.000 untuk produk Sisley. Kode ini hanya bisa dipakai olehmu ya!",
+    replied: 1,
+    failed: 0,
   },
   {
     id: "b2",

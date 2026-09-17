@@ -67,10 +67,7 @@ export function describeBenefit(b: ReferralBenefit): string {
 }
 
 /** Status is derived from the clock, never stored, so it can't go stale. */
-export function getSeasonStatus(season: {
-  startDate: string;
-  endDate: string;
-}): ReferralStatus {
+export function getSeasonStatus(season: { startDate: string; endDate: string }): ReferralStatus {
   if (!season.startDate || !season.endDate) return "scheduled";
   const now = Date.now();
   const start = new Date(season.startDate).getTime();

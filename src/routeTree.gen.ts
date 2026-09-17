@@ -20,11 +20,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
+import { Route as ReferralIndexRouteImport } from './routes/referral.index'
 import { Route as PromoCodesIndexRouteImport } from './routes/promo-codes.index'
 import { Route as BroadcastsIndexRouteImport } from './routes/broadcasts.index'
 import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 import { Route as SkuSkuIdRouteImport } from './routes/sku.$skuId'
 import { Route as SkuDetailSkuIdRouteImport } from './routes/sku-detail.$skuId'
+import { Route as ReferralSeasonIdRouteImport } from './routes/referral.$seasonId'
 import { Route as PromoCodesNewRouteImport } from './routes/promo-codes.new'
 import { Route as InviteSetPasswordRouteImport } from './routes/invite.set-password'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
@@ -91,6 +93,11 @@ const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   path: '/templates/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReferralIndexRoute = ReferralIndexRouteImport.update({
+  id: '/referral/',
+  path: '/referral/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PromoCodesIndexRoute = PromoCodesIndexRouteImport.update({
   id: '/promo-codes/',
   path: '/promo-codes/',
@@ -114,6 +121,11 @@ const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
 const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
   id: '/sku-detail/$skuId',
   path: '/sku-detail/$skuId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralSeasonIdRoute = ReferralSeasonIdRouteImport.update({
+  id: '/referral/$seasonId',
+  path: '/referral/$seasonId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
@@ -185,11 +197,13 @@ export interface FileRoutesByFullPath {
   '/contacts/new': typeof ContactsNewRoute
   '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
+  '/referral/$seasonId': typeof ReferralSeasonIdRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
   '/templates/new': typeof TemplatesNewRoute
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
+  '/referral/': typeof ReferralIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
@@ -213,11 +227,13 @@ export interface FileRoutesByTo {
   '/contacts/new': typeof ContactsNewRoute
   '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
+  '/referral/$seasonId': typeof ReferralSeasonIdRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
   '/templates/new': typeof TemplatesNewRoute
   '/broadcasts': typeof BroadcastsIndexRoute
   '/promo-codes': typeof PromoCodesIndexRoute
+  '/referral': typeof ReferralIndexRoute
   '/templates': typeof TemplatesIndexRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
@@ -242,11 +258,13 @@ export interface FileRoutesById {
   '/contacts/new': typeof ContactsNewRoute
   '/invite/set-password': typeof InviteSetPasswordRoute
   '/promo-codes/new': typeof PromoCodesNewRoute
+  '/referral/$seasonId': typeof ReferralSeasonIdRoute
   '/sku-detail/$skuId': typeof SkuDetailSkuIdRoute
   '/sku/$skuId': typeof SkuSkuIdRoute
   '/templates/new': typeof TemplatesNewRoute
   '/broadcasts/': typeof BroadcastsIndexRoute
   '/promo-codes/': typeof PromoCodesIndexRoute
+  '/referral/': typeof ReferralIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
@@ -272,11 +290,13 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/invite/set-password'
     | '/promo-codes/new'
+    | '/referral/$seasonId'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
     | '/templates/new'
     | '/broadcasts/'
     | '/promo-codes/'
+    | '/referral/'
     | '/templates/'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
@@ -300,11 +320,13 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/invite/set-password'
     | '/promo-codes/new'
+    | '/referral/$seasonId'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
     | '/templates/new'
     | '/broadcasts'
     | '/promo-codes'
+    | '/referral'
     | '/templates'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
@@ -328,11 +350,13 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/invite/set-password'
     | '/promo-codes/new'
+    | '/referral/$seasonId'
     | '/sku-detail/$skuId'
     | '/sku/$skuId'
     | '/templates/new'
     | '/broadcasts/'
     | '/promo-codes/'
+    | '/referral/'
     | '/templates/'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
@@ -355,10 +379,12 @@ export interface RootRouteChildren {
   BroadcastsNewRoute: typeof BroadcastsNewRoute
   InviteSetPasswordRoute: typeof InviteSetPasswordRoute
   PromoCodesNewRoute: typeof PromoCodesNewRoute
+  ReferralSeasonIdRoute: typeof ReferralSeasonIdRoute
   SkuDetailSkuIdRoute: typeof SkuDetailSkuIdRoute
   TemplatesNewRoute: typeof TemplatesNewRoute
   BroadcastsIndexRoute: typeof BroadcastsIndexRoute
   PromoCodesIndexRoute: typeof PromoCodesIndexRoute
+  ReferralIndexRoute: typeof ReferralIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
   PromoCodesEditPromoIdRoute: typeof PromoCodesEditPromoIdRoute
   PromoCodesPromoIdIndexRoute: typeof PromoCodesPromoIdIndexRoute
@@ -443,6 +469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/referral/': {
+      id: '/referral/'
+      path: '/referral'
+      fullPath: '/referral/'
+      preLoaderRoute: typeof ReferralIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/promo-codes/': {
       id: '/promo-codes/'
       path: '/promo-codes'
@@ -476,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/sku-detail/$skuId'
       fullPath: '/sku-detail/$skuId'
       preLoaderRoute: typeof SkuDetailSkuIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referral/$seasonId': {
+      id: '/referral/$seasonId'
+      path: '/referral/$seasonId'
+      fullPath: '/referral/$seasonId'
+      preLoaderRoute: typeof ReferralSeasonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promo-codes/new': {
@@ -594,10 +634,12 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastsNewRoute: BroadcastsNewRoute,
   InviteSetPasswordRoute: InviteSetPasswordRoute,
   PromoCodesNewRoute: PromoCodesNewRoute,
+  ReferralSeasonIdRoute: ReferralSeasonIdRoute,
   SkuDetailSkuIdRoute: SkuDetailSkuIdRoute,
   TemplatesNewRoute: TemplatesNewRoute,
   BroadcastsIndexRoute: BroadcastsIndexRoute,
   PromoCodesIndexRoute: PromoCodesIndexRoute,
+  ReferralIndexRoute: ReferralIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
   PromoCodesEditPromoIdRoute: PromoCodesEditPromoIdRoute,
   PromoCodesPromoIdIndexRoute: PromoCodesPromoIdIndexRoute,

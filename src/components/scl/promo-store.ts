@@ -381,7 +381,10 @@ function seed(): PromoCode[] {
       rule: {
         condition: {
           kind: "buy-item",
-          group: { join: "and", lines: [{ qty: 1, item: { kind: "any-in-brand", brand: "Sisley" } }] },
+          group: {
+            join: "and",
+            lines: [{ qty: 1, item: { kind: "any-in-brand", brand: "Sisley" } }],
+          },
         },
         reward: { kind: "amount-off", amount: 150000, timing: "immediate" },
       },
@@ -428,8 +431,8 @@ function seed(): PromoCode[] {
           contactName: t1004.customerName,
           redeemed: true,
           redeemedAt: t1004.date,
-          broadcastId: "b2",
-          broadcastName: "Sisley Summer Sale",
+          broadcastId: "b-sisley-1to1",
+          broadcastName: "Sisley Summer Sale — Personal Codes",
           sentAt: "2026-07-02T09:00:00Z",
         },
         {
@@ -438,8 +441,8 @@ function seed(): PromoCode[] {
           contactName: t1005.customerName,
           redeemed: true,
           redeemedAt: t1005.date,
-          broadcastId: "b2",
-          broadcastName: "Sisley Summer Sale",
+          broadcastId: "b-sisley-1to1",
+          broadcastName: "Sisley Summer Sale — Personal Codes",
           sentAt: "2026-07-02T09:00:00Z",
         },
         {
@@ -447,8 +450,8 @@ function seed(): PromoCode[] {
           contactId: t1010.customerId!,
           contactName: t1010.customerName,
           redeemed: false,
-          broadcastId: "b2",
-          broadcastName: "Sisley Summer Sale",
+          broadcastId: "b-sisley-1to1",
+          broadcastName: "Sisley Summer Sale — Personal Codes",
           sentAt: "2026-07-02T09:00:00Z",
         },
         {
@@ -456,8 +459,8 @@ function seed(): PromoCode[] {
           contactId: t1011.customerId!,
           contactName: t1011.customerName,
           redeemed: false,
-          broadcastId: "b2",
-          broadcastName: "Sisley Summer Sale",
+          broadcastId: "b-sisley-1to1",
+          broadcastName: "Sisley Summer Sale — Personal Codes",
           sentAt: "2026-07-02T09:00:00Z",
         },
       ],
@@ -515,7 +518,9 @@ function seed(): PromoCode[] {
           kind: "buy-item",
           group: {
             join: "and",
-            lines: [{ qty: 1, item: { kind: "specific", items: ["Translucent Loose Setting Powder"] } }],
+            lines: [
+              { qty: 1, item: { kind: "specific", items: ["Translucent Loose Setting Powder"] } },
+            ],
           },
         },
         reward: { kind: "amount-off", amount: 50000, timing: "immediate" },
@@ -582,10 +587,16 @@ function seed(): PromoCode[] {
           kind: "buy-item",
           group: {
             join: "and",
-            lines: [{ qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } }],
+            lines: [
+              { qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } },
+            ],
           },
         },
-        reward: { kind: "free-item", sameAsPurchased: true, group: { join: "and", lines: [{ qty: 1, item: { kind: "any" } }] } },
+        reward: {
+          kind: "free-item",
+          sameAsPurchased: true,
+          group: { join: "and", lines: [{ qty: 1, item: { kind: "any" } }] },
+        },
       },
       usageType: "one-to-many",
       maxUsage: 150,
