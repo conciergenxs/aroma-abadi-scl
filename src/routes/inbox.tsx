@@ -1263,7 +1263,9 @@ function InboxPage() {
                 <Section title="Audience">
                   <div className="flex flex-wrap gap-1">
                     {contact.listIds.length === 0 && (
-                      <span className="text-[11px] text-muted-foreground">Not in any audience</span>
+                      <span className="text-[11px] text-muted-foreground">
+                        Not in any audience
+                      </span>
                     )}
                     {contact.listIds.map((id) => {
                       const l = lists.find((x) => x.id === id);

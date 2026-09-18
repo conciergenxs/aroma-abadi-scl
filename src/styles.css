@@ -356,28 +356,40 @@
   animation-delay: 0s;
 }
 .stagger > *:nth-child(2) {
-  animation-delay: 0.05s;
+  animation-delay: 0.028s;
 }
 .stagger > *:nth-child(3) {
-  animation-delay: 0.1s;
+  animation-delay: 0.056s;
 }
 .stagger > *:nth-child(4) {
-  animation-delay: 0.14s;
+  animation-delay: 0.084s;
 }
 .stagger > *:nth-child(5) {
-  animation-delay: 0.18s;
+  animation-delay: 0.112s;
 }
 .stagger > *:nth-child(6) {
-  animation-delay: 0.22s;
+  animation-delay: 0.14s;
 }
 .stagger > *:nth-child(7) {
-  animation-delay: 0.26s;
+  animation-delay: 0.168s;
 }
 .stagger > *:nth-child(8) {
-  animation-delay: 0.3s;
+  animation-delay: 0.196s;
 }
-.stagger > *:nth-child(n + 9) {
-  animation-delay: 0.32s;
+.stagger > *:nth-child(9) {
+  animation-delay: 0.224s;
+}
+.stagger > *:nth-child(10) {
+  animation-delay: 0.252s;
+}
+.stagger > *:nth-child(11) {
+  animation-delay: 0.28s;
+}
+.stagger > *:nth-child(12) {
+  animation-delay: 0.308s;
+}
+.stagger > *:nth-child(n + 13) {
+  animation-delay: 0.336s;
 }
 
 /* ---- Utility classes ---- */

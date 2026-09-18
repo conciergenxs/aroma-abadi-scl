@@ -302,7 +302,7 @@ function ItemScopeEditor({
                     No items match your filters
                   </p>
                 ) : (
-                  <div className="stagger">
+                  <div className="animate-fade-in">
                     {filtered.map((it) => {
                       // Covered by the active "Any Item [in Brand]" rule —
                       // shows checked like every other row, without this
