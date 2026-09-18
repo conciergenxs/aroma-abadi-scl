@@ -200,7 +200,7 @@ function ItemScopeEditor({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
+                  className="tap h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -532,7 +532,7 @@ function ItemGroupEditor({
                 type="button"
                 onClick={() => onChange({ ...group, lines: lines.filter((_, idx) => idx !== i) })}
                 title="Remove this SKU"
-                className="press h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                className="tap press h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>

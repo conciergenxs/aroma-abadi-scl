@@ -390,7 +390,7 @@ function LifecycleStageRow({
       <button
         type="button"
         onClick={onEdit}
-        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
+        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
         aria-label="Edit stage"
       >
         <Pencil className="h-3.5 w-3.5" />
@@ -399,7 +399,7 @@ function LifecycleStageRow({
         <button
           type="button"
           onClick={onDelete}
-          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
+          className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
           aria-label="Delete stage"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -830,7 +830,7 @@ function Modal({
           <h2 className="text-sm font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>

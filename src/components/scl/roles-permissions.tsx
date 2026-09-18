@@ -1438,7 +1438,7 @@ function AssignUsersModal({
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>

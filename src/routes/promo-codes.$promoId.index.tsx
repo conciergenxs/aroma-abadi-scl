@@ -99,7 +99,7 @@ function CopyCodeButton({ code }: { code: string }) {
       type="button"
       title="Copy code"
       onClick={handleCopy}
-      className={`h-6 w-6 grid place-items-center rounded transition-colors shrink-0 ${copied ? "text-emerald-500" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+      className={`tap h-6 w-6 grid place-items-center rounded transition-colors shrink-0 ${copied ? "text-emerald-500" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
     >
       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
     </button>
@@ -174,7 +174,7 @@ function TableFooterPagination({
             type="button"
             onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+            className="tap h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
           >
             ‹
           </button>
@@ -182,7 +182,7 @@ function TableFooterPagination({
             type="button"
             onClick={() => setPage(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
-            className="h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+            className="tap h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
           >
             ›
           </button>

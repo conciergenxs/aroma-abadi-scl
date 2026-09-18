@@ -302,7 +302,7 @@ function BroadcastListPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
@@ -319,7 +319,7 @@ function BroadcastListPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className={`h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
+                      className={`tap h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
                     >
                       {p}
                     </button>
@@ -328,7 +328,7 @@ function BroadcastListPage() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={safePage >= totalPages}
-                  className="h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>

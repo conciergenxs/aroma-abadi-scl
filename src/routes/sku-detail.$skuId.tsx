@@ -268,7 +268,7 @@ function SkuDetailPage() {
                   setDateTo("");
                   setPage(1);
                 }}
-                className="h-7 w-7 grid place-items-center rounded border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-[10px]"
+                className="tap h-7 w-7 grid place-items-center rounded border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-[10px]"
                 title="Clear date filter"
               >
                 ✕
@@ -403,7 +403,7 @@ function SkuDetailPage() {
                       type="button"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page <= 1}
-                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+                      className="tap h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -427,7 +427,7 @@ function SkuDetailPage() {
                       type="button"
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page >= totalPages}
-                      className="h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
+                      className="tap h-7 w-7 grid place-items-center rounded border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors duration-150"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>

@@ -425,7 +425,7 @@ export function AppShell({
                       )}
                       <button
                         onClick={() => setNotifOpen(false)}
-                        className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors duration-150"
+                        className="tap h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors duration-150"
                       >
                         <XIcon className="h-3.5 w-3.5" />
                       </button>

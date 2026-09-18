@@ -355,10 +355,22 @@
   animation: page-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ---- Stagger lists ---- */
+/* ---- Stagger lists ----
+ *
+ * Every animation in this file uses `backwards`, never `both`, and the reason
+ * is the same one documented for .page-enter above. `both` keeps the "to"
+ * frame applied at the *animation* cascade origin once the animation ends,
+ * and that origin outranks every normal author declaration. Because each
+ * "to" frame here is the element's natural resting state (opacity 1,
+ * transform none), filling it changes nothing visually — but it does mean
+ * `transform` stays owned by the animation forever, which silently killed
+ * `.card-hover:hover`'s lift and `.press:active`'s scale on every staggered
+ * child: stat tiles, SKU cards, inbox rows, the lot. `backwards` still
+ * applies the "from" frame during the delay (the only thing the stagger
+ * needs) and hands `transform` back when the animation is done. */
 
 .stagger > * {
-  animation: fade-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .stagger > *:nth-child(1) {
   animation-delay: 0s;
@@ -391,37 +403,37 @@
 /* ---- Utility classes ---- */
 
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out both;
+  animation: fade-in 0.2s ease-out backwards;
 }
 .animate-scale-in {
-  animation: scale-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: scale-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 .animate-slide-up {
-  animation: slide-in-bottom 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in-bottom 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .animate-slide-in-right {
-  animation: slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .animate-pop-in {
-  animation: pop-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: pop-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 .badge-animate {
-  animation: pop-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: pop-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 .animate-spin-once {
   animation: spin-once 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .animate-grow-x {
   transform-origin: left;
-  animation: grow-x 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: grow-x 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* ---- Modal backdrop ---- */
 .modal-backdrop {
-  animation: backdrop-in 0.18s ease-out both;
+  animation: backdrop-in 0.18s ease-out backwards;
 }
 .modal-content {
-  animation: modal-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: modal-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* ---- Global interactive element transitions ---- */
@@ -510,13 +522,13 @@ tbody tr:hover td {
 /* ---- Slide panel ---- */
 
 .slide-in-right {
-  animation: slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* Drawers that come in from the left edge (the mobile navigation) slide their
    full width rather than the 12px nudge the keyframe above uses. */
 .slide-in-panel-left {
-  animation: slide-in-panel-left 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in-panel-left 0.24s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @keyframes slide-in-panel-left {
@@ -603,13 +615,13 @@ tbody tr:hover td {
   width: 3px;
   border-radius: 0 2px 2px 0;
   background: var(--color-sidebar-primary);
-  animation: scale-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: scale-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 /* ---- Tooltip fade ---- */
 
 [title]:hover::after {
-  animation: fade-in 0.15s ease-out both;
+  animation: fade-in 0.15s ease-out backwards;
 }
 
 /* ---- Unread badge bounce ---- */
@@ -629,13 +641,13 @@ tbody tr:hover td {
   }
 }
 .badge-new {
-  animation: badge-bounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: badge-bounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 /* ---- Smooth number transitions ---- */
 
 .stat-value {
-  animation: count-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: count-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -708,7 +720,7 @@ ul.divide-y > li:hover {
 /* ---- Images fade in once decoded, instead of popping ---- */
 
 .img-fade {
-  animation: fade-in 0.25s ease-out both;
+  animation: fade-in 0.25s ease-out backwards;
 }
 
 /* ---- Toggle / checkbox / radio feedback ---- */
@@ -753,9 +765,9 @@ html {
    tap delay is turned off. Scoped to coarse pointers, so a mouse-driven
    screen looks exactly as it did.
 
-   `.tap` opts a small icon button into a 44px hit area drawn *around* it,
-   leaving the visible button the size it was — use it wherever growing the
-   button itself would push a dense row apart. */
+   `.tap` opts a small control into a comfortable minimum box. It grows the
+   element itself rather than painting an invisible overlay around it, so two
+   neighbouring buttons can never end up stealing each other's taps. */
 
 @media (pointer: coarse) {
   button,
@@ -781,16 +793,8 @@ html {
   }
 
   .tap {
-    position: relative;
-  }
-  .tap::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 44px;
-    height: 44px;
-    transform: translate(-50%, -50%);
+    min-width: 2.5rem;
+    min-height: 2.5rem;
   }
 }
 

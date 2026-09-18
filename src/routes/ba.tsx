@@ -579,7 +579,7 @@ function BAForm({
                     navigator.clipboard.writeText(password);
                     toast.success("Password copied");
                   }}
-                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
                   title="Copy password"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -591,7 +591,7 @@ function BAForm({
                     setPassword(baStore.generatePassword(areaCoordinator, name));
                     setTimeout(() => setSpinning(false), 420);
                   }}
-                  className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
                   title="Regenerate"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${spinning ? "animate-spin-once" : ""}`} />

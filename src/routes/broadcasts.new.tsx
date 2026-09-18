@@ -552,7 +552,7 @@ function CreateBroadcastPage() {
                           </span>
                           <button
                             onClick={() => setVarPopup(null)}
-                            className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
+                            className="tap h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
                           >
                             <XIcon className="h-3 w-3" />
                           </button>
@@ -592,7 +592,7 @@ function CreateBroadcastPage() {
                           </span>
                           <button
                             onClick={() => setVarPopup(null)}
-                            className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
+                            className="tap h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors duration-150"
                           >
                             <XIcon className="h-3 w-3" />
                           </button>
@@ -783,7 +783,7 @@ function CreateBroadcastPage() {
                           type="button"
                           onClick={() => setCodePage(Math.max(1, safeCodePage - 1))}
                           disabled={safeCodePage <= 1}
-                          className="press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                          className="tap press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
                         >
                           ‹
                         </button>
@@ -791,7 +791,7 @@ function CreateBroadcastPage() {
                           type="button"
                           onClick={() => setCodePage(Math.min(codeTotalPages, safeCodePage + 1))}
                           disabled={safeCodePage >= codeTotalPages}
-                          className="press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+                          className="tap press h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
                         >
                           ›
                         </button>
@@ -1236,7 +1236,7 @@ function AudienceModal({
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <XIcon className="h-4 w-4" />
           </button>

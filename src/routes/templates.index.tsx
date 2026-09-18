@@ -361,7 +361,7 @@ function TemplatesPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
@@ -378,7 +378,7 @@ function TemplatesPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className={`h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
+                      className={`tap h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
                     >
                       {p}
                     </button>
@@ -387,7 +387,7 @@ function TemplatesPage() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={safePage >= totalPages}
-                  className="h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
@@ -497,7 +497,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -549,7 +549,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                     />
                     <button
                       onClick={() => submitRename(g.id)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-emerald-300 transition-colors duration-150"
+                      className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-emerald-300 transition-colors duration-150"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>
@@ -562,13 +562,13 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
                         setEditingId(g.id);
                         setEditingName(g.name);
                       }}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+                      className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => setPendingDelete(g)}
-                      className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-destructive transition-colors duration-150"
+                      className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-destructive transition-colors duration-150"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -1078,7 +1078,7 @@ function GroupPickerModal({
           </h2>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>

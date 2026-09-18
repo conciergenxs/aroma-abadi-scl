@@ -128,7 +128,7 @@ export function TablePager({
             onClick={() => onPage(Math.max(1, page - 1))}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="press h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+            className="press tap h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
           >
             ‹
           </button>
@@ -137,7 +137,7 @@ export function TablePager({
             onClick={() => onPage(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
             aria-label="Next page"
-            className="press h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
+            className="press tap h-7 w-7 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors"
           >
             ›
           </button>

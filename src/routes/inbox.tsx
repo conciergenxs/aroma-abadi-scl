@@ -598,7 +598,7 @@ function InboxPage() {
               </span>
               <button
                 onClick={() => setLabelModalOpen(true)}
-                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+                className="tap h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -1043,7 +1043,7 @@ function InboxPage() {
                     <button
                       onClick={clearReply}
                       aria-label="Cancel reply"
-                      className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
+                      className="tap h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
                     >
                       <XIcon className="h-3.5 w-3.5" />
                     </button>
@@ -1071,7 +1071,7 @@ function InboxPage() {
                       type="button"
                       disabled
                       title="Attachments aren't available yet"
-                      className="h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="tap h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Paperclip className="h-4 w-4" />
                     </button>
@@ -1079,7 +1079,7 @@ function InboxPage() {
                       type="button"
                       disabled
                       title="Emoji picker isn't available yet"
-                      className="h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="tap h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Smile className="h-4 w-4" />
                     </button>
@@ -1888,7 +1888,7 @@ function FilterPanel(props: FilterPanelProps) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
+            className="tap h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
           >
             <XIcon className="h-3.5 w-3.5" />
           </button>
@@ -2472,14 +2472,14 @@ function SearchStrip({
             <button
               onClick={onPrev}
               aria-label="Previous match"
-              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
+              className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
             >
               <ChevronUp className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={onNext}
               aria-label="Next match"
-              className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
+              className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors duration-150"
             >
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
@@ -2490,7 +2490,7 @@ function SearchStrip({
       <button
         onClick={onClose}
         aria-label="Close search"
-        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 shrink-0 transition-colors duration-150"
+        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-50 shrink-0 transition-colors duration-150"
       >
         <XIcon className="h-3.5 w-3.5" />
       </button>

@@ -73,7 +73,7 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
           </span>
           <button
             onClick={onClose}
-            className="ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <XIcon className="h-4 w-4" />
           </button>

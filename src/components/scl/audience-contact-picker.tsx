@@ -147,7 +147,7 @@ function Pager({
             type="button"
             onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors text-[11px]"
+            className="tap h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors text-[11px]"
           >
             ‹
           </button>
@@ -155,7 +155,7 @@ function Pager({
             type="button"
             onClick={() => setPage(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
-            className="h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors text-[11px]"
+            className="tap h-6 w-6 grid place-items-center rounded border border-border disabled:opacity-40 hover:bg-muted transition-colors text-[11px]"
           >
             ›
           </button>

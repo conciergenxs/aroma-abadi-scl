@@ -348,7 +348,7 @@ function ContactsPage() {
               </span>
               <button
                 onClick={() => navigate({ to: "/contacts/audience/new" })}
-                className="h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
+                className="tap h-5 w-5 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -559,7 +559,7 @@ function ContactsPage() {
                       setAudienceModalId(null);
                       setInfoContact(null);
                     }}
-                    className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
+                    className="tap h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground transition-colors duration-150"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -637,7 +637,7 @@ function ContactsPage() {
                         <button
                           type="button"
                           onClick={() => setInfoContact(infoContact?.id === c.id ? null : c)}
-                          className={`h-6 w-6 grid place-items-center rounded shrink-0 transition-colors ${infoContact?.id === c.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          className={`tap h-6 w-6 grid place-items-center rounded shrink-0 transition-colors ${infoContact?.id === c.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                           title="Contact info"
                         >
                           <Info className="h-3.5 w-3.5" />
@@ -745,7 +745,7 @@ function SidebarPager({
           onClick={() => onChange(page - 1)}
           disabled={page <= 1}
           aria-label="Previous page"
-          className="press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          className="tap press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
         >
           ‹
         </button>
@@ -754,7 +754,7 @@ function SidebarPager({
           onClick={() => onChange(page + 1)}
           disabled={page >= pages}
           aria-label="Next page"
-          className="press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          className="tap press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
         >
           ›
         </button>
@@ -1272,7 +1272,7 @@ function ManagePropertiesModal({
             </button>
             <button
               onClick={onClose}
-              className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+              className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
             >
               <X className="h-4 w-4" />
             </button>
@@ -1332,7 +1332,7 @@ function ManagePropertiesModal({
                           setEditing(p);
                           setShowAdd(true);
                         }}
-                        className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
+                        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
                         title="Edit"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -1340,7 +1340,7 @@ function ManagePropertiesModal({
                       {!p.system && (
                         <button
                           onClick={() => deleteProp(p.id)}
-                          className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
+                          className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
                           title="Delete"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -1442,7 +1442,7 @@ function ListSidebarRow({
               e.stopPropagation();
               setMenu((m) => !m);
             }}
-            className="opacity-0 group-hover:opacity-100 h-5 w-5 grid place-items-center rounded hover:bg-gray-100 transition-colors duration-150"
+            className="tap opacity-0 group-hover:opacity-100 h-5 w-5 grid place-items-center rounded hover:bg-gray-100 transition-colors duration-150"
           >
             <MoreHorizontal className="h-3 w-3" />
           </span>
@@ -1564,7 +1564,7 @@ function LabelManager({
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+                className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1580,7 +1580,7 @@ function LabelManager({
                   />
                   <button
                     onClick={() => onDelete(l.id)}
-                    className="h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-150"
+                    className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-150"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -1685,7 +1685,7 @@ function ContactDrawer({
           <div className="text-sm font-medium">Contact details</div>
           <button
             onClick={onClose}
-            className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
+            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1905,7 +1905,7 @@ function LabelPicker({
                     <button
                       onClick={() => onDelete(l.id)}
                       title="Delete label"
-                      className="opacity-0 group-hover/row:opacity-100 h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 mr-1 transition-colors duration-150"
+                      className="tap opacity-0 group-hover/row:opacity-100 h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 mr-1 transition-colors duration-150"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>

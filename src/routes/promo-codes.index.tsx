@@ -104,7 +104,7 @@ function ActionMenu({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        className="tap h-7 w-7 grid place-items-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
@@ -348,7 +348,7 @@ function PromoCodesPage() {
                               navigator.clipboard.writeText(promo.code);
                               toast.success("Copied!");
                             }}
-                            className="press h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            className="tap press h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                             title="Copy"
                           >
                             <Copy className="h-3 w-3" />
