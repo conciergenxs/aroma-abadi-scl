@@ -38,8 +38,9 @@ function ReferralPage() {
     .filter((s) => getSeasonStatus(s) === "ended")
     .sort((a, b) => +new Date(b.endDate) - +new Date(a.endDate));
 
-  const tabs: { key: SeasonTab; label: string; count: number }[] = [
-    { key: "ongoing", label: "Ongoing", count: ongoing ? 1 : 0 },
+  // Ongoing is always at most one season, so a count there says nothing.
+  const tabs: { key: SeasonTab; label: string; count?: number }[] = [
+    { key: "ongoing", label: "Ongoing" },
     { key: "upcoming", label: "Upcoming", count: upcoming.length },
     { key: "past", label: "Past", count: past.length },
   ];
@@ -74,7 +75,11 @@ function ReferralPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               )}
               {t.label}
-              <span className="text-[11px] text-muted-foreground tabular-nums">{t.count}</span>
+              {t.count !== undefined && (
+                <span className="inline-grid h-5 min-w-5 place-items-center rounded-full bg-primary/15 px-1.5 text-[10.5px] font-semibold text-primary tabular-nums">
+                  {t.count}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -101,7 +106,7 @@ function ReferralPage() {
               seasons={upcoming}
               empty="Nothing scheduled yet."
               onDelete={setDeleting}
-              dateLabel="Starts"
+              editable
             />
           </div>
         )}
@@ -112,7 +117,7 @@ function ReferralPage() {
               seasons={past}
               empty="No season has ended yet."
               onDelete={setDeleting}
-              dateLabel="Ended"
+              editable={false}
             />
           </div>
         )}
@@ -140,6 +145,7 @@ function OngoingCard({ season, onDelete }: { season: ReferralSeason; onDelete: (
           <Link
             to="/referral/edit/$seasonId"
             params={{ seasonId: season.id }}
+            search={{ from: "list" }}
             className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             <Pencil className="h-3.5 w-3.5" /> Edit
@@ -168,12 +174,13 @@ function SeasonTable({
   seasons,
   empty,
   onDelete,
-  dateLabel,
+  editable,
 }: {
   seasons: ReferralSeason[];
   empty: string;
   onDelete: (s: ReferralSeason) => void;
-  dateLabel: "Starts" | "Ended";
+  /** Past seasons are history — they can only be deleted. */
+  editable: boolean;
 }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -237,12 +244,7 @@ function SeasonTable({
                 >
                   <td className="px-5 py-2.5 text-[13px] font-medium text-foreground">{s.name}</td>
                   <td className="px-5 py-2.5 text-[12px] text-muted-foreground whitespace-nowrap">
-                    <div>
-                      {fmtDateEN(s.startDate)} — {fmtDateEN(s.endDate)}
-                    </div>
-                    <div className="text-[10.5px]">
-                      {dateLabel} {fmtDateEN(dateLabel === "Starts" ? s.startDate : s.endDate)}
-                    </div>
+                    {fmtDateEN(s.startDate)} — {fmtDateEN(s.endDate)}
                   </td>
                   <td className="px-5 py-2.5 text-[12px] max-w-[280px]">
                     {describePromoRule(s.rule)}
@@ -252,15 +254,18 @@ function SeasonTable({
                     <SeasonStatusBadge status={getSeasonStatus(s)} />
                   </td>
                   <td className="px-5 py-2.5 text-right whitespace-nowrap">
-                    <Link
-                      to="/referral/edit/$seasonId"
-                      params={{ seasonId: s.id }}
-                      onClick={(e) => e.stopPropagation()}
-                      title="Edit season"
-                      className="press inline-grid h-7 w-7 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Link>
+                    {editable && (
+                      <Link
+                        to="/referral/edit/$seasonId"
+                        params={{ seasonId: s.id }}
+                        search={{ from: "list" }}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Edit season"
+                        className="press inline-grid h-7 w-7 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
                     <button
                       type="button"
                       title="Delete season"
