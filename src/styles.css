@@ -745,6 +745,55 @@ html {
    state change for users who ask their OS to minimise motion. Kept last so it
    overrides every rule in this file. */
 
+/* ═══════════════════════════════════════════════════════════════════════
+   TOUCH TARGETS
+   The desktop layout is deliberately dense — 28px icon buttons, 13px
+   checkboxes. On a touch device a fingertip can't hit those reliably, so
+   every control gets a comfortable minimum box and the browser's 300ms
+   tap delay is turned off. Scoped to coarse pointers, so a mouse-driven
+   screen looks exactly as it did.
+
+   `.tap` opts a small icon button into a 44px hit area drawn *around* it,
+   leaving the visible button the size it was — use it wherever growing the
+   button itself would push a dense row apart. */
+
+@media (pointer: coarse) {
+  button,
+  a[href],
+  [role="button"],
+  select,
+  summary,
+  input,
+  textarea,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* Leaf controls: safe to grow, nothing is positioned against them. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 1.15rem;
+    min-height: 1.15rem;
+  }
+
+  select {
+    min-height: 2.25rem;
+  }
+
+  .tap {
+    position: relative;
+  }
+  .tap::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
