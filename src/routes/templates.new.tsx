@@ -195,6 +195,9 @@ function CreateTemplatePage() {
       body: body.trim(),
       groupId: groupId === "none" ? undefined : groupId,
       language,
+      headerType: headerType as "none" | "text" | "image" | "video",
+      headerText: headerType === "text" ? headerText.trim() || undefined : undefined,
+      footer: footer.trim() || undefined,
       promoCodeId: linkedPromoId,
     });
     toast.success(kind === "draft" ? "Draft saved" : "Template submitted for review");
@@ -288,6 +291,10 @@ function CreateTemplatePage() {
                     </button>
                   )}
                 </div>
+              </Field>
+
+              <Field label="Language">
+                <SclSelect value={language} onChange={setLanguage} options={languageOptions} />
               </Field>
 
               <Field label="Header Type (Optional)">

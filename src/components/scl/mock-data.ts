@@ -1417,6 +1417,10 @@ export type Template = {
   body: string;
   groupId?: string;
   language?: string;
+  /** WhatsApp template chrome around the body. */
+  headerType?: "none" | "text" | "image" | "video";
+  headerText?: string;
+  footer?: string;
   rejectionReason?: string;
   promoCodeId?: string;
 };
