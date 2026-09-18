@@ -197,7 +197,7 @@ function BroadcastListPage() {
                   <th className="px-4 py-3 text-left font-medium">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border stagger">
+              <tbody key={`${safePage}-${pageSize}`} className="divide-y divide-border stagger">
                 {paged.map((b) => (
                   <tr
                     key={b.id}

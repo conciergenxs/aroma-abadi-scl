@@ -230,7 +230,7 @@ function BAPage() {
                 <Th>&nbsp;</Th>
               </tr>
             </thead>
-            <tbody className="stagger">
+            <tbody key={page} className="stagger">
               {paginated.map((b) => {
                 const shown = revealed.has(b.id);
                 return (

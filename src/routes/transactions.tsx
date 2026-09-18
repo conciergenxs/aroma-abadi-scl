@@ -229,7 +229,7 @@ function TransactionsPage() {
                   <Th>Status</Th>
                 </tr>
               </thead>
-              <tbody className="stagger">
+              <tbody key={`${safePage}-${pageSize}`} className="stagger">
                 {paginated.map((t) => {
                   const contactMatch = contacts.find((c) => c.id === t.customerId);
                   return (

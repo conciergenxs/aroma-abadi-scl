@@ -28,8 +28,9 @@ import {
   type LifecycleGroup,
   LIFECYCLE_COLORS,
 } from "./contacts-store";
-import { ChannelDot, LabelChip, ListChip } from "./app-shell";
-import type { Contact, ContactLabel, ContactList } from "./mock-data";
+import { ChannelDot, LabelChip, ListChip, labelColorClass, labelColorDot } from "./app-shell";
+import type { Contact, ContactLabel, ContactList, LabelColor } from "./mock-data";
+import { fmtDateEN } from "@/lib/fmt";
 import { PropertyFormModal } from "./property-form-modal";
 
 // =========================================================
@@ -38,65 +39,25 @@ import { PropertyFormModal } from "./property-form-modal";
 
 export type DMSection = "labels" | "contact-properties" | "customer-lifecycle" | "recently-deleted";
 
-type LabelColorKey = "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "gray";
+// Labels here are the same labels contacts wear, so this page speaks the
+// contact store's palette rather than inventing a second one.
+type LabelColorKey = LabelColor;
 
-const LABEL_COLORS: { key: LabelColorKey; name: string; badge: string; dot: string }[] = [
-  {
-    key: "red",
-    name: "Red",
-    badge: "border-red-500/30 bg-red-500/10 text-red-300",
-    dot: "bg-red-500",
-  },
-  {
-    key: "orange",
-    name: "Orange",
-    badge: "border-orange-500/30 bg-orange-500/10 text-orange-300",
-    dot: "bg-orange-500",
-  },
-  {
-    key: "yellow",
-    name: "Yellow",
-    badge: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300",
-    dot: "bg-yellow-500",
-  },
-  {
-    key: "green",
-    name: "Green",
-    badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-    dot: "bg-emerald-500",
-  },
-  {
-    key: "blue",
-    name: "Blue",
-    badge: "border-blue-500/30 bg-blue-500/10 text-blue-300",
-    dot: "bg-blue-500",
-  },
-  {
-    key: "purple",
-    name: "Purple",
-    badge: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-    dot: "bg-violet-500",
-  },
-  {
-    key: "pink",
-    name: "Pink",
-    badge: "border-pink-500/30 bg-pink-500/10 text-pink-300",
-    dot: "bg-pink-500",
-  },
-  {
-    key: "gray",
-    name: "Gray",
-    badge: "border-slate-500/30 bg-slate-500/10 text-slate-300",
-    dot: "bg-slate-400",
-  },
-];
+const LABEL_COLORS: { key: LabelColorKey; name: string; badge: string; dot: string }[] = (
+  ["indigo", "sky", "emerald", "amber", "pink", "violet", "slate"] as const
+).map((key) => ({
+  key,
+  name: key.charAt(0).toUpperCase() + key.slice(1),
+  badge: labelColorClass[key],
+  dot: labelColorDot[key],
+}));
 
-const colorMeta = (k: LabelColorKey) => LABEL_COLORS.find((c) => c.key === k)!;
+// Falls back rather than throwing: a label saved with a colour that has since
+// been retired should still render.
+const colorMeta = (k: LabelColorKey) =>
+  LABEL_COLORS.find((c) => c.key === k) ?? LABEL_COLORS[LABEL_COLORS.length - 1];
 
-function fmtDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
+const fmtDate = fmtDateEN;
 
 // =========================================================
 // Module entry
@@ -1033,86 +994,7 @@ function Pagination({
 // LABELS PAGE
 // =========================================================
 
-type LabelRow = {
-  id: string;
-  name: string;
-  color: LabelColorKey;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const SEED_LABELS: LabelRow[] = [
-  {
-    id: "lb-1",
-    name: "VIP Customer",
-    color: "yellow",
-    createdAt: "2025-01-12T09:00:00Z",
-    updatedAt: "2025-09-04T14:00:00Z",
-  },
-  {
-    id: "lb-2",
-    name: "Hot Lead",
-    color: "red",
-    createdAt: "2025-02-02T09:00:00Z",
-    updatedAt: "2025-08-19T14:00:00Z",
-  },
-  {
-    id: "lb-3",
-    name: "Enterprise",
-    color: "blue",
-    createdAt: "2025-02-21T09:00:00Z",
-    updatedAt: "2025-09-22T14:00:00Z",
-  },
-  {
-    id: "lb-4",
-    name: "Potential Client",
-    color: "purple",
-    createdAt: "2025-03-10T09:00:00Z",
-    updatedAt: "2025-10-01T14:00:00Z",
-  },
-  {
-    id: "lb-5",
-    name: "Existing Customer",
-    color: "green",
-    createdAt: "2025-03-28T09:00:00Z",
-    updatedAt: "2025-10-12T14:00:00Z",
-  },
-  {
-    id: "lb-6",
-    name: "Repeat Buyer",
-    color: "green",
-    createdAt: "2025-04-14T09:00:00Z",
-    updatedAt: "2025-10-20T14:00:00Z",
-  },
-  {
-    id: "lb-7",
-    name: "Newsletter",
-    color: "gray",
-    createdAt: "2025-05-02T09:00:00Z",
-    updatedAt: "2025-10-28T14:00:00Z",
-  },
-  {
-    id: "lb-8",
-    name: "Partnership",
-    color: "pink",
-    createdAt: "2025-05-19T09:00:00Z",
-    updatedAt: "2025-11-05T14:00:00Z",
-  },
-  {
-    id: "lb-9",
-    name: "Campaign Lead",
-    color: "orange",
-    createdAt: "2025-06-04T09:00:00Z",
-    updatedAt: "2025-11-12T14:00:00Z",
-  },
-  {
-    id: "lb-10",
-    name: "Inactive Customer",
-    color: "gray",
-    createdAt: "2025-06-21T09:00:00Z",
-    updatedAt: "2025-11-22T14:00:00Z",
-  },
-];
+type LabelRow = ContactLabel;
 
 const COLOR_FILTER_OPTIONS = [
   { value: "all", label: "All Colors" },
@@ -1120,7 +1002,17 @@ const COLOR_FILTER_OPTIONS = [
 ];
 
 function LabelsPage() {
-  const [labels, setLabels] = useState<LabelRow[]>(SEED_LABELS);
+  // The real thing — the very labels contacts are tagged with.
+  const { labels, contacts } = useContactsStore();
+  const setLabels = contactsStore.setLabels;
+  const usageCount = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of contacts) {
+      if (c.deleted) continue;
+      for (const id of c.labelIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  }, [contacts]);
   const [query, setQuery] = useState("");
   const [colorFilter, setColorFilter] = useState<string>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -1161,22 +1053,26 @@ function LabelsPage() {
   };
 
   const create = (name: string, color: LabelColorKey) => {
-    const now = new Date().toISOString();
-    setLabels((prev) => [
-      { id: `lb-${Date.now()}`, name, color, createdAt: now, updatedAt: now },
-      ...prev,
-    ]);
+    setLabels((prev) => [{ id: `lb-${Date.now()}`, name, color }, ...prev]);
     toast.success("Label created");
   };
 
   const update = (id: string, name: string, color: LabelColorKey) => {
-    const now = new Date().toISOString();
-    setLabels((prev) => prev.map((l) => (l.id === id ? { ...l, name, color, updatedAt: now } : l)));
+    setLabels((prev) => prev.map((l) => (l.id === id ? { ...l, name, color } : l)));
     toast.success("Label updated");
   };
 
   const del = (ids: string[]) => {
     setLabels((prev) => prev.filter((l) => !ids.includes(l.id)));
+    // Take the label off every contact wearing it, or they'd keep a tag that
+    // no longer exists.
+    contactsStore.setContacts((cs) =>
+      cs.map((c) =>
+        c.labelIds.some((id) => ids.includes(id))
+          ? { ...c, labelIds: c.labelIds.filter((id) => !ids.includes(id)) }
+          : c,
+      ),
+    );
     setSelected((prev) => {
       const n = new Set(prev);
       ids.forEach((i) => n.delete(i));
@@ -1261,11 +1157,10 @@ function LabelsPage() {
                     </th>
                     <th className="px-3 py-2.5 text-left font-medium">Label Name</th>
                     <th className="px-3 py-2.5 text-left font-medium">Color</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Created</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Last Updated</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Contacts</th>
                   </tr>
                 </thead>
-                <tbody className="stagger">
+                <tbody key={currentPage} className="stagger">
                   {paged.map((row) => {
                     const c = colorMeta(row.color);
                     return (
@@ -1293,11 +1188,8 @@ function LabelsPage() {
                             {c.name}
                           </span>
                         </td>
-                        <td className="px-3 py-3 text-xs text-muted-foreground">
-                          {fmtDate(row.createdAt)}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-muted-foreground">
-                          {fmtDate(row.updatedAt)}
+                        <td className="px-3 py-3 text-xs text-muted-foreground tabular-nums">
+                          {usageCount.get(row.id) ?? 0}
                         </td>
                       </tr>
                     );
@@ -1397,12 +1289,12 @@ function LabelFormModal({
   mode: "create" | "edit";
 }) {
   const [name, setName] = useState("");
-  const [color, setColor] = useState<LabelColorKey>("blue");
+  const [color, setColor] = useState<LabelColorKey>("indigo");
 
   useEffect(() => {
     if (open) {
       setName(initial?.name ?? "");
-      setColor(initial?.color ?? "blue");
+      setColor(initial?.color ?? "indigo");
     }
   }, [open, initial]);
 

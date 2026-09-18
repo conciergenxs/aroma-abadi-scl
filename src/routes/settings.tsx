@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import {
   ChevronDown,
@@ -23,7 +23,8 @@ import {
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
-import { ARMA_PERSONAS, type ArmaPersona } from "@/components/scl/agents";
+import { armaPersonasStore, useArmaPersonas } from "@/components/scl/arma-personas-store";
+import { type ArmaPersona } from "@/components/scl/agents";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
@@ -1296,8 +1297,16 @@ function ConnectedAgentsSection() {
 
 function ArmaConfigSection() {
   const [active, setActive] = useState<ArmaPersona["id"]>("customer");
-  const [personas, setPersonas] = useState(ARMA_PERSONAS);
-  const persona = personas.find((p) => p.id === active)!;
+  const saved = useArmaPersonas();
+  // Edits are held here until Save Configuration commits them, so an operator
+  // can back out of a half-written prompt by simply leaving the page.
+  const [personas, setPersonas] = useState(saved);
+  const persona = personas.find((p) => p.id === active) ?? personas[0];
+  const dirty = JSON.stringify(personas) !== JSON.stringify(saved);
+
+  useEffect(() => {
+    setPersonas(saved);
+  }, [saved]);
 
   const update = (id: ArmaPersona["id"], patch: Partial<ArmaPersona>) =>
     setPersonas((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
@@ -1395,13 +1404,24 @@ function ArmaConfigSection() {
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => toast.success(`${persona.label} configuration saved`)}
-            className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Save Configuration
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              disabled={!dirty}
+              onClick={() => {
+                armaPersonasStore.save(personas);
+                toast.success(`${persona.label} configuration saved`);
+              }}
+              className="press h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Save Configuration
+            </button>
+            {dirty && (
+              <span className="text-[12px] text-muted-foreground animate-fade-in">
+                Unsaved changes
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Right: example messages */}

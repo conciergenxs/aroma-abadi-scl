@@ -232,7 +232,7 @@ function TemplatesPage() {
                   <th className="px-4 py-3 text-left font-medium">Last updated</th>
                 </tr>
               </thead>
-              <tbody className="stagger divide-y divide-border">
+              <tbody key={`${safePage}-${pageSize}`} className="stagger divide-y divide-border">
                 {paged.map((t) => {
                   const group = groups.find((g) => g.id === t.groupId);
                   const isStar = starred.includes(t.id);

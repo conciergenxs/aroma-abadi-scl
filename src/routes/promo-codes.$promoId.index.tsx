@@ -422,7 +422,10 @@ function PromoDetailPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/60 stagger">
+                  <tbody
+                    key={`${redemptionPage}-${redemptionPageSize}`}
+                    className="divide-y divide-border/60 stagger"
+                  >
                     {pagedRedemptions.map((r) => (
                       <tr key={r.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-5 py-2.5">
@@ -517,7 +520,10 @@ function PromoDetailPage() {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/60 stagger">
+                    <tbody
+                      key={`${codesPage}-${codesPageSize}`}
+                      className="divide-y divide-border/60 stagger"
+                    >
                       {pagedCodes.map((a) => (
                         // A hand-edited code could collide across broadcasts;
                         // the person it belongs to can't.

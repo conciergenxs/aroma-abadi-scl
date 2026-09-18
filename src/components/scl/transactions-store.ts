@@ -224,4 +224,3 @@ export function txStatusBadge(status: string) {
   if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
   return "border-sky-700 bg-sky-600 text-white"; // Processed
 }
-
