@@ -502,6 +502,21 @@ tbody tr:hover td {
   animation: slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Drawers that come in from the left edge (the mobile navigation) slide their
+   full width rather than the 12px nudge the keyframe above uses. */
+.slide-in-panel-left {
+  animation: slide-in-panel-left 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slide-in-panel-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 /* ---- Shimmer skeleton ---- */
 
 .shimmer {

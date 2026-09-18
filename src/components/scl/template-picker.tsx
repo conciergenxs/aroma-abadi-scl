@@ -341,7 +341,7 @@ function EmptyState() {
         </div>
         <Link
           to="/templates"
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create template
         </Link>

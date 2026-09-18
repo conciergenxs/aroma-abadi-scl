@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { nowWIB } from "@/lib/wib";
+import { fmtDateEN } from "@/lib/fmt";
 import {
   ArrowLeft,
   Plus,
@@ -636,7 +638,7 @@ export function RolesPermissionsModule() {
         onAssignUsers={(ids) => {
           setUsers((s) =>
             s.map((u) =>
-              ids.includes(u.id) ? { ...u, role: role.name, assignedDate: todayLabel() } : u,
+              ids.includes(u.id) ? { ...u, role: role.name, assignedDate: fmtDateEN(nowWIB()) } : u,
             ),
           );
           toast.success("Users assigned successfully.");
@@ -1386,14 +1388,6 @@ function RoleDetailPage({
       )}
     </div>
   );
-}
-
-function todayLabel() {
-  return new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
 }
 
 function AssignUsersModal({

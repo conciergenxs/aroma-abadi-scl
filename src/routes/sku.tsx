@@ -781,10 +781,10 @@ function CategoryDetail({
         </div>
       </SectionCard>
 
-      {/* 50% / 50% layout */}
-      <div className="flex gap-4 min-h-0">
-        {/* LEFT 50% — Category Modules */}
-        <div className="w-1/2 min-w-0">
+      {/* Side by side on a wide screen, stacked once there isn't room */}
+      <div className="flex flex-col lg:flex-row gap-4 min-h-0">
+        {/* Category Modules */}
+        <div className="w-full lg:w-1/2 min-w-0">
           <ModulesCard
             level="category"
             modules={category.modules}
@@ -819,7 +819,7 @@ function CategoryDetail({
         </div>
 
         {/* RIGHT 50% — SKUs synced from Odoo */}
-        <div className="w-1/2 min-w-0">
+        <div className="w-full lg:w-1/2 min-w-0">
           <SectionCard
             title="SKUs"
             description="Products synced from Odoo."
@@ -891,9 +891,9 @@ function ListPaginationFooter({
   onNext: () => void;
 }) {
   return (
-    <div className="grid grid-cols-3 items-center gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
       <label className="inline-flex items-center gap-1.5">
-        Showing:
+        Rows per page
         <span className="relative inline-flex items-center">
           {/* appearance-none + our own chevron, so the gap either side of it is
            * ours to set rather than the browser's. */}
@@ -910,9 +910,10 @@ function ListPaginationFooter({
           </select>
           <ChevronDown className="pointer-events-none absolute right-2 h-3 w-3 text-muted-foreground" />
         </span>
-        data
       </label>
-      <span className="text-center">{totalCount === 0 ? "0-0" : `${fromIdx}-${toIdx}`} data</span>
+      <span className="text-center tabular-nums">
+        {totalCount === 0 ? "0" : `${fromIdx}–${toIdx}`} of {totalCount}
+      </span>
       <div className="flex items-center justify-end gap-1.5">
         <button
           type="button"

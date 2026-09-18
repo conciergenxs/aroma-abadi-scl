@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { conversations, contacts, recentActivity } from "@/components/scl/mock-data";
+import { conversations, recentActivity } from "@/components/scl/mock-data";
+import { useLiveContacts } from "@/components/scl/contacts-store";
+import { nowWIB } from "@/lib/wib";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
   avgMessagesBetweenTransaction,
@@ -684,7 +686,8 @@ function DateRangePopover({
 
 // ── Component ──────────────────────────────────────────────────────────────
 function Dashboard() {
-  const today = fmtDateEN(new Date());
+  const today = fmtDateEN(nowWIB());
+  const contacts = useLiveContacts();
   const txState = useTransactionsStore();
 
   const fullRange = useMemo(
@@ -720,7 +723,7 @@ function Dashboard() {
             <div className="flex items-center gap-2">
               <Link
                 to="/inbox"
-                className="inline-flex items-center h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="press inline-flex items-center h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Open Inbox
               </Link>
@@ -779,9 +782,12 @@ function Dashboard() {
                 </Link>
               }
             >
-              <ul className="divide-y divide-border">
+              <ul className="divide-y divide-border stagger">
                 {conversations.slice(0, 6).map((c) => {
-                  const contact = contacts.find((x) => x.id === c.contactId)!;
+                  const contact = contacts.find((x) => x.id === c.contactId);
+                  // A contact moved to Recently Deleted drops out of the feed
+                  // rather than crashing the dashboard.
+                  if (!contact) return null;
                   return (
                     <li
                       key={c.id}

@@ -140,7 +140,7 @@ function BroadcastListPage() {
             <div className="ml-auto">
               <Link
                 to="/broadcasts/new"
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+                className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Create Broadcast
               </Link>
@@ -254,7 +254,17 @@ function BroadcastListPage() {
                       colSpan={10}
                       className="px-4 py-10 text-center text-xs text-muted-foreground"
                     >
-                      No broadcasts match your filters.
+                      {broadcasts.length === 0 ? (
+                        <>
+                          No broadcasts yet.{" "}
+                          <Link to="/broadcasts/new" className="text-primary hover:underline">
+                            Create your first one
+                          </Link>
+                          .
+                        </>
+                      ) : (
+                        "No broadcast matches these filters."
+                      )}
                     </td>
                   </tr>
                 )}

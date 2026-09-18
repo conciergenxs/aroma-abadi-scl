@@ -2,6 +2,7 @@ import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import sclLogoAsset from "@/assets/aroma-abadi-logo-sand.png";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type ReactNode, type ComponentProps } from "react";
+import { useEscapeKey } from "@/lib/use-escape-key";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,7 @@ import {
   BadgeCheck,
   ChevronsLeft,
   ChevronsRight,
+  Menu,
   MessageCircle,
   ShoppingBag,
   Megaphone as MegaphoneIcon,
@@ -182,6 +184,14 @@ export function AppShell({
     return () => window.removeEventListener("mousedown", handler);
   }, [notifOpen]);
 
+  // Below md the sidebar is hidden, so the same nav opens as a drawer from the
+  // header — otherwise a narrow window strands the user on the current page.
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+  useEscapeKey(mobileNavOpen, () => setMobileNavOpen(false));
+
   const markAllRead = () => setReadIds(new Set(MOCK_NOTIFS.map((n) => n.id)));
   const unreadCount = MOCK_NOTIFS.filter((n) => !readIds.has(n.id)).length;
 
@@ -268,10 +278,80 @@ export function AppShell({
         </nav>
       </aside>
 
+      {/* Mobile navigation */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden animate-fade-in">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <aside className="relative flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar slide-in-panel-left">
+            <div className="flex items-center justify-between border-b border-sidebar-border px-4 py-[15px]">
+              <img
+                src={sclIconAsset}
+                alt="Aroma Abadi"
+                className="h-[22px] w-auto object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(false)}
+                aria-label="Close navigation"
+                className="press grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] transition-colors"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-1.5">
+              {topNav.map((item) => (
+                <SidebarLink
+                  key={item.to}
+                  to={item.to}
+                  label={item.label}
+                  active={item.exact ? pathname === item.to : pathname.startsWith(item.to)}
+                  badge={item.badge}
+                  Icon={item.icon}
+                  expanded
+                />
+              ))}
+            </nav>
+            <nav className="border-t border-sidebar-border px-2 pb-3 pt-2 flex flex-col gap-1.5">
+              <SidebarButton
+                label="Invite Members"
+                Icon={UserPlus}
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  setInviteOpen(true);
+                }}
+                expanded
+              />
+              {bottomNav.map((item) => (
+                <SidebarLink
+                  key={item.to}
+                  to={item.to}
+                  label={item.label}
+                  active={item.exact ? pathname === item.to : pathname.startsWith(item.to)}
+                  badge={item.badge}
+                  Icon={item.icon}
+                  expanded
+                />
+              ))}
+            </nav>
+          </aside>
+        </div>
+      )}
+
       {/* Main */}
       <div className="flex h-full flex-col flex-1 min-w-0 overflow-hidden">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-6">
-          <div className="flex items-center gap-1.5">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/70 backdrop-blur px-4 sm:px-6">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open navigation"
+            className="press md:hidden -ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors"
+          >
+            <Menu className="h-4.5 w-4.5" />
+          </button>
+          <div className="flex items-center gap-1.5 min-w-0">
             {backTo && (
               <Link
                 to={backTo as ComponentProps<typeof Link>["to"]}

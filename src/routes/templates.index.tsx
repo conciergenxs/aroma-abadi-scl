@@ -172,7 +172,7 @@ function TemplatesPage() {
             </button>
             <Link
               to="/templates/new"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> New Template
             </Link>
@@ -313,7 +313,17 @@ function TemplatesPage() {
                       colSpan={8}
                       className="px-4 py-10 text-center text-xs text-muted-foreground"
                     >
-                      No templates match your filters.
+                      {templates.length === 0 ? (
+                        <>
+                          No templates yet.{" "}
+                          <Link to="/templates/new" className="text-primary hover:underline">
+                            Create your first one
+                          </Link>
+                          .
+                        </>
+                      ) : (
+                        "No template matches these filters."
+                      )}
                     </td>
                   </tr>
                 )}

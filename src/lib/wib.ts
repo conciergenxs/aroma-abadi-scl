@@ -8,3 +8,10 @@
 export function wib(datetimeLocal: string) {
   return new Date(`${datetimeLocal}:00+07:00`).getTime();
 }
+
+/** Right now, shifted so the UTC parts of the returned Date read as Jakarta
+ * wall-clock time. Pass it to the fmt* helpers (which read UTC parts) to print
+ * today's date identically on the server and in the browser. */
+export function nowWIB() {
+  return new Date(Date.now() + 7 * 60 * 60 * 1000);
+}

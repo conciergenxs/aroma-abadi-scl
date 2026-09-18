@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { nowWIB } from "@/lib/wib";
+import { fmtDateEN } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FloatingMenu } from "@/components/scl/floating-menu";
@@ -76,7 +78,7 @@ function SettingsPage() {
 
   return (
     <AppShell title="Settings" subtitle="Manage your workspace preferences and configuration">
-      <div className="grid grid-cols-[260px_1fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 items-start">
         <aside className="rounded-xl border border-border bg-card/60 glass p-2 h-fit sticky top-0 self-start">
           {NAV.map((section) => {
             const isOpen = open[section.id];
@@ -1521,7 +1523,9 @@ function TeamManagementPage() {
         onBack={() => setOpenTeamId(null)}
         onUpdate={(patch) =>
           setTeams((s) =>
-            s.map((t) => (t.id === openTeam.id ? { ...t, ...patch, updatedOn: todayLabel() } : t)),
+            s.map((t) =>
+              t.id === openTeam.id ? { ...t, ...patch, updatedOn: fmtDateEN(nowWIB()) } : t,
+            ),
           )
         }
         onUsersChange={setUsers}
@@ -1546,7 +1550,7 @@ function TeamManagementPage() {
 
   const handleCreate = (name: string, channelId: string | null) => {
     const id = `team-${Date.now()}`;
-    setTeams((s) => [...s, { id, name, channelId, memberIds: [], updatedOn: todayLabel() }]);
+    setTeams((s) => [...s, { id, name, channelId, memberIds: [], updatedOn: fmtDateEN(nowWIB()) }]);
     toast.success("Team created");
   };
 
@@ -1674,14 +1678,6 @@ function TeamManagementPage() {
       />
     </div>
   );
-}
-
-function todayLabel() {
-  return new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
 }
 
 function TeamFormModal({
