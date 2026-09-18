@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
 import { fmtDateTimeEN, fmtNum, fmtIDR } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CheckCircle2,
   XCircle,
@@ -443,8 +443,9 @@ function PromoDetailPage() {
                           />
                         </td>
                         <td className="px-5 py-2.5 text-[12px] text-muted-foreground max-w-[260px]">
-                          {txById.get(r.transactionId)?.items
-                            .map((i) => `${i.qty}× ${i.skuName}`)
+                          {txById
+                            .get(r.transactionId)
+                            ?.items.map((i) => `${i.qty}× ${i.skuName}`)
                             .join(", ") ?? "—"}
                         </td>
                         <td className="px-5 py-2.5 text-right text-[13px] whitespace-nowrap">

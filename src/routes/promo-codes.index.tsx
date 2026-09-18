@@ -161,6 +161,7 @@ function PromoCodesPage() {
   const { promos } = usePromoStore();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
+  const [filterUsage, setFilterUsage] = useState<"all" | PromoCode["usageType"]>("all");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
   const [deletingPromo, setDeletingPromo] = useState<PromoCode | null>(null);
@@ -168,6 +169,7 @@ function PromoCodesPage() {
   const filtered = useMemo(() => {
     let list = promos;
     if (filterStatus !== "all") list = list.filter((p) => getPromoStatus(p) === filterStatus);
+    if (filterUsage !== "all") list = list.filter((p) => p.usageType === filterUsage);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -178,7 +180,7 @@ function PromoCodesPage() {
       );
     }
     return list;
-  }, [promos, search, filterStatus]);
+  }, [promos, search, filterStatus, filterUsage]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -206,7 +208,7 @@ function PromoCodesPage() {
               setPage(1);
             }}
             placeholder="Search by code or name..."
-            className="h-9 w-52 rounded-md border border-border bg-card/60 pl-9 pr-3 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+            className="h-9 w-72 max-w-full rounded-md border border-border bg-card/60 pl-9 pr-3 text-[13px] text-foreground transition-shadow focus:outline-none focus:ring-1 focus:ring-primary/40"
           />
         </div>
 
@@ -233,10 +235,42 @@ function PromoCodesPage() {
         <button
           type="button"
           onClick={() => navigate({ to: "/promo-codes/new" })}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="press icon-pop ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Create Promo
         </button>
+      </div>
+
+      {/* Usage type — its own row, so it reads as a separate cut of the list */}
+      <div className="flex flex-wrap items-center gap-1 mb-4">
+        {(
+          [
+            { key: "all", label: "All" },
+            { key: "one-to-many", label: "1-to-Many" },
+            { key: "one-to-one", label: "1-to-1" },
+          ] as const
+        ).map((t) => {
+          const count =
+            t.key === "all" ? promos.length : promos.filter((p) => p.usageType === t.key).length;
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => {
+                setFilterUsage(t.key);
+                setPage(1);
+              }}
+              className={`press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
+                filterUsage === t.key
+                  ? "border-primary/40 bg-primary/15 text-foreground"
+                  : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"
+              }`}
+            >
+              {t.label}
+              <span className="text-[10px] text-muted-foreground tabular-nums">{count}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Table */}
@@ -289,18 +323,27 @@ function PromoCodesPage() {
                       <code className="font-mono text-xs font-semibold tracking-wider bg-primary/10 border border-primary/20 rounded px-2 py-0.5 text-foreground">
                         {promo.code}
                       </code>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigator.clipboard.writeText(promo.code);
-                          toast.success("Copied!");
-                        }}
-                        className="h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        title="Copy"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </button>
+                      {promo.usageType === "one-to-one" ? (
+                        <span
+                          className="text-[10px] text-muted-foreground"
+                          title="Each recipient holds their own code"
+                        >
+                          per recipient
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(promo.code);
+                            toast.success("Copied!");
+                          }}
+                          className="press h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          title="Copy"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-3">

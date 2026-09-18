@@ -10,6 +10,8 @@ import {
   type ReferralSeason,
 } from "@/components/scl/referral-store";
 import { describePromoRule, rewardSummary } from "@/components/scl/promo-store";
+import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
+import { useTransactionsStore, type Transaction } from "@/components/scl/transactions-store";
 import { REWARD_ICONS } from "@/components/scl/reward-icons";
 import {
   SeasonStatusBadge,
@@ -42,6 +44,9 @@ function SeasonReportPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const { transactions } = useTransactionsStore();
+  const [peekTx, setPeekTx] = useState<Transaction | null>(null);
+  const txById = useMemo(() => new Map(transactions.map((t) => [t.id, t])), [transactions]);
 
   const season = seasons.find((s) => s.id === seasonId);
 
@@ -216,21 +221,15 @@ function SeasonReportPage() {
                         </Link>
                       </td>
                       <td className="px-5 py-2.5">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigate({ to: "/transactions", search: { tx: u.transactionId } })
-                          }
-                          title="Open this order in Transactions"
-                          className="press text-left"
-                        >
-                          <div className="text-[12px] font-mono text-primary hover:underline">
-                            {u.invoice}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            −{fmtIDR(u.discountValue)} off
-                          </div>
-                        </button>
+                        <TransactionCell
+                          invoice={u.invoice}
+                          date={txById.get(u.transactionId)?.date ?? u.usedAt}
+                          disabled={!txById.has(u.transactionId)}
+                          onOpen={() => setPeekTx(txById.get(u.transactionId) ?? null)}
+                        />
+                        <div className="text-[10px] text-muted-foreground">
+                          −{fmtIDR(u.discountValue)} off
+                        </div>
                       </td>
                       <td className="px-5 py-2.5 text-[12px] text-muted-foreground max-w-[260px]">
                         {u.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
@@ -258,6 +257,8 @@ function SeasonReportPage() {
           )}
         </SectionCard>
       </div>
+
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
 
       <DeleteSeasonDialog
         season={deleting}

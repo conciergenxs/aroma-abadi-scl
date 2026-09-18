@@ -38,7 +38,12 @@ import {
 } from "@/components/scl/mock-data";
 import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
-import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
+import {
+  useTransactionsStore,
+  formatIDR,
+  type Transaction,
+} from "@/components/scl/transactions-store";
+import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
 import { useBaStore, type BA } from "@/components/scl/ba-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
@@ -529,6 +534,7 @@ function ContactDetailPage() {
                       usedCode={filteredReferral.usedCode}
                       referred={filteredReferral.referred}
                       referralCode={contact.referralCode}
+                      transactions={transactions}
                     />
                   )}
                 </>
@@ -1001,89 +1007,7 @@ function TransactionsTab({
         </table>
       </div>
 
-      {peekTx && (
-        <div className="fixed inset-0 z-50 flex animate-fade-in">
-          <div className="flex-1 bg-black/40 backdrop-blur-[2px]" onClick={() => setPeekTx(null)} />
-          <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right shadow-2xl">
-            <div className="p-5 border-b border-border flex items-start justify-between gap-3">
-              <div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Invoice
-                </div>
-                <div className="text-base font-semibold">{peekTx.invoice}</div>
-                <div className="text-[11px] text-muted-foreground mt-1">
-                  {fmtDateTimeEN(peekTx.date)}
-                </div>
-              </div>
-              <button
-                onClick={() => setPeekTx(null)}
-                className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4 text-sm">
-              <PeekRow label="Brand">
-                <div className="flex flex-wrap gap-1">
-                  {(peekTx.brandNames ?? [peekTx.brandName]).map((b) => (
-                    <span
-                      key={b}
-                      className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium"
-                    >
-                      {b}
-                    </span>
-                  ))}
-                </div>
-              </PeekRow>
-              <PeekRow label="Ordered Via">
-                <span className="font-medium">ARMA · WhatsApp</span>
-              </PeekRow>
-              <PeekRow label="Payment Method">
-                <span className="font-medium">{peekTx.paymentMethod}</span>
-              </PeekRow>
-              <PeekRow label="Status">
-                <span
-                  className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(peekTx.status)}`}
-                >
-                  {peekTx.status}
-                </span>
-              </PeekRow>
-              {peekTx.note && (
-                <PeekRow label="Order Note">
-                  <span className="text-muted-foreground italic">{peekTx.note}</span>
-                </PeekRow>
-              )}
-              <div>
-                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                  Items
-                </div>
-                <ul className="divide-y divide-border rounded-md border border-border overflow-hidden">
-                  {peekTx.items.map((i, idx) => (
-                    <li
-                      key={idx}
-                      className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-[13px]">{i.skuName}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}
-                        </div>
-                      </div>
-                      <div className="text-right font-medium tabular-nums text-sm">
-                        {formatIDR(i.unitPrice * i.qty)}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex justify-between mt-3 text-sm font-semibold border-t border-border pt-3">
-                  <span>Total</span>
-                  <span>{formatIDR(peekTx.total)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
     </div>
   );
 }
@@ -1093,13 +1017,18 @@ function RedeemedTab({
   usedCode,
   referred,
   referralCode,
+  transactions,
 }: {
   redemptions: ContactRedemption[];
   usedCode: ReferralUseWithSeason | null;
   referred: ReferralUseWithSeason[];
   referralCode?: string;
+  transactions: Transaction[];
 }) {
   const totalDiscount = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
+  const [peekTx, setPeekTx] = useState<Transaction | null>(null);
+  const txById = useMemo(() => new Map(transactions.map((t) => [t.id, t])), [transactions]);
+  const openPeek = (id: string) => setPeekTx(txById.get(id) ?? null);
   const th =
     "px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium";
 
@@ -1131,13 +1060,13 @@ function RedeemedTab({
                   <code className="font-mono text-[11px] text-foreground bg-muted/60 border border-border rounded px-1.5 py-0.5">
                     {usedCode.code}
                   </code>
-                  <Link
-                    to="/transactions"
-                    search={{ tx: usedCode.transactionId }}
-                    className="font-mono text-primary hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => openPeek(usedCode.transactionId)}
+                    className="press font-mono text-primary hover:underline"
                   >
                     {usedCode.invoice}
-                  </Link>
+                  </button>
                   <span>−{formatIDR(usedCode.discountValue)}</span>
                 </div>
                 <div className="text-[11px] text-muted-foreground">
@@ -1206,13 +1135,12 @@ function RedeemedTab({
                       <div className="text-[11px] text-muted-foreground mt-0.5">{u.seasonName}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        to="/transactions"
-                        search={{ tx: u.transactionId }}
-                        className="text-xs font-mono text-primary hover:underline"
-                      >
-                        {u.invoice}
-                      </Link>
+                      <TransactionCell
+                        invoice={u.invoice}
+                        date={txById.get(u.transactionId)?.date ?? u.usedAt}
+                        disabled={!txById.has(u.transactionId)}
+                        onOpen={() => openPeek(u.transactionId)}
+                      />
                     </td>
                     <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
                       {formatIDR(u.orderValue)}
@@ -1227,6 +1155,8 @@ function RedeemedTab({
           </div>
         )}
       </section>
+
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
 
       {/* ── Promo codes ──────────────────────────────────────────────────── */}
       <section className="space-y-3 animate-fade-in">
@@ -1257,8 +1187,9 @@ function RedeemedTab({
                   <tr className="border-b border-border bg-white">
                     <th className={th}>Promo Code</th>
                     <th className={th}>Transaction</th>
+                    <th className={th}>Items</th>
+                    <th className={th}>Order Total</th>
                     <th className={th}>Discount</th>
-                    <th className={th}>Redeemed</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border stagger">
@@ -1271,22 +1202,26 @@ function RedeemedTab({
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Link
-                          to="/transactions"
-                          search={{ tx: r.transactionId }}
-                          className="text-xs font-mono text-primary hover:underline"
-                        >
-                          {r.invoice}
-                        </Link>
-                        <div className="text-[11px] text-muted-foreground mt-0.5">
-                          {r.sourceName}
-                        </div>
+                        <TransactionCell
+                          invoice={r.invoice}
+                          date={txById.get(r.transactionId)?.date ?? r.redeemedAt}
+                          disabled={!txById.has(r.transactionId)}
+                          onOpen={() => openPeek(r.transactionId)}
+                        />
+                      </td>
+                      <td className="px-4 py-3 text-[11px] text-muted-foreground max-w-[220px]">
+                        {txById
+                          .get(r.transactionId)
+                          ?.items.map((i) => `${i.qty}× ${i.skuName}`)
+                          .join(", ") ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 text-left text-xs whitespace-nowrap">
+                        {txById.has(r.transactionId)
+                          ? formatIDR(txById.get(r.transactionId)!.total)
+                          : "—"}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
-                        {formatIDR(r.discountValue)}
-                      </td>
-                      <td className="px-4 py-3 text-left text-[11px] text-muted-foreground whitespace-nowrap">
-                        {fmtDateTimeEN(r.redeemedAt)}
+                        −{formatIDR(r.discountValue)}
                       </td>
                     </tr>
                   ))}
@@ -1296,17 +1231,6 @@ function RedeemedTab({
           </>
         )}
       </section>
-    </div>
-  );
-}
-
-function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-3">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">
-        {label}
-      </span>
-      <div className="text-sm text-right">{children}</div>
     </div>
   );
 }
