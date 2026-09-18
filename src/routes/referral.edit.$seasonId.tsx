@@ -83,7 +83,12 @@ function EditSeasonPage() {
     >
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6 animate-fade-in">
-          <SeasonFormFields form={form} setForm={setForm} started={started} ended={status === "ended"} />
+          <SeasonFormFields
+            form={form}
+            setForm={setForm}
+            started={started}
+            ended={status === "ended"}
+          />
         </div>
         <PromoFormActionBar
           onCancel={goBack}

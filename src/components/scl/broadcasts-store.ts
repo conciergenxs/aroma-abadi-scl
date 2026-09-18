@@ -5,8 +5,9 @@ type State = { broadcasts: Broadcast[] };
 
 // Bump when the seeded broadcasts or the Broadcast shape change — v2 added the
 // Sisley personal-codes send that promo-2's recipient codes point at, plus the
-// promoCodeId/recipientCodes fields.
-const STORAGE_KEY = "aroma_broadcasts_store_v2";
+// promoCodeId/recipientCodes fields; v3 keeps the audience conditions a draft
+// was built with.
+const STORAGE_KEY = "aroma_broadcasts_store_v3";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];

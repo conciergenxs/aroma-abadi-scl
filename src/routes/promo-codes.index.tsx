@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { TablePager, clampPage } from "@/components/scl/referral-ui";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";

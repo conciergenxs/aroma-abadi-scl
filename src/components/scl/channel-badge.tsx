@@ -33,5 +33,3 @@ export function ChannelIcon({
     />
   );
 }
-
-export const ChannelBadge = ChannelIcon;

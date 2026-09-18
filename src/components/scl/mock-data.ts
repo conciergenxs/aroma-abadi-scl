@@ -12,15 +12,6 @@ export const LIFECYCLE_STAGES = [
 ] as const;
 export type LifecycleStage = string;
 
-export const PROGRESSING_STAGES: string[] = [
-  "New Lead",
-  "Contacted",
-  "Qualified",
-  "Pending Payment",
-  "Customer",
-];
-export const LOST_STAGES: string[] = ["Lost", "No Reply"];
-
 export const STAGE_COLORS: Record<string, { bar: string; dot: string; badge: string }> = {
   "New Lead": {
     bar: "bg-orange-500",
@@ -1591,6 +1582,9 @@ export type Broadcast = {
   createdBy?: string;
   createdAt?: string;
   contentMode?: "template" | "manual";
+  /** Conditions the sender narrowed the audience with, kept so reopening a
+   * draft restores the filter they built. */
+  conditions?: { id: string; propertyKey: string; operator: string; value: string }[];
   templateId?: string;
   /** Set when the template carries a 1-to-1 promo: which promo was handed out,
    * and the individual code each recipient received. */
@@ -1762,29 +1756,6 @@ export const broadcasts: Broadcast[] = [
     replied: 0,
     failed: 0,
   },
-];
-
-// Charts (WhatsApp-only)
-export const volumeSeries = [
-  { d: "Sen", whatsapp: 4200 },
-  { d: "Sel", whatsapp: 5120 },
-  { d: "Rab", whatsapp: 4880 },
-  { d: "Kam", whatsapp: 6020 },
-  { d: "Jum", whatsapp: 7240 },
-  { d: "Sab", whatsapp: 5410 },
-  { d: "Min", whatsapp: 4980 },
-];
-
-export const channelPerf = [{ name: "WhatsApp", value: 100 }];
-
-export const contactGrowth = [
-  { m: "Jun", v: 12400 },
-  { m: "Jul", v: 14820 },
-  { m: "Agu", v: 16210 },
-  { m: "Sep", v: 18540 },
-  { m: "Okt", v: 21810 },
-  { m: "Nov", v: 26120 },
-  { m: "Des", v: 29840 },
 ];
 
 export const recentActivity = [

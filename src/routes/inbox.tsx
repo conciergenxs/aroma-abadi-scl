@@ -14,7 +14,12 @@ import {
 } from "@/components/scl/mock-data";
 import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
-import { useLiveContacts, useContactsStore, contactsStore, getStageStyle } from "@/components/scl/contacts-store";
+import {
+  useLiveContacts,
+  useContactsStore,
+  contactsStore,
+  getStageStyle,
+} from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { ChannelIcon } from "@/components/scl/channel-badge";

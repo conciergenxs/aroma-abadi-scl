@@ -123,7 +123,6 @@ export function SeasonFormFields({
             value={form.startDate}
             max={form.endDate || undefined}
             disabled={started}
-
             onChange={(e) => set("startDate", e.target.value)}
             onClick={() => !started && startRef.current?.showPicker?.()}
             className={started ? lockedCls : inputCls}

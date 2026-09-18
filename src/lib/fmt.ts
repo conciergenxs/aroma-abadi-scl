@@ -3,20 +3,6 @@
  * produce different output in Node vs browser, causing React hydration errors).
  */
 
-const MONTHS_ID = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Mei",
-  "Jun",
-  "Jul",
-  "Agu",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Des",
-];
 const MONTHS_EN = [
   "Jan",
   "Feb",
@@ -72,22 +58,10 @@ function dateParts(iso: string | Date) {
   };
 }
 
-/** 07 Jul 2026 (ID) */
-export function fmtDateID(iso: string | Date) {
-  const p = dateParts(iso);
-  return `${String(p.d).padStart(2, "0")} ${MONTHS_ID[p.mo]} ${p.y}`;
-}
-
 /** 07 Jul 2026 (EN) */
 export function fmtDateEN(iso: string | Date) {
   const p = dateParts(iso);
   return `${String(p.d).padStart(2, "0")} ${MONTHS_EN[p.mo]} ${p.y}`;
-}
-
-/** 07 Jul 2026, 14:05 (ID) */
-export function fmtDateTimeID(iso: string | Date) {
-  const p = dateParts(iso);
-  return `${fmtDateID(iso)}, ${String(p.h).padStart(2, "0")}:${String(p.mi).padStart(2, "0")}`;
 }
 
 /** 07 Jul 2026, 14:05 (EN) */

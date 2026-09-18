@@ -92,13 +92,6 @@ function CreateBroadcastPage() {
 
   const previewBody = contentMode === "template" ? (template?.body ?? "") : manualBody;
 
-  const valid =
-    !!selectedChannel &&
-    name.trim().length > 0 &&
-    (selectedLists.size > 0 || conditions.length > 0) &&
-    previewBody.trim().length > 0 &&
-    (sendMode === "now" || (!!scheduleDate && !!scheduleTime));
-
   const insertVariable = (key: string) => {
     const token = `{{${key}}}`;
     setContentMode("manual");
@@ -128,14 +121,8 @@ function CreateBroadcastPage() {
   };
 
   const submit = (kind: "draft" | "send" | "schedule") => {
-    if (kind !== "draft" && !valid) {
-      toast.error("Please complete all required fields");
-      return;
-    }
-    if (kind !== "draft" && linkedPromo && recipients.length === 0) {
-      toast.error(
-        "This message carries a 1-to-1 promo — pick an audience list so each recipient gets a code",
-      );
+    if (kind !== "draft" && blocker) {
+      toast.error(blocker);
       return;
     }
     if (kind !== "draft" && linkedPromo && (duplicateCodes.size > 0 || codeProblems > 0)) {
@@ -192,6 +179,9 @@ function CreateBroadcastPage() {
       status,
       channelId,
       listIds: Array.from(selectedLists),
+      // Saved so reopening a draft brings its filter back instead of a blank
+      // audience; the lists above are what actually decide who receives it.
+      conditions: conditions.length ? conditions : undefined,
       totalAudience: reach,
       sendMode,
       scheduleDate: sendMode === "schedule" ? scheduleDate : undefined,
@@ -337,6 +327,31 @@ function CreateBroadcastPage() {
     return new Set([...seen].filter(([, n]) => n > 1).map(([code]) => code));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipients, generatedCodes, codeOverrides]);
+
+  // What still stands between this draft and a send — named, so the disabled
+  // button can say why instead of just sitting there greyed out.
+  const blocker = !selectedChannel
+    ? "Pick the WhatsApp number this goes out from"
+    : name.trim().length === 0
+      ? "Give the broadcast a name"
+      : previewBody.trim().length === 0
+        ? "Write the message, or pick a template"
+        : selectedLists.size === 0
+          ? // Conditions narrow an audience but can't produce one on their own
+            // yet — without a list there is nobody to send to.
+            conditions.length > 0
+            ? "Conditions refine an audience — pick at least one list to send to"
+            : "Choose who this goes to"
+          : sendMode === "schedule" && (!scheduleDate || !scheduleTime)
+            ? "Set the date and time to send"
+            : linkedPromo && blankCodes > 0
+              ? "Every recipient needs a promo code"
+              : linkedPromo && conflictingCodes > 0
+                ? "Some codes clash with another code that is active right now"
+                : linkedPromo && duplicateCodes.size > 0
+                  ? "Two recipients have been given the same code"
+                  : null;
+  const valid = !blocker;
 
   return (
     <AppShell backTo="/broadcasts">
@@ -790,6 +805,11 @@ function CreateBroadcastPage() {
 
           {/* Save actions */}
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {blocker && (
+              <span className="mr-auto text-[12px] text-destructive animate-fade-in">
+                {blocker}
+              </span>
+            )}
             <button
               onClick={() => submit("draft")}
               className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium text-foreground transition-colors duration-150"
@@ -799,7 +819,8 @@ function CreateBroadcastPage() {
             {sendMode === "schedule" ? (
               <button
                 onClick={() => submit("schedule")}
-                disabled={!valid || duplicateCodes.size > 0 || codeProblems > 0}
+                disabled={!valid}
+                title={blocker ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
@@ -807,7 +828,8 @@ function CreateBroadcastPage() {
             ) : (
               <button
                 onClick={() => submit("send")}
-                disabled={!valid || duplicateCodes.size > 0 || codeProblems > 0}
+                disabled={!valid}
+                title={blocker ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast

@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from "react";
+// Currency is formatted in one place for the whole app — see lib/fmt.
+export { fmtIDR as formatIDR } from "@/lib/fmt";
 
 export type TxStatus = "Processed" | "Shipped" | "Cancelled";
 
@@ -223,13 +225,3 @@ export function txStatusBadge(status: string) {
   return "border-sky-700 bg-sky-600 text-white"; // Processed
 }
 
-export function formatIDR(n: number) {
-  // Use regex-based formatter — locale-aware toLocaleString differs between
-  // Node (SSR) and browser, causing React hydration mismatches.
-  return (
-    "Rp " +
-    Math.round(n)
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-  );
-}

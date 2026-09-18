@@ -285,26 +285,6 @@ const SCHEMA: CategorySection[] = [
           },
         ],
       },
-      {
-        id: "billing",
-        label: "Plans & Billing",
-        masterLabel: "Access Plans & Billing",
-        masterDescription:
-          "Turning on this toggle enables Plans & Billing access and allows individual permissions below to be configured.",
-        groups: [
-          {
-            id: "billing-mgmt",
-            label: "Billing Management",
-            items: [
-              { id: "view-sub", label: "View Subscription", defaultChecked: true },
-              { id: "change-plan", label: "Change Plan" },
-              { id: "payment-methods", label: "Manage Payment Methods" },
-              { id: "billing-history", label: "Access Billing History", defaultChecked: true },
-              { id: "addons", label: "Manage Add-ons" },
-            ],
-          },
-        ],
-      },
     ],
   },
 ];
