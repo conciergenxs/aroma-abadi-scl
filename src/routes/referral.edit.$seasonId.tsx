@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/scl/app-shell";
 import { PromoFormActionBar } from "@/components/scl/promo-form-fields";
-import { referralStore, useReferralStore } from "@/components/scl/referral-store";
+import { referralStore, useReferralStore, getSeasonStatus } from "@/components/scl/referral-store";
 import {
   SeasonFormFields,
   seasonFormFromExisting,
@@ -47,6 +47,8 @@ function EditSeasonPage() {
   }
 
   const error = validateSeasonForm(form, seasons, season.id);
+  // Anything that has already run is locked down to its end date and notes.
+  const started = getSeasonStatus(season) !== "scheduled";
   const detail = () => navigate({ to: "/referral/$seasonId", params: { seasonId: season.id } });
 
   const handleSave = () => {
@@ -63,7 +65,7 @@ function EditSeasonPage() {
     <AppShell backTo={`/referral/${season.id}`} title={`Edit — ${season.name}`} noPadding>
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6 animate-fade-in">
-          <SeasonFormFields form={form} setForm={setForm} />
+          <SeasonFormFields form={form} setForm={setForm} started={started} />
         </div>
         <PromoFormActionBar
           onCancel={detail}

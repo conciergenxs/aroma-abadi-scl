@@ -1,19 +1,17 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Users, Ticket, Wallet, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
+import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import {
   useReferralStore,
   getSeasonStatus,
-  seasonReport,
   type ReferralSeason,
 } from "@/components/scl/referral-store";
-import { describePromoRule, rewardSummary } from "@/components/scl/promo-store";
-import { REWARD_ICONS } from "@/components/scl/reward-icons";
+import { describePromoRule } from "@/components/scl/promo-store";
+import { SeasonReportView } from "@/components/scl/referral-report";
 import {
   SeasonStatusBadge,
-  StatTile,
   TableSearch,
   TablePager,
   clampPage,
@@ -25,9 +23,12 @@ export const Route = createFileRoute("/referral/")({
   component: ReferralPage,
 });
 
+type SeasonTab = "ongoing" | "upcoming" | "past";
+
 function ReferralPage() {
   const { seasons } = useReferralStore();
   const [deleting, setDeleting] = useState<ReferralSeason | null>(null);
+  const [tab, setTab] = useState<SeasonTab>("ongoing");
 
   const ongoing = seasons.find((s) => getSeasonStatus(s) === "active") ?? null;
   const upcoming = seasons
@@ -36,6 +37,12 @@ function ReferralPage() {
   const past = seasons
     .filter((s) => getSeasonStatus(s) === "ended")
     .sort((a, b) => +new Date(b.endDate) - +new Date(a.endDate));
+
+  const tabs: { key: SeasonTab; label: string; count: number }[] = [
+    { key: "ongoing", label: "Ongoing", count: ongoing ? 1 : 0 },
+    { key: "upcoming", label: "Upcoming", count: upcoming.length },
+    { key: "past", label: "Past", count: past.length },
+  ];
 
   return (
     <AppShell
@@ -50,44 +57,65 @@ function ReferralPage() {
         </Link>
       }
     >
-      <div className="max-w-5xl space-y-8 stagger">
-        {/* ── Ongoing ─────────────────────────────────────────────────────── */}
-        <section className="space-y-3">
-          <SectionHeading dotClass="bg-emerald-500 animate-pulse" label="Ongoing Season" />
-          {ongoing ? (
-            <OngoingCard season={ongoing} onDelete={() => setDeleting(ongoing)} />
+      <div className="max-w-5xl space-y-5">
+        <div className="flex items-center gap-1 border-b border-border">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={`press relative -mb-px inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-medium border-b-2 transition-colors ${
+                tab === t.key
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.key === "ongoing" && ongoing && (
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+              {t.label}
+              <span className="text-[11px] text-muted-foreground tabular-nums">{t.count}</span>
+            </button>
+          ))}
+        </div>
+
+        {tab === "ongoing" &&
+          (ongoing ? (
+            <div key={ongoing.id} className="space-y-6 animate-fade-in">
+              <OngoingCard season={ongoing} onDelete={() => setDeleting(ongoing)} />
+              <SeasonReportView season={ongoing} />
+            </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-border bg-card/20 px-5 py-8 text-center animate-fade-in">
+            <div className="rounded-xl border border-dashed border-border bg-card/20 px-5 py-10 text-center animate-fade-in">
               <p className="text-sm font-medium text-foreground">No referral season is running</p>
               <p className="mt-1 text-[12px] text-muted-foreground">
                 Referral codes only earn something while a season is on. Start one to switch it on
                 for every customer at once.
               </p>
             </div>
-          )}
-        </section>
+          ))}
 
-        {/* ── Upcoming ────────────────────────────────────────────────────── */}
-        <section className="space-y-3">
-          <SectionHeading dotClass="bg-sky-500" label="Upcoming Seasons" />
-          <SeasonTable
-            seasons={upcoming}
-            empty="Nothing scheduled yet."
-            onDelete={setDeleting}
-            dateLabel="Starts"
-          />
-        </section>
+        {tab === "upcoming" && (
+          <div className="animate-fade-in">
+            <SeasonTable
+              seasons={upcoming}
+              empty="Nothing scheduled yet."
+              onDelete={setDeleting}
+              dateLabel="Starts"
+            />
+          </div>
+        )}
 
-        {/* ── Past ────────────────────────────────────────────────────────── */}
-        <section className="space-y-3">
-          <SectionHeading dotClass="bg-slate-400" label="Past Seasons" />
-          <SeasonTable
-            seasons={past}
-            empty="No season has ended yet."
-            onDelete={setDeleting}
-            dateLabel="Ended"
-          />
-        </section>
+        {tab === "past" && (
+          <div className="animate-fade-in">
+            <SeasonTable
+              seasons={past}
+              empty="No season has ended yet."
+              onDelete={setDeleting}
+              dateLabel="Ended"
+            />
+          </div>
+        )}
       </div>
 
       <DeleteSeasonDialog season={deleting} onClose={() => setDeleting(null)} />
@@ -95,18 +123,7 @@ function ReferralPage() {
   );
 }
 
-function SectionHeading({ dotClass, label }: { dotClass: string; label: string }) {
-  return (
-    <h2 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-      <span className={`h-2 w-2 rounded-full ${dotClass}`} />
-      {label}
-    </h2>
-  );
-}
-
 function OngoingCard({ season, onDelete }: { season: ReferralSeason; onDelete: () => void }) {
-  const report = seasonReport(season);
-  const reward = rewardSummary(season.rule, report.uses, report.discountGiven);
   return (
     <div className="rounded-xl border-2 border-emerald-500/40 bg-card/60 p-5 space-y-4 animate-fade-in">
       <div className="flex items-start justify-between gap-4">
@@ -121,27 +138,18 @@ function OngoingCard({ season, onDelete }: { season: ReferralSeason; onDelete: (
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link
-            to="/referral/$seasonId"
-            params={{ seasonId: season.id }}
-            className="press rounded-md border border-border px-4 h-9 inline-flex items-center text-[14px] hover:bg-muted hover:border-primary/40 transition-colors"
-          >
-            View report
-          </Link>
-          <Link
             to="/referral/edit/$seasonId"
             params={{ seasonId: season.id }}
-            title="Edit season"
-            className="press h-9 w-9 grid place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            <Pencil className="h-3.5 w-3.5" />
+            <Pencil className="h-3.5 w-3.5" /> Edit
           </Link>
           <button
             type="button"
             onClick={onDelete}
-            title="Delete season"
-            className="press h-9 w-9 grid place-items-center rounded-md border border-border text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            className="press icon-pop inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-4 h-9 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-3.5 w-3.5" /> Delete
           </button>
         </div>
       </div>
@@ -151,18 +159,6 @@ function OngoingCard({ season, onDelete }: { season: ReferralSeason; onDelete: (
           Every referral gets
         </div>
         <div className="text-sm font-medium text-foreground">{describePromoRule(season.rule)}</div>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-        <StatTile label="Referrals Used" icon={Ticket} value={fmtNum(report.uses)} />
-        <StatTile label="Referrers" icon={Users} value={fmtNum(report.referrers)} />
-        <StatTile label="Revenue" icon={Wallet} value={fmtIDR(report.revenue)} />
-        <StatTile
-          label={reward.label}
-          icon={REWARD_ICONS[reward.kind]}
-          value={reward.value}
-          title={reward.title}
-        />
       </div>
     </div>
   );

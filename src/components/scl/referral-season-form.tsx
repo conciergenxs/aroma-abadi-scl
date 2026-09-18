@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
-import { defaultRule, type PromoRule } from "./promo-store";
+import { defaultRule, describePromoRule, type PromoRule } from "./promo-store";
 import type { ReferralSeason } from "./referral-store";
 
 // ── Shared referral-season form — used by the New and Edit pages so the field
@@ -68,25 +68,40 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-wide text-mut
 export function SeasonFormFields({
   form,
   setForm,
+  started,
 }: {
   form: SeasonFormState;
   setForm: (f: SeasonFormState) => void;
+  /** A season that has already begun can only be shortened or extended, and
+   * have its notes edited — customers have already been promised the rest. */
+  started?: boolean;
 }) {
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
   const set = <K extends keyof SeasonFormState>(key: K, val: SeasonFormState[K]) =>
     setForm({ ...form, [key]: val });
 
+  const lockedCls =
+    "h-9 w-full rounded-md border border-gray-200 bg-gray-100 px-3 text-sm text-gray-500 cursor-not-allowed select-none";
+
   return (
     <div className="space-y-4">
+      {started && (
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground animate-fade-in">
+          <span className="font-medium text-foreground">This season has already started</span> —
+          only its end date and notes can still change.
+        </div>
+      )}
+
       <div>
         <label className={labelCls}>Season Name</label>
         <input
-          autoFocus
+          autoFocus={!started}
           value={form.name}
+          disabled={started}
           onChange={(e) => set("name", e.target.value)}
           placeholder="e.g. Beauty Club Referral — Q3"
-          className={inputCls}
+          className={started ? lockedCls : inputCls}
         />
       </div>
 
@@ -98,9 +113,10 @@ export function SeasonFormFields({
             type="datetime-local"
             value={form.startDate}
             max={form.endDate || undefined}
+            disabled={started}
             onChange={(e) => set("startDate", e.target.value)}
-            onClick={() => startRef.current?.showPicker?.()}
-            className={inputCls}
+            onClick={() => !started && startRef.current?.showPicker?.()}
+            className={started ? lockedCls : inputCls}
           />
         </div>
         <div>
@@ -119,11 +135,24 @@ export function SeasonFormFields({
 
       <div>
         <label className={labelCls}>What a referral gets</label>
-        <p className="mb-2 text-[12px] text-muted-foreground">
-          No code to set — customers share their own permanent referral code. This rule applies to
-          every referral while the season runs.
-        </p>
-        <PromoRuleBuilder rule={form.rule} onChange={(r) => set("rule", r)} />
+        {started ? (
+          <div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-3">
+            <div className="text-sm font-medium text-foreground">
+              {describePromoRule(form.rule)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Locked — referrals already made under this season were promised this reward.
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="mb-2 text-[12px] text-muted-foreground">
+              No code to set — customers share their own permanent referral code. This rule applies
+              to every referral while the season runs.
+            </p>
+            <PromoRuleBuilder rule={form.rule} onChange={(r) => set("rule", r)} />
+          </>
+        )}
       </div>
 
       <div>

@@ -58,11 +58,7 @@ const PRESETS: {
     label: "Buy 1 Get 1 Free",
     build: () => ({
       condition: { kind: "buy-item", group: { join: "and", lines: [itemLine()] } },
-      reward: {
-        kind: "free-item",
-        sameAsPurchased: true,
-        group: { join: "and", lines: [itemLine()] },
-      },
+      reward: { kind: "free-item", group: { join: "and", lines: [itemLine()] } },
     }),
   },
   {
@@ -498,7 +494,9 @@ function ItemGroupEditor({
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-y-2">
+      <div className="border-t border-border" />
+
+      <div className="flex flex-wrap items-center gap-y-2 pt-0.5">
         {lines.map((line, i) => (
           <span key={i} className="inline-flex items-center gap-1 animate-scale-in">
             {i > 0 && (
@@ -537,12 +535,21 @@ function ItemGroupEditor({
           <Plus className="h-3.5 w-3.5" />
         </button>
       </div>
+    </div>
+  );
+}
 
-      <p
+/** "When customer buys" / "Get" with the SKU limit on the same line, so the
+ * heading and its constraint read together. */
+function GroupHeading({ label, atMax }: { label: string; atMax: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-2">
+      <span className="text-muted-foreground">{label}</span>
+      <span
         className={`text-[10.5px] transition-colors duration-200 ${atMax ? "text-primary font-medium" : "text-muted-foreground"}`}
       >
         {atMax ? `Maximum ${MAX_ITEM_LINES} SKUs reached` : `Up to ${MAX_ITEM_LINES} SKUs`}
-      </p>
+      </span>
     </div>
   );
 }
@@ -566,7 +573,10 @@ function ConditionEditor({
       <div key={condition.kind} className="text-[13px] leading-8 animate-fade-in">
         {condition.kind === "buy-item" ? (
           <div className="space-y-1.5">
-            <span className="text-muted-foreground">When customer buys</span>
+            <GroupHeading
+              label="When customer buys"
+              atMax={condition.group.lines.length >= MAX_ITEM_LINES}
+            />
             <ItemGroupEditor
               group={condition.group}
               onChange={(group) => onChange({ ...condition, group })}
@@ -623,28 +633,7 @@ function RewardEditor({
         key={reward.kind}
         className="flex flex-wrap items-center gap-1.5 text-[13px] leading-8 animate-fade-in"
       >
-        <span className="text-muted-foreground">Get</span>
-        {reward.kind === "free-item" && reward.sameAsPurchased && (
-          <>
-            <InlineNumber
-              value={reward.group.lines[0]?.qty ?? 1}
-              onChange={(v) =>
-                onChange({ ...reward, group: { ...reward.group, lines: [itemLine(v)] } })
-              }
-            />
-            <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2.5 h-8 text-[13px] font-medium">
-              Same Item
-            </span>
-            <span className="text-muted-foreground">free</span>
-            <button
-              type="button"
-              onClick={() => onChange({ ...reward, sameAsPurchased: false })}
-              className="ml-1 text-[11px] text-primary hover:underline transition-colors duration-150"
-            >
-              pick specific items instead
-            </button>
-          </>
-        )}
+        {reward.kind !== "free-item" && <span className="text-muted-foreground">Get</span>}
         {reward.kind === "percent-off" && (
           <>
             <InlineNumber
@@ -686,21 +675,15 @@ function RewardEditor({
           </>
         )}
       </div>
-      {reward.kind === "free-item" && !reward.sameAsPurchased && (
+      {reward.kind === "free-item" && (
         <div className="space-y-1.5">
+          <GroupHeading label="Get" atMax={reward.group.lines.length >= MAX_ITEM_LINES} />
           <ItemGroupEditor
             group={reward.group}
             onChange={(group) => onChange({ ...reward, group })}
             items={items}
             verb="get"
           />
-          <button
-            type="button"
-            onClick={() => onChange({ ...reward, sameAsPurchased: true })}
-            className="text-[11px] text-primary hover:underline transition-colors duration-150"
-          >
-            give the same item they bought instead
-          </button>
         </div>
       )}
       {reward.kind === "percent-off" && (
