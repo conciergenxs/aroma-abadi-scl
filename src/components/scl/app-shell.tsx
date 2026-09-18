@@ -376,7 +376,7 @@ export function AppShell({
             {backTo && (
               <Link
                 to={backTo as ComponentProps<typeof Link>["to"]}
-                className="-ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0"
+                className="tap -ml-1.5 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-white/[0.06] h-7 w-7 transition-colors shrink-0"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Link>
@@ -456,7 +456,7 @@ export function AppShell({
                     </div>
                   </div>
                   {/* List */}
-                  <div className="max-h-[420px] overflow-y-auto divide-y divide-border/60">
+                  <div className="max-h-[420px] overflow-y-auto divide-y divide-border/60 stagger">
                     {MOCK_NOTIFS.map((n) => {
                       const isRead = readIds.has(n.id);
                       const Icon = n.icon;

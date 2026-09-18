@@ -297,7 +297,7 @@ function TemplatesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[t.status]}`}
+                          className={`badge-animate inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[t.status]}`}
                         >
                           {t.status === "Rejected" && <AlertTriangle className="h-2.5 w-2.5" />}
                           {t.status}
@@ -670,7 +670,7 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
             <h2 className="text-[14px] font-semibold tracking-tight truncate">{template.name}</h2>
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <span
-                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[template.status]}`}
+                className={`badge-animate inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[template.status]}`}
               >
                 {template.status === "Rejected" && <AlertTriangle className="h-2.5 w-2.5" />}
                 {template.status === "Approved" && <CheckCircle2 className="h-2.5 w-2.5" />}

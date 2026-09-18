@@ -200,7 +200,7 @@ export function PromoFormFields({
                 key={t}
                 type="button"
                 onClick={() => setUsageType(t)}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors whitespace-nowrap ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`tap px-3 h-7 text-[12px] font-medium rounded transition-colors whitespace-nowrap ${form.usageType === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {t === "one-to-many" ? "1-to-Many" : "1-to-1 (unique)"}
               </button>

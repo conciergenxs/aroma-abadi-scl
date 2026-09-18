@@ -390,7 +390,9 @@ function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
                 <div className="text-xs text-muted-foreground">{k.l}</div>
                 <Icon className={`h-3.5 w-3.5 ${k.color}`} />
               </div>
-              <div className="mt-2 text-2xl font-semibold tabular-nums">{fmtNum(k.v)}</div>
+              <div className="stat-value mt-2 text-2xl font-semibold tabular-nums">
+                {fmtNum(k.v)}
+              </div>
             </div>
           );
         })}

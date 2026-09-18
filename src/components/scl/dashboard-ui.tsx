@@ -109,7 +109,7 @@ export function InfoHint({ text }: { text: string }) {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className="inline-flex text-muted-foreground/50 hover:text-primary transition-colors"
+          className="tap inline-flex items-center justify-center text-muted-foreground/50 hover:text-primary transition-colors"
           aria-label="What is this metric?"
         >
           <Info className="h-3 w-3" />

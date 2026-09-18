@@ -444,7 +444,7 @@ function Segmented<T extends string>({
           onClick={() => {
             if (opt.kind !== value) onChange(opt.kind);
           }}
-          className={`press px-2.5 h-7 text-[11px] font-medium rounded transition-all duration-150 ${
+          className={`tap press px-2.5 h-7 text-[11px] font-medium rounded transition-all duration-150 ${
             value === opt.kind
               ? "bg-primary text-primary-foreground"
               : opt.disabled

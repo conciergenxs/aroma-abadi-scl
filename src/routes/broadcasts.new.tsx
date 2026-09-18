@@ -483,7 +483,7 @@ function CreateBroadcastPage() {
                   <button
                     key={m}
                     onClick={() => setContentMode(m)}
-                    className={`px-3 h-7 text-[12px] font-medium rounded ${
+                    className={`tap px-3 h-7 text-[12px] font-medium rounded ${
                       sel
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"
@@ -1252,7 +1252,7 @@ function AudienceModal({
                 <button
                   key={t}
                   onClick={() => onTabChange(t)}
-                  className={`px-3 h-7 text-[12px] font-medium rounded ${
+                  className={`tap px-3 h-7 text-[12px] font-medium rounded ${
                     sel
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"

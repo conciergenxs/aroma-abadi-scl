@@ -126,7 +126,7 @@ function BroadcastListPage() {
                   <button
                     key={s}
                     onClick={() => setStatus(s)}
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium border transition ${
+                    className={`tap inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium border transition ${
                       sel
                         ? "border-primary/40 bg-primary/15 text-primary"
                         : "border-border bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-gray-50"
