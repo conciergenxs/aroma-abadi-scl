@@ -25,6 +25,8 @@ export function PropertyFormModal({
   const isEdit = !!initial;
   const isSystem = !!initial?.system;
 
+  useEscapeKey(true, onClose);
+
   const autoKey = (n: string) =>
     n
       .trim()

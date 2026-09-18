@@ -338,14 +338,7 @@ function TransactionsPage() {
                     setPageSize(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="h-7 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs appearance-none"
-                  style={{
-                    backgroundImage:
-                      "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 0.35rem center",
-                    backgroundSize: "1.2em 1.2em",
-                  }}
+                  className="h-7 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs scl-native-select"
                 >
                   {[5, 10, 20, 50, 100].map((n) => (
                     <option key={n} value={n}>
@@ -460,14 +453,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs appearance-none transition-colors hover:border-gray-300"
-      style={{
-        backgroundImage:
-          "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "right 0.35rem center",
-        backgroundSize: "1.2em 1.2em",
-      }}
+      className="h-8 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs scl-native-select transition-colors hover:border-gray-300"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>

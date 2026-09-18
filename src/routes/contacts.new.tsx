@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { BA_POSITIONS } from "@/components/scl/ba-store";
 import { AppShell } from "@/components/scl/app-shell";
 import { ArrowLeft, Check, ChevronDown, Plus, X, User, BadgeCheck } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/contacts/new")({
 });
 
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
-const POSITIONS = ["BA", "Senior BA", "Supervisor"];
+const POSITIONS = BA_POSITIONS;
 const GENDERS = ["Female", "Male"] as const;
 
 type ContactType = "ba" | "customer";

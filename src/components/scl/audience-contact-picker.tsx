@@ -37,6 +37,16 @@ type ContactStats = {
   orderCount: number;
 };
 
+/** A contact with no orders at all — also the fallback for a lookup miss, so a
+ * missing entry reads as "hasn't bought anything" instead of throwing. */
+const EMPTY_STATS: ContactStats = {
+  totalSpend: 0,
+  avgMonthlySpend: 0,
+  brands: new Set<string>(),
+  frequencyPerMonth: 0,
+  orderCount: 0,
+};
+
 function computeStats(contactId: string, transactions: Transaction[]): ContactStats {
   const txs = transactions.filter((t) => t.customerId === contactId && t.status !== "Cancelled");
   const brands = new Set<string>();
@@ -199,7 +209,7 @@ export function AudienceContactPicker({
     const minMonthlyN = Number(minMonthlySpend);
     const minFreqN = Number(minFrequency);
     return nonBa.filter((c) => {
-      const stats = statsById.get(c.id)!;
+      const stats = statsById.get(c.id) ?? EMPTY_STATS;
       if (stats.totalSpend < minSpendN) return false;
       if (stats.avgMonthlySpend < minMonthlyN) return false;
       if (stats.frequencyPerMonth < minFreqN) return false;
@@ -357,7 +367,7 @@ export function AudienceContactPicker({
               <div className="divide-y divide-border/60">
                 {pagedEligible.map((c) => {
                   const checked = staged.has(c.id);
-                  const stats = statsById.get(c.id)!;
+                  const stats = statsById.get(c.id) ?? EMPTY_STATS;
                   return (
                     <label
                       key={c.id}

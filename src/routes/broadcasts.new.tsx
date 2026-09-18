@@ -400,7 +400,7 @@ function CreateBroadcastPage() {
                   />
                 </div>
                 {sendMode === "schedule" && (
-                  <div className="rounded-lg border border-border bg-background/30 p-3 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end">
+                  <div className="animate-fade-in rounded-lg border border-border bg-background/30 p-3 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end">
                     <div>
                       <div className="text-[11px] text-muted-foreground mb-1">Date</div>
                       <input
@@ -856,8 +856,20 @@ function CreateBroadcastPage() {
                 senderName={selectedChannel?.name ?? "Your business"}
               >
                 {previewBody.trim() ? (
-                  <div className="whitespace-pre-wrap break-words">
-                    {renderWithVars(previewBody)}
+                  <div className="space-y-1.5">
+                    {contentMode === "template" &&
+                      template?.headerType === "text" &&
+                      template.headerText && (
+                        <div className="font-semibold text-[12px]">{template.headerText}</div>
+                      )}
+                    <div className="whitespace-pre-wrap break-words">
+                      {renderWithVars(previewBody)}
+                    </div>
+                    {contentMode === "template" && template?.footer && (
+                      <div className="pt-1 text-[10px] text-muted-foreground">
+                        {template.footer}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-muted-foreground italic">
@@ -1030,7 +1042,7 @@ function ChannelDropdown({ value, onChange }: { value: string; onChange: (id: st
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute z-40 mt-1 w-full rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+          <div className="animate-scale-in origin-top absolute z-40 mt-1 w-full rounded-md border border-border bg-popover shadow-lg overflow-hidden">
             {connectedChannels.map((c) => (
               <button
                 key={c.id}

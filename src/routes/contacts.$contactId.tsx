@@ -1233,7 +1233,7 @@ function RedeemedTab({
                       </td>
                       <td className="px-4 py-3 text-left text-xs whitespace-nowrap">
                         {txById.has(r.transactionId)
-                          ? formatIDR(txById.get(r.transactionId)!.total)
+                          ? formatIDR(txById.get(r.transactionId)?.total ?? 0)
                           : "—"}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">

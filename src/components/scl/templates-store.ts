@@ -14,7 +14,7 @@ type State = {
 
 // Bump when the Template shape changes so browsers holding an older shape
 // re-seed instead of rendering stale records against new code.
-const STORAGE_KEY = "aroma_templates_store_v1";
+const STORAGE_KEY = "aroma_templates_store_v2";
 
 function seedState(): State {
   return {

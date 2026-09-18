@@ -197,7 +197,8 @@ function seed(): ReferralSeason[] {
 
   let turn = 0;
   for (const t of orders) {
-    const referredId = t.customerId!;
+    const referredId = t.customerId;
+    if (!referredId) continue;
     // Each customer can only ever be referred once.
     if (referredAlready.has(referredId)) continue;
     const at = new Date(t.date).getTime();

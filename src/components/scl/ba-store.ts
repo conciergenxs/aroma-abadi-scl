@@ -1,5 +1,9 @@
 import { useSyncExternalStore } from "react";
 
+/** The roles a Beauty Ambassador record can hold — one list, so a BA created
+ * from Contacts can be given the same positions as one created here. */
+export const BA_POSITIONS = ["BA", "Senior BA", "Supervisor", "Area Manager", "Staff"] as const;
+
 export type BA = {
   id: string;
   name: string;
@@ -10,7 +14,6 @@ export type BA = {
   brandIds: string[];
   city: string;
   store: string;
-  adraName?: string; // deprecated, kept for backward compat
   position: string;
   /** Area Coordinator overseeing this BA — feeds the first 3 letters of the auto-generated password. */
   areaCoordinator: string;

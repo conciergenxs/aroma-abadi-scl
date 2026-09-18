@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { useBaStore, baStore, type BA } from "@/components/scl/ba-store";
+import { useBaStore, baStore, BA_POSITIONS, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
@@ -624,11 +624,9 @@ function BAForm({
                 onChange={(e) => setPosition(e.target.value)}
                 className={inputCls}
               >
-                <option>BA</option>
-                <option>Senior BA</option>
-                <option>Supervisor</option>
-                <option>Area Manager</option>
-                <option>Staff</option>
+                {BA_POSITIONS.map((p) => (
+                  <option key={p}>{p}</option>
+                ))}
               </select>
             </Field>
             <Field label="Brand">

@@ -452,9 +452,10 @@ function PromoDetailPage() {
                             .join(", ") ?? "—"}
                         </td>
                         <td className="px-5 py-2.5 text-right text-[13px] whitespace-nowrap">
-                          {txById.has(r.transactionId)
-                            ? fmtIDR(txById.get(r.transactionId)!.total)
-                            : "—"}
+                          {(() => {
+                            const tx = txById.get(r.transactionId);
+                            return tx ? fmtIDR(tx.total) : "—";
+                          })()}
                         </td>
                         <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground whitespace-nowrap">
                           −{fmtIDR(r.discountValue)}

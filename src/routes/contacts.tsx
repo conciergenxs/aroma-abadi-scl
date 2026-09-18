@@ -613,7 +613,7 @@ function ContactsPage() {
                                       ...x,
                                       listIds: inList
                                         ? x.listIds.filter((id) => id !== audienceModalId)
-                                        : [...x.listIds, audienceModalId!],
+                                        : [...x.listIds, audienceModalId],
                                     }
                                   : x,
                               ),

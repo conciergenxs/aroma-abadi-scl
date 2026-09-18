@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, Check, Plus, Search, X } from "lucide-react";
 import { useSkuStore } from "./sku-store";
@@ -131,6 +131,15 @@ function ItemScopeEditor({
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
   const selected = scope.kind === "specific" ? scope.items : [];
+
+  // Reopening the picker starts from the full catalogue — a filter left over
+  // from last time reads as "these are all the SKUs there are".
+  useEffect(() => {
+    if (!open) {
+      setSearch("");
+      setBrandFilter("all");
+    }
+  }, [open]);
 
   const brands = useMemo(() => Array.from(new Set(items.map((it) => it.brand))).sort(), [items]);
 
