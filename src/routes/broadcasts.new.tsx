@@ -35,6 +35,7 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 export const Route = createFileRoute("/broadcasts/new")({
   head: () => ({ meta: [{ title: "Create Broadcast — SCL" }] }),
@@ -1131,6 +1132,8 @@ function AudienceModal({
   setConditions: (c: Condition[]) => void;
   onClose: () => void;
 }) {
+  useEscapeKey(true, onClose);
+
   const { lists, properties } = useContactsStore();
   const [query, setQuery] = useState("");
   const [localLists, setLocalLists] = useState<Set<string>>(new Set(selectedLists));

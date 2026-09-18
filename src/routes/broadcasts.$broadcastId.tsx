@@ -23,6 +23,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 export const Route = createFileRoute("/broadcasts/$broadcastId")({
   head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
@@ -708,6 +709,8 @@ function ListPickerModal({
   assignedOnly?: boolean;
   assignedListIds?: string[];
 }) {
+  useEscapeKey(true, onClose);
+
   const { lists } = useContactsStore();
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Set<string>>(new Set());

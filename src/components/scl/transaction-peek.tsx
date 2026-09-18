@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
 import { formatIDR, type Transaction } from "./transactions-store";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 // ── Transaction side peek ─────────────────────────────────────────────────────
 // Opened from any table that names an ARMA order, so the full order can be read
@@ -28,6 +29,8 @@ function PeekRow({ label, children }: { label: string; children: React.ReactNode
 }
 
 export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
+  useEscapeKey(true, onClose);
+
   if (typeof document === "undefined") return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex animate-fade-in">

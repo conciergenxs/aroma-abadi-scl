@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { contacts } from "@/components/scl/mock-data";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 export const Route = createFileRoute("/transactions")({
   // ?tx=<id> opens that order straight away — used by links from elsewhere
@@ -470,6 +471,8 @@ function TxDrawer({
   onClose: () => void;
   navigate: ReturnType<typeof useNavigate>;
 }) {
+  useEscapeKey(true, onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex animate-fade-in">
       <div className="flex-1 bg-black/40 backdrop-blur-[2px]" onClick={onClose} />

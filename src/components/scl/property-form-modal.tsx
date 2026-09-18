@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { PROPERTY_TYPE_LABELS, type ContactProperty, type PropertyType } from "./contacts-store";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 /**
  * Shared Add/Edit Property modal used by:
