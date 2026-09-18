@@ -280,9 +280,11 @@ function ContactsPage() {
       }
       noPadding
     >
-      <div className="grid grid-cols-[240px_1fr] h-[calc(100vh-64px)] min-h-0">
-        {/* Left sidebar: All Contacts + Lists */}
-        <aside className="border-r border-border bg-background scl-grid-bg overflow-y-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] lg:h-[calc(100vh-64px)] min-h-0">
+        {/* Left sidebar: All Contacts + Lists. Below lg it stacks on top of the
+            table rather than hiding — audiences and brands are only reachable
+            from here, so a phone still needs them. */}
+        <aside className="border-b lg:border-b-0 lg:border-r border-border bg-background scl-grid-bg overflow-y-auto max-h-[40vh] lg:max-h-none">
           <div className="p-3 space-y-1">
             <button
               onClick={() => {

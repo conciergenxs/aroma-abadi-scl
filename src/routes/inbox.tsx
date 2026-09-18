@@ -964,7 +964,7 @@ function InboxPage() {
             />
           )}
 
-          <div className="flex-1 overflow-y-auto px-8 py-8 space-y-5 scl-grid-bg">
+          <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-8 sm:py-8 space-y-5 scl-grid-bg">
             <div className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">
               Today
             </div>
@@ -1370,7 +1370,7 @@ function ConversationHeader({
   const moreRef = useRef<HTMLButtonElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   return (
-    <div className="relative z-30 min-h-[68px] px-7 py-3 flex items-center gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
+    <div className="relative z-30 min-h-[68px] px-3 sm:px-7 py-3 flex items-center gap-3 sm:gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
       {/* LEFT — contact name + lifecycle (single row) */}
       <div className="flex items-center gap-3 min-w-0">
         <span className="text-[13px] font-medium text-foreground truncate">{contact.name}</span>
@@ -1873,7 +1873,7 @@ function FilterPanel(props: FilterPanelProps) {
       ref={panelRef}
       role="dialog"
       aria-label="Filter conversations"
-      className="absolute right-0 top-9 z-40 w-[560px] rounded-lg border border-border bg-popover shadow-2xl overflow-hidden animate-fade-in"
+      className="fixed inset-x-2 top-28 z-40 w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-9 sm:w-[560px] rounded-lg border border-border bg-popover shadow-2xl overflow-hidden animate-scale-in origin-top-right"
     >
       <div className="flex items-center justify-between px-3 h-10 border-b border-border/70">
         <div className="text-[12px] font-semibold text-foreground">Filters</div>
@@ -1894,9 +1894,9 @@ function FilterPanel(props: FilterPanelProps) {
           </button>
         </div>
       </div>
-      <div className="flex min-h-[320px] max-h-[420px]">
+      <div className="flex min-h-[260px] max-h-[60vh] sm:min-h-[320px] sm:max-h-[420px]">
         {/* Left: categories */}
-        <div className="w-[180px] shrink-0 border-r border-border/70 bg-sidebar/30 py-1.5">
+        <div className="w-[132px] sm:w-[180px] shrink-0 border-r border-border/70 bg-sidebar/30 py-1.5 overflow-y-auto">
           {categories.map((c) => (
             <button
               key={c.id}
@@ -2081,7 +2081,7 @@ function MessageRow({
   const [open, setOpen] = useState(false);
 
   const bubble = (
-    <div className="group relative max-w-[64%]">
+    <div className="group relative max-w-[85%] sm:max-w-[64%]">
       <div
         className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm transition ${
           isMe

@@ -946,8 +946,8 @@ function PermissionsStep({
   };
 
   return (
-    <div className="grid grid-cols-[240px_1fr] gap-5 items-start">
-      <aside className="rounded-xl border border-border bg-card/60 glass p-2 sticky top-[88px] self-start">
+    <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-5 items-start">
+      <aside className="rounded-xl border border-border bg-card/60 glass p-2 lg:sticky lg:top-[88px] self-start">
         {SCHEMA.map((sec) => (
           <div key={sec.id} className="mb-2">
             <div className="px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/55">

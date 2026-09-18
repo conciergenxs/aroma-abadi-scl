@@ -39,9 +39,9 @@ function ChannelsPage() {
 
   return (
     <AppShell title="Channels" subtitle="Manage messaging channel connections" noPadding>
-      <div className="flex h-full min-h-0">
+      <div className="flex h-full min-h-0 min-w-0">
         {/* Left selector */}
-        <aside className="w-72 shrink-0 border-r border-border bg-card/30 overflow-y-auto">
+        <aside className="hidden lg:block w-72 shrink-0 border-r border-border bg-card/30 overflow-y-auto">
           <div className="px-4 py-4 border-b border-border">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Channels

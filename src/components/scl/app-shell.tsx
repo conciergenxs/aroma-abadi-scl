@@ -409,7 +409,7 @@ export function AppShell({
               {notifOpen && (
                 <div
                   ref={notifRef}
-                  className="absolute right-0 top-full mt-2 w-[360px] rounded-xl border border-border bg-popover shadow-2xl z-50 overflow-hidden animate-fade-in"
+                  className="fixed inset-x-2 top-[4.25rem] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[360px] rounded-xl border border-border bg-popover shadow-2xl z-50 overflow-hidden animate-scale-in origin-top-right"
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-border">
@@ -507,7 +507,7 @@ export function AppShell({
           className={
             noPadding
               ? "flex-1 min-h-0 overflow-y-auto page-enter"
-              : "flex-1 p-6 overflow-y-auto page-enter"
+              : "flex-1 p-4 sm:p-6 overflow-y-auto page-enter"
           }
         >
           {children}

@@ -317,7 +317,7 @@ export function AudienceContactPicker({
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_340px] gap-4 animate-fade-in">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4 animate-fade-in">
         {/* LEFT: search + browse list */}
         <div className="rounded-lg border border-border overflow-hidden">
           <div className="p-3 border-b border-border bg-card/40 flex items-center gap-3">
