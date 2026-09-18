@@ -33,6 +33,8 @@ import {
   type PromoStatus,
 } from "@/components/scl/promo-store";
 import { REWARD_ICONS } from "@/components/scl/reward-icons";
+import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
+import { useTransactionsStore, type Transaction } from "@/components/scl/transactions-store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -201,6 +203,9 @@ function PromoDetailPage() {
   const [redemptionPageSize, setRedemptionPageSize] = useState(10);
   const [codesPage, setCodesPage] = useState(1);
   const [codesPageSize, setCodesPageSize] = useState(10);
+  const { transactions } = useTransactionsStore();
+  const [peekTx, setPeekTx] = useState<Transaction | null>(null);
+  const txById = useMemo(() => new Map(transactions.map((t) => [t.id, t])), [transactions]);
 
   const promo = promos.find((p) => p.id === promoId);
 
@@ -388,7 +393,7 @@ function PromoDetailPage() {
         {/* Redemption Log */}
         <SectionCard
           title={`Redemption Log (${redemptions.length})`}
-          description="Who redeemed this code, and in which transaction"
+          description="Who redeemed this code, what they bought, and what they spent"
         >
           {redemptions.length === 0 ? (
             <p className="p-5 text-[12px] text-muted-foreground italic">
@@ -406,11 +411,14 @@ function PromoDetailPage() {
                       <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Transaction
                       </th>
-                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Discount
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Items
                       </th>
                       <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Redeemed
+                        Order Total
+                      </th>
+                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Discount
                       </th>
                     </tr>
                   </thead>
@@ -427,16 +435,25 @@ function PromoDetailPage() {
                           </Link>
                         </td>
                         <td className="px-5 py-2.5">
-                          <div className="text-[12px] font-mono text-foreground/90">
-                            {r.invoice}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground">{r.sourceName}</div>
+                          <TransactionCell
+                            invoice={r.invoice}
+                            date={txById.get(r.transactionId)?.date ?? r.redeemedAt}
+                            disabled={!txById.has(r.transactionId)}
+                            onOpen={() => setPeekTx(txById.get(r.transactionId) ?? null)}
+                          />
                         </td>
-                        <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">
-                          {fmtIDR(r.discountValue)}
+                        <td className="px-5 py-2.5 text-[12px] text-muted-foreground max-w-[260px]">
+                          {txById.get(r.transactionId)?.items
+                            .map((i) => `${i.qty}× ${i.skuName}`)
+                            .join(", ") ?? "—"}
                         </td>
-                        <td className="px-5 py-2.5 text-right text-[11px] text-muted-foreground whitespace-nowrap">
-                          {fmtDateTimeEN(r.redeemedAt)}
+                        <td className="px-5 py-2.5 text-right text-[13px] whitespace-nowrap">
+                          {txById.has(r.transactionId)
+                            ? fmtIDR(txById.get(r.transactionId)!.total)
+                            : "—"}
+                        </td>
+                        <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground whitespace-nowrap">
+                          −{fmtIDR(r.discountValue)}
                         </td>
                       </tr>
                     ))}
@@ -561,6 +578,8 @@ function PromoDetailPage() {
           </SectionCard>
         )}
       </div>
+
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
 
       <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
         <AlertDialogContent>
