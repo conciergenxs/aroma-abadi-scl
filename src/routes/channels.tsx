@@ -443,7 +443,7 @@ function OptInTab() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card/40 overflow-hidden">
+      <div className="rounded-xl border border-border bg-card/40 overflow-x-auto">
         <table className="w-full text-xs">
           <thead className="bg-white/[0.03] border-b border-border">
             <tr className="text-[10px] uppercase tracking-wide text-muted-foreground">

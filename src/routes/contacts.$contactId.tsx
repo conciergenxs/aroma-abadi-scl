@@ -944,7 +944,7 @@ function TransactionsTab({
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden">
+      <div className="rounded-lg border border-border overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-white">
@@ -1127,7 +1127,7 @@ function RedeemedTab({
         </div>
 
         {referred.length > 0 && (
-          <div className="rounded-lg border border-border overflow-hidden animate-fade-in">
+          <div className="rounded-lg border border-border overflow-x-auto animate-fade-in">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-white">
@@ -1197,7 +1197,7 @@ function RedeemedTab({
                 <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
               </div>
             </div>
-            <div className="rounded-lg border border-border overflow-hidden">
+            <div className="rounded-lg border border-border overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-white">
