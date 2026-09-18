@@ -73,8 +73,7 @@ import { AI_AGENTS, findAgent, isAgentId } from "@/components/scl/agents";
 import { toast } from "sonner";
 import type { Message } from "@/components/scl/mock-data";
 
-type ReplyRef = { id: string; text: string; fromName: string; time: string };
-type SentMsg = Message & { replyTo?: ReplyRef; forwardedFrom?: string };
+import { inboxStore, useInboxStore, type ReplyRef, type SentMsg } from "@/components/scl/inbox-store";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -225,21 +224,22 @@ function InboxPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [contextOpen]);
-  const [collaborators, setCollaborators] = useState<Record<string, string[]>>({});
+  // Everything the user does in here lives in the inbox store, so replies,
+  // pins and takeovers survive a trip to another page — see inbox-store.
+  const {
+    collaborators,
+    pinnedIds,
+    unreadOverrides,
+    draftByConvo,
+    autopilotByConvo,
+    replyTargets,
+    sentByConvo,
+  } = useInboxStore();
   const [activeId, setActiveId] = useState(conversations[0].id);
 
   // ============== PIN + READ STATE OVERRIDES ==============
-  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
-  // true = forced unread, false = marked read, undefined = use original
-  const [unreadOverrides, setUnreadOverrides] = useState<Record<string, boolean>>({});
-  const isPinned = (id: string) => pinnedIds.has(id);
-  const togglePinned = (id: string) =>
-    setPinnedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const isPinned = (id: string) => pinnedIds.includes(id);
+  const togglePinned = (id: string) => inboxStore.togglePinned(id);
   const unreadCount = useCallback(
     (c: Conversation) => {
       const o = unreadOverrides[c.id];
@@ -250,21 +250,14 @@ function InboxPage() {
     [unreadOverrides],
   );
   const isUnread = useCallback((c: Conversation) => unreadCount(c) > 0, [unreadCount]);
-  const markRead = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: false }));
-  const markUnread = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: true }));
+  const markRead = (id: string) => inboxStore.setUnread(id, false);
+  const markUnread = (id: string) => inboxStore.setUnread(id, true);
 
-  // Keyed by conversation: a half-typed reply must never follow the user to
-  // whoever they click next.
-  const [draftByConvo, setDraftByConvo] = useState<Record<string, string>>({});
-  // Autopilot state: per conversation
-  const [autopilotByConvo, setAutopilotByConvo] = useState<Record<string, boolean>>({});
   const isAutopilot = (id: string) => autopilotByConvo[id] !== false; // default = autopilot ON
-  const setAutopilot = (id: string, v: boolean) => setAutopilotByConvo((p) => ({ ...p, [id]: v }));
+  const setAutopilot = (id: string, v: boolean) => inboxStore.setAutopilot(id, v);
 
   // ============== MESSAGE ACTIONS (reply / copy / forward) ==============
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
-  const [replyTargets, setReplyTargets] = useState<Record<string, ReplyRef | undefined>>({});
-  const [sentByConvo, setSentByConvo] = useState<Record<string, SentMsg[]>>({});
   const [forwardMode, setForwardMode] = useState(false);
   const [selectedMsgIds, setSelectedMsgIds] = useState<Set<string>>(new Set());
   const [forwardModalOpen, setForwardModalOpen] = useState(false);
@@ -368,7 +361,7 @@ function InboxPage() {
     allContacts.find((c) => c.id === active.contactId)!;
   const replyText = draftByConvo[active.id] ?? "";
   const setReplyText = (text: string) =>
-    setDraftByConvo((prev) => ({ ...prev, [active.id]: text }));
+    inboxStore.setDraft(active.id, text);
   const isBA = contact.labelIds.includes("lb-ba");
   const baRecord = bas.find(
     (b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, ""),
@@ -441,13 +434,15 @@ function InboxPage() {
   const senderName = (m: Message) => (m.from === "me" ? "You" : contact.name);
   const replyTarget = replyTargets[active.id];
   const startReply = (m: Message) => {
-    setReplyTargets((prev) => ({
-      ...prev,
-      [active.id]: { id: m.id, text: m.text, fromName: senderName(m), time: m.time },
-    }));
+    inboxStore.setReplyTarget(active.id, {
+      id: m.id,
+      text: m.text,
+      fromName: senderName(m),
+      time: m.time,
+    });
     requestAnimationFrame(() => composerRef.current?.focus());
   };
-  const clearReply = () => setReplyTargets((prev) => ({ ...prev, [active.id]: undefined }));
+  const clearReply = () => inboxStore.setReplyTarget(active.id, undefined);
   const submitReply = () => {
     const text = replyText.trim();
     if (!text) return;
@@ -463,9 +458,8 @@ function InboxPage() {
       // below — so every message sent through it is human-authored.
       sentBy: "human",
     };
-    setSentByConvo((prev) => ({ ...prev, [active.id]: [...(prev[active.id] ?? []), sent] }));
-    setReplyText("");
-    clearReply();
+    // One call: the message lands, the draft clears and the reply target drops.
+    inboxStore.send(active.id, sent);
   };
   const startForward = (m: Message) => {
     setForwardMode(true);
@@ -907,7 +901,7 @@ function InboxPage() {
               );
             }}
             onChangeCollaborators={(ids) =>
-              setCollaborators((prev) => ({ ...prev, [active.id]: ids }))
+              inboxStore.setCollaborators(active.id, ids)
             }
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
