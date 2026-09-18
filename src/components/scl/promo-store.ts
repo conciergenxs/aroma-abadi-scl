@@ -51,7 +51,7 @@ export type PromoCondition =
 
 // Y — what the customer gets
 export type PromoReward =
-  | { kind: "free-item"; sameAsPurchased: boolean; group: PromoItemGroup }
+  | { kind: "free-item"; group: PromoItemGroup }
   | { kind: "percent-off"; percent: number; appliesTo: PromoItemScope; maxDiscount: number | null }
   // Always off the purchase being made — there's no wallet or points balance
   // to carry value into a later order.
@@ -82,7 +82,7 @@ export function defaultCondition(kind: PromoCondition["kind"]): PromoCondition {
 export function defaultReward(kind: PromoReward["kind"]): PromoReward {
   switch (kind) {
     case "free-item":
-      return { kind, sameAsPurchased: false, group: itemGroup() };
+      return { kind, group: itemGroup() };
     case "percent-off":
       return { kind, percent: 10, appliesTo: { kind: "any" }, maxDiscount: null };
     case "amount-off":
@@ -130,7 +130,6 @@ function describeCondition(c: PromoCondition): string {
 function describeReward(r: PromoReward): string {
   switch (r.kind) {
     case "free-item": {
-      if (r.sameAsPurchased) return `Get ${r.group.lines[0]?.qty ?? 1} Same Item Free`;
       const body = describeItemGroup(r.group);
       // An "or" group on the reward side means the customer picks one of the
       // listed items, so say so rather than leaving "A or B" ambiguous.
@@ -606,8 +605,12 @@ function seed(): PromoCode[] {
         },
         reward: {
           kind: "free-item",
-          sameAsPurchased: true,
-          group: { join: "and", lines: [{ qty: 1, item: { kind: "any" } }] },
+          group: {
+            join: "and",
+            lines: [
+              { qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } },
+            ],
+          },
         },
       },
       usageType: "one-to-many",
@@ -656,7 +659,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v10";
+const STORAGE_KEY = "aroma_promo_store_v11";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
