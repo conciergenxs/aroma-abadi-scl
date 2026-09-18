@@ -258,6 +258,10 @@ export const DEFAULT_LIFECYCLE_STAGES: LifecycleStageDef[] = [
   { id: "lcs-no-reply", name: "No Reply", color: "gray", group: "lost", system: true },
 ];
 
+// Fixed anchor, not Date.now(): these timestamps are rendered to the minute,
+// and a module-load clock differs between the server render and hydration.
+const SEED_EPOCH = Date.UTC(2026, 8, 18);
+
 const initialContacts: Contact[] = seedContacts.map((c, idx) => {
   if (c.lifecycleStage) return c;
   // Leave roughly every 5th contact without a lifecycle stage — they appear
@@ -265,7 +269,7 @@ const initialContacts: Contact[] = seedContacts.map((c, idx) => {
   if (idx % 5 === 0) return c;
   const stage = LIFECYCLE_STAGES[idx % LIFECYCLE_STAGES.length];
   const daysBack = 3 + ((idx * 11) % 118);
-  const enteredAt = new Date(Date.now() - daysBack * 86400000).toISOString();
+  const enteredAt = new Date(SEED_EPOCH - daysBack * 86400000).toISOString();
   return { ...c, lifecycleStage: stage, stageEnteredAt: enteredAt };
 });
 

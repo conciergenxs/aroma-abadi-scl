@@ -141,7 +141,7 @@ function CreateTemplatePage() {
   const linkedPromoId = (() => {
     const codes = [...body.matchAll(/\{\{promo-([^}]+)\}\}/g)].map((m) => m[1].trim());
     const found = codes
-      .map((code) => promos.find((p) => p.code === code))
+      .map((code) => promos.find((p) => p.code.toUpperCase() === code.toUpperCase()))
       .filter((p): p is PromoCode => !!p);
     return (found.find((p) => p.usageType === "one-to-one") ?? found[0])?.id;
   })();

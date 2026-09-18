@@ -156,7 +156,9 @@ function ContactDetailPage() {
 
   const derivedActivities = useMemo<ContactActivity[]>(() => {
     if (!contact) return [];
-    const base = contact.stageEnteredAt ?? new Date().toISOString();
+    // A render-time clock would differ between the server render and
+    // hydration, so fall back to when the customer joined.
+    const base = contact.stageEnteredAt ?? contact.joinedAt ?? "2026-01-01T09:00:00Z";
     const out: ContactActivity[] = [...(activities[contact.id] ?? [])];
     if (out.length === 0) {
       if (contact.lifecycleStage) {
@@ -1060,13 +1062,17 @@ function RedeemedTab({
                   <code className="font-mono text-[11px] text-foreground bg-muted/60 border border-border rounded px-1.5 py-0.5">
                     {usedCode.code}
                   </code>
-                  <button
-                    type="button"
-                    onClick={() => openPeek(usedCode.transactionId)}
-                    className="press font-mono text-primary hover:underline"
-                  >
-                    {usedCode.invoice}
-                  </button>
+                  {txById.has(usedCode.transactionId) ? (
+                    <button
+                      type="button"
+                      onClick={() => openPeek(usedCode.transactionId)}
+                      className="press font-mono text-primary hover:underline"
+                    >
+                      {usedCode.invoice}
+                    </button>
+                  ) : (
+                    <span className="font-mono">{usedCode.invoice}</span>
+                  )}
                   <span>−{formatIDR(usedCode.discountValue)}</span>
                 </div>
                 <div className="text-[11px] text-muted-foreground">

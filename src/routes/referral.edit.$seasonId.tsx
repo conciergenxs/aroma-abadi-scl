@@ -25,21 +25,21 @@ function EditSeasonPage() {
   const { seasonId } = useParams({ from: "/referral/edit/$seasonId" });
   const { from } = Route.useSearch();
   const navigate = useNavigate();
-  const { seasons } = useReferralStore();
+  const { seasons, loaded } = useReferralStore();
   const season = seasons.find((s) => s.id === seasonId);
   const [form, setForm] = useState<SeasonFormState | null>(() =>
     season ? seasonFormFromExisting(season) : null,
   );
-  // Seasons load from localStorage a tick after mount, so on a fresh page load
-  // the season can still be missing when the initializer above runs. Adopt it
-  // the first time it appears — once only, so later store updates can't wipe
-  // edits in progress.
-  const initializedRef = useRef(season != null);
+  // Seasons load from localStorage a tick after mount, so the first render
+  // still shows seed data. Adopt the stored season exactly once, when the load
+  // has actually happened — keying off "a season existed on render 1" would
+  // keep the seed values and save them back over the real record.
+  const adoptedRef = useRef(false);
   useEffect(() => {
-    if (initializedRef.current || !season) return;
-    initializedRef.current = true;
+    if (adoptedRef.current || !loaded || !season) return;
+    adoptedRef.current = true;
     setForm(seasonFormFromExisting(season));
-  }, [season]);
+  }, [loaded, season]);
 
   if (!season || !form) {
     return (
@@ -53,7 +53,8 @@ function EditSeasonPage() {
 
   const error = validateSeasonForm(form, seasons, season.id);
   // Anything that has already run is locked down to its end date and notes.
-  const started = getSeasonStatus(season) !== "scheduled";
+  const status = getSeasonStatus(season);
+  const started = status !== "scheduled";
   const backToList = from === "list";
   const goBack = () =>
     backToList
@@ -61,6 +62,10 @@ function EditSeasonPage() {
       : navigate({ to: "/referral/$seasonId", params: { seasonId: season.id } });
 
   const handleSave = () => {
+    if (status === "ended") {
+      toast.error("A season that has ended can't be changed");
+      return;
+    }
     if (error) {
       toast.error(error);
       return;
@@ -78,13 +83,13 @@ function EditSeasonPage() {
     >
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6 animate-fade-in">
-          <SeasonFormFields form={form} setForm={setForm} started={started} />
+          <SeasonFormFields form={form} setForm={setForm} started={started} ended={status === "ended"} />
         </div>
         <PromoFormActionBar
           onCancel={goBack}
           onSubmit={handleSave}
           submitLabel="Save Changes"
-          disabled={!!error}
+          disabled={!!error || status === "ended"}
         />
       </div>
     </AppShell>

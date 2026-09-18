@@ -3,6 +3,7 @@ import { Megaphone, Wand2, X } from "lucide-react";
 import type { PromoCondition, PromoReward } from "./promo-store";
 import { CODE_INITIALS_TOKEN, defaultCodeFormat, fillCodeFormat } from "./promo-store";
 import { type PromoFormState, PROMO_CODE_MAX_LENGTH } from "./promo-form-fields";
+import { usePromoStore } from "./promo-store";
 
 const CONDITION_CODE: Record<PromoCondition["kind"], string> = {
   "any-purchase": "ANY",
@@ -46,6 +47,7 @@ export function PromoCodeSetupModal({
   onCancel: () => void;
   onConfirm: (code: string, codeFormat?: string) => void;
 }) {
+  const { promos } = usePromoStore();
   const suggested = useMemo(() => generatePromoCodeSuggestion(form), [form]);
   const [code, setCode] = useState(form.code.trim() || suggested);
   const isOneToOne = form.usageType === "one-to-one";
@@ -54,8 +56,10 @@ export function PromoCodeSetupModal({
     setCode(val.toUpperCase().slice(0, PROMO_CODE_MAX_LENGTH));
   };
 
+  const taken = promos.find((p) => p.code.toUpperCase() === code.trim().toUpperCase());
+
   const handleConfirm = () => {
-    if (!code.trim()) return;
+    if (!code.trim() || taken) return;
     const trimmed = code.trim().toUpperCase();
     // 1-to-1 recipients still get a personal code, but the pattern is derived
     // here rather than configured — Broadcast is where individual codes are

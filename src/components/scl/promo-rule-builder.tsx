@@ -359,11 +359,13 @@ function InlineNumber({
   onChange,
   suffix,
   min = 1,
+  max,
 }: {
   value: number;
   onChange: (v: number) => void;
   suffix?: string;
   min?: number;
+  max?: number;
 }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-1.5 h-8 align-middle">
@@ -371,7 +373,10 @@ function InlineNumber({
         type="number"
         value={value}
         min={min}
-        onChange={(e) => onChange(Math.max(min, Number(e.target.value) || min))}
+        max={max}
+        onChange={(e) =>
+          onChange(Math.min(max ?? Infinity, Math.max(min, Number(e.target.value) || min)))
+        }
         className="w-10 bg-transparent text-[13px] font-medium text-center focus:outline-none"
       />
       {suffix && <span className="text-[12px] text-muted-foreground pr-0.5">{suffix}</span>}
@@ -396,7 +401,7 @@ function InlineCurrency({
         value={value || ""}
         min={0}
         placeholder={placeholder}
-        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
         className="w-24 bg-transparent text-[13px] font-medium focus:outline-none"
       />
     </span>
@@ -640,6 +645,7 @@ function RewardEditor({
               value={reward.percent}
               onChange={(v) => onChange({ ...reward, percent: v })}
               suffix="%"
+              max={100}
             />
             <span className="text-muted-foreground">off</span>
             <ItemScopeEditor

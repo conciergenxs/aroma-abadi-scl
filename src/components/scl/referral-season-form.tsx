@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import { defaultRule, describePromoRule, type PromoRule } from "./promo-store";
-import type { ReferralSeason } from "./referral-store";
+import { wib, type ReferralSeason } from "./referral-store";
 
 // ── Shared referral-season form — used by the New and Edit pages so the field
 // set can't drift between them. A season is only ever: a name, when it runs,
@@ -38,14 +38,11 @@ export function validateSeasonForm(
 ): string | null {
   if (!form.name.trim()) return "Season name is required";
   if (!form.startDate || !form.endDate) return "Start and End dates are required";
-  const start = new Date(form.startDate).getTime();
-  const end = new Date(form.endDate).getTime();
+  const start = wib(form.startDate);
+  const end = wib(form.endDate);
   if (end <= start) return "End date must be after the start date";
   const clash = seasons.find(
-    (s) =>
-      s.id !== selfId &&
-      start <= new Date(s.endDate).getTime() &&
-      end >= new Date(s.startDate).getTime(),
+    (s) => s.id !== selfId && start <= wib(s.endDate) && end >= wib(s.startDate),
   );
   if (clash) return `These dates overlap "${clash.name}"`;
   return null;
@@ -69,12 +66,15 @@ export function SeasonFormFields({
   form,
   setForm,
   started,
+  ended,
 }: {
   form: SeasonFormState;
   setForm: (f: SeasonFormState) => void;
   /** A season that has already begun can only be shortened or extended, and
    * have its notes edited — customers have already been promised the rest. */
   started?: boolean;
+  /** A season that has finished is history: nothing about it can change. */
+  ended?: boolean;
 }) {
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
@@ -88,8 +88,17 @@ export function SeasonFormFields({
     <div className="space-y-4">
       {started && (
         <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] text-muted-foreground animate-fade-in">
-          <span className="font-medium text-foreground">This season has already started</span> —
-          only its end date and notes can still change.
+          {ended ? (
+            <>
+              <span className="font-medium text-foreground">This season has ended</span> — it's kept
+              as a record and can no longer be changed.
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-foreground">This season has already started</span> —
+              only its end date and notes can still change.
+            </>
+          )}
         </div>
       )}
 
@@ -114,6 +123,7 @@ export function SeasonFormFields({
             value={form.startDate}
             max={form.endDate || undefined}
             disabled={started}
+
             onChange={(e) => set("startDate", e.target.value)}
             onClick={() => !started && startRef.current?.showPicker?.()}
             className={started ? lockedCls : inputCls}
@@ -126,9 +136,10 @@ export function SeasonFormFields({
             type="datetime-local"
             value={form.endDate}
             min={form.startDate || undefined}
+            disabled={ended}
             onChange={(e) => set("endDate", e.target.value)}
-            onClick={() => endRef.current?.showPicker?.()}
-            className={inputCls}
+            onClick={() => !ended && endRef.current?.showPicker?.()}
+            className={ended ? lockedCls : inputCls}
           />
         </div>
       </div>
@@ -159,6 +170,7 @@ export function SeasonFormFields({
         <label className={labelCls}>Notes</label>
         <textarea
           value={form.notes}
+          disabled={ended}
           onChange={(e) => set("notes", e.target.value)}
           rows={2}
           placeholder="Anything the team should know about this season..."

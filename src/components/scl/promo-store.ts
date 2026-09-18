@@ -101,7 +101,9 @@ export function defaultRule(): PromoRule {
 function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
   if (scope.kind === "any") return anyLabel;
   if (scope.kind === "any-in-brand") return `${anyLabel} (${scope.brand})`;
-  if (scope.items.length === 0) return anyLabel;
+  // An explicit list that ended up empty means nothing is selected — saying
+  // "Any Item" there would promise the opposite of what the rule does.
+  if (scope.items.length === 0) return "No items selected";
   if (scope.items.length === 1) return scope.items[0];
   return `${scope.items[0]} +${scope.items.length - 1} more`;
 }
@@ -711,6 +713,14 @@ function _load() {
   }
 }
 
+/** Every entry point loads first: a page that only writes (e.g. creating a
+ * promo straight from /promo-codes/new) would otherwise save the seed over
+ * whatever the browser already had. */
+function _ensureLoaded() {
+  if (typeof window === "undefined") return;
+  _load();
+}
+
 function _save() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ promos: _promos }));
@@ -724,10 +734,12 @@ function _save() {
 
 export const promoStore = {
   getPromos(): PromoCode[] {
+    _ensureLoaded();
     return _promos;
   },
 
   addPromo(data: Omit<PromoCode, "id" | "redemptions">): string {
+    _ensureLoaded();
     const id = `promo-${Date.now()}`;
     _promos = [{ ...data, id, redemptions: [] }, ..._promos];
     _save();
@@ -735,6 +747,7 @@ export const promoStore = {
   },
 
   updatePromo(id: string, data: Partial<Omit<PromoCode, "id" | "redemptions" | "assignedCodes">>) {
+    _ensureLoaded();
     _promos = _promos.map((p) => (p.id === id ? { ...p, ...data } : p));
     _save();
   },
@@ -750,6 +763,7 @@ export const promoStore = {
     broadcast: { id: string; name: string; sentAt: string },
     entries: { contactId: string; contactName: string; code: string }[],
   ) {
+    _ensureLoaded();
     _promos = _promos.map((p) => {
       if (p.id !== promoId) return p;
       const existing = p.assignedCodes ?? [];
@@ -779,6 +793,7 @@ export const promoStore = {
   },
 
   deletePromo(id: string) {
+    _ensureLoaded();
     _promos = _promos.filter((p) => p.id !== id);
     _save();
   },
@@ -793,18 +808,23 @@ export const promoStore = {
 
 // ── React hook (client-only via useEffect) ────────────────────────────────────
 
+/** `loaded` turns true once localStorage has been read. Until then the promos
+ * returned are the seed — an edit form must wait for it before deciding there
+ * is nothing to adopt, or it will save the seed over the real record. */
 export function usePromoStore() {
   const [promos, setPromos] = useState<PromoCode[]>(() => _promos);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     // Load from localStorage on first mount (client-only)
     _load();
     setPromos([..._promos]);
+    setLoaded(true);
 
     // Subscribe to future changes
     const unsub = promoStore.subscribe(() => setPromos([..._promos]));
     return unsub;
   }, []);
 
-  return { promos };
+  return { promos, loaded };
 }

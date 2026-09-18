@@ -129,6 +129,12 @@ function CreateBroadcastPage() {
       toast.error("Please complete all required fields");
       return;
     }
+    if (kind !== "draft" && linkedPromo && recipients.length === 0) {
+      toast.error(
+        "This message carries a 1-to-1 promo — pick an audience list so each recipient gets a code",
+      );
+      return;
+    }
     if (kind !== "draft" && linkedPromo && (duplicateCodes.size > 0 || codeProblems > 0)) {
       toast.error(
         blankCodes > 0
@@ -192,7 +198,9 @@ function CreateBroadcastPage() {
       contentMode,
       templateId: templateId ?? undefined,
       promoCodeId: linkedPromo?.id,
-      recipientCodes: status === "Sent" && recipientCodes.length ? recipientCodes : undefined,
+      // Kept for a scheduled send too, so the codes the user set aren't lost;
+      // they are only handed out (written onto the promo) once it is sent.
+      recipientCodes: status !== "Draft" && recipientCodes.length ? recipientCodes : undefined,
       body: previewBody,
       replied: 0,
       failed: 0,
@@ -234,7 +242,7 @@ function CreateBroadcastPage() {
   const linkedPromo = useMemo(() => {
     const codes = [...previewBody.matchAll(/\{\{promo-([^}]+)\}\}/g)].map((m) => m[1].trim());
     for (const code of codes) {
-      const promo = promos.find((p) => p.code === code);
+      const promo = promos.find((p) => p.code.toUpperCase() === code.toUpperCase());
       if (promo?.usageType === "one-to-one") return promo;
     }
     return null;
@@ -574,7 +582,7 @@ function CreateBroadcastPage() {
                         <div className="max-h-44 overflow-y-auto py-1">
                           {promos.map((p) => (
                             <button
-                              key={p.code}
+                              key={p.id}
                               onClick={() => insertPromo(p.code)}
                               className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2"
                             >

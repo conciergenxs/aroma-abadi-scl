@@ -20,7 +20,7 @@ export const Route = createFileRoute("/promo-codes/edit/$promoId")({
 function EditPromoCodePage() {
   const { promoId } = useParams({ from: "/promo-codes/edit/$promoId" });
   const navigate = useNavigate();
-  const { promos } = usePromoStore();
+  const { promos, loaded } = usePromoStore();
   const promo = promos.find((p) => p.id === promoId);
   const [form, setForm] = useState<PromoFormState | null>(() =>
     promo ? promoFormFromExisting(promo) : null,
@@ -31,12 +31,12 @@ function EditPromoCodePage() {
   // once `promo` resolves on a later render. Adopt it the first time it
   // becomes available, but only once, so this doesn't clobber in-progress
   // edits if the store updates again afterward for an unrelated reason.
-  const initializedRef = useRef(promo != null);
+  const adoptedRef = useRef(false);
   useEffect(() => {
-    if (initializedRef.current || !promo) return;
-    initializedRef.current = true;
+    if (adoptedRef.current || !loaded || !promo) return;
+    adoptedRef.current = true;
     setForm(promoFormFromExisting(promo));
-  }, [promo]);
+  }, [loaded, promo]);
 
   if (!promo || !form) {
     return (
@@ -51,7 +51,7 @@ function EditPromoCodePage() {
   const detailPath = `/promo-codes/${promo.id}`;
 
   const handleSave = () => {
-    const error = validatePromoForm(form);
+    const error = validatePromoForm(form, promos, promo.id);
     if (error) {
       toast.error(error);
       return;
@@ -71,7 +71,7 @@ function EditPromoCodePage() {
           onCancel={() => navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })}
           onSubmit={handleSave}
           submitLabel="Save Changes"
-          disabled={!!validatePromoForm(form)}
+          disabled={!!validatePromoForm(form, promos, promo.id)}
         />
       </div>
     </AppShell>

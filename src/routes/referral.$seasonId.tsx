@@ -61,13 +61,15 @@ function SeasonReportPage() {
               <SeasonStatusBadge status={status} />
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Link
-                to="/referral/edit/$seasonId"
-                params={{ seasonId: season.id }}
-                className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                <Pencil className="h-3.5 w-3.5" /> Edit
-              </Link>
+              {status !== "ended" && (
+                <Link
+                  to="/referral/edit/$seasonId"
+                  params={{ seasonId: season.id }}
+                  className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Edit
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => setDeleting(season)}

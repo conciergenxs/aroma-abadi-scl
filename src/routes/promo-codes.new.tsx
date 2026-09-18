@@ -3,7 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, FileText } from "lucide-react";
-import { promoStore } from "@/components/scl/promo-store";
+import { promoStore, usePromoStore } from "@/components/scl/promo-store";
 import {
   PromoFormFields,
   PromoFormActionBar,
@@ -83,12 +83,13 @@ function SuccessView({
 
 function NewPromoCodePage() {
   const navigate = useNavigate();
+  const { promos } = usePromoStore();
   const [form, setForm] = useState<PromoFormState>(() => emptyPromoForm());
   const [settingCode, setSettingCode] = useState(false);
   const [created, setCreated] = useState<CreatedPromo | null>(null);
 
   const handleConfirmClick = () => {
-    const error = validatePromoForm(form);
+    const error = validatePromoForm(form, promos);
     if (error) {
       toast.error(error);
       return;
@@ -139,7 +140,7 @@ function NewPromoCodePage() {
           onCancel={() => navigate({ to: "/promo-codes" })}
           onSubmit={handleConfirmClick}
           submitLabel="Confirm Promo Code"
-          disabled={!!validatePromoForm(form)}
+          disabled={!!validatePromoForm(form, promos)}
         />
       </div>
 

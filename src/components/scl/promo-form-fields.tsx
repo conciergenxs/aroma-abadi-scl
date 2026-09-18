@@ -1,7 +1,13 @@
 import { useRef } from "react";
 import { Infinity as InfinityIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
-import { defaultCodeFormat, defaultRule, type PromoRule, type PromoCode } from "./promo-store";
+import {
+  defaultCodeFormat,
+  defaultRule,
+  type PromoRule,
+  type PromoCode,
+  type PromoItemScope,
+} from "./promo-store";
 
 // ── Shared promo form — used by the Create page and the Edit page so the
 // field set can never drift out of sync between them. ──
@@ -57,9 +63,41 @@ export function promoFormFromExisting(promo: PromoCode): PromoFormState {
   };
 }
 
-export function validatePromoForm(form: PromoFormState): string | null {
+function emptyScope(scope: PromoItemScope): boolean {
+  return scope.kind === "specific" && scope.items.length === 0;
+}
+
+/** `existing` lets the caller reject a code another promo already holds —
+ * the promo being edited is excluded by id. */
+export function validatePromoForm(
+  form: PromoFormState,
+  existing: PromoCode[] = [],
+  selfId?: string,
+): string | null {
   if (!form.name.trim()) return "Promo Name is required";
   if (!form.startDate || !form.endDate) return "Start and End dates are required";
+  if (new Date(form.endDate) <= new Date(form.startDate))
+    return "End date must be after the start date";
+
+  // A cap of 0 would mean a promo nobody can use, which is never what's meant.
+  if (!form.maxUsageUnlimited && form.maxUsage && Number(form.maxUsage) < 1)
+    return "Max Usage must be at least 1";
+  if (!form.limitPerUserUnlimited && form.limitPerUser && Number(form.limitPerUser) < 1)
+    return "Limit Per User must be at least 1";
+
+  // An item list the user emptied would silently match nothing.
+  const { condition, reward } = form.rule;
+  if (condition.kind === "buy-item" && condition.group.lines.some((l) => emptyScope(l.item)))
+    return "Pick at least one item for every line under 'When customer buys'";
+  if (reward.kind === "free-item" && reward.group.lines.some((l) => emptyScope(l.item)))
+    return "Pick at least one item for every free item";
+  if (reward.kind === "percent-off" && emptyScope(reward.appliesTo))
+    return "Pick what the discount applies to";
+
+  const code = form.code.trim().toUpperCase();
+  if (code && existing.some((p) => p.id !== selfId && p.code.toUpperCase() === code))
+    return `Another promo already uses the code ${code}`;
+
   // 1-to-1 deliberately has no usage caps: how many codes exist is decided by
   // how many recipients a Broadcast sends it to.
   return null;

@@ -183,7 +183,10 @@ function PromoCodesPage() {
   }, [promos, search, filterStatus, filterUsage]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // Clamp on read: deleting the last row of the last page would otherwise
+  // leave the view on a page that no longer exists, with the pager hidden.
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const confirmDelete = () => {
     if (!deletingPromo) return;

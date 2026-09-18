@@ -49,8 +49,8 @@ export type ReferralSeason = {
 export function getSeasonStatus(season: { startDate: string; endDate: string }): ReferralStatus {
   if (!season.startDate || !season.endDate) return "scheduled";
   const now = Date.now();
-  const start = new Date(season.startDate).getTime();
-  const end = new Date(season.endDate).getTime();
+  const start = wib(season.startDate);
+  const end = wib(season.endDate);
   if (Number.isNaN(start) || Number.isNaN(end)) return "scheduled";
   if (now < start) return "scheduled";
   if (now > end) return "ended";
@@ -94,8 +94,10 @@ export function referralActivityFor(seasons: ReferralSeason[], contactId: string
 // that exists, made by the customer it names.
 
 /** Parse a datetime-local season boundary as Jakarta time, so the server and
- * the browser assign each seeded order to the same season. */
-function wib(datetimeLocal: string) {
+ * the browser always agree on which season a moment belongs to — a bare
+ * `new Date("2026-10-01T00:00")` resolves in the runtime's own timezone, which
+ * is UTC on the server and UTC+7 in the browser. */
+export function wib(datetimeLocal: string) {
   return new Date(`${datetimeLocal}:00+07:00`).getTime();
 }
 
@@ -270,6 +272,13 @@ function _load() {
   }
 }
 
+/** Load before any read or write, so a page that only writes can't save the
+ * seed over what the browser already had. */
+function _ensureLoaded() {
+  if (typeof window === "undefined") return;
+  _load();
+}
+
 function _save() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ seasons: _seasons }));
@@ -281,10 +290,12 @@ function _save() {
 
 export const referralStore = {
   getSeasons(): ReferralSeason[] {
+    _ensureLoaded();
     return _seasons;
   },
 
   addSeason(data: Omit<ReferralSeason, "id" | "uses" | "createdAt">): string {
+    _ensureLoaded();
     const id = `rs-${Date.now()}`;
     _seasons = [{ ...data, id, createdAt: new Date().toISOString(), uses: [] }, ..._seasons];
     _save();
@@ -292,11 +303,13 @@ export const referralStore = {
   },
 
   updateSeason(id: string, data: Partial<Omit<ReferralSeason, "id" | "uses">>) {
+    _ensureLoaded();
     _seasons = _seasons.map((s) => (s.id === id ? { ...s, ...data } : s));
     _save();
   },
 
   deleteSeason(id: string) {
+    _ensureLoaded();
     _seasons = _seasons.filter((s) => s.id !== id);
     _save();
   },
@@ -311,12 +324,15 @@ export const referralStore = {
 
 /** Seasons load from localStorage a tick after mount so the server and the
  * first client render agree — same pattern as the promo store. */
+/** `loaded` turns true once localStorage has been read — see usePromoStore. */
 export function useReferralStore() {
   const [seasons, setSeasons] = useState<ReferralSeason[]>(_seasons);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     _load();
     setSeasons([..._seasons]);
+    setLoaded(true);
     return referralStore.subscribe(() => setSeasons([..._seasons]));
   }, []);
-  return { seasons };
+  return { seasons, loaded };
 }
