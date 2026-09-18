@@ -543,7 +543,7 @@ function BAForm({
               className={inputCls}
             />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Gender">
               <select
                 value={gender}
@@ -599,7 +599,7 @@ function BAForm({
               </div>
             </div>
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="City">
               <SearchableSelect
                 value={city}
@@ -617,7 +617,7 @@ function BAForm({
               />
             </Field>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Position">
               <select
                 value={position}

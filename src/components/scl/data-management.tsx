@@ -162,7 +162,7 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-9 w-64 rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+        className="h-9 w-64 max-w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
       />
     </div>
   );
@@ -598,7 +598,7 @@ function RecentlyDeletedContactsPage() {
       />
 
       <SectionCard>
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-border">
+        <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border">
           <SearchInput value={query} onChange={setQuery} placeholder="Search deleted contacts" />
           <div className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1.5">
             <Filter className="h-3.5 w-3.5" /> {deletedContacts.length} deleted

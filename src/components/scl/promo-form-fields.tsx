@@ -218,7 +218,7 @@ export function PromoFormFields({
           each one gets their own single-use code.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 stagger animate-fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger animate-fade-in">
           <div>
             <label className={labelCls}>Max Usage</label>
             <div className="h-9 w-full flex items-center gap-2 rounded-md border border-border bg-card pl-3 pr-2 transition-colors focus-within:ring-1 focus-within:ring-primary/40">
@@ -298,7 +298,7 @@ export function PromoFormFields({
       )}
 
       {/* Start / End Date+Time */}
-      <div className="grid grid-cols-2 gap-4 stagger">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Start Date &amp; Time</label>
           <input

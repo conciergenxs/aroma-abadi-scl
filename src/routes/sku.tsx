@@ -2189,7 +2189,7 @@ function SkuFormModal({
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs text-muted-foreground mb-1">Name</span>
               <input disabled value={product.name} className={disabledInput} />

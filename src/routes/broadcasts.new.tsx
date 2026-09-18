@@ -1329,7 +1329,7 @@ function AudienceModal({
                 {localConds.map((c) => (
                   <div
                     key={c.id}
-                    className="grid grid-cols-[1fr_140px_1fr_auto] gap-2 items-center"
+                    className="grid grid-cols-1 sm:grid-cols-[1fr_140px_1fr_auto] gap-2 items-center"
                   >
                     <select
                       value={c.propertyKey}

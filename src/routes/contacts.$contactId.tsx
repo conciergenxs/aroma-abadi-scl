@@ -455,7 +455,7 @@ function ContactDetailPage() {
             {/* Tabs */}
             {!isBA && (
               <div className="border-b border-border bg-background/60 px-4 lg:px-6">
-                <div className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-1">
                   <TabButton
                     active={tab === "activity"}
                     onClick={() => setTab("activity")}
@@ -477,7 +477,7 @@ function ContactDetailPage() {
                     label="Code Redeem"
                     count={redeemCount}
                   />
-                  <div className="ml-auto flex items-center gap-1.5 py-1.5">
+                  <div className="ml-auto flex shrink-0 items-center gap-1.5 py-1.5">
                     <input
                       type="date"
                       value={dateFrom}
@@ -899,7 +899,7 @@ function TransactionsTab({
   return (
     <div className="max-w-3xl space-y-4">
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
             Total Transactions

@@ -114,7 +114,7 @@ export function SeasonFormFields({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 stagger">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Starts</label>
           <input
