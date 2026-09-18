@@ -73,7 +73,12 @@ import { AI_AGENTS, findAgent, isAgentId } from "@/components/scl/agents";
 import { toast } from "sonner";
 import type { Message } from "@/components/scl/mock-data";
 
-import { inboxStore, useInboxStore, type ReplyRef, type SentMsg } from "@/components/scl/inbox-store";
+import {
+  inboxStore,
+  useInboxStore,
+  type ReplyRef,
+  type SentMsg,
+} from "@/components/scl/inbox-store";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -236,6 +241,9 @@ function InboxPage() {
     sentByConvo,
   } = useInboxStore();
   const [activeId, setActiveId] = useState(conversations[0].id);
+  // Below sm there is only room for one pane, so the list and the conversation
+  // take turns the way a phone mail app does.
+  const [mobilePane, setMobilePane] = useState<"list" | "chat">("list");
 
   // ============== PIN + READ STATE OVERRIDES ==============
   const isPinned = (id: string) => pinnedIds.includes(id);
@@ -345,8 +353,8 @@ function InboxPage() {
   // Pinned conversations float to the top while preserving original order.
   const sortedVisible = useMemo(() => {
     return [...visible].sort((a, b) => {
-      const ap = pinnedIds.has(a.id) ? 1 : 0;
-      const bp = pinnedIds.has(b.id) ? 1 : 0;
+      const ap = pinnedIds.includes(a.id) ? 1 : 0;
+      const bp = pinnedIds.includes(b.id) ? 1 : 0;
       return bp - ap;
     });
   }, [visible, pinnedIds]);
@@ -360,8 +368,7 @@ function InboxPage() {
     contacts.find((c) => c.id === active.contactId) ??
     allContacts.find((c) => c.id === active.contactId)!;
   const replyText = draftByConvo[active.id] ?? "";
-  const setReplyText = (text: string) =>
-    inboxStore.setDraft(active.id, text);
+  const setReplyText = (text: string) => inboxStore.setDraft(active.id, text);
   const isBA = contact.labelIds.includes("lb-ba");
   const baRecord = bas.find(
     (b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, ""),
@@ -550,7 +557,9 @@ function InboxPage() {
     <AppShell title="Inbox" subtitle="Shared workspace · 4 teammates online" noPadding>
       <div className="flex h-[calc(100vh-64px)] min-h-0 w-full overflow-hidden">
         {/* ============== LEFT NAV ============== */}
-        <aside className="shrink-0 w-[252px] border-r border-border/60 bg-background scl-grid-bg overflow-y-auto py-1.5">
+        {/* The views/labels rail is the first thing to go when space runs out —
+            every filter in it is also reachable from the funnel button. */}
+        <aside className="hidden xl:block shrink-0 w-[252px] border-r border-border/60 bg-background scl-grid-bg overflow-y-auto py-1.5">
           <NavSection title="Inbox Views">
             {VIEWS.map((v) => {
               const Icon = v.icon;
@@ -665,7 +674,11 @@ function InboxPage() {
         </aside>
 
         {/* ============== CONVERSATION LIST ============== */}
-        <aside className="shrink-0 w-[340px] min-w-[340px] border-r border-border flex flex-col min-h-0 bg-background/40">
+        <aside
+          className={`shrink-0 w-full sm:w-[340px] sm:min-w-[300px] border-r border-border flex-col min-h-0 bg-background/40 ${
+            mobilePane === "chat" ? "hidden sm:flex" : "flex"
+          }`}
+        >
           <div className="px-3.5 pt-3 pb-2 border-b border-border/60">
             <div className="text-[13px] font-semibold text-foreground truncate">
               {filterContext.title}
@@ -808,7 +821,10 @@ function InboxPage() {
               return (
                 <button
                   key={c.id}
-                  onClick={() => setActiveId(c.id)}
+                  onClick={() => {
+                    setActiveId(c.id);
+                    setMobilePane("chat");
+                  }}
                   className={`conv-item w-full text-left flex gap-3 px-3.5 py-3 border-b border-border/40 transition-all duration-150 ${
                     sel
                       ? "active-conv bg-primary/10 border-l-2 border-l-primary"
@@ -881,7 +897,18 @@ function InboxPage() {
         </aside>
 
         {/* ============== ACTIVE CONVERSATION ============== */}
-        <section className="flex-1 min-w-0 flex flex-col min-h-0">
+        <section
+          className={`flex-1 min-w-0 flex-col min-h-0 ${
+            mobilePane === "list" ? "hidden sm:flex" : "flex"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => setMobilePane("list")}
+            className="press sm:hidden flex items-center gap-1.5 border-b border-border px-3 py-2 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" /> All conversations
+          </button>
           <ConversationHeader
             contact={contact}
             active={active}
@@ -900,9 +927,7 @@ function InboxPage() {
                 ),
               );
             }}
-            onChangeCollaborators={(ids) =>
-              inboxStore.setCollaborators(active.id, ids)
-            }
+            onChangeCollaborators={(ids) => inboxStore.setCollaborators(active.id, ids)}
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
             isPinned={isPinned(active.id)}
