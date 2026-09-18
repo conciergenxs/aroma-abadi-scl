@@ -148,6 +148,9 @@ const topNav: NavItem[] = [
 ];
 const bottomNav: NavItem[] = [{ to: "/settings", label: "Settings", icon: Settings }];
 
+/** Whether the sidebar is expanded, remembered per browser. */
+const SIDEBAR_KEY = "aroma_sidebar_expanded";
+
 export function AppShell({
   children,
   title,
@@ -166,7 +169,25 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
+  // AppShell remounts on every route change, so this has to outlive it or the
+  // sidebar springs back open each time the user navigates.
   const [expanded, setExpanded] = useState(true);
+  useEffect(() => {
+    try {
+      setExpanded(localStorage.getItem(SIDEBAR_KEY) !== "0");
+    } catch {
+      /* private mode — keep the default */
+    }
+  }, []);
+  const toggleExpanded = () =>
+    setExpanded((v) => {
+      try {
+        localStorage.setItem(SIDEBAR_KEY, v ? "0" : "1");
+      } catch {
+        /* ignore */
+      }
+      return !v;
+    });
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -219,7 +240,7 @@ export function AppShell({
             )}
             <button
               type="button"
-              onClick={() => setExpanded((v) => !v)}
+              onClick={toggleExpanded}
               aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
               className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.08] transition-colors"
             >
@@ -400,7 +421,10 @@ export function AppShell({
                   className={`h-4 w-4 ${notifOpen ? "text-primary" : "text-muted-foreground"}`}
                 />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground grid place-items-center tabular-nums">
+                  <span
+                    key={unreadCount}
+                    className="badge-new absolute -top-1 -right-1 h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground grid place-items-center tabular-nums"
+                  >
                     {unreadCount}
                   </span>
                 )}

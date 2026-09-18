@@ -435,7 +435,12 @@ function InboxPage() {
   useEffect(() => {
     if (!activeMatchId) return;
     const el = document.querySelector(`[data-search-id="${activeMatchId}"]`) as HTMLElement | null;
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.scrollIntoView({
+      // `scroll-behavior: auto !important` can't override an explicit option,
+      // so the preference has to be read here too.
+      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "center",
+    });
   }, [activeMatchId]);
   const highlightQuery = searchOpen ? searchQuery.trim() : "";
 
@@ -847,7 +852,7 @@ function InboxPage() {
                         title="Arma is replying automatically"
                         className="absolute -top-1 -right-1"
                       >
-                        <Bot className="h-3.5 w-3.5 text-primary" />
+                        <Bot className="h-3.5 w-3.5 text-primary bot-pulse" />
                       </span>
                     )}
                     <ChannelIcon
@@ -1119,7 +1124,7 @@ function InboxPage() {
           <aside
             role="dialog"
             aria-label="Contact details"
-            className="absolute right-0 top-0 h-full w-[440px] max-w-[95vw] bg-background border-l border-border shadow-2xl flex flex-col animate-slide-in-right"
+            className="absolute right-0 top-0 h-full w-[440px] max-w-[95vw] bg-background border-l border-border shadow-2xl flex flex-col slide-in-right"
           >
             {/* Fixed header */}
             <div className="shrink-0 flex items-center justify-between gap-3 px-5 h-14 border-b border-border bg-background">
@@ -1498,7 +1503,9 @@ function OwnerSelect({
         ) : (
           <span className="text-muted-foreground">Unassigned</span>
         )}
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       <FloatingMenu
         anchorRef={btnRef}
@@ -2081,7 +2088,7 @@ function MessageRow({
   const [open, setOpen] = useState(false);
 
   const bubble = (
-    <div className="group relative max-w-[85%] sm:max-w-[64%]">
+    <div className="group relative max-w-[85%] sm:max-w-[64%] animate-slide-up">
       <div
         className={`rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm transition ${
           isMe

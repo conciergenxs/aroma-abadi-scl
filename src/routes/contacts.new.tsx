@@ -687,7 +687,9 @@ function LabelMultiSelect({
             </span>
           );
         })}
-        <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
+        <ChevronDown
+          className={`h-3 w-3 ml-auto text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
@@ -821,7 +823,9 @@ function AudienceMultiSelect({
             </span>
           );
         })}
-        <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
+        <ChevronDown
+          className={`h-3 w-3 ml-auto text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">

@@ -235,11 +235,9 @@ function ConnectedNumberCard({
           </span>
           <span className="text-[10px] text-muted-foreground">Quality: High</span>
         </div>
-        {open ? (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        ) : (
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        )}
+        <ChevronRight
+          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-90" : ""}`}
+        />
       </button>
       {open && (
         <div className="border-t border-border px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -384,7 +382,9 @@ function BillingCard({ name, balance }: { name: string; balance: string }) {
           className="grid h-8 w-8 place-items-center rounded-md hover:bg-gray-100 text-muted-foreground transition-colors duration-150"
           aria-label="Expand"
         >
-          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <ChevronRight
+            className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`}
+          />
         </button>
       </div>
       {open && (

@@ -26,7 +26,7 @@ function SuccessView({
 }) {
   return (
     <div className="max-w-md mx-auto text-center py-20">
-      <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center animate-pop-in">
+      <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/15 grid place-items-center badge-animate">
         <CheckCircle2 className="h-9 w-9 text-emerald-500" />
       </div>
       <h2 className="mt-5 text-lg font-semibold text-foreground animate-fade-in">

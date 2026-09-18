@@ -1746,7 +1746,9 @@ function LabelSelector({
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add label
         </span>
-        <ChevronDown className="h-3 w-3" />
+        <ChevronDown
+          className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
@@ -1876,7 +1878,9 @@ function ListSelector({
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add to list
         </span>
-        <ChevronDown className="h-3 w-3" />
+        <ChevronDown
+          className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">

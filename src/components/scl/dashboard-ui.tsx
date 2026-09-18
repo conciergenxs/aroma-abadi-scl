@@ -52,6 +52,12 @@ export function useRevealOnScroll<T extends HTMLElement>() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // No observer (older browser, print, some assistive contexts) must not
+    // mean a permanently blank dashboard.
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -81,9 +87,17 @@ export function Reveal({
   return (
     <div
       ref={innerRef}
-      className={`transition-all duration-500 ease-out ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"} ${className}`}
+      className={`transition-all duration-300 ease-out ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"} ${className}`}
     >
-      {children}
+      {/* The children bring their own mount-triggered entrances — the tile
+          stagger, the count-up on every number, the bars growing out from the
+          left. Those fire at t=0, which used to be while this wrapper was
+          still at opacity-0, so by the time the section scrolled into view the
+          choreography was long over and the user saw one flat block fade.
+          Keying the subtree on `inView` restarts it the moment the section is
+          actually on screen. The children stay mounted either way, so the
+          page height never jumps. */}
+      <div key={inView ? "in" : "out"}>{children}</div>
     </div>
   );
 }

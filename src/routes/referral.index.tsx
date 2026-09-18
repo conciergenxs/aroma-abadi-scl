@@ -72,7 +72,7 @@ function ReferralPage() {
               }`}
             >
               {t.key === "ongoing" && ongoing && (
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 pulse-dot" />
               )}
               {t.label}
               {t.count !== undefined && (
