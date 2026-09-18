@@ -36,6 +36,12 @@ export const Route = createFileRoute("/transactions")({
   component: TransactionsPage,
 });
 
+/** The Jakarta calendar date an order falls on, as YYYY-MM-DD. Built from
+ * epoch milliseconds so it reads the same in Node and in the browser. */
+function wibDay(iso: string) {
+  return new Date(new Date(iso).getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
 function TransactionsPage() {
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
@@ -109,15 +115,21 @@ function TransactionsPage() {
   // The tiles describe the most recent trading day in the records rather than
   // the wall clock: reading the clock during render would differ between the
   // server render and hydration, and a quiet day would blank all three tiles.
+  // The day an order belongs to is its Jakarta calendar date — `toDateString()`
+  // would answer differently on the server (UTC) than in the browser (UTC+7)
+  // for anything ordered after 5pm, and React would report a mismatch.
   const latestDay = useMemo(() => {
     let latest = "";
-    for (const t of transactions) if (t.date > latest) latest = t.date;
-    return latest ? new Date(latest).toDateString() : "";
+    for (const t of transactions) {
+      const day = wibDay(t.date);
+      if (day > latest) latest = day;
+    }
+    return latest;
   }, [transactions]);
-  const todayTx = transactions.filter((t) => new Date(t.date).toDateString() === latestDay);
+  const todayTx = transactions.filter((t) => wibDay(t.date) === latestDay);
   const revenue = todayTx.reduce((acc, t) => acc + t.total, 0);
   const aov = todayTx.length ? Math.round(revenue / Math.max(1, todayTx.length)) : 0;
-  const dayLabel = latestDay ? fmtDateEN(latestDay) : "—";
+  const dayLabel = latestDay ? fmtDateEN(`${latestDay}T00:00:00Z`) : "—";
   const topSku = (() => {
     const map = new Map<string, number>();
     transactions.forEach((t) =>
