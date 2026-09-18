@@ -182,7 +182,7 @@ function GeneralPage() {
           >
             {t}
             {tab === t && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
+              <span className="animate-grow-x absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
             )}
           </button>
         ))}
@@ -568,7 +568,7 @@ function CompanyDetailsPage() {
           >
             {t}
             {tab === t && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
+              <span className="animate-grow-x absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
             )}
           </button>
         ))}
@@ -942,7 +942,7 @@ function UserManagementPage() {
                 {count}
               </span>
               {tab === t && (
-                <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
+                <span className="animate-grow-x absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
               )}
             </button>
           );

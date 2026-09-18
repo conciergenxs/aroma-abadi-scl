@@ -261,7 +261,7 @@ function BrandsOverview({
                   <img
                     src={b.logoUrl}
                     alt={b.name}
-                    className="max-h-36 max-w-[90%] object-contain"
+                    className="img-fade max-h-36 max-w-[90%] object-contain"
                     loading="lazy"
                   />
                 ) : (
@@ -438,7 +438,11 @@ function BrandDetail({
         <div className="p-3 flex items-center gap-3">
           <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {brand.logoUrl ? (
-              <img src={brand.logoUrl} alt="" className="max-h-16 max-w-[85%] object-contain" />
+              <img
+                src={brand.logoUrl}
+                alt=""
+                className="img-fade max-h-16 max-w-[85%] object-contain"
+              />
             ) : (
               <Package className="h-7 w-7 text-primary" />
             )}
@@ -575,7 +579,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
               className="group relative h-12 w-12 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
             >
               {imageUrl ? (
-                <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+                <img src={imageUrl} alt="" className="img-fade h-full w-full object-cover" />
               ) : (
                 <FolderOpen className="h-5 w-5 text-primary" />
               )}
@@ -658,7 +662,7 @@ function CategoryRow({
         className="group relative h-10 w-10 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
       >
         {category.imageUrl ? (
-          <img src={category.imageUrl} alt="" className="h-full w-full object-cover" />
+          <img src={category.imageUrl} alt="" className="img-fade h-full w-full object-cover" />
         ) : (
           <FolderOpen className="h-5 w-5 text-primary" />
         )}
@@ -750,7 +754,7 @@ function CategoryDetail({
         <div className="p-3 flex items-center gap-3">
           <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
             {category.imageUrl ? (
-              <img src={category.imageUrl} alt="" className="h-full w-full object-cover" />
+              <img src={category.imageUrl} alt="" className="img-fade h-full w-full object-cover" />
             ) : (
               <FolderOpen className="h-7 w-7 text-primary" />
             )}
@@ -1009,7 +1013,12 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
       <div className="flex items-start gap-3">
         <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
           {sku.photoUrl ? (
-            <img src={sku.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+            <img
+              src={sku.photoUrl}
+              alt=""
+              className="img-fade h-full w-full object-cover"
+              loading="lazy"
+            />
           ) : (
             <ImageIcon className="h-5 w-5 text-primary" />
           )}
@@ -1221,7 +1230,7 @@ function SkuEditModal({
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={photoUrl} alt="" className="img-fade h-full w-full object-cover" />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-primary/40" />
                 )}
@@ -1501,7 +1510,7 @@ function ModuleFormModal({
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                 {coverUrl ? (
-                  <img src={coverUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={coverUrl} alt="" className="img-fade h-full w-full object-cover" />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-primary/40" />
                 )}
@@ -1666,7 +1675,7 @@ function ModuleRow({
             <img
               src={module.coverUrl}
               alt=""
-              className="h-full w-full object-cover"
+              className="img-fade h-full w-full object-cover"
               loading="lazy"
             />
           ) : (
@@ -1790,7 +1799,12 @@ function KnowledgeCards({
           className="shrink-0 w-48 snap-start rounded-md border border-border bg-card/40 overflow-hidden"
         >
           {k.coverUrl && (
-            <img src={k.coverUrl} alt="" className="w-full h-24 object-cover" loading="lazy" />
+            <img
+              src={k.coverUrl}
+              alt=""
+              className="img-fade w-full h-24 object-cover"
+              loading="lazy"
+            />
           )}
           <div className="p-3">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">
@@ -1905,7 +1919,7 @@ function KnowledgeCardForm({
                   <img
                     src={coverUrl}
                     alt=""
-                    className="w-32 aspect-video object-cover rounded-md border border-border shrink-0"
+                    className="img-fade w-32 aspect-video object-cover rounded-md border border-border shrink-0"
                   />
                 )}
                 <div className="min-w-0">
@@ -2044,7 +2058,7 @@ function BrandFormModal({
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
                 {logoUrl ? (
-                  <img src={logoUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={logoUrl} alt="" className="img-fade h-full w-full object-cover" />
                 ) : (
                   <Package className="h-5 w-5 text-primary" />
                 )}
@@ -2165,7 +2179,7 @@ function SkuFormModal({
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden shrink-0">
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={photoUrl} alt="" className="img-fade h-full w-full object-cover" />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-primary/40" />
                 )}

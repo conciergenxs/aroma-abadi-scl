@@ -784,7 +784,7 @@ function AdvocateLeaderboard({ advocates }: { advocates: Advocate[] }) {
             src={a.photo}
             alt={a.name}
             loading="lazy"
-            className="h-9 w-9 rounded-full object-cover border border-border shrink-0"
+            className="img-fade h-9 w-9 rounded-full object-cover border border-border shrink-0"
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
