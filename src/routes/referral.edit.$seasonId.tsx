@@ -14,11 +14,16 @@ import {
 
 export const Route = createFileRoute("/referral/edit/$seasonId")({
   head: () => ({ meta: [{ title: "Edit Referral Season — Aroma Abadi" }] }),
+  // Opened from the Referral list (?from=list) or from a season's own page —
+  // back and cancel return to whichever it was.
+  validateSearch: (search: Record<string, unknown>): { from?: "list" } =>
+    search.from === "list" ? { from: "list" } : {},
   component: EditSeasonPage,
 });
 
 function EditSeasonPage() {
   const { seasonId } = useParams({ from: "/referral/edit/$seasonId" });
+  const { from } = Route.useSearch();
   const navigate = useNavigate();
   const { seasons } = useReferralStore();
   const season = seasons.find((s) => s.id === seasonId);
@@ -49,7 +54,11 @@ function EditSeasonPage() {
   const error = validateSeasonForm(form, seasons, season.id);
   // Anything that has already run is locked down to its end date and notes.
   const started = getSeasonStatus(season) !== "scheduled";
-  const detail = () => navigate({ to: "/referral/$seasonId", params: { seasonId: season.id } });
+  const backToList = from === "list";
+  const goBack = () =>
+    backToList
+      ? navigate({ to: "/referral" })
+      : navigate({ to: "/referral/$seasonId", params: { seasonId: season.id } });
 
   const handleSave = () => {
     if (error) {
@@ -58,17 +67,21 @@ function EditSeasonPage() {
     }
     referralStore.updateSeason(season.id, seasonFormToPayload(form));
     toast.success("Referral season updated");
-    detail();
+    goBack();
   };
 
   return (
-    <AppShell backTo={`/referral/${season.id}`} title={`Edit — ${season.name}`} noPadding>
+    <AppShell
+      backTo={backToList ? "/referral" : `/referral/${season.id}`}
+      title={`Edit — ${season.name}`}
+      noPadding
+    >
       <div className="min-h-full flex flex-col">
         <div className="flex-1 p-6 animate-fade-in">
           <SeasonFormFields form={form} setForm={setForm} started={started} />
         </div>
         <PromoFormActionBar
-          onCancel={detail}
+          onCancel={goBack}
           onSubmit={handleSave}
           submitLabel="Save Changes"
           disabled={!!error}

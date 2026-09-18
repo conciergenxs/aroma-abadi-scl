@@ -190,6 +190,16 @@ export function rewardSummary(rule: PromoRule, count: number, totalValue: number
   return { kind: "discount", label: "Discount Given", value: fmtIDR(totalValue) };
 }
 
+/** One line naming what a single use of this rule handed over — money off for
+ * a discount, the items themselves for a free-item rule, and so on. */
+export function benefitFor(rule: PromoRule, discountValue: number): string {
+  const r = rule.reward;
+  if (r.kind === "free-item") return `${describeItemGroup(r.group)} free`;
+  if (r.kind === "free-shipping") return "Free shipping";
+  if (r.kind === "bonus-points") return `${fmtNum(r.points)} points`;
+  return `−${fmtIDR(discountValue)}`;
+}
+
 /** Rupiah a rule takes off an order of `orderValue`. */
 export function discountFor(rule: PromoRule, orderValue: number): number {
   const r = rule.reward;

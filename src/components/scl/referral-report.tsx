@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Users, Ticket, Wallet } from "lucide-react";
 import { SectionCard } from "./app-shell";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
-import { rewardSummary } from "./promo-store";
+import { benefitFor, rewardSummary } from "./promo-store";
 import { REWARD_ICONS } from "./reward-icons";
 import { seasonReport, type ReferralSeason } from "./referral-store";
 import { StatTile, TableSearch, TablePager, clampPage } from "./referral-ui";
@@ -135,8 +135,8 @@ export function SeasonReportView({ season }: { season: ReferralSeason }) {
                     <td className="px-5 py-2.5 text-right text-[13px] whitespace-nowrap">
                       {fmtIDR(u.orderValue)}
                     </td>
-                    <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground whitespace-nowrap">
-                      −{fmtIDR(u.discountValue)}
+                    <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground">
+                      {benefitFor(season.rule, u.discountValue)}
                     </td>
                   </tr>
                 ))}
