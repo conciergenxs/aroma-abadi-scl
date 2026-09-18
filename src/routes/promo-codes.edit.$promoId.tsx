@@ -72,6 +72,7 @@ function EditPromoCodePage() {
           onSubmit={handleSave}
           submitLabel="Save Changes"
           disabled={!!validatePromoForm(form, promos, promo.id)}
+          reason={validatePromoForm(form, promos, promo.id)}
         />
       </div>
     </AppShell>

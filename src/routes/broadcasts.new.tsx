@@ -4,7 +4,7 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
-import { useLiveContacts, useContactsStore, contactsStore } from "@/components/scl/contacts-store";
+import { useLiveContacts, useContactsStore } from "@/components/scl/contacts-store";
 import { fmtNum } from "@/lib/fmt";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { broadcastsStore } from "@/components/scl/broadcasts-store";

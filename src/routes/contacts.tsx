@@ -710,7 +710,7 @@ function ContactsPage() {
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
-        description="This action cannot be undone."
+        description="They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
         confirmLabel="Delete"
         onConfirm={bulkDelete}
         onClose={() => setBulkDeleteOpen(false)}

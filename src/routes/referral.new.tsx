@@ -52,6 +52,7 @@ function NewSeasonPage() {
           onSubmit={handleCreate}
           submitLabel="Create Season"
           disabled={!!error}
+          reason={error}
         />
       </div>
     </AppShell>

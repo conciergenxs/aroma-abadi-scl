@@ -4,6 +4,7 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useBaStore, baStore, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import {
   Search,
   Plus,
@@ -47,6 +48,7 @@ function BAPage() {
   const [filterStore, setFilterStore] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<BA | null>(null);
+  const [deleting, setDeleting] = useState<BA | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const [resetConfirm, setResetConfirm] = useState<BA | null>(null);
@@ -291,10 +293,7 @@ function BAPage() {
                           Edit
                         </button>
                         <button
-                          onClick={() => {
-                            baStore.remove(b.id);
-                            toast.success("BA deleted");
-                          }}
+                          onClick={() => setDeleting(b)}
                           className="grid h-8 w-8 place-items-center rounded text-rose-500 hover:bg-rose-500/10 transition-colors"
                           title="Delete"
                         >
@@ -384,6 +383,20 @@ function BAPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleting}
+        title={deleting ? `Delete ${deleting.name}?` : ""}
+        description="Their login will stop working immediately. This can't be undone."
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (!deleting) return;
+          baStore.remove(deleting.id);
+          setDeleting(null);
+          toast.success("BA deleted");
+        }}
+        onClose={() => setDeleting(null)}
+      />
 
       {revealTarget && (
         <RevealPasswordModal

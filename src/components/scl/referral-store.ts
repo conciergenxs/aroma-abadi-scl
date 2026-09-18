@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { contacts as seedContacts } from "./mock-data";
 import { transactionsStore } from "./transactions-store";
 import { promoStore, discountFor, type PromoRule } from "./promo-store";
+import { wib } from "@/lib/wib";
+
+export { wib };
 
 // ── Referral programme ────────────────────────────────────────────────────────
 // Referral codes are never configured here: every customer is issued a
@@ -92,14 +95,6 @@ export function referralActivityFor(seasons: ReferralSeason[], contactId: string
 // ── Seed ──────────────────────────────────────────────────────────────────────
 // Built from the real ARMA orders so every referral points at a transaction
 // that exists, made by the customer it names.
-
-/** Parse a datetime-local season boundary as Jakarta time, so the server and
- * the browser always agree on which season a moment belongs to — a bare
- * `new Date("2026-10-01T00:00")` resolves in the runtime's own timezone, which
- * is UTC on the server and UTC+7 in the browser. */
-export function wib(datetimeLocal: string) {
-  return new Date(`${datetimeLocal}:00+07:00`).getTime();
-}
 
 function seed(): ReferralSeason[] {
   const seasons: ReferralSeason[] = [

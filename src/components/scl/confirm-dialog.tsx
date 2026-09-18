@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { AlertTriangle, X } from "lucide-react";
+import { useEscapeKey } from "@/lib/use-escape-key";
 
 export type ConfirmDialogProps = {
   open: boolean;
@@ -13,9 +13,9 @@ export type ConfirmDialogProps = {
 };
 
 /**
- * Standardized confirmation dialog used across the platform for any
- * destructive action (delete contact, delete template, delete group, etc.).
- * Closes on outside click and Escape.
+ * The one confirmation dialog in the app — every destructive action routes
+ * through it so the wording, the escape hatch and the button order never drift
+ * between pages. Closes on outside click and Escape.
  */
 export function ConfirmDialog({
   open,
@@ -27,17 +27,7 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }: ConfirmDialogProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  useEscapeKey(open, onClose);
 
   if (!open) return null;
 

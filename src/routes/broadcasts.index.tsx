@@ -64,7 +64,9 @@ function BroadcastListPage() {
   const fromIdx = rows.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const toIdx = Math.min(safePage * pageSize, rows.length);
 
-  const visibleIds = rows.map((r) => r.id);
+  // The rows actually on screen — selecting rows the user can't see and then
+  // offering to delete "all 50" is how people lose data they never saw.
+  const visibleIds = paged.map((r) => r.id);
   const allVisibleSelected =
     visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
   const toggleAll = () => {

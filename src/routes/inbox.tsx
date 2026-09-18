@@ -114,7 +114,7 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  const { labels, lists, lifecycleStages } = useContactsStore();
+  const { labels, lists, lifecycleStages, contacts: allContacts } = useContactsStore();
   // A contact moved to Recently Deleted must not keep a live conversation.
   const contacts = useLiveContacts();
   const { bas } = useBaStore();
@@ -248,7 +248,9 @@ function InboxPage() {
   const markRead = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: false }));
   const markUnread = (id: string) => setUnreadOverrides((p) => ({ ...p, [id]: true }));
 
-  const [replyText, setReplyText] = useState("");
+  // Keyed by conversation: a half-typed reply must never follow the user to
+  // whoever they click next.
+  const [draftByConvo, setDraftByConvo] = useState<Record<string, string>>({});
   // Autopilot state: per conversation
   const [autopilotByConvo, setAutopilotByConvo] = useState<Record<string, boolean>>({});
   const isAutopilot = (id: string) => autopilotByConvo[id] !== false; // default = autopilot ON
@@ -353,7 +355,15 @@ function InboxPage() {
 
   const active =
     sortedVisible.find((c) => c.id === activeId) ?? sortedVisible[0] ?? conversations[0];
-  const contact = contacts.find((c) => c.id === active.contactId)!;
+  // The conversation list only offers live contacts; the detail pane falls
+  // back to the full list so the first-conversation fallback still renders
+  // while its contact sits in Recently Deleted.
+  const contact =
+    contacts.find((c) => c.id === active.contactId) ??
+    allContacts.find((c) => c.id === active.contactId)!;
+  const replyText = draftByConvo[active.id] ?? "";
+  const setReplyText = (text: string) =>
+    setDraftByConvo((prev) => ({ ...prev, [active.id]: text }));
   const isBA = contact.labelIds.includes("lb-ba");
   const baRecord = bas.find(
     (b) => b.waNumber.replace(/\s/g, "") === contact.phone.replace(/\s/g, ""),
@@ -1030,10 +1040,22 @@ function InboxPage() {
                 />
                 <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/50">
                   <div className="flex items-center gap-0.5 text-muted-foreground/70">
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150">
+                    {/* Not wired up yet — disabled rather than silently doing
+                        nothing when someone clicks to send a product photo. */}
+                    <button
+                      type="button"
+                      disabled
+                      title="Attachments aren't available yet"
+                      className="h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
                       <Paperclip className="h-4 w-4" />
                     </button>
-                    <button className="h-7 w-7 grid place-items-center rounded hover:bg-gray-50 hover:text-foreground transition-colors duration-150">
+                    <button
+                      type="button"
+                      disabled
+                      title="Emoji picker isn't available yet"
+                      className="h-7 w-7 grid place-items-center rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
                       <Smile className="h-4 w-4" />
                     </button>
                   </div>

@@ -90,6 +90,7 @@ function EditSeasonPage() {
           onSubmit={handleSave}
           submitLabel="Save Changes"
           disabled={!!error || status === "ended"}
+          reason={status === "ended" ? "A season that has ended can't be changed" : error}
         />
       </div>
     </AppShell>

@@ -23,6 +23,7 @@ import {
   Share2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { toast } from "sonner";
 import {
   contactsStore,
@@ -85,6 +86,7 @@ function ContactDetailPage() {
 
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
   const [tab, setTab] = useState<Tab>("activity");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const { bas } = useBaStore();
@@ -268,7 +270,6 @@ function ContactDetailPage() {
   }
 
   const handleDelete = () => {
-    if (!confirm(`Delete ${contact.name}? They will be moved to Recently Deleted.`)) return;
     contactsStore.softDeleteContacts([contact.id]);
     toast.success("Contact moved to Recently Deleted");
     navigate({ to: "/contacts" });
@@ -443,7 +444,7 @@ function ContactDetailPage() {
                   <ExternalLink className="h-3.5 w-3.5" /> See Inbox
                 </Link>
                 <button
-                  onClick={handleDelete}
+                  onClick={() => setConfirmDelete(true)}
                   className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -563,6 +564,15 @@ function ContactDetailPage() {
           </aside>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={`Delete ${contact.name}?`}
+        description="They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onClose={() => setConfirmDelete(false)}
+      />
     </AppShell>
   );
 }

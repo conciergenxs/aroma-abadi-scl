@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { wib } from "@/lib/wib";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { transactionsStore } from "./transactions-store";
 import { initialsFor } from "@/lib/codes";
 
 export { initialsFor };
 
-export type PromoStatus = "active" | "expired" | "inactive";
+export type PromoStatus = "active" | "expired" | "scheduled";
 
 // ── Rule model — a composable Condition × Reward engine ───────────────────────
 // Not a fixed catalog of promo "types" (that was the Odoo-style limitation).
@@ -286,12 +287,14 @@ export type PromoCode = {
 // Status is never stored — it's always derived from the current time vs. the
 // promo's date range, so it can't drift out of sync with reality.
 export function getPromoStatus(promo: { startDate: string; endDate: string }): PromoStatus {
-  if (!promo.startDate || !promo.endDate) return "inactive";
+  if (!promo.startDate || !promo.endDate) return "scheduled";
   const now = Date.now();
-  const start = new Date(promo.startDate).getTime();
-  const end = new Date(promo.endDate).getTime();
-  if (Number.isNaN(start) || Number.isNaN(end)) return "inactive";
-  if (now < start) return "inactive";
+  // Read as Jakarta time so the badge is the same in the SSR render and after
+  // hydration — see lib/wib.
+  const start = wib(promo.startDate);
+  const end = wib(promo.endDate);
+  if (Number.isNaN(start) || Number.isNaN(end)) return "scheduled";
+  if (now < start) return "scheduled";
   if (now > end) return "expired";
   return "active";
 }

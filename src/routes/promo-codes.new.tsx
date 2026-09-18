@@ -141,6 +141,7 @@ function NewPromoCodePage() {
           onSubmit={handleConfirmClick}
           submitLabel="Confirm Promo Code"
           disabled={!!validatePromoForm(form, promos)}
+          reason={validatePromoForm(form, promos)}
         />
       </div>
 

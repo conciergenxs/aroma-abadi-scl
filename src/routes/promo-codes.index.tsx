@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { TablePager, clampPage } from "@/components/scl/referral-ui";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { FloatingMenu } from "@/components/scl/floating-menu";
@@ -163,7 +164,7 @@ function PromoCodesPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | PromoStatus>("all");
   const [filterUsage, setFilterUsage] = useState<"all" | PromoCode["usageType"]>("all");
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 10;
+  const [pageSize, setPageSize] = useState(10);
   const [deletingPromo, setDeletingPromo] = useState<PromoCode | null>(null);
 
   const filtered = useMemo(() => {
@@ -182,11 +183,10 @@ function PromoCodesPage() {
     return list;
   }, [promos, search, filterStatus, filterUsage]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   // Clamp on read: deleting the last row of the last page would otherwise
   // leave the view on a page that no longer exists, with the pager hidden.
-  const safePage = Math.min(page, totalPages);
-  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const safePage = clampPage(page, filtered.length, pageSize);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const confirmDelete = () => {
     if (!deletingPromo) return;
@@ -216,7 +216,7 @@ function PromoCodesPage() {
         </div>
 
         <div className="flex items-center gap-1">
-          {(["all", "active", "inactive", "expired"] as const).map((s) => (
+          {(["all", "active", "scheduled", "expired"] as const).map((s) => (
             <button
               key={s}
               type="button"
@@ -226,11 +226,7 @@ function PromoCodesPage() {
               }}
               className={`px-3 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${filterStatus === s ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
             >
-              {s === "all"
-                ? "All"
-                : s === "inactive"
-                  ? "Scheduled"
-                  : s.charAt(0).toUpperCase() + s.slice(1)}
+              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
@@ -278,175 +274,161 @@ function PromoCodesPage() {
 
       {/* Table */}
       <div className="rounded-xl border border-border bg-card/40 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-card/60">
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Code
-              </th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Name &amp; Rule
-              </th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Type
-              </th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Period
-              </th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Status
-              </th>
-              <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Used
-              </th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border stagger">
-            {paged.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-12 text-center text-[13px] text-muted-foreground"
-                >
-                  No promo codes found
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[880px]">
+            <thead>
+              <tr className="border-b border-border bg-card/60">
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Code
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Name &amp; Rule
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Period
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Used
+                </th>
+                <th className="px-4 py-3" />
               </tr>
-            ) : (
-              paged.map((promo) => (
-                <tr
-                  key={promo.id}
-                  onClick={() =>
-                    navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })
-                  }
-                  className="cursor-pointer hover:bg-muted/40 transition-colors"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <code className="font-mono text-xs font-semibold tracking-wider bg-primary/10 border border-primary/20 rounded px-2 py-0.5 text-foreground">
-                        {promo.code}
-                      </code>
-                      {promo.usageType === "one-to-one" ? (
-                        <span
-                          className="text-[10px] text-muted-foreground"
-                          title="Each recipient holds their own code"
-                        >
-                          per recipient
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(promo.code);
-                            toast.success("Copied!");
-                          }}
-                          className="press h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                          title="Copy"
-                        >
-                          <Copy className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
-                    <div className="text-[11px] text-primary/80 mt-0.5 max-w-[280px] truncate">
-                      {describePromoRule(promo.rule)}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {promo.usageType === "one-to-one" ? (
-                      <span className="inline-flex items-center rounded-full border border-sky-600 bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white">
-                        1-to-1
-                      </span>
+            </thead>
+            <tbody key={`${safePage}-${pageSize}`} className="divide-y divide-border stagger">
+              {paged.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-4 py-12 text-center text-[13px] text-muted-foreground"
+                  >
+                    {promos.length === 0 ? (
+                      <>
+                        No promo codes yet.{" "}
+                        <Link to="/promo-codes/new" className="text-primary hover:underline">
+                          Create your first one
+                        </Link>
+                        .
+                      </>
                     ) : (
-                      <span className="inline-flex items-center rounded-full border border-violet-600 bg-violet-600 px-2 py-0.5 text-[10px] font-medium text-white">
-                        1-to-Many
-                      </span>
+                      "No promo code matches these filters."
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[12px] text-muted-foreground whitespace-nowrap">
-                    {formatDate(promo.startDate)} — {formatDate(promo.endDate)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={getPromoStatus(promo)} />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className="text-[13px] font-semibold text-foreground">
-                      {promo.redemptions.length}
-                    </span>
-                    {promo.usageType === "one-to-one"
-                      ? (promo.assignedCodes?.length ?? 0) > 0 && (
-                          <span className="text-[10px] text-muted-foreground">
-                            {" "}
-                            / {promo.assignedCodes?.length}
-                          </span>
-                        )
-                      : promo.maxUsage && (
-                          <span className="text-[10px] text-muted-foreground">
-                            {" "}
-                            / {promo.maxUsage}
-                          </span>
-                        )}
-                  </td>
-                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-end">
-                      <ActionMenu
-                        onSeeDetails={() =>
-                          navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })
-                        }
-                        onEdit={() =>
-                          navigate({
-                            to: "/promo-codes/edit/$promoId",
-                            params: { promoId: promo.id },
-                          })
-                        }
-                        onDelete={() => setDeletingPromo(promo)}
-                      />
-                    </div>
-                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>{filtered.length} promo codes</span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150"
-            >
-              ‹
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPage(p)}
-                className={`h-7 w-7 rounded border text-[11px] ${p === page ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-card"}`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="h-7 px-2 rounded border border-border bg-card/40 disabled:opacity-40 hover:bg-card transition-colors duration-150"
-            >
-              ›
-            </button>
-          </div>
+              ) : (
+                paged.map((promo) => (
+                  <tr
+                    key={promo.id}
+                    onClick={() =>
+                      navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })
+                    }
+                    className="cursor-pointer hover:bg-muted/40 transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <code className="font-mono text-xs font-semibold tracking-wider bg-primary/10 border border-primary/20 rounded px-2 py-0.5 text-foreground">
+                          {promo.code}
+                        </code>
+                        {promo.usageType === "one-to-one" ? (
+                          <span
+                            className="text-[10px] text-muted-foreground"
+                            title="Each recipient holds their own code"
+                          >
+                            per recipient
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(promo.code);
+                              toast.success("Copied!");
+                            }}
+                            className="press h-5 w-5 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            title="Copy"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
+                      <div className="text-[11px] text-primary/80 mt-0.5 max-w-[280px] truncate">
+                        {describePromoRule(promo.rule)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {promo.usageType === "one-to-one" ? (
+                        <span className="inline-flex items-center rounded-full border border-sky-600 bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                          1-to-1
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-violet-600 bg-violet-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                          1-to-Many
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-[12px] text-muted-foreground whitespace-nowrap">
+                      {formatDate(promo.startDate)} — {formatDate(promo.endDate)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={getPromoStatus(promo)} />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="text-[13px] font-semibold text-foreground">
+                        {promo.redemptions.length}
+                      </span>
+                      {promo.usageType === "one-to-one"
+                        ? (promo.assignedCodes?.length ?? 0) > 0 && (
+                            <span className="text-[10px] text-muted-foreground">
+                              {" "}
+                              / {promo.assignedCodes?.length}
+                            </span>
+                          )
+                        : promo.maxUsage && (
+                            <span className="text-[10px] text-muted-foreground">
+                              {" "}
+                              / {promo.maxUsage}
+                            </span>
+                          )}
+                    </td>
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end">
+                        <ActionMenu
+                          onSeeDetails={() =>
+                            navigate({ to: "/promo-codes/$promoId", params: { promoId: promo.id } })
+                          }
+                          onEdit={() =>
+                            navigate({
+                              to: "/promo-codes/edit/$promoId",
+                              params: { promoId: promo.id },
+                            })
+                          }
+                          onDelete={() => setDeletingPromo(promo)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+        {filtered.length > 0 && (
+          <TablePager
+            page={safePage}
+            pageSize={pageSize}
+            total={filtered.length}
+            onPage={setPage}
+            onPageSize={setPageSize}
+          />
+        )}
+      </div>
 
       <AlertDialog open={!!deletingPromo} onOpenChange={(open) => !open && setDeletingPromo(null)}>
         <AlertDialogContent>

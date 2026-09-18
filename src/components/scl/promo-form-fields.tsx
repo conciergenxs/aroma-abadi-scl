@@ -342,11 +342,15 @@ export function PromoFormActionBar({
   onSubmit,
   submitLabel,
   disabled,
+  reason,
 }: {
   onCancel: () => void;
   onSubmit: () => void;
   submitLabel: string;
   disabled?: boolean;
+  /** Why the form can't be submitted yet — shown next to the button, because a
+   * greyed-out button with no explanation is a dead end. */
+  reason?: string | null;
 }) {
   return (
     <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between">
@@ -357,15 +361,20 @@ export function PromoFormActionBar({
       >
         Cancel
       </button>
-      <button
-        type="button"
-        onClick={onSubmit}
-        disabled={disabled}
-        title={disabled ? "Fill in the required fields to continue" : undefined}
-        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary transition-colors"
-      >
-        {submitLabel}
-      </button>
+      <div className="flex items-center gap-3 min-w-0">
+        {disabled && reason && (
+          <span className="text-[12px] text-destructive truncate animate-fade-in">{reason}</span>
+        )}
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={disabled}
+          title={disabled ? (reason ?? "Fill in the required fields to continue") : undefined}
+          className="press inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary transition-colors"
+        >
+          {submitLabel}
+        </button>
+      </div>
     </div>
   );
 }
