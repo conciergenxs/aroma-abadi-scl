@@ -30,6 +30,7 @@ import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
+  ChevronLeft,
   Filter,
   Paperclip,
   Smile,
@@ -675,7 +676,7 @@ function InboxPage() {
 
         {/* ============== CONVERSATION LIST ============== */}
         <aside
-          className={`shrink-0 w-full sm:w-[340px] sm:min-w-[300px] border-r border-border flex-col min-h-0 bg-background/40 ${
+          className={`shrink-0 w-full sm:w-[280px] lg:w-[340px] border-r border-border flex-col min-h-0 bg-background/40 ${
             mobilePane === "chat" ? "hidden sm:flex" : "flex"
           }`}
         >
