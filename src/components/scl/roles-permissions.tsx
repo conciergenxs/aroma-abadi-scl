@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Toggle } from "./toggle";
 import { nowWIB } from "@/lib/wib";
 import { fmtDateEN } from "@/lib/fmt";
 import {
@@ -484,42 +485,6 @@ const SEED_USERS: AssignedUser[] = [
 ];
 
 // ----- UI atoms -----
-
-function Toggle({
-  checked,
-  onChange,
-  size = "md",
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  size?: "sm" | "md";
-}) {
-  const dims = size === "sm" ? "h-4 w-7" : "h-5 w-9";
-  const thumb = size === "sm" ? "h-3 w-3" : "h-4 w-4";
-  const tx =
-    size === "sm"
-      ? checked
-        ? "translate-x-[14px]"
-        : "translate-x-0.5"
-      : checked
-        ? "translate-x-[18px]"
-        : "translate-x-0.5";
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex ${dims} shrink-0 items-center rounded-full transition-colors ${
-        checked ? "bg-primary" : "bg-white/10 border border-border"
-      }`}
-    >
-      <span
-        className={`inline-block ${thumb} rounded-full bg-white shadow transition-transform ${tx}`}
-      />
-    </button>
-  );
-}
 
 function Checkbox({
   checked,

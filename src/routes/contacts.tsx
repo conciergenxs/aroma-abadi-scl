@@ -61,6 +61,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { Toggle } from "@/components/scl/toggle";
 import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
 export const Route = createFileRoute("/contacts")({
@@ -1317,15 +1318,11 @@ function ManagePropertiesModal({
                     {PROPERTY_TYPE_LABELS[p.type]}
                   </td>
                   <td className="px-3 py-2">
-                    <button
-                      onClick={() => toggleVisible(p.id)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${p.visible ? "bg-primary" : "bg-white/10"}`}
-                      aria-label="toggle visible"
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${p.visible ? "translate-x-4" : "translate-x-0.5"}`}
-                      />
-                    </button>
+                    <Toggle
+                      checked={p.visible}
+                      onChange={() => toggleVisible(p.id)}
+                      label={`Show ${p.name}`}
+                    />
                   </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex items-center gap-1">

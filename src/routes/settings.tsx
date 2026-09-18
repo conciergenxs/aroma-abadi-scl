@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { nowWIB } from "@/lib/wib";
 import { fmtDateEN } from "@/lib/fmt";
+import { Toggle } from "@/components/scl/toggle";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FloatingMenu } from "@/components/scl/floating-menu";
@@ -545,26 +546,6 @@ const DEFAULT_HOURS: Record<string, WorkingHours> = {
   Saturday: { open: false, from: "09:00", to: "18:00" },
   Sunday: { open: false, from: "09:00", to: "18:00" },
 };
-
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
-        checked ? "bg-primary" : "bg-white/10 border border-border"
-      }`}
-    >
-      <span
-        className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
-          checked ? "translate-x-[18px]" : "translate-x-0.5"
-        }`}
-      />
-    </button>
-  );
-}
 
 function CompanyDetailsPage() {
   const [tab, setTab] = useState<"Settings" | "Security">("Settings");
