@@ -14,7 +14,7 @@ import {
 } from "@/components/scl/mock-data";
 import type { Contact, Channel } from "@/components/scl/mock-data";
 type Conversation = (typeof conversations)[number];
-import { useContactsStore, contactsStore, getStageStyle } from "@/components/scl/contacts-store";
+import { useLiveContacts, useContactsStore, contactsStore, getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { ChannelIcon } from "@/components/scl/channel-badge";
@@ -114,7 +114,9 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  const { contacts, labels, lists, lifecycleStages } = useContactsStore();
+  const { labels, lists, lifecycleStages } = useContactsStore();
+  // A contact moved to Recently Deleted must not keep a live conversation.
+  const contacts = useLiveContacts();
   const { bas } = useBaStore();
   const { transactions } = useTransactionsStore();
   const { brands } = useSkuStore();

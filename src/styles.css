@@ -413,7 +413,7 @@
 }
 .animate-grow-x {
   transform-origin: left;
-  animation: grow-x 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: grow-x 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* ---- Modal backdrop ---- */
@@ -724,9 +724,21 @@ html {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    /* Without this the staggered children keep their delay and the list sits
+       blank for up to half a second before appearing all at once. */
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Press feedback is motion too — a 0.01ms transition still jumps the scale. */
+  button:active:not(:disabled),
+  [role="button"]:active:not([aria-disabled="true"]),
+  .press:active:not(:disabled),
+  .card-hover:active,
+  input[type="checkbox"]:active,
+  input[type="radio"]:active {
+    transform: none;
   }
   .card-hover:hover,
   .lift-sm:hover {

@@ -4,7 +4,8 @@ import { ChannelIcon } from "@/components/scl/channel-badge";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
-import { useContactsStore, contactsStore } from "@/components/scl/contacts-store";
+import { useLiveContacts, useContactsStore, contactsStore } from "@/components/scl/contacts-store";
+import { fmtNum } from "@/lib/fmt";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { broadcastsStore } from "@/components/scl/broadcasts-store";
 import {
@@ -55,7 +56,9 @@ type Condition = {
 
 function CreateBroadcastPage() {
   const navigate = useNavigate();
-  const { lists, contacts } = useContactsStore();
+  const { lists } = useContactsStore();
+  // Never message somebody who has been moved to Recently Deleted.
+  const contacts = useLiveContacts();
   const { templates } = useTemplatesStore();
   const { brands } = useSkuStore();
   const { promos } = usePromoStore();
@@ -150,13 +153,13 @@ function CreateBroadcastPage() {
     // audiences aren't matched here (no shared condition-evaluator exists
     // yet), so we're honest about that in the label rather than guessing.
     const listContactIds = new Set<string>();
-    contactsStore.state.contacts.forEach((c) => {
+    contacts.forEach((c) => {
       if (c.listIds.some((lid) => selectedLists.has(lid))) listContactIds.add(c.id);
     });
     const reach = listContactIds.size;
     const audienceLabel = audienceSummary
       ? audienceSummary.listNames.length > 0
-        ? `${audienceSummary.listNames.join(", ")} · ${reach.toLocaleString("en-US")}`
+        ? `${audienceSummary.listNames.join(", ")} · ${fmtNum(reach)}`
         : `Custom filter (${audienceSummary.conditionCount} condition${audienceSummary.conditionCount === 1 ? "" : "s"})`
       : "—";
 

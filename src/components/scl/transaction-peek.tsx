@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
-import { formatIDR, type Transaction } from "./transactions-store";
+import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
 
 // ── Transaction side peek ─────────────────────────────────────────────────────
@@ -10,12 +10,6 @@ import { useEscapeKey } from "@/lib/use-escape-key";
 // without losing the page behind it. Portaled to <body> because several of its
 // callers live inside backdrop-filtered cards, which would otherwise become the
 // containing block for a fixed overlay and clip it.
-
-function statusBadge(status: string) {
-  if (status === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
-  if (status === "Processed") return "border-amber-700 bg-amber-600 text-white";
-  return "border-rose-700 bg-rose-600 text-white";
-}
 
 function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -90,7 +84,7 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
           </PeekRow>
           <PeekRow label="Status">
             <span
-              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(tx.status)}`}
+              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${txStatusBadge(tx.status)}`}
             >
               {tx.status}
             </span>
@@ -164,7 +158,7 @@ export function TransactionCell({
 }) {
   if (disabled) {
     return (
-      <div>
+      <div title="This order is no longer in the transaction records">
         <div className="text-[12px] font-mono text-foreground/90">{invoice}</div>
         <div className="text-[10px] text-muted-foreground">{fmtDateTimeEN(date)}</div>
       </div>

@@ -215,6 +215,14 @@ export function useTransactionsStore() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
+/** The colours an order's status wears — shared so the same order never looks
+ * different in the table than it does in the side peek. */
+export function txStatusBadge(status: string) {
+  if (status === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
+  if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
+  return "border-sky-700 bg-sky-600 text-white"; // Processed
+}
+
 export function formatIDR(n: number) {
   // Use regex-based formatter — locale-aware toLocaleString differs between
   // Node (SSR) and browser, causing React hydration mismatches.

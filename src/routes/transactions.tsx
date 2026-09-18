@@ -4,9 +4,10 @@ import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import {
   useTransactionsStore,
   formatIDR,
+  txStatusBadge,
   type Transaction,
 } from "@/components/scl/transactions-store";
-import { fmtDateEN, fmtDateTimeEN, fmtNum } from "@/lib/fmt";
+import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import {
   Search,
   Receipt,
@@ -18,8 +19,8 @@ import {
   CalendarDays,
   X,
 } from "lucide-react";
-import { contacts } from "@/components/scl/mock-data";
-import { useEscapeKey } from "@/lib/use-escape-key";
+import { TransactionPeek } from "@/components/scl/transaction-peek";
+import { useLiveContacts } from "@/components/scl/contacts-store";
 
 export const Route = createFileRoute("/transactions")({
   // ?tx=<id> opens that order straight away — used by links from elsewhere
@@ -35,12 +36,6 @@ export const Route = createFileRoute("/transactions")({
   component: TransactionsPage,
 });
 
-function statusBadge(s: string) {
-  if (s === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
-  if (s === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
-  return "border-sky-700 bg-sky-600 text-white"; // Processed
-}
-
 function TransactionsPage() {
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
@@ -49,6 +44,7 @@ function TransactionsPage() {
   const [brand, setBrand] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const contacts = useLiveContacts();
   const [open, setOpen] = useState<Transaction | null>(null);
   const { tx: linkedTx } = Route.useSearch();
   useEffect(() => {
@@ -110,10 +106,18 @@ function TransactionsPage() {
       ? filtered
       : filtered.slice((safePage - 1) * safePageSize, safePage * safePageSize);
 
-  const today = new Date().toDateString();
-  const todayTx = transactions.filter((t) => new Date(t.date).toDateString() === today);
+  // The tiles describe the most recent trading day in the records rather than
+  // the wall clock: reading the clock during render would differ between the
+  // server render and hydration, and a quiet day would blank all three tiles.
+  const latestDay = useMemo(() => {
+    let latest = "";
+    for (const t of transactions) if (t.date > latest) latest = t.date;
+    return latest ? new Date(latest).toDateString() : "";
+  }, [transactions]);
+  const todayTx = transactions.filter((t) => new Date(t.date).toDateString() === latestDay);
   const revenue = todayTx.reduce((acc, t) => acc + t.total, 0);
   const aov = todayTx.length ? Math.round(revenue / Math.max(1, todayTx.length)) : 0;
+  const dayLabel = latestDay ? fmtDateEN(latestDay) : "—";
   const topSku = (() => {
     const map = new Map<string, number>();
     transactions.forEach((t) =>
@@ -127,13 +131,13 @@ function TransactionsPage() {
   const to = Math.min(safePage * safePageSize, filtered.length);
 
   return (
-    <AppShell title="Transaction Records" subtitle="Sales transactions per store, BA, and brand">
+    <AppShell title="Transaction Records" subtitle="Every order placed through ARMA on WhatsApp">
       <div className="space-y-5">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 stagger">
-          <StatCard label="Today's Revenue" value={formatIDR(revenue)} icon={Wallet} />
-          <StatCard label="Today's Transactions" value={fmtNum(todayTx.length)} icon={Receipt} />
-          <StatCard label="Today's AOV" value={formatIDR(aov)} icon={TrendingUp} />
+          <StatCard label={`Revenue · ${dayLabel}`} value={formatIDR(revenue)} icon={Wallet} />
+          <StatCard label={`Orders · ${dayLabel}`} value={fmtNum(todayTx.length)} icon={Receipt} />
+          <StatCard label={`AOV · ${dayLabel}`} value={formatIDR(aov)} icon={TrendingUp} />
           <StatCard label="Top SKU" value={topSku} icon={Package} />
         </div>
 
@@ -298,7 +302,7 @@ function TransactionsPage() {
 
                       <Td>
                         <span
-                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(t.status)}`}
+                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${txStatusBadge(t.status)}`}
                         >
                           {t.status}
                         </span>
@@ -308,8 +312,10 @@ function TransactionsPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
-                      No transactions found
+                    <td colSpan={5} className="text-center py-10 text-muted-foreground text-sm">
+                      {transactions.length === 0
+                        ? "No orders have come through ARMA yet."
+                        : "No transactions match these filters."}
                     </td>
                   </tr>
                 )}
@@ -391,7 +397,17 @@ function TransactionsPage() {
         </SectionCard>
       </div>
 
-      {open && <TxDrawer tx={open} onClose={() => setOpen(null)} navigate={navigate} />}
+      {open && (
+        <TransactionPeek
+          tx={open}
+          onClose={() => {
+            setOpen(null);
+            // Drop ?tx, or the drawer would reopen on the next store update
+            // and on every press of the browser's back button.
+            if (linkedTx) navigate({ to: "/transactions", search: {}, replace: true });
+          }}
+        />
+      )}
     </AppShell>
   );
 }
@@ -425,7 +441,7 @@ function StatCard({
       </div>
       <div className="min-w-0">
         <div className="text-[11px] text-muted-foreground">{label}</div>
-        <div className="text-[14px] font-semibold mt-0.5 truncate">{value}</div>
+        <div className="stat-value text-[14px] font-semibold mt-0.5 truncate">{value}</div>
       </div>
     </div>
   );
@@ -462,129 +478,3 @@ function Select({
   );
 }
 
-function TxDrawer({
-  tx,
-  onClose,
-  navigate,
-}: {
-  tx: Transaction;
-  onClose: () => void;
-  navigate: ReturnType<typeof useNavigate>;
-}) {
-  useEscapeKey(true, onClose);
-
-  return (
-    <div className="fixed inset-0 z-50 flex animate-fade-in">
-      <div className="flex-1 bg-black/40 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right shadow-2xl">
-        <div className="p-5 border-b border-border flex items-start justify-between gap-3">
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
-            <div className="text-[14px] font-semibold">{tx.invoice}</div>
-            <div className="text-[11px] text-muted-foreground mt-1">{fmtDateTimeEN(tx.date)}</div>
-          </div>
-          <button
-            onClick={onClose}
-            className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100 text-muted-foreground transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="p-5 space-y-4 text-sm">
-          <Row label="Customer">
-            <button
-              onClick={() => {
-                const c = contacts.find((c) => c.id === tx.customerId);
-                if (c) {
-                  onClose();
-                  navigate({ to: "/contacts/$contactId", params: { contactId: c.id } });
-                }
-              }}
-              className="font-medium hover:text-primary hover:underline underline-offset-2 transition-colors"
-            >
-              {tx.customerName}
-            </button>
-          </Row>
-          <Row label="Ordered Via">
-            <span className="font-medium">ARMA · WhatsApp</span>
-          </Row>
-          <Row label="Ship To">
-            <span className="font-medium">{tx.city}</span>
-          </Row>
-          <Row label="Brand">
-            <div className="flex flex-wrap gap-1">
-              {tx.brandNames.map((b) => (
-                <span
-                  key={b}
-                  className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium"
-                >
-                  {b}
-                </span>
-              ))}
-            </div>
-          </Row>
-          <Row label="Payment Method">
-            <span className="font-medium">{tx.paymentMethod}</span>
-          </Row>
-          <Row label="Status">
-            <span
-              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusBadge(tx.status)}`}
-            >
-              {tx.status}
-            </span>
-          </Row>
-          {tx.note && (
-            <Row label="Order Note">
-              <span className="text-muted-foreground italic">{tx.note}</span>
-            </Row>
-          )}
-
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
-            <ul className="divide-y divide-border rounded-md border border-border overflow-hidden">
-              {tx.items.map((i, idx) => (
-                <li
-                  key={idx}
-                  className="px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 transition-colors group/item"
-                >
-                  <div className="flex-1 min-w-0">
-                    <button
-                      onClick={() => {
-                        onClose();
-                        navigate({ to: "/sku-detail/$skuId", params: { skuId: i.skuId } });
-                      }}
-                      className="font-medium text-left hover:text-primary hover:underline underline-offset-2 transition-colors"
-                    >
-                      {i.skuName}
-                    </button>
-                    <div className="text-xs text-muted-foreground">
-                      {i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}
-                    </div>
-                  </div>
-                  <div className="text-right font-medium tabular-nums">
-                    {formatIDR(i.unitPrice * i.qty)}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex justify-between mt-3 text-sm font-semibold border-t border-border pt-3">
-              <span>Total</span>
-              <span>{formatIDR(tx.total)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-3">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">
-        {label}
-      </span>
-      <div className="text-sm text-right">{children}</div>
-    </div>
-  );
-}

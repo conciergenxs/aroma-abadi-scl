@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   contacts as seedContacts,
   initialLabels,
@@ -489,6 +489,14 @@ export const contactsStore = {
 
 export function useContactsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
+/** The contacts a customer-facing surface may use: a soft-deleted contact is
+ * waiting in Recently Deleted, so it must not be messaged, counted or listed.
+ * Only Contacts (which offers Restore) reads the full list. */
+export function useLiveContacts(): Contact[] {
+  const { contacts } = useContactsStore();
+  return useMemo(() => contacts.filter((c) => !c.deleted), [contacts]);
 }
 
 const FALLBACK_STAGE_STYLE = {
