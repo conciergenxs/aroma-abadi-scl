@@ -68,7 +68,7 @@ export function BrandPicker({ open, onClose, onSelect }: Props) {
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
           <Tag className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">Select Brand</h2>
-          <span className="text-[11px] text-muted-foreground">
+          <span className="hidden sm:inline text-[11px] text-muted-foreground">
             Insert a brand token into the message
           </span>
           <button

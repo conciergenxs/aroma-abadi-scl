@@ -1280,8 +1280,8 @@ function ManagePropertiesModal({
             </button>
           </div>
         </div>
-        <div className="max-h-[60vh] overflow-y-auto">
-          <table className="w-full text-sm">
+        <div className="max-h-[60vh] overflow-auto">
+          <table className="w-full min-w-[560px] text-sm">
             <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
               <tr>
                 <th className="w-10 px-3 py-2"></th>
@@ -1451,7 +1451,7 @@ function ListSidebarRow({
         </span>
       </button>
       {menu && (
-        <div className="absolute right-2 top-full z-20 mt-1 w-36 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+        <div className="animate-scale-in origin-top-right absolute right-2 top-full z-20 mt-1 w-36 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
           <button
             onClick={() => {
               setMenu(false);
@@ -1499,7 +1499,7 @@ function PickerPopover({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full z-20 mt-1 w-56 rounded-md border border-border bg-popover shadow-lg p-1 max-h-64 overflow-y-auto">
+          <div className="animate-scale-in origin-top absolute left-0 top-full z-20 mt-1 w-56 rounded-md border border-border bg-popover shadow-lg p-1 max-h-64 overflow-y-auto">
             {items.length === 0 && (
               <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
                 Nothing to pick
@@ -1550,11 +1550,11 @@ function LabelManager({
       <span onClick={() => setOpen(true)}>{trigger}</span>
       {open && (
         <div
-          className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm modal-backdrop"
+          className="fixed inset-0 z-40 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+            className="w-full max-w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -1640,7 +1640,7 @@ function ColorSwatch({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full z-20 mt-1 flex gap-1 p-1.5 rounded-md border border-border bg-popover shadow-lg">
+          <div className="animate-scale-in origin-top absolute left-0 top-full z-20 mt-1 flex gap-1 p-1.5 rounded-md border border-border bg-popover shadow-lg">
             {COLORS.map((c) => (
               <button
                 key={c}
@@ -1805,7 +1805,7 @@ function Dropdown({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg p-1 max-h-56 overflow-y-auto">
+          <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg p-1 max-h-56 overflow-y-auto">
             {items.length === 0 && (
               <div className="px-2 py-3 text-[11px] text-muted-foreground text-center">
                 Nothing available
@@ -1878,7 +1878,7 @@ function LabelPicker({
               setSearch("");
             }}
           />
-          <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+          <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-border bg-popover shadow-lg overflow-hidden">
             <div className="p-1.5 border-b border-border">
               <input
                 autoFocus

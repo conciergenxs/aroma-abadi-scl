@@ -745,7 +745,7 @@ function SearchableSelect({
         className={inputCls}
       />
       {open && (
-        <ul className="absolute z-30 top-10 left-0 right-0 rounded-md border border-border bg-background shadow-lg max-h-44 overflow-y-auto">
+        <ul className="animate-scale-in origin-top absolute z-30 top-10 left-0 right-0 rounded-md border border-border bg-background shadow-lg max-h-44 overflow-y-auto">
           {filtered.map((opt) => (
             <li key={opt}>
               <button

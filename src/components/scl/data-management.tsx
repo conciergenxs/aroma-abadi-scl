@@ -899,8 +899,8 @@ function Toggle({
         }`}
       >
         <span
-          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
-            checked ? "left-[18px]" : "left-0.5"
+          className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform duration-150 ${
+            checked ? "translate-x-[18px]" : "translate-x-0"
           }`}
         />
       </span>
@@ -1575,8 +1575,8 @@ function ContactPropertiesRouter() {
                           }`}
                         >
                           <span
-                            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
-                              row.visible ? "left-[18px]" : "left-0.5"
+                            className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform duration-150 ${
+                              row.visible ? "translate-x-[18px]" : "translate-x-0"
                             }`}
                           />
                         </button>

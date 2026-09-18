@@ -662,12 +662,12 @@ export function SectionCard({
   return (
     <div className={`rounded-xl border border-border bg-card/60 glass ${className}`}>
       {(title || action) && (
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div>
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
+          <div className="min-w-0">
             {title && <h3 className="text-sm font-medium">{title}</h3>}
             {description && <p className="text-sm text-muted-foreground mt-0.5">{description}</p>}
           </div>
-          {action}
+          {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
       {children}

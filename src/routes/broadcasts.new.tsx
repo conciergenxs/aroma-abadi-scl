@@ -1037,7 +1037,9 @@ function ChannelDropdown({ value, onChange }: { value: string; onChange: (id: st
         ) : (
           <span className="text-muted-foreground">Select a connected channel…</span>
         )}
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <>

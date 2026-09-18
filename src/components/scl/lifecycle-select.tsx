@@ -48,7 +48,9 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
             {current ?? "No Lifecycle Stage"}
           </span>
         </span>
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       <FloatingMenu anchorRef={btnRef} open={open} onClose={() => setOpen(false)} width={256}>

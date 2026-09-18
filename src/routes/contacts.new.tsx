@@ -690,7 +690,7 @@ function LabelMultiSelect({
         <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
+        <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
             <input
               autoFocus
@@ -824,7 +824,7 @@ function AudienceMultiSelect({
         <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
+        <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
             <input
               autoFocus

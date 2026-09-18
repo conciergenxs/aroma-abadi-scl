@@ -714,13 +714,13 @@ function Dashboard() {
       <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
         <div className="space-y-5 pb-[50px]">
           {/* Header row */}
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className="text-lg font-semibold">Hello, Aria 👋</div>
               <span className="text-muted-foreground/40 text-[15px] select-none">|</span>
               <DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/inbox"
                 className="press inline-flex items-center h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"

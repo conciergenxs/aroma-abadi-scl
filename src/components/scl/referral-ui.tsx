@@ -75,7 +75,7 @@ export function TableSearch({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-8 w-[260px] max-w-full rounded-md border border-border bg-card pl-8 pr-3 text-[13px] transition-all duration-200 focus:w-[300px] focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40"
+        className="h-8 w-full sm:w-[280px] rounded-md border border-border bg-card pl-8 pr-3 text-[13px] transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40"
       />
     </div>
   );

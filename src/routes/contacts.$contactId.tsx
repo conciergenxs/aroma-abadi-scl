@@ -676,7 +676,9 @@ function LifecycleDropdown({
         }`}
       >
         {value ?? "Set stage"}
-        <ChevronDown className="h-3 w-3 opacity-60" />
+        <ChevronDown
+          className={`h-3 w-3 opacity-60 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="absolute top-full left-0 mt-1 z-30 min-w-[160px] rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
@@ -1747,7 +1749,7 @@ function LabelSelector({
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
+        <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
             <input
               autoFocus
@@ -1877,7 +1879,7 @@ function ListSelector({
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
+        <div className="animate-scale-in origin-top absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-white/10 bg-popover shadow-xl overflow-hidden">
           <div className="p-1.5 border-b border-border">
             <input
               autoFocus
