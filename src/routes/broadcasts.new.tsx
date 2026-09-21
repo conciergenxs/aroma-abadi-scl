@@ -598,18 +598,36 @@ function CreateBroadcastPage() {
                           </button>
                         </div>
                         <div className="max-h-44 overflow-y-auto py-1">
-                          {promos.map((p) => (
-                            <button
-                              key={p.id}
-                              onClick={() => insertPromo(p.code)}
-                              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 transition-colors flex items-center gap-2"
-                            >
-                              <span className="font-mono text-[10px] font-semibold bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
-                                {p.code}
-                              </span>
-                              <span className="truncate text-muted-foreground">{p.name}</span>
-                            </button>
-                          ))}
+                          {promos.map((p) => {
+                            // A broadcast hands the code out now, so a promo
+                            // that has already ended can't be the one it
+                            // carries — offering it only to reject the send
+                            // later wastes the whole composition.
+                            const status = getPromoStatus(p);
+                            const spent = status === "expired";
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                disabled={spent}
+                                title={
+                                  spent ? "This promo ended — it can't be sent out" : undefined
+                                }
+                                onClick={() => insertPromo(p.code)}
+                                className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors flex items-center gap-2"
+                              >
+                                <span className="font-mono text-[10px] font-semibold bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
+                                  {p.code}
+                                </span>
+                                <span className="truncate text-muted-foreground">{p.name}</span>
+                                {spent && (
+                                  <span className="ml-auto shrink-0 text-[9px] uppercase tracking-wide text-destructive">
+                                    Ended
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

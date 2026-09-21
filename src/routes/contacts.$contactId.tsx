@@ -49,7 +49,12 @@ import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-p
 import { useBaStore, type BA } from "@/components/scl/ba-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { usePromoStore, type PromoRedemption } from "@/components/scl/promo-store";
+import {
+  usePromoStore,
+  benefitFor,
+  type PromoRedemption,
+  type PromoRule,
+} from "@/components/scl/promo-store";
 import {
   useReferralStore,
   referralActivityFor,
@@ -75,7 +80,13 @@ export const Route = createFileRoute("/contacts/$contactId")({
 
 type Tab = "activity" | "transactions" | "redeemed";
 
-type ContactRedemption = PromoRedemption & { promoName: string; promoCode: string };
+type ContactRedemption = PromoRedemption & {
+  promoName: string;
+  promoCode: string;
+  /** Needed to say what the promo handed over — a free item or covered
+   * shipping takes no rupiah off, so "−Rp …" would be a lie. */
+  promoRule: PromoRule;
+};
 
 function ContactDetailPage() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
@@ -136,7 +147,7 @@ function ContactDetailPage() {
             .flatMap((p) =>
               p.redemptions
                 .filter((r) => r.contactId === contact.id)
-                .map((r) => ({ ...r, promoName: p.name, promoCode: p.code })),
+                .map((r) => ({ ...r, promoName: p.name, promoCode: p.code, promoRule: p.rule })),
             )
             .sort((a, b) => new Date(b.redeemedAt).getTime() - new Date(a.redeemedAt).getTime()),
     [promos, contact],
@@ -1040,7 +1051,16 @@ function RedeemedTab({
   referralCode?: string;
   transactions: Transaction[];
 }) {
-  const totalDiscount = redemptions.reduce((sum, r) => sum + r.discountValue, 0);
+  // Only money actually taken off an order — a free item's retail price and
+  // covered shipping are value received, not a discount, so summing them here
+  // overstated what the customer saved.
+  const totalDiscount = redemptions.reduce(
+    (sum, r) =>
+      r.promoRule.reward.kind === "percent-off" || r.promoRule.reward.kind === "amount-off"
+        ? sum + r.discountValue
+        : sum,
+    0,
+  );
   const [peekTx, setPeekTx] = useState<Transaction | null>(null);
   const txById = useMemo(() => new Map(transactions.map((t) => [t.id, t])), [transactions]);
   const openPeek = (id: string) => setPeekTx(txById.get(id) ?? null);
@@ -1208,7 +1228,7 @@ function RedeemedTab({
                     <th className={th}>Transaction</th>
                     <th className={th}>Items</th>
                     <th className={th}>Order Total</th>
-                    <th className={th}>Discount</th>
+                    <th className={th}>Benefit</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border stagger">
@@ -1240,7 +1260,7 @@ function RedeemedTab({
                           : "—"}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
-                        −{formatIDR(r.discountValue)}
+                        {benefitFor(r.promoRule, r.discountValue)}
                       </td>
                     </tr>
                   ))}

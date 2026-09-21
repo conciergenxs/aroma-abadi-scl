@@ -637,6 +637,26 @@ function seed(): PromoCode[] {
       ],
     },
     {
+      id: "promo-6",
+      code: "DGBOGO",
+      name: "Dolce & Gabbana Buy 1 Get 1",
+      description:
+        "Buy any Caviar Hydra-Crème Lipstick, get a second one free. In-store and via WhatsApp order.",
+      rule: RULES.buyDgFreeItem,
+      usageType: "one-to-many",
+      maxUsage: 150,
+      limitPerUser: 3,
+      startDate: "2026-07-10T00:00",
+      endDate: "2026-08-10T23:59",
+      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
+      createdAt: "2026-07-08T08:30:00Z",
+      redemptions: [
+        redeem("6a", "tx-1006", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
+        redeem("6b", "tx-1007", RULES.buyDgFreeItem, "ARMA Product Consult", 685000),
+        redeem("6c", "tx-1017", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
+      ],
+    },
+    {
       id: "promo-7",
       code: "ARMAGIFT",
       name: "Free Setting Powder",
@@ -854,26 +874,6 @@ function seed(): PromoCode[] {
       createdBy: ARIA,
       createdAt: "2026-09-18T08:00:00Z",
       redemptions: [],
-    },
-    {
-      id: "promo-6",
-      code: "DGBOGO",
-      name: "Dolce & Gabbana Buy 1 Get 1",
-      description:
-        "Buy any Caviar Hydra-Crème Lipstick, get a second one free. In-store and via WhatsApp order.",
-      rule: RULES.buyDgFreeItem,
-      usageType: "one-to-many",
-      maxUsage: 150,
-      limitPerUser: 3,
-      startDate: "2026-07-10T00:00",
-      endDate: "2026-08-10T23:59",
-      createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
-      createdAt: "2026-07-08T08:30:00Z",
-      redemptions: [
-        redeem("6a", "tx-1006", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
-        redeem("6b", "tx-1007", RULES.buyDgFreeItem, "ARMA Product Consult", 685000),
-        redeem("6c", "tx-1017", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
-      ],
     },
   ];
 }

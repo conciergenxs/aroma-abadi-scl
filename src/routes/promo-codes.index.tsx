@@ -182,14 +182,20 @@ function PromoCodesPage() {
     if (filterUsage !== "all") list = list.filter((p) => p.usageType === filterUsage);
     if (search.trim()) {
       const q = search.toLowerCase();
+      // The rule sentence is printed in the table, so it has to be
+      // searchable; `description` is matched too but is never rendered, which
+      // is why typing "Spend min" used to return nothing.
       list = list.filter(
         (p) =>
           p.code.toLowerCase().includes(q) ||
           p.name.toLowerCase().includes(q) ||
+          describePromoRule(p.rule).toLowerCase().includes(q) ||
           p.description.toLowerCase().includes(q),
       );
     }
-    return list;
+    // Newest first, so a promo the user just created lands at the top rather
+    // than wherever raw seed order happens to put it.
+    return [...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [byStatus, search, filterUsage]);
 
   // Clamp on read: deleting the last row of the last page would otherwise
@@ -375,7 +381,10 @@ function PromoCodesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
-                      <div className="text-[11px] text-primary/80 mt-0.5 max-w-[280px] truncate">
+                      <div
+                        className="text-[11px] text-primary/80 mt-0.5 max-w-[420px] truncate"
+                        title={describePromoRule(promo.rule)}
+                      >
                         {describePromoRule(promo.rule)}
                       </div>
                     </td>
