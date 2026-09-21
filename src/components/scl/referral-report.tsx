@@ -129,7 +129,7 @@ export function SeasonReportView({ season }: { season: ReferralSeason }) {
                         onOpen={() => setPeekTx(txById.get(u.transactionId) ?? null)}
                       />
                     </td>
-                    <td className="px-5 py-2.5 text-[12px] text-muted-foreground max-w-[260px]">
+                    <td className="px-5 py-2.5 text-[12px] text-muted-foreground max-w-[260px] xl:max-w-[520px]">
                       {u.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
                     </td>
                     <td className="px-5 py-2.5 text-right text-[13px] whitespace-nowrap">

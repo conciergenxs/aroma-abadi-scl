@@ -246,7 +246,7 @@ function SeasonTable({
                   <td className="px-5 py-2.5 text-[12px] text-muted-foreground whitespace-nowrap">
                     {fmtDateEN(s.startDate)} — {fmtDateEN(s.endDate)}
                   </td>
-                  <td className="px-5 py-2.5 text-[12px] max-w-[280px]">
+                  <td className="px-5 py-2.5 text-[12px] max-w-[280px] xl:max-w-[520px]">
                     {describePromoRule(s.rule)}
                   </td>
                   <td className="px-5 py-2.5 text-[13px] tabular-nums">{fmtNum(s.uses.length)}</td>
