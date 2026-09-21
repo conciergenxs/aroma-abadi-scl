@@ -14,6 +14,7 @@ import {
   defaultCondition,
   defaultReward,
   describePromoRule,
+  sameItem,
 } from "./promo-store";
 
 // ── Sentence-builder UI for promo rules ────────────────────────────────────────
@@ -159,7 +160,7 @@ function ItemScopeEditor({
       : scope.kind === "any-in-brand"
         ? `${anyLabel} (${scope.brand})`
         : selected.length === 1
-          ? selected[0]
+          ? selected[0].name
           : selected.length
             ? `${selected.length} items`
             : "Select items";
@@ -249,7 +250,7 @@ function ItemScopeEditor({
                   // ever writing out every single item name.
                   const allFilteredSelected =
                     filtered.length > 0 &&
-                    (impliedByAny || filtered.every((it) => selected.includes(it.name)));
+                    (impliedByAny || filtered.every((it) => selected.some((x) => sameItem(x, it))));
                   return (
                     <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
                       <input
@@ -275,7 +276,7 @@ function ItemScopeEditor({
                             onChange({ kind: "specific", items: [] });
                           } else if (allFilteredSelected) {
                             const next = selected.filter(
-                              (name) => !filtered.some((it) => it.name === name),
+                              (sel) => !filtered.some((it) => sameItem(it, sel)),
                             );
                             onChange(
                               next.length ? { kind: "specific", items: next } : { kind: "any" },
@@ -287,9 +288,14 @@ function ItemScopeEditor({
                                 : { kind: "any" },
                             );
                           } else {
-                            const next = Array.from(
-                              new Set([...selected, ...filtered.map((it) => it.name)]),
-                            );
+                            // A Set can't dedupe object refs, so the merge
+                            // filters on identity instead.
+                            const next = [
+                              ...selected,
+                              ...filtered
+                                .filter((it) => !selected.some((x) => sameItem(x, it)))
+                                .map((it) => ({ name: it.name, brand: it.brand })),
+                            ];
                             onChange({ kind: "specific", items: next });
                           }
                         }}
@@ -322,9 +328,15 @@ function ItemScopeEditor({
                       // Covered by the active "Any Item [in Brand]" rule —
                       // shows checked like every other row, without this
                       // item actually being in an explicit list.
+                      // Matched on brand as well as name — two brands ship a
+                      // "Translucent Loose Setting Powder", and comparing names
+                      // alone lit up both rows (and, in a radio group, left the
+                      // tick on whichever one rendered last).
                       const checked = single
-                        ? scope.kind === "specific" && scope.items[0] === it.name
-                        : impliedByAny || selected.includes(it.name);
+                        ? scope.kind === "specific" &&
+                          !!scope.items[0] &&
+                          sameItem(scope.items[0], it)
+                        : impliedByAny || selected.some((x) => sameItem(x, it));
                       return (
                         <label
                           key={`${it.brand}::${it.name}`}
@@ -339,7 +351,10 @@ function ItemScopeEditor({
                               if (single) {
                                 // Swap the one choice; closing is Done's job,
                                 // so a mis-click can be corrected in place.
-                                onChange({ kind: "specific", items: [it.name] });
+                                onChange({
+                                  kind: "specific",
+                                  items: [{ name: it.name, brand: it.brand }],
+                                });
                                 return;
                               }
                               if (impliedByAny) {
@@ -347,14 +362,14 @@ function ItemScopeEditor({
                                 // Brand]" — keep everything else in the
                                 // current filter explicitly selected.
                                 const next = filtered
-                                  .filter((x) => x.name !== it.name)
-                                  .map((x) => x.name);
+                                  .filter((x) => !sameItem(x, it))
+                                  .map((x) => ({ name: x.name, brand: x.brand }));
                                 onChange({ kind: "specific", items: next });
                                 return;
                               }
                               const next = checked
-                                ? selected.filter((x) => x !== it.name)
-                                : [...selected, it.name];
+                                ? selected.filter((x) => !sameItem(x, it))
+                                : [...selected, { name: it.name, brand: it.brand }];
                               onChange(
                                 next.length ? { kind: "specific", items: next } : { kind: "any" },
                               );
