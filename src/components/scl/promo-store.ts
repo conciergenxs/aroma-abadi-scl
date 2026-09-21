@@ -106,7 +106,7 @@ export function defaultRule(): PromoRule {
   return { condition: defaultCondition("any-purchase"), reward: defaultReward("percent-off") };
 }
 
-function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
+export function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
   if (scope.kind === "any") return anyLabel;
   // Brand-scoped means the brand's items, not the whole basket — so the
   // caller's "everything" wording ("Total Purchase") must not survive here,
@@ -881,7 +881,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v13";
+const STORAGE_KEY = "aroma_promo_store_v14";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
@@ -892,8 +892,26 @@ function isCurrentShape(promos: unknown): promos is PromoCode[] {
         typeof p === "object" &&
         "rule" in p &&
         (p as PromoCode).rule?.condition?.kind !== undefined &&
-        (p as PromoCode).rule?.reward?.kind !== undefined,
+        (p as PromoCode).rule?.reward?.kind !== undefined &&
+        // The version bump is not the only guard: a "specific" scope whose
+        // items are bare strings is the pre-PromoItemRef shape, and it renders
+        // as "Buy 1 undefined" rather than failing loudly.
+        itemScopesAreRefs((p as PromoCode).rule),
     )
+  );
+}
+
+/** Every item scope in a rule carries {name, brand} objects, not bare names. */
+function itemScopesAreRefs(rule: PromoRule): boolean {
+  const scopes: PromoItemScope[] = [];
+  const collect = (g: PromoItemGroup) => g.lines.forEach((l) => scopes.push(l.item));
+  if (rule.condition.kind === "buy-item") collect(rule.condition.group);
+  if (rule.reward.kind === "free-item") collect(rule.reward.group);
+  if (rule.reward.kind === "percent-off") scopes.push(rule.reward.appliesTo);
+  return scopes.every(
+    (s) =>
+      s.kind !== "specific" ||
+      s.items.every((i) => i !== null && typeof i === "object" && typeof i.name === "string"),
   );
 }
 

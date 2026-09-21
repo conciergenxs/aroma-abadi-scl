@@ -15,6 +15,7 @@ import {
   defaultReward,
   describePromoRule,
   sameItem,
+  scopeLabel,
 } from "./promo-store";
 
 // ── Sentence-builder UI for promo rules ────────────────────────────────────────
@@ -154,16 +155,15 @@ function ItemScopeEditor({
   const safePage = clampPage(page, filtered.length, pageSize);
   const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
+  // Deferred to scopeLabel so the button and the rule sentence can't drift —
+  // this used to re-derive it and kept saying "Total Purchase (Rimmel)" after
+  // the sentence stopped.
   const label =
-    scope.kind === "any"
-      ? anyLabel
-      : scope.kind === "any-in-brand"
-        ? `${anyLabel} (${scope.brand})`
-        : selected.length === 1
-          ? selected[0].name
-          : selected.length
-            ? `${selected.length} items`
-            : "Select items";
+    scope.kind === "specific" && selected.length > 1
+      ? `${selected.length} items`
+      : scope.kind === "specific" && selected.length === 0
+        ? "Select items"
+        : scopeLabel(scope, anyLabel);
 
   const isBrandScoped = brandFilter !== "all";
   const rowChecked = isBrandScoped
