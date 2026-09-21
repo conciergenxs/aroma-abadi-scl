@@ -31,6 +31,7 @@ import {
   rewardSummary,
   type AssignedCode,
   type PromoStatus,
+  benefitFor,
 } from "@/components/scl/promo-store";
 import { REWARD_ICONS } from "@/components/scl/reward-icons";
 import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
@@ -259,8 +260,8 @@ function PromoDetailPage() {
       <div className="space-y-6 stagger">
         {/* Header card */}
         <div className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1 basis-full sm:basis-auto">
               <h2 className="text-lg font-semibold text-foreground truncate">{promo.name}</h2>
               <div className="mt-2 flex items-center flex-wrap gap-2">
                 <code className="font-mono text-[15px] font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2.5 py-0.5">
@@ -270,7 +271,7 @@ function PromoDetailPage() {
                 <StatusBadge status={getPromoStatus(promo)} />
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
               {canDownload && (
                 <>
                   <button
@@ -384,7 +385,7 @@ function PromoDetailPage() {
           />
           <StatTile label="Unique Customers" icon={Users} value={fmtNum(uniqueCustomers)} />
           <StatTile
-            label="Usage Rate"
+            label={usageRate == null ? "Usage Cap" : "Usage Rate"}
             icon={Percent}
             value={usageRate == null ? "Unlimited" : `${usageRate}%`}
           />
@@ -418,7 +419,14 @@ function PromoDetailPage() {
                         Order Total
                       </th>
                       <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Discount
+                        {/* A free item or covered shipping takes no rupiah off
+                            the order, so calling the column "Discount" and
+                            printing −Rp there stated something untrue. */}
+                        {promo.rule.reward.kind === "free-item"
+                          ? "Gets"
+                          : promo.rule.reward.kind === "free-shipping"
+                            ? "Shipping"
+                            : "Discount"}
                       </th>
                     </tr>
                   </thead>
@@ -458,7 +466,7 @@ function PromoDetailPage() {
                           })()}
                         </td>
                         <td className="px-5 py-2.5 text-right text-[13px] font-medium text-foreground whitespace-nowrap">
-                          −{fmtIDR(r.discountValue)}
+                          {benefitFor(promo.rule, r.discountValue)}
                         </td>
                       </tr>
                     ))}

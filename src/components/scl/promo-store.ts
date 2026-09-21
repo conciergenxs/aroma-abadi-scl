@@ -108,7 +108,10 @@ export function defaultRule(): PromoRule {
 
 function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
   if (scope.kind === "any") return anyLabel;
-  if (scope.kind === "any-in-brand") return `${anyLabel} (${scope.brand})`;
+  // Brand-scoped means the brand's items, not the whole basket — so the
+  // caller's "everything" wording ("Total Purchase") must not survive here,
+  // or a 30%-off-Rimmel rule reads as 30% off the total.
+  if (scope.kind === "any-in-brand") return `${scope.brand} Items`;
   // An explicit list that ended up empty means nothing is selected — saying
   // "Any Item" there would promise the opposite of what the rule does.
   if (scope.items.length === 0) return "No items selected";
@@ -383,6 +386,7 @@ function seed(): PromoCode[] {
   const t1008 = tx("tx-1008"); // Bagus Pratama
   const t1020 = tx("tx-1020"); // Bagus Pratama (2nd visit)
   const t1003 = tx("tx-1003"); // Nadya Salsabila
+  const t1022 = tx("tx-1022"); // Tiara Hapsari (first order)
   const t1001 = tx("tx-1001"); // Citra Halim
 
   // ── Every condition against every reward ────────────────────────────────
@@ -410,6 +414,24 @@ function seed(): PromoCode[] {
   });
 
   const RULES = {
+    anyPercentOff: {
+      condition: ANY_PURCHASE,
+      reward: { kind: "percent-off", percent: 20, appliesTo: { kind: "any" }, maxDiscount: null },
+    },
+    buySisleyAmountOff: {
+      condition: { kind: "buy-item", group: brandLine("Sisley") },
+      reward: { kind: "amount-off", amount: 150000 },
+    },
+    buyDgFreeItem: {
+      condition: {
+        kind: "buy-item",
+        group: oneLine("Caviar Hydra-Crème Lipstick 42g", "Dolce & Gabbana"),
+      },
+      reward: {
+        kind: "free-item",
+        group: oneLine("Caviar Hydra-Crème Lipstick 42g", "Dolce & Gabbana"),
+      },
+    },
     anyFreeItem: {
       condition: ANY_PURCHASE,
       reward: {
@@ -483,10 +505,7 @@ function seed(): PromoCode[] {
       code: "AROMA20",
       name: "20% Off All Brands",
       description: "20% discount across all brands. Code shared via broadcast or template.",
-      rule: {
-        condition: { kind: "any-purchase" },
-        reward: { kind: "percent-off", percent: 20, appliesTo: { kind: "any" }, maxDiscount: null },
-      },
+      rule: RULES.anyPercentOff,
       usageType: "one-to-many",
       maxUsage: 500,
       limitPerUser: 1,
@@ -495,36 +514,9 @@ function seed(): PromoCode[] {
       createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
       createdAt: "2026-05-28T09:00:00Z",
       redemptions: [
-        {
-          id: "rdm-1a",
-          contactId: t1000.customerId!,
-          contactName: t1000.customerName,
-          transactionId: t1000.id,
-          invoice: t1000.invoice,
-          discountValue: Math.round(t1000.total * 0.2),
-          sourceName: "June Flash Sale",
-          redeemedAt: t1000.date,
-        },
-        {
-          id: "rdm-1b",
-          contactId: t1006.customerId!,
-          contactName: t1006.customerName,
-          transactionId: t1006.id,
-          invoice: t1006.invoice,
-          discountValue: Math.round(t1006.total * 0.2),
-          sourceName: "VIP Customer Blast",
-          redeemedAt: t1006.date,
-        },
-        {
-          id: "rdm-1c",
-          contactId: t1012.customerId!,
-          contactName: t1012.customerName,
-          transactionId: t1012.id,
-          invoice: t1012.invoice,
-          discountValue: Math.round(t1012.total * 0.2),
-          sourceName: "End of Month Promo",
-          redeemedAt: t1012.date,
-        },
+        redeem("1a", "tx-1015", RULES.anyPercentOff, "June Flash Sale"),
+        redeem("1b", "tx-1018", RULES.anyPercentOff, "VIP Customer Blast"),
+        redeem("1c", "tx-1020", RULES.anyPercentOff, "End of Month Promo"),
       ],
     },
     {
@@ -532,16 +524,7 @@ function seed(): PromoCode[] {
       code: "SISLEY150K",
       name: "Sisley Rp150k Off",
       description: "Rp150,000 off any Sisley product. Single-use code issued per customer.",
-      rule: {
-        condition: {
-          kind: "buy-item",
-          group: {
-            join: "and",
-            lines: [{ qty: 1, item: { kind: "any-in-brand", brand: "Sisley" } }],
-          },
-        },
-        reward: { kind: "amount-off", amount: 150000 },
-      },
+      rule: RULES.buySisleyAmountOff,
       usageType: "one-to-one",
       maxUsage: null,
       limitPerUser: null,
@@ -551,40 +534,12 @@ function seed(): PromoCode[] {
       createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
       createdAt: "2026-06-25T10:00:00Z",
       redemptions: [
-        {
-          id: "rdm-2a",
-          contactId: t1004.customerId!,
-          contactName: t1004.customerName,
-          transactionId: t1004.id,
-          invoice: t1004.invoice,
-          discountValue: 150000,
-          sourceName: "Sisley Summer Sale",
-          redeemedAt: t1004.date,
-        },
-        {
-          id: "rdm-2b",
-          contactId: t1005.customerId!,
-          contactName: t1005.customerName,
-          transactionId: t1005.id,
-          invoice: t1005.invoice,
-          discountValue: 150000,
-          sourceName: "Abandoned Cart Reminder",
-          redeemedAt: t1005.date,
-        },
+        redeem("2a", "tx-1005", RULES.buySisleyAmountOff, "Sisley Summer Sale"),
+        redeem("2b", "tx-1010", RULES.buySisleyAmountOff, "Abandoned Cart Reminder"),
       ],
       // Issued by a Broadcast — the last four characters are each recipient's
       // initials, minted from codeFormat above.
       assignedCodes: [
-        {
-          code: `SISLEY150K-${initialsFor(t1004.customerName)}`,
-          contactId: t1004.customerId!,
-          contactName: t1004.customerName,
-          redeemed: true,
-          redeemedAt: t1004.date,
-          broadcastId: "b-sisley-1to1",
-          broadcastName: "Sisley Summer Sale — Personal Codes",
-          sentAt: "2026-07-02T09:00:00Z",
-        },
         {
           code: `SISLEY150K-${initialsFor(t1005.customerName)}`,
           contactId: t1005.customerId!,
@@ -599,6 +554,16 @@ function seed(): PromoCode[] {
           code: `SISLEY150K-${initialsFor(t1010.customerName)}`,
           contactId: t1010.customerId!,
           contactName: t1010.customerName,
+          redeemed: true,
+          redeemedAt: t1010.date,
+          broadcastId: "b-sisley-1to1",
+          broadcastName: "Sisley Summer Sale — Personal Codes",
+          sentAt: "2026-07-02T09:00:00Z",
+        },
+        {
+          code: `SISLEY150K-${initialsFor(t1004.customerName)}`,
+          contactId: t1004.customerId!,
+          contactName: t1004.customerName,
           redeemed: false,
           broadcastId: "b-sisley-1to1",
           broadcastName: "Sisley Summer Sale — Personal Codes",
@@ -629,8 +594,8 @@ function seed(): PromoCode[] {
       createdBy: LUCA,
       createdAt: "2026-06-12T09:00:00Z",
       redemptions: [
-        redeem("3a", "tx-1003", RULES.anyAmountOff, "Mid-Year Blast"),
-        redeem("3b", "tx-1007", RULES.anyAmountOff, "ARMA Product Consult"),
+        redeem("3a", "tx-1023", RULES.anyAmountOff, "Mid-Year Blast"),
+        redeem("3b", "tx-1028", RULES.anyAmountOff, "ARMA Product Consult"),
       ],
     },
     {
@@ -647,9 +612,9 @@ function seed(): PromoCode[] {
       createdBy: ARIA,
       createdAt: "2026-06-28T08:00:00Z",
       redemptions: [
-        redeem("4a", "tx-1001", RULES.anyFreeShipping, "Free Ongkir Campaign", 30000),
-        redeem("4b", "tx-1013", RULES.anyFreeShipping, "ARMA Product Consult", 35000),
-        redeem("4c", "tx-1021", RULES.anyFreeShipping, "Free Ongkir Campaign", 28000),
+        redeem("4a", "tx-1030", RULES.anyFreeShipping, "Free Ongkir Campaign", 30000),
+        redeem("4b", "tx-1031", RULES.anyFreeShipping, "ARMA Product Consult", 35000),
+        redeem("4c", "tx-1032", RULES.anyFreeShipping, "Free Ongkir Campaign", 28000),
       ],
     },
     {
@@ -667,8 +632,8 @@ function seed(): PromoCode[] {
       createdBy: LUCA,
       createdAt: "2026-07-01T09:30:00Z",
       redemptions: [
-        redeem("5a", "tx-1008", RULES.buyPercentOff, "Rimmel Bundle Push"),
-        redeem("5b", "tx-1020", RULES.buyPercentOff, "Rimmel Bundle Push"),
+        redeem("5a", "tx-1002", RULES.buyPercentOff, "Rimmel Bundle Push"),
+        redeem("5b", "tx-1008", RULES.buyPercentOff, "Rimmel Bundle Push"),
       ],
     },
     {
@@ -685,8 +650,8 @@ function seed(): PromoCode[] {
       createdBy: ARIA,
       createdAt: "2026-06-26T10:00:00Z",
       redemptions: [
-        redeem("7a", "tx-1000", RULES.anyFreeItem, "Gift With Purchase", 189000),
-        redeem("7b", "tx-1012", RULES.anyFreeItem, "ARMA Product Consult", 189000),
+        redeem("7a", "tx-1033", RULES.anyFreeItem, "Gift With Purchase", 189000),
+        redeem("7b", "tx-1035", RULES.anyFreeItem, "ARMA Product Consult", 189000),
       ],
     },
     {
@@ -719,8 +684,8 @@ function seed(): PromoCode[] {
       createdBy: LUCA,
       createdAt: "2026-07-07T09:00:00Z",
       redemptions: [
-        redeem("9a", "tx-1002", RULES.minFreeItem, "High Basket Reward", 425000),
-        redeem("9b", "tx-1015", RULES.minFreeItem, "High Basket Reward", 425000),
+        redeem("9a", "tx-1000", RULES.minFreeItem, "High Basket Reward", 425000),
+        redeem("9b", "tx-1001", RULES.minFreeItem, "High Basket Reward", 425000),
       ],
     },
     {
@@ -737,9 +702,9 @@ function seed(): PromoCode[] {
       createdBy: ARIA,
       createdAt: "2026-06-27T11:00:00Z",
       redemptions: [
-        redeem("10a", "tx-1006", RULES.minPercentOff, "Basket Booster"),
-        redeem("10b", "tx-1017", RULES.minPercentOff, "ARMA Product Consult"),
-        redeem("10c", "tx-1025", RULES.minPercentOff, "Basket Booster"),
+        redeem("10a", "tx-1011", RULES.minPercentOff, "Basket Booster"),
+        redeem("10b", "tx-1013", RULES.minPercentOff, "ARMA Product Consult"),
+        redeem("10c", "tx-1016", RULES.minPercentOff, "Basket Booster"),
       ],
     },
     {
@@ -756,8 +721,8 @@ function seed(): PromoCode[] {
       createdBy: NOOR,
       createdAt: "2026-06-29T09:00:00Z",
       redemptions: [
-        redeem("11a", "tx-1011", RULES.minAmountOff, "Basket Booster"),
-        redeem("11b", "tx-1023", RULES.minAmountOff, "ARMA Product Consult"),
+        redeem("11a", "tx-1003", RULES.minAmountOff, "Basket Booster"),
+        redeem("11b", "tx-1021", RULES.minAmountOff, "ARMA Product Consult"),
       ],
     },
     {
@@ -790,8 +755,50 @@ function seed(): PromoCode[] {
       createdBy: NOOR,
       createdAt: "2026-07-11T10:00:00Z",
       redemptions: [
-        redeem("13a", "tx-1005", RULES.firstFreeItem, "Welcome Series", 215000),
-        redeem("13b", "tx-1018", RULES.firstFreeItem, "Welcome Series", 215000),
+        redeem("13a", "tx-1012", RULES.firstFreeItem, "Welcome Series", 215000),
+        redeem("13b", "tx-1022", RULES.firstFreeItem, "Welcome Series", 215000),
+      ],
+      // A 1-to-1 code can only be redeemed by someone a Broadcast issued it
+      // to, so the recipients list has to contain the two who redeemed.
+      assignedCodes: [
+        {
+          code: `WELCOME-${initialsFor(t1012.customerName)}`,
+          contactId: t1012.customerId!,
+          contactName: t1012.customerName,
+          redeemed: true,
+          redeemedAt: t1012.date,
+          broadcastId: "b-welcome-1to1",
+          broadcastName: "Welcome Series — Personal Codes",
+          sentAt: "2026-07-16T09:00:00Z",
+        },
+        {
+          code: `WELCOME-${initialsFor(t1022.customerName)}`,
+          contactId: t1022.customerId!,
+          contactName: t1022.customerName,
+          redeemed: true,
+          redeemedAt: t1022.date,
+          broadcastId: "b-welcome-1to1",
+          broadcastName: "Welcome Series — Personal Codes",
+          sentAt: "2026-07-16T09:00:00Z",
+        },
+        {
+          code: `WELCOME-${initialsFor(t1003.customerName)}`,
+          contactId: t1003.customerId!,
+          contactName: t1003.customerName,
+          redeemed: false,
+          broadcastId: "b-welcome-1to1",
+          broadcastName: "Welcome Series — Personal Codes",
+          sentAt: "2026-07-16T09:00:00Z",
+        },
+        {
+          code: `WELCOME-${initialsFor(t1006.customerName)}`,
+          contactId: t1006.customerId!,
+          contactName: t1006.customerName,
+          redeemed: false,
+          broadcastId: "b-welcome-1to1",
+          broadcastName: "Welcome Series — Personal Codes",
+          sentAt: "2026-07-16T09:00:00Z",
+        },
       ],
       codeFormat: "WELCOME-####",
     },
@@ -809,9 +816,9 @@ function seed(): PromoCode[] {
       createdBy: LUCA,
       createdAt: "2026-06-25T09:00:00Z",
       redemptions: [
-        redeem("14a", "tx-1010", RULES.firstPercentOff, "Welcome Series"),
-        redeem("14b", "tx-1022", RULES.firstPercentOff, "Welcome Series"),
-        redeem("14c", "tx-1030", RULES.firstPercentOff, "ARMA Product Consult"),
+        redeem("14a", "tx-1025", RULES.firstPercentOff, "Welcome Series"),
+        redeem("14b", "tx-1026", RULES.firstPercentOff, "Welcome Series"),
+        redeem("14c", "tx-1027", RULES.firstPercentOff, "ARMA Product Consult"),
       ],
     },
     {
@@ -854,38 +861,7 @@ function seed(): PromoCode[] {
       name: "Dolce & Gabbana Buy 1 Get 1",
       description:
         "Buy any Caviar Hydra-Crème Lipstick, get a second one free. In-store and via WhatsApp order.",
-      rule: {
-        condition: {
-          kind: "buy-item",
-          group: {
-            join: "and",
-            lines: [
-              {
-                qty: 1,
-                item: {
-                  kind: "specific",
-                  items: [{ name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana" }],
-                },
-              },
-            ],
-          },
-        },
-        reward: {
-          kind: "free-item",
-          group: {
-            join: "and",
-            lines: [
-              {
-                qty: 1,
-                item: {
-                  kind: "specific",
-                  items: [{ name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana" }],
-                },
-              },
-            ],
-          },
-        },
-      },
+      rule: RULES.buyDgFreeItem,
       usageType: "one-to-many",
       maxUsage: 150,
       limitPerUser: 3,
@@ -894,36 +870,9 @@ function seed(): PromoCode[] {
       createdBy: { name: "Aria Kapoor", jobTitle: "Workspace Owner" },
       createdAt: "2026-07-08T08:30:00Z",
       redemptions: [
-        {
-          id: "rdm-6a",
-          contactId: t1002.customerId!,
-          contactName: t1002.customerName,
-          transactionId: t1002.id,
-          invoice: t1002.invoice,
-          discountValue: 685000,
-          sourceName: "Lipstick BOGO Blast",
-          redeemedAt: t1002.date,
-        },
-        {
-          id: "rdm-6b",
-          contactId: t1014.customerId!,
-          contactName: t1014.customerName,
-          transactionId: t1014.id,
-          invoice: t1014.invoice,
-          discountValue: 685000,
-          sourceName: "ARMA Product Consult",
-          redeemedAt: t1014.date,
-        },
-        {
-          id: "rdm-6c",
-          contactId: t1020.customerId!,
-          contactName: t1020.customerName,
-          transactionId: t1020.id,
-          invoice: t1020.invoice,
-          discountValue: 685000,
-          sourceName: "Lipstick BOGO Blast",
-          redeemedAt: t1020.date,
-        },
+        redeem("6a", "tx-1006", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
+        redeem("6b", "tx-1007", RULES.buyDgFreeItem, "ARMA Product Consult", 685000),
+        redeem("6c", "tx-1017", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
       ],
     },
   ];

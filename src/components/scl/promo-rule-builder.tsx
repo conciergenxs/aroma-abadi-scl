@@ -308,7 +308,8 @@ function ItemScopeEditor({
                               ? { kind: "any-in-brand", brand: brandFilter }
                               : { kind: "any" },
                           );
-                          setOpen(false);
+                          // Selecting never closes the picker — Done and ×
+                          // do. This row used to be the one exception.
                         }}
                         className={`flex-1 min-w-0 flex items-center justify-between text-[13px] text-left ${rowChecked ? "text-primary font-medium" : ""}`}
                       >
@@ -599,7 +600,7 @@ function ItemGroupEditor({
  * heading and its constraint read together. */
 function GroupHeading({ label, atMax }: { label: string; atMax: boolean }) {
   return (
-    <div className="flex items-baseline justify-between gap-2 text-[13px]">
+    <div className="flex items-baseline justify-between gap-2 text-[13px] leading-8">
       <span className="text-muted-foreground">{label}</span>
       <span
         className={`text-[10.5px] transition-colors duration-200 ${atMax ? "text-primary font-medium" : "text-muted-foreground"}`}
