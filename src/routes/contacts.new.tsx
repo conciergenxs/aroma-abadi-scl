@@ -301,7 +301,7 @@ function NewContactPage() {
           </header>
 
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-2xl mx-auto">
+            <div>
               <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 animate-fade-in">
                 <FormSection title="Basic Information">
                   <FormGrid>
@@ -416,7 +416,7 @@ function NewContactPage() {
         </header>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-2xl mx-auto">
+          <div>
             <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 animate-fade-in">
               <FormSection title="Basic Information">
                 <FormGrid>

@@ -94,7 +94,7 @@ function WhatsAppDetail() {
   const [tab, setTab] = useState<"accounts" | "billing" | "optin">("accounts");
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Hero card */}
       <div className="rounded-xl border border-border bg-card/60 glass p-6 flex items-start gap-5 lift-sm">
         <ChannelIcon channel="whatsapp" className="h-14 w-14" />

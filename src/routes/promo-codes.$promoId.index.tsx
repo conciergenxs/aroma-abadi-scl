@@ -256,7 +256,7 @@ function PromoDetailPage() {
 
   return (
     <AppShell backTo="/promo-codes" title="Promo Code Detail">
-      <div className="max-w-5xl space-y-6 stagger">
+      <div className="space-y-6 stagger">
         {/* Header card */}
         <div className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
           <div className="flex items-start justify-between gap-4">
