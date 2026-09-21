@@ -57,10 +57,7 @@ export type PromoReward =
   // Always off the purchase being made — there's no wallet or points balance
   // to carry value into a later order.
   | { kind: "amount-off"; amount: number }
-  | { kind: "free-shipping" }
-  // Loyalty points are owned by the loyalty programme, not by promo codes —
-  // kept in the model for existing data but switched off in the builder.
-  | { kind: "bonus-points"; points: number };
+  | { kind: "free-shipping" };
 
 export type PromoRule = {
   condition: PromoCondition;
@@ -90,8 +87,6 @@ export function defaultReward(kind: PromoReward["kind"]): PromoReward {
       return { kind, amount: 50000 };
     case "free-shipping":
       return { kind };
-    case "bonus-points":
-      return { kind, points: 100 };
   }
 }
 
@@ -148,8 +143,6 @@ function describeReward(r: PromoReward): string {
       return `Get ${fmtIDR(r.amount)} Off`;
     case "free-shipping":
       return "Get Free Shipping";
-    case "bonus-points":
-      return `Get ${r.points} Bonus Points`;
   }
 }
 
@@ -162,7 +155,7 @@ export function describePromoRule(rule: PromoRule): string {
 // describe each reward in its own terms. Shared by promo and referral reports.
 
 export type RewardSummary = {
-  kind: "discount" | "items" | "shipping" | "points";
+  kind: "discount" | "items" | "shipping";
   label: string;
   value: string;
   title?: string;
@@ -187,9 +180,6 @@ export function rewardSummary(rule: PromoRule, count: number, totalValue: number
   if (reward.kind === "free-shipping") {
     return { kind: "shipping", label: "Shipping Covered", value: fmtIDR(totalValue) };
   }
-  if (reward.kind === "bonus-points") {
-    return { kind: "points", label: "Points Awarded", value: fmtNum(reward.points * count) };
-  }
   return { kind: "discount", label: "Discount Given", value: fmtIDR(totalValue) };
 }
 
@@ -199,7 +189,6 @@ export function benefitFor(rule: PromoRule, discountValue: number): string {
   const r = rule.reward;
   if (r.kind === "free-item") return `${describeItemGroup(r.group)} free`;
   if (r.kind === "free-shipping") return "Free shipping";
-  if (r.kind === "bonus-points") return `${fmtNum(r.points)} points`;
   return `−${fmtIDR(discountValue)}`;
 }
 

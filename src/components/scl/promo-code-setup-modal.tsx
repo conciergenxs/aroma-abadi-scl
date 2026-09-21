@@ -17,7 +17,6 @@ const REWARD_CODE: Record<PromoReward["kind"], string> = {
   "percent-off": "PCT",
   "amount-off": "AMT",
   "free-shipping": "SHP",
-  "bonus-points": "PTS",
 };
 
 function extractMMDD(datetimeLocal: string): string {

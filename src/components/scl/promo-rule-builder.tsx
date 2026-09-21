@@ -37,23 +37,12 @@ const REWARD_OPTIONS: SegmentedOption<PromoReward["kind"]>[] = [
   { kind: "percent-off", label: "% Discount" },
   { kind: "amount-off", label: "Rp Discount" },
   { kind: "free-shipping", label: "Free Shipping" },
-  {
-    kind: "bonus-points",
-    label: "Bonus Points",
-    disabled: true,
-    disabledReason: "Loyalty points are awarded by the loyalty programme, not by promo codes.",
-  },
 ];
 
 // One preset per genuinely distinct condition × reward pairing — not variations
 // on the same pairing (e.g. "Buy 2 Get 1" is just a qty tweak of "Buy 1 Get 1",
 // which the qty field already covers, so it isn't a separate preset).
-const PRESETS: {
-  label: string;
-  build: () => PromoRule;
-  disabled?: boolean;
-  disabledReason?: string;
-}[] = [
+const PRESETS: { label: string; build: () => PromoRule }[] = [
   {
     label: "Buy 1 Get 1 Free",
     build: () => ({
@@ -87,15 +76,6 @@ const PRESETS: {
     build: () => ({
       condition: { kind: "first-purchase" },
       reward: { kind: "free-shipping" },
-    }),
-  },
-  {
-    label: "Bonus Points on Purchase",
-    disabled: true,
-    disabledReason: "Loyalty points are awarded by the loyalty programme, not by promo codes.",
-    build: () => ({
-      condition: { kind: "any-purchase" },
-      reward: { kind: "bonus-points", points: 100 },
     }),
   },
 ];
@@ -417,12 +397,7 @@ function InlineCurrency({
   );
 }
 
-type SegmentedOption<T extends string> = {
-  kind: T;
-  label: string;
-  disabled?: boolean;
-  disabledReason?: string;
-};
+type SegmentedOption<T extends string> = { kind: T; label: string };
 
 function Segmented<T extends string>({
   options,
@@ -439,17 +414,13 @@ function Segmented<T extends string>({
         <button
           key={opt.kind}
           type="button"
-          disabled={opt.disabled}
-          title={opt.disabled ? opt.disabledReason : undefined}
           onClick={() => {
             if (opt.kind !== value) onChange(opt.kind);
           }}
           className={`tap press px-2.5 h-7 text-[11px] font-medium rounded transition-all duration-150 ${
             value === opt.kind
               ? "bg-primary text-primary-foreground"
-              : opt.disabled
-                ? "text-muted-foreground/40 cursor-not-allowed"
-                : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           {opt.label}
@@ -679,16 +650,6 @@ function RewardEditor({
             free shipping
           </span>
         )}
-        {reward.kind === "bonus-points" && (
-          <>
-            <InlineNumber
-              value={reward.points}
-              onChange={(v) => onChange({ ...reward, points: v })}
-              min={10}
-            />
-            <span className="text-muted-foreground">bonus loyalty points</span>
-          </>
-        )}
       </div>
       {reward.kind === "free-item" && (
         <div className="space-y-1.5">
@@ -768,14 +729,8 @@ export function PromoRuleBuilder({
             <button
               key={p.label}
               type="button"
-              disabled={p.disabled}
-              title={p.disabled ? p.disabledReason : undefined}
               onClick={() => onChange(p.build())}
-              className={`press rounded-full border px-3 h-7 text-[11px] font-medium transition-all duration-150 ${
-                p.disabled
-                  ? "border-border/60 bg-card/30 text-muted-foreground/40 cursor-not-allowed"
-                  : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
-              }`}
+              className="tap press rounded-full border border-border bg-card/60 px-3 h-7 text-[11px] font-medium text-muted-foreground transition-all duration-150 hover:text-foreground hover:bg-card"
             >
               {p.label}
             </button>
