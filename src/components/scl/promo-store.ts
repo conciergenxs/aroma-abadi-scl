@@ -334,6 +334,31 @@ function tx(id: string) {
 }
 
 function seed(): PromoCode[] {
+  /** One redemption, with the customer, invoice and date taken straight off
+   * the order so the log can never name a transaction that doesn't exist.
+   * `value` is only passed where the rule hands over something other than
+   * money — the retail price of a free item, or the shipping it covered —
+   * because discountFor() correctly reports those as zero rupiah off. */
+  const redeem = (
+    seq: string,
+    txId: string,
+    rule: PromoRule,
+    sourceName: string,
+    value?: number,
+  ): PromoRedemption => {
+    const t = tx(txId);
+    return {
+      id: `rdm-${seq}`,
+      contactId: t.customerId!,
+      contactName: t.customerName,
+      transactionId: t.id,
+      invoice: t.invoice,
+      discountValue: value ?? discountFor(rule, t.total),
+      sourceName,
+      redeemedAt: t.date,
+    };
+  };
+
   const t1000 = tx("tx-1000"); // Putri Anggraini
   const t1004 = tx("tx-1004"); // Siti Rahmawati
   const t1005 = tx("tx-1005"); // Indah Permata
@@ -347,6 +372,95 @@ function seed(): PromoCode[] {
   const t1020 = tx("tx-1020"); // Bagus Pratama (2nd visit)
   const t1003 = tx("tx-1003"); // Nadya Salsabila
   const t1001 = tx("tx-1001"); // Citra Halim
+
+  // ── Every condition against every reward ────────────────────────────────
+  // Four conditions (Any Purchase, Buy Item(s), Minimum Spend, First
+  // Purchase) times four rewards (Free Item(s), % Discount, Rp Discount,
+  // Free Shipping) is sixteen combinations, and each one is seeded here so
+  // the list, the detail page and the rule builder can be seen against every
+  // shape they have to render — including the reward tile, which changes
+  // from rupiah to a count of items to shipping covered.
+  //
+  // Orders in this workspace all fall in late July 2026, so a promo that has
+  // redemptions has to be open over that window: the ones still running
+  // started in July and close later in the year, the ones that closed ran
+  // inside it, and the ones that haven't started yet have no redemptions at
+  // all — which is exactly what a scheduled promo looks like.
+  const ANY_PURCHASE: PromoCondition = { kind: "any-purchase" };
+  const FIRST_PURCHASE: PromoCondition = { kind: "first-purchase" };
+  const oneLine = (name: string, qty = 1): PromoItemGroup => ({
+    join: "and",
+    lines: [{ qty, item: { kind: "specific", items: [name] } }],
+  });
+  const brandLine = (brand: string, qty = 1): PromoItemGroup => ({
+    join: "and",
+    lines: [{ qty, item: { kind: "any-in-brand", brand } }],
+  });
+
+  const RULES = {
+    anyFreeItem: {
+      condition: ANY_PURCHASE,
+      reward: { kind: "free-item", group: oneLine("Translucent Loose Setting Powder") },
+    },
+    anyAmountOff: { condition: ANY_PURCHASE, reward: { kind: "amount-off", amount: 50000 } },
+    anyFreeShipping: { condition: ANY_PURCHASE, reward: { kind: "free-shipping" } },
+    buyPercentOff: {
+      condition: { kind: "buy-item", group: brandLine("Rimmel", 2) },
+      reward: {
+        kind: "percent-off",
+        percent: 30,
+        appliesTo: { kind: "any-in-brand", brand: "Rimmel" },
+        maxDiscount: 150000,
+      },
+    },
+    buyFreeShipping: {
+      condition: { kind: "buy-item", group: brandLine("Sisley") },
+      reward: { kind: "free-shipping" },
+    },
+    minFreeItem: {
+      condition: { kind: "min-spend", amount: 2000000 },
+      reward: { kind: "free-item", group: oneLine("Blush Color Infusion") },
+    },
+    minPercentOff: {
+      condition: { kind: "min-spend", amount: 1500000 },
+      reward: {
+        kind: "percent-off",
+        percent: 15,
+        appliesTo: { kind: "any" },
+        maxDiscount: 500000,
+      },
+    },
+    minAmountOff: {
+      condition: { kind: "min-spend", amount: 1000000 },
+      reward: { kind: "amount-off", amount: 100000 },
+    },
+    minFreeShipping: {
+      condition: { kind: "min-spend", amount: 500000 },
+      reward: { kind: "free-shipping" },
+    },
+    firstFreeItem: {
+      condition: FIRST_PURCHASE,
+      reward: {
+        kind: "free-item",
+        group: oneLine("Translucent Hydrating Setting Spray Ultra-Blur"),
+      },
+    },
+    firstPercentOff: {
+      condition: FIRST_PURCHASE,
+      reward: {
+        kind: "percent-off",
+        percent: 15,
+        appliesTo: { kind: "any" },
+        maxDiscount: 300000,
+      },
+    },
+    firstAmountOff: { condition: FIRST_PURCHASE, reward: { kind: "amount-off", amount: 75000 } },
+    firstFreeShipping: { condition: FIRST_PURCHASE, reward: { kind: "free-shipping" } },
+  } satisfies Record<string, PromoRule>;
+
+  const LUCA = { name: "Luca Romano", jobTitle: "Marketing Manager" };
+  const ARIA = { name: "Aria Kapoor", jobTitle: "Workspace Owner" };
+  const NOOR = { name: "Noor Hassan", jobTitle: "Customer Insights" };
 
   return [
     {
@@ -488,108 +602,233 @@ function seed(): PromoCode[] {
     },
     {
       id: "promo-3",
-      code: "BEAUTY10",
-      name: "10% Off New Arrivals",
-      description: "10% discount on new arrival products. No minimum purchase required.",
-      rule: {
-        condition: { kind: "any-purchase" },
-        reward: { kind: "percent-off", percent: 10, appliesTo: { kind: "any" }, maxDiscount: null },
-      },
+      code: "HEMAT50K",
+      name: "Rp50k Off Any Order",
+      description: "Flat Rp50,000 off any order, no minimum. Ran alongside the mid-year campaign.",
+      rule: RULES.anyAmountOff,
       usageType: "one-to-many",
-      maxUsage: null,
-      limitPerUser: 2,
-      startDate: "2026-05-01T00:00",
-      endDate: "2026-05-31T23:59",
-      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
-      createdAt: "2026-04-27T09:00:00Z",
+      maxUsage: 400,
+      limitPerUser: 1,
+      startDate: "2026-06-15T00:00",
+      endDate: "2026-08-20T23:59",
+      createdBy: LUCA,
+      createdAt: "2026-06-12T09:00:00Z",
       redemptions: [
-        {
-          id: "rdm-3a",
-          contactId: t1001.customerId!,
-          contactName: t1001.customerName,
-          transactionId: t1001.id,
-          invoice: t1001.invoice,
-          discountValue: Math.round(t1001.total * 0.1),
-          sourceName: "New Arrival May",
-          redeemedAt: t1001.date,
-        },
-        {
-          id: "rdm-3b",
-          contactId: t1003.customerId!,
-          contactName: t1003.customerName,
-          transactionId: t1003.id,
-          invoice: t1003.invoice,
-          discountValue: Math.round(t1003.total * 0.1),
-          sourceName: "All Contacts Blast",
-          redeemedAt: t1003.date,
-        },
+        redeem("3a", "tx-1003", RULES.anyAmountOff, "Mid-Year Blast"),
+        redeem("3b", "tx-1007", RULES.anyAmountOff, "ARMA Product Consult"),
       ],
     },
     {
       id: "promo-4",
-      code: "LAURA50K",
-      name: "Laura Mercier Rp50k Off",
-      description: "Rp50,000 off any Laura Mercier product. No minimum purchase.",
-      rule: {
-        condition: {
-          kind: "buy-item",
-          group: {
-            join: "and",
-            lines: [
-              { qty: 1, item: { kind: "specific", items: ["Translucent Loose Setting Powder"] } },
-            ],
-          },
-        },
-        reward: { kind: "amount-off", amount: 50000 },
-      },
+      code: "GRATISONGKIR",
+      name: "Free Shipping — All Orders",
+      description: "Shipping is on us for every ARMA order, anywhere in Indonesia.",
+      rule: RULES.anyFreeShipping,
       usageType: "one-to-many",
-      maxUsage: 100,
-      limitPerUser: 1,
-      startDate: "2026-07-05T00:00",
-      endDate: "2026-08-20T23:59",
-      createdBy: { name: "Noor Hassan", jobTitle: "Customer Insights" },
-      createdAt: "2026-07-02T11:00:00Z",
-      redemptions: [],
+      maxUsage: null,
+      limitPerUser: null,
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-12-31T23:59",
+      createdBy: ARIA,
+      createdAt: "2026-06-28T08:00:00Z",
+      redemptions: [
+        redeem("4a", "tx-1001", RULES.anyFreeShipping, "Free Ongkir Campaign", 30000),
+        redeem("4b", "tx-1013", RULES.anyFreeShipping, "ARMA Product Consult", 35000),
+        redeem("4c", "tx-1021", RULES.anyFreeShipping, "Free Ongkir Campaign", 28000),
+      ],
     },
     {
       id: "promo-5",
       code: "RIMMEL30",
-      name: "Rimmel 30% Off",
-      description: "30% off all Rimmel London products for loyalty customers.",
-      rule: {
-        condition: { kind: "any-purchase" },
-        reward: {
-          kind: "percent-off",
-          percent: 30,
-          appliesTo: {
-            kind: "specific",
-            items: [
-              "Rimmel Translucent Loose Setting Powder",
-              "Rimmel Translucent Hydrating Setting Spray Ultra-Blur",
-            ],
-          },
-          maxDiscount: null,
-        },
-      },
+      name: "Rimmel 30% Off — Buy 2",
+      description:
+        "Buy any two Rimmel products and take 30% off the Rimmel items, up to Rp150,000.",
+      rule: RULES.buyPercentOff,
+      usageType: "one-to-many",
+      maxUsage: 200,
+      limitPerUser: 1,
+      startDate: "2026-07-05T00:00",
+      endDate: "2026-09-05T23:59",
+      createdBy: LUCA,
+      createdAt: "2026-07-01T09:30:00Z",
+      redemptions: [
+        redeem("5a", "tx-1008", RULES.buyPercentOff, "Rimmel Bundle Push"),
+        redeem("5b", "tx-1020", RULES.buyPercentOff, "Rimmel Bundle Push"),
+      ],
+    },
+    {
+      id: "promo-7",
+      code: "ARMAGIFT",
+      name: "Free Setting Powder",
+      description: "A free Translucent Loose Setting Powder with any ARMA order while stocks last.",
+      rule: RULES.anyFreeItem,
       usageType: "one-to-many",
       maxUsage: 300,
-      limitPerUser: null,
-      startDate: "2026-04-01T00:00",
-      endDate: "2026-04-30T23:59",
-      createdBy: { name: "Luca Romano", jobTitle: "Marketing Manager" },
-      createdAt: "2026-03-27T09:00:00Z",
+      limitPerUser: 1,
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-11-30T23:59",
+      createdBy: ARIA,
+      createdAt: "2026-06-26T10:00:00Z",
       redemptions: [
-        {
-          id: "rdm-5a",
-          contactId: t1008.customerId!,
-          contactName: t1008.customerName,
-          transactionId: t1008.id,
-          invoice: t1008.invoice,
-          discountValue: Math.round(t1008.total * 0.3),
-          sourceName: "April Loyalty Blast",
-          redeemedAt: t1008.date,
-        },
+        redeem("7a", "tx-1000", RULES.anyFreeItem, "Gift With Purchase", 189000),
+        redeem("7b", "tx-1012", RULES.anyFreeItem, "ARMA Product Consult", 189000),
       ],
+    },
+    {
+      id: "promo-8",
+      code: "SISLEYONGKIR",
+      name: "Sisley — Free Shipping",
+      description:
+        "Buy any Sisley product and shipping is covered. Starts with the year-end Sisley push.",
+      rule: RULES.buyFreeShipping,
+      usageType: "one-to-many",
+      maxUsage: 250,
+      limitPerUser: 2,
+      startDate: "2026-10-01T00:00",
+      endDate: "2026-12-15T23:59",
+      createdBy: NOOR,
+      createdAt: "2026-09-14T09:00:00Z",
+      redemptions: [],
+    },
+    {
+      id: "promo-9",
+      code: "SPEND2JT",
+      name: "Spend Rp2jt, Get a Free Blush",
+      description: "Spend Rp2,000,000 in one order and a Blush Color Infusion comes free.",
+      rule: RULES.minFreeItem,
+      usageType: "one-to-many",
+      maxUsage: 180,
+      limitPerUser: 1,
+      startDate: "2026-07-10T00:00",
+      endDate: "2026-10-31T23:59",
+      createdBy: LUCA,
+      createdAt: "2026-07-07T09:00:00Z",
+      redemptions: [
+        redeem("9a", "tx-1002", RULES.minFreeItem, "High Basket Reward", 425000),
+        redeem("9b", "tx-1015", RULES.minFreeItem, "High Basket Reward", 425000),
+      ],
+    },
+    {
+      id: "promo-10",
+      code: "BELANJA15",
+      name: "15% Off Over Rp1,5jt",
+      description: "Spend Rp1,500,000 and take 15% off the order, capped at Rp500,000.",
+      rule: RULES.minPercentOff,
+      usageType: "one-to-many",
+      maxUsage: null,
+      limitPerUser: 2,
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-12-31T23:59",
+      createdBy: ARIA,
+      createdAt: "2026-06-27T11:00:00Z",
+      redemptions: [
+        redeem("10a", "tx-1006", RULES.minPercentOff, "Basket Booster"),
+        redeem("10b", "tx-1017", RULES.minPercentOff, "ARMA Product Consult"),
+        redeem("10c", "tx-1025", RULES.minPercentOff, "Basket Booster"),
+      ],
+    },
+    {
+      id: "promo-11",
+      code: "MIN1JT100K",
+      name: "Rp100k Off Over Rp1jt",
+      description: "Spend Rp1,000,000 in one order and take Rp100,000 off.",
+      rule: RULES.minAmountOff,
+      usageType: "one-to-many",
+      maxUsage: 350,
+      limitPerUser: 1,
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-09-10T23:59",
+      createdBy: NOOR,
+      createdAt: "2026-06-29T09:00:00Z",
+      redemptions: [
+        redeem("11a", "tx-1011", RULES.minAmountOff, "Basket Booster"),
+        redeem("11b", "tx-1023", RULES.minAmountOff, "ARMA Product Consult"),
+      ],
+    },
+    {
+      id: "promo-12",
+      code: "ONGKIR500K",
+      name: "Free Shipping Over Rp500k",
+      description: "Orders from Rp500,000 ship free. Planned for the new-year restock.",
+      rule: RULES.minFreeShipping,
+      usageType: "one-to-many",
+      maxUsage: null,
+      limitPerUser: null,
+      startDate: "2026-10-05T00:00",
+      endDate: "2027-01-05T23:59",
+      createdBy: ARIA,
+      createdAt: "2026-09-16T08:30:00Z",
+      redemptions: [],
+    },
+    {
+      id: "promo-13",
+      code: "WELCOMEGIFT",
+      name: "Welcome Gift — First Order",
+      description:
+        "A free setting spray on a customer's very first ARMA order. Issued personally per recipient.",
+      rule: RULES.firstFreeItem,
+      usageType: "one-to-one",
+      maxUsage: null,
+      limitPerUser: null,
+      startDate: "2026-07-15T00:00",
+      endDate: "2026-12-31T23:59",
+      createdBy: NOOR,
+      createdAt: "2026-07-11T10:00:00Z",
+      redemptions: [
+        redeem("13a", "tx-1005", RULES.firstFreeItem, "Welcome Series", 215000),
+        redeem("13b", "tx-1018", RULES.firstFreeItem, "Welcome Series", 215000),
+      ],
+      codeFormat: "WELCOME-####",
+    },
+    {
+      id: "promo-14",
+      code: "NEWBIE15",
+      name: "15% Off Your First Order",
+      description: "New customers take 15% off their first ARMA order, up to Rp300,000.",
+      rule: RULES.firstPercentOff,
+      usageType: "one-to-many",
+      maxUsage: null,
+      limitPerUser: 1,
+      startDate: "2026-07-01T00:00",
+      endDate: "2026-12-31T23:59",
+      createdBy: LUCA,
+      createdAt: "2026-06-25T09:00:00Z",
+      redemptions: [
+        redeem("14a", "tx-1010", RULES.firstPercentOff, "Welcome Series"),
+        redeem("14b", "tx-1022", RULES.firstPercentOff, "Welcome Series"),
+        redeem("14c", "tx-1030", RULES.firstPercentOff, "ARMA Product Consult"),
+      ],
+    },
+    {
+      id: "promo-15",
+      code: "FIRST75K",
+      name: "Rp75k Off Your First Order",
+      description: "Rp75,000 off a first ARMA order. Queued behind the current welcome offer.",
+      rule: RULES.firstAmountOff,
+      usageType: "one-to-many",
+      maxUsage: 500,
+      limitPerUser: 1,
+      startDate: "2026-10-01T00:00",
+      endDate: "2026-12-31T23:59",
+      createdBy: NOOR,
+      createdAt: "2026-09-15T09:00:00Z",
+      redemptions: [],
+    },
+    {
+      id: "promo-16",
+      code: "FIRSTONGKIR",
+      name: "First Order Ships Free",
+      description:
+        "Shipping covered on a customer's first ARMA order. Opens with the new-year intake.",
+      rule: RULES.firstFreeShipping,
+      usageType: "one-to-many",
+      maxUsage: null,
+      limitPerUser: 1,
+      startDate: "2026-11-01T00:00",
+      endDate: "2027-01-31T23:59",
+      createdBy: ARIA,
+      createdAt: "2026-09-18T08:00:00Z",
+      redemptions: [],
     },
     {
       id: "promo-6",
@@ -663,7 +902,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v11";
+const STORAGE_KEY = "aroma_promo_store_v12";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
