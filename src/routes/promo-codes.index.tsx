@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { TablePager, clampPage } from "@/components/scl/referral-ui";
 import { fmtDateEN } from "@/lib/fmt";
-import { AppShell } from "@/components/scl/app-shell";
+import { AppShell, TabCount } from "@/components/scl/app-shell";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useState, useMemo, useRef } from "react";
 import {
@@ -266,7 +266,7 @@ function PromoCodesPage() {
               }`}
             >
               {t.label}
-              <span className="text-[10px] text-muted-foreground tabular-nums">{count}</span>
+              <TabCount value={count} />
             </button>
           );
         })}

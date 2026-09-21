@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { AppShell, SectionCard, TabCount } from "@/components/scl/app-shell";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import {
   useReferralStore,
@@ -75,11 +75,7 @@ function ReferralPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 pulse-dot" />
               )}
               {t.label}
-              {t.count !== undefined && (
-                <span className="inline-grid h-5 min-w-5 place-items-center rounded-full bg-primary/15 px-1.5 text-[10.5px] font-semibold text-primary tabular-nums">
-                  {t.count}
-                </span>
-              )}
+              {t.count !== undefined && <TabCount value={t.count} />}
             </button>
           ))}
         </div>

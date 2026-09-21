@@ -734,6 +734,17 @@ export const labelColorDot: Record<LabelColor, string> = {
   slate: "bg-slate-400",
 };
 
+/** The count that rides along in a tab label — a soft primary disc with the
+ * number in the brand red. Shared so the promo and referral tab strips can't
+ * drift into two different-looking badges. */
+export function TabCount({ value }: { value: number }) {
+  return (
+    <span className="inline-grid h-5 min-w-5 place-items-center rounded-full bg-primary/15 px-1.5 text-[10.5px] font-semibold text-primary tabular-nums">
+      {value}
+    </span>
+  );
+}
+
 export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?: () => void }) {
   return (
     <span
