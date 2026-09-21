@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { TablePager, clampPage } from "@/components/scl/referral-ui";
 import { fmtDateEN } from "@/lib/fmt";
 import { AppShell, TabCount } from "@/components/scl/app-shell";
+import { SclSelect } from "@/components/scl/scl-select";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import { useState, useMemo, useRef } from "react";
 import {
@@ -223,22 +224,6 @@ function PromoCodesPage() {
           />
         </div>
 
-        <div className="flex items-center gap-1">
-          {(["all", "active", "scheduled", "expired"] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => {
-                setFilterStatus(s);
-                setPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${filterStatus === s ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card"}`}
-            >
-              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-          ))}
-        </div>
-
         <button
           type="button"
           onClick={() => navigate({ to: "/promo-codes/new" })}
@@ -248,7 +233,11 @@ function PromoCodesPage() {
         </button>
       </div>
 
-      {/* Usage type — its own row, so it reads as a separate cut of the list */}
+      {/* Usage type, and the status filter alongside it — one row that holds
+          every cut of the list, instead of two strips of buttons. Status is a
+          dropdown because its four options are mutually exclusive and only
+          one is ever in force, so four permanent buttons spent a row's worth
+          of width saying what one line of text says. */}
       <div className="flex flex-wrap items-center gap-1 mb-4">
         {(
           [
@@ -280,6 +269,24 @@ function PromoCodesPage() {
             </button>
           );
         })}
+
+        <div className="ml-auto">
+          <SclSelect
+            value={filterStatus}
+            onChange={(v) => {
+              setFilterStatus(v as "all" | PromoStatus);
+              setPage(1);
+            }}
+            ariaLabel="Filter by status"
+            size="sm"
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "active", label: "Active", dot: "bg-emerald-500" },
+              { value: "scheduled", label: "Scheduled", dot: "bg-slate-400" },
+              { value: "expired", label: "Expired", dot: "bg-rose-500" },
+            ]}
+          />
+        </div>
       </div>
 
       {/* Table */}
