@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, Check, Plus, Search, X } from "lucide-react";
 import { useSkuStore } from "./sku-store";
@@ -101,12 +101,19 @@ function ItemScopeEditor({
   onChange,
   items,
   anyLabel = "Any Item",
+  single = false,
 }: {
   scope: PromoItemScope;
   onChange: (s: PromoItemScope) => void;
   items: SkuItem[];
   anyLabel?: string;
+  /** One choice only, as radios. A Buy/Get line already means "this many of
+   * this one thing" — a second SKU on the same line is what the next line is
+   * for — so ticking several here would say something the rule can't express.
+   * The percent-off scope stays a checklist, where a list is the point. */
+  single?: boolean;
 }) {
+  const radioGroup = useId();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
@@ -176,7 +183,9 @@ function ItemScopeEditor({
           >
             <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
               <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-                <div className="text-sm font-semibold text-foreground">Select Items</div>
+                <div className="text-sm font-semibold text-foreground">
+                  {single ? "Select Item" : "Select Items"}
+                </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
@@ -231,11 +240,25 @@ function ItemScopeEditor({
                   return (
                     <div className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted transition-colors duration-150">
                       <input
-                        type="checkbox"
-                        checked={allFilteredSelected}
-                        title="Select all items matching the current search/brand filter"
+                        type={single ? "radio" : "checkbox"}
+                        name={single ? radioGroup : undefined}
+                        checked={single ? rowChecked : allFilteredSelected}
+                        title={
+                          single
+                            ? "Any item counts, with no particular SKU named"
+                            : "Select all items matching the current search/brand filter"
+                        }
                         className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
                         onChange={() => {
+                          if (single) {
+                            onChange(
+                              isBrandScoped
+                                ? { kind: "any-in-brand", brand: brandFilter }
+                                : { kind: "any" },
+                            );
+                            setOpen(false);
+                            return;
+                          }
                           if (impliedByAny) {
                             onChange({ kind: "specific", items: [] });
                           } else if (allFilteredSelected) {
@@ -287,17 +310,27 @@ function ItemScopeEditor({
                       // Covered by the active "Any Item [in Brand]" rule —
                       // shows checked like every other row, without this
                       // item actually being in an explicit list.
-                      const checked = impliedByAny || selected.includes(it.name);
+                      const checked = single
+                        ? scope.kind === "specific" && scope.items[0] === it.name
+                        : impliedByAny || selected.includes(it.name);
                       return (
                         <label
                           key={`${it.brand}::${it.name}`}
                           className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] hover:bg-muted cursor-pointer transition-colors duration-150"
                         >
                           <input
-                            type="checkbox"
+                            type={single ? "radio" : "checkbox"}
+                            name={single ? radioGroup : undefined}
                             checked={checked}
                             className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
                             onChange={() => {
+                              if (single) {
+                                // The pick *is* the answer, so the picker has
+                                // nothing left to ask — close it.
+                                onChange({ kind: "specific", items: [it.name] });
+                                setOpen(false);
+                                return;
+                              }
                               if (impliedByAny) {
                                 // Opting this one item out of "Any Item [in
                                 // Brand]" — keep everything else in the
@@ -497,6 +530,7 @@ function ItemGroupEditor({
               scope={line.item}
               onChange={(item) => setLine(i, { item })}
               items={items}
+              single
             />
             {lines.length > 1 && (
               <button
@@ -528,7 +562,7 @@ function ItemGroupEditor({
  * heading and its constraint read together. */
 function GroupHeading({ label, atMax }: { label: string; atMax: boolean }) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
+    <div className="flex items-baseline justify-between gap-2 text-[13px]">
       <span className="text-muted-foreground">{label}</span>
       <span
         className={`text-[10.5px] transition-colors duration-200 ${atMax ? "text-primary font-medium" : "text-muted-foreground"}`}
