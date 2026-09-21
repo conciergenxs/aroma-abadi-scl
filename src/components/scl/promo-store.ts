@@ -15,10 +15,22 @@ export type PromoStatus = "active" | "expired" | "scheduled";
 // so the same builder can express any promo shape: Buy 1 Get 1, Buy 2 Get 1
 // different item, min-spend cashback, item-specific % off with a cap, etc.
 
+/** A SKU named on a promo rule. The brand is part of the identity, not
+ * decoration: this catalogue ships a "Translucent Loose Setting Powder" under
+ * both Rimmel and Laura Mercier at very different prices, so a rule that named
+ * the item by name alone could not say which one it meant — and a picker
+ * matching on name alone ticked both. */
+export type PromoItemRef = { name: string; brand: string };
+
+/** Same SKU? Name alone is not an identity here — see PromoItemRef. */
+export function sameItem(a: PromoItemRef, b: PromoItemRef): boolean {
+  return a.name === b.name && a.brand === b.brand;
+}
+
 export type PromoItemScope =
   | { kind: "any" }
   | { kind: "any-in-brand"; brand: string }
-  | { kind: "specific"; items: string[] };
+  | { kind: "specific"; items: PromoItemRef[] };
 
 /** One "N x item" line inside a Buy/Get group. */
 export type PromoItemLine = { qty: number; item: PromoItemScope };
@@ -100,8 +112,8 @@ function scopeLabel(scope: PromoItemScope, anyLabel = "Any Item"): string {
   // An explicit list that ended up empty means nothing is selected — saying
   // "Any Item" there would promise the opposite of what the rule does.
   if (scope.items.length === 0) return "No items selected";
-  if (scope.items.length === 1) return scope.items[0];
-  return `${scope.items[0]} +${scope.items.length - 1} more`;
+  if (scope.items.length === 1) return scope.items[0].name;
+  return `${scope.items[0].name} +${scope.items.length - 1} more`;
 }
 
 /** "2 Soap and 1 Shampoo" / "1 Soap or 1 Shampoo" — the join reads as plain
@@ -388,9 +400,9 @@ function seed(): PromoCode[] {
   // all — which is exactly what a scheduled promo looks like.
   const ANY_PURCHASE: PromoCondition = { kind: "any-purchase" };
   const FIRST_PURCHASE: PromoCondition = { kind: "first-purchase" };
-  const oneLine = (name: string, qty = 1): PromoItemGroup => ({
+  const oneLine = (name: string, brand: string, qty = 1): PromoItemGroup => ({
     join: "and",
-    lines: [{ qty, item: { kind: "specific", items: [name] } }],
+    lines: [{ qty, item: { kind: "specific", items: [{ name, brand }] } }],
   });
   const brandLine = (brand: string, qty = 1): PromoItemGroup => ({
     join: "and",
@@ -400,7 +412,10 @@ function seed(): PromoCode[] {
   const RULES = {
     anyFreeItem: {
       condition: ANY_PURCHASE,
-      reward: { kind: "free-item", group: oneLine("Translucent Loose Setting Powder") },
+      reward: {
+        kind: "free-item",
+        group: oneLine("Translucent Loose Setting Powder", "Rimmel"),
+      },
     },
     anyAmountOff: { condition: ANY_PURCHASE, reward: { kind: "amount-off", amount: 50000 } },
     anyFreeShipping: { condition: ANY_PURCHASE, reward: { kind: "free-shipping" } },
@@ -419,7 +434,7 @@ function seed(): PromoCode[] {
     },
     minFreeItem: {
       condition: { kind: "min-spend", amount: 2000000 },
-      reward: { kind: "free-item", group: oneLine("Blush Color Infusion") },
+      reward: { kind: "free-item", group: oneLine("Blush Color Infusion", "BareMinerals") },
     },
     minPercentOff: {
       condition: { kind: "min-spend", amount: 1500000 },
@@ -442,7 +457,7 @@ function seed(): PromoCode[] {
       condition: FIRST_PURCHASE,
       reward: {
         kind: "free-item",
-        group: oneLine("Translucent Hydrating Setting Spray Ultra-Blur"),
+        group: oneLine("Translucent Hydrating Setting Spray Ultra-Blur", "Rimmel"),
       },
     },
     firstPercentOff: {
@@ -845,7 +860,13 @@ function seed(): PromoCode[] {
           group: {
             join: "and",
             lines: [
-              { qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } },
+              {
+                qty: 1,
+                item: {
+                  kind: "specific",
+                  items: [{ name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana" }],
+                },
+              },
             ],
           },
         },
@@ -854,7 +875,13 @@ function seed(): PromoCode[] {
           group: {
             join: "and",
             lines: [
-              { qty: 1, item: { kind: "specific", items: ["Caviar Hydra-Crème Lipstick 42g"] } },
+              {
+                qty: 1,
+                item: {
+                  kind: "specific",
+                  items: [{ name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana" }],
+                },
+              },
             ],
           },
         },
@@ -905,7 +932,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v12";
+const STORAGE_KEY = "aroma_promo_store_v13";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (
