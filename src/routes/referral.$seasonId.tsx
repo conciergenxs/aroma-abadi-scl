@@ -48,7 +48,7 @@ function SeasonReportPage() {
 
   return (
     <AppShell backTo="/referral" title={season.name}>
-      <div className="max-w-5xl space-y-6 stagger">
+      <div className="space-y-6 stagger">
         {/* What this season does */}
         <div
           className={`rounded-xl bg-card/40 p-5 space-y-4 ${

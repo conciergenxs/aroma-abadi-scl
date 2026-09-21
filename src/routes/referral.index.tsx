@@ -58,7 +58,7 @@ function ReferralPage() {
         </Link>
       }
     >
-      <div className="max-w-5xl space-y-5">
+      <div className="space-y-5">
         <div className="flex items-center gap-1 border-b border-border">
           {tabs.map((t) => (
             <button
