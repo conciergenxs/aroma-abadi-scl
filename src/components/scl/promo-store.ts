@@ -805,9 +805,12 @@ function seed(): PromoCode[] {
       name: "Rp75k Off Your First Order",
       description: "Rp75,000 off a first ARMA order. Queued behind the current welcome offer.",
       rule: RULES.firstAmountOff,
-      usageType: "one-to-many",
-      maxUsage: 500,
-      limitPerUser: 1,
+      // Issued per recipient, and the only 1-to-1 promo that hasn't started —
+      // without it, Scheduled x 1-to-1 is a filter pair with nothing in it.
+      usageType: "one-to-one",
+      maxUsage: null,
+      limitPerUser: null,
+      codeFormat: "FIRST75K-####",
       startDate: "2026-10-01T00:00",
       endDate: "2026-12-31T23:59",
       createdBy: NOOR,

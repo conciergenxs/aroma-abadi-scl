@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useState } from "react";
+import { TablePager, clampPage } from "./referral-ui";
 import { createPortal } from "react-dom";
 import { ChevronDown, Check, Plus, Search, X } from "lucide-react";
 import { useSkuStore } from "./sku-store";
@@ -117,6 +118,8 @@ function ItemScopeEditor({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const selected = scope.kind === "specific" ? scope.items : [];
 
   // Reopening the picker starts from the full catalogue — a filter left over
@@ -127,6 +130,11 @@ function ItemScopeEditor({
       setBrandFilter("all");
     }
   }, [open]);
+
+  // Narrowing the list invalidates whatever page you were on.
+  useEffect(() => {
+    setPage(1);
+  }, [search, brandFilter]);
 
   const brands = useMemo(() => Array.from(new Set(items.map((it) => it.brand))).sort(), [items]);
 
@@ -139,6 +147,11 @@ function ItemScopeEditor({
       return matchesBrand && matchesSearch;
     });
   }, [items, search, brandFilter]);
+
+  // The catalogue is paged, but "select all matching" and the Any Item row
+  // still mean the whole filtered set, not just the rows on screen.
+  const safePage = clampPage(page, filtered.length, pageSize);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const label =
     scope.kind === "any"
@@ -181,7 +194,7 @@ function ItemScopeEditor({
               if (e.target === e.currentTarget) setOpen(false);
             }}
           >
-            <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
+            <div className="w-full max-w-3xl max-h-[85vh] flex flex-col bg-card border border-border rounded-xl shadow-2xl modal-content">
               <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
                 <div className="text-sm font-semibold text-foreground">
                   {single ? "Select Item" : "Select Items"}
@@ -256,7 +269,6 @@ function ItemScopeEditor({
                                 ? { kind: "any-in-brand", brand: brandFilter }
                                 : { kind: "any" },
                             );
-                            setOpen(false);
                             return;
                           }
                           if (impliedByAny) {
@@ -306,7 +318,7 @@ function ItemScopeEditor({
                   </p>
                 ) : (
                   <div className="animate-fade-in">
-                    {filtered.map((it) => {
+                    {paged.map((it) => {
                       // Covered by the active "Any Item [in Brand]" rule —
                       // shows checked like every other row, without this
                       // item actually being in an explicit list.
@@ -325,10 +337,9 @@ function ItemScopeEditor({
                             className="accent-[oklch(0.62_0.17_40)] h-3.5 w-3.5 shrink-0"
                             onChange={() => {
                               if (single) {
-                                // The pick *is* the answer, so the picker has
-                                // nothing left to ask — close it.
+                                // Swap the one choice; closing is Done's job,
+                                // so a mis-click can be corrected in place.
                                 onChange({ kind: "specific", items: [it.name] });
-                                setOpen(false);
                                 return;
                               }
                               if (impliedByAny) {
@@ -359,6 +370,17 @@ function ItemScopeEditor({
                   </div>
                 )}
               </div>
+              {filtered.length > 0 && (
+                <div className="border-t border-border shrink-0">
+                  <TablePager
+                    page={safePage}
+                    pageSize={pageSize}
+                    total={filtered.length}
+                    onPage={setPage}
+                    onPageSize={setPageSize}
+                  />
+                </div>
+              )}
               <div className="p-3 border-t border-border flex justify-end shrink-0">
                 <button
                   type="button"

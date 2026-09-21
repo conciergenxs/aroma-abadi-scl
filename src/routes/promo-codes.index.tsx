@@ -167,9 +167,17 @@ function PromoCodesPage() {
   const [pageSize, setPageSize] = useState(10);
   const [deletingPromo, setDeletingPromo] = useState<PromoCode | null>(null);
 
+  // The status tab narrows the list the usage tabs then cut up, so their
+  // counts have to be taken from here rather than from the whole catalogue —
+  // otherwise a tab advertises rows that clicking it doesn't produce.
+  const byStatus = useMemo(
+    () =>
+      filterStatus === "all" ? promos : promos.filter((p) => getPromoStatus(p) === filterStatus),
+    [promos, filterStatus],
+  );
+
   const filtered = useMemo(() => {
-    let list = promos;
-    if (filterStatus !== "all") list = list.filter((p) => getPromoStatus(p) === filterStatus);
+    let list = byStatus;
     if (filterUsage !== "all") list = list.filter((p) => p.usageType === filterUsage);
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -181,7 +189,7 @@ function PromoCodesPage() {
       );
     }
     return list;
-  }, [promos, search, filterStatus, filterUsage]);
+  }, [byStatus, search, filterUsage]);
 
   // Clamp on read: deleting the last row of the last page would otherwise
   // leave the view on a page that no longer exists, with the pager hidden.
@@ -250,7 +258,9 @@ function PromoCodesPage() {
           ] as const
         ).map((t) => {
           const count =
-            t.key === "all" ? promos.length : promos.filter((p) => p.usageType === t.key).length;
+            t.key === "all"
+              ? byStatus.length
+              : byStatus.filter((p) => p.usageType === t.key).length;
           return (
             <button
               key={t.key}
