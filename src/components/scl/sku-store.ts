@@ -226,7 +226,7 @@ export function availableOdooProducts(importedCodes: string[]): OdooProduct[] {
   return ODOO_CATALOG.filter((p) => !importedCodes.includes(p.code));
 }
 
-const STORAGE_KEY = "aroma_sku_store_v5";
+const STORAGE_KEY = "aroma_sku_store_v6";
 
 function seed(): Brand[] {
   return [
@@ -752,6 +752,180 @@ function seed(): Brand[] {
                   coverUrl: kc4,
                   title: "Application",
                   text: "Tap brush, knock off excess, sweep from apple of cheek towards temples.",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "brand-ct",
+      name: "Charlotte Tilbury",
+      modules: [
+        {
+          id: "mod-ct-b-1",
+          name: "Charlotte's Red Carpet Heritage",
+          coverUrl: kc1,
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-ct-b-2",
+          name: "Magic Range Positioning Guide",
+          coverUrl: kc2,
+          knowledgeCards: [],
+        },
+      ],
+      categories: [
+        {
+          id: "cat-ct-lip",
+          brandId: "brand-ct",
+          name: "Lip",
+          modules: [
+            {
+              id: "mod-ct-c-1",
+              name: "Pillow Talk Shade Family Guide",
+              coverUrl: kc1,
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-ct-c-2",
+              name: "Lip Liner Pairing Technique",
+              coverUrl: kc2,
+              knowledgeCards: [],
+            },
+          ],
+          skus: [
+            {
+              id: "sku-ct-matte-revolution",
+              categoryId: "cat-ct-lip",
+              name: "Matte Revolution Lipstick",
+              code: "CT-MRL-12",
+              price: 595000,
+              description:
+                "Lipstick matte dengan finish soft-focus, pigmentasi penuh, tidak mengeringkan bibir.",
+              knowledgeCards: [
+                {
+                  id: "kc-ct-matte-revolution-1",
+                  coverUrl: kc1,
+                  title: "Pillow Talk Family",
+                  text: "Empat undertone berbeda dalam satu keluarga shade — cocokkan dengan warna bibir asli, bukan warna kulit.",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "brand-nars",
+      name: "NARS",
+      modules: [
+        {
+          id: "mod-nars-b-1",
+          name: "NARS Artistry Philosophy",
+          coverUrl: kc1,
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-nars-b-2",
+          name: "Counter Artist Service Standards",
+          coverUrl: kc2,
+          knowledgeCards: [],
+        },
+      ],
+      categories: [
+        {
+          id: "cat-nars-foundation",
+          brandId: "brand-nars",
+          name: "Foundation",
+          modules: [
+            {
+              id: "mod-nars-c-1",
+              name: "Light Reflecting Technology Explainer",
+              coverUrl: kc1,
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-nars-c-2",
+              name: "Undertone Matching Workflow",
+              coverUrl: kc2,
+              knowledgeCards: [],
+            },
+          ],
+          skus: [
+            {
+              id: "sku-nars-light-reflecting",
+              categoryId: "cat-nars-foundation",
+              name: "Light Reflecting Foundation",
+              code: "NARS-LRF-30",
+              price: 1150000,
+              description:
+                "Foundation medium coverage dengan optical blurring, finish natural luminous.",
+              knowledgeCards: [
+                {
+                  id: "kc-nars-light-reflecting-1",
+                  coverUrl: kc1,
+                  title: "Blurring Optics",
+                  text: "Partikel pemantul cahaya menyamarkan pori tanpa menambah ketebalan lapisan.",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "brand-clinique",
+      name: "Clinique",
+      modules: [
+        {
+          id: "mod-clinique-b-1",
+          name: "Allergy Tested, 100% Fragrance Free",
+          coverUrl: kc1,
+          knowledgeCards: [],
+        },
+        {
+          id: "mod-clinique-b-2",
+          name: "Dermatologist-Developed Claims",
+          coverUrl: kc2,
+          knowledgeCards: [],
+        },
+      ],
+      categories: [
+        {
+          id: "cat-clinique-powder",
+          brandId: "brand-clinique",
+          name: "Powder",
+          modules: [
+            {
+              id: "mod-clinique-c-1",
+              name: "Sensitive Skin Recommendation Guide",
+              coverUrl: kc1,
+              knowledgeCards: [],
+            },
+            {
+              id: "mod-clinique-c-2",
+              name: "Oil-Control Layering Technique",
+              coverUrl: kc2,
+              knowledgeCards: [],
+            },
+          ],
+          skus: [
+            {
+              id: "sku-clinique-blended-face-powder",
+              categoryId: "cat-clinique-powder",
+              name: "Blended Face Powder",
+              code: "CLQ-BFP-35",
+              price: 545000,
+              description:
+                "Loose powder ringan untuk set makeup, bebas parfum, aman untuk kulit sensitif.",
+              knowledgeCards: [
+                {
+                  id: "kc-clinique-blended-face-powder-1",
+                  coverUrl: kc1,
+                  title: "Fragrance Free",
+                  text: "Tanpa parfum sama sekali — aman direkomendasikan ke pelanggan dengan kulit reaktif.",
                 },
               ],
             },

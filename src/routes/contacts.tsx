@@ -370,7 +370,7 @@ function ContactsPage() {
                       setSelected([]);
                     }}
                     onDoubleClick={() => setAudienceModalId(l.id)}
-                    className={`w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-gray-50 flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`press w-full text-left px-3 py-1.5 text-[12px] rounded hover:bg-gray-50 flex items-center gap-2 transition-colors ${activeView === l.id ? "text-foreground bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <Users className="h-3 w-3 shrink-0" />
                     <span className="truncate flex-1">{l.name}</span>
@@ -811,7 +811,7 @@ function BrandsNav({
                 setActiveView(`brand:${brand.id}`);
                 setSelected([]);
               }}
-              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+              className={`press w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition-colors ${
                 active
                   ? "bg-primary/15 text-foreground"
                   : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
