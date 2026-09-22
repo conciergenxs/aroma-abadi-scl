@@ -145,6 +145,14 @@ export const initialLists: ContactList[] = [
   { id: "ls-bandung", name: "Customers — Bandung", description: "Paris van Java & TSM stores" },
   { id: "ls-launch", name: "Product Launch Audience", description: "Opted-in to new SKU launches" },
   { id: "ls-community", name: "Aroma Beauty Club", description: "WhatsApp loyalty community" },
+  { id: "ls-surabaya", name: "Customers — Surabaya", description: "Galaxy Mall & Pakuwon stores" },
+  { id: "ls-lapsed", name: "Lapsed 90 Days", description: "No ARMA order in the last quarter" },
+  { id: "ls-highspend", name: "High Spenders", description: "Above Rp5jt lifetime basket" },
+  {
+    id: "ls-tips",
+    name: "Beauty Tips Subscribers",
+    description: "Opted in to the weekly WhatsApp tips broadcast",
+  },
 ];
 
 export const contacts: Contact[] = [
