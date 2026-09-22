@@ -441,7 +441,7 @@ function CreateTemplatePage() {
             <button
               onClick={() => submit("submit")}
               disabled={!valid}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <Send className="h-3.5 w-3.5" /> Submit for review
             </button>

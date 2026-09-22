@@ -115,7 +115,7 @@ function WhatsAppDetail() {
           </div>
           <div className="text-[15px] font-semibold">Rp235,000</div>
           <div className="text-[10px] text-muted-foreground">per number / month</div>
-          <button className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+          <button className="press icon-pop mt-3 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
             <Plus className="h-3.5 w-3.5" />
             Connect
           </button>

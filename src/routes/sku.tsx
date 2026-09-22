@@ -242,7 +242,7 @@ function BrandsOverview({
         </div>
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
         >
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
@@ -1276,7 +1276,7 @@ function SkuEditModal({
           <button
             type="button"
             onClick={() => onSubmit({ photoUrl, description: description.trim() })}
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
             Save Changes
           </button>
@@ -1559,7 +1559,7 @@ function ModuleFormModal({
           <button
             type="button"
             onClick={submit}
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
             {initial ? "Save Changes" : "Add Module"}
           </button>
@@ -2012,7 +2012,7 @@ function KnowledgeCardForm({
           </button>
           <button
             type="submit"
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
           >
             Save
           </button>
@@ -2116,7 +2116,7 @@ function BrandFormModal({
           </button>
           <button
             type="submit"
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
           >
             Add Brand
           </button>
@@ -2239,7 +2239,7 @@ function SkuFormModal({
           <button
             type="button"
             onClick={submit}
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
           >
             Add SKU
           </button>

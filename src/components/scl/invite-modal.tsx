@@ -183,7 +183,7 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
         <div className="flex justify-end gap-2 pt-2">
           <button
             onClick={onClose}
-            className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+            className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
           >
             Done
           </button>
@@ -231,7 +231,7 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
             toast.success(`Invitation sent to ${phone} via WhatsApp`);
             setSentLink(link);
           }}
-          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
+          className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Send Invitation
         </button>
@@ -342,7 +342,7 @@ function AgentTab({
         </button>
         <button
           onClick={handleConnect}
-          className="h-9 px-3 rounded-md bg-primary text-xs font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
+          className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
           <Bot className="h-3.5 w-3.5" /> Connect Agent
         </button>

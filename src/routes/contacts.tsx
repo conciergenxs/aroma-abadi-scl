@@ -415,7 +415,7 @@ function ContactsPage() {
               )}
               <button
                 onClick={() => setShowManageProps(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 py-2 text-xs hover:bg-card transition-colors duration-150"
+                className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] hover:bg-card transition-colors duration-150"
               >
                 <Settings2 className="h-3.5 w-3.5" /> Manage Properties
                 <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">
@@ -424,7 +424,7 @@ function ContactsPage() {
               </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+                className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> New Contact
               </button>

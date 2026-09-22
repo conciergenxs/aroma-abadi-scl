@@ -233,7 +233,7 @@ function PromoCodesPage() {
         <button
           type="button"
           onClick={() => navigate({ to: "/promo-codes/new" })}
-          className="press icon-pop ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="press icon-pop ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Create Promo
         </button>

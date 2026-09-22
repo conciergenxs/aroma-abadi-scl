@@ -1100,7 +1100,7 @@ function InboxPage() {
                     <button
                       onClick={submitReply}
                       disabled={!replyText.trim()}
-                      className="inline-flex items-center gap-2 h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center gap-2 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className="h-3.5 w-3.5" /> Send
                     </button>

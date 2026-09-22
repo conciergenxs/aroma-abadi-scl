@@ -119,7 +119,7 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
     >
       {children}
     </button>

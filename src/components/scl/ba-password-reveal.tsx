@@ -80,7 +80,7 @@ export function RevealPasswordModal({
           <button
             type="submit"
             disabled={checking || !value}
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium disabled:opacity-60 inline-flex items-center gap-1.5"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium disabled:opacity-60 inline-flex items-center gap-1.5"
           >
             {checking && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {checking ? "Verifying…" : "Confirm"}

@@ -208,7 +208,7 @@ function BAPage() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity"
             >
               <Plus className="h-3.5 w-3.5" /> Add BA
             </button>
@@ -375,7 +375,7 @@ function BAPage() {
                   toast.success(`New password: ${pw}`);
                   setResetConfirm(null);
                 }}
-                className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+                className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
               >
                 Reset
               </button>
@@ -655,7 +655,7 @@ function BAForm({
           </button>
           <button
             type="submit"
-            className="rounded-md bg-primary text-primary-foreground px-3 h-9 text-[14px] font-medium"
+            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
           >
             {initial ? "Save" : "Add BA"}
           </button>

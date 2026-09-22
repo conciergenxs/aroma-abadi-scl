@@ -641,7 +641,7 @@ export function RolesPermissionsModule() {
         </div>
         <button
           onClick={() => setView({ mode: "create" })}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create New Role
         </button>
@@ -853,14 +853,14 @@ function RoleEditor({
           <button
             disabled={step === 1 && !canContinue1}
             onClick={() => setStep((step + 1) as Step)}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             Continue
           </button>
         ) : (
           <button
             onClick={() => onSubmit(name.trim(), description.trim(), state)}
-            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+            className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
           >
             {initial ? "Save Changes" : "Create Role"}
           </button>
@@ -1215,7 +1215,7 @@ function RoleDetailPage({
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setShowAssign(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <UserPlus className="h-3.5 w-3.5" /> Add User
             </button>
@@ -1494,7 +1494,7 @@ function AssignUsersModal({
             <button
               disabled={selected.length === 0}
               onClick={() => onSubmit(selected)}
-              className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+              className="inline-flex items-center rounded-md px-4 h-9 text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
               Assign Users
             </button>

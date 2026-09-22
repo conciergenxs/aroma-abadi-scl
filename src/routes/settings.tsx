@@ -502,7 +502,7 @@ function WhatsAppQrTab() {
               </button>
               <button
                 onClick={copy}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors duration-150"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors duration-150"
               >
                 <Copy className="h-3.5 w-3.5" /> Copy link
               </button>
@@ -723,7 +723,7 @@ function CompanySecurityTab() {
                     setDraft("");
                     toast.success("IP added to allowlist");
                   }}
-                  className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+                  className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add IP address
                 </button>
@@ -917,7 +917,7 @@ function UserManagementPage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Invite user
         </button>
@@ -1546,7 +1546,7 @@ function TeamManagementPage() {
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
           <Plus className="h-3.5 w-3.5" /> Create Team
         </button>
@@ -1745,7 +1745,7 @@ function TeamFormModal({
           <button
             disabled={!name.trim()}
             onClick={() => onSubmit(name.trim(), channelId)}
-            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            className="inline-flex items-center rounded-md px-4 h-9 text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             {submitLabel}
           </button>
@@ -1819,7 +1819,7 @@ function TeamDetailPage({
             </button>
             <button
               onClick={() => setAddOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <UserPlus className="h-3.5 w-3.5" /> Add Team Members
             </button>
@@ -2036,7 +2036,7 @@ function AddMembersModal({
           <button
             disabled={picked.length === 0}
             onClick={() => onSubmit(picked)}
-            className="inline-flex items-center rounded-md px-3 h-9 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            className="inline-flex items-center rounded-md px-4 h-9 text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           >
             Add Members
           </button>
