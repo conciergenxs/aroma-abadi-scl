@@ -49,17 +49,9 @@ function ReferralPage() {
     <AppShell
       title="Referral"
       subtitle="Every customer has a permanent referral code — seasons decide when it works and what it gives"
-      actions={
-        <Link
-          to="/referral/new"
-          className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="h-3.5 w-3.5" /> New Season
-        </Link>
-      }
     >
       <div className="space-y-5">
-        <div className="flex items-center gap-1 border-b border-border">
+        <div className="flex flex-wrap items-center gap-1 border-b border-border">
           {tabs.map((t) => (
             <button
               key={t.key}
@@ -78,6 +70,16 @@ function ReferralPage() {
               {t.count !== undefined && <TabCount value={t.count} />}
             </button>
           ))}
+
+          {/* Sits on the tabs' row rather than up in the page header, so the
+              action and the thing it acts on read as one band. `pb-2` lifts it
+              clear of the tab underline. */}
+          <Link
+            to="/referral/new"
+            className="press icon-pop ml-auto mb-1.5 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5" /> New Season
+          </Link>
         </div>
 
         {tab === "ongoing" &&
