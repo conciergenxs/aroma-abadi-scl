@@ -864,7 +864,7 @@ function seed(): PromoCode[] {
 // Bump this whenever the PromoCode/PromoRule shape changes — otherwise browsers
 // with an older cached shape in localStorage will load stale data that crashes
 // against the current code (e.g. rule.condition/reward missing on old records).
-const STORAGE_KEY = "aroma_promo_store_v14";
+const STORAGE_KEY = "aroma_promo_store_v15";
 
 function isCurrentShape(promos: unknown): promos is PromoCode[] {
   return (

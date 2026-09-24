@@ -235,7 +235,7 @@ function seed(): ReferralSeason[] {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 // v3: seasons carry their own promo rule and uses point at real ARMA orders.
-const STORAGE_KEY = "aroma_referral_store_v4";
+const STORAGE_KEY = "aroma_referral_store_v5";
 
 function isCurrentShape(seasons: unknown): seasons is ReferralSeason[] {
   return (
