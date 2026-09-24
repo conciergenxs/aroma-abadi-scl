@@ -810,7 +810,7 @@ function InboxPage() {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto stagger">
+          <div className="flex-1 overflow-y-auto pb-[60px] stagger">
             {sortedVisible.length === 0 && (
               <div className="px-4 py-10 text-center text-[11px] text-muted-foreground">
                 No conversations match the current filters.
