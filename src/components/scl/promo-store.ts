@@ -516,7 +516,6 @@ function seed(): PromoCode[] {
       redemptions: [
         redeem("1a", "tx-1015", RULES.anyPercentOff, "June Flash Sale"),
         redeem("1b", "tx-1018", RULES.anyPercentOff, "VIP Customer Blast"),
-        redeem("1c", "tx-1020", RULES.anyPercentOff, "End of Month Promo"),
       ],
     },
     {
@@ -593,10 +592,7 @@ function seed(): PromoCode[] {
       endDate: "2026-08-20T23:59",
       createdBy: LUCA,
       createdAt: "2026-06-12T09:00:00Z",
-      redemptions: [
-        redeem("3a", "tx-1023", RULES.anyAmountOff, "Mid-Year Blast"),
-        redeem("3b", "tx-1028", RULES.anyAmountOff, "ARMA Product Consult"),
-      ],
+      redemptions: [],
     },
     {
       id: "promo-4",
@@ -614,7 +610,6 @@ function seed(): PromoCode[] {
       redemptions: [
         redeem("4a", "tx-1030", RULES.anyFreeShipping, "Free Ongkir Campaign", 30000),
         redeem("4b", "tx-1031", RULES.anyFreeShipping, "ARMA Product Consult", 35000),
-        redeem("4c", "tx-1032", RULES.anyFreeShipping, "Free Ongkir Campaign", 28000),
       ],
     },
     {
@@ -653,7 +648,6 @@ function seed(): PromoCode[] {
       redemptions: [
         redeem("6a", "tx-1006", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
         redeem("6b", "tx-1007", RULES.buyDgFreeItem, "ARMA Product Consult", 685000),
-        redeem("6c", "tx-1017", RULES.buyDgFreeItem, "Lipstick BOGO Blast", 685000),
       ],
     },
     {
@@ -669,10 +663,7 @@ function seed(): PromoCode[] {
       endDate: "2026-11-30T23:59",
       createdBy: ARIA,
       createdAt: "2026-06-26T10:00:00Z",
-      redemptions: [
-        redeem("7a", "tx-1033", RULES.anyFreeItem, "Gift With Purchase", 189000),
-        redeem("7b", "tx-1035", RULES.anyFreeItem, "ARMA Product Consult", 189000),
-      ],
+      redemptions: [],
     },
     {
       id: "promo-8",
@@ -703,10 +694,7 @@ function seed(): PromoCode[] {
       endDate: "2026-10-31T23:59",
       createdBy: LUCA,
       createdAt: "2026-07-07T09:00:00Z",
-      redemptions: [
-        redeem("9a", "tx-1000", RULES.minFreeItem, "High Basket Reward", 425000),
-        redeem("9b", "tx-1001", RULES.minFreeItem, "High Basket Reward", 425000),
-      ],
+      redemptions: [],
     },
     {
       id: "promo-10",
@@ -724,7 +712,6 @@ function seed(): PromoCode[] {
       redemptions: [
         redeem("10a", "tx-1011", RULES.minPercentOff, "Basket Booster"),
         redeem("10b", "tx-1013", RULES.minPercentOff, "ARMA Product Consult"),
-        redeem("10c", "tx-1016", RULES.minPercentOff, "Basket Booster"),
       ],
     },
     {
@@ -740,10 +727,7 @@ function seed(): PromoCode[] {
       endDate: "2026-09-10T23:59",
       createdBy: NOOR,
       createdAt: "2026-06-29T09:00:00Z",
-      redemptions: [
-        redeem("11a", "tx-1003", RULES.minAmountOff, "Basket Booster"),
-        redeem("11b", "tx-1021", RULES.minAmountOff, "ARMA Product Consult"),
-      ],
+      redemptions: [],
     },
     {
       id: "promo-12",
@@ -838,7 +822,6 @@ function seed(): PromoCode[] {
       redemptions: [
         redeem("14a", "tx-1025", RULES.firstPercentOff, "Welcome Series"),
         redeem("14b", "tx-1026", RULES.firstPercentOff, "Welcome Series"),
-        redeem("14c", "tx-1027", RULES.firstPercentOff, "ARMA Product Consult"),
       ],
     },
     {

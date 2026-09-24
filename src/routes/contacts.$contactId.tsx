@@ -1127,197 +1127,201 @@ function RedeemedTab({
           React reuses the subtree and the content swaps with no motion. */}
       <div key={sub} className="animate-fade-in">
         {sub === "referral" ? (
-        <section className="space-y-3 animate-fade-in">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger">
-            <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Used a referral code
-              </div>
-              {usedCode ? (
-                <div className="mt-1.5 space-y-1 text-[12px]">
-                  <div>
-                    Referred by{" "}
-                    <Link
-                      to="/contacts/$contactId"
-                      params={{ contactId: usedCode.referrerId }}
-                      className="font-medium text-primary hover:underline"
-                    >
-                      {usedCode.referrerName}
-                    </Link>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
-                    <code className="font-mono text-[11px] text-foreground bg-muted/60 border border-border rounded px-1.5 py-0.5">
-                      {usedCode.code}
-                    </code>
-                    {txById.has(usedCode.transactionId) ? (
-                      <button
-                        type="button"
-                        onClick={() => openPeek(usedCode.transactionId)}
-                        className="press font-mono text-primary hover:underline"
-                      >
-                        {usedCode.invoice}
-                      </button>
-                    ) : (
-                      <span className="font-mono">{usedCode.invoice}</span>
-                    )}
-                    <span>−{formatIDR(usedCode.discountValue)}</span>
-                  </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    {usedCode.seasonName} · {fmtDateTimeEN(usedCode.usedAt)}
-                  </div>
+          <section className="space-y-3 animate-fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger">
+              <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Used a referral code
                 </div>
-              ) : (
-                <p className="mt-1.5 text-[12px] text-muted-foreground italic">
-                  Hasn't used anyone's referral code.
-                </p>
-              )}
-            </div>
-
-            <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Their code
-              </div>
-              <div className="mt-1.5 flex items-center gap-2">
-                <code className="font-mono text-[14px] font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2 py-0.5">
-                  {referralCode ?? "—"}
-                </code>
-                {referralCode && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(referralCode);
-                      toast.success("Referral code copied");
-                    }}
-                    title="Copy"
-                    className="press icon-pop text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </button>
+                {usedCode ? (
+                  <div className="mt-1.5 space-y-1 text-[12px]">
+                    <div>
+                      Referred by{" "}
+                      <Link
+                        to="/contacts/$contactId"
+                        params={{ contactId: usedCode.referrerId }}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        {usedCode.referrerName}
+                      </Link>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
+                      <code className="font-mono text-[11px] text-foreground bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                        {usedCode.code}
+                      </code>
+                      {txById.has(usedCode.transactionId) ? (
+                        <button
+                          type="button"
+                          onClick={() => openPeek(usedCode.transactionId)}
+                          className="press font-mono text-primary hover:underline"
+                        >
+                          {usedCode.invoice}
+                        </button>
+                      ) : (
+                        <span className="font-mono">{usedCode.invoice}</span>
+                      )}
+                      <span>−{formatIDR(usedCode.discountValue)}</span>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {usedCode.seasonName} · {fmtDateTimeEN(usedCode.usedAt)}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-1.5 text-[12px] text-muted-foreground italic">
+                    Hasn't used anyone's referral code.
+                  </p>
                 )}
               </div>
-              <div className="mt-1.5 text-[12px] text-muted-foreground">
-                Used by <span className="font-semibold text-foreground">{referred.length}</span>{" "}
-                customer
-                {referred.length === 1 ? "" : "s"}
-              </div>
-            </div>
-          </div>
 
-          {referred.length > 0 && (
-            <div className="rounded-lg border border-border overflow-x-auto animate-fade-in">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-white">
-                    <th className={th}>Used by</th>
-                    <th className={th}>Transaction</th>
-                    <th className={th}>Order</th>
-                    <th className={th}>Used</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border stagger">
-                  {referred.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <Link
-                          to="/contacts/$contactId"
-                          params={{ contactId: u.referredId }}
-                          className="text-xs font-medium text-primary hover:underline"
-                        >
-                          {u.referredName}
-                        </Link>
-                        <div className="text-[11px] text-muted-foreground mt-0.5">{u.seasonName}</div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <TransactionCell
-                          invoice={u.invoice}
-                          date={txById.get(u.transactionId)?.date ?? u.usedAt}
-                          disabled={!txById.has(u.transactionId)}
-                          onOpen={() => openPeek(u.transactionId)}
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
-                        {formatIDR(u.orderValue)}
-                      </td>
-                      <td className="px-4 py-3 text-[11px] text-muted-foreground whitespace-nowrap">
-                        {fmtDateTimeEN(u.usedAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-        ) : (
-        <section className="space-y-3 animate-fade-in">
-          {redemptions.length === 0 ? (
-            <p className="text-[12px] text-muted-foreground italic">No promo codes redeemed yet.</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 gap-3 stagger">
-                <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Total Redemptions
-                  </div>
-                  <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
+              <div className="card-hover rounded-lg border border-border bg-card/60 px-4 py-3 transition-all duration-300">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Their code
                 </div>
-                <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Total Discount Received
-                  </div>
-                  <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <code className="font-mono text-[14px] font-semibold tracking-wider text-foreground bg-primary/10 border border-primary/20 rounded px-2 py-0.5">
+                    {referralCode ?? "—"}
+                  </code>
+                  {referralCode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(referralCode);
+                        toast.success("Referral code copied");
+                      }}
+                      title="Copy"
+                      className="press icon-pop text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="mt-1.5 text-[12px] text-muted-foreground">
+                  Used by <span className="font-semibold text-foreground">{referred.length}</span>{" "}
+                  customer
+                  {referred.length === 1 ? "" : "s"}
                 </div>
               </div>
-              <div className="rounded-lg border border-border overflow-x-auto">
+            </div>
+
+            {referred.length > 0 && (
+              <div className="rounded-lg border border-border overflow-x-auto animate-fade-in">
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-white">
-                      <th className={th}>Promo Code</th>
+                      <th className={th}>Used by</th>
                       <th className={th}>Transaction</th>
-                      <th className={th}>Items</th>
-                      <th className={th}>Order Total</th>
-                      <th className={th}>Benefit</th>
+                      <th className={th}>Order</th>
+                      <th className={th}>Used</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border stagger">
-                    {redemptions.map((r) => (
-                      <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                    {referred.map((u) => (
+                      <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-foreground text-xs">{r.promoName}</div>
-                          <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                            {r.promoCode}
+                          <Link
+                            to="/contacts/$contactId"
+                            params={{ contactId: u.referredId }}
+                            className="text-xs font-medium text-primary hover:underline"
+                          >
+                            {u.referredName}
+                          </Link>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">
+                            {u.seasonName}
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <TransactionCell
-                            invoice={r.invoice}
-                            date={txById.get(r.transactionId)?.date ?? r.redeemedAt}
-                            disabled={!txById.has(r.transactionId)}
-                            onOpen={() => openPeek(r.transactionId)}
+                            invoice={u.invoice}
+                            date={txById.get(u.transactionId)?.date ?? u.usedAt}
+                            disabled={!txById.has(u.transactionId)}
+                            onOpen={() => openPeek(u.transactionId)}
                           />
                         </td>
-                        <td className="px-4 py-3 text-[11px] text-muted-foreground max-w-[220px]">
-                          {txById
-                            .get(r.transactionId)
-                            ?.items.map((i) => `${i.qty}× ${i.skuName}`)
-                            .join(", ") ?? "—"}
+                        <td className="px-4 py-3 text-xs font-medium whitespace-nowrap">
+                          {formatIDR(u.orderValue)}
                         </td>
-                        <td className="px-4 py-3 text-left text-xs whitespace-nowrap">
-                          {txById.has(r.transactionId)
-                            ? formatIDR(txById.get(r.transactionId)?.total ?? 0)
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
-                          {benefitFor(r.promoRule, r.discountValue)}
+                        <td className="px-4 py-3 text-[11px] text-muted-foreground whitespace-nowrap">
+                          {fmtDateTimeEN(u.usedAt)}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </>
-          )}
-        </section>
+            )}
+          </section>
+        ) : (
+          <section className="space-y-3 animate-fade-in">
+            {redemptions.length === 0 ? (
+              <p className="text-[12px] text-muted-foreground italic">
+                No promo codes redeemed yet.
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 stagger">
+                  <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Total Redemptions
+                    </div>
+                    <div className="text-lg font-semibold mt-1">{redemptions.length}</div>
+                  </div>
+                  <div className="rounded-lg border border-border bg-card/60 px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Total Discount Received
+                    </div>
+                    <div className="text-lg font-semibold mt-1">{formatIDR(totalDiscount)}</div>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-border overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-white">
+                        <th className={th}>Promo Code</th>
+                        <th className={th}>Transaction</th>
+                        <th className={th}>Items</th>
+                        <th className={th}>Order Total</th>
+                        <th className={th}>Benefit</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border stagger">
+                      {redemptions.map((r) => (
+                        <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-foreground text-xs">{r.promoName}</div>
+                            <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                              {r.promoCode}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <TransactionCell
+                              invoice={r.invoice}
+                              date={txById.get(r.transactionId)?.date ?? r.redeemedAt}
+                              disabled={!txById.has(r.transactionId)}
+                              onOpen={() => openPeek(r.transactionId)}
+                            />
+                          </td>
+                          <td className="px-4 py-3 text-[11px] text-muted-foreground max-w-[220px]">
+                            {txById
+                              .get(r.transactionId)
+                              ?.items.map((i) => `${i.qty}× ${i.skuName}`)
+                              .join(", ") ?? "—"}
+                          </td>
+                          <td className="px-4 py-3 text-left text-xs whitespace-nowrap">
+                            {txById.has(r.transactionId)
+                              ? formatIDR(txById.get(r.transactionId)?.total ?? 0)
+                              : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-left text-xs font-medium text-foreground whitespace-nowrap">
+                            {benefitFor(r.promoRule, r.discountValue)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </section>
         )}
       </div>
 
