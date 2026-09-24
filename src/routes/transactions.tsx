@@ -440,8 +440,11 @@ function StatCard({
   icon: typeof Receipt;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/60 glass p-4 flex items-start gap-3 lift-sm">
-      <div className="h-9 w-9 rounded-md bg-primary/10 grid place-items-center">
+    // min-w-0 so a long value can't widen this card's grid track past its
+    // share of the row, and shrink-0 so it can't squash the icon tile either —
+    // "Real Flawless Feather Matte Powder Foundation" was doing both.
+    <div className="min-w-0 rounded-xl border border-border bg-card/60 glass p-4 flex items-start gap-3 lift-sm">
+      <div className="h-9 w-9 shrink-0 rounded-md bg-primary/10 grid place-items-center">
         <Icon className="h-4 w-4 text-primary" />
       </div>
       <div className="min-w-0">
