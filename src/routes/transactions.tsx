@@ -6,6 +6,7 @@ import {
   formatIDR,
   txStatusBadge,
   type Transaction,
+  type TxStatus,
 } from "@/components/scl/transactions-store";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import {
@@ -42,10 +43,16 @@ function wibDay(iso: string) {
   return new Date(new Date(iso).getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }
 
+/** Listed in the order an order actually travels, so the dropdown reads as a
+ * journey rather than an alphabet. Typed as TxStatus so adding a stage to the
+ * store without adding it here is a compile error. */
+const TX_STATUSES: TxStatus[] = ["Processed", "Shipped", "Cancelled"];
+
 function TransactionsPage() {
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<string>("all");
   const [brand, setBrand] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -69,6 +76,7 @@ function TransactionsPage() {
   const filtered = useMemo(
     () =>
       transactions.filter((t) => {
+        if (status !== "all" && t.status !== status) return false;
         if (brand !== "all" && !t.brandNames.includes(brand)) return false;
         if (dateFrom) {
           const txDate = new Date(t.date);
@@ -95,7 +103,7 @@ function TransactionsPage() {
         }
         return true;
       }),
-    [transactions, brand, dateFrom, dateTo, search],
+    [transactions, status, brand, dateFrom, dateTo, search],
   );
 
   const safePageSize = pageSize === 0 ? filtered.length || 1 : pageSize;
@@ -162,6 +170,17 @@ function TransactionsPage() {
                 className="h-8 w-64 max-w-full rounded-md border border-gray-200 bg-white pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 transition-shadow"
               />
             </div>
+            <Select
+              value={status}
+              onChange={(v) => {
+                setStatus(v);
+                setPage(1);
+              }}
+              options={[
+                { value: "all", label: "All Statuses" },
+                ...TX_STATUSES.map((st) => ({ value: st, label: st })),
+              ]}
+            />
             <Select
               value={brand}
               onChange={(v) => {
