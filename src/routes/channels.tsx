@@ -41,7 +41,7 @@ function ChannelsPage() {
     <AppShell title="Channels" subtitle="Manage messaging channel connections" noPadding>
       <div className="flex h-full min-h-0 min-w-0">
         {/* Left selector */}
-        <aside className="hidden lg:block w-72 shrink-0 border-r border-border bg-card/30 overflow-y-auto">
+        <aside className="hidden lg:block w-72 shrink-0 border-r border-border bg-card/30 overflow-y-auto pb-[60px]">
           <div className="px-4 py-4 border-b border-border">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Channels
@@ -82,7 +82,7 @@ function ChannelsPage() {
         </aside>
 
         {/* Detail */}
-        <div className="flex-1 min-w-0 overflow-y-auto p-6">
+        <div className="flex-1 min-w-0 overflow-y-auto p-6 pb-[60px]">
           {selected === "whatsapp" && <WhatsAppDetail />}
         </div>
       </div>

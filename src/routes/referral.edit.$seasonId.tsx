@@ -82,7 +82,7 @@ function EditSeasonPage() {
       noPadding
     >
       <div className="min-h-full flex flex-col">
-        <div className="flex-1 p-6 animate-fade-in">
+        <div className="flex-1 p-6 animate-fade-in pb-[60px]">
           <SeasonFormFields
             form={form}
             setForm={setForm}

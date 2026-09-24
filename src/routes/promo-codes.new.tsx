@@ -133,7 +133,7 @@ function NewPromoCodePage() {
   return (
     <AppShell backTo="/promo-codes" title="New Promo Code" noPadding>
       <div className="min-h-full flex flex-col">
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 pb-[60px]">
           <PromoFormFields form={form} setForm={setForm} />
         </div>
         <PromoFormActionBar

@@ -285,7 +285,7 @@ function ContactsPage() {
         {/* Left sidebar: All Contacts + Lists. Below lg it stacks on top of the
             table rather than hiding — audiences and brands are only reachable
             from here, so a phone still needs them. */}
-        <aside className="border-b lg:border-b-0 lg:border-r border-border bg-background scl-grid-bg overflow-y-auto max-h-[40vh] lg:max-h-none">
+        <aside className="border-b lg:border-b-0 lg:border-r border-border bg-background scl-grid-bg overflow-y-auto pb-[60px] max-h-[40vh] lg:max-h-none">
           <div className="p-3 space-y-1">
             <button
               onClick={() => {
@@ -489,7 +489,7 @@ function ContactsPage() {
               />
             ) : (
               <SectionCard className="h-full flex flex-col">
-                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
+                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto pb-[60px] [overscroll-behavior-x:contain] [overscroll-behavior-y:contain] scroll-smooth scl-scroll">
                   <ContactsTable
                     contacts={pageContacts}
                     view={activeView}
@@ -1679,7 +1679,7 @@ function ContactDrawer({
   return (
     <div className="fixed inset-0 z-40 flex">
       <div className="flex-1 bg-black/50 backdrop-blur-sm modal-backdrop" onClick={onClose} />
-      <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto glass slide-in-right">
+      <aside className="w-[420px] bg-sidebar border-l border-border h-full overflow-y-auto pb-[60px] glass slide-in-right">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-medium">Contact details</div>
           <button

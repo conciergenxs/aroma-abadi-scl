@@ -531,7 +531,11 @@ export function AppShell({
           className={
             noPadding
               ? "flex-1 min-h-0 overflow-y-auto page-enter"
-              : "flex-1 p-4 sm:p-6 overflow-y-auto page-enter"
+              : // 60px of run-off under the last element so a page never ends
+                // flush against the viewport edge. noPadding pages own their
+                // own layout (viewport-locked panes, sticky action bars) and
+                // add the same run-off at their real scroll container instead.
+                "flex-1 px-4 pt-4 sm:px-6 sm:pt-6 pb-[60px] overflow-y-auto page-enter"
           }
         >
           {children}

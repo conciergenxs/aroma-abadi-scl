@@ -520,7 +520,7 @@ function ContactDetailPage() {
                 </div>
               </div>
             )}
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <div className="flex-1 overflow-y-auto px-4 pt-4 lg:px-6 lg:pt-6 pb-[60px]">
               {isBA ? (
                 /* BA: always show activity log directly */
                 <>
@@ -558,7 +558,7 @@ function ContactDetailPage() {
           </section>
 
           {/* RIGHT: contact data panel */}
-          <aside className="border-l border-border overflow-y-auto bg-card/20">
+          <aside className="border-l border-border overflow-y-auto pb-[60px] bg-card/20">
             <RightPanel
               contact={contact}
               labels={labels}

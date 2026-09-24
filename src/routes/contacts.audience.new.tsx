@@ -137,7 +137,7 @@ function NewAudiencePage() {
       noPadding
     >
       <div className="min-h-full flex flex-col">
-        <div className="flex-1 p-6 space-y-4">
+        <div className="flex-1 p-6 space-y-4 pb-[60px]">
           <div className="max-w-sm">
             <label className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">
               Audience Name

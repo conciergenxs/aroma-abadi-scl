@@ -64,7 +64,7 @@ function EditPromoCodePage() {
   return (
     <AppShell backTo={detailPath} title={`Edit — ${promo.code}`} noPadding>
       <div className="min-h-full flex flex-col">
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 pb-[60px]">
           <PromoFormFields form={form} setForm={setForm} />
         </div>
         <PromoFormActionBar

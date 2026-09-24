@@ -135,7 +135,7 @@ function AddToAudiencePage() {
       noPadding
     >
       <div className="min-h-full flex flex-col">
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 pb-[60px]">
           <AudienceContactPicker
             candidates={eligibleCandidates}
             transactions={transactions}
