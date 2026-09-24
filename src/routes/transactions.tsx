@@ -46,7 +46,6 @@ function TransactionsPage() {
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");
-  const [city, setCity] = useState<string>("all");
   const [brand, setBrand] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -61,10 +60,6 @@ function TransactionsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const cities = useMemo(
-    () => Array.from(new Set(transactions.map((t) => t.city))).sort(),
-    [transactions],
-  );
   const brands = useMemo(() => {
     const set = new Set<string>();
     transactions.forEach((t) => t.brandNames.forEach((b) => set.add(b)));
@@ -74,7 +69,6 @@ function TransactionsPage() {
   const filtered = useMemo(
     () =>
       transactions.filter((t) => {
-        if (city !== "all" && t.city !== city) return false;
         if (brand !== "all" && !t.brandNames.includes(brand)) return false;
         if (dateFrom) {
           const txDate = new Date(t.date);
@@ -101,7 +95,7 @@ function TransactionsPage() {
         }
         return true;
       }),
-    [transactions, city, brand, dateFrom, dateTo, search],
+    [transactions, brand, dateFrom, dateTo, search],
   );
 
   const safePageSize = pageSize === 0 ? filtered.length || 1 : pageSize;
@@ -168,17 +162,6 @@ function TransactionsPage() {
                 className="h-8 w-64 max-w-full rounded-md border border-gray-200 bg-white pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 transition-shadow"
               />
             </div>
-            <Select
-              value={city}
-              onChange={(v) => {
-                setCity(v);
-                setPage(1);
-              }}
-              options={[
-                { value: "all", label: "All Ship-to Cities" },
-                ...cities.map((c) => ({ value: c, label: c })),
-              ]}
-            />
             <Select
               value={brand}
               onChange={(v) => {
