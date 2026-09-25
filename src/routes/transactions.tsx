@@ -208,7 +208,7 @@ function TransactionsPage() {
                   setDateFrom(e.target.value);
                   setPage(1);
                 }}
-                className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 scl-date-input"
                 title="From date"
               />
               <span className="text-[11px] text-muted-foreground">–</span>
@@ -219,7 +219,7 @@ function TransactionsPage() {
                   setDateTo(e.target.value);
                   setPage(1);
                 }}
-                className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 scl-date-input"
                 title="To date"
               />
               {(dateFrom || dateTo) && (

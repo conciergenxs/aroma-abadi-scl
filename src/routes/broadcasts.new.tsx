@@ -407,7 +407,7 @@ function CreateBroadcastPage() {
                         type="date"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}
-                        className="w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                        className="w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40 scl-date-input"
                       />
                     </div>
                     <div>

@@ -224,7 +224,7 @@ function DateRangeControl({
               onChange={(e) => {
                 if (e.target.value) onCustomChange({ start: e.target.value });
               }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
             <input
               type="date"
@@ -234,7 +234,7 @@ function DateRangeControl({
               onChange={(e) => {
                 if (e.target.value) onCustomChange({ end: e.target.value });
               }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
           </div>
         </div>

@@ -247,7 +247,7 @@ function SkuDetailPage() {
                 setDateFrom(e.target.value);
                 setPage(1);
               }}
-              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
             <span className="text-[11px] text-muted-foreground">–</span>
             <input
@@ -258,7 +258,7 @@ function SkuDetailPage() {
                 setDateTo(e.target.value);
                 setPage(1);
               }}
-              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer"
+              className="h-9 rounded-md border border-border bg-card px-2.5 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
             {(dateFrom || dateTo) && (
               <button
