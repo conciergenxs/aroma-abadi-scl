@@ -494,7 +494,7 @@ function ContactDetailPage() {
                       type="date"
                       value={dateFrom}
                       onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none"
+                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none scl-date-input"
                       title="From date"
                     />
                     <span className="text-[10px] text-muted-foreground">—</span>
@@ -502,7 +502,7 @@ function ContactDetailPage() {
                       type="date"
                       value={dateTo}
                       onChange={(e) => setDateTo(e.target.value)}
-                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none"
+                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none scl-date-input"
                       title="To date"
                     />
                     {(dateFrom || dateTo) && (
@@ -1656,7 +1656,7 @@ function PropertyField({
                 type="date"
                 value={(value as string) ?? ""}
                 onChange={(e) => onChange(e.target.value)}
-                className={inputCls}
+                className={`${inputCls} scl-date-input`}
               />
             );
           default:

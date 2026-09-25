@@ -9,17 +9,7 @@ import {
   type TxStatus,
 } from "@/components/scl/transactions-store";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
-import {
-  Search,
-  Receipt,
-  TrendingUp,
-  Wallet,
-  Package,
-  ChevronLeft,
-  ChevronRight,
-  CalendarDays,
-  X,
-} from "lucide-react";
+import { Search, Receipt, TrendingUp, Wallet, Package, X } from "lucide-react";
 import { TransactionPeek } from "@/components/scl/transaction-peek";
 import { useLiveContacts } from "@/components/scl/contacts-store";
 
@@ -49,7 +39,7 @@ function wibDay(iso: string) {
 const TX_STATUSES: TxStatus[] = ["Processed", "Shipped", "Cancelled"];
 
 const PAGE_NAV_BTN =
-  "press tap h-7 w-7 grid place-items-center rounded border border-border bg-card/40 " +
+  "press tap h-7 rounded border border-border bg-card/40 px-2.5 text-[11px] font-medium " +
   "enabled:hover:bg-white enabled:hover:border-gray-300 enabled:hover:text-foreground " +
   "disabled:opacity-40 disabled:cursor-not-allowed transition-colors";
 
@@ -200,7 +190,6 @@ function TransactionsPage() {
 
             {/* Date range */}
             <div className="ml-auto flex items-center gap-1.5">
-              <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               <input
                 type="date"
                 value={dateFrom}
@@ -344,11 +333,7 @@ function TransactionsPage() {
 
           {/* Pagination */}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 border-t border-border text-[11px] text-muted-foreground">
-            <div className="flex items-center gap-3">
-              <span>
-                {filtered.length === 0 ? "0" : `${from}–${to}`} of {filtered.length} transaction
-                {filtered.length !== 1 ? "s" : ""}
-              </span>
+            <div className="flex items-center gap-2.5">
               <label className="flex items-center gap-1">
                 <span>Rows</span>
                 <select
@@ -357,7 +342,7 @@ function TransactionsPage() {
                     setPageSize(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="h-7 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs scl-native-select"
+                  className="h-7 rounded-md border border-gray-200 bg-white pl-2 pr-5 text-xs scl-native-select"
                 >
                   {[5, 10, 20, 50, 100].map((n) => (
                     <option key={n} value={n}>
@@ -367,50 +352,30 @@ function TransactionsPage() {
                   <option value={0}>All</option>
                 </select>
               </label>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={safePage <= 1}
-                  aria-label="Previous page"
-                  title={safePage <= 1 ? "Already on the first page" : "Previous page"}
-                  className={PAGE_NAV_BTN}
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={safePage >= totalPages}
-                  aria-label="Next page"
-                  title={safePage >= totalPages ? "Already on the last page" : "Next page"}
-                  className={PAGE_NAV_BTN}
-                >
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <span aria-hidden className="h-3.5 w-px shrink-0 bg-border" />
+              <span>
+                {filtered.length === 0 ? "0" : `${from}–${to}`} of {filtered.length} transaction
+                {filtered.length !== 1 ? "s" : ""}
+              </span>
             </div>
-            {showPagination && totalPages > 1 && (
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                  const p =
-                    totalPages <= 7
-                      ? i + 1
-                      : safePage <= 4
-                        ? i + 1
-                        : safePage >= totalPages - 3
-                          ? totalPages - 6 + i
-                          : safePage - 3 + i;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`press tap h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border bg-card/40 hover:bg-white text-muted-foreground"}`}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                title={safePage <= 1 ? "Already on the first page" : "Previous page"}
+                className={PAGE_NAV_BTN}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                title={safePage >= totalPages ? "Already on the last page" : "Next page"}
+                className={PAGE_NAV_BTN}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </SectionCard>
       </div>
@@ -481,7 +446,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs scl-native-select transition-colors hover:border-gray-300"
+      className="h-8 min-w-[8.5rem] rounded-md border border-gray-200 bg-white pl-2 pr-6 text-xs scl-native-select transition-colors hover:border-gray-300"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>

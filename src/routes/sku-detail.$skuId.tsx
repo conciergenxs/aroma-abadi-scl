@@ -12,7 +12,6 @@ import {
   Hash,
   ImageIcon,
   ChevronRight,
-  Calendar,
   Search,
   ChevronLeft,
 } from "lucide-react";
@@ -239,7 +238,6 @@ function SkuDetailPage() {
 
           {/* Date range picker */}
           <div className="flex items-center gap-1.5 ml-auto">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <input
               type="date"
               value={dateFrom}
