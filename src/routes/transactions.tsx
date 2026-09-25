@@ -48,6 +48,11 @@ function wibDay(iso: string) {
  * store without adding it here is a compile error. */
 const TX_STATUSES: TxStatus[] = ["Processed", "Shipped", "Cancelled"];
 
+const PAGE_NAV_BTN =
+  "press tap h-7 w-7 grid place-items-center rounded border border-border bg-card/40 " +
+  "enabled:hover:bg-white enabled:hover:border-gray-300 enabled:hover:text-foreground " +
+  "disabled:opacity-40 disabled:cursor-not-allowed transition-colors";
+
 function TransactionsPage() {
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
@@ -362,16 +367,29 @@ function TransactionsPage() {
                   <option value={0}>All</option>
                 </select>
               </label>
-            </div>
-            {showPagination && totalPages > 1 && (
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="press tap h-7 w-7 grid place-items-center rounded border border-border bg-card/40 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Previous page"
+                  title={safePage <= 1 ? "Already on the first page" : "Previous page"}
+                  className={PAGE_NAV_BTN}
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={safePage >= totalPages}
+                  aria-label="Next page"
+                  title={safePage >= totalPages ? "Already on the last page" : "Next page"}
+                  className={PAGE_NAV_BTN}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+            {showPagination && totalPages > 1 && (
+              <div className="flex items-center gap-1">
                 {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
                   const p =
                     totalPages <= 7
@@ -391,13 +409,6 @@ function TransactionsPage() {
                     </button>
                   );
                 })}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={safePage >= totalPages}
-                  className="press tap h-7 w-7 grid place-items-center rounded border border-border bg-card/40 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
               </div>
             )}
           </div>
