@@ -1033,13 +1033,7 @@ function TransactionsTab({
         </table>
       </div>
 
-      {peekTx && (
-        <TransactionPeek
-          tx={peekTx}
-          onClose={() => setPeekTx(null)}
-          showOpenInTransactions={false}
-        />
-      )}
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
     </div>
   );
 }
@@ -1331,13 +1325,7 @@ function RedeemedTab({
         )}
       </div>
 
-      {peekTx && (
-        <TransactionPeek
-          tx={peekTx}
-          onClose={() => setPeekTx(null)}
-          showOpenInTransactions={false}
-        />
-      )}
+      {peekTx && <TransactionPeek tx={peekTx} onClose={() => setPeekTx(null)} />}
     </div>
   );
 }

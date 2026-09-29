@@ -46,8 +46,8 @@ export function TransactionPeek({
 }: {
   tx: Transaction;
   onClose: () => void;
-  /** Hidden where the jump adds nothing — the transactions page itself, and the
-   * contact page, which already lists the order it came from. */
+  /** Hidden where the jump leads nowhere new: the transactions page already has
+   * this order open. Everywhere else the link is the way back to it. */
   showOpenInTransactions?: boolean;
 }) {
   useEscapeKey(true, onClose);
