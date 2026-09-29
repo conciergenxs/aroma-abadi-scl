@@ -389,6 +389,7 @@ function TransactionsPage() {
             // and on every press of the browser's back button.
             if (linkedTx) navigate({ to: "/transactions", search: {}, replace: true });
           }}
+          showOpenInTransactions={false}
         />
       )}
     </AppShell>

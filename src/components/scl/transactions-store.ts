@@ -205,7 +205,13 @@ function load(): { transactions: Transaction[] } {
         const money =
           t.subtotal === undefined
             ? priceOrder(t.total, 0, t.paymentMethod)
-            : { subtotal: t.subtotal, discount: t.discount, tax: t.tax, adminFee: t.adminFee, total: t.total };
+            : {
+                subtotal: t.subtotal,
+                discount: t.discount,
+                tax: t.tax,
+                adminFee: t.adminFee,
+                total: t.total,
+              };
         return {
           ...t,
           ...money,

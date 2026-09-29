@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
-import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store";
+import { formatIDR, txStatusBadge, PPN_RATE, type Transaction } from "./transactions-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
 
 // ── Transaction side peek ─────────────────────────────────────────────────────
@@ -11,18 +11,45 @@ import { useEscapeKey } from "@/lib/use-escape-key";
 // callers live inside backdrop-filtered cards, which would otherwise become the
 // containing block for a fixed overlay and clip it.
 
+const LABEL = "text-[11px] uppercase tracking-wide text-muted-foreground";
+
 function PeekRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground shrink-0">
-        {label}
-      </span>
-      <div className="text-sm text-right">{children}</div>
+      <span className={`${LABEL} shrink-0`}>{label}</span>
+      <div className="text-[13px] text-right">{children}</div>
     </div>
   );
 }
 
-export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () => void }) {
+function MoneyRow({
+  label,
+  value,
+  muted = true,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-[13px]">
+      <span className={muted ? "text-muted-foreground" : ""}>{label}</span>
+      <span className="tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+export function TransactionPeek({
+  tx,
+  onClose,
+  showOpenInTransactions = true,
+}: {
+  tx: Transaction;
+  onClose: () => void;
+  /** Hidden where the jump adds nothing — the transactions page itself, and the
+   * contact page, which already lists the order it came from. */
+  showOpenInTransactions?: boolean;
+}) {
   useEscapeKey(true, onClose);
 
   if (typeof document === "undefined") return null;
@@ -32,7 +59,7 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
       <div className="w-full max-w-md bg-background border-l border-border overflow-y-auto slide-in-right shadow-2xl">
         <div className="p-5 border-b border-border flex items-start justify-between gap-3">
           <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Invoice</div>
+            <div className={LABEL}>Invoice</div>
             <div className="text-base font-semibold">{tx.invoice}</div>
             <div className="text-[11px] text-muted-foreground mt-1">{fmtDateTimeEN(tx.date)}</div>
           </div>
@@ -46,7 +73,7 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
           </button>
         </div>
 
-        <div className="p-5 space-y-4 text-sm">
+        <div className="p-5 space-y-4 text-[13px]">
           <PeekRow label="Customer">
             {tx.customerId ? (
               <Link
@@ -84,7 +111,7 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
           </PeekRow>
           <PeekRow label="Status">
             <span
-              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${txStatusBadge(tx.status)}`}
+              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${txStatusBadge(tx.status)}`}
             >
               {tx.status}
             </span>
@@ -96,7 +123,7 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
           )}
 
           <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Items</div>
+            <div className={`${LABEL} mb-2`}>Items</div>
             <ul className="divide-y divide-border rounded-md border border-border overflow-hidden">
               {tx.items.map((i, idx) => (
                 <li
@@ -112,30 +139,42 @@ export function TransactionPeek({ tx, onClose }: { tx: Transaction; onClose: () 
                     >
                       {i.skuName}
                     </Link>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-[11px] text-muted-foreground">
                       {i.skuCode} · {i.qty} pcs · {formatIDR(i.unitPrice)}
                     </div>
                   </div>
-                  <div className="text-right font-medium tabular-nums text-sm">
+                  <div className="text-right font-medium tabular-nums text-[13px]">
                     {formatIDR(i.unitPrice * i.qty)}
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="flex justify-between mt-3 text-sm font-semibold border-t border-border pt-3">
-              <span>Total</span>
-              <span>{formatIDR(tx.total)}</span>
+            <div className="mt-3 border-t border-border pt-3 space-y-1.5">
+              <MoneyRow label="Subtotal" value={formatIDR(tx.subtotal)} />
+              {tx.discount > 0 && (
+                <MoneyRow label="Discount" value={`− ${formatIDR(tx.discount)}`} />
+              )}
+              <MoneyRow label={`PPN (${Math.round(PPN_RATE * 100)}%)`} value={formatIDR(tx.tax)} />
+              <MoneyRow label={`Admin Fee · ${tx.paymentMethod}`} value={formatIDR(tx.adminFee)} />
+              <div className="flex items-center justify-between gap-3 border-t border-border pt-2">
+                <span className="text-[13px] font-semibold">Total</span>
+                <span className="text-[14px] font-semibold tabular-nums">
+                  {formatIDR(tx.total)}
+                </span>
+              </div>
             </div>
           </div>
 
-          <Link
-            to="/transactions"
-            search={{ tx: tx.id }}
-            onClick={onClose}
-            className="press icon-nudge inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline transition-colors"
-          >
-            <ExternalLink className="h-3.5 w-3.5" /> Open in Transactions
-          </Link>
+          {showOpenInTransactions && (
+            <Link
+              to="/transactions"
+              search={{ tx: tx.id }}
+              onClick={onClose}
+              className="press icon-nudge inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" /> Open in Transactions
+            </Link>
+          )}
         </div>
       </div>
     </div>,
