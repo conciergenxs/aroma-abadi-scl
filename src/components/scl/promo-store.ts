@@ -368,7 +368,7 @@ function seed(): PromoCode[] {
       contactName: t.customerName,
       transactionId: t.id,
       invoice: t.invoice,
-      discountValue: value ?? discountFor(rule, t.total),
+      discountValue: value ?? discountFor(rule, t.subtotal),
       sourceName,
       redeemedAt: t.date,
     };

@@ -212,7 +212,7 @@ function seed(): ReferralSeason[] {
     const code = codeOf.get(referrerId);
     if (!code) continue;
     const minSpend = season.rule.condition.kind === "min-spend" ? season.rule.condition.amount : 0;
-    if (t.total < minSpend) continue;
+    if (t.subtotal < minSpend) continue;
 
     referredAlready.add(referredId);
     season.uses.push({
@@ -225,8 +225,8 @@ function seed(): ReferralSeason[] {
       transactionId: t.id,
       invoice: t.invoice,
       items: t.items.map((i) => ({ name: i.skuName, qty: i.qty })),
-      orderValue: t.total,
-      discountValue: discountFor(season.rule, t.total),
+      orderValue: t.subtotal,
+      discountValue: discountFor(season.rule, t.subtotal),
       usedAt: t.date,
     });
   }

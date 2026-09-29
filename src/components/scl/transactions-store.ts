@@ -26,11 +26,47 @@ export type Transaction = {
   brandName: string;
   brandNames: string[];
   items: TxLine[];
+  /** Goods value: the lines before anything is added or taken off. This is the
+   * base every promo and referral rule measures against — a percentage off or
+   * a minimum spend is about what was bought, not about tax and fees. */
+  subtotal: number;
+  /** Order-level discount. Not every order has one. */
+  discount: number;
+  /** PPN at the Indonesian standard rate, charged on subtotal less discount. */
+  tax: number;
+  /** What the payment channel takes: a percentage for the card rails, a flat
+   * fee for bank transfer and debit. */
+  adminFee: number;
+  /** What the customer actually paid: subtotal - discount + tax + adminFee. */
   total: number;
   paymentMethod: "QRIS" | "Debit" | "Credit Card" | "Transfer";
   status: TxStatus;
   note?: string;
 };
+
+export const PPN_RATE = 0.11;
+
+/** Percentage rails charge a cut of the amount; the others take a flat fee. */
+const ADMIN_FEE: Record<Transaction["paymentMethod"], { pct?: number; flat?: number }> = {
+  QRIS: { pct: 0.007 },
+  "Credit Card": { pct: 0.029 },
+  Debit: { flat: 2500 },
+  Transfer: { flat: 6500 },
+};
+
+/** Builds the money breakdown from the goods value. Kept in one place so the
+ * peek never has to re-derive it and drift from what the store holds. */
+export function priceOrder(
+  subtotal: number,
+  discount: number,
+  paymentMethod: Transaction["paymentMethod"],
+) {
+  const net = Math.max(0, subtotal - discount);
+  const tax = Math.round(net * PPN_RATE);
+  const fee = ADMIN_FEE[paymentMethod];
+  const adminFee = fee.flat ?? Math.round(net * (fee.pct ?? 0));
+  return { subtotal, discount, tax, adminFee, total: net + tax + adminFee };
+}
 
 function seed(): Transaction[] {
   const items: Transaction[] = [];
@@ -111,7 +147,7 @@ function seed(): Transaction[] {
     const cust = customers[i % customers.length];
     const lineCount = 1 + (i % 3);
     const lines: TxLine[] = [];
-    let total = 0;
+    let subtotal = 0;
     const brandSet = new Set<string>();
     for (let l = 0; l < lineCount; l++) {
       // Pick SKU from this customer's allowed brand SKUs
@@ -125,10 +161,15 @@ function seed(): Transaction[] {
         qty,
         unitPrice: sku.price,
       });
-      total += sku.price * qty;
+      subtotal += sku.price * qty;
       brandSet.add(sku.brand);
     }
     const brandNames = Array.from(brandSet);
+    // Roughly a quarter of orders carry a discount, so the row has something to
+    // show without appearing on every single order.
+    const paymentMethod = payments[i % payments.length];
+    const discount = i % 4 === 1 ? Math.round((subtotal * 0.1) / 1000) * 1000 : 0;
+    const money = priceOrder(subtotal, discount, paymentMethod);
     items.push({
       id: `tx-${1000 + i}`,
       invoice: `AA-${String(82200 + i).padStart(5, "0")}`,
@@ -139,8 +180,8 @@ function seed(): Transaction[] {
       brandName: brandNames[0],
       brandNames,
       items: lines,
-      total,
-      paymentMethod: payments[i % payments.length],
+      ...money,
+      paymentMethod,
       status: statuses[i % statuses.length],
       note: i % 5 === 0 ? "Customer minta sample shade lain lewat ARMA." : undefined,
     });
@@ -148,8 +189,8 @@ function seed(): Transaction[] {
   return items;
 }
 
-// v12: orders are ARMA-only — BA and store were dropped from the shape.
-const STORAGE_KEY = "aroma_tx_store_v12";
+// v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
+const STORAGE_KEY = "aroma_tx_store_v13";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
@@ -158,10 +199,19 @@ function load(): { transactions: Transaction[] } {
     if (raw) {
       const parsed = JSON.parse(raw) as { transactions: Transaction[] };
       // Migrate: ensure brandNames exists on every transaction
-      const migrated = parsed.transactions.map((t) => ({
-        ...t,
-        brandNames: t.brandNames ?? (t.brandName ? [t.brandName] : []),
-      }));
+      const migrated = parsed.transactions.map((t) => {
+        // A payload written before v13 has `total` holding the goods value and
+        // no breakdown, so rebuild it rather than rendering blank money rows.
+        const money =
+          t.subtotal === undefined
+            ? priceOrder(t.total, 0, t.paymentMethod)
+            : { subtotal: t.subtotal, discount: t.discount, tax: t.tax, adminFee: t.adminFee, total: t.total };
+        return {
+          ...t,
+          ...money,
+          brandNames: t.brandNames ?? (t.brandName ? [t.brandName] : []),
+        };
+      });
       return { transactions: migrated };
     }
   } catch {
