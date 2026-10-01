@@ -255,31 +255,32 @@ export function SclManagedSelect({
             })}
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5 text-[11px] text-muted-foreground">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={safePage <= 1}
-                aria-label="Previous page"
-                className="press grid h-6 w-6 place-items-center rounded border border-border bg-card/40 enabled:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </button>
-              <span className="tabular-nums">
-                {safePage} / {totalPages}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={safePage >= totalPages}
-                aria-label="Next page"
-                className="press grid h-6 w-6 place-items-center rounded border border-border bg-card/40 enabled:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight className="h-3 w-3" />
-              </button>
-            </div>
-          )}
+          {/* Always rendered, disabled at a single page — same rule as the
+              transactions footer, so the menu keeps its shape as a search
+              narrows the list instead of the footer appearing and vanishing. */}
+          <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5 text-[11px] text-muted-foreground">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage <= 1}
+              aria-label="Previous page"
+              className="press grid h-6 w-6 place-items-center rounded border border-border bg-card/40 enabled:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </button>
+            <span className="tabular-nums">
+              {safePage} / {totalPages} · {matches.length} entr{matches.length === 1 ? "y" : "ies"}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage >= totalPages}
+              aria-label="Next page"
+              className="press grid h-6 w-6 place-items-center rounded border border-border bg-card/40 enabled:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="h-3 w-3" />
+            </button>
+          </div>
 
           <div className="border-t border-border">
             {adding ? (
