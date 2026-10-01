@@ -35,6 +35,7 @@ import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contac
 import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
 import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
+import { Route as TemplatesEditTemplateIdRouteImport } from './routes/templates.edit.$templateId'
 import { Route as ReferralEditSeasonIdRouteImport } from './routes/referral.edit.$seasonId'
 import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
 import { Route as ContactsAudienceNewRouteImport } from './routes/contacts.audience.new'
@@ -170,6 +171,11 @@ const PromoCodesPromoIdIndexRoute = PromoCodesPromoIdIndexRouteImport.update({
   path: '/promo-codes/$promoId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesEditTemplateIdRoute = TemplatesEditTemplateIdRouteImport.update({
+  id: '/templates/edit/$templateId',
+  path: '/templates/edit/$templateId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReferralEditSeasonIdRoute = ReferralEditSeasonIdRouteImport.update({
   id: '/referral/edit/$seasonId',
   path: '/referral/edit/$seasonId',
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
+  '/templates/edit/$templateId': typeof TemplatesEditTemplateIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
   '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
+  '/templates/edit/$templateId': typeof TemplatesEditTemplateIdRoute
   '/promo-codes/$promoId': typeof PromoCodesPromoIdIndexRoute
   '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
+  '/templates/edit/$templateId': typeof TemplatesEditTemplateIdRoute
   '/promo-codes/$promoId/': typeof PromoCodesPromoIdIndexRoute
   '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
+    | '/templates/edit/$templateId'
     | '/promo-codes/$promoId/'
     | '/contacts/audience/add/$audienceId'
   fileRoutesByTo: FileRoutesByTo
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
+    | '/templates/edit/$templateId'
     | '/promo-codes/$promoId'
     | '/contacts/audience/add/$audienceId'
   id:
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
+    | '/templates/edit/$templateId'
     | '/promo-codes/$promoId/'
     | '/contacts/audience/add/$audienceId'
   fileRoutesById: FileRoutesById
@@ -413,6 +425,7 @@ export interface RootRouteChildren {
   TemplatesIndexRoute: typeof TemplatesIndexRoute
   PromoCodesEditPromoIdRoute: typeof PromoCodesEditPromoIdRoute
   ReferralEditSeasonIdRoute: typeof ReferralEditSeasonIdRoute
+  TemplatesEditTemplateIdRoute: typeof TemplatesEditTemplateIdRoute
   PromoCodesPromoIdIndexRoute: typeof PromoCodesPromoIdIndexRoute
 }
 
@@ -600,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesPromoIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates/edit/$templateId': {
+      id: '/templates/edit/$templateId'
+      path: '/templates/edit/$templateId'
+      fullPath: '/templates/edit/$templateId'
+      preLoaderRoute: typeof TemplatesEditTemplateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/referral/edit/$seasonId': {
       id: '/referral/edit/$seasonId'
       path: '/referral/edit/$seasonId'
@@ -684,6 +704,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesIndexRoute: TemplatesIndexRoute,
   PromoCodesEditPromoIdRoute: PromoCodesEditPromoIdRoute,
   ReferralEditSeasonIdRoute: ReferralEditSeasonIdRoute,
+  TemplatesEditTemplateIdRoute: TemplatesEditTemplateIdRoute,
   PromoCodesPromoIdIndexRoute: PromoCodesPromoIdIndexRoute,
 }
 export const routeTree = rootRouteImport

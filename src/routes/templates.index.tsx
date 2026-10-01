@@ -10,6 +10,7 @@ import {
   TEMPLATE_GROUP_DOT,
   TEMPLATE_GROUP_BADGE,
   TEMPLATE_CATEGORY_TONE,
+  canEditTemplate,
 } from "@/components/scl/templates-store";
 import {
   TEMPLATE_LANGUAGES,
@@ -62,6 +63,15 @@ function useCategoryColor(categories: { name: string; color: TemplateTone }[]) {
     return (name: string): TemplateTone => byName.get(name) ?? "slate";
   }, [categories]);
 }
+
+/** Why a template can no longer be edited. Keyed by status so a rejected one is
+ * not told it is still under review — it has been reviewed, and refused. */
+const LOCK_REASON: Record<Template["status"], string> = {
+  Draft: "",
+  Pending: "Submitted to Meta — wording is locked while it is under review.",
+  Approved: "Approved templates are locked — Meta sends this exact wording.",
+  Rejected: "Rejected by Meta — this version is locked. Create a new template with the wording fixed.",
+};
 
 const STATUS_OPTIONS = [
   { value: "Approved", label: "Approved", dot: "bg-emerald-400" },
@@ -915,6 +925,20 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
 
         {/* Footer actions */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-border">
+          {canEditTemplate(template.status) ? (
+            <Link
+              to="/templates/edit/$templateId"
+              params={{ templateId: template.id }}
+              onClick={onClose}
+              className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 h-9 text-xs font-semibold hover:bg-card transition-colors duration-150"
+            >
+              <Pencil className="h-3.5 w-3.5" /> Edit Template
+            </Link>
+          ) : (
+            <span className="mr-auto text-[12px] text-muted-foreground">
+              {LOCK_REASON[template.status]}
+            </span>
+          )}
           <button
             onClick={() => setConfirmDelete(true)}
             className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150"

@@ -35,7 +35,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/templates/new")({
   head: () => ({ meta: [{ title: "Create New Template — SCL" }] }),
-  component: CreateTemplatePage,
+  component: () => <TemplateForm />,
 });
 
 const HEADER_OPTIONS = [
@@ -67,28 +67,38 @@ const BUTTON_OPTIONS = [
   },
 ];
 
-function CreateTemplatePage() {
+/**
+ * The create form, which also edits. Pass `existing` and every field starts
+ * from that template and Save writes back to it instead of adding a new row —
+ * the alternative was a second 500-line copy of this page that would drift.
+ */
+export function TemplateForm({ existing }: { existing?: Template }) {
   const navigate = useNavigate();
   const { groups, categories } = useTemplatesStore();
+  const isEdit = !!existing;
 
   // Variable popup state
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
 
   // Settings
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<string>("Marketing");
-  const [language, setLanguage] = useState<string>("en_US");
-  const [groupId, setGroupId] = useState<string>("none");
+  const [name, setName] = useState(existing?.name ?? "");
+  const [category, setCategory] = useState<string>(existing?.category ?? "Marketing");
+  const [language, setLanguage] = useState<string>(existing?.language ?? "en_US");
+  const [groupId, setGroupId] = useState<string>(existing?.groupId ?? "none");
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
   const selectedChannel = connectedChannels.find((c) => c.id === channelId) ?? null;
 
   // Content
-  const [headerType, setHeaderType] = useState<string>("none");
-  const [headerText, setHeaderText] = useState("");
-  const [headerMedia, setHeaderMedia] = useState<{ url: string; name: string } | null>(null);
+  const [headerType, setHeaderType] = useState<string>(existing?.headerType ?? "none");
+  const [headerText, setHeaderText] = useState(existing?.headerText ?? "");
+  const [headerMedia, setHeaderMedia] = useState<{ url: string; name: string } | null>(
+    existing?.headerMediaUrl
+      ? { url: existing.headerMediaUrl, name: existing.headerMediaName ?? "Header media" }
+      : null,
+  );
   const headerFileRef = useRef<HTMLInputElement>(null);
-  const [body, setBody] = useState("");
-  const [footer, setFooter] = useState("");
+  const [body, setBody] = useState(existing?.body ?? "");
+  const [footer, setFooter] = useState(existing?.footer ?? "");
   const [buttonType, setButtonType] = useState<string>("none");
   const [buttonLabel, setButtonLabel] = useState("");
   const [buttonUrl, setButtonUrl] = useState("");
@@ -199,7 +209,9 @@ function CreateTemplatePage() {
       toast.error("Template name and body are required");
       return;
     }
-    templatesStore.addTemplate({
+    // Typed, because in a standalone object literal `status` would widen to
+    // string and neither store method accepts that.
+    const payload: Omit<Template, "id" | "updated"> = {
       name: name.trim(),
       category,
       channel: channelKind,
@@ -215,15 +227,28 @@ function CreateTemplatePage() {
         headerType === "image" || headerType === "video" ? headerMedia?.name : undefined,
       footer: footer.trim() || undefined,
       promoCodeId: linkedPromoId,
-    });
-    toast.success(kind === "draft" ? "Draft saved" : "Template submitted for review");
+    };
+    if (existing) {
+      templatesStore.updateTemplate(existing.id, payload);
+    } else {
+      templatesStore.addTemplate(payload);
+    }
+    toast.success(
+      kind === "submit"
+        ? "Template submitted for review"
+        : existing
+          ? "Changes saved"
+          : "Draft saved",
+    );
     navigate({ to: "/templates" });
   };
 
   return (
     <AppShell backTo="/templates">
       <div className="mb-8">
-        <h1 className="text-xl font-semibold tracking-tight">Create New Template</h1>
+        <h1 className="text-xl font-semibold tracking-tight">
+          {isEdit ? "Edit Template" : "Create New Template"}
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start page-enter">
@@ -518,7 +543,7 @@ function CreateTemplatePage() {
               onClick={() => submit("draft")}
               className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
             >
-              <Save className="h-3.5 w-3.5" /> Save draft
+              <Save className="h-3.5 w-3.5" /> {isEdit ? "Save changes" : "Save draft"}
             </button>
             <button
               onClick={() => submit("submit")}
