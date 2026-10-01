@@ -276,6 +276,7 @@ function CreateTemplatePage() {
                   }}
                   addLabel="Add New Category"
                   namePlaceholder="Category name…"
+                  searchPlaceholder="Search categories…"
                   ariaLabel="Category"
                 />
               </Field>
@@ -306,6 +307,7 @@ function CreateTemplatePage() {
                   }}
                   addLabel="Add New Group"
                   namePlaceholder="Group name…"
+                  searchPlaceholder="Search groups…"
                   ariaLabel="Template group"
                 />
               </Field>

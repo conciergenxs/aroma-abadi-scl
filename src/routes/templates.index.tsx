@@ -297,7 +297,7 @@ function TemplatesPage() {
                             className={`inline-flex w-min items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}
                           >
                             <span
-                              className={`h-1.5 w-1.5 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
+                              className={`h-1.5 w-1.5 shrink-0 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
                             />
                             {group.name}
                           </span>
@@ -554,7 +554,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
           <div className="rounded-lg border border-border divide-y divide-border max-h-72 overflow-y-auto">
             {filtered.map((g) => (
               <div key={g.id} className="flex items-center gap-2 px-3 py-2">
-                <span className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`} />
+                <span className={`h-2 w-2 shrink-0 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`} />
                 {editingId === g.id ? (
                   <>
                     <input
@@ -711,7 +711,9 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`} />
+                  <span
+                    className={`h-1.5 w-1.5 shrink-0 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
+                  />
                   {group.name}
                 </span>
               )}
@@ -741,7 +743,7 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                     group ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span
-                          className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
+                          className={`h-2 w-2 shrink-0 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
                         />
                         {group.name}
                       </span>
@@ -1128,7 +1130,9 @@ function GroupPickerModal({
                     checked={checked}
                     onChange={() => toggle(g.id)}
                   />
-                  <span className={`h-2 w-2 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`} />
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${TEMPLATE_GROUP_DOT[g.color]}`}
+                  />
                   <span className="text-[13px]">{g.name}</span>
                 </label>
               );
