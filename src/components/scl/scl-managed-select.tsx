@@ -269,7 +269,7 @@ export function SclManagedSelect({
               <ChevronLeft className="h-3 w-3" />
             </button>
             <span className="tabular-nums">
-              {safePage} / {totalPages} · {matches.length} entr{matches.length === 1 ? "y" : "ies"}
+              {safePage} / {totalPages}
             </span>
             <button
               type="button"

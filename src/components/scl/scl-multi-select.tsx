@@ -177,8 +177,7 @@ export function SclMultiSelect({
               <ChevronLeft className="h-3 w-3" />
             </button>
             <span className="tabular-nums">
-              {safePage} / {totalPages} · {filtered.length} entr
-              {filtered.length === 1 ? "y" : "ies"}
+              {safePage} / {totalPages}
             </span>
             <button
               type="button"
