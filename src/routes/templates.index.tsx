@@ -70,7 +70,8 @@ const LOCK_REASON: Record<Template["status"], string> = {
   Draft: "",
   Pending: "Submitted to Meta — wording is locked while it is under review.",
   Approved: "Approved templates are locked — Meta sends this exact wording.",
-  Rejected: "Rejected by Meta — this version is locked. Create a new template with the wording fixed.",
+  Rejected:
+    "Rejected by Meta — this version is locked. Create a new template with the wording fixed.",
 };
 
 const STATUS_OPTIONS = [
