@@ -1431,6 +1431,10 @@ export type Template = {
   /** WhatsApp template chrome around the body. */
   headerType?: "none" | "text" | "image" | "video";
   headerText?: string;
+  /** Data URL of the uploaded header image or video, when headerType is one of
+   * those. Data URLs keep the prototype self-contained — no upload endpoint. */
+  headerMediaUrl?: string;
+  headerMediaName?: string;
   footer?: string;
   rejectionReason?: string;
   promoCodeId?: string;

@@ -2,24 +2,30 @@ import { useSyncExternalStore } from "react";
 import {
   templates as seedTemplates,
   initialTemplateGroups,
+  initialTemplateCategories,
   type Template,
   type TemplateGroup,
+  type TemplateCategory,
+  type TemplateTone,
 } from "./mock-data";
 
 type State = {
   templates: Template[];
   groups: TemplateGroup[];
+  categories: TemplateCategory[];
   starred: string[];
 };
 
 // Bump when the Template shape changes so browsers holding an older shape
 // re-seed instead of rendering stale records against new code.
-const STORAGE_KEY = "aroma_templates_store_v2";
+// v3: categories joined groups as editable records.
+const STORAGE_KEY = "aroma_templates_store_v3";
 
 function seedState(): State {
   return {
     templates: [...seedTemplates],
     groups: [...initialTemplateGroups],
+    categories: [...initialTemplateCategories],
     starred: ["tp2", "tp4"],
   };
 }
@@ -32,7 +38,14 @@ function load(): State {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed?.templates) && Array.isArray(parsed?.groups)) return parsed;
+      if (Array.isArray(parsed?.templates) && Array.isArray(parsed?.groups)) {
+        return {
+          ...parsed,
+          categories: Array.isArray(parsed.categories)
+            ? parsed.categories
+            : [...initialTemplateCategories],
+        };
+      }
     }
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seedState()));
   } catch {
@@ -67,7 +80,7 @@ const getSnapshot = () => state;
 const SERVER_SNAPSHOT: State = seedState();
 const getServerSnapshot = () => SERVER_SNAPSHOT;
 
-const GROUP_COLORS: TemplateGroup["color"][] = [
+const GROUP_COLORS: TemplateTone[] = [
   "pink",
   "amber",
   "sky",
@@ -152,6 +165,43 @@ export const templatesStore = {
     emit();
     return entry;
   },
+  addCategory(name: string) {
+    const color = GROUP_COLORS[state.categories.length % GROUP_COLORS.length];
+    const entry: TemplateCategory = { id: `tc-${Date.now()}`, name, color };
+    state = { ...state, categories: [...state.categories, entry] };
+    emit();
+    return entry;
+  },
+  renameCategory(id: string, name: string) {
+    const before = state.categories.find((c) => c.id === id);
+    state = {
+      ...state,
+      categories: state.categories.map((c) => (c.id === id ? { ...c, name } : c)),
+      // Templates store the category by name, so a rename has to follow through
+      // or every template on the old name would fall off the filter.
+      templates: before
+        ? state.templates.map((t) => (t.category === before.name ? { ...t, category: name } : t))
+        : state.templates,
+    };
+    emit();
+  },
+  deleteCategory(id: string) {
+    const gone = state.categories.find((c) => c.id === id);
+    const fallback = state.categories.find((c) => c.id !== id);
+    state = {
+      ...state,
+      categories: state.categories.filter((c) => c.id !== id),
+      // Category is required on a template, so survivors move to the first
+      // remaining category rather than being left pointing at nothing.
+      templates:
+        gone && fallback
+          ? state.templates.map((t) =>
+              t.category === gone.name ? { ...t, category: fallback.name } : t,
+            )
+          : state.templates,
+    };
+    emit();
+  },
   renameGroup(id: string, name: string) {
     state = {
       ...state,
@@ -173,7 +223,8 @@ export function useTemplatesStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-export const TEMPLATE_GROUP_DOT: Record<TemplateGroup["color"], string> = {
+export const TEMPLATE_GROUP_DOT: Record<TemplateTone, string> = {
+  primary: "bg-primary",
   indigo: "bg-indigo-400",
   pink: "bg-pink-400",
   emerald: "bg-emerald-400",
@@ -184,7 +235,8 @@ export const TEMPLATE_GROUP_DOT: Record<TemplateGroup["color"], string> = {
   rose: "bg-rose-400",
 };
 
-export const TEMPLATE_GROUP_BADGE: Record<TemplateGroup["color"], string> = {
+export const TEMPLATE_GROUP_BADGE: Record<TemplateTone, string> = {
+  primary: "border-primary bg-primary text-primary-foreground font-semibold",
   indigo: "border-indigo-700 bg-indigo-600 text-white font-semibold",
   pink: "border-pink-700 bg-pink-600 text-white font-semibold",
   emerald: "border-emerald-700 bg-emerald-600 text-white font-semibold",
@@ -193,4 +245,17 @@ export const TEMPLATE_GROUP_BADGE: Record<TemplateGroup["color"], string> = {
   violet: "border-violet-700 bg-violet-600 text-white font-semibold",
   slate: "border-slate-600 bg-slate-500 text-white font-semibold",
   rose: "border-rose-700 bg-rose-600 text-white font-semibold",
+};
+
+/** Category pills are lighter than group badges — same palette, no bold. */
+export const TEMPLATE_CATEGORY_TONE: Record<TemplateTone, string> = {
+  primary: "border-primary bg-primary text-primary-foreground",
+  indigo: "border-indigo-700 bg-indigo-600 text-white",
+  pink: "border-pink-700 bg-pink-600 text-white",
+  emerald: "border-emerald-700 bg-emerald-600 text-white",
+  amber: "border-amber-700 bg-amber-600 text-white",
+  sky: "border-sky-700 bg-sky-600 text-white",
+  violet: "border-violet-700 bg-violet-600 text-white",
+  slate: "border-slate-600 bg-slate-500 text-white",
+  rose: "border-rose-700 bg-rose-600 text-white",
 };

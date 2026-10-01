@@ -2,14 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
+import { SclMultiSelect } from "@/components/scl/scl-multi-select";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   templatesStore,
   useTemplatesStore,
   TEMPLATE_GROUP_DOT,
   TEMPLATE_GROUP_BADGE,
+  TEMPLATE_CATEGORY_TONE,
 } from "@/components/scl/templates-store";
-import { TEMPLATE_LANGUAGES, type Template, type TemplateGroup } from "@/components/scl/mock-data";
+import {
+  TEMPLATE_LANGUAGES,
+  type Template,
+  type TemplateGroup,
+  type TemplateTone,
+} from "@/components/scl/mock-data";
 import {
   Plus,
   Search,
@@ -46,32 +53,19 @@ const statusTone: Record<string, string> = {
   Draft: "border-slate-600 bg-slate-500 text-white",
 };
 
-const categoryTone: Record<string, string> = {
-  Marketing: "border-primary bg-primary text-primary-foreground",
-  Utility: "border-sky-700 bg-sky-600 text-white",
-  Service: "border-violet-700 bg-violet-600 text-white",
-  Reminder: "border-amber-700 bg-amber-600 text-white",
-};
 
-const CATEGORY_OPTIONS = [
-  { value: "all", label: "All Categories" },
-  { value: "Marketing", label: "Marketing", dot: "bg-primary" },
-  { value: "Utility", label: "Utility", dot: "bg-sky-400" },
-  { value: "Reminder", label: "Reminder", dot: "bg-amber-400" },
-  { value: "Service", label: "Service", dot: "bg-violet-400" },
-];
 
-const CHANNEL_OPTIONS = [
-  { value: "all", label: "All Group" },
-  {
-    value: "whatsapp",
-    label: "WhatsApp",
-    icon: <ChannelIcon channel="whatsapp" className="h-3.5 w-3.5" />,
-  },
-];
+/** Templates reference a category by name, so the colour is resolved by name
+ * too. A template on a category that was deleted falls back to slate rather
+ * than rendering an unstyled pill. */
+function useCategoryColor(categories: { name: string; color: TemplateTone }[]) {
+  return useMemo(() => {
+    const byName = new Map(categories.map((c) => [c.name, c.color]));
+    return (name: string): TemplateTone => byName.get(name) ?? "slate";
+  }, [categories]);
+}
 
 const STATUS_OPTIONS = [
-  { value: "all", label: "All Statuses" },
   { value: "Approved", label: "Approved", dot: "bg-emerald-400" },
   { value: "Pending", label: "Pending", dot: "bg-amber-400" },
   { value: "Rejected", label: "Rejected", dot: "bg-red-400" },
@@ -79,11 +73,14 @@ const STATUS_OPTIONS = [
 ];
 
 function TemplatesPage() {
-  const { templates, groups, starred } = useTemplatesStore();
+  const { templates, groups, categories, starred } = useTemplatesStore();
+  const categoryColor = useCategoryColor(categories);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
-  const [channel, setChannel] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [category, setCategory] = useState<string[]>([]);
+  // Was a channel filter mislabelled "All Group" — it listed WhatsApp, the only
+  // channel there is, and never filtered by group at all.
+  const [group, setGroup] = useState<string[]>([]);
+  const [status, setStatus] = useState<string[]>([]);
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [detail, setDetail] = useState<Template | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -98,18 +95,35 @@ function TemplatesPage() {
     const q = query.trim().toLowerCase();
     return templates.filter((t) => {
       if (q && !t.name.toLowerCase().includes(q) && !t.body.toLowerCase().includes(q)) return false;
-      if (category !== "all" && t.category !== category) return false;
-      if (channel !== "all" && t.channel !== channel) return false;
-      if (status !== "all" && t.status !== status) return false;
+      if (category.length && !category.includes(t.category)) return false;
+      if (group.length && !group.includes(t.groupId ?? "none")) return false;
+      if (status.length && !status.includes(t.status)) return false;
       return true;
     });
-  }, [templates, query, category, channel, status]);
+  }, [templates, query, category, group, status]);
+
+  const categoryOptions = useMemo(
+    () =>
+      categories.map((c) => ({
+        value: c.name,
+        label: c.name,
+        dot: TEMPLATE_GROUP_DOT[c.color],
+      })),
+    [categories],
+  );
+  const groupFilterOptions = useMemo(
+    () => [
+      ...groups.map((g) => ({ value: g.id, label: g.name, dot: TEMPLATE_GROUP_DOT[g.color] })),
+      { value: "none", label: "No group" },
+    ],
+    [groups],
+  );
 
   // Reset to page 1 whenever the filters change, so pagination never lands
   // on a page that no longer exists for the new result set.
   useEffect(() => {
     setPage(1);
-  }, [templates, query, category, channel, status]);
+  }, [templates, query, category, group, status]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -142,25 +156,27 @@ function TemplatesPage() {
               className="h-9 w-48 rounded-md border border-border bg-card/60 pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
-          <SclSelect
-            value={category}
+          <SclMultiSelect
+            values={category}
             onChange={setCategory}
-            options={CATEGORY_OPTIONS}
-            className="w-36"
+            options={categoryOptions}
+            allLabel="All Categories"
             ariaLabel="Filter by category"
           />
-          <SclSelect
-            value={channel}
-            onChange={setChannel}
-            options={CHANNEL_OPTIONS}
-            className="w-36"
-            ariaLabel="Filter by channel"
+          <SclMultiSelect
+            values={group}
+            onChange={setGroup}
+            options={groupFilterOptions}
+            allLabel="All Groups"
+            searchable
+            searchPlaceholder="Search groups…"
+            ariaLabel="Filter by group"
           />
-          <SclSelect
-            value={status}
+          <SclMultiSelect
+            values={status}
             onChange={setStatus}
             options={STATUS_OPTIONS}
-            className="w-32"
+            allLabel="All Statuses"
             ariaLabel="Filter by status"
           />
           <div className="ml-auto flex items-center gap-2">
@@ -287,7 +303,7 @@ function TemplatesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${categoryTone[t.category]}`}
+                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_CATEGORY_TONE[categoryColor(t.category)]}`}
                         >
                           {t.category}
                         </span>
@@ -618,6 +634,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
 }
 
 function TemplateDetailModal({ template, onClose }: { template: Template; onClose: () => void }) {
+  const categoryColor = useCategoryColor(useTemplatesStore().categories);
   const { groups } = useTemplatesStore();
   const group: TemplateGroup | undefined = groups.find((g) => g.id === template.groupId);
 
@@ -678,7 +695,7 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                 {template.status}
               </span>
               <span
-                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${categoryTone[template.category]}`}
+                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_CATEGORY_TONE[categoryColor(template.category)]}`}
               >
                 {template.category}
               </span>

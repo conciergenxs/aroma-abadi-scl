@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
+import { SclManagedSelect } from "@/components/scl/scl-managed-select";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   templatesStore,
@@ -36,13 +37,6 @@ export const Route = createFileRoute("/templates/new")({
   component: CreateTemplatePage,
 });
 
-const CATEGORY_OPTIONS = [
-  { value: "Marketing", label: "Marketing", dot: "bg-primary" },
-  { value: "Utility", label: "Utility", dot: "bg-sky-400" },
-  { value: "Reminder", label: "Reminder", dot: "bg-amber-400" },
-  { value: "Service", label: "Service", dot: "bg-violet-400" },
-];
-
 const HEADER_OPTIONS = [
   { value: "none", label: "None" },
   {
@@ -74,26 +68,25 @@ const BUTTON_OPTIONS = [
 
 function CreateTemplatePage() {
   const navigate = useNavigate();
-  const { groups } = useTemplatesStore();
+  const { groups, categories } = useTemplatesStore();
 
   // Variable popup state
   const [varPopup, setVarPopup] = useState<"brands" | "promo" | null>(null);
 
   // Settings
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<Template["category"]>("Marketing");
+  const [category, setCategory] = useState<string>("Marketing");
   const [language, setLanguage] = useState<string>("en_US");
   const [groupId, setGroupId] = useState<string>("none");
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
   const selectedChannel = connectedChannels.find((c) => c.id === channelId) ?? null;
 
-  // Optional groups: create inline
-  const [newGroupName, setNewGroupName] = useState("");
-  const [showNewGroupInput, setShowNewGroupInput] = useState(false);
 
   // Content
   const [headerType, setHeaderType] = useState<string>("none");
   const [headerText, setHeaderText] = useState("");
+  const [headerMedia, setHeaderMedia] = useState<{ url: string; name: string } | null>(null);
+  const headerFileRef = useRef<HTMLInputElement>(null);
   const [body, setBody] = useState("");
   const [footer, setFooter] = useState("");
   const [buttonType, setButtonType] = useState<string>("none");
@@ -172,15 +165,6 @@ function CreateTemplatePage() {
     setVarPopup(null);
   };
 
-  const createGroupInline = () => {
-    const name = newGroupName.trim();
-    if (!name) return;
-    const g = templatesStore.addGroup(name);
-    setGroupId(g.id);
-    setNewGroupName("");
-    setShowNewGroupInput(false);
-    toast.success("Group created");
-  };
 
   const submit = (kind: "draft" | "submit") => {
     if (!valid) {
@@ -229,10 +213,38 @@ function CreateTemplatePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Category" required>
-                <SclSelect
+                <SclManagedSelect
                   value={category}
-                  onChange={(v) => setCategory(v as Template["category"])}
-                  options={CATEGORY_OPTIONS}
+                  onChange={setCategory}
+                  options={categoryOptions}
+                  onAdd={(name) => {
+                    templatesStore.addCategory(name);
+                    setCategory(name);
+                    toast.success("Category added");
+                  }}
+                  onRename={(v, name) => {
+                    const c = categories.find((x) => x.name === v);
+                    if (!c) return;
+                    templatesStore.renameCategory(c.id, name);
+                    if (category === v) setCategory(name);
+                    toast.success("Category renamed");
+                  }}
+                  onDelete={(v) => {
+                    const c = categories.find((x) => x.name === v);
+                    if (!c) return;
+                    if (categories.length === 1) {
+                      toast.error("Keep at least one category.");
+                      return;
+                    }
+                    templatesStore.deleteCategory(c.id);
+                    if (category === v) {
+                      setCategory(categories.find((x) => x.id !== c.id)!.name);
+                    }
+                    toast.success("Category deleted");
+                  }}
+                  addLabel="Add New Category"
+                  namePlaceholder="Category name…"
+                  ariaLabel="Category"
                 />
               </Field>
               <Field label="Channel" required>
@@ -242,55 +254,28 @@ function CreateTemplatePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Template Group (Optional)">
-                <div className="space-y-2">
-                  <SclSelect
-                    value={groupId}
-                    onChange={setGroupId}
-                    options={groupOptions}
-                    searchable
-                  />
-                  {showNewGroupInput ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        autoFocus
-                        value={newGroupName}
-                        onChange={(e) => setNewGroupName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") createGroupInline();
-                          if (e.key === "Escape") {
-                            setShowNewGroupInput(false);
-                            setNewGroupName("");
-                          }
-                        }}
-                        placeholder="Group name…"
-                        className="flex-1 h-8 rounded-md border border-border bg-white px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-                      />
-                      <button
-                        onClick={createGroupInline}
-                        disabled={!newGroupName.trim()}
-                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 h-8 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
-                      >
-                        Create
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowNewGroupInput(false);
-                          setNewGroupName("");
-                        }}
-                        className="text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-150"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowNewGroupInput(true)}
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline transition-colors duration-150"
-                    >
-                      <Plus className="h-3 w-3" /> New group
-                    </button>
-                  )}
-                </div>
+                <SclManagedSelect
+                  value={groupId}
+                  onChange={setGroupId}
+                  options={groupOptions}
+                  onAdd={(name) => {
+                    const g = templatesStore.addGroup(name);
+                    setGroupId(g.id);
+                    toast.success("Group created");
+                  }}
+                  onRename={(v, name) => {
+                    templatesStore.renameGroup(v, name);
+                    toast.success("Group renamed");
+                  }}
+                  onDelete={(v) => {
+                    templatesStore.deleteGroup(v);
+                    if (groupId === v) setGroupId("none");
+                    toast.success("Group deleted");
+                  }}
+                  addLabel="Add New Group"
+                  namePlaceholder="Group name…"
+                  ariaLabel="Template group"
+                />
               </Field>
 
               <Field label="Language">
@@ -308,9 +293,72 @@ function CreateTemplatePage() {
                   />
                 )}
                 {(headerType === "image" || headerType === "video") && (
-                  <div className="mt-2 rounded-md border border-dashed border-border bg-background/30 p-3 text-[11px] text-muted-foreground text-center">
-                    {headerType === "image" ? "Image" : "Video"} upload available after the template
-                    is created.
+                  <div className="mt-2 animate-fade-in">
+                    <input
+                      ref={headerFileRef}
+                      type="file"
+                      accept={headerType === "image" ? "image/*" : "video/*"}
+                      className="hidden"
+                      onChange={handleHeaderFile}
+                    />
+                    {headerMedia ? (
+                      <div className="flex items-center gap-3 rounded-md border border-border bg-background/30 p-2">
+                        {headerType === "image" ? (
+                          <img
+                            src={headerMedia.url}
+                            alt=""
+                            className="img-fade h-12 w-12 shrink-0 rounded object-cover"
+                          />
+                        ) : (
+                          <video
+                            src={headerMedia.url}
+                            className="h-12 w-12 shrink-0 rounded object-cover"
+                            muted
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[12px] font-medium">{headerMedia.name}</div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {headerType === "image" ? "Image" : "Video"} header
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => headerFileRef.current?.click()}
+                          className="press shrink-0 rounded border border-border bg-card/60 px-2.5 h-7 text-[11px] hover:bg-card transition-colors"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHeaderMedia(null)}
+                          aria-label="Remove header media"
+                          className="press grid h-7 w-7 shrink-0 place-items-center rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => headerFileRef.current?.click()}
+                        className="press flex w-full flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-background/30 p-4 text-center hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                      >
+                        {headerType === "image" ? (
+                          <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <Video className="h-5 w-5 text-muted-foreground" />
+                        )}
+                        <span className="text-[12px] font-medium text-foreground">
+                          Upload {headerType === "image" ? "image" : "video"}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {headerType === "image"
+                            ? "JPG, PNG or WebP · 1.91:1 works best"
+                            : "MP4 · up to 16 MB"}
+                        </span>
+                      </button>
+                    )}
                   </div>
                 )}
               </Field>
