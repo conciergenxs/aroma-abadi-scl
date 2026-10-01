@@ -288,7 +288,11 @@ function TemplatesPage() {
                       <td className="px-4 py-3">
                         {group ? (
                           <span
-                            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}
+                            // w-min so a long name wraps at its spaces and the
+                            // badge is only as wide as the longest word. Left to
+                            // shrink-to-fit it would take the cell's whole
+                            // content width and wrap inside all that empty space.
+                            className={`inline-flex w-min items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium ${TEMPLATE_GROUP_BADGE[group.color]}`}
                           >
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${TEMPLATE_GROUP_DOT[group.color]}`}
