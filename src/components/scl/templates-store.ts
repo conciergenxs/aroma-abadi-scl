@@ -105,6 +105,15 @@ export const templatesStore = {
     emit();
     return entry;
   },
+  updateTemplate(id: string, patch: Partial<Omit<Template, "id">>) {
+    state = {
+      ...state,
+      templates: state.templates.map((t) =>
+        t.id === id ? { ...t, ...patch, updated: "just now" } : t,
+      ),
+    };
+    emit();
+  },
   deleteTemplate(id: string) {
     state = {
       ...state,
@@ -259,3 +268,10 @@ export const TEMPLATE_CATEGORY_TONE: Record<TemplateTone, string> = {
   slate: "border-slate-600 bg-slate-500 text-white",
   rose: "border-rose-700 bg-rose-600 text-white",
 };
+
+/** A template can still be changed while Meta has not seen it. Once it has been
+ * submitted the wording is under review, and once approved it is the version
+ * Meta will send — neither is ours to edit from here. */
+export function canEditTemplate(status: Template["status"]) {
+  return status === "Draft";
+}
