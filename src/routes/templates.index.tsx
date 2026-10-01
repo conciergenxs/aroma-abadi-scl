@@ -53,8 +53,6 @@ const statusTone: Record<string, string> = {
   Draft: "border-slate-600 bg-slate-500 text-white",
 };
 
-
-
 /** Templates reference a category by name, so the colour is resolved by name
  * too. A template on a category that was deleted falls back to slate rather
  * than rendering an unstyled pill. */

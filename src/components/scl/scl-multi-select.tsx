@@ -58,7 +58,11 @@ export function SclMultiSelect({
 
   const picked = options.filter((o) => values.includes(o.value));
   const triggerLabel =
-    picked.length === 0 ? allLabel : picked.length === 1 ? picked[0].label : `${picked.length} selected`;
+    picked.length === 0
+      ? allLabel
+      : picked.length === 1
+        ? picked[0].label
+        : `${picked.length} selected`;
 
   return (
     <div className="relative">
@@ -75,7 +79,9 @@ export function SclMultiSelect({
           {picked.length === 1 && picked[0].dot ? (
             <span className={`h-2 w-2 rounded-full shrink-0 ${picked[0].dot}`} />
           ) : null}
-          <span className={`leading-snug ${picked.length ? "text-foreground" : "text-muted-foreground"}`}>
+          <span
+            className={`leading-snug ${picked.length ? "text-foreground" : "text-muted-foreground"}`}
+          >
             {triggerLabel}
           </span>
         </span>
@@ -126,12 +132,21 @@ export function SclMultiSelect({
                 >
                   <span
                     className={`mt-[1px] grid h-3.5 w-3.5 shrink-0 place-items-center rounded-[3px] border transition-colors ${
-                      on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white"
+                      on
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-white"
                     }`}
                   >
                     {on && (
-                      <svg viewBox="0 0 10 8" className="h-2 w-2 fill-none stroke-current stroke-[1.8]">
-                        <path d="M1 4.2 3.5 6.7 9 1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg
+                        viewBox="0 0 10 8"
+                        className="h-2 w-2 fill-none stroke-current stroke-[1.8]"
+                      >
+                        <path
+                          d="M1 4.2 3.5 6.7 9 1.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     )}
                   </span>

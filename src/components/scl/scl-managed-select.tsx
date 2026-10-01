@@ -168,7 +168,9 @@ export function SclManagedSelect({
                       reset();
                     }}
                     className={`press flex min-w-0 flex-1 items-center gap-2 rounded px-2 py-1.5 text-left text-[12px] transition-colors ${
-                      active ? "bg-primary/10 text-foreground" : "text-foreground/90 hover:bg-gray-50"
+                      active
+                        ? "bg-primary/10 text-foreground"
+                        : "text-foreground/90 hover:bg-gray-50"
                     }`}
                   >
                     {o.dot && <span className={`h-2 w-2 shrink-0 rounded-full ${o.dot}`} />}

@@ -18,6 +18,7 @@ import {
   Save,
   Send,
   Plus,
+  X,
   AtSign,
   Sparkles,
   Lightbulb,
@@ -81,7 +82,6 @@ function CreateTemplatePage() {
   const [channelId, setChannelId] = useState<string>(connectedChannels[0]?.id ?? "");
   const selectedChannel = connectedChannels.find((c) => c.id === channelId) ?? null;
 
-
   // Content
   const [headerType, setHeaderType] = useState<string>("none");
   const [headerText, setHeaderText] = useState("");
@@ -96,9 +96,14 @@ function CreateTemplatePage() {
 
   const channelKind = selectedChannel?.channel ?? "whatsapp";
 
+  const categoryOptions = useMemo(
+    () =>
+      categories.map((c) => ({ value: c.name, label: c.name, dot: TEMPLATE_GROUP_DOT[c.color] })),
+    [categories],
+  );
   const groupOptions = useMemo(
     () => [
-      { value: "none", label: "No group" },
+      { value: "none", label: "No group", locked: true },
       ...groups.map((g) => ({
         value: g.id,
         label: g.name,
@@ -165,6 +170,29 @@ function CreateTemplatePage() {
     setVarPopup(null);
   };
 
+  // Reads the picked file to a data URL. Images get decoded first, because
+  // accept="image/*" lets the OS offer formats the browser cannot display
+  // (HEIC from an iPhone) which would otherwise render as a broken preview.
+  function handleHeaderFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = () => toast.error("Could not read that file.");
+    reader.onload = () => {
+      const url = String(reader.result);
+      if (headerType === "video") {
+        setHeaderMedia({ url, name: file.name });
+        return;
+      }
+      const probe = new window.Image();
+      probe.onload = () => setHeaderMedia({ url, name: file.name });
+      probe.onerror = () =>
+        toast.error("That image format can't be displayed. Try a JPG, PNG, or WebP.");
+      probe.src = url;
+    };
+    reader.readAsDataURL(file);
+  }
 
   const submit = (kind: "draft" | "submit") => {
     if (!valid) {
@@ -181,6 +209,10 @@ function CreateTemplatePage() {
       language,
       headerType: headerType as "none" | "text" | "image" | "video",
       headerText: headerType === "text" ? headerText.trim() || undefined : undefined,
+      headerMediaUrl:
+        headerType === "image" || headerType === "video" ? headerMedia?.url : undefined,
+      headerMediaName:
+        headerType === "image" || headerType === "video" ? headerMedia?.name : undefined,
       footer: footer.trim() || undefined,
       promoCodeId: linkedPromoId,
     });
@@ -516,16 +548,31 @@ function CreateTemplatePage() {
                 {headerType === "text" && headerText && (
                   <div className="font-semibold text-[12px] mb-1.5">{headerText}</div>
                 )}
-                {headerType === "image" && (
-                  <div className="mb-2 h-20 w-full rounded bg-white/[0.05] border border-border grid place-items-center text-[10px] text-muted-foreground">
-                    <ImageIcon className="h-4 w-4" />
-                  </div>
-                )}
-                {headerType === "video" && (
-                  <div className="mb-2 h-20 w-full rounded bg-white/[0.05] border border-border grid place-items-center text-[10px] text-muted-foreground">
-                    <Video className="h-4 w-4" />
-                  </div>
-                )}
+                {headerType === "image" &&
+                  (headerMedia ? (
+                    <img
+                      src={headerMedia.url}
+                      alt=""
+                      className="img-fade mb-2 h-20 w-full rounded object-cover"
+                    />
+                  ) : (
+                    <div className="mb-2 h-20 w-full rounded bg-white/[0.05] border border-border grid place-items-center text-[10px] text-muted-foreground">
+                      <ImageIcon className="h-4 w-4" />
+                    </div>
+                  ))}
+                {headerType === "video" &&
+                  (headerMedia ? (
+                    <video
+                      src={headerMedia.url}
+                      className="mb-2 h-20 w-full rounded object-cover"
+                      muted
+                      controls
+                    />
+                  ) : (
+                    <div className="mb-2 h-20 w-full rounded bg-white/[0.05] border border-border grid place-items-center text-[10px] text-muted-foreground">
+                      <Video className="h-4 w-4" />
+                    </div>
+                  ))}
                 {body.trim() ? (
                   <div className="whitespace-pre-wrap break-words">{renderWithVars(body)}</div>
                 ) : (
