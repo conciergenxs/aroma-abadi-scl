@@ -1418,7 +1418,10 @@ export const conversations: Conversation[] = [
 export type Template = {
   id: string;
   name: string;
-  category: "Marketing" | "Utility" | "Service" | "Reminder";
+  /** The name of a TemplateCategory. A plain string rather than a union, because
+   * categories are editable from the UI now and a closed union could not hold
+   * one the user typed. */
+  category: string;
   channel: Channel;
   status: "Approved" | "Pending" | "Rejected" | "Draft";
   updated: string;
@@ -1433,11 +1436,38 @@ export type Template = {
   promoCodeId?: string;
 };
 
+export type TemplateTone =
+  | "primary"
+  | "indigo"
+  | "pink"
+  | "emerald"
+  | "amber"
+  | "sky"
+  | "violet"
+  | "slate"
+  | "rose";
+
 export type TemplateGroup = {
   id: string;
   name: string;
-  color: "indigo" | "pink" | "emerald" | "amber" | "sky" | "violet" | "slate" | "rose";
+  color: TemplateTone;
 };
+
+/** Categories are managed the same way groups are, so one can be added, renamed
+ * or removed without a code change. Seeded with the four that used to be hard
+ * coded, keeping their original colours. */
+export type TemplateCategory = {
+  id: string;
+  name: string;
+  color: TemplateTone;
+};
+
+export const initialTemplateCategories: TemplateCategory[] = [
+  { id: "tc-marketing", name: "Marketing", color: "primary" },
+  { id: "tc-utility", name: "Utility", color: "sky" },
+  { id: "tc-service", name: "Service", color: "violet" },
+  { id: "tc-reminder", name: "Reminder", color: "amber" },
+];
 
 export const initialTemplateGroups: TemplateGroup[] = [
   { id: "tg-promotions", name: "Promotions", color: "pink" },
