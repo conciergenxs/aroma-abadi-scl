@@ -7,6 +7,7 @@ import {
   MoreVertical,
   Pencil,
   Plus,
+  Search as SearchIcon,
   Trash2,
 } from "lucide-react";
 import { FloatingMenu } from "./floating-menu";
@@ -35,6 +36,7 @@ export function SclManagedSelect({
   namePlaceholder = "Name…",
   pageSize = 8,
   placeholder = "Select…",
+  searchPlaceholder = "Search…",
   ariaLabel,
 }: {
   value: string | null | undefined;
@@ -48,9 +50,11 @@ export function SclManagedSelect({
   namePlaceholder?: string;
   pageSize?: number;
   placeholder?: string;
+  searchPlaceholder?: string;
   ariaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
@@ -60,19 +64,26 @@ export function SclManagedSelect({
   const btnRef = useRef<HTMLButtonElement>(null);
 
   const selected = options.find((o) => o.value === value) ?? null;
-  const totalPages = Math.max(1, Math.ceil(options.length / pageSize));
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, query]);
+  const totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const paged = useMemo(
-    () => options.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [options, safePage, pageSize],
+    () => matches.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [matches, safePage, pageSize],
   );
 
-  // Deleting the last row on the last page would otherwise strand the viewer.
+  // Narrowing the search, or deleting the last row on the last page, would
+  // otherwise strand the viewer on a page that no longer exists.
   useEffect(() => {
-    setPage((p) => Math.min(p, Math.max(1, Math.ceil(options.length / pageSize))));
-  }, [options.length, pageSize]);
+    setPage((p) => Math.min(p, Math.max(1, Math.ceil(matches.length / pageSize))));
+  }, [matches.length, pageSize]);
 
   const reset = () => {
+    setQuery("");
     setMenuFor(null);
     setEditing(null);
     setDraft("");
@@ -86,7 +97,8 @@ export function SclManagedSelect({
     onAdd(name);
     setNewName("");
     setAdding(false);
-    // A new entry lands at the end, so follow it there.
+    setQuery("");
+    // A new entry lands at the end of the full list, so follow it there.
     setPage(Math.max(1, Math.ceil((options.length + 1) / pageSize)));
   };
 
@@ -128,7 +140,22 @@ export function SclManagedSelect({
         }}
       >
         <div className="rounded-md border border-border bg-popover shadow-xl overflow-hidden animate-scale-in origin-top">
+          <div className="relative border-b border-border">
+            <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="h-9 w-full bg-transparent pl-8 pr-3 text-[12px] focus:outline-none"
+            />
+          </div>
           <div className="p-1">
+            {paged.length === 0 && (
+              <div className="px-3 py-5 text-center text-[12px] text-muted-foreground">
+                No matches
+              </div>
+            )}
             {paged.map((o) => {
               const active = o.value === value;
               if (editing === o.value) {
@@ -283,7 +310,12 @@ export function SclManagedSelect({
             ) : (
               <button
                 type="button"
-                onClick={() => setAdding(true)}
+                onClick={() => {
+                  // Carry whatever was typed into the add field, so a search
+                  // that found nothing becomes the new entry in one step.
+                  setNewName(query.trim());
+                  setAdding(true);
+                }}
                 className="press flex w-full items-center gap-1.5 px-3 py-2 text-left text-[12px] font-medium text-primary hover:bg-primary/5 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" /> {addLabel}

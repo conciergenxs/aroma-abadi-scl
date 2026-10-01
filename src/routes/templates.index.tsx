@@ -159,6 +159,8 @@ function TemplatesPage() {
             onChange={setCategory}
             options={categoryOptions}
             allLabel="All Categories"
+            searchable
+            searchPlaceholder="Search categories…"
             ariaLabel="Filter by category"
           />
           <SclMultiSelect
