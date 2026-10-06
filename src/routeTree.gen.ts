@@ -9,76 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TransactionsRouteImport } from './routes/transactions'
-import { Route as SkuRouteImport } from './routes/sku'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as InboxRouteImport } from './routes/inbox'
-import { Route as ContactsRouteImport } from './routes/contacts'
-import { Route as ChannelsRouteImport } from './routes/channels'
-import { Route as BaRouteImport } from './routes/ba'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
-import { Route as ReferralIndexRouteImport } from './routes/referral.index'
-import { Route as PromoCodesIndexRouteImport } from './routes/promo-codes.index'
+import { Route as AccessDeniedRouteImport } from './routes/access-denied'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BaRouteImport } from './routes/ba'
+import { Route as ChannelsRouteImport } from './routes/channels'
+import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SkuRouteImport } from './routes/sku'
+import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as BroadcastsIndexRouteImport } from './routes/broadcasts.index'
-import { Route as TemplatesNewRouteImport } from './routes/templates.new'
-import { Route as SkuSkuIdRouteImport } from './routes/sku.$skuId'
-import { Route as SkuDetailSkuIdRouteImport } from './routes/sku-detail.$skuId'
-import { Route as ReferralNewRouteImport } from './routes/referral.new'
-import { Route as ReferralSeasonIdRouteImport } from './routes/referral.$seasonId'
-import { Route as PromoCodesNewRouteImport } from './routes/promo-codes.new'
-import { Route as InviteSetPasswordRouteImport } from './routes/invite.set-password'
-import { Route as ContactsNewRouteImport } from './routes/contacts.new'
-import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
-import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
-import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
-import { Route as TemplatesEditTemplateIdRouteImport } from './routes/templates.edit.$templateId'
-import { Route as ReferralEditSeasonIdRouteImport } from './routes/referral.edit.$seasonId'
-import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
+import { Route as BroadcastsNewRouteImport } from './routes/broadcasts.new'
+import { Route as ContactsContactIdRouteImport } from './routes/contacts.$contactId'
+import { Route as ContactsNewRouteImport } from './routes/contacts.new'
+import { Route as InviteSetPasswordRouteImport } from './routes/invite.set-password'
+import { Route as PromoCodesIndexRouteImport } from './routes/promo-codes.index'
+import { Route as PromoCodesNewRouteImport } from './routes/promo-codes.new'
+import { Route as ReferralIndexRouteImport } from './routes/referral.index'
+import { Route as ReferralSeasonIdRouteImport } from './routes/referral.$seasonId'
+import { Route as ReferralNewRouteImport } from './routes/referral.new'
+import { Route as SkuDetailSkuIdRouteImport } from './routes/sku-detail.$skuId'
+import { Route as SkuSkuIdRouteImport } from './routes/sku.$skuId'
+import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
+import { Route as TemplatesNewRouteImport } from './routes/templates.new'
 import { Route as ContactsAudienceNewRouteImport } from './routes/contacts.audience.new'
+import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
+import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
+import { Route as ReferralEditSeasonIdRouteImport } from './routes/referral.edit.$seasonId'
+import { Route as TemplatesEditTemplateIdRouteImport } from './routes/templates.edit.$templateId'
 import { Route as ContactsAudienceAddAudienceIdRouteImport } from './routes/contacts.audience.add.$audienceId'
 
-const TransactionsRoute = TransactionsRouteImport.update({
-  id: '/transactions',
-  path: '/transactions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SkuRoute = SkuRouteImport.update({
-  id: '/sku',
-  path: '/sku',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InboxRoute = InboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactsRoute = ContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChannelsRoute = ChannelsRouteImport.update({
-  id: '/channels',
-  path: '/channels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BaRoute = BaRouteImport.update({
-  id: '/ba',
-  path: '/ba',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessDeniedRoute = AccessDeniedRouteImport.update({
@@ -86,24 +51,44 @@ const AccessDeniedRoute = AccessDeniedRouteImport.update({
   path: '/access-denied',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
+const BaRoute = BaRouteImport.update({
+  id: '/ba',
+  path: '/ba',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReferralIndexRoute = ReferralIndexRouteImport.update({
-  id: '/referral/',
-  path: '/referral/',
+const ChannelsRoute = ChannelsRouteImport.update({
+  id: '/channels',
+  path: '/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PromoCodesIndexRoute = PromoCodesIndexRouteImport.update({
-  id: '/promo-codes/',
-  path: '/promo-codes/',
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuRoute = SkuRouteImport.update({
+  id: '/sku',
+  path: '/sku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BroadcastsIndexRoute = BroadcastsIndexRouteImport.update({
@@ -111,29 +96,34 @@ const BroadcastsIndexRoute = BroadcastsIndexRouteImport.update({
   path: '/broadcasts/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TemplatesNewRoute = TemplatesNewRouteImport.update({
-  id: '/templates/new',
-  path: '/templates/new',
+const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
+  id: '/broadcasts/$broadcastId',
+  path: '/broadcasts/$broadcastId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
-  id: '/$skuId',
-  path: '/$skuId',
-  getParentRoute: () => SkuRoute,
-} as any)
-const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
-  id: '/sku-detail/$skuId',
-  path: '/sku-detail/$skuId',
+const BroadcastsNewRoute = BroadcastsNewRouteImport.update({
+  id: '/broadcasts/new',
+  path: '/broadcasts/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReferralNewRoute = ReferralNewRouteImport.update({
-  id: '/referral/new',
-  path: '/referral/new',
+const ContactsContactIdRoute = ContactsContactIdRouteImport.update({
+  id: '/$contactId',
+  path: '/$contactId',
+  getParentRoute: () => ContactsRoute,
+} as any)
+const ContactsNewRoute = ContactsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ContactsRoute,
+} as any)
+const InviteSetPasswordRoute = InviteSetPasswordRouteImport.update({
+  id: '/invite/set-password',
+  path: '/invite/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReferralSeasonIdRoute = ReferralSeasonIdRouteImport.update({
-  id: '/referral/$seasonId',
-  path: '/referral/$seasonId',
+const PromoCodesIndexRoute = PromoCodesIndexRouteImport.update({
+  id: '/promo-codes/',
+  path: '/promo-codes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
@@ -141,44 +131,49 @@ const PromoCodesNewRoute = PromoCodesNewRouteImport.update({
   path: '/promo-codes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InviteSetPasswordRoute = InviteSetPasswordRouteImport.update({
-  id: '/invite/set-password',
-  path: '/invite/set-password',
+const ReferralIndexRoute = ReferralIndexRouteImport.update({
+  id: '/referral/',
+  path: '/referral/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactsNewRoute = ContactsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
+const ReferralSeasonIdRoute = ReferralSeasonIdRouteImport.update({
+  id: '/referral/$seasonId',
+  path: '/referral/$seasonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralNewRoute = ReferralNewRouteImport.update({
+  id: '/referral/new',
+  path: '/referral/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuDetailSkuIdRoute = SkuDetailSkuIdRouteImport.update({
+  id: '/sku-detail/$skuId',
+  path: '/sku-detail/$skuId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkuSkuIdRoute = SkuSkuIdRouteImport.update({
+  id: '/$skuId',
+  path: '/$skuId',
+  getParentRoute: () => SkuRoute,
+} as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesNewRoute = TemplatesNewRouteImport.update({
+  id: '/templates/new',
+  path: '/templates/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsAudienceNewRoute = ContactsAudienceNewRouteImport.update({
+  id: '/audience/new',
+  path: '/audience/new',
   getParentRoute: () => ContactsRoute,
-} as any)
-const ContactsContactIdRoute = ContactsContactIdRouteImport.update({
-  id: '/$contactId',
-  path: '/$contactId',
-  getParentRoute: () => ContactsRoute,
-} as any)
-const BroadcastsNewRoute = BroadcastsNewRouteImport.update({
-  id: '/broadcasts/new',
-  path: '/broadcasts/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BroadcastsBroadcastIdRoute = BroadcastsBroadcastIdRouteImport.update({
-  id: '/broadcasts/$broadcastId',
-  path: '/broadcasts/$broadcastId',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesPromoIdIndexRoute = PromoCodesPromoIdIndexRouteImport.update({
   id: '/promo-codes/$promoId/',
   path: '/promo-codes/$promoId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesEditTemplateIdRoute = TemplatesEditTemplateIdRouteImport.update({
-  id: '/templates/edit/$templateId',
-  path: '/templates/edit/$templateId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReferralEditSeasonIdRoute = ReferralEditSeasonIdRouteImport.update({
-  id: '/referral/edit/$seasonId',
-  path: '/referral/edit/$seasonId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromoCodesEditPromoIdRoute = PromoCodesEditPromoIdRouteImport.update({
@@ -186,10 +181,15 @@ const PromoCodesEditPromoIdRoute = PromoCodesEditPromoIdRouteImport.update({
   path: '/promo-codes/edit/$promoId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactsAudienceNewRoute = ContactsAudienceNewRouteImport.update({
-  id: '/audience/new',
-  path: '/audience/new',
-  getParentRoute: () => ContactsRoute,
+const ReferralEditSeasonIdRoute = ReferralEditSeasonIdRouteImport.update({
+  id: '/referral/edit/$seasonId',
+  path: '/referral/edit/$seasonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesEditTemplateIdRoute = TemplatesEditTemplateIdRouteImport.update({
+  id: '/templates/edit/$templateId',
+  path: '/templates/edit/$templateId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsAudienceAddAudienceIdRoute =
   ContactsAudienceAddAudienceIdRouteImport.update({
@@ -431,60 +431,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/transactions': {
-      id: '/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof TransactionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sku': {
-      id: '/sku'
-      path: '/sku'
-      fullPath: '/sku'
-      preLoaderRoute: typeof SkuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inbox': {
-      id: '/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof InboxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contacts': {
-      id: '/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof ContactsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/channels': {
-      id: '/channels'
-      path: '/channels'
-      fullPath: '/channels'
-      preLoaderRoute: typeof ChannelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ba': {
-      id: '/ba'
-      path: '/ba'
-      fullPath: '/ba'
-      preLoaderRoute: typeof BaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/access-denied': {
@@ -494,32 +445,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccessDeniedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/templates/': {
-      id: '/templates/'
-      path: '/templates'
-      fullPath: '/templates/'
-      preLoaderRoute: typeof TemplatesIndexRouteImport
+    '/ba': {
+      id: '/ba'
+      path: '/ba'
+      fullPath: '/ba'
+      preLoaderRoute: typeof BaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/referral/': {
-      id: '/referral/'
-      path: '/referral'
-      fullPath: '/referral/'
-      preLoaderRoute: typeof ReferralIndexRouteImport
+    '/channels': {
+      id: '/channels'
+      path: '/channels'
+      fullPath: '/channels'
+      preLoaderRoute: typeof ChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/promo-codes/': {
-      id: '/promo-codes/'
-      path: '/promo-codes'
-      fullPath: '/promo-codes/'
-      preLoaderRoute: typeof PromoCodesIndexRouteImport
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sku': {
+      id: '/sku'
+      path: '/sku'
+      fullPath: '/sku'
+      preLoaderRoute: typeof SkuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/broadcasts/': {
@@ -529,39 +508,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/templates/new': {
-      id: '/templates/new'
-      path: '/templates/new'
-      fullPath: '/templates/new'
-      preLoaderRoute: typeof TemplatesNewRouteImport
+    '/broadcasts/$broadcastId': {
+      id: '/broadcasts/$broadcastId'
+      path: '/broadcasts/$broadcastId'
+      fullPath: '/broadcasts/$broadcastId'
+      preLoaderRoute: typeof BroadcastsBroadcastIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sku/$skuId': {
-      id: '/sku/$skuId'
-      path: '/$skuId'
-      fullPath: '/sku/$skuId'
-      preLoaderRoute: typeof SkuSkuIdRouteImport
-      parentRoute: typeof SkuRoute
-    }
-    '/sku-detail/$skuId': {
-      id: '/sku-detail/$skuId'
-      path: '/sku-detail/$skuId'
-      fullPath: '/sku-detail/$skuId'
-      preLoaderRoute: typeof SkuDetailSkuIdRouteImport
+    '/broadcasts/new': {
+      id: '/broadcasts/new'
+      path: '/broadcasts/new'
+      fullPath: '/broadcasts/new'
+      preLoaderRoute: typeof BroadcastsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/referral/new': {
-      id: '/referral/new'
-      path: '/referral/new'
-      fullPath: '/referral/new'
-      preLoaderRoute: typeof ReferralNewRouteImport
+    '/contacts/$contactId': {
+      id: '/contacts/$contactId'
+      path: '/$contactId'
+      fullPath: '/contacts/$contactId'
+      preLoaderRoute: typeof ContactsContactIdRouteImport
+      parentRoute: typeof ContactsRoute
+    }
+    '/contacts/new': {
+      id: '/contacts/new'
+      path: '/new'
+      fullPath: '/contacts/new'
+      preLoaderRoute: typeof ContactsNewRouteImport
+      parentRoute: typeof ContactsRoute
+    }
+    '/invite/set-password': {
+      id: '/invite/set-password'
+      path: '/invite/set-password'
+      fullPath: '/invite/set-password'
+      preLoaderRoute: typeof InviteSetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/referral/$seasonId': {
-      id: '/referral/$seasonId'
-      path: '/referral/$seasonId'
-      fullPath: '/referral/$seasonId'
-      preLoaderRoute: typeof ReferralSeasonIdRouteImport
+    '/promo-codes/': {
+      id: '/promo-codes/'
+      path: '/promo-codes'
+      fullPath: '/promo-codes/'
+      preLoaderRoute: typeof PromoCodesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promo-codes/new': {
@@ -571,60 +557,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/invite/set-password': {
-      id: '/invite/set-password'
-      path: '/invite/set-password'
-      fullPath: '/invite/set-password'
-      preLoaderRoute: typeof InviteSetPasswordRouteImport
+    '/referral/': {
+      id: '/referral/'
+      path: '/referral'
+      fullPath: '/referral/'
+      preLoaderRoute: typeof ReferralIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contacts/new': {
-      id: '/contacts/new'
-      path: '/new'
-      fullPath: '/contacts/new'
-      preLoaderRoute: typeof ContactsNewRouteImport
+    '/referral/$seasonId': {
+      id: '/referral/$seasonId'
+      path: '/referral/$seasonId'
+      fullPath: '/referral/$seasonId'
+      preLoaderRoute: typeof ReferralSeasonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referral/new': {
+      id: '/referral/new'
+      path: '/referral/new'
+      fullPath: '/referral/new'
+      preLoaderRoute: typeof ReferralNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sku-detail/$skuId': {
+      id: '/sku-detail/$skuId'
+      path: '/sku-detail/$skuId'
+      fullPath: '/sku-detail/$skuId'
+      preLoaderRoute: typeof SkuDetailSkuIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sku/$skuId': {
+      id: '/sku/$skuId'
+      path: '/$skuId'
+      fullPath: '/sku/$skuId'
+      preLoaderRoute: typeof SkuSkuIdRouteImport
+      parentRoute: typeof SkuRoute
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/new': {
+      id: '/templates/new'
+      path: '/templates/new'
+      fullPath: '/templates/new'
+      preLoaderRoute: typeof TemplatesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts/audience/new': {
+      id: '/contacts/audience/new'
+      path: '/audience/new'
+      fullPath: '/contacts/audience/new'
+      preLoaderRoute: typeof ContactsAudienceNewRouteImport
       parentRoute: typeof ContactsRoute
-    }
-    '/contacts/$contactId': {
-      id: '/contacts/$contactId'
-      path: '/$contactId'
-      fullPath: '/contacts/$contactId'
-      preLoaderRoute: typeof ContactsContactIdRouteImport
-      parentRoute: typeof ContactsRoute
-    }
-    '/broadcasts/new': {
-      id: '/broadcasts/new'
-      path: '/broadcasts/new'
-      fullPath: '/broadcasts/new'
-      preLoaderRoute: typeof BroadcastsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/broadcasts/$broadcastId': {
-      id: '/broadcasts/$broadcastId'
-      path: '/broadcasts/$broadcastId'
-      fullPath: '/broadcasts/$broadcastId'
-      preLoaderRoute: typeof BroadcastsBroadcastIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/promo-codes/$promoId/': {
       id: '/promo-codes/$promoId/'
       path: '/promo-codes/$promoId'
       fullPath: '/promo-codes/$promoId/'
       preLoaderRoute: typeof PromoCodesPromoIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/templates/edit/$templateId': {
-      id: '/templates/edit/$templateId'
-      path: '/templates/edit/$templateId'
-      fullPath: '/templates/edit/$templateId'
-      preLoaderRoute: typeof TemplatesEditTemplateIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/referral/edit/$seasonId': {
-      id: '/referral/edit/$seasonId'
-      path: '/referral/edit/$seasonId'
-      fullPath: '/referral/edit/$seasonId'
-      preLoaderRoute: typeof ReferralEditSeasonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promo-codes/edit/$promoId': {
@@ -634,12 +627,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCodesEditPromoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contacts/audience/new': {
-      id: '/contacts/audience/new'
-      path: '/audience/new'
-      fullPath: '/contacts/audience/new'
-      preLoaderRoute: typeof ContactsAudienceNewRouteImport
-      parentRoute: typeof ContactsRoute
+    '/referral/edit/$seasonId': {
+      id: '/referral/edit/$seasonId'
+      path: '/referral/edit/$seasonId'
+      fullPath: '/referral/edit/$seasonId'
+      preLoaderRoute: typeof ReferralEditSeasonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/edit/$templateId': {
+      id: '/templates/edit/$templateId'
+      path: '/templates/edit/$templateId'
+      fullPath: '/templates/edit/$templateId'
+      preLoaderRoute: typeof TemplatesEditTemplateIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/contacts/audience/add/$audienceId': {
       id: '/contacts/audience/add/$audienceId'
