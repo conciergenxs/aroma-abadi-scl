@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { variableLabel } from "@/components/scl/template-vars";
 import { useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
@@ -529,9 +530,9 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                 icon={<Sparkles className="h-3.5 w-3.5 text-primary" />}
                 title="Variables Guide"
                 items={[
-                  "Use {{name}} for the contact name.",
-                  "Use {{1}}, {{2}} for positional values.",
-                  "Variables come from Contact Properties.",
+                  "Use {{name}} for the customer name.",
+                  "Pick a brand or promo code from the buttons above.",
+                  "Variables are named — previews show what each one stands for.",
                   "Always provide a fallback value at send.",
                 ]}
               />
@@ -769,7 +770,7 @@ function renderWithVars(body: string) {
   return parts.map((p, i) =>
     /^\{\{[^}]+\}\}$/.test(p) ? (
       <span key={i} className="rounded bg-primary/15 px-1 py-0.5 text-primary font-medium">
-        {p}
+        {variableLabel(p)}
       </span>
     ) : (
       <span key={i}>{p}</span>

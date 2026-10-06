@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { variableLabel } from "./template-vars";
 import { Link } from "@tanstack/react-router";
 import { Search, Star, X as XIcon, FileText, ExternalLink, Plus } from "lucide-react";
 import { templatesStore, useTemplatesStore } from "@/components/scl/templates-store";
@@ -320,7 +321,7 @@ function renderPreview(body: string) {
         key={i}
         className="rounded bg-primary/15 px-1 py-0.5 text-primary text-[12px] font-medium"
       >
-        {p}
+        {variableLabel(p)}
       </span>
     ) : (
       <span key={i}>{p}</span>

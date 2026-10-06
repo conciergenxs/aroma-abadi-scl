@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { variableLabel } from "@/components/scl/template-vars";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
@@ -677,14 +678,6 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
     return Array.from(found);
   }, [template.body]);
 
-  const variableHints: Record<string, string> = {
-    "1": "Customer Name",
-    "2": "Order Number",
-    "3": "Tracking URL",
-    "4": "Agent Name",
-    name: "Contact Name",
-  };
-
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -837,12 +830,9 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
               <DetailSection title="Variables Used">
                 <div className="rounded-md border border-border bg-background/40 divide-y divide-border">
                   {variables.map((v) => (
-                    <div key={v} className="flex items-center gap-3 px-3 py-2 text-[12px]">
-                      <span className="font-mono rounded bg-primary/15 text-primary px-1.5 py-0.5 text-[11px]">
-                        {`{{${v}}}`}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {variableHints[v] ?? "Unmapped variable"}
+                    <div key={v} className="flex items-center gap-2 px-3 py-2 text-[12px]">
+                      <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                        {variableLabel(v)}
                       </span>
                     </div>
                   ))}
@@ -853,8 +843,8 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
             {/* Approval Details */}
             <DetailSection title="Approval Details">
               {template.status === "Approved" && (
-                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-[12px] font-semibold text-emerald-300">
+                <div className="rounded-lg border border-emerald-600/30 bg-emerald-50 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-[12px] font-semibold text-emerald-800">
                     <CheckCircle2 className="h-3.5 w-3.5" /> Approved
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-[12px]">
@@ -864,8 +854,8 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                 </div>
               )}
               {template.status === "Rejected" && (
-                <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-[12px] font-semibold text-red-300">
+                <div className="rounded-lg border border-red-600/30 bg-red-50 p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-[12px] font-semibold text-red-800">
                     <AlertTriangle className="h-3.5 w-3.5" /> Rejected
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-[12px]">
@@ -874,10 +864,10 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                   </div>
                   {template.rejectionReason && (
                     <div>
-                      <div className="text-[11px] font-medium text-red-300/80 mb-1">
+                      <div className="text-[11px] font-medium text-red-800/80 mb-1">
                         Rejection reason
                       </div>
-                      <p className="text-[12px] text-red-200/90 leading-relaxed">
+                      <p className="text-[12px] text-red-900/90 leading-relaxed">
                         {template.rejectionReason}
                       </p>
                     </div>
@@ -885,13 +875,13 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
                 </div>
               )}
               {template.status === "Pending" && (
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 flex items-center gap-2 text-[12px] text-amber-200/90">
-                  <Hourglass className="h-3.5 w-3.5 text-amber-300" />
+                <div className="rounded-lg border border-amber-600/30 bg-amber-50 p-4 flex items-center gap-2 text-[12px] text-amber-900">
+                  <Hourglass className="h-3.5 w-3.5 text-amber-700" />
                   Waiting for review by the channel provider.
                 </div>
               )}
               {template.status === "Draft" && (
-                <div className="rounded-lg border border-border bg-background/40 p-4 flex items-center gap-2 text-[12px] text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/40 p-4 flex items-center gap-2 text-[12px] text-foreground/70">
                   <FileText className="h-3.5 w-3.5" />
                   Not submitted yet — finish editing and submit for review.
                 </div>
@@ -1057,7 +1047,7 @@ function renderBodyWithVars(body: string) {
   return parts.map((p, i) =>
     /^\{\{[^}]+\}\}$/.test(p) ? (
       <span key={i} className="rounded bg-primary/15 px-1 py-0.5 text-primary font-medium">
-        {p}
+        {variableLabel(p)}
       </span>
     ) : (
       <span key={i}>{p}</span>

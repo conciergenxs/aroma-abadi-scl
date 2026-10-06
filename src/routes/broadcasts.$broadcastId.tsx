@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { variableLabel } from "@/components/scl/template-vars";
 import { fmtNum } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
@@ -650,7 +651,7 @@ function renderWithVars(body: string) {
   return parts.map((p, i) =>
     /^\{\{[^}]+\}\}$/.test(p) ? (
       <span key={i} className="rounded bg-primary/15 px-1 py-0.5 text-primary font-medium">
-        {p}
+        {variableLabel(p)}
       </span>
     ) : (
       <span key={i}>{p}</span>

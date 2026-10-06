@@ -19,7 +19,8 @@ type State = {
 // Bump when the Template shape changes so browsers holding an older shape
 // re-seed instead of rendering stale records against new code.
 // v3: categories joined groups as editable records.
-const STORAGE_KEY = "aroma_templates_store_v3";
+// v4: seeded bodies swapped numbered placeholders for named variables.
+const STORAGE_KEY = "aroma_templates_store_v4";
 
 function seedState(): State {
   return {
