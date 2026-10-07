@@ -294,7 +294,7 @@ function TransactionsPage() {
                           {t.brandNames.map((b) => (
                             <span
                               key={b}
-                              className="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-[10px] font-medium text-foreground"
+                              className="inline-flex items-center rounded-full border border-border bg-white px-2 py-0.5 text-[12px] font-medium text-foreground"
                             >
                               {b}
                             </span>

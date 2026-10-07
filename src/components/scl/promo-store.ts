@@ -214,9 +214,6 @@ export function benefitFor(rule: PromoRule, discountValue: number): string {
   const r = rule.reward;
   if (r.kind === "free-item") return freeItemsLabel(r.group);
   if (r.kind === "free-shipping") return "Free shipping";
-  // A percentage rule carries its rate alongside the rupiah, because the same
-  // amount means something different on a small basket than on a large one.
-  if (r.kind === "percent-off") return `−${fmtIDR(discountValue)} (${r.percent}%)`;
   return `−${fmtIDR(discountValue)}`;
 }
 
@@ -227,7 +224,8 @@ export function rewardKindLabel(reward: PromoReward): string {
     case "free-item":
       return "Free Item(s)";
     case "percent-off":
-      return "% Discount";
+      // The rate rides with the kind, so the value line can stay pure rupiah.
+      return `% Discount (-${reward.percent}%)`;
     case "amount-off":
       return "Rp Discount";
     case "free-shipping":

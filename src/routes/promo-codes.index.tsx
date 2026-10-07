@@ -388,13 +388,13 @@ function PromoCodesPage() {
                         {describePromoRule(promo.rule)}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {promo.usageType === "one-to-one" ? (
-                        <span className="inline-flex items-center rounded-full border border-sky-600 bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                        <span className="inline-flex items-center rounded-full border border-sky-600 bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white whitespace-nowrap">
                           1-to-1
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full border border-violet-600 bg-violet-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                        <span className="inline-flex items-center rounded-full border border-violet-600 bg-violet-600 px-2 py-0.5 text-[10px] font-medium text-white whitespace-nowrap">
                           1-to-Many
                         </span>
                       )}
