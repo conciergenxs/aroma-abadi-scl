@@ -73,18 +73,22 @@ function seed(): Transaction[] {
   const cities = ["Jakarta", "Jakarta", "Bandung", "Surabaya", "Tangerang"];
   // skuIndices: indices into skus[] that match each customer's brand(s)
   const customers: { id: string; name: string; skuIndices: number[] }[] = [
-    { id: "c1", name: "Putri Anggraini", skuIndices: [1, 2, 0, 5, 3] }, // sisley + dg + laura + rimmel
-    { id: "c9", name: "Citra Halim", skuIndices: [5] }, // laura
-    { id: "c11", name: "Bayu Hartanto", skuIndices: [1, 2, 3, 4, 5, 0] }, // sisley + rimmel + laura + dg
-    { id: "c12", name: "Nadya Salsabila", skuIndices: [5] }, // laura
-    { id: "c3", name: "Siti Rahmawati", skuIndices: [1, 2, 6] }, // sisley + bareMinerals
-    { id: "c6", name: "Indah Permata", skuIndices: [0, 1, 2, 6, 4] }, // dg + sisley + bareMinerals + rimmel
-    { id: "c16", name: "Lina Wulandari", skuIndices: [0, 5, 1, 2] }, // dg + laura + sisley
-    { id: "c20", name: "Zahra Aulia", skuIndices: [0] }, // dg
-    { id: "c2", name: "Bagus Pratama", skuIndices: [3, 4, 6] }, // rimmel + bareMinerals
-    { id: "c13", name: "Ayu Fitriani", skuIndices: [0] }, // dg
-    { id: "c15", name: "Tiara Hapsari", skuIndices: [1, 2, 5, 6] }, // sisley + laura + bareMinerals
-    { id: "c22", name: "Dian Puspita", skuIndices: [1, 2, 3, 0] }, // sisley + rimmel + dg
+    // Every customer shops across at least four of the seven SKUs. Baskets are
+    // built by cycling this list, so a short list caps how many *different*
+    // products an order can hold no matter how many lines it has — which is why
+    // single-SKU customers used to produce one-item orders every time.
+    { id: "c1", name: "Putri Anggraini", skuIndices: [1, 2, 0, 5, 3] },
+    { id: "c9", name: "Citra Halim", skuIndices: [5, 1, 2, 6] },
+    { id: "c11", name: "Bayu Hartanto", skuIndices: [1, 2, 3, 4, 5, 0] },
+    { id: "c12", name: "Nadya Salsabila", skuIndices: [5, 0, 1, 4] },
+    { id: "c3", name: "Siti Rahmawati", skuIndices: [1, 2, 6, 0, 3] },
+    { id: "c6", name: "Indah Permata", skuIndices: [0, 1, 2, 6, 4] },
+    { id: "c16", name: "Lina Wulandari", skuIndices: [0, 5, 1, 2, 3] },
+    { id: "c20", name: "Zahra Aulia", skuIndices: [0, 3, 4, 6] },
+    { id: "c2", name: "Bagus Pratama", skuIndices: [3, 4, 6, 1, 5] },
+    { id: "c13", name: "Ayu Fitriani", skuIndices: [0, 2, 5, 6] },
+    { id: "c15", name: "Tiara Hapsari", skuIndices: [1, 2, 5, 6, 0] },
+    { id: "c22", name: "Dian Puspita", skuIndices: [1, 2, 3, 0, 4, 6] },
   ];
   const skus = [
     {
@@ -190,9 +194,9 @@ function seed(): Transaction[] {
 }
 
 // v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
-// v14: wider brand affinity and baskets up to 7 lines, so some orders hold more
-// than the three products the table shows and more than the five the peek pages.
-const STORAGE_KEY = "aroma_tx_store_v14";
+// v15: every customer shops several SKUs, so plenty of orders hold more than
+// the three products the table shows and more than the five the peek pages.
+const STORAGE_KEY = "aroma_tx_store_v15";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
