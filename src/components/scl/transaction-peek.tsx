@@ -204,7 +204,7 @@ export function TransactionPeek({
 
         {/* The money is the answer the panel exists to give, so it stays put
             while the detail above it scrolls. */}
-        <div className="shrink-0 border-t border-border bg-background p-5 space-y-3">
+        <div className="shrink-0 border-t border-border bg-background px-5 pt-5 pb-[calc(1.25rem+10px)] space-y-3">
           <div>
             <div className={LABEL}>{codeUsed?.kind ?? "Promo Code"}</div>
             {codeUsed ? (
