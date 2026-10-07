@@ -169,11 +169,11 @@ function seed(): Transaction[] {
       brandSet.add(sku.brand);
     }
     const brandNames = Array.from(brandSet);
-    // Roughly a quarter of orders carry a discount, so the row has something to
-    // show without appearing on every single order.
+    // No discount is invented here. An order is only discounted because a promo
+    // or referral code was redeemed on it, and those stores set it through
+    // applyCodeDiscounts once they know which order used which code.
     const paymentMethod = payments[i % payments.length];
-    const discount = i % 4 === 1 ? Math.round((subtotal * 0.1) / 1000) * 1000 : 0;
-    const money = priceOrder(subtotal, discount, paymentMethod);
+    const money = priceOrder(subtotal, 0, paymentMethod);
     items.push({
       id: `tx-${1000 + i}`,
       invoice: `AA-${String(82200 + i).padStart(5, "0")}`,
@@ -196,7 +196,8 @@ function seed(): Transaction[] {
 // v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
 // v15: every customer shops several SKUs, so plenty of orders hold more than
 // the three products the table shows and more than the five the peek pages.
-const STORAGE_KEY = "aroma_tx_store_v15";
+// v16: discounts come from redeemed codes instead of being invented per order.
+const STORAGE_KEY = "aroma_tx_store_v16";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
@@ -265,7 +266,32 @@ const getSnapshot = () => state;
 const SERVER_SNAPSHOT: { transactions: Transaction[] } = { transactions: seed() };
 const getServerSnapshot = () => SERVER_SNAPSHOT;
 
+/** Promo and referral each know which orders their codes were used on, but
+ * neither knows about the other. Their contributions are kept apart and merged
+ * on every call, so whichever loads second cannot erase the first's discounts. */
+const codeDiscountSources = new Map<string, Map<string, number>>();
+
 export const transactionsStore = {
+  /** Sets the discount redeemed codes took off each order and re-prices it.
+   * Without this an order's total would ignore the very discount shown beside
+   * the code. Assigns rather than adds, so reloading cannot compound it. */
+  applyCodeDiscounts(source: "promo" | "referral", byTransaction: Map<string, number>) {
+    codeDiscountSources.set(source, byTransaction);
+    const merged = new Map<string, number>();
+    for (const contribution of codeDiscountSources.values()) {
+      for (const [txId, amount] of contribution) merged.set(txId, amount);
+    }
+    let changed = false;
+    const next = state.transactions.map((t) => {
+      const discount = merged.get(t.id) ?? 0;
+      if (t.discount === discount) return t;
+      changed = true;
+      return { ...t, ...priceOrder(t.subtotal, discount, t.paymentMethod) };
+    });
+    if (!changed) return;
+    state = { ...state, transactions: next };
+    emit();
+  },
   get state() {
     return state;
   },

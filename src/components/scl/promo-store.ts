@@ -930,6 +930,18 @@ let _promos: PromoCode[] = seed();
 let _loaded = false;
 const _listeners = new Set<() => void>();
 
+/** Only money rewards change what the customer pays — a free item or free
+ * shipping is handed over on top of the order, not taken off its goods total. */
+function _pushDiscountsToOrders() {
+  const byTransaction = new Map<string, number>();
+  for (const promo of _promos) {
+    const kind = promo.rule.reward.kind;
+    if (kind !== "percent-off" && kind !== "amount-off") continue;
+    for (const r of promo.redemptions) byTransaction.set(r.transactionId, r.discountValue);
+  }
+  transactionsStore.applyCodeDiscounts("promo", byTransaction);
+}
+
 function _load() {
   if (_loaded) return;
   _loaded = true;
@@ -948,6 +960,7 @@ function _load() {
   } catch {
     /* ignore */
   }
+  _pushDiscountsToOrders();
 }
 
 /** Every entry point loads first: a page that only writes (e.g. creating a
@@ -1048,6 +1061,11 @@ export const promoStore = {
 /** `loaded` turns true once localStorage has been read. Until then the promos
  * returned are the seed — an edit form must wait for it before deciding there
  * is nothing to adopt, or it will save the seed over the real record. */
+// Load eagerly on the client. These codes decide what their orders actually
+// cost, so the discounts have to reach the transactions before anything reads a
+// total — not only once a panel that happens to use this store mounts.
+if (typeof window !== "undefined") _load();
+
 export function usePromoStore() {
   const [promos, setPromos] = useState<PromoCode[]>(() => _promos);
   const [loaded, setLoaded] = useState(false);

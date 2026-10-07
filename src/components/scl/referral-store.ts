@@ -250,6 +250,17 @@ let _seasons: ReferralSeason[] = seed();
 let _loaded = false;
 const _listeners = new Set<() => void>();
 
+/** A season's reward is always money off, so every use discounts its order. */
+function _pushDiscountsToOrders() {
+  const byTransaction = new Map<string, number>();
+  for (const season of _seasons) {
+    const kind = season.rule.reward.kind;
+    if (kind !== "percent-off" && kind !== "amount-off") continue;
+    for (const use of season.uses) byTransaction.set(use.transactionId, use.discountValue);
+  }
+  transactionsStore.applyCodeDiscounts("referral", byTransaction);
+}
+
 function _load() {
   if (_loaded) return;
   _loaded = true;
@@ -259,6 +270,7 @@ function _load() {
       const parsed = JSON.parse(raw);
       if (parsed?.seasons && isCurrentShape(parsed.seasons)) {
         _seasons = parsed.seasons;
+        _pushDiscountsToOrders();
         return;
       }
     }
@@ -266,6 +278,7 @@ function _load() {
   } catch {
     /* ignore */
   }
+  _pushDiscountsToOrders();
 }
 
 /** Load before any read or write, so a page that only writes can't save the
@@ -321,6 +334,11 @@ export const referralStore = {
 /** Seasons load from localStorage a tick after mount so the server and the
  * first client render agree — same pattern as the promo store. */
 /** `loaded` turns true once localStorage has been read — see usePromoStore. */
+// Load eagerly on the client. These codes decide what their orders actually
+// cost, so the discounts have to reach the transactions before anything reads a
+// total — not only once a panel that happens to use this store mounts.
+if (typeof window !== "undefined") _load();
+
 export function useReferralStore() {
   const [seasons, setSeasons] = useState<ReferralSeason[]>(_seasons);
   const [loaded, setLoaded] = useState(false);
