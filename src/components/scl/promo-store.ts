@@ -198,13 +198,38 @@ export function rewardSummary(rule: PromoRule, count: number, totalValue: number
   return { kind: "discount", label: "Discount Given", value: fmtIDR(totalValue) };
 }
 
+/** The free items themselves, written the way a picking list reads: quantity
+ * first, then the product. `describeItemGroup` stays as it is because it feeds
+ * rule sentences ("Buy 1 Lipstick"), where the "pcs" would be noise. */
+function freeItemsLabel(group: PromoItemGroup): string {
+  if (group.lines.length === 0) return "Any Item";
+  return group.lines
+    .map((l) => `${l.qty} pcs - ${scopeLabel(l.item)}`)
+    .join(group.join === "and" ? " and " : " or ");
+}
+
 /** One line naming what a single use of this rule handed over — money off for
  * a discount, the items themselves for a free-item rule, and so on. */
 export function benefitFor(rule: PromoRule, discountValue: number): string {
   const r = rule.reward;
-  if (r.kind === "free-item") return `${describeItemGroup(r.group)} free`;
+  if (r.kind === "free-item") return freeItemsLabel(r.group);
   if (r.kind === "free-shipping") return "Free shipping";
   return `−${fmtIDR(discountValue)}`;
+}
+
+/** What kind of reward it is, in the same words the rule builder offers so the
+ * two never disagree — see REWARD_OPTIONS in promo-rule-builder. */
+export function rewardKindLabel(reward: PromoReward): string {
+  switch (reward.kind) {
+    case "free-item":
+      return "Free Item(s)";
+    case "percent-off":
+      return "% Discount";
+    case "amount-off":
+      return "Rp Discount";
+    case "free-shipping":
+      return "Free Shipping";
+  }
 }
 
 /** Rupiah a rule takes off an order of `orderValue`. */

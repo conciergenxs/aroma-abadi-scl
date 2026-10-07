@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
 import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store";
-import { benefitFor, usePromoStore } from "./promo-store";
+import { benefitFor, rewardKindLabel, usePromoStore } from "./promo-store";
 import { useReferralStore } from "./referral-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
 
@@ -63,6 +63,7 @@ export function TransactionPeek({
         return {
           kind: "Promo Code",
           code: promo.code,
+          rewardLabel: rewardKindLabel(promo.rule.reward),
           benefit: benefitFor(promo.rule, hit.discountValue),
         };
       }
@@ -73,6 +74,7 @@ export function TransactionPeek({
         return {
           kind: "Referral Code",
           code: hit.code,
+          rewardLabel: rewardKindLabel(season.rule.reward),
           benefit: benefitFor(season.rule, hit.discountValue),
         };
       }
@@ -206,13 +208,16 @@ export function TransactionPeek({
             while the detail above it scrolls. */}
         <div className="shrink-0 border-t border-border bg-background px-5 pt-5 pb-[calc(1.25rem+10px)] space-y-3">
           <div>
-            <div className={LABEL}>{codeUsed?.kind ?? "Promo Code"}</div>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className={LABEL}>{codeUsed?.kind ?? "Promo Code"}</span>
+              {codeUsed && <span className={LABEL}>{codeUsed.rewardLabel}</span>}
+            </div>
             {codeUsed ? (
-              <div className="mt-1.5 flex items-center justify-between gap-3">
-                <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-primary">
+              <div className="mt-1.5 flex items-start justify-between gap-3">
+                <span className="shrink-0 rounded bg-primary/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-primary">
                   {codeUsed.code}
                 </span>
-                <span className="text-[13px] font-medium">{codeUsed.benefit}</span>
+                <span className="text-right text-[13px] font-medium">{codeUsed.benefit}</span>
               </div>
             ) : (
               <div className="mt-1.5 text-[13px] text-muted-foreground">
