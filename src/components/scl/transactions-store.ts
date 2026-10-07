@@ -145,7 +145,7 @@ function seed(): Transaction[] {
   for (let i = 0; i < 36; i++) {
     const d = new Date(BASE_EPOCH - i * 8 * 3600 * 1000);
     const cust = customers[i % customers.length];
-    const lineCount = 1 + (i % 5);
+    const lineCount = 1 + (i % 7);
     const lines: TxLine[] = [];
     let subtotal = 0;
     const brandSet = new Set<string>();
@@ -190,8 +190,8 @@ function seed(): Transaction[] {
 }
 
 // v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
-// v14: wider brand affinity and baskets up to 5 lines, so some orders hold more
-// than three distinct products.
+// v14: wider brand affinity and baskets up to 7 lines, so some orders hold more
+// than the three products the table shows and more than the five the peek pages.
 const STORAGE_KEY = "aroma_tx_store_v14";
 
 function load(): { transactions: Transaction[] } {
