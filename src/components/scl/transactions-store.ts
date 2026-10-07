@@ -73,18 +73,18 @@ function seed(): Transaction[] {
   const cities = ["Jakarta", "Jakarta", "Bandung", "Surabaya", "Tangerang"];
   // skuIndices: indices into skus[] that match each customer's brand(s)
   const customers: { id: string; name: string; skuIndices: number[] }[] = [
-    { id: "c1", name: "Putri Anggraini", skuIndices: [1, 2, 0] }, // sisley + dg
+    { id: "c1", name: "Putri Anggraini", skuIndices: [1, 2, 0, 5, 3] }, // sisley + dg + laura + rimmel
     { id: "c9", name: "Citra Halim", skuIndices: [5] }, // laura
-    { id: "c11", name: "Bayu Hartanto", skuIndices: [1, 2, 3, 4] }, // sisley + rimmel
+    { id: "c11", name: "Bayu Hartanto", skuIndices: [1, 2, 3, 4, 5, 0] }, // sisley + rimmel + laura + dg
     { id: "c12", name: "Nadya Salsabila", skuIndices: [5] }, // laura
-    { id: "c3", name: "Siti Rahmawati", skuIndices: [1, 2] }, // sisley
-    { id: "c6", name: "Indah Permata", skuIndices: [0, 1, 2] }, // dg + sisley
-    { id: "c16", name: "Lina Wulandari", skuIndices: [0, 5] }, // dg + laura
+    { id: "c3", name: "Siti Rahmawati", skuIndices: [1, 2, 6] }, // sisley + bareMinerals
+    { id: "c6", name: "Indah Permata", skuIndices: [0, 1, 2, 6, 4] }, // dg + sisley + bareMinerals + rimmel
+    { id: "c16", name: "Lina Wulandari", skuIndices: [0, 5, 1, 2] }, // dg + laura + sisley
     { id: "c20", name: "Zahra Aulia", skuIndices: [0] }, // dg
-    { id: "c2", name: "Bagus Pratama", skuIndices: [3, 4] }, // rimmel
+    { id: "c2", name: "Bagus Pratama", skuIndices: [3, 4, 6] }, // rimmel + bareMinerals
     { id: "c13", name: "Ayu Fitriani", skuIndices: [0] }, // dg
-    { id: "c15", name: "Tiara Hapsari", skuIndices: [1, 2] }, // sisley
-    { id: "c22", name: "Dian Puspita", skuIndices: [1, 2] }, // sisley
+    { id: "c15", name: "Tiara Hapsari", skuIndices: [1, 2, 5, 6] }, // sisley + laura + bareMinerals
+    { id: "c22", name: "Dian Puspita", skuIndices: [1, 2, 3, 0] }, // sisley + rimmel + dg
   ];
   const skus = [
     {
@@ -145,7 +145,7 @@ function seed(): Transaction[] {
   for (let i = 0; i < 36; i++) {
     const d = new Date(BASE_EPOCH - i * 8 * 3600 * 1000);
     const cust = customers[i % customers.length];
-    const lineCount = 1 + (i % 3);
+    const lineCount = 1 + (i % 5);
     const lines: TxLine[] = [];
     let subtotal = 0;
     const brandSet = new Set<string>();
@@ -190,7 +190,9 @@ function seed(): Transaction[] {
 }
 
 // v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
-const STORAGE_KEY = "aroma_tx_store_v13";
+// v14: wider brand affinity and baskets up to 5 lines, so some orders hold more
+// than three distinct products.
+const STORAGE_KEY = "aroma_tx_store_v14";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
