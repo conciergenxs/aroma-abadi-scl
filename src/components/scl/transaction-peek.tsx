@@ -25,23 +25,6 @@ function PeekRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-function MoneyRow({
-  label,
-  value,
-  muted = true,
-}: {
-  label: string;
-  value: string;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-[13px]">
-      <span className={muted ? "text-muted-foreground" : ""}>{label}</span>
-      <span className="tabular-nums">{value}</span>
-    </div>
-  );
-}
-
 export function TransactionPeek({
   tx,
   onClose,
