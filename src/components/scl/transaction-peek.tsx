@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
-import { formatIDR, txStatusBadge, PPN_RATE, type Transaction } from "./transactions-store";
+import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store";
+import { benefitFor, usePromoStore } from "./promo-store";
+import { useReferralStore } from "./referral-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
 
 // ── Transaction side peek ─────────────────────────────────────────────────────
@@ -66,6 +68,34 @@ export function TransactionPeek({
   // The panel stays mounted when the table opens a different order, so the page
   // has to follow the order rather than persist across them.
   useEffect(() => setItemPage(1), [tx.id]);
+
+  // An order carries at most one code — the referral seeding skips any order a
+  // promo already claimed — so the first match is the answer.
+  const { promos } = usePromoStore();
+  const { seasons } = useReferralStore();
+  const codeUsed = useMemo(() => {
+    for (const promo of promos) {
+      const hit = promo.redemptions.find((r) => r.transactionId === tx.id);
+      if (hit) {
+        return {
+          kind: "Promo Code",
+          code: promo.code,
+          benefit: benefitFor(promo.rule, hit.discountValue),
+        };
+      }
+    }
+    for (const season of seasons) {
+      const hit = season.uses.find((u) => u.transactionId === tx.id);
+      if (hit) {
+        return {
+          kind: "Referral Code",
+          code: hit.code,
+          benefit: benefitFor(season.rule, hit.discountValue),
+        };
+      }
+    }
+    return null;
+  }, [promos, seasons, tx.id]);
 
   if (typeof document === "undefined") return null;
   return createPortal(
@@ -191,11 +221,22 @@ export function TransactionPeek({
 
         {/* The money is the answer the panel exists to give, so it stays put
             while the detail above it scrolls. */}
-        <div className="shrink-0 border-t border-border bg-background p-5 space-y-1.5">
-          <MoneyRow label="Subtotal" value={formatIDR(tx.subtotal)} />
-          {tx.discount > 0 && <MoneyRow label="Discount" value={`− ${formatIDR(tx.discount)}`} />}
-          <MoneyRow label={`PPN (${Math.round(PPN_RATE * 100)}%)`} value={formatIDR(tx.tax)} />
-          <MoneyRow label={`Admin Fee · ${tx.paymentMethod}`} value={formatIDR(tx.adminFee)} />
+        <div className="shrink-0 border-t border-border bg-background p-5 space-y-3">
+          <div>
+            <div className={LABEL}>{codeUsed?.kind ?? "Promo Code"}</div>
+            {codeUsed ? (
+              <div className="mt-1.5 flex items-center justify-between gap-3">
+                <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-primary">
+                  {codeUsed.code}
+                </span>
+                <span className="text-[13px] font-medium">{codeUsed.benefit}</span>
+              </div>
+            ) : (
+              <div className="mt-1.5 text-[13px] text-muted-foreground">
+                No code used on this order.
+              </div>
+            )}
+          </div>
           <div className="flex items-center justify-between gap-3 border-t border-border pt-2">
             <span className="text-[13px] font-semibold">Total</span>
             <span className="text-[14px] font-semibold tabular-nums">{formatIDR(tx.total)}</span>
