@@ -38,6 +38,23 @@ function wibDay(iso: string) {
  * store without adding it here is a compile error. */
 const TX_STATUSES: TxStatus[] = ["Processed", "Shipped", "Cancelled"];
 
+/** The table lists distinct products. An order can carry the same SKU on two
+ * lines, and repeating the name tells the reader nothing — the quantities are
+ * summed instead. The peek still shows the real lines. */
+function distinctItems(items: Transaction["items"]) {
+  const merged = new Map<string, { skuId: string; skuName: string; qty: number }>();
+  for (const i of items) {
+    const seen = merged.get(i.skuId);
+    if (seen) seen.qty += i.qty;
+    else merged.set(i.skuId, { skuId: i.skuId, skuName: i.skuName, qty: i.qty });
+  }
+  return [...merged.values()];
+}
+
+/** At most three rows in the cell. Past that the third becomes the way in to
+ * the full list rather than an arbitrary third product. */
+const ITEM_ROWS = 3;
+
 const PAGE_NAV_BTN =
   "press tap h-7 rounded border border-border bg-card/40 px-2.5 text-[11px] font-medium " +
   "enabled:hover:bg-white enabled:hover:border-gray-300 enabled:hover:text-foreground " +
@@ -287,25 +304,47 @@ function TransactionsPage() {
 
                       {/* Items — each clickable to SKU details */}
                       <Td>
-                        <ul className="space-y-1">
-                          {t.items.map((i, idx) => (
-                            <li key={idx} className="leading-tight">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate({
-                                    to: "/sku-detail/$skuId",
-                                    params: { skuId: i.skuId },
-                                  });
-                                }}
-                                className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors text-foreground"
-                              >
-                                {i.skuName}
-                              </button>
-                              <span className="text-muted-foreground"> · {i.qty} pcs</span>
-                            </li>
-                          ))}
-                        </ul>
+                        {(() => {
+                          const lines = distinctItems(t.items);
+                          const shown =
+                            lines.length > ITEM_ROWS ? lines.slice(0, ITEM_ROWS - 1) : lines;
+                          const hidden = lines.length - shown.length;
+                          return (
+                            <ul className="space-y-1">
+                              {shown.map((i) => (
+                                <li key={i.skuId} className="leading-tight">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate({
+                                        to: "/sku-detail/$skuId",
+                                        params: { skuId: i.skuId },
+                                      });
+                                    }}
+                                    className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors text-foreground"
+                                  >
+                                    {i.skuName}
+                                  </button>
+                                  <span className="text-muted-foreground"> · {i.qty} pcs</span>
+                                </li>
+                              ))}
+                              {hidden > 0 && (
+                                <li className="leading-tight">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpen(t);
+                                    }}
+                                    title={`${hidden} more item${hidden === 1 ? "" : "s"} — open the order`}
+                                    className="press text-left text-muted-foreground hover:text-primary hover:underline underline-offset-2 transition-colors"
+                                  >
+                                    (See more..)
+                                  </button>
+                                </li>
+                              )}
+                            </ul>
+                          );
+                        })()}
                       </Td>
 
                       <Td>

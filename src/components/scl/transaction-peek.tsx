@@ -103,9 +103,6 @@ export function TransactionPeek({
           <PeekRow label="Ordered Via">
             <span className="font-medium">ARMA · WhatsApp</span>
           </PeekRow>
-          <PeekRow label="Ship To">
-            <span className="font-medium">{tx.city}</span>
-          </PeekRow>
           <PeekRow label="Payment Method">
             <span className="font-medium">{tx.paymentMethod}</span>
           </PeekRow>
