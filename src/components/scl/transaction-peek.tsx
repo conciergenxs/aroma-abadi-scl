@@ -123,7 +123,7 @@ export function TransactionPeek({
               {(tx.brandNames ?? [tx.brandName]).map((b) => (
                 <span
                   key={b}
-                  className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] font-medium"
+                  className="inline-flex items-center rounded-full border border-border bg-background/40 px-2.5 py-0.5 text-[13px] font-medium"
                 >
                   {b}
                 </span>
