@@ -104,16 +104,19 @@ const CATEGORY_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ra
 const CATEGORY_COVER_HINT =
   "Cover, shown at the top of the category page.\nRecommended: 16:9 ratio (1920×1080px).";
 const SKU_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
-/* Create forms label each field, so they only need the size on one line. */
-const COVER_RATIO_HINT = "Recommended: 16:9 ratio (1920×1080px).";
-const PHOTO_RATIO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
 
-/* Small "i" badge pinned to the top-right of an existing brand/category photo —
- * surfaces the recommended size at the moment you go to replace the image.
- * TooltipProvider isn't mounted app-wide (only the Overview page has one), so
- * each hint carries its own. TooltipContent portals itself, so the `.glass`
- * SectionCards on this page can't clip it. */
-function PhotoRatioHint({ text }: { text: string }) {
+/* Small "i" badge carrying what an image slot is for and the size to upload —
+ * pinned to the corner of an existing photo, or sat beside the field label in
+ * the create forms. TooltipProvider isn't mounted app-wide (only the Overview
+ * page has one), so each hint carries its own. TooltipContent portals itself,
+ * so the `.glass` SectionCards on this page can't clip it. */
+function PhotoRatioHint({
+  text,
+  className = "absolute top-0.5 right-0.5",
+}: {
+  text: string;
+  className?: string;
+}) {
   return (
     <TooltipProvider delayDuration={150}>
       <Tooltip>
@@ -121,7 +124,7 @@ function PhotoRatioHint({ text }: { text: string }) {
           <button
             type="button"
             aria-label={text}
-            className="absolute top-0.5 right-0.5 h-4 w-4 grid place-items-center rounded-full border border-border bg-background/90 text-muted-foreground hover:text-primary transition-colors duration-150"
+            className={`${className} h-4 w-4 grid place-items-center rounded-full border border-border bg-background/90 text-muted-foreground hover:text-primary transition-colors duration-150`}
           >
             <Info className="h-2.5 w-2.5" />
           </button>
@@ -134,6 +137,17 @@ function PhotoRatioHint({ text }: { text: string }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+/* Field label for an image slot in the create forms — the slot is only as big as
+ * its locked frame, so what it is and the size to upload live in the tooltip. */
+function ImageFieldLabel({ label, hint }: { label: string; hint: string }) {
+  return (
+    <div className="mb-1 flex items-center gap-1.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <PhotoRatioHint text={hint} className="relative shrink-0" />
+    </div>
   );
 }
 
