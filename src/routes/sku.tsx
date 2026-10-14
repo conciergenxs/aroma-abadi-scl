@@ -160,19 +160,25 @@ function CoverPanel({
   pickTitle,
   onPick,
   className = "",
+  aside,
 }: {
   coverUrl?: string;
-  /** Tooltip for the detail header, where nothing else names the field. The
-   *  create forms label and size the field in plain sight, so they omit it. */
+  /** Corner tooltip, for the detail header where nothing else names the slot.
+   *  The create forms name it in their field label, so they omit it. */
   hint?: string;
   pickTitle: string;
   onPick: (dataUrl: string) => void;
+  /** Locked 16:9 frame — the caller fixes both sides so the slot keeps the
+   *  app's framing whatever the picked file's own proportions are. */
   className?: string;
+  /** Text controls beside the frame; the picker lives in here, so callers that
+   *  want their own "Upload"/"Remove" links get it handed to them. */
+  aside?: (openPicker: () => void) => React.ReactNode;
 }) {
   const { fileRef, openPicker, handleChange } = useImagePicker(onPick);
-  return (
+  const frame = (
     <div
-      className={`relative aspect-[16/9] rounded-lg overflow-hidden border bg-primary/5 ${
+      className={`group relative rounded-lg overflow-hidden border bg-primary/5 shrink-0 ${
         coverUrl ? "border-border" : "border-dashed border-primary/30"
       } ${className}`}
     >
@@ -183,37 +189,39 @@ function CoverPanel({
         className="hidden"
         onChange={handleChange}
       />
-      {coverUrl ? (
-        <>
-          <img src={coverUrl} alt="" className="img-fade h-full w-full object-cover" />
-          <button
-            type="button"
-            onClick={openPicker}
-            title={pickTitle}
-            className="absolute bottom-1.5 right-1.5 h-6 w-6 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
-          >
-            <Camera className="h-3 w-3" />
-          </button>
-        </>
-      ) : (
-        <button
-          type="button"
-          onClick={openPicker}
-          title={pickTitle}
-          className="h-full w-full flex flex-col items-center justify-center gap-1.5 text-primary hover:bg-primary/10 transition-colors duration-150"
-        >
+      <button
+        type="button"
+        onClick={openPicker}
+        title={pickTitle}
+        className="h-full w-full grid place-items-center text-primary hover:bg-primary/10 transition-colors duration-150"
+      >
+        {coverUrl ? (
+          <>
+            <img src={coverUrl} alt="" className="img-fade h-full w-full object-cover" />
+            <span className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+              <Camera className="h-4 w-4 text-white" />
+            </span>
+          </>
+        ) : (
           <ImageIcon className="h-5 w-5" />
-          <span className="text-[13px] font-medium">Upload Cover</span>
-        </button>
-      )}
+        )}
+      </button>
       {hint && <PhotoRatioHint text={hint} />}
+    </div>
+  );
+  if (!aside) return frame;
+  return (
+    <div className="flex items-center gap-2">
+      {frame}
+      {aside(openPicker)}
     </div>
   );
 }
 
-/* Header card shared by the Brand and Category detail views — the wide cover
- * leads, the square profile photo and the record's name sit beside it, and both
- * images can be replaced without leaving the page. */
+/* Header card shared by the Brand and Category detail views — the record's name
+ * leads at the left edge, then a rule, then its two images in the frames the BA
+ * app uses: the wide cover and the square profile photo. Both are replaced in
+ * place, and both frames are locked so a picked file can't resize the header. */
 function DetailHeader({
   cover,
   photo,
@@ -235,29 +243,25 @@ function DetailHeader({
   const { fileRef, openPicker, handleChange } = useImagePicker(photo.onPick);
   return (
     <SectionCard>
-      <div className="p-3 flex flex-col sm:flex-row sm:items-center gap-4">
-        <CoverPanel
-          coverUrl={cover.url}
-          hint={cover.hint}
-          pickTitle={cover.pickTitle}
-          onPick={cover.onPick}
-          className="w-full sm:w-56 lg:w-72 shrink-0"
-        />
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-            {photo.url ? (
-              <img
-                src={photo.url}
-                alt=""
-                className={
-                  photo.fit === "contain"
-                    ? "img-fade max-h-16 max-w-[85%] object-contain"
-                    : "img-fade h-full w-full object-cover"
-                }
-              />
-            ) : (
-              photo.fallback
-            )}
+      <div className="p-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="min-w-0 sm:flex-1">
+          <div className="text-base font-semibold truncate">{name}</div>
+          <div className="mt-0.5 text-xs text-muted-foreground">{meta}</div>
+        </div>
+        <div aria-hidden className="h-px w-full bg-border sm:h-14 sm:w-px sm:shrink-0" />
+        <div className="flex items-center gap-3 shrink-0">
+          <CoverPanel
+            coverUrl={cover.url}
+            hint={cover.hint}
+            pickTitle={cover.pickTitle}
+            onPick={cover.onPick}
+            className="h-[72px] w-32"
+          />
+          <div
+            className={`group relative h-[72px] w-[72px] rounded-lg border overflow-hidden shrink-0 ${
+              photo.url ? "bg-white border-border" : "bg-primary/5 border-dashed border-primary/30"
+            }`}
+          >
             <input
               ref={fileRef}
               type="file"
@@ -269,15 +273,26 @@ function DetailHeader({
               type="button"
               onClick={openPicker}
               title={photo.pickTitle}
-              className="absolute bottom-0.5 right-0.5 h-5 w-5 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+              className="h-full w-full grid place-items-center"
             >
-              <Camera className="h-2.5 w-2.5" />
+              {photo.url ? (
+                <img
+                  src={photo.url}
+                  alt=""
+                  className={
+                    photo.fit === "contain"
+                      ? "img-fade max-h-14 max-w-[85%] object-contain"
+                      : "img-fade h-full w-full object-cover"
+                  }
+                />
+              ) : (
+                photo.fallback
+              )}
+              <span className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+                <Camera className="h-4 w-4 text-white" />
+              </span>
             </button>
             <PhotoRatioHint text={photo.hint} />
-          </div>
-          <div className="min-w-0">
-            <div className="text-base font-semibold truncate">{name}</div>
-            <div className="mt-0.5 text-xs text-muted-foreground">{meta}</div>
           </div>
         </div>
       </div>
@@ -714,41 +729,39 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
             className="hidden"
             onChange={handleChange}
           />
-          <div>
-            <CoverPanel
-              coverUrl={coverUrl || undefined}
-              pickTitle="Upload category cover"
-              onPick={setCoverUrl}
-            />
-            <p className="mt-1.5 text-xs text-muted-foreground">
-              Cover, shown at the top of the category page. {COVER_RATIO_HINT}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={openPicker}
-              title="Upload category photo"
-              className="group relative h-12 w-12 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
-            >
-              {imageUrl ? (
-                <img src={imageUrl} alt="" className="img-fade h-full w-full object-cover" />
-              ) : (
-                <FolderOpen className="h-5 w-5 text-primary" />
-              )}
-              <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
-                <Camera className="h-3.5 w-3.5 text-white" />
-              </span>
-            </button>
-            <div className="min-w-0">
+          {/* Same pair as the brand form: photo and cover side by side, each in
+              the frame the app uses, each named by its own label. */}
+          <div className="flex items-start gap-4">
+            <div>
+              <ImageFieldLabel label="Photo" hint={CATEGORY_PHOTO_HINT} />
               <button
                 type="button"
                 onClick={openPicker}
-                className="text-[13px] text-primary hover:underline"
+                title="Upload category photo"
+                className={`group relative h-12 w-12 rounded-md border grid place-items-center overflow-hidden shrink-0 transition-colors duration-150 ${
+                  imageUrl
+                    ? "bg-white border-border"
+                    : "bg-primary/5 border-dashed border-primary/30 hover:bg-primary/10"
+                }`}
               >
-                {imageUrl ? "Replace Photo" : "Upload Photo"}
+                {imageUrl ? (
+                  <img src={imageUrl} alt="" className="img-fade h-full w-full object-cover" />
+                ) : (
+                  <FolderOpen className="h-5 w-5 text-primary" />
+                )}
+                <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+                  <Camera className="h-3.5 w-3.5 text-white" />
+                </span>
               </button>
-              <p className="mt-1 text-xs text-muted-foreground leading-snug">{PHOTO_RATIO_HINT}</p>
+            </div>
+            <div>
+              <ImageFieldLabel label="Cover" hint={CATEGORY_COVER_HINT} />
+              <CoverPanel
+                coverUrl={coverUrl || undefined}
+                pickTitle="Upload category cover"
+                onPick={setCoverUrl}
+                className="h-12 w-[85px]"
+              />
             </div>
           </div>
           <input
@@ -2192,68 +2205,86 @@ function BrandFormModal({
           </button>
         </div>
         <div className="p-4 space-y-3">
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Cover</div>
-            <CoverPanel
-              coverUrl={coverUrl || undefined}
-              pickTitle="Upload brand cover"
-              onPick={setCoverUrl}
-            />
-            <div className="mt-1.5 flex items-start justify-between gap-3">
-              <p className="text-xs text-muted-foreground">
-                Shown at the top of the brand page. {COVER_RATIO_HINT}
-              </p>
-              {coverUrl && (
+          {/* Logo and Cover sit side by side at the same height, so the two
+              frames read as one pair and the form stays short. */}
+          <div className="flex flex-wrap items-start gap-x-6 gap-y-3">
+            <div>
+              <ImageFieldLabel label="Logo" hint={BRAND_PHOTO_HINT} />
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleChange}
+                />
                 <button
                   type="button"
-                  onClick={() => setCoverUrl("")}
-                  className="shrink-0 text-[14px] text-rose-500 hover:underline"
+                  onClick={openPicker}
+                  title="Upload brand logo"
+                  className={`group relative h-14 w-14 rounded-md border grid place-items-center overflow-hidden shrink-0 ${
+                    logoUrl
+                      ? "bg-white border-border"
+                      : "bg-primary/5 border-dashed border-primary/30"
+                  }`}
                 >
-                  Remove
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="" className="img-fade h-full w-full object-cover" />
+                  ) : (
+                    <Package className="h-5 w-5 text-primary" />
+                  )}
+                  <span className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+                    <Camera className="h-4 w-4 text-white" />
+                  </span>
                 </button>
-              )}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Logo</div>
-            <div className="flex items-center gap-3">
-              <div className="h-14 w-14 rounded-md bg-white border border-border grid place-items-center overflow-hidden">
-                {logoUrl ? (
-                  <img src={logoUrl} alt="" className="img-fade h-full w-full object-cover" />
-                ) : (
-                  <Package className="h-5 w-5 text-primary" />
-                )}
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleChange}
-              />
-              <div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-start gap-0.5">
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="rounded-md border border-border px-2.5 h-8 text-[14px]"
+                    className="text-[13px] text-primary hover:underline"
                   >
-                    Upload Logo
+                    {logoUrl ? "Replace" : "Upload"}
                   </button>
                   {logoUrl && (
                     <button
                       type="button"
                       onClick={() => setLogoUrl("")}
-                      className="text-[14px] text-rose-500"
+                      className="text-[13px] text-rose-500 hover:underline"
                     >
                       Remove
                     </button>
                   )}
                 </div>
-                <p className="mt-1.5 text-xs text-muted-foreground leading-snug">
-                  Shown in lists. {PHOTO_RATIO_HINT}
-                </p>
               </div>
+            </div>
+            <div>
+              <ImageFieldLabel label="Cover" hint={BRAND_COVER_HINT} />
+              <CoverPanel
+                coverUrl={coverUrl || undefined}
+                pickTitle="Upload brand cover"
+                onPick={setCoverUrl}
+                className="h-14 w-[100px]"
+                aside={(openCoverPicker) => (
+                  <div className="flex flex-col items-start gap-0.5">
+                    <button
+                      type="button"
+                      onClick={openCoverPicker}
+                      className="text-[13px] text-primary hover:underline"
+                    >
+                      {coverUrl ? "Replace" : "Upload"}
+                    </button>
+                    {coverUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setCoverUrl("")}
+                        className="text-[13px] text-rose-500 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                )}
+              />
             </div>
           </div>
           <label className="block">
