@@ -171,23 +171,21 @@ function CoverPanel({
   pickTitle,
   onPick,
   className = "",
-  aside,
+  onClear,
 }: {
   coverUrl?: string;
-  /** Corner tooltip, for the detail header where nothing else names the slot.
-   *  The create forms name it in their field label, so they omit it. */
-  hint?: string;
+  /** Tooltip pinned to the frame: what the slot is for and the size to upload. */
+  hint: string;
   pickTitle: string;
   onPick: (dataUrl: string) => void;
   /** Locked 16:9 frame — the caller fixes both sides so the slot keeps the
    *  app's framing whatever the picked file's own proportions are. */
   className?: string;
-  /** Text controls beside the frame; the picker lives in here, so callers that
-   *  want their own "Upload"/"Remove" links get it handed to them. */
-  aside?: (openPicker: () => void) => React.ReactNode;
+  /** Create forms pass this so a picked cover can be taken back off. */
+  onClear?: () => void;
 }) {
   const { fileRef, openPicker, handleChange } = useImagePicker(onPick);
-  const frame = (
+  return (
     <div
       className={`group relative rounded-lg overflow-hidden border bg-primary/5 shrink-0 ${
         coverUrl ? "border-border" : "border-dashed border-primary/30"
@@ -217,14 +215,8 @@ function CoverPanel({
           <ImageIcon className="h-5 w-5" />
         )}
       </button>
-      {hint && <PhotoRatioHint text={hint} />}
-    </div>
-  );
-  if (!aside) return frame;
-  return (
-    <div className="flex items-center gap-2">
-      {frame}
-      {aside(openPicker)}
+      <PhotoRatioHint text={hint} />
+      {coverUrl && onClear && <ClearImageButton title="Remove cover" onClear={onClear} />}
     </div>
   );
 }
@@ -742,35 +734,46 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
           />
           {/* Same pair as the brand form: photo and cover side by side, each in
               the frame the app uses, each named by its own label. */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-stretch gap-4">
             <div>
-              <ImageFieldLabel label="Photo" hint={CATEGORY_PHOTO_HINT} />
-              <button
-                type="button"
-                onClick={openPicker}
-                title="Upload category photo"
-                className={`group relative h-12 w-12 rounded-md border grid place-items-center overflow-hidden shrink-0 transition-colors duration-150 ${
+              <ImageFieldLabel label="Photo" />
+              <div
+                className={`group relative h-12 w-12 rounded-md border overflow-hidden shrink-0 ${
                   imageUrl
                     ? "bg-white border-border"
-                    : "bg-primary/5 border-dashed border-primary/30 hover:bg-primary/10"
+                    : "bg-primary/5 border-dashed border-primary/30"
                 }`}
               >
-                {imageUrl ? (
-                  <img src={imageUrl} alt="" className="img-fade h-full w-full object-cover" />
-                ) : (
-                  <FolderOpen className="h-5 w-5 text-primary" />
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  title="Upload category photo"
+                  className="h-full w-full grid place-items-center"
+                >
+                  {imageUrl ? (
+                    <img src={imageUrl} alt="" className="img-fade h-full w-full object-cover" />
+                  ) : (
+                    <FolderOpen className="h-5 w-5 text-primary" />
+                  )}
+                  <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
+                    <Camera className="h-3.5 w-3.5 text-white" />
+                  </span>
+                </button>
+                <PhotoRatioHint text={CATEGORY_PHOTO_HINT} />
+                {imageUrl && (
+                  <ClearImageButton title="Remove photo" onClear={() => setImageUrl("")} />
                 )}
-                <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
-                  <Camera className="h-3.5 w-3.5 text-white" />
-                </span>
-              </button>
+              </div>
             </div>
+            <div aria-hidden className="w-px self-stretch bg-border" />
             <div>
-              <ImageFieldLabel label="Cover" hint={CATEGORY_COVER_HINT} />
+              <ImageFieldLabel label="Cover" />
               <CoverPanel
                 coverUrl={coverUrl || undefined}
+                hint={CATEGORY_COVER_HINT}
                 pickTitle="Upload category cover"
                 onPick={setCoverUrl}
+                onClear={() => setCoverUrl("")}
                 className="h-12 w-[85px]"
               />
             </div>
@@ -1210,7 +1213,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
       </div>
 
       <Accordion type="single" collapsible className="mt-3">
-        <AccordionItem value={sku.id} className="border-border">
+        <AccordionItem value={sku.id} className="border-b-0">
           <AccordionTrigger
             className="text-[13px] hover:no-underline py-2 transition-colors duration-150"
             actions={
@@ -1860,7 +1863,7 @@ function ModuleRow({
       </div>
 
       <Accordion type="single" collapsible className="mt-3">
-        <AccordionItem value={module.id} className="border-border">
+        <AccordionItem value={module.id} className="border-b-0">
           <AccordionTrigger
             className="text-[13px] hover:no-underline py-2 transition-colors duration-150"
             actions={
@@ -2216,12 +2219,18 @@ function BrandFormModal({
           </button>
         </div>
         <div className="p-4 space-y-3">
-          {/* Logo and Cover sit side by side at the same height, so the two
-              frames read as one pair and the form stays short. */}
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-3">
+          {/* Logo and Cover sit side by side at the same height, split by a rule,
+              so the two frames read as a pair without being mistaken for one. */}
+          <div className="flex items-stretch gap-4">
             <div>
-              <ImageFieldLabel label="Logo" hint={BRAND_PHOTO_HINT} />
-              <div className="flex items-center gap-2">
+              <ImageFieldLabel label="Logo" />
+              <div
+                className={`group relative h-14 w-14 rounded-md border overflow-hidden shrink-0 ${
+                  logoUrl
+                    ? "bg-white border-border"
+                    : "bg-primary/5 border-dashed border-primary/30"
+                }`}
+              >
                 <input
                   ref={fileRef}
                   type="file"
@@ -2233,11 +2242,7 @@ function BrandFormModal({
                   type="button"
                   onClick={openPicker}
                   title="Upload brand logo"
-                  className={`group relative h-14 w-14 rounded-md border grid place-items-center overflow-hidden shrink-0 ${
-                    logoUrl
-                      ? "bg-white border-border"
-                      : "bg-primary/5 border-dashed border-primary/30"
-                  }`}
+                  className="h-full w-full grid place-items-center"
                 >
                   {logoUrl ? (
                     <img src={logoUrl} alt="" className="img-fade h-full w-full object-cover" />
@@ -2248,53 +2253,20 @@ function BrandFormModal({
                     <Camera className="h-4 w-4 text-white" />
                   </span>
                 </button>
-                <div className="flex flex-col items-start gap-0.5">
-                  <button
-                    type="button"
-                    onClick={openPicker}
-                    className="text-[13px] text-primary hover:underline"
-                  >
-                    {logoUrl ? "Replace" : "Upload"}
-                  </button>
-                  {logoUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setLogoUrl("")}
-                      className="text-[13px] text-rose-500 hover:underline"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+                <PhotoRatioHint text={BRAND_PHOTO_HINT} />
+                {logoUrl && <ClearImageButton title="Remove logo" onClear={() => setLogoUrl("")} />}
               </div>
             </div>
+            <div aria-hidden className="w-px self-stretch bg-border" />
             <div>
-              <ImageFieldLabel label="Cover" hint={BRAND_COVER_HINT} />
+              <ImageFieldLabel label="Cover" />
               <CoverPanel
                 coverUrl={coverUrl || undefined}
+                hint={BRAND_COVER_HINT}
                 pickTitle="Upload brand cover"
                 onPick={setCoverUrl}
+                onClear={() => setCoverUrl("")}
                 className="h-14 w-[100px]"
-                aside={(openCoverPicker) => (
-                  <div className="flex flex-col items-start gap-0.5">
-                    <button
-                      type="button"
-                      onClick={openCoverPicker}
-                      className="text-[13px] text-primary hover:underline"
-                    >
-                      {coverUrl ? "Replace" : "Upload"}
-                    </button>
-                    {coverUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setCoverUrl("")}
-                        className="text-[13px] text-rose-500 hover:underline"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                )}
               />
             </div>
           </div>
@@ -2304,7 +2276,7 @@ function BrandFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Brand name..."
-              className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+              className="h-9 w-60 max-w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
             />
           </label>
           <p className="text-xs text-muted-foreground">
