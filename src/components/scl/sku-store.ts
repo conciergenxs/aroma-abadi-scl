@@ -53,18 +53,27 @@ export type Module = {
   knowledgeCards: KnowledgeCard[];
 };
 
+// Brands and Categories each carry two images, because the BA app uses them in
+// two different places: the square one is the profile photo that identifies the
+// record in lists and headers, the wide one is the cover that heads its page.
 export type Category = {
   id: string;
   brandId: string;
   name: string;
+  /** Square (1:1) profile photo. */
   imageUrl?: string;
+  /** Wide (16:9) cover, shown at the top of the category page. */
+  coverUrl?: string;
   modules: Module[];
   skus: SKU[];
 };
 
 export type Brand = {
   id: string;
+  /** Square (1:1) brand mark. */
   logoUrl?: string;
+  /** Wide (16:9) cover, shown at the top of the brand page. */
+  coverUrl?: string;
   name: string;
   modules: Module[];
   categories: Category[];
