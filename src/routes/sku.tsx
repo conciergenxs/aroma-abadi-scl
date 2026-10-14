@@ -140,15 +140,26 @@ function PhotoRatioHint({
   );
 }
 
-/* Field label for an image slot in the create forms — the slot is only as big as
- * its locked frame, so what it is and the size to upload live in the tooltip. */
-function ImageFieldLabel({ label, hint }: { label: string; hint: string }) {
+/* Small "✕" badge on a filled image slot in the create forms — only surfaces on
+ * hover, so an unfilled or settled slot stays clean. */
+function ClearImageButton({ title, onClear }: { title: string; onClear: () => void }) {
   return (
-    <div className="mb-1 flex items-center gap-1.5">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <PhotoRatioHint text={hint} className="relative shrink-0" />
-    </div>
+    <button
+      type="button"
+      onClick={onClear}
+      title={title}
+      aria-label={title}
+      className="absolute top-0.5 left-0.5 h-4 w-4 grid place-items-center rounded-full border border-border bg-background/90 text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:text-rose-500 transition-opacity duration-150"
+    >
+      <X className="h-2.5 w-2.5" />
+    </button>
   );
+}
+
+/* Field label for an image slot in the create forms. What the slot is for and
+ * the size to upload sit in the tooltip pinned to the frame itself. */
+function ImageFieldLabel({ label }: { label: string }) {
+  return <div className="mb-1 text-xs text-muted-foreground">{label}</div>;
 }
 
 /* The 16:9 cover that heads a Brand's or Category's page in the BA app. Framed
