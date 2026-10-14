@@ -162,6 +162,12 @@ function ImageFieldLabel({ label }: { label: string }) {
   return <div className="mb-1 text-xs text-muted-foreground">{label}</div>;
 }
 
+/* "a logo, a cover and a name" — for telling someone what a form still needs. */
+function formatList(items: string[]) {
+  if (items.length < 2) return items.join("");
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
 /* What an empty image slot shows: the same icon size in every slot, and — where
  * the frame is big enough to carry it — the call to action naming that slot. */
 function EmptySlotContent({ icon, label }: { icon: React.ReactNode; label?: string }) {
@@ -169,7 +175,7 @@ function EmptySlotContent({ icon, label }: { icon: React.ReactNode; label?: stri
   return (
     <span className="flex flex-col items-center justify-center gap-1 px-1 text-center">
       {icon}
-      <span className="text-xs font-medium leading-tight">{label}</span>
+      <span className="text-[11px] font-medium leading-tight">{label}</span>
     </span>
   );
 }
@@ -712,6 +718,10 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [coverUrl, setCoverUrl] = useState("");
   const { fileRef, openPicker, handleChange } = useImagePicker(setImageUrl);
   const ref = useRef<HTMLDivElement>(null);
+  // Same bar as a new brand: a category reaches the BA app with both images.
+  const missing = [!imageUrl && "a photo", !coverUrl && "a cover", !name.trim() && "a name"].filter(
+    Boolean,
+  ) as string[];
 
   function close() {
     setOpen(false);
@@ -721,7 +731,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   }
 
   function submit() {
-    if (!name.trim()) return;
+    if (missing.length > 0) return;
     skuStore.addCategory(brandId, {
       name: name.trim(),
       imageUrl: imageUrl || undefined,
@@ -814,6 +824,9 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
             placeholder="Category name..."
             className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
           />
+          {missing.length > 0 && (
+            <p className="text-xs text-muted-foreground">Add {formatList(missing)} to continue.</p>
+          )}
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -825,7 +838,9 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
             <button
               type="button"
               onClick={submit}
-              className="h-8 rounded-md bg-primary text-primary-foreground px-3 text-[13px] font-medium hover:opacity-90 transition-opacity duration-150"
+              disabled={missing.length > 0}
+              title={missing.length > 0 ? `Add ${formatList(missing)} to continue.` : undefined}
+              className="h-8 rounded-md bg-primary text-primary-foreground px-3 text-[13px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
             >
               Add
             </button>
@@ -2223,13 +2238,17 @@ function BrandFormModal({
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [coverUrl, setCoverUrl] = useState<string>("");
   const { fileRef, openPicker, handleChange } = useImagePicker(setLogoUrl);
+  // A brand carries both images into the BA app, so neither is optional here.
+  const missing = [!logoUrl && "a logo", !coverUrl && "a cover", !name.trim() && "a name"].filter(
+    Boolean,
+  ) as string[];
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 modal-backdrop">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!name.trim()) return;
+          if (missing.length > 0) return;
           const b = skuStore.addBrand({
             name: name.trim(),
             logoUrl: logoUrl || undefined,
@@ -2311,20 +2330,29 @@ function BrandFormModal({
             Brand Knowledge & Product Category can be set up after the brand is created.
           </p>
         </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-border px-3 h-9 text-[14px]"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
-          >
-            Add Brand
-          </button>
+        <div className="p-4 border-t border-border flex items-center justify-between gap-3">
+          {/* Says what the disabled button is still waiting for, rather than
+              leaving it greyed out with no reason. */}
+          <p className="text-xs text-muted-foreground">
+            {missing.length > 0 ? `Add ${formatList(missing)} to continue.` : ""}
+          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-border px-3 h-9 text-[14px]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={missing.length > 0}
+              title={missing.length > 0 ? `Add ${formatList(missing)} to continue.` : undefined}
+              className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
+            >
+              Add Brand
+            </button>
+          </div>
         </div>
       </form>
     </div>
