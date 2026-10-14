@@ -98,11 +98,15 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
  * categories carry two images: the square profile photo that identifies them in
  * lists, and the wide cover that heads their page in the BA app. */
 const BRAND_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
-const BRAND_COVER_HINT = "Cover, shown at the top of the brand page.\nRecommended: 16:9 ratio (1920×1080px).";
+const BRAND_COVER_HINT =
+  "Cover, shown at the top of the brand page.\nRecommended: 16:9 ratio (1920×1080px).";
 const CATEGORY_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
 const CATEGORY_COVER_HINT =
   "Cover, shown at the top of the category page.\nRecommended: 16:9 ratio (1920×1080px).";
 const SKU_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
+/* Create forms label each field, so they only need the size on one line. */
+const COVER_RATIO_HINT = "Recommended: 16:9 ratio (1920×1080px).";
+const PHOTO_RATIO_HINT = "Recommended: 1:1 ratio (1080×1080px).";
 
 /* Small "i" badge pinned to the top-right of an existing brand/category photo —
  * surfaces the recommended size at the moment you go to replace the image.
@@ -144,7 +148,9 @@ function CoverPanel({
   className = "",
 }: {
   coverUrl?: string;
-  hint: string;
+  /** Tooltip for the detail header, where nothing else names the field. The
+   *  create forms label and size the field in plain sight, so they omit it. */
+  hint?: string;
   pickTitle: string;
   onPick: (dataUrl: string) => void;
   className?: string;
@@ -184,7 +190,7 @@ function CoverPanel({
           <span className="text-[13px] font-medium">Upload Cover</span>
         </button>
       )}
-      <PhotoRatioHint text={hint} />
+      {hint && <PhotoRatioHint text={hint} />}
     </div>
   );
 }
@@ -219,7 +225,7 @@ function DetailHeader({
           hint={cover.hint}
           pickTitle={cover.pickTitle}
           onPick={cover.onPick}
-          className="w-full sm:w-56 lg:w-64 shrink-0"
+          className="w-full sm:w-56 lg:w-72 shrink-0"
         />
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
@@ -254,8 +260,8 @@ function DetailHeader({
             <PhotoRatioHint text={photo.hint} />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">{name}</div>
-            <div className="text-xs text-muted-foreground">{meta}</div>
+            <div className="text-base font-semibold truncate">{name}</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">{meta}</div>
           </div>
         </div>
       </div>
@@ -527,6 +533,7 @@ function BrandDetail({
   onOpenCategory: (c: Category) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const brandSkuCount = brand.categories.reduce((n, c) => n + c.skus.length, 0);
 
   return (
     <div className="space-y-4">
@@ -568,7 +575,9 @@ function BrandDetail({
         name={brand.name}
         meta={`${brand.categories.length} ${
           brand.categories.length === 1 ? "category" : "categories"
-        } · ${brand.modules.length} ${brand.modules.length === 1 ? "module" : "modules"}`}
+        } · ${brand.modules.length} ${
+          brand.modules.length === 1 ? "module" : "modules"
+        } · ${brandSkuCount} SKU${brandSkuCount === 1 ? "" : "s"}`}
         cover={{
           url: brand.coverUrl,
           hint: BRAND_COVER_HINT,
@@ -689,12 +698,16 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
             className="hidden"
             onChange={handleChange}
           />
-          <CoverPanel
-            coverUrl={coverUrl || undefined}
-            hint={CATEGORY_COVER_HINT}
-            pickTitle="Upload category cover"
-            onPick={setCoverUrl}
-          />
+          <div>
+            <CoverPanel
+              coverUrl={coverUrl || undefined}
+              pickTitle="Upload category cover"
+              onPick={setCoverUrl}
+            />
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Cover, shown at the top of the category page. {COVER_RATIO_HINT}
+            </p>
+          </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -719,9 +732,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
               >
                 {imageUrl ? "Replace Photo" : "Upload Photo"}
               </button>
-              <p className="mt-1 text-xs text-muted-foreground whitespace-pre-line leading-snug">
-                {CATEGORY_PHOTO_HINT}
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground leading-snug">{PHOTO_RATIO_HINT}</p>
             </div>
           </div>
           <input
@@ -2169,19 +2180,23 @@ function BrandFormModal({
             <div className="text-xs text-muted-foreground mb-1">Cover</div>
             <CoverPanel
               coverUrl={coverUrl || undefined}
-              hint={BRAND_COVER_HINT}
               pickTitle="Upload brand cover"
               onPick={setCoverUrl}
             />
-            {coverUrl && (
-              <button
-                type="button"
-                onClick={() => setCoverUrl("")}
-                className="mt-1.5 text-[14px] text-rose-500 hover:underline"
-              >
-                Remove
-              </button>
-            )}
+            <div className="mt-1.5 flex items-start justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                Shown at the top of the brand page. {COVER_RATIO_HINT}
+              </p>
+              {coverUrl && (
+                <button
+                  type="button"
+                  onClick={() => setCoverUrl("")}
+                  className="shrink-0 text-[14px] text-rose-500 hover:underline"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground mb-1">Logo</div>
@@ -2219,8 +2234,8 @@ function BrandFormModal({
                     </button>
                   )}
                 </div>
-                <p className="mt-1.5 text-xs text-muted-foreground whitespace-pre-line leading-snug">
-                  {BRAND_PHOTO_HINT}
+                <p className="mt-1.5 text-xs text-muted-foreground leading-snug">
+                  Shown in lists. {PHOTO_RATIO_HINT}
                 </p>
               </div>
             </div>
