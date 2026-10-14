@@ -158,7 +158,9 @@ function CoverPanel({
   const { fileRef, openPicker, handleChange } = useImagePicker(onPick);
   return (
     <div
-      className={`relative aspect-[16/9] rounded-lg overflow-hidden border border-border bg-primary/5 ${className}`}
+      className={`relative aspect-[16/9] rounded-lg overflow-hidden border bg-primary/5 ${
+        coverUrl ? "border-border" : "border-dashed border-primary/30"
+      } ${className}`}
     >
       <input
         ref={fileRef}
