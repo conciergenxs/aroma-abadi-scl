@@ -243,6 +243,7 @@ function seed(): Brand[] {
       id: "brand-dg",
       name: "Dolce & Gabbana",
       logoUrl: logoDG,
+      coverUrl: kc1,
       modules: [
         {
           id: "mod-dg-b-1",
@@ -300,6 +301,8 @@ function seed(): Brand[] {
           id: "cat-dg-lip",
           brandId: "brand-dg",
           name: "Lip",
+          imageUrl: skuCaviar,
+          coverUrl: kc3,
           modules: [
             {
               id: "mod-dg-lip-1",
@@ -372,6 +375,7 @@ function seed(): Brand[] {
       id: "brand-sisley",
       name: "Sisley",
       logoUrl: logoSisley,
+      coverUrl: kc2,
       modules: [
         {
           id: "mod-sis-b-1",
@@ -404,6 +408,8 @@ function seed(): Brand[] {
           id: "cat-sisley-foundation",
           brandId: "brand-sisley",
           name: "Foundation",
+          imageUrl: skuFoundation,
+          coverUrl: kc1,
           modules: [
             {
               id: "mod-sis-fdn-1",
@@ -462,6 +468,8 @@ function seed(): Brand[] {
           id: "cat-sisley-powder",
           brandId: "brand-sisley",
           name: "Powder",
+          imageUrl: skuTranslucent,
+          coverUrl: kc4,
           modules: [
             {
               id: "mod-sis-pwd-1",
@@ -503,6 +511,7 @@ function seed(): Brand[] {
       id: "brand-rimmel",
       name: "Rimmel",
       logoUrl: logoRimmel,
+      coverUrl: kc3,
       modules: [
         {
           id: "mod-rim-b-1",
@@ -535,6 +544,8 @@ function seed(): Brand[] {
           id: "cat-rimmel-powder",
           brandId: "brand-rimmel",
           name: "Powder",
+          imageUrl: skuFeather,
+          coverUrl: kc2,
           modules: [
             {
               id: "mod-rim-pwd-1",
@@ -586,6 +597,8 @@ function seed(): Brand[] {
           id: "cat-rimmel-spray",
           brandId: "brand-rimmel",
           name: "Setting Spray",
+          imageUrl: skuSpray,
+          coverUrl: kc1,
           modules: [
             {
               id: "mod-rim-spr-1",
@@ -627,6 +640,7 @@ function seed(): Brand[] {
       id: "brand-laura",
       name: "Laura Mercier",
       logoUrl: logoLaura,
+      coverUrl: kc4,
       modules: [
         {
           id: "mod-lm-b-1",
@@ -653,6 +667,8 @@ function seed(): Brand[] {
           id: "cat-laura-powder",
           brandId: "brand-laura",
           name: "Powder",
+          imageUrl: skuTranslucent,
+          coverUrl: kc3,
           modules: [
             {
               id: "mod-lm-pwd-1",
@@ -700,6 +716,7 @@ function seed(): Brand[] {
       id: "brand-bm",
       name: "BareMinerals",
       logoUrl: logoBM,
+      coverUrl: kc2,
       modules: [
         {
           id: "mod-bm-b-1",
@@ -726,6 +743,8 @@ function seed(): Brand[] {
           id: "cat-bm-blush",
           brandId: "brand-bm",
           name: "Blush",
+          imageUrl: skuBlush,
+          coverUrl: kc4,
           modules: [
             {
               id: "mod-bm-bl-1",
@@ -997,11 +1016,12 @@ export const skuStore = {
   get state() {
     return state;
   },
-  addBrand(input: { name: string; logoUrl?: string }) {
+  addBrand(input: { name: string; logoUrl?: string; coverUrl?: string }) {
     const brand: Brand = {
       id: uid("brand"),
       name: input.name,
       logoUrl: input.logoUrl,
+      coverUrl: input.coverUrl,
       modules: [],
       categories: [],
     };
@@ -1109,12 +1129,13 @@ export const skuStore = {
     };
     emit();
   },
-  addCategory(brandId: string, name: string, imageUrl?: string) {
+  addCategory(brandId: string, input: { name: string; imageUrl?: string; coverUrl?: string }) {
     const cat: Category = {
       id: uid("cat"),
       brandId,
-      name,
-      imageUrl,
+      name: input.name,
+      imageUrl: input.imageUrl,
+      coverUrl: input.coverUrl,
       modules: [],
       skus: [],
     };

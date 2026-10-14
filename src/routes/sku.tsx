@@ -94,9 +94,14 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
 }
 
 /* Recommended source-image sizes, shown under the upload CTA when creating and
- * behind a corner tooltip on the photo once the record exists. */
-const BRAND_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
-const CATEGORY_PHOTO_HINT = "Recommended: 9:16 ratio\n(1080×1920px).";
+ * behind a corner tooltip on the photo once the record exists. Brands and
+ * categories carry two images: the square profile photo that identifies them in
+ * lists, and the wide cover that heads their page in the BA app. */
+const BRAND_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
+const BRAND_COVER_HINT = "Cover, shown at the top of the brand page.\nRecommended: 16:9 ratio (1920×1080px).";
+const CATEGORY_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
+const CATEGORY_COVER_HINT =
+  "Cover, shown at the top of the category page.\nRecommended: 16:9 ratio (1920×1080px).";
 const SKU_PHOTO_HINT = "Recommended: 1:1 ratio\n(1080×1080px).";
 
 /* Small "i" badge pinned to the top-right of an existing brand/category photo —
@@ -125,6 +130,136 @@ function PhotoRatioHint({ text }: { text: string }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+/* The 16:9 cover that heads a Brand's or Category's page in the BA app. Framed
+ * here exactly as the app frames it, so what you see is what a BA will see, and
+ * editable in place like the profile photo beside it. */
+function CoverPanel({
+  coverUrl,
+  hint,
+  pickTitle,
+  onPick,
+  className = "",
+}: {
+  coverUrl?: string;
+  hint: string;
+  pickTitle: string;
+  onPick: (dataUrl: string) => void;
+  className?: string;
+}) {
+  const { fileRef, openPicker, handleChange } = useImagePicker(onPick);
+  return (
+    <div
+      className={`relative aspect-[16/9] rounded-lg overflow-hidden border border-border bg-primary/5 ${className}`}
+    >
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleChange}
+      />
+      {coverUrl ? (
+        <>
+          <img src={coverUrl} alt="" className="img-fade h-full w-full object-cover" />
+          <button
+            type="button"
+            onClick={openPicker}
+            title={pickTitle}
+            className="absolute bottom-1.5 right-1.5 h-6 w-6 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+          >
+            <Camera className="h-3 w-3" />
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={openPicker}
+          title={pickTitle}
+          className="h-full w-full flex flex-col items-center justify-center gap-1.5 text-primary hover:bg-primary/10 transition-colors duration-150"
+        >
+          <ImageIcon className="h-5 w-5" />
+          <span className="text-[13px] font-medium">Upload Cover</span>
+        </button>
+      )}
+      <PhotoRatioHint text={hint} />
+    </div>
+  );
+}
+
+/* Header card shared by the Brand and Category detail views — the wide cover
+ * leads, the square profile photo and the record's name sit beside it, and both
+ * images can be replaced without leaving the page. */
+function DetailHeader({
+  cover,
+  photo,
+  name,
+  meta,
+}: {
+  cover: { url?: string; hint: string; pickTitle: string; onPick: (dataUrl: string) => void };
+  photo: {
+    url?: string;
+    hint: string;
+    pickTitle: string;
+    onPick: (dataUrl: string) => void;
+    fit: "contain" | "cover";
+    fallback: React.ReactNode;
+  };
+  name: string;
+  meta: string;
+}) {
+  const { fileRef, openPicker, handleChange } = useImagePicker(photo.onPick);
+  return (
+    <SectionCard>
+      <div className="p-3 flex flex-col sm:flex-row sm:items-center gap-4">
+        <CoverPanel
+          coverUrl={cover.url}
+          hint={cover.hint}
+          pickTitle={cover.pickTitle}
+          onPick={cover.onPick}
+          className="w-full sm:w-56 lg:w-64 shrink-0"
+        />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
+            {photo.url ? (
+              <img
+                src={photo.url}
+                alt=""
+                className={
+                  photo.fit === "contain"
+                    ? "img-fade max-h-16 max-w-[85%] object-contain"
+                    : "img-fade h-full w-full object-cover"
+                }
+              />
+            ) : (
+              photo.fallback
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              onClick={openPicker}
+              title={photo.pickTitle}
+              className="absolute bottom-0.5 right-0.5 h-5 w-5 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
+            >
+              <Camera className="h-2.5 w-2.5" />
+            </button>
+            <PhotoRatioHint text={photo.hint} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold truncate">{name}</div>
+            <div className="text-xs text-muted-foreground">{meta}</div>
+          </div>
+        </div>
+      </div>
+    </SectionCard>
   );
 }
 
@@ -391,11 +526,6 @@ function BrandDetail({
   onBack: () => void;
   onOpenCategory: (c: Category) => void;
 }) {
-  const {
-    fileRef: logoFileRef,
-    openPicker: openLogoPicker,
-    handleChange: handleLogoChange,
-  } = useImagePicker((dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }));
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -434,44 +564,26 @@ function BrandDetail({
         </button>
       </div>
 
-      <SectionCard>
-        <div className="p-3 flex items-center gap-3">
-          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-            {brand.logoUrl ? (
-              <img
-                src={brand.logoUrl}
-                alt=""
-                className="img-fade max-h-16 max-w-[85%] object-contain"
-              />
-            ) : (
-              <Package className="h-7 w-7 text-primary" />
-            )}
-            <input
-              ref={logoFileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleLogoChange}
-            />
-            <button
-              type="button"
-              onClick={openLogoPicker}
-              title="Change brand logo"
-              className="absolute bottom-0.5 right-0.5 h-5 w-5 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
-            >
-              <Camera className="h-2.5 w-2.5" />
-            </button>
-            <PhotoRatioHint text={BRAND_PHOTO_HINT} />
-          </div>
-          <div>
-            <div className="text-sm font-semibold">{brand.name}</div>
-            <div className="text-xs text-muted-foreground">
-              {brand.categories.length} {brand.categories.length === 1 ? "category" : "categories"}{" "}
-              · {brand.modules.length} {brand.modules.length === 1 ? "module" : "modules"}
-            </div>
-          </div>
-        </div>
-      </SectionCard>
+      <DetailHeader
+        name={brand.name}
+        meta={`${brand.categories.length} ${
+          brand.categories.length === 1 ? "category" : "categories"
+        } · ${brand.modules.length} ${brand.modules.length === 1 ? "module" : "modules"}`}
+        cover={{
+          url: brand.coverUrl,
+          hint: BRAND_COVER_HINT,
+          pickTitle: "Change brand cover",
+          onPick: (dataUrl) => skuStore.updateBrand(brand.id, { coverUrl: dataUrl }),
+        }}
+        photo={{
+          url: brand.logoUrl,
+          hint: BRAND_PHOTO_HINT,
+          pickTitle: "Change brand logo",
+          onPick: (dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }),
+          fit: "contain",
+          fallback: <Package className="h-7 w-7 text-primary" />,
+        }}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ModulesCard
@@ -528,6 +640,7 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
   const { fileRef, openPicker, handleChange } = useImagePicker(setImageUrl);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -535,11 +648,16 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
     setOpen(false);
     setName("");
     setImageUrl("");
+    setCoverUrl("");
   }
 
   function submit() {
     if (!name.trim()) return;
-    skuStore.addCategory(brandId, name.trim(), imageUrl || undefined);
+    skuStore.addCategory(brandId, {
+      name: name.trim(),
+      imageUrl: imageUrl || undefined,
+      coverUrl: coverUrl || undefined,
+    });
     toast.success("Category added");
     close();
   }
@@ -571,11 +689,17 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
             className="hidden"
             onChange={handleChange}
           />
+          <CoverPanel
+            coverUrl={coverUrl || undefined}
+            hint={CATEGORY_COVER_HINT}
+            pickTitle="Upload category cover"
+            onPick={setCoverUrl}
+          />
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={openPicker}
-              title="Upload category image"
+              title="Upload category photo"
               className="group relative h-12 w-12 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
             >
               {imageUrl ? (
@@ -587,15 +711,17 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
                 <Camera className="h-3.5 w-3.5 text-white" />
               </span>
             </button>
-            <div>
+            <div className="min-w-0">
               <button
                 type="button"
                 onClick={openPicker}
                 className="text-[13px] text-primary hover:underline"
               >
-                {imageUrl ? "Replace photo" : "Upload photo"}
+                {imageUrl ? "Replace Photo" : "Upload Photo"}
               </button>
-              <p className="mt-1 text-[11px] text-muted-foreground">{CATEGORY_PHOTO_HINT}</p>
+              <p className="mt-1 text-xs text-muted-foreground whitespace-pre-line leading-snug">
+                {CATEGORY_PHOTO_HINT}
+              </p>
             </div>
           </div>
           <input
@@ -658,7 +784,7 @@ function CategoryRow({
           e.stopPropagation();
           openPicker();
         }}
-        title={`Change category photo — ${CATEGORY_PHOTO_HINT}`}
+        title={`Change category photo\n${CATEGORY_PHOTO_HINT}`}
         className="group relative h-10 w-10 rounded-md bg-primary/10 grid place-items-center overflow-hidden shrink-0 hover:bg-primary/20 transition-colors duration-150"
       >
         {category.imageUrl ? (
@@ -699,13 +825,6 @@ function CategoryDetail({
   onBackToBrands: () => void;
   onPickProduct: (product: OdooProduct) => void;
 }) {
-  const {
-    fileRef: imageFileRef,
-    openPicker: openImagePicker,
-    handleChange: handleImageChange,
-  } = useImagePicker((dataUrl) =>
-    skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }),
-  );
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -750,40 +869,28 @@ function CategoryDetail({
         </button>
       </div>
 
-      <SectionCard>
-        <div className="p-3 flex items-center gap-3">
-          <div className="relative h-20 w-20 rounded-lg bg-white border border-border grid place-items-center overflow-hidden shrink-0">
-            {category.imageUrl ? (
-              <img src={category.imageUrl} alt="" className="img-fade h-full w-full object-cover" />
-            ) : (
-              <FolderOpen className="h-7 w-7 text-primary" />
-            )}
-            <input
-              ref={imageFileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-            <button
-              type="button"
-              onClick={openImagePicker}
-              title="Change category photo"
-              className="absolute bottom-0.5 right-0.5 h-5 w-5 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-md hover:bg-primary/90 transition-colors duration-150"
-            >
-              <Camera className="h-2.5 w-2.5" />
-            </button>
-            <PhotoRatioHint text={CATEGORY_PHOTO_HINT} />
-          </div>
-          <div>
-            <div className="text-sm font-semibold">{category.name}</div>
-            <div className="text-xs text-muted-foreground">
-              {category.skus.length} SKU{category.skus.length !== 1 ? "s" : ""} ·{" "}
-              {category.modules.length} {category.modules.length === 1 ? "module" : "modules"}
-            </div>
-          </div>
-        </div>
-      </SectionCard>
+      <DetailHeader
+        name={category.name}
+        meta={`${category.skus.length} SKU${category.skus.length !== 1 ? "s" : ""} · ${
+          category.modules.length
+        } ${category.modules.length === 1 ? "module" : "modules"}`}
+        cover={{
+          url: category.coverUrl,
+          hint: CATEGORY_COVER_HINT,
+          pickTitle: "Change category cover",
+          onPick: (dataUrl) =>
+            skuStore.updateCategory(brand.id, category.id, { coverUrl: dataUrl }),
+        }}
+        photo={{
+          url: category.imageUrl,
+          hint: CATEGORY_PHOTO_HINT,
+          pickTitle: "Change category photo",
+          onPick: (dataUrl) =>
+            skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }),
+          fit: "cover",
+          fallback: <FolderOpen className="h-7 w-7 text-primary" />,
+        }}
+      />
 
       {/* Side by side on a wide screen, stacked once there isn't room */}
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
@@ -2032,6 +2139,7 @@ function BrandFormModal({
 }) {
   const [name, setName] = useState("");
   const [logoUrl, setLogoUrl] = useState<string>("");
+  const [coverUrl, setCoverUrl] = useState<string>("");
   const { fileRef, openPicker, handleChange } = useImagePicker(setLogoUrl);
 
   return (
@@ -2040,11 +2148,15 @@ function BrandFormModal({
         onSubmit={(e) => {
           e.preventDefault();
           if (!name.trim()) return;
-          const b = skuStore.addBrand({ name: name.trim(), logoUrl: logoUrl || undefined });
+          const b = skuStore.addBrand({
+            name: name.trim(),
+            logoUrl: logoUrl || undefined,
+            coverUrl: coverUrl || undefined,
+          });
           toast.success("Brand added");
           onCreated(b);
         }}
-        className="w-full max-w-md bg-background border border-border rounded-xl overflow-hidden modal-content"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-background border border-border rounded-xl modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add New Brand</div>
@@ -2053,6 +2165,24 @@ function BrandFormModal({
           </button>
         </div>
         <div className="p-4 space-y-3">
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Cover</div>
+            <CoverPanel
+              coverUrl={coverUrl || undefined}
+              hint={BRAND_COVER_HINT}
+              pickTitle="Upload brand cover"
+              onPick={setCoverUrl}
+            />
+            {coverUrl && (
+              <button
+                type="button"
+                onClick={() => setCoverUrl("")}
+                className="mt-1.5 text-[14px] text-rose-500 hover:underline"
+              >
+                Remove
+              </button>
+            )}
+          </div>
           <div>
             <div className="text-xs text-muted-foreground mb-1">Logo</div>
             <div className="flex items-center gap-3">
@@ -2089,7 +2219,9 @@ function BrandFormModal({
                     </button>
                   )}
                 </div>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">{BRAND_PHOTO_HINT}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground whitespace-pre-line leading-snug">
+                  {BRAND_PHOTO_HINT}
+                </p>
               </div>
             </div>
           </div>
