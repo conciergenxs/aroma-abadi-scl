@@ -1,0 +1,83 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - banner [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - generic [ref=f1e6]:
+          - link [ref=f1e7] [cursor=pointer]:
+            - /url: /home
+            - img "Aroma · Laura Mercier" [ref=f1e8]
+          - button "Switch brand" [ref=f1e9]
+        - link "Profile" [ref=f1e12] [cursor=pointer]:
+          - /url: /profile
+    - main [ref=f1e16]:
+      - generic [ref=f1e17]:
+        - generic [ref=f1e18]:
+          - link "Kembali ke Beranda" [ref=f1e19] [cursor=pointer]:
+            - /url: /home
+          - link "About Brand 4 Modul" [ref=f1e23] [cursor=pointer]:
+            - /url: /knowledge/brand
+            - generic [ref=f1e26]:
+              - generic [ref=f1e27]: About Brand
+              - generic [ref=f1e28]: 4 Modul
+          - heading "Semua Kategori" [level=1] [ref=f1e29]
+          - paragraph [ref=f1e30]: 6 Kategori
+          - generic [ref=f1e31]:
+            - link "Skin Care Skin Care 21 Modul" [ref=f1e33] [cursor=pointer]:
+              - /url: /category/skin-care
+              - img "Skin Care" [ref=f1e34]
+              - generic [ref=f1e36]:
+                - generic [ref=f1e37]: Skin Care
+                - generic [ref=f1e38]: 21 Modul
+            - link "Makeup Makeup 39 Modul" [ref=f1e40] [cursor=pointer]:
+              - /url: /category/makeup
+              - img "Makeup" [ref=f1e41]
+              - generic [ref=f1e43]:
+                - generic [ref=f1e44]: Makeup
+                - generic [ref=f1e45]: 39 Modul
+            - link "Fragrance Fragrance 4 Modul" [ref=f1e47] [cursor=pointer]:
+              - /url: /category/fragrance
+              - img "Fragrance" [ref=f1e48]
+              - generic [ref=f1e50]:
+                - generic [ref=f1e51]: Fragrance
+                - generic [ref=f1e52]: 4 Modul
+            - link "Wellness Wellness 2 Modul" [ref=f1e54] [cursor=pointer]:
+              - /url: /category/wellness
+              - img "Wellness" [ref=f1e55]
+              - generic [ref=f1e57]:
+                - generic [ref=f1e58]: Wellness
+                - generic [ref=f1e59]: 2 Modul
+            - link "Hair Care Hair Care 2 Modul" [ref=f1e61] [cursor=pointer]:
+              - /url: /category/hair-care
+              - img "Hair Care" [ref=f1e62]
+              - generic [ref=f1e64]:
+                - generic [ref=f1e65]: Hair Care
+                - generic [ref=f1e66]: 2 Modul
+            - link "Body Care Body Care 2 Modul" [ref=f1e68] [cursor=pointer]:
+              - /url: /category/body-care
+              - img "Body Care" [ref=f1e69]
+              - generic [ref=f1e71]:
+                - generic [ref=f1e72]: Body Care
+                - generic [ref=f1e73]: 2 Modul
+        - generic [ref=f1e75]:
+          - img "Aroma" [ref=f1e76]
+          - generic [ref=f1e77]:
+            - link "FAQ" [ref=f1e78] [cursor=pointer]:
+              - /url: /faq
+            - link "S&K" [ref=f1e79] [cursor=pointer]:
+              - /url: /terms
+            - link "Kebijakan Privasi" [ref=f1e80] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=f1e81]: © 2026 PT Aroma Abadi
+    - link "Chat with AI assistant" [ref=f1e82] [cursor=pointer]:
+      - /url: /chat/general
+    - navigation "Primary":
+      - generic [ref=f1e86]:
+        - link "Beranda" [ref=f1e87] [cursor=pointer]:
+          - /url: /home
+        - link "Kategori" [ref=f1e93] [cursor=pointer]:
+          - /url: /category
+        - link "Progres" [ref=f1e101] [cursor=pointer]:
+          - /url: /my-learning
+        - link "Profil" [ref=f1e108] [cursor=pointer]:
+          - /url: /profile
+  - region "Notifications alt+T"

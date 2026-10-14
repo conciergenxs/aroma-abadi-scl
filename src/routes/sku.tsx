@@ -2238,7 +2238,7 @@ function BrandFormModal({
           toast.success("Brand added");
           onCreated(b);
         }}
-        className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-background border border-border rounded-xl modal-content"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background border border-border rounded-xl modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="text-sm font-semibold">Add New Brand</div>
@@ -2304,7 +2304,7 @@ function BrandFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Brand name..."
-              className="h-9 w-60 max-w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
+              className="h-9 w-80 max-w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
             />
           </label>
           <p className="text-xs text-muted-foreground">
