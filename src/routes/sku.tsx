@@ -162,6 +162,18 @@ function ImageFieldLabel({ label }: { label: string }) {
   return <div className="mb-1 text-xs text-muted-foreground">{label}</div>;
 }
 
+/* What an empty image slot shows: the same icon size in every slot, and — where
+ * the frame is big enough to carry it — the call to action naming that slot. */
+function EmptySlotContent({ icon, label }: { icon: React.ReactNode; label?: string }) {
+  if (!label) return <>{icon}</>;
+  return (
+    <span className="flex flex-col items-center justify-center gap-1 px-1 text-center">
+      {icon}
+      <span className="text-xs font-medium leading-tight">{label}</span>
+    </span>
+  );
+}
+
 /* The 16:9 cover that heads a Brand's or Category's page in the BA app. Framed
  * here exactly as the app frames it, so what you see is what a BA will see, and
  * editable in place like the profile photo beside it. */
@@ -172,6 +184,7 @@ function CoverPanel({
   onPick,
   className = "",
   onClear,
+  emptyLabel,
 }: {
   coverUrl?: string;
   /** Tooltip pinned to the frame: what the slot is for and the size to upload. */
@@ -183,6 +196,9 @@ function CoverPanel({
   className?: string;
   /** Create forms pass this so a picked cover can be taken back off. */
   onClear?: () => void;
+  /** Call to action under the icon while the slot is empty. The create forms
+   *  name their slots in a field label instead, so they leave it out. */
+  emptyLabel?: string;
 }) {
   const { fileRef, openPicker, handleChange } = useImagePicker(onPick);
   return (
@@ -212,7 +228,7 @@ function CoverPanel({
             </span>
           </>
         ) : (
-          <ImageIcon className="h-5 w-5" />
+          <EmptySlotContent icon={<ImageIcon className="h-5 w-5" />} label={emptyLabel} />
         )}
       </button>
       <PhotoRatioHint text={hint} />
@@ -231,11 +247,18 @@ function DetailHeader({
   name,
   meta,
 }: {
-  cover: { url?: string; hint: string; pickTitle: string; onPick: (dataUrl: string) => void };
+  cover: {
+    url?: string;
+    hint: string;
+    pickTitle: string;
+    emptyLabel: string;
+    onPick: (dataUrl: string) => void;
+  };
   photo: {
     url?: string;
     hint: string;
     pickTitle: string;
+    emptyLabel: string;
     onPick: (dataUrl: string) => void;
     fit: "contain" | "cover";
     fallback: React.ReactNode;
@@ -258,6 +281,7 @@ function DetailHeader({
             hint={cover.hint}
             pickTitle={cover.pickTitle}
             onPick={cover.onPick}
+            emptyLabel={cover.emptyLabel}
             className="h-[72px] w-32"
           />
           <div
@@ -276,7 +300,7 @@ function DetailHeader({
               type="button"
               onClick={openPicker}
               title={photo.pickTitle}
-              className="h-full w-full grid place-items-center"
+              className="h-full w-full grid place-items-center text-primary"
             >
               {photo.url ? (
                 <img
@@ -289,7 +313,7 @@ function DetailHeader({
                   }
                 />
               ) : (
-                photo.fallback
+                <EmptySlotContent icon={photo.fallback} label={photo.emptyLabel} />
               )}
               <span className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid place-items-center">
                 <Camera className="h-4 w-4 text-white" />
@@ -616,15 +640,17 @@ function BrandDetail({
           url: brand.coverUrl,
           hint: BRAND_COVER_HINT,
           pickTitle: "Change brand cover",
+          emptyLabel: "Upload Cover",
           onPick: (dataUrl) => skuStore.updateBrand(brand.id, { coverUrl: dataUrl }),
         }}
         photo={{
           url: brand.logoUrl,
           hint: BRAND_PHOTO_HINT,
           pickTitle: "Change brand logo",
+          emptyLabel: "Upload Profile",
           onPick: (dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }),
           fit: "contain",
-          fallback: <Package className="h-7 w-7 text-primary" />,
+          fallback: <Package className="h-5 w-5" />,
         }}
       />
 
@@ -932,6 +958,7 @@ function CategoryDetail({
           url: category.coverUrl,
           hint: CATEGORY_COVER_HINT,
           pickTitle: "Change category cover",
+          emptyLabel: "Upload Cover",
           onPick: (dataUrl) =>
             skuStore.updateCategory(brand.id, category.id, { coverUrl: dataUrl }),
         }}
@@ -939,10 +966,11 @@ function CategoryDetail({
           url: category.imageUrl,
           hint: CATEGORY_PHOTO_HINT,
           pickTitle: "Change category photo",
+          emptyLabel: "Upload Profile",
           onPick: (dataUrl) =>
             skuStore.updateCategory(brand.id, category.id, { imageUrl: dataUrl }),
           fit: "cover",
-          fallback: <FolderOpen className="h-7 w-7 text-primary" />,
+          fallback: <FolderOpen className="h-5 w-5" />,
         }}
       />
 
