@@ -72,11 +72,16 @@ export function BroadcastSessionAnalytics({
   const matchedRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return recipientRows;
-    return recipientRows.filter(
-      ({ contact }) =>
-        contact.name.toLowerCase().includes(q) ||
-        contact.phone.replace(/\s/g, "").includes(q.replace(/\s/g, "")),
-    );
+    // Numbers are stored as "+62 812 …" but people search them the way they
+    // type them locally ("0812…"), so both spellings have to match.
+    const digits = (v: string) => v.replace(/\D/g, "");
+    const qDigits = digits(q);
+    return recipientRows.filter(({ contact }) => {
+      if (contact.name.toLowerCase().includes(q)) return true;
+      if (!qDigits) return false;
+      const phone = digits(contact.phone);
+      return phone.includes(qDigits) || phone.replace(/^62/, "0").includes(qDigits);
+    });
   }, [recipientRows, query]);
 
   const [page, setPage] = useState(1);
