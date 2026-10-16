@@ -1606,6 +1606,36 @@ export const templates: Template[] = [
   },
 ];
 
+/** One execution of a broadcast. A one-off send has exactly one; a recurring
+ * broadcast gets one per occurrence. This is what the Broadcast Logs table
+ * lists, and what each session's analytics is measured over. */
+export type BroadcastRun = {
+  id: string;
+  /** Display timestamp, e.g. "29 Jul 2026 · 09:00". */
+  sentAt: string;
+  /** Real ISO date (YYYY-MM-DD). */
+  sentAtDate: string;
+  audience: number;
+  reach: number;
+  delivered: number;
+  read: number;
+  failed: number;
+  status: "Success" | "Partial" | "Failed";
+};
+
+/** How often a recurring broadcast goes out. Written in plain language because
+ * that is how the sender set it up and how they read it back. */
+export type BroadcastRecurrence = {
+  /** e.g. "Every Wednesday". */
+  summary: string;
+  /** Send time in the workspace timezone, e.g. "09:00". */
+  time: string;
+  startDate: string;
+  endDate?: string;
+  /** Next occurrence; absent once the series has ended. */
+  nextRunAt?: string;
+};
+
 export type Broadcast = {
   id: string;
   name: string;
@@ -1622,7 +1652,12 @@ export type Broadcast = {
   channelId?: string;
   listIds?: string[];
   totalAudience?: number;
-  sendMode?: "now" | "schedule";
+  sendMode?: "now" | "schedule" | "recurring";
+  /** Set when sendMode is "recurring" — the cadence the series runs on. */
+  recurrence?: BroadcastRecurrence;
+  /** Send history for a recurring broadcast, newest last. A one-off send
+   * leaves this empty and its single run is derived from the totals above. */
+  runs?: BroadcastRun[];
   scheduleDate?: string;
   scheduleTime?: string;
   createdBy?: string;
