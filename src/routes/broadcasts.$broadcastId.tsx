@@ -130,7 +130,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
 
         <Section title="Audience">
           <ReadGrid>
-            <ReadField label="Selected Audience" span={2}>
+            <ReadField label="Selected Audience">
               {selectedLists.length === 0 ? (
                 <span className="text-muted-foreground">No audience selected</span>
               ) : (
@@ -234,7 +234,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                     {broadcast.buttons.map((b, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[13px]"
+                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[12px]"
                       >
                         {b.label}
                         <span className="ml-1 text-[12px] text-muted-foreground">
@@ -300,11 +300,14 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
 /* ------------------------------ Broadcast Logs ----------------------------- */
 
 /** Logs list dates, not relative words: "Today · 09:00" tells you nothing a
- * week later. Falls back to whatever the send recorded if it has no real date. */
-function fmtDateDMY(run: BroadcastRun) {
+ * week later. The time comes off whatever the send recorded, so a series that
+ * runs twice in a day stays readable. */
+function fmtSentAt(run: BroadcastRun) {
   if (!run.sentAtDate) return run.sentAt;
   const [y, m, d] = run.sentAtDate.split("-");
-  return `${d}/${m}/${y}`;
+  const time = run.sentAt.match(/(\d{1,2}):(\d{2})/);
+  const clock = time ? `, ${time[1].padStart(2, "0")}.${time[2]}` : "";
+  return `${d}/${m}/${y}${clock}`;
 }
 
 /* Every send this broadcast has made. A one-off has a single row; a recurring
@@ -357,7 +360,10 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
   const visible = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
-    <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
+    // No overflow-hidden here: the filter popover has to escape the card.
+    // The scroll area below clips itself, and the rounded corners survive
+    // because nothing paints a background right at the card's edge.
+    <div className="rounded-xl border border-border bg-card/60 glass">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
         <div className="flex items-center gap-3">
           <div>
@@ -425,19 +431,21 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
             <table className="w-full min-w-[720px] text-[14px]">
               <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium">Date Sent</th>
+                  <th className="w-[180px] px-4 py-3 text-left font-medium whitespace-nowrap">
+                    Date Sent
+                  </th>
                   <th className="px-4 py-3 text-left font-medium">Audience</th>
                   <th className="px-4 py-3 text-left font-medium">Reach</th>
                   <th className="px-4 py-3 text-left font-medium">Delivered</th>
                   <th className="px-4 py-3 text-left font-medium">Read</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Action</th>
+                  <th className="w-[120px] px-4 py-3 text-left font-medium">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {visible.map((run) => (
                   <tr key={run.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">{fmtDateDMY(run)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">{fmtSentAt(run)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.audience)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.reach)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.delivered)}</td>
