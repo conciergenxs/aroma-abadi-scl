@@ -335,7 +335,7 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[720px] text-sm">
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">Date Sent</th>

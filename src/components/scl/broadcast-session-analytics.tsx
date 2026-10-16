@@ -120,7 +120,7 @@ export function BroadcastSessionAnalytics({
             </p>
           </div>
           <span className="text-[11px] text-muted-foreground">
-            {recipientRows.length} of {fmtNum(run.reach)} contacts
+            {recipientRows.length} of {fmtNum(run.reach)} recipients shown
           </span>
         </div>
 
@@ -149,7 +149,9 @@ export function BroadcastSessionAnalytics({
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          {/* Narrow screens scroll the table instead of squeezing phone
+              numbers and names into stacks of fragments. */}
+          <table className="w-full min-w-[780px] text-sm">
             <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
               <tr>
                 <th className="w-10 px-4 py-3">
@@ -195,7 +197,7 @@ export function BroadcastSessionAnalytics({
                         <span className="font-medium">{contact.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
                       {contact.phone}
                     </td>
                     <td className="px-4 py-3">
