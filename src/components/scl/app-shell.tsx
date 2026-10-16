@@ -751,7 +751,7 @@ export function StatusPill({
 }) {
   return (
     <span
-      className={`badge-animate inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusTone[tone]}`}
+      className={`badge-animate inline-flex items-center rounded-full border px-2.5 py-0.5 text-[12px] font-semibold ${statusTone[tone]}`}
     >
       {children}
     </span>
@@ -782,7 +782,7 @@ export function TabCount({ value }: { value: number }) {
 export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?: () => void }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium ${labelColorClass[label.color]}`}
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[12px] font-medium ${labelColorClass[label.color]}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[label.color]}`} />
       {label.name}
