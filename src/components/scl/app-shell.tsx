@@ -728,6 +728,36 @@ export const labelColorClass: Record<LabelColor, string> = {
   slate: "bg-slate-500/10 text-slate-700 border-slate-500/30",
 };
 
+/** Status pills — solid fill, white text. The Templates list and the Broadcast
+ * list were already moved to this treatment when the pale tinted version
+ * turned out to be unreadable on the light surface; this map exists so the
+ * next status chip can't drift back to the pale one. Label chips keep their
+ * soft tint on purpose, so a status reads louder than the labels beside it. */
+export const statusTone = {
+  neutral: "border-slate-600 bg-slate-500 text-white",
+  positive: "border-emerald-700 bg-emerald-600 text-white",
+  info: "border-sky-700 bg-sky-600 text-white",
+  accent: "border-violet-700 bg-violet-600 text-white",
+  warning: "border-amber-700 bg-amber-600 text-white",
+  danger: "border-red-700 bg-red-600 text-white",
+} as const;
+
+export function StatusPill({
+  tone,
+  children,
+}: {
+  tone: keyof typeof statusTone;
+  children: ReactNode;
+}) {
+  return (
+    <span
+      className={`badge-animate inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusTone[tone]}`}
+    >
+      {children}
+    </span>
+  );
+}
+
 export const labelColorDot: Record<LabelColor, string> = {
   indigo: "bg-indigo-400",
   pink: "bg-pink-400",
