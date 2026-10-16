@@ -9,6 +9,7 @@ import {
   ListMinus,
   Search as SearchIcon,
   Check,
+  ChevronDown,
   X as XIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -67,11 +68,22 @@ export function BroadcastSessionAnalytics({
     });
   }, [contacts, run]);
 
+  const [query, setQuery] = useState("");
+  const matchedRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return recipientRows;
+    return recipientRows.filter(
+      ({ contact }) =>
+        contact.name.toLowerCase().includes(q) ||
+        contact.phone.replace(/\s/g, "").includes(q.replace(/\s/g, "")),
+    );
+  }, [recipientRows, query]);
+
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
-  const totalPages = Math.max(1, Math.ceil(recipientRows.length / pageSize));
+  const [pageSize, setPageSize] = useState(10);
+  const totalPages = Math.max(1, Math.ceil(matchedRows.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const visibleRows = recipientRows.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const visibleRows = matchedRows.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const [selected, setSelected] = useState<string[]>([]);
   const visibleIds = visibleRows.map((r) => r.contact.id);
@@ -119,9 +131,19 @@ export function BroadcastSessionAnalytics({
               Per-contact delivery and engagement for this send.
             </p>
           </div>
-          <span className="text-[11px] text-muted-foreground">
-            {recipientRows.length} of {fmtNum(run.reach)} recipients shown
-          </span>
+          <div className="relative w-full sm:w-72">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search by name or phone…"
+              aria-label="Search recipients"
+              className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+            />
+          </div>
         </div>
 
         {selected.length > 0 && (
@@ -227,12 +249,24 @@ export function BroadcastSessionAnalytics({
           </table>
         </div>
 
+        {matchedRows.length === 0 && (
+          <div className="px-5 py-10 text-center">
+            <p className="text-sm text-muted-foreground">No recipients match “{query.trim()}”.</p>
+            <button
+              onClick={() => setQuery("")}
+              className="mt-2 text-[12px] text-primary hover:underline"
+            >
+              Clear search
+            </button>
+          </div>
+        )}
+
         <TableFooterPagination
           page={safePage}
           setPage={setPage}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          total={recipientRows.length}
+          total={matchedRows.length}
         />
       </div>
 
@@ -317,21 +351,26 @@ export function TableFooterPagination({
     <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-border">
       <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
         <span>Rows per page</span>
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setPage(1);
-          }}
-          className="h-7 rounded-md border border-border bg-card px-1.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
-          aria-label="Rows per page"
-        >
-          {PAGE_SIZE_OPTIONS.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <span className="relative inline-flex items-center">
+          {/* appearance-none + our own chevron, so the gap either side of it is
+           * ours to set rather than the browser's. */}
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
+            className="h-7 appearance-none rounded-md border border-border bg-card pl-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+            aria-label="Rows per page"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 h-3 w-3 text-muted-foreground" />
+        </span>
       </div>
       <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
         <span>{total === 0 ? "0 of 0" : `${start}–${end} of ${total}`}</span>
