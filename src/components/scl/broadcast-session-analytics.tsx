@@ -39,11 +39,11 @@ export function BroadcastSessionAnalytics({
   const { contacts, labels } = useContactsStore();
 
   const kpis = [
-    { l: "Audience", v: run.audience, icon: Users, color: "text-foreground" },
-    { l: "Reach", v: run.reach, icon: Send, color: "text-foreground" },
-    { l: "Delivered", v: run.delivered, icon: CheckCheck, color: "text-foreground" },
-    { l: "Read", v: run.read, icon: Eye, color: "text-foreground" },
-    { l: "Failed", v: run.failed, icon: AlertTriangle, color: "text-foreground" },
+    { l: "Audience", v: run.audience, icon: Users },
+    { l: "Reach", v: run.reach, icon: Send },
+    { l: "Delivered", v: run.delivered, icon: CheckCheck },
+    { l: "Read", v: run.read, icon: Eye },
+    { l: "Failed", v: run.failed, icon: AlertTriangle },
   ];
 
   // Recipients for this run. Seeded off the run id, so each session in a
@@ -90,10 +90,13 @@ export function BroadcastSessionAnalytics({
   const [range, setRange] = useState<DateRange>(bounds);
   const [presetLabel, setPresetLabel] = useState<string | null>("Program Lifetime");
   // Switching sends changes the window the filter may cover.
+  // Depend on the two dates, not the object: `bounds` is rebuilt on every
+  // render, and depending on it would reset the filter in a loop.
   useEffect(() => {
     setRange(bounds);
     setPresetLabel("Program Lifetime");
-  }, [bounds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bounds.start, bounds.end]);
 
   const [query, setQuery] = useState("");
   const matchedRows = useMemo(() => {
@@ -146,9 +149,11 @@ export function BroadcastSessionAnalytics({
               key={k.l}
               className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
             >
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-muted-foreground">{k.l}</div>
-                <Icon className={`h-3.5 w-3.5 ${k.color}`} />
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-[12px] text-muted-foreground">{k.l}</div>
+                <div className="h-6 w-6 shrink-0 grid place-items-center rounded-md bg-white/[0.04] border border-border">
+                  <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
               </div>
               <div className="stat-value mt-2 text-2xl font-semibold tabular-nums">
                 {fmtNum(k.v)}
@@ -161,8 +166,8 @@ export function BroadcastSessionAnalytics({
       <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
           <div>
-            <h3 className="text-sm font-medium">Contact performance</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <h3 className="text-[14px] font-medium">Contact Performance</h3>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               Per-contact delivery and engagement for this send.
             </p>
           </div>
@@ -195,7 +200,7 @@ export function BroadcastSessionAnalytics({
         </div>
 
         {selected.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
+          <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[12px]">
             <span className="text-muted-foreground">{selected.length} selected</span>
             <button
               onClick={() => setAddListOpen(true)}
@@ -221,8 +226,8 @@ export function BroadcastSessionAnalytics({
         <div className="overflow-x-auto">
           {/* Narrow screens scroll the table instead of squeezing phone
               numbers and names into stacks of fragments. */}
-          <table className="w-full min-w-[780px] text-sm">
-            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
+          <table className="w-full min-w-[780px] text-[14px]">
+            <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
               <tr>
                 <th className="w-10 px-4 py-3">
                   <input
@@ -261,13 +266,13 @@ export function BroadcastSessionAnalytics({
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-primary/15 text-primary text-[11px] font-medium grid place-items-center">
+                        <div className="h-7 w-7 rounded-full bg-primary/15 text-primary text-[12px] font-medium grid place-items-center">
                           {contact.avatar}
                         </div>
                         <span className="font-medium">{contact.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                    <td className="px-4 py-3 text-[12px] text-muted-foreground tabular-nums whitespace-nowrap">
                       {contact.phone}
                     </td>
                     <td className="px-4 py-3">
@@ -276,18 +281,18 @@ export function BroadcastSessionAnalytics({
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center gap-1">
                         {contactLabels.length === 0 ? (
-                          <span className="text-[11px] text-muted-foreground">—</span>
+                          <span className="text-[12px] text-muted-foreground">—</span>
                         ) : (
                           contactLabels.map((l) => <LabelChip key={l.id} label={l} />)
                         )}
                         {extraLabels > 0 && (
-                          <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                          <span className="inline-flex items-center rounded-md border border-border bg-white/[0.04] px-1.5 py-0.5 text-[12px] text-muted-foreground">
                             +{extraLabels}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-4 py-3 text-[12px] text-muted-foreground whitespace-nowrap">
                       {fmtUpdatedAt(updatedAt)}
                     </td>
                   </tr>
@@ -299,10 +304,12 @@ export function BroadcastSessionAnalytics({
 
         {matchedRows.length === 0 && (
           <div className="px-5 py-10 text-center">
-            <p className="text-sm text-muted-foreground">No recipients match “{query.trim()}”.</p>
+            <p className="text-[14px] text-muted-foreground">
+              No recipients match “{query.trim()}”.
+            </p>
             <button
               onClick={() => setQuery("")}
-              className="mt-2 text-[12px] text-primary hover:underline"
+              className="mt-2 text-[13px] text-primary hover:underline"
             >
               Clear search
             </button>
@@ -356,7 +363,7 @@ export function BroadcastSessionAnalytics({
       )}
 
       {broadcast.status !== "Sent" && recipientRows.length === 0 && (
-        <p className="text-xs text-muted-foreground">This send has no recipients on record.</p>
+        <p className="text-[12px] text-muted-foreground">This send has no recipients on record.</p>
       )}
     </div>
   );
@@ -391,7 +398,7 @@ export function TableFooterPagination({
   const end = Math.min(page * pageSize, total);
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-border">
-      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
         <span>Rows per page</span>
         <span className="relative inline-flex items-center">
           {/* appearance-none + our own chevron, so the gap either side of it is
@@ -402,7 +409,7 @@ export function TableFooterPagination({
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className="h-7 appearance-none rounded-md border border-border bg-card pl-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+            className="h-7 appearance-none rounded-md border border-border bg-card pl-2.5 pr-7 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
             aria-label="Rows per page"
           >
             {PAGE_SIZE_OPTIONS.map((n) => (
@@ -414,7 +421,7 @@ export function TableFooterPagination({
           <ChevronDown className="pointer-events-none absolute right-2 h-3 w-3 text-muted-foreground" />
         </span>
       </div>
-      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
         <span>{total === 0 ? "0 of 0" : `${start}–${end} of ${total}`}</span>
         <div className="flex items-center gap-1">
           <button
@@ -525,7 +532,7 @@ function ListPickerModal({
         className="w-full max-w-md max-h-[80vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
       >
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <h2 className="text-sm font-semibold">{title}</h2>
+          <h2 className="text-[14px] font-semibold">{title}</h2>
           <button
             onClick={onClose}
             className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
@@ -548,7 +555,7 @@ function ListPickerModal({
         </div>
         <div className="flex-1 overflow-y-auto p-2">
           {filtered.length === 0 ? (
-            <div className="px-3 py-10 text-center text-xs text-muted-foreground">
+            <div className="px-3 py-10 text-center text-[12px] text-muted-foreground">
               {assignedOnly ? "No assigned lists." : "No lists match."}
             </div>
           ) : (
@@ -575,7 +582,7 @@ function ListPickerModal({
           )}
         </div>
         <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-          <span className="text-[11px] text-muted-foreground">{picked.size} selected</span>
+          <span className="text-[12px] text-muted-foreground">{picked.size} selected</span>
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}

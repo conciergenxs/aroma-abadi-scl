@@ -88,7 +88,7 @@ export function DateRangePopover({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors duration-150"
+        className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[13px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors duration-150"
       >
         <Calendar className="h-3.5 w-3.5 shrink-0" />
         <span className="max-w-[160px] truncate">{label}</span>
@@ -123,7 +123,7 @@ export function DateRangePopover({
           </div>
           <div className="my-2 border-t border-border" />
           <div className="px-1 pb-1 space-y-1.5">
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground px-2">
+            <div className="text-[12px] uppercase tracking-wider text-muted-foreground px-2">
               Custom Range
             </div>
             <input
@@ -135,7 +135,7 @@ export function DateRangePopover({
                 if (e.target.value) onChange({ start: e.target.value, end: range.end }, null);
               }}
               aria-label="From date"
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
             <input
               type="date"
@@ -146,7 +146,7 @@ export function DateRangePopover({
                 if (e.target.value) onChange({ start: range.start, end: e.target.value }, null);
               }}
               aria-label="To date"
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
           </div>
         </div>

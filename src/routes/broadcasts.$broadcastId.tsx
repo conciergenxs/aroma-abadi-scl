@@ -8,9 +8,11 @@ import { useContactsStore } from "@/components/scl/contacts-store";
 import { usePromoStore } from "@/components/scl/promo-store";
 import { useTemplatesStore } from "@/components/scl/templates-store";
 import { TableFooterPagination } from "@/components/scl/broadcast-session-analytics";
+import { DateRangePopover, lifetimePresets } from "@/components/scl/date-range-popover";
+import type { DateRange } from "@/components/scl/overview-metrics";
 import { connectedChannels, type Broadcast, type BroadcastRun } from "@/components/scl/mock-data";
-import { useState } from "react";
-import { ChevronLeft, Users, Eye, Repeat } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, Users, Eye, Repeat, ChevronDown } from "lucide-react";
 
 export const Route = createFileRoute("/broadcasts/$broadcastId")({
   head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
@@ -27,7 +29,7 @@ function BroadcastDetailPage() {
       <AppShell>
         <div className="max-w-xl">
           <h1 className="mt-4 text-lg font-semibold">Broadcast not found</h1>
-          <p className="text-xs text-muted-foreground mt-1">It may have been deleted.</p>
+          <p className="text-[12px] text-muted-foreground mt-1">It may have been deleted.</p>
         </div>
       </AppShell>
     );
@@ -40,7 +42,7 @@ function BroadcastDetailPage() {
           <h1 className="text-xl font-semibold tracking-tight">{broadcast.name}</h1>
           <StatusBadge status={broadcast.status} />
           {broadcast.recurrence && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[12px] font-medium text-primary">
               <Repeat className="h-3 w-3" />
               {broadcast.recurrence.summary} · {broadcast.recurrence.time}
             </span>
@@ -82,7 +84,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                 <span className="inline-flex items-center gap-2">
                   <ChannelIcon channel={channel.channel} className="h-4 w-4" />
                   <span className="font-medium">{channel.name}</span>
-                  <span className="text-muted-foreground text-[11px]">{channel.handle}</span>
+                  <span className="text-muted-foreground text-[12px]">{channel.handle}</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
@@ -136,7 +138,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                   {selectedLists.map((l) => (
                     <span
                       key={l.id}
-                      className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] text-primary"
+                      className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[12px] text-primary"
                     >
                       <Users className="h-3 w-3" /> {l.name}
                     </span>
@@ -153,7 +155,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
         {issuedCodes.length > 0 && (
           <Section title={`Promo Codes Issued (${issuedCodes.length})`}>
             {promo && (
-              <p className="text-[12px] text-muted-foreground mb-3">
+              <p className="text-[13px] text-muted-foreground mb-3">
                 Each recipient received their own{" "}
                 <Link
                   to="/promo-codes/$promoId"
@@ -167,13 +169,13 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
             )}
             <div className="rounded-lg border border-border overflow-hidden">
               <div className="max-h-64 overflow-y-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-[14px]">
                   <thead className="sticky top-0 bg-card">
                     <tr className="border-b border-border">
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-3 py-2 text-left text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Recipient
                       </th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-3 py-2 text-left text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Code
                       </th>
                     </tr>
@@ -181,9 +183,9 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                   <tbody className="divide-y divide-border/60">
                     {issuedCodes.map((r) => (
                       <tr key={r.contactId}>
-                        <td className="px-3 py-1.5 text-[12px]">{r.contactName}</td>
+                        <td className="px-3 py-1.5 text-[13px]">{r.contactName}</td>
                         <td className="px-3 py-1.5">
-                          <code className="font-mono text-[12px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
+                          <code className="font-mono text-[13px] bg-muted/60 border border-border rounded px-1.5 py-0.5">
                             {r.code}
                           </code>
                         </td>
@@ -205,7 +207,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
               <ReadField label="Selected Template">
                 <span className="inline-flex items-center gap-2">
                   <span className="font-medium">{template.name}</span>
-                  <span className="text-[10px] text-muted-foreground rounded-full border border-border px-1.5 py-0.5">
+                  <span className="text-[12px] text-muted-foreground rounded-full border border-border px-2 py-0.5">
                     {template.category}
                   </span>
                 </span>
@@ -214,16 +216,16 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
           </ReadGrid>
           <div className="mt-4 space-y-3">
             <ReadBlock label="Message Content">
-              <div className="whitespace-pre-wrap break-words text-[13px] leading-relaxed">
+              <div className="whitespace-pre-wrap break-words text-[14px] leading-relaxed">
                 {renderWithVars(broadcast.body ?? "")}
               </div>
             </ReadBlock>
             {/* Footer and Buttons are both short — side by side on a wide screen,
                 stacked only when there isn't room. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 items-stretch gap-3">
               {broadcast.footer && (
                 <ReadBlock label="Footer">
-                  <div className="text-[12px] text-muted-foreground">{broadcast.footer}</div>
+                  <div className="text-[13px] text-muted-foreground">{broadcast.footer}</div>
                 </ReadBlock>
               )}
               {broadcast.buttons && broadcast.buttons.length > 0 && (
@@ -232,10 +234,10 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                     {broadcast.buttons.map((b, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[11px]"
+                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[13px]"
                       >
                         {b.label}
-                        <span className="ml-1 text-[10px] text-muted-foreground">
+                        <span className="ml-1 text-[12px] text-muted-foreground">
                           · {b.kind === "url" ? "URL" : b.kind === "phone" ? "Phone" : "Reply"}
                         </span>
                       </span>
@@ -253,9 +255,9 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <ChannelIcon channel={broadcast.channel} className="h-4 w-4" />
-              <span className="text-sm font-medium">Preview</span>
+              <span className="text-[14px] font-medium">Preview</span>
             </div>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="text-[12px] uppercase tracking-wider text-muted-foreground">
               WhatsApp
             </span>
           </div>
@@ -281,7 +283,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                 {broadcast.buttons.map((b, i) => (
                   <div
                     key={i}
-                    className="rounded-lg border border-border bg-background/60 px-3 py-1.5 text-center text-[12px] text-primary"
+                    className="rounded-lg border border-border bg-background/60 px-3 py-1.5 text-center text-[13px] text-primary"
                   >
                     {b.label}
                   </div>
@@ -297,36 +299,117 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
 
 /* ------------------------------ Broadcast Logs ----------------------------- */
 
+/** Logs list dates, not relative words: "Today · 09:00" tells you nothing a
+ * week later. Falls back to whatever the send recorded if it has no real date. */
+function fmtDateDMY(run: BroadcastRun) {
+  if (!run.sentAtDate) return run.sentAt;
+  const [y, m, d] = run.sentAtDate.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 /* Every send this broadcast has made. A one-off has a single row; a recurring
  * series gets one per occurrence, and each row opens that session's own
  * analytics — performance is only ever read per send, never averaged across
  * the series. */
+const LOG_STATUSES = ["All", "Success", "Partial", "Failed"] as const;
+
 function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
-  const runs = broadcastRuns(broadcast);
+  // broadcastRuns() builds a fresh array on every call, so memoise it: the
+  // date bounds derive from it, and an unstable identity would re-run the
+  // effect that resets the filter on every render.
+  const runs = useMemo(() => broadcastRuns(broadcast), [broadcast]);
+
+  // A log filter can only reach from the day the broadcast was created to its
+  // most recent send — never outside its own history.
+  const bounds: DateRange = useMemo(() => {
+    const dates = runs.map((r) => r.sentAtDate).filter(Boolean);
+    const end = dates.length ? dates.reduce((a, b) => (a > b ? a : b)) : "";
+    const earliest = dates.length ? dates.reduce((a, b) => (a < b ? a : b)) : "";
+    const start = broadcast.createdAtDate ?? earliest;
+    return { start: start && start <= end ? start : end, end };
+  }, [runs, broadcast.createdAtDate]);
+
+  const [range, setRange] = useState<DateRange>(bounds);
+  const [presetLabel, setPresetLabel] = useState<string | null>("Program Lifetime");
+  // Depend on the two dates, not the object: `bounds` is rebuilt on every
+  // render, and depending on it would reset the filter in a loop.
+  useEffect(() => {
+    setRange(bounds);
+    setPresetLabel("Program Lifetime");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bounds.start, bounds.end]);
+  const [status, setStatus] = useState<(typeof LOG_STATUSES)[number]>("All");
+
+  const filtered = useMemo(
+    () =>
+      runs.filter((r) => {
+        if (status !== "All" && r.status !== status) return false;
+        if (!r.sentAtDate || !bounds.end) return true;
+        return r.sentAtDate >= range.start && r.sentAtDate <= range.end;
+      }),
+    [runs, status, range, bounds.end],
+  );
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const totalPages = Math.max(1, Math.ceil(runs.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const visible = runs.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const visible = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
-        <div>
-          <h3 className="text-sm font-medium">Broadcast Logs</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Execution history for this broadcast.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h3 className="text-[14px] font-medium">Broadcast Logs</h3>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Execution history for this broadcast.
+            </p>
+          </div>
+          <div aria-hidden className="h-8 w-px bg-border" />
+          <span className="inline-flex items-center rounded-full border border-border bg-white/[0.04] px-2.5 py-1 text-[12px] text-muted-foreground">
+            Logs Count: {runs.length}
+          </span>
         </div>
-        <span className="inline-flex items-center rounded-full border border-border bg-white/[0.04] px-2.5 py-1 text-[11px] text-muted-foreground">
-          Logs Count: {runs.length}
-        </span>
+        {runs.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <DateRangePopover
+              range={range}
+              bounds={bounds}
+              presets={lifetimePresets(bounds)}
+              selectedLabel={presetLabel}
+              onChange={(r, label) => {
+                setRange(r);
+                setPresetLabel(label);
+                setPage(1);
+              }}
+            />
+            <span className="relative inline-flex items-center">
+              <select
+                value={status}
+                onChange={(e) => {
+                  setStatus(e.target.value as (typeof LOG_STATUSES)[number]);
+                  setPage(1);
+                }}
+                aria-label="Filter by status"
+                className="h-9 appearance-none rounded-md border border-border bg-card/60 pl-3 pr-8 text-[13px] text-muted-foreground hover:text-foreground hover:bg-card focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors duration-150"
+              >
+                {LOG_STATUSES.map((v) => (
+                  <option key={v} value={v}>
+                    {v === "All" ? "All Statuses" : v}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-2.5 h-3 w-3 text-muted-foreground" />
+            </span>
+          </div>
+        )}
       </div>
 
       {runs.length === 0 ? (
         <div className="px-5 py-10 text-center">
-          <p className="text-sm text-muted-foreground">No sends yet.</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground">No sends yet.</p>
+          <p className="text-[12px] text-muted-foreground mt-1">
             {broadcast.recurrence?.nextRunAt
               ? `The first send runs ${broadcast.recurrence.nextRunAt}.`
               : broadcast.status === "Scheduled"
@@ -339,8 +422,8 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
+            <table className="w-full min-w-[720px] text-[14px]">
+              <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">Date Sent</th>
                   <th className="px-4 py-3 text-left font-medium">Audience</th>
@@ -348,13 +431,13 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
                   <th className="px-4 py-3 text-left font-medium">Delivered</th>
                   <th className="px-4 py-3 text-left font-medium">Read</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Analytics</th>
+                  <th className="px-4 py-3 text-left font-medium">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {visible.map((run) => (
                   <tr key={run.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-4 py-3 whitespace-nowrap">{run.sentAt}</td>
+                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">{fmtDateDMY(run)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.audience)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.reach)}</td>
                     <td className="px-4 py-3 tabular-nums">{fmtNum(run.delivered)}</td>
@@ -366,7 +449,7 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
                       <Link
                         to="/broadcast-log/$broadcastId/$logId"
                         params={{ broadcastId: broadcast.id, logId: run.id }}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 h-8 text-[12px] transition-colors duration-150"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 h-8 text-[13px] transition-colors duration-150"
                       >
                         <Eye className="h-3.5 w-3.5" /> View Details
                       </Link>
@@ -376,12 +459,27 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
               </tbody>
             </table>
           </div>
+          {filtered.length === 0 && (
+            <div className="px-5 py-10 text-center">
+              <p className="text-[14px] text-muted-foreground">No sends match these filters.</p>
+              <button
+                onClick={() => {
+                  setRange(bounds);
+                  setPresetLabel("Program Lifetime");
+                  setStatus("All");
+                }}
+                className="mt-2 text-[13px] text-primary hover:underline"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
           <TableFooterPagination
             page={safePage}
             setPage={setPage}
             pageSize={pageSize}
             setPageSize={setPageSize}
-            total={runs.length}
+            total={filtered.length}
           />
         </>
       )}
@@ -415,7 +513,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="rounded-xl border border-border bg-card/60 glass">
       <div className="px-5 py-3.5 border-b border-border">
-        <h3 className="text-sm font-medium">{title}</h3>
+        <h3 className="text-[14px] font-medium">{title}</h3>
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -437,7 +535,7 @@ function ReadField({
 }) {
   return (
     <div className={span === 2 ? "sm:col-span-2 space-y-1" : "space-y-1"}>
-      <div className="text-[11px] font-medium text-muted-foreground">{label}</div>
+      <div className="text-[12px] font-medium text-muted-foreground">{label}</div>
       <div className="text-[13px]">{children}</div>
     </div>
   );
@@ -445,9 +543,11 @@ function ReadField({
 
 function ReadBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <div className="text-[11px] font-medium text-muted-foreground">{label}</div>
-      <div className="rounded-lg border border-border bg-background/30 p-3">{children}</div>
+    // Side-by-side blocks (Footer and Buttons) get the same height: the column
+    // stretches, and the box grows to fill whatever the taller one sets.
+    <div className="flex h-full flex-col gap-1.5">
+      <div className="text-[12px] font-medium text-muted-foreground">{label}</div>
+      <div className="flex-1 rounded-lg border border-border bg-background/30 p-3">{children}</div>
     </div>
   );
 }

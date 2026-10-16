@@ -27,17 +27,17 @@ function BroadcastLogPage() {
     return (
       <AppShell backTo="/broadcasts">
         <div className="max-w-xl">
-          <h1 className="mt-4 text-lg font-semibold">Send not found</h1>
-          <p className="text-xs text-muted-foreground mt-1">
+          <h1 className="mt-4 text-[18px] font-semibold">Send not found</h1>
+          <p className="text-[12px] text-muted-foreground mt-1">
             {broadcast
               ? "This broadcast has no send with that id — it may have been removed."
               : "The broadcast it belongs to may have been deleted."}
           </p>
           <Link
             to="/broadcasts"
-            className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-primary hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline"
           >
-            <ChevronLeft className="h-3.5 w-3.5" /> Back to broadcasts
+            <ChevronLeft className="h-3.5 w-3.5" /> Back to Broadcasts
           </Link>
         </div>
       </AppShell>
@@ -53,9 +53,9 @@ function BroadcastLogPage() {
       <Link
         to="/broadcasts/$broadcastId"
         params={{ broadcastId: broadcast.id }}
-        className="inline-flex items-center gap-1.5 text-[12px] text-primary hover:underline"
+        className="inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline"
       >
-        <ChevronLeft className="h-3.5 w-3.5" /> Back to broadcast
+        <ChevronLeft className="h-3.5 w-3.5" /> Back to Broadcast
       </Link>
 
       <div className="mt-3 mb-6">
@@ -63,7 +63,7 @@ function BroadcastLogPage() {
           <h1 className="text-xl font-semibold tracking-tight">{run.sentAt}</h1>
           <RunStatusBadge status={run.status} />
         </div>
-        <p className="text-xs text-muted-foreground mt-1.5">
+        <p className="text-[12px] text-muted-foreground mt-1.5">
           {broadcast.name} · send {position} of {runs.length}
           {broadcast.recurrence ? ` · ${broadcast.recurrence.summary}` : ""}
         </p>
