@@ -12,7 +12,7 @@ import { DateRangePopover, lifetimePresets } from "@/components/scl/date-range-p
 import type { DateRange } from "@/components/scl/overview-metrics";
 import { connectedChannels, type Broadcast, type BroadcastRun } from "@/components/scl/mock-data";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, Users, Eye, Repeat, ChevronDown } from "lucide-react";
+import { ChevronLeft, Users, Eye, Repeat, ChevronDown, ExternalLink, Phone } from "lucide-react";
 
 export const Route = createFileRoute("/broadcasts/$broadcastId")({
   head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
@@ -96,11 +96,8 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
               )}
             </ReadField>
             <ReadField label="Broadcast Name">{broadcast.name}</ReadField>
-            <ReadField label="Status">
-              <StatusBadge status={broadcast.status} />
-            </ReadField>
             <ReadField label="Broadcast Time">{broadcast.sentAt || "—"}</ReadField>
-            <ReadField label="Send mode">
+            <ReadField label="Send Mode">
               {broadcast.sendMode === "recurring"
                 ? "Recurring"
                 : broadcast.sendMode === "schedule"
@@ -264,7 +261,11 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
             </span>
           </div>
           <div className="p-5 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent)]">
-            <PhoneFrame channel={broadcast.channel} senderName={channel?.name ?? "Your business"}>
+            <PhoneFrame
+              channel={broadcast.channel}
+              senderName={channel?.name ?? "Your business"}
+              buttons={broadcast.buttons ?? []}
+            >
               {broadcast.body ? (
                 <>
                   <div className="whitespace-pre-wrap break-words">
@@ -280,18 +281,6 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                 <span className="text-muted-foreground italic">No message body</span>
               )}
             </PhoneFrame>
-            {broadcast.buttons && broadcast.buttons.length > 0 && (
-              <div className="mx-auto mt-2 w-full max-w-[300px] space-y-1">
-                {broadcast.buttons.map((b, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg border border-border bg-background/60 px-3 py-1.5 text-center text-[13px] text-primary"
-                  >
-                    {b.label}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -575,15 +564,24 @@ function renderWithVars(body: string) {
   );
 }
 
+/* WhatsApp attaches call-to-action buttons (URL / phone) to the bottom of the
+ * message bubble itself: a hairline divider, then the label centred in link
+ * blue with a small leading icon. Quick replies are different — they sit
+ * outside the bubble as their own tappable chips — so the preview keeps the
+ * two apart instead of drawing every button the same way. */
 function PhoneFrame({
   channel,
   senderName,
+  buttons = [],
   children,
 }: {
   channel: "whatsapp" | "instagram";
   senderName: string;
+  buttons?: NonNullable<Broadcast["buttons"]>;
   children: React.ReactNode;
 }) {
+  const ctaButtons = buttons.filter((b) => b.kind !== "quick_reply");
+  const quickReplies = buttons.filter((b) => b.kind === "quick_reply");
   const isWa = channel === "whatsapp";
   return (
     <div className="mx-auto w-full max-w-[300px] rounded-[28px] border border-border bg-background/60 p-3 shadow-xl">
@@ -604,7 +602,44 @@ function PhoneFrame({
             }`}
           >
             {children}
+            {ctaButtons.length > 0 && (
+              <div className="-mx-3 mt-2">
+                {ctaButtons.map((b, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-center gap-1.5 border-t px-3 py-2 text-[13px] ${
+                      isWa
+                        ? "border-emerald-900/10 text-[#027EB5]"
+                        : "border-pink-900/10 text-primary"
+                    }`}
+                  >
+                    {b.kind === "phone" ? (
+                      <Phone className="h-3.5 w-3.5" />
+                    ) : (
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    )}
+                    {b.label}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+          {quickReplies.length > 0 && (
+            <div className="mt-1.5 max-w-[85%] space-y-1">
+              {quickReplies.map((b, i) => (
+                <div
+                  key={i}
+                  className={`rounded-lg border px-3 py-1.5 text-center text-[13px] ${
+                    isWa
+                      ? "border-emerald-500/20 bg-emerald-500/10 text-[#027EB5]"
+                      : "border-pink-500/20 bg-pink-500/10 text-primary"
+                  }`}
+                >
+                  {b.label}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
