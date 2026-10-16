@@ -1640,6 +1640,9 @@ export type Broadcast = {
   sentAt: string;
   /** Real ISO date (YYYY-MM-DD) — only set for "Sent" broadcasts, used to filter Overview metrics by date range. */
   sentAtDate?: string;
+  /** Real ISO date the broadcast was created — the earliest date any of its
+   * activity can fall on, so date filters clamp their start to it. */
+  createdAtDate?: string;
   status: "Sent" | "Scheduled" | "Draft";
   channelId?: string;
   listIds?: string[];
@@ -1687,6 +1690,7 @@ export const broadcasts: Broadcast[] = [
     listIds: ["ls-vip", "ls-launch"],
     totalAudience: 12408,
     sendMode: "now",
+    createdAtDate: "2026-07-30",
     createdBy: "Putri Anggraini",
     createdAt: "Today · 08:42",
     contentMode: "template",
@@ -1713,6 +1717,7 @@ export const broadcasts: Broadcast[] = [
     listIds: ["ls-vip"],
     totalAudience: 4,
     sendMode: "now",
+    createdAtDate: "2026-07-02",
     createdBy: "Noor Hassan",
     createdAt: "02 Jul 2026 · 08:30",
     contentMode: "template",
@@ -1797,6 +1802,7 @@ export const broadcasts: Broadcast[] = [
         status: "Success",
       },
     ],
+    createdAtDate: "2026-07-07",
     createdBy: "Bagus Pratama",
     createdAt: "Yesterday · 17:10",
     contentMode: "template",
@@ -1824,6 +1830,7 @@ export const broadcasts: Broadcast[] = [
     sendMode: "schedule",
     scheduleDate: "2026-06-26",
     scheduleTime: "08:00",
+    createdAtDate: "2026-06-24",
     createdBy: "Putri Anggraini",
     createdAt: "2 days ago",
     contentMode: "manual",
@@ -1849,6 +1856,7 @@ export const broadcasts: Broadcast[] = [
     listIds: ["ls-vip"],
     totalAudience: 612,
     sendMode: "now",
+    createdAtDate: "2026-07-27",
     createdBy: "Siti Rahmawati",
     createdAt: "3 days ago",
     contentMode: "template",
@@ -1873,6 +1881,7 @@ export const broadcasts: Broadcast[] = [
     listIds: ["ls-community"],
     totalAudience: 22114,
     sendMode: "now",
+    createdAtDate: "2026-07-30",
     createdBy: "Indah Permata",
     createdAt: "30 minutes ago",
     contentMode: "template",
