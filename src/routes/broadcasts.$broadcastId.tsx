@@ -218,28 +218,32 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
                 {renderWithVars(broadcast.body ?? "")}
               </div>
             </ReadBlock>
-            {broadcast.footer && (
-              <ReadBlock label="Footer">
-                <div className="text-[12px] text-muted-foreground">{broadcast.footer}</div>
-              </ReadBlock>
-            )}
-            {broadcast.buttons && broadcast.buttons.length > 0 && (
-              <ReadBlock label="Buttons">
-                <div className="flex flex-wrap gap-1.5">
-                  {broadcast.buttons.map((b, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[11px]"
-                    >
-                      {b.label}
-                      <span className="ml-1 text-[10px] text-muted-foreground">
-                        · {b.kind === "url" ? "URL" : b.kind === "phone" ? "Phone" : "Reply"}
+            {/* Footer and Buttons are both short — side by side on a wide screen,
+                stacked only when there isn't room. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {broadcast.footer && (
+                <ReadBlock label="Footer">
+                  <div className="text-[12px] text-muted-foreground">{broadcast.footer}</div>
+                </ReadBlock>
+              )}
+              {broadcast.buttons && broadcast.buttons.length > 0 && (
+                <ReadBlock label="Buttons">
+                  <div className="flex flex-wrap gap-1.5">
+                    {broadcast.buttons.map((b, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[11px]"
+                      >
+                        {b.label}
+                        <span className="ml-1 text-[10px] text-muted-foreground">
+                          · {b.kind === "url" ? "URL" : b.kind === "phone" ? "Phone" : "Reply"}
+                        </span>
                       </span>
-                    </span>
-                  ))}
-                </div>
-              </ReadBlock>
-            )}
+                    ))}
+                  </div>
+                </ReadBlock>
+              )}
+            </div>
           </div>
         </Section>
       </div>
@@ -339,26 +343,26 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
               <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">Date Sent</th>
-                  <th className="px-4 py-3 text-right font-medium">Audience</th>
-                  <th className="px-4 py-3 text-right font-medium">Reach</th>
-                  <th className="px-4 py-3 text-right font-medium">Delivered</th>
-                  <th className="px-4 py-3 text-right font-medium">Read</th>
+                  <th className="px-4 py-3 text-left font-medium">Audience</th>
+                  <th className="px-4 py-3 text-left font-medium">Reach</th>
+                  <th className="px-4 py-3 text-left font-medium">Delivered</th>
+                  <th className="px-4 py-3 text-left font-medium">Read</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="px-4 py-3 text-right font-medium">Analytics</th>
+                  <th className="px-4 py-3 text-left font-medium">Analytics</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {visible.map((run) => (
                   <tr key={run.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-4 py-3 whitespace-nowrap">{run.sentAt}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.audience)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.reach)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.delivered)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.read)}</td>
+                    <td className="px-4 py-3 tabular-nums">{fmtNum(run.audience)}</td>
+                    <td className="px-4 py-3 tabular-nums">{fmtNum(run.reach)}</td>
+                    <td className="px-4 py-3 tabular-nums">{fmtNum(run.delivered)}</td>
+                    <td className="px-4 py-3 tabular-nums">{fmtNum(run.read)}</td>
                     <td className="px-4 py-3">
                       <RunStatusBadge status={run.status} />
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3">
                       <Link
                         to="/broadcast-log/$broadcastId/$logId"
                         params={{ broadcastId: broadcast.id, logId: run.id }}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Users,
   Send,
@@ -18,6 +18,8 @@ import { useEscapeKey } from "@/lib/use-escape-key";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { LabelChip, StatusPill, type statusTone } from "@/components/scl/app-shell";
 import type { Broadcast, BroadcastRun, ContactLabel } from "@/components/scl/mock-data";
+import type { DateRange } from "@/components/scl/overview-metrics";
+import { DateRangePopover, lifetimePresets } from "@/components/scl/date-range-popover";
 
 /* How one send session performed: the five numbers for that occurrence, then
  * the contacts it reached. A recurring broadcast has one of these per run, so
@@ -39,9 +41,9 @@ export function BroadcastSessionAnalytics({
   const kpis = [
     { l: "Audience", v: run.audience, icon: Users, color: "text-foreground" },
     { l: "Reach", v: run.reach, icon: Send, color: "text-foreground" },
-    { l: "Delivered", v: run.delivered, icon: CheckCheck, color: "text-sky-600" },
-    { l: "Read", v: run.read, icon: Eye, color: "text-emerald-600" },
-    { l: "Failed", v: run.failed, icon: AlertTriangle, color: "text-red-600" },
+    { l: "Delivered", v: run.delivered, icon: CheckCheck, color: "text-foreground" },
+    { l: "Read", v: run.read, icon: Eye, color: "text-foreground" },
+    { l: "Failed", v: run.failed, icon: AlertTriangle, color: "text-foreground" },
   ];
 
   // Recipients for this run. Seeded off the run id, so each session in a
@@ -64,25 +66,53 @@ export function BroadcastSessionAnalytics({
       else if (r < failRate + readRate) status = "Read";
       else if (r < failRate + deliveredRate) status = "Delivered";
       else status = "Sent";
-      return { contact: c, status, i };
+      // When this message last changed state. Engagement trails the send by
+      // hours or days, so each row lands somewhere in the week after it —
+      // deterministic, so the same send always reads the same way.
+      const lagHours = hash(c.id + run.id + "lag") % (24 * 7);
+      const updatedAt = addHoursIso(`${run.sentAtDate}T09:00`, lagHours);
+      return { contact: c, status, i, updatedAt };
     });
   }, [contacts, run]);
 
+  // The filter can reach from the day the broadcast was created to the last
+  // engagement on record — never outside the data it filters.
+  const bounds: DateRange = useMemo(() => {
+    const start = broadcast.createdAtDate ?? run.sentAtDate;
+    const latest = recipientRows.reduce(
+      (max, r) => (r.updatedAt > max ? r.updatedAt : max),
+      run.sentAtDate,
+    );
+    const end = latest.slice(0, 10);
+    return { start: start <= end ? start : end, end };
+  }, [broadcast.createdAtDate, run.sentAtDate, recipientRows]);
+
+  const [range, setRange] = useState<DateRange>(bounds);
+  const [presetLabel, setPresetLabel] = useState<string | null>("Program Lifetime");
+  // Switching sends changes the window the filter may cover.
+  useEffect(() => {
+    setRange(bounds);
+    setPresetLabel("Program Lifetime");
+  }, [bounds]);
+
   const [query, setQuery] = useState("");
   const matchedRows = useMemo(() => {
+    const inWindow = recipientRows.filter(
+      (r) => r.updatedAt.slice(0, 10) >= range.start && r.updatedAt.slice(0, 10) <= range.end,
+    );
     const q = query.trim().toLowerCase();
-    if (!q) return recipientRows;
+    if (!q) return inWindow;
     // Numbers are stored as "+62 812 …" but people search them the way they
     // type them locally ("0812…"), so both spellings have to match.
     const digits = (v: string) => v.replace(/\D/g, "");
     const qDigits = digits(q);
-    return recipientRows.filter(({ contact }) => {
+    return inWindow.filter(({ contact }) => {
       if (contact.name.toLowerCase().includes(q)) return true;
       if (!qDigits) return false;
       const phone = digits(contact.phone);
       return phone.includes(qDigits) || phone.replace(/^62/, "0").includes(qDigits);
     });
-  }, [recipientRows, query]);
+  }, [recipientRows, query, range]);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -136,18 +166,31 @@ export function BroadcastSessionAnalytics({
               Per-contact delivery and engagement for this send.
             </p>
           </div>
-          <div className="relative w-full sm:w-72">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            <DateRangePopover
+              range={range}
+              bounds={bounds}
+              presets={lifetimePresets(bounds)}
+              selectedLabel={presetLabel}
+              onChange={(r, label) => {
+                setRange(r);
+                setPresetLabel(label);
                 setPage(1);
               }}
-              placeholder="Search by name or phone…"
-              aria-label="Search recipients"
-              className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
+            <div className="relative min-w-[200px] flex-1 sm:w-72 sm:flex-none">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search by name or phone…"
+                aria-label="Search recipients"
+                className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
           </div>
         </div>
 
@@ -198,7 +241,7 @@ export function BroadcastSessionAnalytics({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {visibleRows.map(({ contact, status }) => {
+              {visibleRows.map(({ contact, status, updatedAt }) => {
                 const isSel = selected.includes(contact.id);
                 const contactLabels = contact.labelIds
                   .map((lid) => labels.find((l) => l.id === lid))
@@ -244,8 +287,8 @@ export function BroadcastSessionAnalytics({
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {contact.lastInteraction}
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      {fmtUpdatedAt(updatedAt)}
                     </td>
                   </tr>
                 );
@@ -396,6 +439,36 @@ export function TableFooterPagination({
       </div>
     </div>
   );
+}
+
+/** "2026-07-29T09:00" + n hours → ISO minute string, built from the parts in
+ * UTC so the day can't shift with the machine's timezone. */
+function addHoursIso(iso: string, hours: number) {
+  const [date, time = "00:00"] = iso.split("T");
+  const [y, m, d] = date.split("-").map(Number);
+  const [hh, mm] = time.split(":").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, hh + hours, mm)).toISOString().slice(0, 16);
+}
+
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function fmtUpdatedAt(iso: string) {
+  const [date, time] = iso.split("T");
+  const [y, m, d] = date.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y} · ${time}`;
 }
 
 function hash(s: string) {
