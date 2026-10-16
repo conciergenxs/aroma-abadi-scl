@@ -34,6 +34,7 @@ import { Route as SkuDetailSkuIdRouteImport } from './routes/sku-detail.$skuId'
 import { Route as SkuSkuIdRouteImport } from './routes/sku.$skuId'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesNewRouteImport } from './routes/templates.new'
+import { Route as BroadcastLogBroadcastIdLogIdRouteImport } from './routes/broadcast-log.$broadcastId.$logId'
 import { Route as ContactsAudienceNewRouteImport } from './routes/contacts.audience.new'
 import { Route as PromoCodesPromoIdIndexRouteImport } from './routes/promo-codes.$promoId.index'
 import { Route as PromoCodesEditPromoIdRouteImport } from './routes/promo-codes.edit.$promoId'
@@ -166,6 +167,12 @@ const TemplatesNewRoute = TemplatesNewRouteImport.update({
   path: '/templates/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BroadcastLogBroadcastIdLogIdRoute =
+  BroadcastLogBroadcastIdLogIdRouteImport.update({
+    id: '/broadcast-log/$broadcastId/$logId',
+    path: '/broadcast-log/$broadcastId/$logId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ContactsAudienceNewRoute = ContactsAudienceNewRouteImport.update({
   id: '/audience/new',
   path: '/audience/new',
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/referral/': typeof ReferralIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/broadcast-log/$broadcastId/$logId': typeof BroadcastLogBroadcastIdLogIdRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/promo-codes': typeof PromoCodesIndexRoute
   '/referral': typeof ReferralIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/broadcast-log/$broadcastId/$logId': typeof BroadcastLogBroadcastIdLogIdRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
@@ -291,6 +300,7 @@ export interface FileRoutesById {
   '/promo-codes/': typeof PromoCodesIndexRoute
   '/referral/': typeof ReferralIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/broadcast-log/$broadcastId/$logId': typeof BroadcastLogBroadcastIdLogIdRoute
   '/contacts/audience/new': typeof ContactsAudienceNewRoute
   '/promo-codes/edit/$promoId': typeof PromoCodesEditPromoIdRoute
   '/referral/edit/$seasonId': typeof ReferralEditSeasonIdRoute
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/promo-codes/'
     | '/referral/'
     | '/templates/'
+    | '/broadcast-log/$broadcastId/$logId'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/promo-codes'
     | '/referral'
     | '/templates'
+    | '/broadcast-log/$broadcastId/$logId'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
@@ -392,6 +404,7 @@ export interface FileRouteTypes {
     | '/promo-codes/'
     | '/referral/'
     | '/templates/'
+    | '/broadcast-log/$broadcastId/$logId'
     | '/contacts/audience/new'
     | '/promo-codes/edit/$promoId'
     | '/referral/edit/$seasonId'
@@ -423,6 +436,7 @@ export interface RootRouteChildren {
   PromoCodesIndexRoute: typeof PromoCodesIndexRoute
   ReferralIndexRoute: typeof ReferralIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  BroadcastLogBroadcastIdLogIdRoute: typeof BroadcastLogBroadcastIdLogIdRoute
   PromoCodesEditPromoIdRoute: typeof PromoCodesEditPromoIdRoute
   ReferralEditSeasonIdRoute: typeof ReferralEditSeasonIdRoute
   TemplatesEditTemplateIdRoute: typeof TemplatesEditTemplateIdRoute
@@ -606,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/broadcast-log/$broadcastId/$logId': {
+      id: '/broadcast-log/$broadcastId/$logId'
+      path: '/broadcast-log/$broadcastId/$logId'
+      fullPath: '/broadcast-log/$broadcastId/$logId'
+      preLoaderRoute: typeof BroadcastLogBroadcastIdLogIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contacts/audience/new': {
       id: '/contacts/audience/new'
       path: '/audience/new'
@@ -702,6 +723,7 @@ const rootRouteChildren: RootRouteChildren = {
   PromoCodesIndexRoute: PromoCodesIndexRoute,
   ReferralIndexRoute: ReferralIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  BroadcastLogBroadcastIdLogIdRoute: BroadcastLogBroadcastIdLogIdRoute,
   PromoCodesEditPromoIdRoute: PromoCodesEditPromoIdRoute,
   ReferralEditSeasonIdRoute: ReferralEditSeasonIdRoute,
   TemplatesEditTemplateIdRoute: TemplatesEditTemplateIdRoute,

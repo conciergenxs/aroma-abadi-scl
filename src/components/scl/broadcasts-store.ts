@@ -1,13 +1,14 @@
 import { useSyncExternalStore } from "react";
-import { broadcasts as seedBroadcasts, type Broadcast } from "./mock-data";
+import { broadcasts as seedBroadcasts, type Broadcast, type BroadcastRun } from "./mock-data";
 
 type State = { broadcasts: Broadcast[] };
 
 // Bump when the seeded broadcasts or the Broadcast shape change — v2 added the
 // Sisley personal-codes send that promo-2's recipient codes point at, plus the
 // promoCodeId/recipientCodes fields; v3 keeps the audience conditions a draft
-// was built with.
-const STORAGE_KEY = "aroma_broadcasts_store_v3";
+// was built with; v4 turned the Reseller Promo into a recurring series and
+// gave broadcasts a per-send run history.
+const STORAGE_KEY = "aroma_broadcasts_store_v4";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];
@@ -93,4 +94,30 @@ export const broadcastsStore = {
 
 export function useBroadcastsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+/** Every send this broadcast has made, newest first — one row per occurrence
+ * for a recurring series, one row for a one-off, none for anything that hasn't
+ * gone out yet. A one-off carries no `runs` of its own, so its single send is
+ * derived from the broadcast's own totals. */
+export function broadcastRuns(b: Broadcast): BroadcastRun[] {
+  if (b.runs?.length) return [...b.runs].reverse();
+  if (b.status !== "Sent") return [];
+  return [
+    {
+      id: `${b.id}-run-1`,
+      sentAt: b.sentAt,
+      sentAtDate: b.sentAtDate ?? "",
+      audience: b.totalAudience ?? b.reach,
+      reach: b.reach,
+      delivered: b.delivered,
+      read: b.read,
+      failed: b.failed ?? Math.max(0, b.reach - b.delivered),
+      status: "Success",
+    },
+  ];
+}
+
+export function findBroadcastRun(b: Broadcast, runId: string): BroadcastRun | null {
+  return broadcastRuns(b).find((r) => r.id === runId) ?? null;
 }

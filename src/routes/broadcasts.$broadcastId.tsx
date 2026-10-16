@@ -3,41 +3,24 @@ import { variableLabel } from "@/components/scl/template-vars";
 import { fmtNum } from "@/lib/fmt";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
-import { useBroadcastsStore } from "@/components/scl/broadcasts-store";
+import { useBroadcastsStore, broadcastRuns } from "@/components/scl/broadcasts-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { usePromoStore } from "@/components/scl/promo-store";
-import { useTemplatesStore, TEMPLATE_GROUP_BADGE } from "@/components/scl/templates-store";
-import { connectedChannels, type Broadcast } from "@/components/scl/mock-data";
-import { useMemo, useState } from "react";
-import {
-  ChevronLeft,
-  Users,
-  ListPlus,
-  ListMinus,
-  Search as SearchIcon,
-  Check,
-  X as XIcon,
-  Send,
-  CheckCheck,
-  Eye,
-  MessageSquare,
-  AlertTriangle,
-} from "lucide-react";
-import { toast } from "sonner";
-import { useEscapeKey } from "@/lib/use-escape-key";
+import { useTemplatesStore } from "@/components/scl/templates-store";
+import { TableFooterPagination } from "@/components/scl/broadcast-session-analytics";
+import { connectedChannels, type Broadcast, type BroadcastRun } from "@/components/scl/mock-data";
+import { useState } from "react";
+import { ChevronLeft, Users, Eye, Repeat } from "lucide-react";
 
 export const Route = createFileRoute("/broadcasts/$broadcastId")({
   head: () => ({ meta: [{ title: "Broadcast — SCL" }] }),
   component: BroadcastDetailPage,
 });
 
-type Tab = "details" | "analytics";
-
 function BroadcastDetailPage() {
   const { broadcastId } = Route.useParams();
   const { broadcasts } = useBroadcastsStore();
   const broadcast = broadcasts.find((b) => b.id === broadcastId);
-  const [tab, setTab] = useState<Tab>("details");
 
   if (!broadcast) {
     return (
@@ -56,45 +39,26 @@ function BroadcastDetailPage() {
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-semibold tracking-tight">{broadcast.name}</h1>
           <StatusBadge status={broadcast.status} />
+          {broadcast.recurrence && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">
+              <Repeat className="h-3 w-3" />
+              {broadcast.recurrence.summary} · {broadcast.recurrence.time}
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="border-b border-border mb-6">
-        <div className="flex items-center gap-1">
-          {[
-            { id: "details", label: "Broadcast Details" },
-            { id: "analytics", label: "Analytics" },
-          ].map((t) => {
-            const active = tab === (t.id as Tab);
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id as Tab)}
-                className={`px-4 h-9 text-[12px] font-medium border-b-2 -mb-px transition ${
-                  active
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="space-y-6">
+        <BroadcastDetails broadcast={broadcast} />
+        <BroadcastLogs broadcast={broadcast} />
       </div>
-
-      {tab === "details" ? (
-        <DetailsTab broadcast={broadcast} />
-      ) : (
-        <AnalyticsTab broadcast={broadcast} />
-      )}
     </AppShell>
   );
 }
 
 /* --------------------------------- Details -------------------------------- */
 
-function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
+function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
   const { promos } = usePromoStore();
   const issuedCodes = broadcast.recipientCodes ?? [];
   const promo = promos.find((p) => p.id === broadcast.promoCodeId) ?? null;
@@ -133,13 +97,29 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
             </ReadField>
             <ReadField label="Broadcast Time">{broadcast.sentAt || "—"}</ReadField>
             <ReadField label="Send mode">
-              {broadcast.sendMode === "schedule" ? "Scheduled" : "Send now"}
+              {broadcast.sendMode === "recurring"
+                ? "Recurring"
+                : broadcast.sendMode === "schedule"
+                  ? "Scheduled"
+                  : "Send now"}
             </ReadField>
             {broadcast.sendMode === "schedule" && (
               <ReadField label="Scheduled For">
                 {[broadcast.scheduleDate, broadcast.scheduleTime].filter(Boolean).join(" · ") ||
                   "—"}
               </ReadField>
+            )}
+            {broadcast.recurrence && (
+              <>
+                <ReadField label="Repeats">
+                  {broadcast.recurrence.summary} at {broadcast.recurrence.time}
+                </ReadField>
+                <ReadField label="Next Send">{broadcast.recurrence.nextRunAt ?? "—"}</ReadField>
+                <ReadField label="Series Started">{broadcast.recurrence.startDate}</ReadField>
+                <ReadField label="Series Ends">
+                  {broadcast.recurrence.endDate ?? "No end date"}
+                </ReadField>
+              </>
             )}
             <ReadField label="Created By">{broadcast.createdBy ?? "—"}</ReadField>
             <ReadField label="Created Date">{broadcast.createdAt ?? "—"}</ReadField>
@@ -311,266 +291,117 @@ function DetailsTab({ broadcast }: { broadcast: Broadcast }) {
   );
 }
 
-/* -------------------------------- Analytics ------------------------------- */
+/* ------------------------------ Broadcast Logs ----------------------------- */
 
-type ContactRowStatus = "Sent" | "Delivered" | "Read" | "Replied" | "Failed";
-
-function AnalyticsTab({ broadcast }: { broadcast: Broadcast }) {
-  const { contacts, lists } = useContactsStore();
-  const { groups } = useTemplatesStore();
-
-  // Build a deterministic set of recipient contacts from the broadcast id.
-  const recipientRows = useMemo(() => {
-    const seed = broadcast.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-    const ordered = [...contacts].sort((a, b) => {
-      const ha = hash(a.id + broadcast.id);
-      const hb = hash(b.id + broadcast.id);
-      return ha - hb;
-    });
-    const count = Math.min(contacts.length, Math.max(6, Math.floor(broadcast.reach / 2000) + 6));
-    const slice = ordered.slice(0, count);
-    const statuses: ContactRowStatus[] = ["Sent", "Delivered", "Read", "Replied", "Failed"];
-    return slice.map((c, i) => {
-      let status: ContactRowStatus;
-      if (broadcast.status !== "Sent") status = "Sent";
-      else {
-        const r = hash(c.id + broadcast.id + String(seed)) % 100;
-        if (r < 6) status = "Failed";
-        else if (r < 18) status = "Replied";
-        else if (r < 60) status = "Read";
-        else if (r < 90) status = "Delivered";
-        else status = "Sent";
-      }
-      return { contact: c, status, i };
-    });
-  }, [broadcast, contacts]);
-
-  const kpis = useMemo(() => {
-    const sent = broadcast.reach;
-    const delivered = broadcast.delivered;
-    const read = broadcast.read;
-    const replied = broadcast.replied ?? Math.floor(read * 0.08);
-    const failed = broadcast.failed ?? Math.max(0, sent - delivered);
-    return [
-      { l: "Sent", v: sent, icon: Send, color: "text-foreground" },
-      { l: "Delivered", v: delivered, icon: CheckCheck, color: "text-sky-300" },
-      { l: "Read", v: read, icon: Eye, color: "text-emerald-300" },
-      { l: "Replied", v: replied, icon: MessageSquare, color: "text-violet-300" },
-      { l: "Failed", v: failed, icon: AlertTriangle, color: "text-red-300" },
-    ];
-  }, [broadcast]);
-
-  // Selection
-  const [selected, setSelected] = useState<string[]>([]);
-  const visibleIds = recipientRows.map((r) => r.contact.id);
-  const allSel = visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
-  const toggleAll = () =>
-    setSelected(
-      allSel
-        ? selected.filter((id) => !visibleIds.includes(id))
-        : Array.from(new Set([...selected, ...visibleIds])),
-    );
-  const toggleOne = (id: string) =>
-    setSelected((p) => (p.includes(id) ? p.filter((s) => s !== id) : [...p, id]));
-  const clearSelection = () => setSelected([]);
-
-  const [addListOpen, setAddListOpen] = useState(false);
-  const [removeListOpen, setRemoveListOpen] = useState(false);
+/* Every send this broadcast has made. A one-off has a single row; a recurring
+ * series gets one per occurrence, and each row opens that session's own
+ * analytics — performance is only ever read per send, never averaged across
+ * the series. */
+function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
+  const runs = broadcastRuns(broadcast);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const totalPages = Math.max(1, Math.ceil(runs.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const visible = runs.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 stagger">
-        {kpis.map((k) => {
-          const Icon = k.icon;
-          return (
-            <div
-              key={k.l}
-              className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-muted-foreground">{k.l}</div>
-                <Icon className={`h-3.5 w-3.5 ${k.color}`} />
-              </div>
-              <div className="stat-value mt-2 text-2xl font-semibold tabular-nums">
-                {fmtNum(k.v)}
-              </div>
-            </div>
-          );
-        })}
+    <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
+        <div>
+          <h3 className="text-sm font-medium">Broadcast Logs</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Execution history for this broadcast.
+          </p>
+        </div>
+        <span className="inline-flex items-center rounded-full border border-border bg-white/[0.04] px-2.5 py-1 text-[11px] text-muted-foreground">
+          Logs Count: {runs.length}
+        </span>
       </div>
 
-      <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div>
-            <h3 className="text-sm font-medium">Contact performance</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Per-contact delivery and engagement.
-            </p>
-          </div>
-          <span className="text-[11px] text-muted-foreground">
-            {recipientRows.length} of {fmtNum(broadcast.reach)} contacts
-          </span>
+      {runs.length === 0 ? (
+        <div className="px-5 py-10 text-center">
+          <p className="text-sm text-muted-foreground">No sends yet.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {broadcast.recurrence?.nextRunAt
+              ? `The first send runs ${broadcast.recurrence.nextRunAt}.`
+              : broadcast.status === "Scheduled"
+                ? `Scheduled for ${[broadcast.scheduleDate, broadcast.scheduleTime]
+                    .filter(Boolean)
+                    .join(" · ")}.`
+                : "This broadcast is still a draft."}
+          </p>
         </div>
-
-        {selected.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-border bg-primary/5 text-[11px]">
-            <span className="text-muted-foreground">{selected.length} selected</span>
-            <button
-              onClick={() => setAddListOpen(true)}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
-            >
-              <ListPlus className="h-3 w-3" /> Add to List
-            </button>
-            <button
-              onClick={() => setRemoveListOpen(true)}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 py-1.5 transition-colors duration-150"
-            >
-              <ListMinus className="h-3 w-3" /> Remove from List
-            </button>
-            <button
-              onClick={clearSelection}
-              className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
-            >
-              Clear Selection
-            </button>
-          </div>
-        )}
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
-              <tr>
-                <th className="w-10 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    className="accent-[oklch(0.62_0.17_40)]"
-                    checked={allSel}
-                    onChange={toggleAll}
-                    aria-label="Select all"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left font-medium">Contact</th>
-                <th className="px-4 py-3 text-left font-medium">Channel</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-left font-medium">Labels</th>
-                <th className="px-4 py-3 text-left font-medium">Last Updated</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {recipientRows.map(({ contact, status, i }) => {
-                const isSel = selected.includes(contact.id);
-                // Map contacts' listIds → group-like display using contact lists names.
-                const contactGroups = contact.listIds
-                  .map((lid) => lists.find((l) => l.id === lid))
-                  .filter(Boolean)
-                  .slice(0, 2) as { id: string; name: string }[];
-                return (
-                  <tr key={contact.id} className="hover:bg-gray-50 transition-colors duration-150">
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
+                <tr>
+                  <th className="px-4 py-3 text-left font-medium">Date Sent</th>
+                  <th className="px-4 py-3 text-right font-medium">Audience</th>
+                  <th className="px-4 py-3 text-right font-medium">Reach</th>
+                  <th className="px-4 py-3 text-right font-medium">Delivered</th>
+                  <th className="px-4 py-3 text-right font-medium">Read</th>
+                  <th className="px-4 py-3 text-left font-medium">Status</th>
+                  <th className="px-4 py-3 text-right font-medium">Analytics</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {visible.map((run) => (
+                  <tr key={run.id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <td className="px-4 py-3 whitespace-nowrap">{run.sentAt}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.audience)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.reach)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.delivered)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{fmtNum(run.read)}</td>
                     <td className="px-4 py-3">
-                      <input
-                        type="checkbox"
-                        className="accent-[oklch(0.62_0.17_40)]"
-                        checked={isSel}
-                        onChange={() => toggleOne(contact.id)}
-                      />
+                      <RunStatusBadge status={run.status} />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-primary/15 text-primary text-[11px] font-medium grid place-items-center">
-                          {contact.avatar}
-                        </div>
-                        <span className="font-medium">{contact.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <ChannelIcon channel={contact.channel} className="h-4 w-4" />
-                        WhatsApp
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <ContactStatusBadge status={status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {contactGroups.length === 0 ? (
-                          <span className="text-[11px] text-muted-foreground">—</span>
-                        ) : (
-                          contactGroups.map((g, idx) => {
-                            const tone =
-                              Object.values(TEMPLATE_GROUP_BADGE)[
-                                (idx + i) % Object.values(TEMPLATE_GROUP_BADGE).length
-                              ];
-                            return (
-                              <span
-                                key={g.id}
-                                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${tone}`}
-                              >
-                                {g.name}
-                              </span>
-                            );
-                          })
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {contact.lastInteraction}
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        to="/broadcast-log/$broadcastId/$logId"
+                        params={{ broadcastId: broadcast.id, logId: run.id }}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 h-8 text-[12px] transition-colors duration-150"
+                      >
+                        <Eye className="h-3.5 w-3.5" /> View Details
+                      </Link>
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {addListOpen && (
-        <ListPickerModal
-          title="Add to List"
-          confirmLabel="Add to selected lists"
-          onClose={() => setAddListOpen(false)}
-          onConfirm={(listIds) => {
-            toast.success(
-              `Added ${selected.length} contact${selected.length === 1 ? "" : "s"} to ${listIds.length} list${listIds.length === 1 ? "" : "s"}`,
-            );
-            setAddListOpen(false);
-            clearSelection();
-          }}
-        />
-      )}
-      {removeListOpen && (
-        <ListPickerModal
-          title="Remove from List"
-          confirmLabel="Remove from selected lists"
-          assignedOnly
-          assignedListIds={Array.from(
-            new Set(
-              recipientRows
-                .filter((r) => selected.includes(r.contact.id))
-                .flatMap((r) => r.contact.listIds),
-            ),
-          )}
-          onClose={() => setRemoveListOpen(false)}
-          onConfirm={(listIds) => {
-            toast.success(
-              `Removed ${selected.length} contact${selected.length === 1 ? "" : "s"} from ${listIds.length} list${listIds.length === 1 ? "" : "s"}`,
-            );
-            setRemoveListOpen(false);
-            clearSelection();
-          }}
-        />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <TableFooterPagination
+            page={safePage}
+            setPage={setPage}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            total={runs.length}
+          />
+        </>
       )}
     </div>
   );
 }
 
-/* --------------------------------- Helpers -------------------------------- */
-
-function hash(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h;
+export function RunStatusBadge({ status }: { status: BroadcastRun["status"] }) {
+  const tone =
+    status === "Success"
+      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+      : status === "Partial"
+        ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+        : "border-red-500/30 bg-red-500/10 text-red-300";
+  return (
+    <span
+      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${tone}`}
+    >
+      {status}
+    </span>
+  );
 }
+
+/* --------------------------------- Helpers -------------------------------- */
 
 function StatusBadge({ status }: { status: Broadcast["status"] }) {
   return (
@@ -582,23 +413,6 @@ function StatusBadge({ status }: { status: Broadcast["status"] }) {
             ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
             : "border-border bg-white/[0.04] text-muted-foreground"
       }`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function ContactStatusBadge({ status }: { status: ContactRowStatus }) {
-  const map: Record<ContactRowStatus, string> = {
-    Sent: "border-border bg-white/[0.04] text-muted-foreground",
-    Delivered: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-    Read: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-    Replied: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-    Failed: "border-red-500/30 bg-red-500/10 text-red-300",
-  };
-  return (
-    <span
-      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}
     >
       {status}
     </span>
@@ -688,125 +502,6 @@ function PhoneFrame({
             }`}
           >
             {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------------------- List picker modal -------------------------- */
-
-function ListPickerModal({
-  title,
-  confirmLabel,
-  onClose,
-  onConfirm,
-  assignedOnly,
-  assignedListIds,
-}: {
-  title: string;
-  confirmLabel: string;
-  onClose: () => void;
-  onConfirm: (listIds: string[]) => void;
-  assignedOnly?: boolean;
-  assignedListIds?: string[];
-}) {
-  useEscapeKey(true, onClose);
-
-  const { lists } = useContactsStore();
-  const [query, setQuery] = useState("");
-  const [picked, setPicked] = useState<Set<string>>(new Set());
-
-  const pool = assignedOnly ? lists.filter((l) => assignedListIds?.includes(l.id)) : lists;
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return pool;
-    return pool.filter((l) => l.name.toLowerCase().includes(q));
-  }, [pool, query]);
-
-  const toggle = (id: string) => {
-    const next = new Set(picked);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setPicked(next);
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md max-h-[80vh] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden modal-content"
-      >
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <h2 className="text-sm font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
-          >
-            <XIcon className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="p-4 border-b border-border">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search lists…"
-              className="w-full h-9 rounded-md border border-border bg-background/40 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto p-2">
-          {filtered.length === 0 ? (
-            <div className="px-3 py-10 text-center text-xs text-muted-foreground">
-              {assignedOnly ? "No assigned lists." : "No lists match."}
-            </div>
-          ) : (
-            filtered.map((l) => {
-              const sel = picked.has(l.id);
-              return (
-                <label
-                  key={l.id}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer ${
-                    sel ? "bg-primary/10" : "hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={sel}
-                    onChange={() => toggle(l.id)}
-                    className="h-4 w-4 accent-primary"
-                  />
-                  <span className="text-[13px] font-medium flex-1 truncate">{l.name}</span>
-                  {sel && <Check className="h-3.5 w-3.5 text-primary" />}
-                </label>
-              );
-            })
-          )}
-        </div>
-        <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-          <span className="text-[11px] text-muted-foreground">{picked.size} selected</span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-8 text-[12px] transition-colors duration-150"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => picked.size > 0 && onConfirm(Array.from(picked))}
-              disabled={picked.size === 0}
-              className="inline-flex items-center rounded-md bg-primary px-3 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
-            >
-              {confirmLabel}
-            </button>
           </div>
         </div>
       </div>

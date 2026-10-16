@@ -1441,15 +1441,7 @@ export type Template = {
 };
 
 export type TemplateTone =
-  | "primary"
-  | "indigo"
-  | "pink"
-  | "emerald"
-  | "amber"
-  | "sky"
-  | "violet"
-  | "slate"
-  | "rose";
+  "primary" | "indigo" | "pink" | "emerald" | "amber" | "sky" | "violet" | "slate" | "rose";
 
 export type TemplateGroup = {
   id: string;
@@ -1751,7 +1743,60 @@ export const broadcasts: Broadcast[] = [
     channelId: "wa-bdg",
     listIds: ["ls-launch"],
     totalAudience: 4910,
-    sendMode: "now",
+    sendMode: "recurring",
+    recurrence: {
+      summary: "Every Wednesday",
+      time: "09:00",
+      startDate: "08 Jul 2026",
+      nextRunAt: "05 Aug 2026 · 09:00",
+    },
+    // Four weekly sends so far; the per-run figures add up to the totals above.
+    runs: [
+      {
+        id: "b2-run-1",
+        sentAt: "08 Jul 2026 · 09:00",
+        sentAtDate: "2026-07-08",
+        audience: 1180,
+        reach: 1180,
+        delivered: 1172,
+        read: 968,
+        failed: 8,
+        status: "Success",
+      },
+      {
+        id: "b2-run-2",
+        sentAt: "15 Jul 2026 · 09:00",
+        sentAtDate: "2026-07-15",
+        audience: 1216,
+        reach: 1216,
+        delivered: 1208,
+        read: 1014,
+        failed: 8,
+        status: "Success",
+      },
+      {
+        id: "b2-run-3",
+        sentAt: "22 Jul 2026 · 09:00",
+        sentAtDate: "2026-07-22",
+        audience: 1242,
+        reach: 1242,
+        delivered: 1236,
+        read: 1048,
+        failed: 6,
+        status: "Success",
+      },
+      {
+        id: "b2-run-4",
+        sentAt: "29 Jul 2026 · 09:00",
+        sentAtDate: "2026-07-29",
+        audience: 1272,
+        reach: 1272,
+        delivered: 1264,
+        read: 1082,
+        failed: 8,
+        status: "Success",
+      },
+    ],
     createdBy: "Bagus Pratama",
     createdAt: "Yesterday · 17:10",
     contentMode: "template",
