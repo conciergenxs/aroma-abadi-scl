@@ -429,8 +429,8 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
                   <th className="px-4 py-3 text-left font-medium">Reach</th>
                   <th className="px-4 py-3 text-left font-medium">Delivered</th>
                   <th className="px-4 py-3 text-left font-medium">Read</th>
-                  <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="w-[170px] px-4 py-3 text-left font-medium">Action</th>
+                  <th className="w-[110px] px-4 py-3 text-left font-medium">Status</th>
+                  <th className="w-[190px] px-4 py-3 text-left font-medium">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -603,7 +603,9 @@ function PhoneFrame({
           >
             {children}
             {ctaButtons.length > 0 && (
-              <div className="-mx-3 mt-2">
+              {/* -mb-2 cancels the bubble's own bottom padding: without it the
+              {/* gap under the label is the row's padding plus the bubble's. */}
+              <div className="-mx-3 -mb-2 mt-2">
                 {ctaButtons.map((b, i) => (
                   <div
                     key={i}
