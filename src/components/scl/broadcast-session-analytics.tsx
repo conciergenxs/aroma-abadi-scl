@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { fmtNum } from "@/lib/fmt";
 import { useEscapeKey } from "@/lib/use-escape-key";
 import { useContactsStore } from "@/components/scl/contacts-store";
-import { LabelChip } from "@/components/scl/app-shell";
+import { LabelChip, StatusPill, type statusTone } from "@/components/scl/app-shell";
 import type { Broadcast, BroadcastRun, ContactLabel } from "@/components/scl/mock-data";
 
 /* How one send session performed: the five numbers for that occurrence, then
@@ -39,9 +39,9 @@ export function BroadcastSessionAnalytics({
   const kpis = [
     { l: "Audience", v: run.audience, icon: Users, color: "text-foreground" },
     { l: "Reach", v: run.reach, icon: Send, color: "text-foreground" },
-    { l: "Delivered", v: run.delivered, icon: CheckCheck, color: "text-sky-300" },
-    { l: "Read", v: run.read, icon: Eye, color: "text-emerald-300" },
-    { l: "Failed", v: run.failed, icon: AlertTriangle, color: "text-red-300" },
+    { l: "Delivered", v: run.delivered, icon: CheckCheck, color: "text-sky-600" },
+    { l: "Read", v: run.read, icon: Eye, color: "text-emerald-600" },
+    { l: "Failed", v: run.failed, icon: AlertTriangle, color: "text-red-600" },
   ];
 
   // Recipients for this run. Seeded off the run id, so each session in a
@@ -320,20 +320,14 @@ export function BroadcastSessionAnalytics({
 }
 
 export function ContactStatusBadge({ status }: { status: ContactRowStatus }) {
-  const map: Record<ContactRowStatus, string> = {
-    Sent: "border-border bg-white/[0.04] text-muted-foreground",
-    Delivered: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-    Read: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-    Replied: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-    Failed: "border-red-500/30 bg-red-500/10 text-red-300",
+  const tone: Record<ContactRowStatus, keyof typeof statusTone> = {
+    Sent: "neutral",
+    Delivered: "info",
+    Read: "positive",
+    Replied: "accent",
+    Failed: "danger",
   };
-  return (
-    <span
-      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${map[status]}`}
-    >
-      {status}
-    </span>
-  );
+  return <StatusPill tone={tone[status]}>{status}</StatusPill>;
 }
 
 export function TableFooterPagination({

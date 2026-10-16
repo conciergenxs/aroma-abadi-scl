@@ -1,4 +1,4 @@
-import { AppShell, SectionCard, ChannelDot } from "@/components/scl/app-shell";
+import { AppShell, SectionCard, ChannelDot, StatusPill } from "@/components/scl/app-shell";
 import { useBroadcastsStore, broadcastsStore } from "@/components/scl/broadcasts-store";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
@@ -234,17 +234,17 @@ function BroadcastListPage() {
                     </td>
                     <td className="px-4 py-3 text-[13px] text-muted-foreground">{b.sentAt}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
+                      <StatusPill
+                        tone={
                           b.status === "Sent"
-                            ? "border-emerald-700 bg-emerald-600 text-white"
+                            ? "positive"
                             : b.status === "Scheduled"
-                              ? "border-amber-700 bg-amber-600 text-white"
-                              : "border-slate-600 bg-slate-500 text-white"
-                        }`}
+                              ? "warning"
+                              : "neutral"
+                        }
                       >
                         {b.status}
-                      </span>
+                      </StatusPill>
                     </td>
                   </tr>
                 ))}

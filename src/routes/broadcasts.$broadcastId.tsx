@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { variableLabel } from "@/components/scl/template-vars";
 import { fmtNum } from "@/lib/fmt";
-import { AppShell } from "@/components/scl/app-shell";
+import { AppShell, StatusPill } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useBroadcastsStore, broadcastRuns } from "@/components/scl/broadcasts-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
@@ -386,18 +386,12 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
 }
 
 export function RunStatusBadge({ status }: { status: BroadcastRun["status"] }) {
-  const tone =
-    status === "Success"
-      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-      : status === "Partial"
-        ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-        : "border-red-500/30 bg-red-500/10 text-red-300";
   return (
-    <span
-      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${tone}`}
+    <StatusPill
+      tone={status === "Success" ? "positive" : status === "Partial" ? "warning" : "danger"}
     >
       {status}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -405,17 +399,11 @@ export function RunStatusBadge({ status }: { status: BroadcastRun["status"] }) {
 
 function StatusBadge({ status }: { status: Broadcast["status"] }) {
   return (
-    <span
-      className={`badge-animate inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
-        status === "Sent"
-          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-          : status === "Scheduled"
-            ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-            : "border-border bg-white/[0.04] text-muted-foreground"
-      }`}
+    <StatusPill
+      tone={status === "Sent" ? "positive" : status === "Scheduled" ? "warning" : "neutral"}
     >
       {status}
-    </span>
+    </StatusPill>
   );
 }
 
