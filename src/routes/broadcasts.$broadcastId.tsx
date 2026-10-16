@@ -602,9 +602,9 @@ function PhoneFrame({
             }`}
           >
             {children}
+            {/* -mb-2 cancels the bubble's own bottom padding, so the gap under
+                the label matches the one above it. */}
             {ctaButtons.length > 0 && (
-              {/* -mb-2 cancels the bubble's own bottom padding: without it the
-              {/* gap under the label is the row's padding plus the bubble's. */}
               <div className="-mx-3 -mb-2 mt-2">
                 {ctaButtons.map((b, i) => (
                   <div
