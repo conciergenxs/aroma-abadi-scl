@@ -50,7 +50,9 @@ function BroadcastDetailPage() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      {/* The shell's own bottom gutter leaves the logs table sitting tight
+          against the viewport edge on this page; give it 30px more. */}
+      <div className="space-y-6 pb-[30px]">
         <BroadcastDetails broadcast={broadcast} />
         <BroadcastLogs broadcast={broadcast} />
       </div>
@@ -302,7 +304,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
 /** Logs list dates, not relative words: "Today · 09:00" tells you nothing a
  * week later. The time comes off whatever the send recorded, so a series that
  * runs twice in a day stays readable. */
-function fmtSentAt(run: BroadcastRun) {
+export function fmtSentAt(run: BroadcastRun) {
   if (!run.sentAtDate) return run.sentAt;
   const [y, m, d] = run.sentAtDate.split("-");
   const time = run.sentAt.match(/(\d{1,2}):(\d{2})/);
@@ -439,7 +441,7 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
                   <th className="px-4 py-3 text-left font-medium">Delivered</th>
                   <th className="px-4 py-3 text-left font-medium">Read</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="w-[120px] px-4 py-3 text-left font-medium">Action</th>
+                  <th className="w-[170px] px-4 py-3 text-left font-medium">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -457,7 +459,7 @@ function BroadcastLogs({ broadcast }: { broadcast: Broadcast }) {
                       <Link
                         to="/broadcast-log/$broadcastId/$logId"
                         params={{ broadcastId: broadcast.id, logId: run.id }}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-2.5 h-8 text-[13px] transition-colors duration-150"
+                        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-card/60 hover:bg-card px-2.5 h-8 text-[13px] transition-colors duration-150"
                       >
                         <Eye className="h-3.5 w-3.5" /> View Details
                       </Link>

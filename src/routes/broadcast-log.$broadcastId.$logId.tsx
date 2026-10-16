@@ -7,7 +7,7 @@ import {
   findBroadcastRun,
 } from "@/components/scl/broadcasts-store";
 import { BroadcastSessionAnalytics } from "@/components/scl/broadcast-session-analytics";
-import { RunStatusBadge } from "./broadcasts.$broadcastId";
+import { RunStatusBadge, fmtSentAt } from "./broadcasts.$broadcastId";
 
 /* One send session of a broadcast. Reached from the Broadcast Logs table, and
  * the only place broadcast performance is read: a recurring series is measured
@@ -58,12 +58,14 @@ function BroadcastLogPage() {
         <ChevronLeft className="h-3.5 w-3.5" /> Back to Broadcast
       </Link>
 
-      <div className="mt-3 mb-6">
+      {/* Which send this is sits at the far right of the title row rather than
+          under it — the row was empty on that side. */}
+      <div className="mt-3 mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-semibold tracking-tight">{run.sentAt}</h1>
+          <h1 className="text-xl font-semibold tracking-tight tabular-nums">{fmtSentAt(run)}</h1>
           <RunStatusBadge status={run.status} />
         </div>
-        <p className="text-[12px] text-muted-foreground mt-1.5">
+        <p className="text-[12px] text-muted-foreground">
           {broadcast.name} · send {position} of {runs.length}
           {broadcast.recurrence ? ` · ${broadcast.recurrence.summary}` : ""}
         </p>

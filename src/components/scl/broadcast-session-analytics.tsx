@@ -163,7 +163,8 @@ export function BroadcastSessionAnalytics({
         })}
       </div>
 
-      <div className="rounded-xl border border-border bg-card/60 glass overflow-hidden">
+      {/* No overflow-hidden: the date filter's popover has to escape the card. */}
+      <div className="rounded-xl border border-border bg-card/60 glass">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
           <div>
             <h3 className="text-[14px] font-medium">Contact Performance</h3>
@@ -264,14 +265,10 @@ export function BroadcastSessionAnalytics({
                         aria-label={`Select ${contact.name}`}
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-primary/15 text-primary text-[12px] font-medium grid place-items-center">
-                          {contact.avatar}
-                        </div>
-                        <span className="font-medium">{contact.name}</span>
-                      </div>
-                    </td>
+                    {/* No avatar: WhatsApp profile photos aren't available to
+                        us, and initials in a circle say nothing the name next
+                        to them doesn't already say. */}
+                    <td className="px-4 py-3 font-medium">{contact.name}</td>
                     <td className="px-4 py-3 text-[12px] text-muted-foreground tabular-nums whitespace-nowrap">
                       {contact.phone}
                     </td>
