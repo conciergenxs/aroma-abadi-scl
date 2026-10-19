@@ -177,7 +177,23 @@ function BroadcastListPage() {
         </div>
 
         <SectionCard>
-          <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-b border-border">
+          {/* Card header carries the primary action; the row under it is for
+              narrowing what the table shows. */}
+          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
+            <div>
+              <h3 className="text-[14px] font-medium">All Broadcasts</h3>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
+                Search, filter, and manage campaigns.
+              </p>
+            </div>
+            <Link
+              to="/broadcasts/new"
+              className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+            >
+              <Plus className="h-3.5 w-3.5" /> Create Broadcast
+            </Link>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
@@ -205,8 +221,7 @@ function BroadcastListPage() {
                 );
               })}
             </div>
-            {/* Kept at the right edge beside the primary action rather than
-                centred over the table. */}
+            {/* Kept at the right edge rather than centred over the table. */}
             <div className="ml-auto flex items-center gap-3">
               <div
                 role="group"
@@ -232,13 +247,6 @@ function BroadcastListPage() {
                   );
                 })}
               </div>
-              <div aria-hidden className="h-6 w-px bg-border" />
-              <Link
-                to="/broadcasts/new"
-                className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-              >
-                <Plus className="h-3.5 w-3.5" /> Create Broadcast
-              </Link>
             </div>
           </div>
 

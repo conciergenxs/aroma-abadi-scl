@@ -2242,6 +2242,9 @@ function KnowledgeCardForm({
     (!titleEn.trim() || !textEn.trim()) && ("en" as const),
     (!titleId.trim() || !textId.trim()) && ("id" as const),
   ].filter(Boolean) as ContentLang[];
+  // Quiet until a save is attempted — see ModuleFormModal for the same rule.
+  const [triedSave, setTriedSave] = useState(false);
+  const warning = triedSave ? langWarning(missingLangs, "title and content") : "";
 
   // Portaled to <body> — this form can be opened from deep inside a
   // SectionCard/Accordion tree, and any ancestor's `backdrop-filter`
@@ -2256,7 +2259,7 @@ function KnowledgeCardForm({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (missingLangs.length > 0) return;
+          if (missingLangs.length > 0) return setTriedSave(true);
           onSubmit({
             title: titleEn.trim(),
             titleId: titleId.trim(),
@@ -2275,7 +2278,11 @@ function KnowledgeCardForm({
               {initial ? "Edit Knowledge Card" : "Add Knowledge Card"}
             </div>
             <div aria-hidden className="h-6 w-px bg-border" />
-            <LangToggle value={lang} onChange={setLang} incomplete={missingLangs} />
+            <LangToggle
+              value={lang}
+              onChange={setLang}
+              incomplete={triedSave ? missingLangs : []}
+            />
           </div>
           <button type="button" onClick={onClose} aria-label="Close">
             <X className="h-4 w-4" />
@@ -2393,9 +2400,7 @@ function KnowledgeCardForm({
           </div>
         </div>
         <div className="p-4 border-t border-border flex items-center justify-between gap-3">
-          <p className="text-[12px] text-amber-600">
-            {langWarning(missingLangs, "title and content")}
-          </p>
+          <p className="text-[12px] text-amber-600">{warning}</p>
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
@@ -2404,14 +2409,17 @@ function KnowledgeCardForm({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={missingLangs.length > 0}
-              title={langWarning(missingLangs, "title and content") || undefined}
-              className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
-            >
-              Save
-            </button>
+            {/* Disabled, but the wrapper still hears the click that asks for
+                the warning. */}
+            <span onClick={() => setTriedSave(true)}>
+              <button
+                type="submit"
+                disabled={missingLangs.length > 0}
+                className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none transition-opacity duration-150"
+              >
+                Save
+              </button>
+            </span>
           </div>
         </div>
       </form>
