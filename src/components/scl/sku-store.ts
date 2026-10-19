@@ -23,12 +23,21 @@ export type Attachment = {
   url: string;
 };
 
+/* Module and card copy is authored in both languages and stored side by side:
+ * the BA app renders whichever one matches the language a Beauty Ambassador
+ * picked in their LMS profile. The artwork is shared — only the words differ,
+ * so a cover is uploaded once. */
+export type ContentLang = "en" | "id";
+
 export type KnowledgeCard = {
   id: string;
   coverUrl?: string;
   title: string;
+  titleId: string;
   subtitle?: string;
+  subtitleId?: string;
   text: string;
+  textId: string;
 };
 
 export type SKU = {
@@ -49,6 +58,7 @@ export type SKU = {
 export type Module = {
   id: string;
   name: string;
+  nameId: string;
   coverUrl?: string;
   knowledgeCards: KnowledgeCard[];
 };
@@ -235,7 +245,9 @@ export function availableOdooProducts(importedCodes: string[]): OdooProduct[] {
   return ODOO_CATALOG.filter((p) => !importedCodes.includes(p.code));
 }
 
-const STORAGE_KEY = "aroma_sku_store_v6";
+// v7: every module and knowledge card now carries both languages, so cached
+// v6 data would render half-empty rows when the BA app asks for Indonesian.
+const STORAGE_KEY = "aroma_sku_store_v7";
 
 function seed(): Brand[] {
   return [
@@ -257,7 +269,8 @@ function seed(): Brand[] {
               title: "Sicilian Motifs",
               titleId: "Motif Sisilia",
               text: "Lemon, lace, and majolica tile patterns recur across packaging and counter displays — reference them when describing the brand story.",
-              textId: "Motif lemon, renda, dan ubin majolika berulang di kemasan dan display counter — pakai sebagai pegangan saat menceritakan kisah brand.",
+              textId:
+                "Motif lemon, renda, dan ubin majolika berulang di kemasan dan display counter — pakai sebagai pegangan saat menceritakan kisah brand.",
             },
           ],
         },
@@ -273,7 +286,8 @@ function seed(): Brand[] {
               title: "Tester Rotation",
               titleId: "Rotasi Tester",
               text: "Replace testers every 4 weeks or sooner if visibly used; keep them capped between demonstrations.",
-              textId: "Ganti tester setiap 4 minggu, atau lebih cepat bila terlihat sudah banyak dipakai; tutup kembali setiap selesai demo.",
+              textId:
+                "Ganti tester setiap 4 minggu, atau lebih cepat bila terlihat sudah banyak dipakai; tutup kembali setiap selesai demo.",
             },
           ],
         },
@@ -326,7 +340,8 @@ function seed(): Brand[] {
                   title: "Undertone Test",
                   titleId: "Tes Undertone",
                   text: "Compare the bullet against the inner wrist — warm undertones lean coral-red, cool undertones lean berry-pink.",
-                  textId: "Bandingkan batang lipstik dengan bagian dalam pergelangan tangan — undertone hangat condong ke coral-red, undertone dingin condong ke berry-pink.",
+                  textId:
+                    "Bandingkan batang lipstik dengan bagian dalam pergelangan tangan — undertone hangat condong ke coral-red, undertone dingin condong ke berry-pink.",
                 },
               ],
             },
@@ -376,7 +391,8 @@ function seed(): Brand[] {
                   title: "Texture & Finish",
                   titleId: "Tekstur & Hasil Akhir",
                   text: "Hydra-crème delivers a satin finish with a fine sheen, non-transferring after setting in 2 minutes.",
-                  textId: "Hydra-crème memberi hasil akhir satin dengan kilau halus, dan tidak berpindah saat bersentuhan setelah set 2 menit.",
+                  textId:
+                    "Hydra-crème memberi hasil akhir satin dengan kilau halus, dan tidak berpindah saat bersentuhan setelah set 2 menit.",
                 },
                 {
                   id: "kc-dg-2",
@@ -384,7 +400,8 @@ function seed(): Brand[] {
                   title: "Shade Story",
                   titleId: "Pilihan Shade",
                   text: "Available in 12 shades from nude to deep red, all suitable for Indonesian skin tones.",
-                  textId: "Tersedia dalam 12 shade dari nude sampai deep red, semuanya cocok untuk warna kulit Indonesia.",
+                  textId:
+                    "Tersedia dalam 12 shade dari nude sampai deep red, semuanya cocok untuk warna kulit Indonesia.",
                 },
               ],
             },
@@ -410,7 +427,8 @@ function seed(): Brand[] {
               title: "Plant-Based Actives",
               titleId: "Bahan Aktif Nabati",
               text: "Sisley blends botanical extracts with skincare actives so makeup doubles as skin treatment.",
-              textId: "Sisley memadukan ekstrak botani dengan bahan aktif skincare sehingga makeup sekaligus merawat kulit.",
+              textId:
+                "Sisley memadukan ekstrak botani dengan bahan aktif skincare sehingga makeup sekaligus merawat kulit.",
             },
           ],
         },
@@ -449,7 +467,8 @@ function seed(): Brand[] {
                   title: "Three-Point Check",
                   titleId: "Cek Tiga Titik",
                   text: "Test on jaw, neck, and chest — the shade should disappear into all three under natural light.",
-                  textId: "Tes di rahang, leher, dan dada — shade yang tepat akan menyatu di ketiganya saat dilihat di cahaya alami.",
+                  textId:
+                    "Tes di rahang, leher, dan dada — shade yang tepat akan menyatu di ketiganya saat dilihat di cahaya alami.",
                 },
               ],
             },
@@ -493,7 +512,8 @@ function seed(): Brand[] {
                   title: "Application",
                   titleId: "Cara Aplikasi",
                   text: "Pour 1-2 drops on the back of hand, blend with a round brush from the center of the face.",
-                  textId: "Tuang 1-2 tetes di punggung tangan, ratakan dengan brush bulat mulai dari tengah wajah.",
+                  textId:
+                    "Tuang 1-2 tetes di punggung tangan, ratakan dengan brush bulat mulai dari tengah wajah.",
                 },
               ],
             },
@@ -538,7 +558,8 @@ function seed(): Brand[] {
                   title: "Layering Tips",
                   titleId: "Tips Layering",
                   text: "Apply with a kabuki brush for natural coverage, or a damp sponge for full coverage.",
-                  textId: "Pakai kabuki brush untuk coverage natural, atau sponge lembap untuk coverage penuh.",
+                  textId:
+                    "Pakai kabuki brush untuk coverage natural, atau sponge lembap untuk coverage penuh.",
                 },
               ],
             },
@@ -564,7 +585,8 @@ function seed(): Brand[] {
               title: "Since 1834",
               titleId: "Sejak 1834",
               text: "Rimmel London is one of the oldest cosmetics brands, known for democratizing trend-led makeup.",
-              textId: "Rimmel London adalah salah satu brand kosmetik tertua, dikenal membuat makeup yang mengikuti tren jadi terjangkau untuk semua.",
+              textId:
+                "Rimmel London adalah salah satu brand kosmetik tertua, dikenal membuat makeup yang mengikuti tren jadi terjangkau untuk semua.",
             },
           ],
         },
@@ -683,7 +705,8 @@ function seed(): Brand[] {
                   title: "Long-wear Promise",
                   titleId: "Janji Ketahanan",
                   text: "Clinically tested to last 16 hours without touch-ups for indoor activities.",
-                  textId: "Teruji klinis bertahan 16 jam tanpa retouch untuk aktivitas dalam ruangan.",
+                  textId:
+                    "Teruji klinis bertahan 16 jam tanpa retouch untuk aktivitas dalam ruangan.",
                 },
               ],
             },
@@ -709,7 +732,8 @@ function seed(): Brand[] {
               title: "Backstage Roots",
               titleId: "Akar Backstage",
               text: "Founded by a celebrity makeup artist, the brand's products were originally built for backstage and editorial work.",
-              textId: "Didirikan oleh makeup artist selebritas; produknya awalnya dibuat untuk kebutuhan backstage dan pemotretan editorial.",
+              textId:
+                "Didirikan oleh makeup artist selebritas; produknya awalnya dibuat untuk kebutuhan backstage dan pemotretan editorial.",
             },
           ],
         },
@@ -769,7 +793,8 @@ function seed(): Brand[] {
                   title: "Universal Shade",
                   titleId: "Shade Universal",
                   text: "Translucent means it can be worn on all skin tones without altering the foundation's color.",
-                  textId: "Translucent berarti bisa dipakai di semua warna kulit tanpa mengubah warna foundation.",
+                  textId:
+                    "Translucent berarti bisa dipakai di semua warna kulit tanpa mengubah warna foundation.",
                 },
               ],
             },
@@ -795,7 +820,8 @@ function seed(): Brand[] {
               title: "Excluded Ingredients",
               titleId: "Bahan yang Tidak Dipakai",
               text: "No parabens, talc, or synthetic fragrance across the mineral makeup range.",
-              textId: "Tanpa paraben, talc, atau parfum sintetis di seluruh rangkaian mineral makeup.",
+              textId:
+                "Tanpa paraben, talc, atau parfum sintetis di seluruh rangkaian mineral makeup.",
             },
           ],
         },
@@ -846,7 +872,8 @@ function seed(): Brand[] {
                   title: "Mineral Formula",
                   titleId: "Formula Mineral",
                   text: "Clean formula without parabens, talc, and fragrance, safe for sensitive skin.",
-                  textId: "Formula clean tanpa paraben, talc, dan parfum, aman untuk kulit sensitif.",
+                  textId:
+                    "Formula clean tanpa paraben, talc, dan parfum, aman untuk kulit sensitif.",
                 },
                 {
                   id: "kc-bm-2",
@@ -854,7 +881,8 @@ function seed(): Brand[] {
                   title: "Application",
                   titleId: "Cara Aplikasi",
                   text: "Tap brush, knock off excess, sweep from apple of cheek towards temples.",
-                  textId: "Celupkan brush, ketuk sisa bedaknya, lalu sapukan dari apple of cheek ke arah pelipis.",
+                  textId:
+                    "Celupkan brush, ketuk sisa bedaknya, lalu sapukan dari apple of cheek ke arah pelipis.",
                 },
               ],
             },
@@ -918,7 +946,8 @@ function seed(): Brand[] {
                   title: "Pillow Talk Family",
                   titleId: "Keluarga Pillow Talk",
                   text: "Four different undertones in one shade family — match it to the customer's natural lip colour, not their skin tone.",
-                  textId: "Empat undertone berbeda dalam satu keluarga shade — cocokkan dengan warna bibir asli, bukan warna kulit.",
+                  textId:
+                    "Empat undertone berbeda dalam satu keluarga shade — cocokkan dengan warna bibir asli, bukan warna kulit.",
                 },
               ],
             },
@@ -982,7 +1011,8 @@ function seed(): Brand[] {
                   title: "Blurring Optics",
                   titleId: "Optik Blurring",
                   text: "Light-reflecting particles soften the look of pores without adding thickness to the layer.",
-                  textId: "Partikel pemantul cahaya menyamarkan pori tanpa menambah ketebalan lapisan.",
+                  textId:
+                    "Partikel pemantul cahaya menyamarkan pori tanpa menambah ketebalan lapisan.",
                 },
               ],
             },
@@ -1046,7 +1076,8 @@ function seed(): Brand[] {
                   title: "Fragrance Free",
                   titleId: "Tanpa Parfum",
                   text: "No added fragrance at all — safe to recommend to customers with reactive skin.",
-                  textId: "Tanpa parfum sama sekali — aman direkomendasikan ke pelanggan dengan kulit reaktif.",
+                  textId:
+                    "Tanpa parfum sama sekali — aman direkomendasikan ke pelanggan dengan kulit reaktif.",
                 },
               ],
             },
@@ -1570,6 +1601,22 @@ export const skuStore = {
     emit();
   },
 };
+
+/* Readers for the language on screen. They fall back to the other language
+ * rather than rendering an empty row: older records created before both
+ * languages were required can still be read while someone fills the gap. */
+export function moduleName(m: Module, lang: ContentLang) {
+  return (lang === "id" ? m.nameId || m.name : m.name || m.nameId) ?? "";
+}
+export function cardTitle(c: KnowledgeCard, lang: ContentLang) {
+  return (lang === "id" ? c.titleId || c.title : c.title || c.titleId) ?? "";
+}
+export function cardSubtitle(c: KnowledgeCard, lang: ContentLang) {
+  return (lang === "id" ? c.subtitleId || c.subtitle : c.subtitle || c.subtitleId) ?? "";
+}
+export function cardText(c: KnowledgeCard, lang: ContentLang) {
+  return (lang === "id" ? c.textId || c.text : c.text || c.textId) ?? "";
+}
 
 export function useSkuStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

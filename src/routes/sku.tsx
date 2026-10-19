@@ -10,6 +10,11 @@ import {
   type SKU,
   type Module,
   type KnowledgeCard,
+  type ContentLang,
+  moduleName,
+  cardTitle,
+  cardSubtitle,
+  cardText,
   type OdooProduct,
 } from "@/components/scl/sku-store";
 import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
@@ -91,6 +96,66 @@ function useImagePicker(onPick: (dataUrl: string) => void) {
     reader.readAsDataURL(file);
   }
   return { fileRef, openPicker, handleChange };
+}
+
+/** "Bahasa Indonesia name is still empty." — says which side is missing so a
+ * disabled Save button isn't a dead end. */
+function langWarning(missing: ContentLang[], what: string) {
+  if (missing.length === 0) return "";
+  const names = missing.map((l) => (l === "id" ? "Bahasa Indonesia" : "English"));
+  const list = names.length > 1 ? `${names[0]} and ${names[1]}` : names[0];
+  // "title and content" is already plural, whichever language is missing.
+  const verb = missing.length > 1 || what.includes(" and ") ? "are" : "is";
+  return `${list} ${what} ${verb} still empty.`;
+}
+
+/* EN / ID switch. In the lists it chooses which language is on screen; in the
+ * forms it chooses which language you are typing, and marks the side that is
+ * still empty — a module or card only saves once both are written. */
+function LangToggle({
+  value,
+  onChange,
+  incomplete = [],
+  className = "",
+}: {
+  value: ContentLang;
+  onChange: (lang: ContentLang) => void;
+  incomplete?: ContentLang[];
+  className?: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Content language"
+      className={`inline-flex items-center rounded-md border border-border bg-card/60 p-0.5 ${className}`}
+    >
+      {(["en", "id"] as ContentLang[]).map((lang) => {
+        const active = value === lang;
+        return (
+          <button
+            key={lang}
+            type="button"
+            onClick={() => onChange(lang)}
+            aria-pressed={active}
+            title={lang === "en" ? "English" : "Bahasa Indonesia"}
+            className={`inline-flex items-center gap-1 h-7 rounded px-2.5 text-[12px] font-semibold transition-colors duration-150 ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {lang.toUpperCase()}
+            {incomplete.includes(lang) && (
+              <span
+                aria-hidden
+                className={`h-1.5 w-1.5 rounded-full ${active ? "bg-primary-foreground" : "bg-amber-500"}`}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 /* Recommended source-image sizes, shown under the upload CTA when creating and
@@ -538,11 +603,11 @@ type ModuleInput = Omit<Module, "id" | "knowledgeCards">;
 const MODULE_CARD_COPY = {
   brand: {
     title: "Brand Modules",
-    description: "Brand-level story, care guides & FAQs.",
+    description: "Story, care guides & FAQs.",
   },
   category: {
     title: "Category Modules",
-    description: "Category-level care guides & FAQs.",
+    description: "Care guides & FAQs.",
   },
 } as const;
 
@@ -568,15 +633,26 @@ function ModulesCard({
   onRemoveCard: (moduleId: string, cardId: string) => void;
 }) {
   const copy = MODULE_CARD_COPY[level];
+  // Which language this section is read in. The BA app picks it up from the
+  // Beauty Ambassador's LMS profile; here it is a preview switch, and the
+  // artwork stays the same either way.
+  const [lang, setLang] = useState<ContentLang>("en");
 
   return (
     <SectionCard
       title={copy.title}
       description={copy.description}
-      action={<AddModuleButton onSubmit={onAddModule} />}
+      action={
+        <div className="flex items-center gap-3">
+          <LangToggle value={lang} onChange={setLang} />
+          <div aria-hidden className="h-6 w-px bg-border" />
+          <AddModuleButton onSubmit={onAddModule} />
+        </div>
+      }
     >
       <ModuleList
         modules={modules}
+        lang={lang}
         onUpdateModule={onUpdateModule}
         onRemove={onRemoveModule}
         onAddCard={onAddCard}
@@ -921,6 +997,7 @@ function CategoryDetail({
   onPickProduct: (product: OdooProduct) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [skuLang, setSkuLang] = useState<ContentLang>("en");
 
   return (
     <div className="space-y-4">
@@ -1032,13 +1109,17 @@ function CategoryDetail({
             title="SKUs"
             description="Products synced from Odoo."
             action={
-              <AddSkuButton
-                importedCodes={brand.categories.flatMap((c) => c.skus).map((s) => s.code)}
-                onPickProduct={onPickProduct}
-              />
+              <div className="flex items-center gap-3">
+                <LangToggle value={skuLang} onChange={setSkuLang} />
+                <div aria-hidden className="h-6 w-px bg-border" />
+                <AddSkuButton
+                  importedCodes={brand.categories.flatMap((c) => c.skus).map((s) => s.code)}
+                  onPickProduct={onPickProduct}
+                />
+              </div>
             }
           >
-            <SkuList brand={brand} category={category} />
+            <SkuList brand={brand} category={category} lang={skuLang} />
           </SectionCard>
         </div>
       </div>
@@ -1146,7 +1227,15 @@ function ListPaginationFooter({
   );
 }
 
-function SkuList({ brand, category }: { brand: Brand; category: Category }) {
+function SkuList({
+  brand,
+  category,
+  lang,
+}: {
+  brand: Brand;
+  category: Category;
+  lang: ContentLang;
+}) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -1177,7 +1266,7 @@ function SkuList({ brand, category }: { brand: Brand; category: Category }) {
       <ListSearchBar value={query} onChange={setQuery} placeholder="Search SKUs…" />
       <ul className="divide-y divide-border">
         {paged.map((s) => (
-          <SkuRow key={s.id} brand={brand} category={category} sku={s} />
+          <SkuRow key={s.id} brand={brand} category={category} sku={s} lang={lang} />
         ))}
         {filtered.length === 0 && (
           <li className="p-6 text-center text-sm text-muted-foreground">
@@ -1205,7 +1294,17 @@ function SkuList({ brand, category }: { brand: Brand; category: Category }) {
   );
 }
 
-function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sku: SKU }) {
+function SkuRow({
+  brand,
+  category,
+  sku,
+  lang,
+}: {
+  brand: Brand;
+  category: Category;
+  sku: SKU;
+  lang: ContentLang;
+}) {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
@@ -1279,6 +1378,7 @@ function SkuRow({ brand, category, sku }: { brand: Brand; category: Category; sk
           <AccordionContent>
             <KnowledgeCards
               cards={sku.knowledgeCards}
+              lang={lang}
               onEdit={(k) => {
                 setEditing(k);
                 setShowForm(true);
@@ -1683,14 +1783,26 @@ function ModuleFormModal({
   onClose: () => void;
   onSubmit: (input: ModuleInput) => void;
 }) {
-  const [name, setName] = useState(initial?.name || "");
+  // One cover, two names: the BA app shows whichever matches the Beauty
+  // Ambassador's LMS language, so neither side may be left empty.
+  const [nameEn, setNameEn] = useState(initial?.name || "");
+  const [nameId, setNameId] = useState(initial?.nameId || "");
+  const [lang, setLang] = useState<ContentLang>("en");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
 
+  const missingLangs: ContentLang[] = [
+    !nameEn.trim() && ("en" as const),
+    !nameId.trim() && ("id" as const),
+  ].filter(Boolean) as ContentLang[];
+  const name = lang === "id" ? nameId : nameEn;
+  const setName = lang === "id" ? setNameId : setNameEn;
+
   function submit() {
-    if (!name.trim()) return toast.error("Name is required.");
+    if (missingLangs.length > 0) return;
     onSubmit({
-      name: name.trim(),
+      name: nameEn.trim(),
+      nameId: nameId.trim(),
       coverUrl: coverUrl || undefined,
     });
   }
@@ -1734,39 +1846,53 @@ function ModuleFormModal({
                 >
                   {coverUrl ? "Replace Photo" : "Upload Photo"}
                 </button>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                <p className="mt-1.5 text-[12px] text-muted-foreground">
                   Recommended: 1:1 ratio (1080×1080px).
                 </p>
+              </div>
+              {/* The cover is shared by both languages; the switch to its right
+                  picks which language the name below is being written in. */}
+              <div className="ml-auto flex items-center gap-3">
+                <div aria-hidden className="h-8 w-px bg-border" />
+                <LangToggle value={lang} onChange={setLang} incomplete={missingLangs} />
               </div>
             </div>
           </div>
           <label className="block">
             <span className="block text-xs text-muted-foreground mb-1">
-              Name <span className="text-rose-500">*</span>
+              Name — {lang === "id" ? "Bahasa Indonesia" : "English"}{" "}
+              <span className="text-rose-500">*</span>
             </span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Skin Prep Routine Guide"
+              placeholder={
+                lang === "id" ? "mis. Panduan Rutinitas Skin Prep" : "e.g. Skin Prep Routine Guide"
+              }
               className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </label>
         </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={submit}
-            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity duration-150"
-          >
-            {initial ? "Save Changes" : "Add Module"}
-          </button>
+        <div className="p-4 border-t border-border flex items-center justify-between gap-3">
+          <p className="text-[12px] text-amber-600">{langWarning(missingLangs, "name")}</p>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-border px-3 h-9 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={submit}
+              disabled={missingLangs.length > 0}
+              title={langWarning(missingLangs, "name") || undefined}
+              className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
+            >
+              {initial ? "Save Changes" : "Add Module"}
+            </button>
+          </div>
         </div>
       </div>
     </div>,
@@ -1779,6 +1905,7 @@ function ModuleFormModal({
  * details-link, since a module isn't a purchasable product. */
 function ModuleList({
   modules,
+  lang,
   onUpdateModule,
   onRemove,
   onAddCard,
@@ -1786,6 +1913,7 @@ function ModuleList({
   onRemoveCard,
 }: {
   modules: Module[];
+  lang: ContentLang;
   onUpdateModule: (moduleId: string, patch: ModuleInput) => void;
   onRemove: (moduleId: string) => void;
   onAddCard: (moduleId: string, card: Omit<KnowledgeCard, "id">) => void;
@@ -1799,7 +1927,10 @@ function ModuleList({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return modules;
-    return modules.filter((m) => m.name.toLowerCase().includes(q));
+    // Search both languages: the name you remember may not be the one on screen.
+    return modules.filter(
+      (m) => m.name.toLowerCase().includes(q) || m.nameId.toLowerCase().includes(q),
+    );
   }, [modules, query]);
 
   useEffect(() => {
@@ -1820,6 +1951,7 @@ function ModuleList({
           <ModuleRow
             key={m.id}
             module={m}
+            lang={lang}
             onEdit={(patch) => onUpdateModule(m.id, patch)}
             onRemove={() => onRemove(m.id)}
             onAddCard={(card) => onAddCard(m.id, card)}
@@ -1853,6 +1985,7 @@ function ModuleList({
 
 function ModuleRow({
   module,
+  lang,
   onEdit,
   onRemove,
   onAddCard,
@@ -1860,6 +1993,7 @@ function ModuleRow({
   onRemoveCard,
 }: {
   module: Module;
+  lang: ContentLang;
   onEdit: (patch: ModuleInput) => void;
   onRemove: () => void;
   onAddCard: (card: Omit<KnowledgeCard, "id">) => void;
@@ -1887,7 +2021,7 @@ function ModuleRow({
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium">{module.name}</div>
+          <div className="text-sm font-medium">{moduleName(module, lang)}</div>
           <div className="mt-0.5 text-xs text-muted-foreground">
             {module.knowledgeCards.length} card{module.knowledgeCards.length === 1 ? "" : "s"}
           </div>
@@ -1929,6 +2063,7 @@ function ModuleRow({
           <AccordionContent>
             <KnowledgeCards
               cards={module.knowledgeCards}
+              lang={lang}
               onEdit={(k) => {
                 setEditing(k);
                 setShowForm(true);
@@ -1969,7 +2104,7 @@ function ModuleRow({
 
       <DeleteConfirmDialog
         open={confirmDelete}
-        title={`Delete "${module.name}"?`}
+        title={`Delete "${moduleName(module, lang)}"?`}
         description={`This removes the module and its ${module.knowledgeCards.length} knowledge card${
           module.knowledgeCards.length === 1 ? "" : "s"
         }. This can't be undone.`}
@@ -1986,10 +2121,12 @@ function ModuleRow({
  * the shared add/edit form state and knows where to persist a delete. */
 function KnowledgeCards({
   cards,
+  lang,
   onEdit,
   onRemove,
 }: {
   cards: KnowledgeCard[];
+  lang: ContentLang;
   onEdit: (card: KnowledgeCard) => void;
   onRemove: (cardId: string) => void;
 }) {
@@ -2014,11 +2151,15 @@ function KnowledgeCards({
             <div className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">
               Knowledge {idx + 1}
             </div>
-            <div className="text-sm font-medium line-clamp-2">{k.title}</div>
-            {k.subtitle && (
-              <div className="text-[11px] text-muted-foreground/80 line-clamp-1">{k.subtitle}</div>
+            <div className="text-sm font-medium line-clamp-2">{cardTitle(k, lang)}</div>
+            {cardSubtitle(k, lang) && (
+              <div className="text-[11px] text-muted-foreground/80 line-clamp-1">
+                {cardSubtitle(k, lang)}
+              </div>
             )}
-            <div className="text-xs text-muted-foreground mt-1 line-clamp-3">{k.text}</div>
+            <div className="text-xs text-muted-foreground mt-1 line-clamp-3">
+              {cardText(k, lang)}
+            </div>
             <div className="mt-2 flex items-center justify-end gap-2">
               <button
                 onClick={() => onEdit(k)}
@@ -2040,7 +2181,7 @@ function KnowledgeCards({
 
       <DeleteConfirmDialog
         open={pendingDelete !== null}
-        title={`Delete "${pendingDelete?.title ?? ""}"?`}
+        title={`Delete "${pendingDelete ? cardTitle(pendingDelete, lang) : ""}"?`}
         description="This knowledge card will be removed. This can't be undone."
         confirmLabel="Delete Card"
         onClose={() => setPendingDelete(null)}
@@ -2064,13 +2205,32 @@ function KnowledgeCardForm({
 }: {
   initial: KnowledgeCard | null;
   onClose: () => void;
-  onSubmit: (data: { title: string; subtitle?: string; text: string; coverUrl?: string }) => void;
+  onSubmit: (data: Omit<KnowledgeCard, "id">) => void;
 }) {
-  const [title, setTitle] = useState(initial?.title || "");
-  const [subtitle, setSubtitle] = useState(initial?.subtitle || "");
-  const [text, setText] = useState(initial?.text || "");
+  // One cover, two sets of words. A card reaches the BA app in the language
+  // the Beauty Ambassador picked, so both sides are written before it saves.
+  const [lang, setLang] = useState<ContentLang>("en");
+  const [titleEn, setTitleEn] = useState(initial?.title || "");
+  const [titleId, setTitleId] = useState(initial?.titleId || "");
+  const [subtitleEn, setSubtitleEn] = useState(initial?.subtitle || "");
+  const [subtitleId, setSubtitleId] = useState(initial?.subtitleId || "");
+  const [textEn, setTextEn] = useState(initial?.text || "");
+  const [textId, setTextId] = useState(initial?.textId || "");
   const [coverUrl, setCoverUrl] = useState(initial?.coverUrl || "");
   const { fileRef, openPicker, handleChange } = useImagePicker(setCoverUrl);
+
+  const isId = lang === "id";
+  const title = isId ? titleId : titleEn;
+  const setTitle = isId ? setTitleId : setTitleEn;
+  const subtitle = isId ? subtitleId : subtitleEn;
+  const setSubtitle = isId ? setSubtitleId : setSubtitleEn;
+  const text = isId ? textId : textEn;
+  const setText = isId ? setTextId : setTextEn;
+  // Subtitle stays optional in both languages; title and content do not.
+  const missingLangs: ContentLang[] = [
+    (!titleEn.trim() || !textEn.trim()) && ("en" as const),
+    (!titleId.trim() || !textId.trim()) && ("id" as const),
+  ].filter(Boolean) as ContentLang[];
 
   // Portaled to <body> — this form can be opened from deep inside a
   // SectionCard/Accordion tree, and any ancestor's `backdrop-filter`
@@ -2085,21 +2245,28 @@ function KnowledgeCardForm({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!title.trim()) return;
+          if (missingLangs.length > 0) return;
           onSubmit({
-            title,
-            subtitle: subtitle.trim() || undefined,
-            text,
+            title: titleEn.trim(),
+            titleId: titleId.trim(),
+            subtitle: subtitleEn.trim() || undefined,
+            subtitleId: subtitleId.trim() || undefined,
+            text: textEn.trim(),
+            textId: textId.trim(),
             coverUrl: coverUrl || undefined,
           });
         }}
         className="w-full max-w-3xl bg-background border border-border rounded-xl overflow-hidden modal-content"
       >
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="text-sm font-semibold">
-            {initial ? "Edit Knowledge Card" : "Add Knowledge Card"}
+        <div className="p-4 border-b border-border flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-semibold">
+              {initial ? "Edit Knowledge Card" : "Add Knowledge Card"}
+            </div>
+            <div aria-hidden className="h-6 w-px bg-border" />
+            <LangToggle value={lang} onChange={setLang} incomplete={missingLangs} />
           </div>
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={onClose} aria-label="Close">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -2168,22 +2335,27 @@ function KnowledgeCardForm({
               </div>
             </div>
             <label className="block">
-              <span className="block text-xs text-muted-foreground mb-1">Title</span>
+              <span className="block text-xs text-muted-foreground mb-1">
+                Title — {isId ? "Bahasa Indonesia" : "English"}{" "}
+                <span className="text-rose-500">*</span>
+              </span>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Card title..."
+                placeholder={isId ? "Judul kartu..." : "Card title..."}
                 className="h-9 w-full rounded-md border border-border bg-card/60 px-2.5 text-sm"
               />
             </label>
             <label className="block">
-              <span className="block text-xs text-muted-foreground mb-1">Subtitle</span>
+              <span className="block text-xs text-muted-foreground mb-1">
+                Subtitle — {isId ? "Bahasa Indonesia" : "English"}
+              </span>
               {/* Two rows tall and fixed there — newlines allowed, no resizing. */}
               <textarea
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
                 rows={2}
-                placeholder="Card subtitle..."
+                placeholder={isId ? "Subjudul kartu..." : "Card subtitle..."}
                 className="w-full rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
               />
             </label>
@@ -2196,30 +2368,40 @@ function KnowledgeCardForm({
            * edge level with the Subtitle field opposite. */}
           <div className="flex-1 min-w-0 p-4 flex flex-col">
             <label className="flex flex-1 min-h-0 flex-col">
-              <span className="block text-xs text-muted-foreground mb-1">Content</span>
+              <span className="block text-xs text-muted-foreground mb-1">
+                Content — {isId ? "Bahasa Indonesia" : "English"}{" "}
+                <span className="text-rose-500">*</span>
+              </span>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Knowledge content..."
+                placeholder={isId ? "Isi knowledge card..." : "Knowledge content..."}
                 className="w-full flex-1 min-h-0 rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
               />
             </label>
           </div>
         </div>
-        <div className="p-4 border-t border-border flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-border px-3 h-9 text-[14px]"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium"
-          >
-            Save
-          </button>
+        <div className="p-4 border-t border-border flex items-center justify-between gap-3">
+          <p className="text-[12px] text-amber-600">
+            {langWarning(missingLangs, "title and content")}
+          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-border px-3 h-9 text-[14px]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={missingLangs.length > 0}
+              title={langWarning(missingLangs, "title and content") || undefined}
+              className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
+            >
+              Save
+            </button>
+          </div>
         </div>
       </form>
     </div>,
