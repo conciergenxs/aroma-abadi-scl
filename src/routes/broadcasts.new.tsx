@@ -45,6 +45,59 @@ export const Route = createFileRoute("/broadcasts/new")({
 });
 
 type SendMode = "now" | "schedule";
+
+/* A scheduled send can repeat. Picking a cadence is what turns it into a
+ * recurring series: the list reads those under "By Recurring", and the series
+ * stays active until somebody switches it off. */
+type Repeat = "none" | "daily" | "weekly" | "monthly" | "yearly";
+const REPEAT_OPTIONS: { id: Repeat; label: string }[] = [
+  { id: "none", label: "Does not repeat" },
+  { id: "daily", label: "Every Day" },
+  { id: "weekly", label: "Every Week" },
+  { id: "monthly", label: "Every Month" },
+  { id: "yearly", label: "Every Year" },
+];
+
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** "Every Wednesday", "Every month on the 24th" — written from the first send
+ * date, which is what the cadence actually repeats from. */
+function repeatSummary(repeat: Repeat, iso: string): string {
+  if (repeat === "none" || !iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  if (repeat === "daily") return "Every day";
+  if (repeat === "weekly") return `Every ${WEEKDAYS[date.getDay()]}`;
+  if (repeat === "monthly") return `Every month on the ${d}${ordinal(d)}`;
+  return `Every year on ${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
+}
+
+function ordinal(d: number) {
+  if (d % 10 === 1 && d !== 11) return "st";
+  if (d % 10 === 2 && d !== 12) return "nd";
+  if (d % 10 === 3 && d !== 13) return "rd";
+  return "th";
+}
+
+function fmtRunLabel(iso: string, time: string) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y} · ${time}`;
+}
 type ContentMode = "template" | "manual";
 type AudienceTab = "list" | "condition";
 
@@ -72,6 +125,8 @@ function CreateBroadcastPage() {
   const [sendMode, setSendMode] = useState<SendMode>("now");
   const [scheduleDate, setScheduleDate] = useState<string>("");
   const [scheduleTime, setScheduleTime] = useState<string>("09:00");
+  const [repeat, setRepeat] = useState<Repeat>("none");
+  const isRecurring = sendMode === "schedule" && repeat !== "none";
 
   // Audience
   const [audienceOpen, setAudienceOpen] = useState(false);
@@ -184,9 +239,21 @@ function CreateBroadcastPage() {
       // audience; the lists above are what actually decide who receives it.
       conditions: conditions.length ? conditions : undefined,
       totalAudience: reach,
-      sendMode,
+      // A cadence turns the scheduled send into a series, which is how the
+      // list tells the two apart; a new series starts switched on.
+      sendMode: isRecurring ? "recurring" : sendMode,
+      recurrence: isRecurring
+        ? {
+            summary: repeatSummary(repeat, scheduleDate),
+            time: scheduleTime,
+            startDate: fmtRunLabel(scheduleDate, scheduleTime).split(" · ")[0],
+            nextRunAt: fmtRunLabel(scheduleDate, scheduleTime),
+          }
+        : undefined,
+      activation: sendMode === "schedule" ? "active" : undefined,
       scheduleDate: sendMode === "schedule" ? scheduleDate : undefined,
       scheduleTime: sendMode === "schedule" ? scheduleTime : undefined,
+      createdAtDate: now.toISOString().slice(0, 10),
       createdBy: "Aria Kapoor",
       createdAt: `Today · ${nowLabel}`,
       contentMode,
@@ -214,7 +281,9 @@ function CreateBroadcastPage() {
       kind === "draft"
         ? "Draft saved"
         : kind === "schedule"
-          ? `Broadcast scheduled for ${scheduleDate} ${scheduleTime}`
+          ? isRecurring
+            ? `Recurring broadcast started — ${repeatSummary(repeat, scheduleDate)} at ${scheduleTime}`
+            : `Broadcast scheduled for ${scheduleDate} ${scheduleTime}`
           : "Broadcast sent";
     toast.success(label);
     navigate({ to: "/broadcasts" });
@@ -422,6 +491,34 @@ function CreateBroadcastPage() {
                     </div>
                     <div className="text-[11px] text-muted-foreground pb-2 sm:pb-2.5">
                       {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                    </div>
+                    {/* Picking a cadence is what makes this a recurring series
+                        rather than a single scheduled send. */}
+                    <div className="sm:col-span-3 border-t border-border pt-3">
+                      <div className="text-[11px] text-muted-foreground mb-1">
+                        Recurring (optional)
+                      </div>
+                      <span className="relative inline-flex items-center">
+                        <select
+                          value={repeat}
+                          onChange={(e) => setRepeat(e.target.value as Repeat)}
+                          aria-label="Repeat"
+                          className="h-9 w-60 appearance-none rounded-md border border-border bg-background/40 pl-3 pr-8 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
+                        >
+                          {REPEAT_OPTIONS.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-2.5 h-3 w-3 text-muted-foreground" />
+                      </span>
+                      {isRecurring && scheduleDate && (
+                        <p className="mt-1.5 text-[12px] text-muted-foreground">
+                          {repeatSummary(repeat, scheduleDate)} at {scheduleTime}, from{" "}
+                          {fmtRunLabel(scheduleDate, scheduleTime)}.
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -842,7 +939,8 @@ function CreateBroadcastPage() {
                 title={blocker ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
-                <CalendarClock className="h-3.5 w-3.5" /> Schedule broadcast
+                <CalendarClock className="h-3.5 w-3.5" />{" "}
+                {isRecurring ? "Start Recurring Broadcast" : "Schedule broadcast"}
               </button>
             ) : (
               <button
