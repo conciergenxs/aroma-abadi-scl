@@ -8,7 +8,9 @@ type State = { broadcasts: Broadcast[] };
 // promoCodeId/recipientCodes fields; v3 keeps the audience conditions a draft
 // was built with; v4 turned the Reseller Promo into a recurring series and
 // gave broadcasts a per-send run history.
-const STORAGE_KEY = "aroma_broadcasts_store_v4";
+// v5 adds the activation state a scheduled or recurring broadcast carries,
+// plus the blocked scheduled example.
+const STORAGE_KEY = "aroma_broadcasts_store_v5";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];
@@ -70,6 +72,12 @@ export const broadcastsStore = {
     state = { broadcasts: state.broadcasts.filter((b) => !set.has(b.id)) };
     emit();
   },
+  setActivation(id: string, activation: "active" | "inactive") {
+    state = {
+      broadcasts: state.broadcasts.map((b) => (b.id === id ? { ...b, activation } : b)),
+    };
+    emit();
+  },
   duplicate(id: string) {
     const src = state.broadcasts.find((b) => b.id === id);
     if (!src) return;
@@ -91,6 +99,59 @@ export const broadcastsStore = {
     return copy;
   },
 };
+
+/* ── What kind of broadcast this is, and what state it is actually in ──────
+ * The three kinds move through different states, and the list is read by
+ * kind:
+ *   One time   → Sent (or still a Draft).
+ *   Scheduled  → Active → Sent, and can be switched off in between. Left off
+ *                past its send time it is Blocked: that send cannot be armed
+ *                again, only rescheduled.
+ *   Recurring  → Active ⇄ Inactive for as long as it runs; deleting one is
+ *                only allowed once it has been switched off. */
+export type BroadcastKind = "one-time" | "scheduled" | "recurring";
+export type LifecycleStatus = "Sent" | "Active" | "Inactive" | "Blocked" | "Draft";
+
+export function broadcastKind(b: Broadcast): BroadcastKind {
+  if (b.sendMode === "recurring") return "recurring";
+  if (b.sendMode === "schedule") return "scheduled";
+  return "one-time";
+}
+
+/** True once a scheduled broadcast's own send time is in the past. */
+export function scheduleHasPassed(b: Broadcast, now = new Date()): boolean {
+  if (!b.scheduleDate) return false;
+  const [y, m, d] = b.scheduleDate.split("-").map(Number);
+  const [hh, mm] = (b.scheduleTime ?? "00:00").split(":").map(Number);
+  return new Date(y, m - 1, d, hh, mm).getTime() < now.getTime();
+}
+
+export function lifecycleStatus(b: Broadcast, now = new Date()): LifecycleStatus {
+  if (b.status === "Draft") return "Draft";
+  const kind = broadcastKind(b);
+  if (kind === "one-time") return "Sent";
+  if (kind === "scheduled") {
+    if (b.status === "Sent") return "Sent";
+    if (b.activation === "inactive") return scheduleHasPassed(b, now) ? "Blocked" : "Inactive";
+    return "Active";
+  }
+  return b.activation === "inactive" ? "Inactive" : "Active";
+}
+
+/** Why a broadcast can't be switched back on, or "" when it can. */
+export function activationBlockedReason(b: Broadcast, now = new Date()): string {
+  if (lifecycleStatus(b, now) !== "Blocked") return "";
+  return "This send time has already passed — reschedule it to send again.";
+}
+
+/** Recurring broadcasts are switched off before they can be deleted, so a
+ * live series can't disappear from under the people it is sending to. */
+export function deleteBlockedReason(b: Broadcast, now = new Date()): string {
+  if (broadcastKind(b) === "recurring" && lifecycleStatus(b, now) === "Active") {
+    return "Deactivate this recurring broadcast before deleting it.";
+  }
+  return "";
+}
 
 export function useBroadcastsStore(): State {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

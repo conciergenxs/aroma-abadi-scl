@@ -1648,6 +1648,11 @@ export type Broadcast = {
   listIds?: string[];
   totalAudience?: number;
   sendMode?: "now" | "schedule" | "recurring";
+  /** Whether a scheduled or recurring broadcast is currently armed. A one-off
+   * send has no activation state — it has either gone out or it hasn't.
+   * A scheduled broadcast left inactive past its send time can't be armed
+   * again: that send is blocked, not merely paused. */
+  activation?: "active" | "inactive";
   /** Set when sendMode is "recurring" — the cadence the series runs on. */
   recurrence?: BroadcastRecurrence;
   /** Send history for a recurring broadcast, newest last. A one-off send
@@ -1822,13 +1827,13 @@ export const broadcasts: Broadcast[] = [
     delivered: 0,
     read: 0,
     clicks: 0,
-    sentAt: "Fri · 08:00",
+    sentAt: "20 Nov 2026 · 08:00",
     status: "Scheduled",
     channelId: "wa-main",
     listIds: ["ls-community", "ls-launch"],
     totalAudience: 84221,
     sendMode: "schedule",
-    scheduleDate: "2026-06-26",
+    scheduleDate: "2026-11-20",
     scheduleTime: "08:00",
     createdAtDate: "2026-06-24",
     createdBy: "Putri Anggraini",
@@ -1837,6 +1842,35 @@ export const broadcasts: Broadcast[] = [
     body: "Hi {{name}} — Promo Ramadhan Glow Set mulai Jumat jam 8 pagi. Akses awal untuk Beauty Club.",
     footer: "Balas STOP untuk berhenti.",
     buttons: [{ label: "Preview drop", kind: "url" }],
+    replied: 0,
+    failed: 0,
+  },
+  {
+    id: "b-sched-blocked",
+    name: "Mid-Year Clearance Reminder",
+    channel: "whatsapp",
+    audience: "Reseller · 1,820",
+    reach: 0,
+    delivered: 0,
+    read: 0,
+    clicks: 0,
+    sentAt: "12 Sep 2026 · 10:00",
+    status: "Scheduled",
+    channelId: "wa-bdg",
+    listIds: ["ls-launch"],
+    totalAudience: 1820,
+    sendMode: "schedule",
+    scheduleDate: "2026-09-12",
+    scheduleTime: "10:00",
+    // Switched off before the send and never switched back on in time.
+    activation: "inactive",
+    createdAtDate: "2026-09-01",
+    createdBy: "Bagus Pratama",
+    createdAt: "01 Sep 2026 · 14:20",
+    contentMode: "template",
+    templateId: "tp3",
+    body: "Hi {{name}}, stok clearance pertengahan tahun tinggal sedikit. Hubungi kami untuk daftar harga reseller.",
+    footer: "Aroma Abadi",
     replied: 0,
     failed: 0,
   },

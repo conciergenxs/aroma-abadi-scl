@@ -1,9 +1,30 @@
 import { AppShell, SectionCard, ChannelDot, StatusPill } from "@/components/scl/app-shell";
-import { useBroadcastsStore, broadcastsStore } from "@/components/scl/broadcasts-store";
+import {
+  useBroadcastsStore,
+  broadcastsStore,
+  broadcastKind,
+  lifecycleStatus,
+  activationBlockedReason,
+  deleteBlockedReason,
+  type BroadcastKind,
+  type LifecycleStatus,
+} from "@/components/scl/broadcasts-store";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
 import { fmtNum } from "@/lib/fmt";
-import { Plus, Search, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Copy,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  Play,
+  Pause,
+} from "lucide-react";
+import type { Broadcast } from "@/components/scl/mock-data";
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -12,13 +33,36 @@ export const Route = createFileRoute("/broadcasts/")({
   component: BroadcastListPage,
 });
 
-const STATUSES = ["All", "Sent", "Scheduled", "Draft"] as const;
-type StatusFilter = (typeof STATUSES)[number];
+/* The list is read one kind at a time: a one-off send, a scheduled send and a
+ * recurring series answer different questions and end in different states, so
+ * each tab carries its own columns and its own set of statuses. */
+const KIND_TABS: { id: BroadcastKind; label: string }[] = [
+  { id: "one-time", label: "One Time" },
+  { id: "scheduled", label: "By Scheduler" },
+  { id: "recurring", label: "By Recurring" },
+];
+
+const KIND_STATUSES: Record<BroadcastKind, LifecycleStatus[]> = {
+  "one-time": ["Sent", "Draft"],
+  scheduled: ["Active", "Inactive", "Blocked", "Sent"],
+  recurring: ["Active", "Inactive"],
+};
+
+const STATUS_TONE: Record<LifecycleStatus, "positive" | "warning" | "neutral" | "danger"> = {
+  Sent: "positive",
+  Active: "positive",
+  Inactive: "neutral",
+  Blocked: "danger",
+  Draft: "neutral",
+};
+
+type StatusFilter = "All" | LifecycleStatus;
 
 function BroadcastListPage() {
   const navigate = useNavigate();
   const { broadcasts } = useBroadcastsStore();
   const [query, setQuery] = useState("");
+  const [kind, setKind] = useState<BroadcastKind>("one-time");
   const [status, setStatus] = useState<StatusFilter>("All");
   const [selected, setSelected] = useState<string[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
@@ -28,7 +72,8 @@ function BroadcastListPage() {
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
     return broadcasts.filter((b) => {
-      if (status !== "All" && b.status !== status) return false;
+      if (broadcastKind(b) !== kind) return false;
+      if (status !== "All" && lifecycleStatus(b) !== status) return false;
       if (!q) return true;
       return (
         b.name.toLowerCase().includes(q) ||
@@ -36,7 +81,16 @@ function BroadcastListPage() {
         b.channel.toLowerCase().includes(q)
       );
     });
-  }, [query, status, broadcasts]);
+  }, [query, kind, status, broadcasts]);
+
+  // Switching tabs clears a status that doesn't exist in the new one.
+  useEffect(() => {
+    setStatus((cur) =>
+      cur === "All" || KIND_STATUSES[kind].includes(cur as LifecycleStatus) ? cur : "All",
+    );
+    setPage(1);
+    setSelected([]);
+  }, [kind]);
 
   const stats = useMemo(() => {
     const sent = broadcasts.filter((b) => b.status === "Sent");
@@ -87,9 +141,21 @@ function BroadcastListPage() {
     setSelected([]);
   };
   const doDelete = () => {
-    const count = selected.length;
-    broadcastsStore.deleteMany(selected);
-    toast.success(`${count} broadcast${count === 1 ? "" : "s"} deleted`);
+    // A live recurring series is switched off before it can be deleted — the
+    // bulk path can't be a way around that.
+    const blocked = broadcasts.filter(
+      (b) => selected.includes(b.id) && deleteBlockedReason(b) !== "",
+    );
+    const deletable = selected.filter((id) => !blocked.some((b) => b.id === id));
+    if (deletable.length > 0) broadcastsStore.deleteMany(deletable);
+    if (deletable.length > 0) {
+      toast.success(`${deletable.length} broadcast${deletable.length === 1 ? "" : "s"} deleted`);
+    }
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} recurring broadcast${blocked.length === 1 ? " was" : "s were"} skipped — deactivate ${blocked.length === 1 ? "it" : "them"} first.`,
+      );
+    }
     setSelected([]);
   };
 
@@ -120,7 +186,7 @@ function BroadcastListPage() {
               />
             </div>
             <div className="flex items-center gap-1 flex-wrap">
-              {STATUSES.map((s) => {
+              {(["All", ...KIND_STATUSES[kind]] as StatusFilter[]).map((s) => {
                 const sel = status === s;
                 return (
                   <button
@@ -137,7 +203,34 @@ function BroadcastListPage() {
                 );
               })}
             </div>
-            <div className="ml-auto">
+            {/* Kept at the right edge beside the primary action rather than
+                centred over the table. */}
+            <div className="ml-auto flex items-center gap-3">
+              <div
+                role="group"
+                aria-label="Broadcast type"
+                className="inline-flex items-center rounded-md border border-border bg-card/60 p-0.5"
+              >
+                {KIND_TABS.map((t) => {
+                  const active = kind === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setKind(t.id)}
+                      aria-pressed={active}
+                      className={`h-8 rounded px-3 text-[13px] font-medium transition-colors duration-150 ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <div aria-hidden className="h-6 w-px bg-border" />
               <Link
                 to="/broadcasts/new"
                 className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
@@ -188,13 +281,18 @@ function BroadcastListPage() {
                   </th>
                   <th className="px-4 py-3 text-left font-medium">Name</th>
                   <th className="px-4 py-3 text-left font-medium">Channel</th>
+                  {kind === "recurring" && (
+                    <th className="px-4 py-3 text-left font-medium">Recurring</th>
+                  )}
                   <th className="px-4 py-3 text-left font-medium">Audience</th>
-                  <th className="px-4 py-3 text-right font-medium">Reach</th>
-                  <th className="px-4 py-3 text-right font-medium">Delivered</th>
-                  <th className="px-4 py-3 text-right font-medium">Read</th>
-                  <th className="px-4 py-3 text-right font-medium">Clicks</th>
-                  <th className="px-4 py-3 text-left font-medium">Sent</th>
+                  <th className="px-4 py-3 text-left font-medium">Reach</th>
+                  <th className="px-4 py-3 text-left font-medium">Delivered</th>
+                  <th className="px-4 py-3 text-left font-medium">Read</th>
+                  <th className="px-4 py-3 text-left font-medium">
+                    {kind === "one-time" ? "Sent" : kind === "scheduled" ? "Schedule" : "Next Send"}
+                  </th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
+                  <th className="w-12 px-4 py-3" />
                 </tr>
               </thead>
               <tbody key={`${safePage}-${pageSize}`} className="divide-y divide-border stagger">
@@ -219,39 +317,38 @@ function BroadcastListPage() {
                     <td className="px-4 py-3">
                       <ChannelDot channel={b.channel} />
                     </td>
+                    {kind === "recurring" && (
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center rounded-full border border-border bg-white/[0.04] px-2.5 py-0.5 text-[12px] text-muted-foreground">
+                          {b.recurrence?.summary ?? "—"}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-4 py-3 text-[13px]">{b.audience}</td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">
-                      {fmtNum(b.reach)}
+                    <td className="px-4 py-3 text-[13px] tabular-nums">{fmtNum(b.reach)}</td>
+                    <td className="px-4 py-3 text-[13px] tabular-nums">{fmtNum(b.delivered)}</td>
+                    <td className="px-4 py-3 text-[13px] tabular-nums">{fmtNum(b.read)}</td>
+                    <td className="px-4 py-3 text-[13px] text-muted-foreground whitespace-nowrap">
+                      {kind === "recurring"
+                        ? (b.recurrence?.nextRunAt ?? "—")
+                        : kind === "scheduled"
+                          ? [b.scheduleDate, b.scheduleTime].filter(Boolean).join(" · ")
+                          : b.sentAt}
                     </td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">
-                      {fmtNum(b.delivered)}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">
-                      {fmtNum(b.read)}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] text-right tabular-nums">
-                      {fmtNum(b.clicks)}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] text-muted-foreground">{b.sentAt}</td>
                     <td className="px-4 py-3">
-                      <StatusPill
-                        tone={
-                          b.status === "Sent"
-                            ? "positive"
-                            : b.status === "Scheduled"
-                              ? "warning"
-                              : "neutral"
-                        }
-                      >
-                        {b.status}
+                      <StatusPill tone={STATUS_TONE[lifecycleStatus(b)]}>
+                        {lifecycleStatus(b)}
                       </StatusPill>
+                    </td>
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <BroadcastRowMenu broadcast={b} />
                     </td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
                   <tr>
                     <td
-                      colSpan={10}
+                      colSpan={kind === "recurring" ? 11 : 10}
                       className="px-4 py-10 text-center text-xs text-muted-foreground"
                     >
                       {broadcasts.length === 0 ? (
@@ -354,5 +451,94 @@ function BroadcastListPage() {
         onClose={() => setBulkDeleteOpen(false)}
       />
     </AppShell>
+  );
+}
+
+/* Per-row actions. What is offered depends on where the broadcast is in its
+ * own lifecycle: a scheduled send can be switched off until its time passes,
+ * a recurring series can be switched off and on for as long as it runs, and a
+ * live series has to be switched off before it can be deleted. */
+function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const kind = broadcastKind(broadcast);
+  const state = lifecycleStatus(broadcast);
+  const canToggle = kind !== "one-time" && state !== "Sent" && state !== "Draft";
+  const isActive = state === "Active";
+  const activationReason = activationBlockedReason(broadcast);
+  const deleteReason = deleteBlockedReason(broadcast);
+
+  return (
+    <div ref={ref} className="relative flex justify-end">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-label={`Actions for ${broadcast.name}`}
+        className="h-8 w-8 grid place-items-center rounded-md border border-border hover:bg-gray-50 transition-colors duration-150"
+      >
+        <MoreHorizontal className="h-3.5 w-3.5" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-9 z-30 w-56 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
+          {canToggle && (
+            <button
+              type="button"
+              disabled={!isActive && activationReason !== ""}
+              title={!isActive ? activationReason || undefined : undefined}
+              onClick={() => {
+                broadcastsStore.setActivation(broadcast.id, isActive ? "inactive" : "active");
+                toast.success(isActive ? "Broadcast deactivated" : "Broadcast activated");
+                setOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              {isActive ? "Deactivate" : "Activate"}
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={deleteReason !== ""}
+            title={deleteReason || undefined}
+            onClick={() => {
+              setConfirmDelete(true);
+              setOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+          {(activationReason || deleteReason) && (
+            <p className="px-3 pt-1 pb-2 text-[12px] text-amber-600">
+              {deleteReason || activationReason}
+            </p>
+          )}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={`Delete "${broadcast.name}"?`}
+        description="This broadcast and its send history will be removed. This can't be undone."
+        confirmLabel="Delete Broadcast"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          broadcastsStore.deleteMany([broadcast.id]);
+          toast.success("Broadcast deleted");
+          setConfirmDelete(false);
+        }}
+      />
+    </div>
   );
 }
