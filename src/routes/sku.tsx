@@ -1795,6 +1795,10 @@ function ModuleFormModal({
     !nameEn.trim() && ("en" as const),
     !nameId.trim() && ("id" as const),
   ].filter(Boolean) as ContentLang[];
+  // The form stays quiet until someone actually tries to save: a warning that
+  // greets you on an empty form is noise, not help.
+  const [triedSave, setTriedSave] = useState(false);
+  const warning = triedSave ? langWarning(missingLangs, "name") : "";
   const name = lang === "id" ? nameId : nameEn;
   const setName = lang === "id" ? setNameId : setNameEn;
 
@@ -1854,7 +1858,11 @@ function ModuleFormModal({
                   picks which language the name below is being written in. */}
               <div className="ml-auto flex items-center gap-3">
                 <div aria-hidden className="h-8 w-px bg-border" />
-                <LangToggle value={lang} onChange={setLang} incomplete={missingLangs} />
+                <LangToggle
+                  value={lang}
+                  onChange={setLang}
+                  incomplete={triedSave ? missingLangs : []}
+                />
               </div>
             </div>
           </div>
@@ -1874,7 +1882,7 @@ function ModuleFormModal({
           </label>
         </div>
         <div className="p-4 border-t border-border flex items-center justify-between gap-3">
-          <p className="text-[12px] text-amber-600">{langWarning(missingLangs, "name")}</p>
+          <p className="text-[12px] text-amber-600">{warning}</p>
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
@@ -1883,15 +1891,18 @@ function ModuleFormModal({
             >
               Cancel
             </button>
-            <button
-              type="button"
-              onClick={submit}
-              disabled={missingLangs.length > 0}
-              title={langWarning(missingLangs, "name") || undefined}
-              className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
-            >
-              {initial ? "Save Changes" : "Add Module"}
-            </button>
+            {/* The button stays disabled, but the wrapper still hears the
+                click — that attempt is what surfaces the warning. */}
+            <span onClick={() => setTriedSave(true)}>
+              <button
+                type="button"
+                onClick={submit}
+                disabled={missingLangs.length > 0}
+                className="rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none transition-opacity duration-150"
+              >
+                {initial ? "Save Changes" : "Add Module"}
+              </button>
+            </span>
           </div>
         </div>
       </div>
