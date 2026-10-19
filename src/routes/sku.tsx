@@ -18,6 +18,7 @@ import {
   type OdooProduct,
 } from "@/components/scl/sku-store";
 import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
+import { RichTextEditor, htmlToText } from "@/components/scl/rich-text-editor";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatIDR } from "@/components/scl/transactions-store";
 import {
@@ -2169,7 +2170,7 @@ function KnowledgeCards({
               </div>
             )}
             <div className="text-xs text-muted-foreground mt-1 line-clamp-3">
-              {cardText(k, lang)}
+              {htmlToText(cardText(k, lang))}
             </div>
             <div className="mt-2 flex items-center justify-end gap-2">
               <button
@@ -2238,9 +2239,12 @@ function KnowledgeCardForm({
   const text = isId ? textId : textEn;
   const setText = isId ? setTextId : setTextEn;
   // Subtitle stays optional in both languages; title and content do not.
+  // Content is HTML now: an empty editor can still hold markup, and a card
+  // that is only an image still counts as written.
+  const hasContent = (html: string) => htmlToText(html) !== "" || /<img/i.test(html);
   const missingLangs: ContentLang[] = [
-    (!titleEn.trim() || !textEn.trim()) && ("en" as const),
-    (!titleId.trim() || !textId.trim()) && ("id" as const),
+    (!titleEn.trim() || !hasContent(textEn)) && ("en" as const),
+    (!titleId.trim() || !hasContent(textId)) && ("id" as const),
   ].filter(Boolean) as ContentLang[];
   // Quiet until a save is attempted — see ModuleFormModal for the same rule.
   const [triedSave, setTriedSave] = useState(false);
@@ -2265,8 +2269,8 @@ function KnowledgeCardForm({
             titleId: titleId.trim(),
             subtitle: subtitleEn.trim() || undefined,
             subtitleId: subtitleId.trim() || undefined,
-            text: textEn.trim(),
-            textId: textId.trim(),
+            text: textEn,
+            textId: textId,
             coverUrl: coverUrl || undefined,
           });
         }}
@@ -2388,18 +2392,22 @@ function KnowledgeCardForm({
            * height; the textarea then flexes to fill it, landing its bottom
            * edge level with the Subtitle field opposite. */}
           <div className="flex-1 min-w-0 p-4 flex flex-col">
-            <label className="flex flex-1 min-h-0 flex-col">
+            <div className="flex flex-1 min-h-0 flex-col">
               <span className="block text-xs text-muted-foreground mb-1">
                 Content — {isId ? "Bahasa Indonesia" : "English"}{" "}
                 <span className="text-rose-500">*</span>
               </span>
-              <textarea
+              {/* Remounted per language so the surface is seeded with that
+                  language's own content instead of keeping the other one. */}
+              <RichTextEditor
+                key={lang}
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={setText}
                 placeholder={isId ? "Isi knowledge card..." : "Knowledge content..."}
-                className="w-full flex-1 min-h-[320px] rounded-md border border-border bg-card/60 px-2.5 py-2 text-[14px] leading-relaxed resize-none"
+                ariaLabel={`Content — ${isId ? "Bahasa Indonesia" : "English"}`}
+                className="flex-1 min-h-[320px]"
               />
-            </label>
+            </div>
           </div>
         </div>
         <div className="p-4 border-t border-border flex items-center justify-between gap-3">
