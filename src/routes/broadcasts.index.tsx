@@ -43,9 +43,11 @@ const KIND_TABS: { id: BroadcastKind; label: string }[] = [
 ];
 
 const KIND_STATUSES: Record<BroadcastKind, LifecycleStatus[]> = {
+  // A draft keeps the send mode it was saved with, so it lands in that mode's
+  // tab and has to be filterable there too.
   "one-time": ["Sent", "Draft"],
-  scheduled: ["Active", "Inactive", "Blocked", "Sent"],
-  recurring: ["Active", "Inactive"],
+  scheduled: ["Active", "Inactive", "Blocked", "Sent", "Draft"],
+  recurring: ["Active", "Inactive", "Draft"],
 };
 
 const STATUS_TONE: Record<LifecycleStatus, "positive" | "warning" | "neutral" | "danger"> = {
