@@ -2270,7 +2270,7 @@ function KnowledgeCardForm({
             coverUrl: coverUrl || undefined,
           });
         }}
-        className="w-full max-w-3xl bg-background border border-border rounded-xl overflow-hidden modal-content"
+        className="w-full max-w-5xl max-h-[92vh] overflow-y-auto bg-background border border-border rounded-xl modal-content"
       >
         <div className="p-4 border-b border-border flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -2290,8 +2290,11 @@ function KnowledgeCardForm({
         </div>
         {/* Two columns: cover + title + subtitle on the left, content on the
          * right, split by a vertical separator. */}
-        <div className="flex items-stretch">
-          <div className="w-[42%] shrink-0 p-4 space-y-3">
+        {/* The content box is the field people actually write in, so it gets
+            the room: the cover/title column is kept to a third of the width
+            and the row carries a floor height the textarea grows into. */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:min-h-[460px]">
+          <div className="w-full sm:w-[32%] shrink-0 p-4 space-y-3">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Cover</div>
               <input
@@ -2379,7 +2382,7 @@ function KnowledgeCardForm({
             </label>
           </div>
 
-          <div className="w-px bg-border shrink-0" />
+          <div className="h-px w-full sm:h-auto sm:w-px bg-border shrink-0" />
 
           {/* The row is items-stretch, so this column matches the left one's
            * height; the textarea then flexes to fill it, landing its bottom
@@ -2394,7 +2397,7 @@ function KnowledgeCardForm({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder={isId ? "Isi knowledge card..." : "Knowledge content..."}
-                className="w-full flex-1 min-h-0 rounded-md border border-border bg-card/60 px-2.5 py-2 text-sm resize-none"
+                className="w-full flex-1 min-h-[320px] rounded-md border border-border bg-card/60 px-2.5 py-2 text-[14px] leading-relaxed resize-none"
               />
             </label>
           </div>
