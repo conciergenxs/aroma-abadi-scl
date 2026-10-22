@@ -22,7 +22,7 @@ export const Route = createFileRoute("/invite/set-password")({
 });
 
 const DEFAULT_INVITED_PHONE = "+62 812 3456 7890";
-const DEFAULT_INVITED_ROLE = "Member";
+const DEFAULT_INVITED_ROLE = "Staff";
 
 function SetPasswordPage() {
   const navigate = useNavigate();

@@ -155,7 +155,7 @@ const inputCls =
 
 function WhatsAppTab({ onClose }: { onClose: () => void }) {
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("Member");
+  const [role, setRole] = useState("Staff");
   const [sentLink, setSentLink] = useState<string | null>(null);
 
   if (sentLink) {
@@ -211,10 +211,12 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
         label="Role"
         hint="Set in Roles & Permissions — this is what they'll be assigned on joining."
       >
+        {/* The workspace's real roles — Super Admin isn't offered here, since
+            it is held by the owner rather than handed out in an invite. */}
         <select value={role} onChange={(e) => setRole(e.target.value)} className={inputCls}>
-          <option>Member</option>
+          <option>Staff</option>
+          <option>Area Coordinator</option>
           <option>Admin</option>
-          <option>Owner</option>
         </select>
       </Field>
       <div className="flex justify-end gap-2 pt-2">
