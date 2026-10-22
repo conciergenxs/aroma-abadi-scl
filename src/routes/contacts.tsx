@@ -22,6 +22,7 @@ import {
   contactsStore,
   useContactsStore,
   PROPERTY_TYPE_LABELS,
+  DEFAULT_PROPERTIES,
   type ContactProperty,
   type LifecycleStageDef,
   LIFECYCLE_COLORS,
@@ -432,7 +433,7 @@ function ContactsPage() {
                 onClick={() => setShowManageProps(true)}
                 className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] hover:bg-card transition-colors duration-150"
               >
-                <Settings2 className="h-3.5 w-3.5" /> Manage Properties
+                <Settings2 className="h-3.5 w-3.5" /> Filter Properties
                 <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                   {properties.length}
                 </span>
@@ -888,7 +889,7 @@ function ContactsTable({
     brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [revealTarget, setRevealTarget] = useState<BA | null>(null);
-  // Manage Properties' Visible toggle governs which of these optional
+  // Filter Properties' Visible toggle governs which of these optional
   // columns render — a property missing from the list defaults to shown so
   // this never silently hides a column no one configured.
   const isVisible = (key: string) => properties.find((p) => p.key === key)?.visible !== false;
@@ -914,7 +915,7 @@ function ContactsTable({
   const getBA = (c: Contact) =>
     bas.find((b) => b.waNumber.replace(/\s/g, "") === c.phone.replace(/\s/g, ""));
 
-  // Column layout per view, filtered further by Manage Properties' Visible toggle
+  // Column layout per view, filtered further by Filter Properties' Visible toggle
   const isBaView = view === "ba";
   const isMineView = view === "mine";
   const isAllOrBrand = view === "all" || view.startsWith("brand:");
@@ -1238,6 +1239,32 @@ function ManagePropertiesModal({
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState<ContactProperty | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [resetOpen, setResetOpen] = useState(false);
+
+  // A property someone added here is theirs, so a reset never deletes one —
+  // the defaults go back to how they shipped and the rest is switched off,
+  // which is one toggle away from being back.
+  const custom = properties.filter((p) => !DEFAULT_PROPERTIES.some((d) => d.id === p.id));
+  const isDefault =
+    custom.length === 0 &&
+    properties.length === DEFAULT_PROPERTIES.length &&
+    properties.every((p, i) => {
+      const d = DEFAULT_PROPERTIES[i];
+      return p.id === d.id && p.name === d.name && p.visible === d.visible;
+    });
+
+  const resetToDefault = () => {
+    onChange([
+      ...DEFAULT_PROPERTIES.map((d) => ({ ...d })),
+      ...custom.map((p) => ({ ...p, visible: false })),
+    ]);
+    setResetOpen(false);
+    toast.success(
+      custom.length
+        ? `Properties reset — ${custom.length} custom ${custom.length === 1 ? "property" : "properties"} hidden`
+        : "Properties reset to default",
+    );
+  };
 
   const toggleVisible = (id: string) =>
     onChange(properties.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
@@ -1273,12 +1300,20 @@ function ManagePropertiesModal({
       >
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
-            <div className="text-sm font-medium">Manage Properties</div>
+            <div className="text-sm font-medium">Filter Properties</div>
             <div className="text-[11px] text-muted-foreground">
-              Reorder, show/hide, edit, or add contact properties.
+              Choose which properties show as columns, reorder them, or add your own.
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setResetOpen(true)}
+              disabled={isDefault}
+              title={isDefault ? "Already showing the default properties" : undefined}
+              className="press inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Reset to Default
+            </button>
             <button
               onClick={() => {
                 setEditing(null);
@@ -1383,6 +1418,27 @@ function ManagePropertiesModal({
           }}
         />
       )}
+
+      <ConfirmDialog
+        open={resetOpen}
+        variant="default"
+        title="Reset Properties to Default"
+        confirmLabel="Reset to Default"
+        description={
+          <>
+            The default properties go back to the order, names and columns they started with.
+            {custom.length > 0 && (
+              <>
+                {" "}
+                The {custom.length} propert{custom.length === 1 ? "y" : "ies"} you added{" "}
+                {custom.length === 1 ? "is" : "are"} kept, switched off at the bottom of the list.
+              </>
+            )}
+          </>
+        }
+        onClose={() => setResetOpen(false)}
+        onConfirm={resetToDefault}
+      />
     </div>
   );
 }
