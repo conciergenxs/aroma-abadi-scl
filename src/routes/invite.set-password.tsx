@@ -29,7 +29,9 @@ function SetPasswordPage() {
   const { phone: invitedPhone, role: invitedRole } = Route.useSearch();
   // An invite carries a phone number and a role, not a name — the person
   // types their own, and the workspace needs it before the account exists.
-  const [fullName, setFullName] = useState("");
+  // Kept as two fields, the way the workspace stores and greets people.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -39,14 +41,14 @@ function SetPasswordPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!fullName.trim()) return setError("Please enter your full name.");
-    if (fullName.trim().length < 2) return setError("Please enter your full name.");
+    if (firstName.trim().length < 2) return setError("Please enter your first name.");
+    if (!lastName.trim()) return setError("Please enter your last name.");
     if (password.length < 6) return setError("Password must be at least 6 characters.");
     if (password !== confirmPassword) return setError("Passwords don't match.");
     setLoading(true);
     await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
-    toast.success(`Welcome, ${fullName.trim().split(" ")[0]}. You can now sign in.`);
+    toast.success(`Welcome, ${firstName.trim()}. You can now sign in.`);
     navigate({ to: "/auth" });
   }
 
@@ -63,17 +65,30 @@ function SetPasswordPage() {
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <Field label="Full Name">
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Sarah Amelia"
-              className={inputCls}
-              autoComplete="name"
-              autoFocus
-            />
-          </Field>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="First Name">
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="e.g. Sarah"
+                className={inputCls}
+                autoComplete="given-name"
+                autoFocus
+              />
+            </Field>
+
+            <Field label="Last Name">
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="e.g. Amelia"
+                className={inputCls}
+                autoComplete="family-name"
+              />
+            </Field>
+          </div>
 
           <Field label="Password">
             <div className="relative">
