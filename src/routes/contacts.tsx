@@ -49,6 +49,7 @@ import {
   ListPlus,
   Check,
   Settings2,
+  RotateCcw,
   GripVertical,
   LayoutGrid,
   Rows3,
@@ -88,7 +89,7 @@ function ContactsPage() {
   const setLists = contactsStore.setLists;
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
-  const [showManageProps, setShowManageProps] = useState(false);
+  const [showFilterProps, setShowFilterProps] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [audiencePage, setAudiencePage] = useState(1);
@@ -430,7 +431,7 @@ function ContactsPage() {
                 />
               )}
               <button
-                onClick={() => setShowManageProps(true)}
+                onClick={() => setShowFilterProps(true)}
                 className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] hover:bg-card transition-colors duration-150"
               >
                 <Settings2 className="h-3.5 w-3.5" /> Filter Properties
@@ -535,10 +536,10 @@ function ContactsPage() {
         </div>
       </div>
 
-      {showManageProps && (
-        <ManagePropertiesModal
+      {showFilterProps && (
+        <FilterPropertiesModal
           properties={properties}
-          onClose={() => setShowManageProps(false)}
+          onClose={() => setShowFilterProps(false)}
           onChange={(next) => {
             setProperties(next);
             toast.success("Property updated");
@@ -1227,7 +1228,7 @@ function renderPropertyCell(
   }
 }
 
-function ManagePropertiesModal({
+function FilterPropertiesModal({
   properties,
   onClose,
   onChange,
@@ -1298,19 +1299,19 @@ function ManagePropertiesModal({
         className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-          <div>
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+          <div className="min-w-0">
             <div className="text-sm font-medium">Filter Properties</div>
             <div className="text-[11px] text-muted-foreground">
               Choose which properties show as columns, reorder them, or add your own.
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setResetOpen(true)}
               disabled={isDefault}
               title={isDefault ? "Already showing the default properties" : undefined}
-              className="press inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+              className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset to Default
             </button>
@@ -1319,7 +1320,7 @@ function ManagePropertiesModal({
                 setEditing(null);
                 setShowAdd(true);
               }}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> Add Property
             </button>

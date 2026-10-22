@@ -30,12 +30,7 @@ import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { DataManagementModule } from "@/components/scl/data-management";
-import {
-  useCurrentUser,
-  useWorkspaceTimeZone,
-  sessionStore as workspaceStore,
-  type WorkspaceRole,
-} from "@/components/scl/session-store";
+import { useCurrentUser, type WorkspaceRole } from "@/components/scl/session-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -66,7 +61,6 @@ const NAV: NavSection[] = [
     label: "Data management",
     items: [
       { id: "labels", label: "Labels", enabled: true },
-      { id: "contact-properties", label: "Contact Properties", enabled: true },
       { id: "customer-lifecycle", label: "Customer Lifecycle", enabled: true },
       { id: "recently-deleted", label: "Recently Deleted Contacts", enabled: true },
     ],
@@ -136,7 +130,6 @@ function SettingsPage() {
           {active === "user-management" && <UserManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
           {(active === "labels" ||
-            active === "contact-properties" ||
             active === "customer-lifecycle" ||
             active === "recently-deleted") && <DataManagementModule section={active} />}
         </div>
@@ -147,19 +140,39 @@ function SettingsPage() {
 
 // ---------- General Page ----------
 
+const GENERAL_TABS = ["Profile", "WhatsApp QR Code"] as const;
+type GeneralTab = (typeof GENERAL_TABS)[number];
+
 function GeneralPage() {
-  // One surface: the WhatsApp QR entry point belonged to a multi-agent shared
-  // inbox, which isn't how this workspace works.
+  const [tab, setTab] = useState<GeneralTab>("Profile");
+
   return (
     <div className="space-y-5">
       <div className="px-1 pt-0.5">
         <h2 className="text-xl font-semibold leading-tight m-0">General</h2>
         <p className="text-xs text-muted-foreground mt-1 m-0">
-          Your personal profile and workspace defaults
+          Your personal profile, and how customers reach Arma on WhatsApp
         </p>
       </div>
 
-      <ProfileTab />
+      <div className="flex items-center gap-1 border-b border-border">
+        {GENERAL_TABS.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`relative px-3 py-2 text-[14px] transition-colors duration-150 ${
+              tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t}
+            {tab === t && (
+              <span className="animate-grow-x absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {tab === "Profile" ? <ProfileTab /> : <WhatsAppQrTab />}
     </div>
   );
 }
@@ -168,7 +181,6 @@ function GeneralPage() {
 
 function ProfileTab() {
   const user = useCurrentUser();
-  const timeZone = useWorkspaceTimeZone();
   const [avatar, setAvatar] = useState<string | null>(null);
   const [first, setFirst] = useState(user.name.split(" ")[0] ?? "");
   const [last, setLast] = useState(user.name.split(" ").slice(1).join(" "));
@@ -246,30 +258,115 @@ function ProfileTab() {
           </div>
         </div>
       </SectionCard>
+    </div>
+  );
+}
 
-      <SectionCard title="Workspace defaults">
-        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <div className="text-[12px] text-muted-foreground">Default time zone</div>
-            <span className="relative inline-flex w-full items-center">
-              <select
-                value={timeZone}
-                onChange={(e) => workspaceStore.setTimeZone(e.target.value)}
-                aria-label="Default time zone"
-                className="h-9 w-full appearance-none rounded-md border border-border bg-background/60 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-              >
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 h-3 w-3 text-muted-foreground" />
-            </span>
-            <p className="text-[12px] text-muted-foreground">Used when scheduling broadcasts.</p>
-          </div>
+// ---------- WhatsApp QR Tab ----------
+
+/* The entry point customers use to reach Arma. The workspace answers on one
+ * WhatsApp number, so there is nothing to pick here — only the message the
+ * conversation opens with. */
+
+function WhatsAppQrTab() {
+  const arma = WHATSAPP_CHANNELS[0];
+  const [message, setMessage] = useState("Hi Arma, I'd like to know more about Aroma Abadi.");
+
+  const waLink = useMemo(() => {
+    const phone = arma.phone.replace(/[^\d]/g, "");
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }, [arma.phone, message]);
+
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&bgcolor=ffffff&data=${encodeURIComponent(
+    waLink,
+  )}`;
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(waLink);
+    toast.success("WhatsApp link copied");
+  };
+
+  const download = async () => {
+    try {
+      const res = await fetch(qrSrc);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "arma-whatsapp-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("QR code downloaded");
+    } catch {
+      toast.error("Could not download QR code");
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <SectionCard title="Arma on WhatsApp">
+        <div className="p-5 text-[14px] text-muted-foreground">
+          Put this QR code on packaging, counters or campaign material. Scanning it — or opening the
+          link — starts a WhatsApp chat with Arma, pre-filled with the message below, and the
+          conversation lands in Inbox.
         </div>
       </SectionCard>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] items-start gap-5">
+        <SectionCard title="Opening message">
+          <div className="p-5 space-y-4">
+            <label className="block">
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Pre-filled message
+              </span>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={4}
+                className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-[14px] focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
+              />
+              <p className="mt-1.5 text-[12px] text-muted-foreground">
+                What the customer sends when the chat opens — Arma replies from there.
+              </p>
+            </label>
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Preview">
+          <div className="p-5 flex flex-col items-center text-center gap-3">
+            <div className="rounded-lg border border-border bg-white p-2">
+              <img
+                src={qrSrc}
+                alt="QR code that opens a WhatsApp chat with Arma"
+                className="h-[240px] w-[240px] block"
+              />
+            </div>
+            <div>
+              <div className="text-[14px] font-semibold flex items-center gap-1.5 justify-center">
+                <QrCode className="h-3.5 w-3.5 text-muted-foreground" />
+                {arma.name}
+              </div>
+              <div className="text-[12px] text-muted-foreground">{arma.phone}</div>
+            </div>
+            <div className="flex items-center gap-2 pt-1 w-full">
+              <button
+                onClick={download}
+                className="press flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-[12px] font-medium hover:bg-gray-100 transition-colors duration-150"
+              >
+                <Download className="h-3.5 w-3.5" /> Download QR
+              </button>
+              <button
+                onClick={copy}
+                className="press flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors duration-150"
+              >
+                <Copy className="h-3.5 w-3.5" /> Copy link
+              </button>
+            </div>
+          </div>
+        </SectionCard>
+      </div>
     </div>
   );
 }
@@ -299,24 +396,6 @@ function TextField({
     </label>
   );
 }
-
-// ---------- Workspace defaults ----------
-
-const TIMEZONES = ["(UTC+07:00) Jakarta", "(UTC+08:00) Singapore", "(UTC+00:00) London"];
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-type WorkingHours = { open: boolean; from: string; to: string };
-
-const DEFAULT_HOURS: Record<string, WorkingHours> = {
-  Monday: { open: true, from: "09:00", to: "18:00" },
-  Tuesday: { open: true, from: "09:00", to: "18:00" },
-  Wednesday: { open: true, from: "09:00", to: "18:00" },
-  Thursday: { open: true, from: "09:00", to: "18:00" },
-  Friday: { open: true, from: "09:00", to: "18:00" },
-  Saturday: { open: false, from: "09:00", to: "18:00" },
-  Sunday: { open: false, from: "09:00", to: "18:00" },
-};
 
 type UserRole = WorkspaceRole;
 type UserStatus = "Online" | "Offline" | "Away";
