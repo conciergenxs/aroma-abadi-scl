@@ -9,6 +9,7 @@ import {
 } from "react";
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import { matchBaCredentials } from "@/components/scl/ba-store";
+import { sessionStore } from "@/components/scl/session-store";
 import { Eye, EyeOff, Loader2, Phone, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -138,7 +139,10 @@ function AuthPage() {
         window.localStorage.setItem("scl_authed", "1");
         window.localStorage.setItem("scl_account_password", password);
       }
-      toast.success("Welcome back, Aria.");
+      // Which workspace account signed in decides the role the dashboard runs
+      // with — what they can reach follows from it.
+      const signedIn = sessionStore.signInAs(phone || email);
+      toast.success(`Welcome back, ${signedIn.name.split(" ")[0]}.`);
       navigate({ to: "/" });
       return;
     }

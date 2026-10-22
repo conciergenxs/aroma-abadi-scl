@@ -57,72 +57,29 @@ type PermCategory = {
 
 type CategorySection = { id: string; label: string; categories: PermCategory[] };
 
+/* The permission tree follows this product's own menu. The version inherited
+ * from the generic SCL described a different app — calls, payment links, live
+ * monitoring — while saying nothing about the two things that actually carry
+ * risk here: the knowledge every Beauty Ambassador reads in the LMS, and the
+ * BA accounts themselves. */
 const SCHEMA: CategorySection[] = [
   {
-    id: "core",
-    label: "Core Features",
+    id: "conversations",
+    label: "Conversations & Contacts",
     categories: [
       {
         id: "inbox",
         label: "Inbox",
-        masterLabel: "View Inbox",
-        masterDescription:
-          "Turning on this toggle enables Inbox access and allows individual permissions below to be configured.",
+        masterLabel: "Inbox Access",
+        masterDescription: "Handle WhatsApp conversations with customers and Beauty Ambassadors.",
         groups: [
           {
-            id: "basic",
-            label: "Basic Access",
+            id: "inbox-basic",
+            label: "Conversations",
             items: [
-              {
-                id: "view-conv",
-                label: "View Conversations",
-                select: "3",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              {
-                id: "send-msg",
-                label: "Send Messages",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              {
-                id: "assign-conv",
-                label: "Assign Conversations",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              { id: "send-product", label: "Send Product Links", defaultChecked: true },
-              { id: "send-payment", label: "Send Payment Links", defaultChecked: true },
-              { id: "live-monitor", label: "View Live Monitoring Dashboard" },
-            ],
-          },
-          {
-            id: "inbox-settings",
-            label: "Inbox Settings",
-            items: [
-              { id: "manage-inbox", label: "Manage Inbox Settings" },
-              {
-                id: "view-saved",
-                label: "View Saved Replies",
-                defaultChecked: true,
-                children: [
-                  { id: "create-saved", label: "Create Saved Replies", defaultChecked: true },
-                  { id: "edit-saved", label: "Edit Saved Replies", defaultChecked: true },
-                  { id: "delete-saved", label: "Delete Saved Replies" },
-                ],
-              },
-            ],
-          },
-          {
-            id: "calls",
-            label: "Call Access",
-            items: [
-              { id: "recv-call", label: "Receive Calls", defaultChecked: true },
-              { id: "make-call", label: "Make Calls", defaultChecked: true },
-              { id: "transfer-call", label: "Transfer Calls" },
+              { id: "inbox-view", label: "View Conversations", defaultChecked: true },
+              { id: "inbox-send", label: "Send Messages", defaultChecked: true },
+              { id: "inbox-assign", label: "Assign & Transfer Conversations" },
             ],
           },
         ],
@@ -130,134 +87,26 @@ const SCHEMA: CategorySection[] = [
       {
         id: "contacts",
         label: "Contacts",
-        masterLabel: "View Contacts",
-        masterDescription:
-          "Turning on this toggle enables Contacts access and allows individual permissions below to be configured.",
+        masterLabel: "Contacts Access",
+        masterDescription: "The customer directory, its labels, lifecycle stages and properties.",
         groups: [
           {
-            id: "contact-access",
-            label: "Contact Access",
+            id: "contacts-basic",
+            label: "Contact Records",
             items: [
-              { id: "access-page", label: "Access Contacts Page", defaultChecked: true },
-              {
-                id: "view-detail",
-                label: "View Contact Details",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              {
-                id: "create-contact",
-                label: "Create Contacts",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              {
-                id: "edit-contact",
-                label: "Edit Contacts",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              {
-                id: "assign-contact",
-                label: "Assign Contacts",
-                select: "2",
-                defaultChecked: true,
-                defaultAccess: "full",
-              },
-              { id: "delete-contact", label: "Delete Contacts", select: "2" },
+              { id: "contacts-view", label: "View Contacts", defaultChecked: true },
+              { id: "contacts-create", label: "Create Contacts", defaultChecked: true },
+              { id: "contacts-edit", label: "Edit Contacts", defaultChecked: true },
+              { id: "contacts-delete", label: "Delete Contacts" },
+              { id: "contacts-export", label: "Export Contacts" },
             ],
           },
           {
-            id: "list-mgmt",
-            label: "Audience Management",
+            id: "contacts-schema",
+            label: "Data Structure",
             items: [
-              {
-                id: "add-remove-list",
-                label: "Add / Remove Contacts To Audience",
-                defaultChecked: true,
-              },
-              { id: "export-contacts", label: "Export Contacts" },
-              {
-                id: "view-lists",
-                label: "View Contact Audiences",
-                defaultChecked: true,
-                children: [
-                  { id: "create-list", label: "Create Contact Audiences", defaultChecked: true },
-                  { id: "edit-list", label: "Edit Contact Audiences", defaultChecked: true },
-                  { id: "delete-list", label: "Delete Contact Audiences" },
-                ],
-              },
-            ],
-          },
-          {
-            id: "contact-settings",
-            label: "Contact Settings",
-            items: [
-              {
-                id: "view-labels",
-                label: "View Contact Labels",
-                defaultChecked: true,
-                children: [
-                  { id: "create-labels", label: "Create Contact Labels" },
-                  { id: "edit-labels", label: "Edit Contact Labels" },
-                  { id: "delete-labels", label: "Delete Contact Labels" },
-                ],
-              },
-              {
-                id: "view-properties",
-                label: "View Contact Properties",
-                defaultChecked: true,
-                children: [
-                  { id: "create-properties", label: "Create Contact Properties" },
-                  { id: "edit-properties", label: "Edit Contact Properties" },
-                  { id: "delete-properties", label: "Delete Contact Properties" },
-                ],
-              },
-              { id: "recently-deleted", label: "Access Recently Deleted Contacts" },
-              { id: "conversion-log", label: "Access Conversion Logging Page" },
-            ],
-          },
-        ],
-      },
-      {
-        id: "broadcast",
-        label: "Broadcast",
-        masterLabel: "View Broadcast",
-        masterDescription:
-          "Turning on this toggle enables Broadcast access and allows individual permissions below to be configured.",
-        groups: [
-          {
-            id: "broadcast-mgmt",
-            label: "Broadcast Management",
-            items: [
-              { id: "create-bc", label: "Create Broadcast", defaultChecked: true },
-              { id: "edit-bc", label: "Edit Broadcast", defaultChecked: true },
-              { id: "delete-bc", label: "Delete Broadcast" },
-              { id: "schedule-bc", label: "Schedule Broadcast", defaultChecked: true },
-              { id: "view-bc-analytics", label: "View Broadcast Analytics", defaultChecked: true },
-            ],
-          },
-        ],
-      },
-      {
-        id: "channels",
-        label: "Channels",
-        masterLabel: "View Channels",
-        masterDescription:
-          "Turning on this toggle enables Channels access and allows individual permissions below to be configured.",
-        groups: [
-          {
-            id: "channel-mgmt",
-            label: "Channel Management",
-            items: [
-              { id: "view-connected", label: "View Connected Channels", defaultChecked: true },
-              { id: "connect-new", label: "Connect New Channel" },
-              { id: "edit-channel", label: "Edit Channel Settings", defaultChecked: true },
-              { id: "remove-channel", label: "Remove Channel" },
-              { id: "channel-assign", label: "Manage Channel Assignment", defaultChecked: true },
+              { id: "contacts-properties", label: "Manage Contact Properties" },
+              { id: "contacts-labels", label: "Manage Labels & Lifecycle Stages" },
             ],
           },
         ],
@@ -265,25 +114,145 @@ const SCHEMA: CategorySection[] = [
     ],
   },
   {
-    id: "general",
-    label: "General Setup",
+    id: "outbound",
+    label: "Outbound",
     categories: [
       {
-        id: "company",
-        label: "Company Settings",
-        masterLabel: "Access Company Settings",
-        masterDescription:
-          "Turning on this toggle enables Company Settings access and allows individual permissions below to be configured.",
+        id: "broadcast",
+        label: "Broadcast & Templates",
+        masterLabel: "Broadcast Access",
+        masterDescription: "Compose campaigns, and decide who may actually send them.",
         groups: [
           {
-            id: "company-mgmt",
-            label: "Company Management",
+            id: "broadcast-basic",
+            label: "Campaigns",
             items: [
-              { id: "edit-company", label: "Edit Company Details", defaultChecked: true },
-              { id: "working-hours", label: "Manage Working Hours", defaultChecked: true },
-              { id: "security", label: "Configure Security Settings" },
-              { id: "manage-teams", label: "Manage Teams", defaultChecked: true },
-              { id: "manage-roles", label: "Manage Roles & Permissions" },
+              { id: "broadcast-view", label: "View Broadcasts & Logs", defaultChecked: true },
+              { id: "broadcast-create", label: "Create & Edit Broadcasts" },
+              { id: "broadcast-send", label: "Send & Schedule Broadcasts" },
+              { id: "broadcast-recurring", label: "Start & Stop Recurring Broadcasts" },
+            ],
+          },
+          {
+            id: "broadcast-templates",
+            label: "Templates",
+            items: [
+              { id: "templates-view", label: "View Templates", defaultChecked: true },
+              { id: "templates-manage", label: "Create & Edit Templates" },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "enablement",
+    label: "BA Enablement",
+    categories: [
+      {
+        id: "knowledge",
+        label: "SKU & Knowledge",
+        masterLabel: "Knowledge Access",
+        masterDescription:
+          "Brands, categories, SKUs and the knowledge cards Beauty Ambassadors read in the LMS.",
+        groups: [
+          {
+            id: "knowledge-read",
+            label: "Reading",
+            items: [
+              { id: "knowledge-view", label: "View Knowledge Content", defaultChecked: true },
+            ],
+          },
+          {
+            id: "knowledge-write",
+            label: "Publishing",
+            items: [
+              { id: "knowledge-brands", label: "Manage Brands & Categories" },
+              { id: "knowledge-modules", label: "Manage Modules" },
+              { id: "knowledge-cards", label: "Manage Knowledge Cards" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "ba",
+        label: "Beauty Ambassadors",
+        masterLabel: "BA Access",
+        masterDescription:
+          "The BA directory and their LMS credentials. An Area Coordinator sees only their own area.",
+        groups: [
+          {
+            id: "ba-read",
+            label: "Directory",
+            items: [
+              { id: "ba-view", label: "View Beauty Ambassadors", defaultChecked: true },
+              { id: "ba-scope", label: "See Every Area", select: "2", defaultAccess: "none" },
+            ],
+          },
+          {
+            id: "ba-write",
+            label: "Accounts",
+            items: [
+              { id: "ba-create", label: "Add Beauty Ambassadors" },
+              { id: "ba-edit", label: "Edit BA Details & Brand Assignment" },
+              { id: "ba-password", label: "Reveal & Reset LMS Passwords" },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "commerce",
+    label: "Commerce",
+    categories: [
+      {
+        id: "commerce",
+        label: "Promo, Referral & Transactions",
+        masterLabel: "Commerce Access",
+        masterDescription: "Promo codes, referral seasons and the transaction ledger.",
+        groups: [
+          {
+            id: "commerce-read",
+            label: "Reading",
+            items: [
+              {
+                id: "commerce-view",
+                label: "View Promo, Referral & Transactions",
+                defaultChecked: true,
+              },
+            ],
+          },
+          {
+            id: "commerce-write",
+            label: "Creating",
+            items: [
+              { id: "promo-manage", label: "Create & Edit Promo Codes" },
+              { id: "referral-manage", label: "Create & Edit Referral Seasons" },
+              { id: "transactions-manage", label: "Record Transactions" },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "workspace",
+    label: "Workspace",
+    categories: [
+      {
+        id: "settings",
+        label: "Settings",
+        masterLabel: "Settings Access",
+        masterDescription: "Workspace preferences, the people in it, and what they may do.",
+        groups: [
+          {
+            id: "settings-basic",
+            label: "Settings",
+            items: [
+              { id: "settings-view", label: "Open Settings" },
+              { id: "settings-users", label: "Invite & Manage Users" },
+              { id: "settings-roles", label: "Manage Roles & Permissions" },
             ],
           },
         ],
@@ -302,23 +271,82 @@ function flattenItems(items: PermItem[]): PermItem[] {
   return items.flatMap((i) => [i, ...(i.children ? flattenItems(i.children) : [])]);
 }
 
-function buildDefaultState(): PermState {
+/* What each seeded role starts with. Previously every role was built from the
+ * same defaults, so the four of them differed in name only. */
+const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
+  "Super Admin": { categories: ["*"], items: ["*"] },
+  Admin: {
+    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
+    items: ["*", "-settings-roles"],
+  },
+  // Looks after their own area's BAs; reads knowledge but never edits it, and
+  // the commercial pages aren't theirs at all.
+  "Area Coordinator": {
+    categories: ["inbox", "contacts", "knowledge", "ba"],
+    items: [
+      "inbox-view",
+      "inbox-send",
+      "contacts-view",
+      "contacts-create",
+      "contacts-edit",
+      "knowledge-view",
+      "ba-view",
+      "ba-create",
+      "ba-edit",
+      "ba-password",
+    ],
+  },
+  // Desk work: conversations, contacts and the commercial pages.
+  Staff: {
+    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
+    items: [
+      "inbox-view",
+      "inbox-send",
+      "contacts-view",
+      "contacts-create",
+      "contacts-edit",
+      "broadcast-view",
+      "broadcast-create",
+      "templates-view",
+      "knowledge-view",
+      "ba-view",
+      "commerce-view",
+      "promo-manage",
+      "referral-manage",
+      "transactions-manage",
+    ],
+  },
+};
+
+function buildStateForRole(roleName: string): PermState {
+  const grant = ROLE_GRANTS[roleName];
   const master: Record<string, boolean> = {};
   const items: Record<string, { checked: boolean; access?: AccessOption }> = {};
+  const allows = (list: string[], id: string) =>
+    list.includes("*") ? !list.includes(`-${id}`) : list.includes(id);
+
   for (const sec of SCHEMA) {
     for (const cat of sec.categories) {
-      master[cat.id] = true;
+      master[cat.id] = grant ? allows(grant.categories, cat.id) : true;
       for (const g of cat.groups) {
         for (const it of flattenItems(g.items)) {
+          const checked = grant
+            ? master[cat.id] && allows(grant.items, it.id)
+            : !!it.defaultChecked;
           items[it.id] = {
-            checked: !!it.defaultChecked,
-            access: it.select ? (it.defaultAccess ?? "none") : undefined,
+            checked,
+            access: it.select ? (checked ? "full" : (it.defaultAccess ?? "none")) : undefined,
           };
         }
       }
     }
   }
   return { master, items };
+}
+
+/** A brand-new custom role starts from the quietest sensible position. */
+function buildDefaultState(): PermState {
+  return buildStateForRole("Staff");
 }
 
 // ----- Public types -----
@@ -337,26 +365,26 @@ const SEED_ROLES: Role[] = [
     id: "r-super",
     name: "Super Admin",
     description: "Full unrestricted access to all workspace features and settings.",
-    state: buildDefaultState(),
+    state: buildStateForRole("Super Admin"),
     system: true,
   },
   {
     id: "r-admin",
     name: "Admin",
-    description: "Manages workspace operations, members, and most configuration.",
-    state: buildDefaultState(),
+    description: "Runs the workspace day to day: knowledge, BA accounts, broadcasts and commerce.",
+    state: buildStateForRole("Admin"),
   },
   {
-    id: "r-team-admin",
-    name: "Team Admin",
-    description: "Manages a single team's members, conversations, and assignments.",
-    state: buildDefaultState(),
+    id: "r-area-coordinator",
+    name: "Area Coordinator",
+    description: "Looks after the Beauty Ambassadors in their own area.",
+    state: buildStateForRole("Area Coordinator"),
   },
   {
     id: "r-staff",
     name: "Staff",
-    description: "Day-to-day agent access to inbox, contacts, and broadcasts.",
-    state: buildDefaultState(),
+    description: "Conversations, contacts, and the promo, referral and transaction pages.",
+    state: buildStateForRole("Staff"),
   },
 ];
 
@@ -426,7 +454,7 @@ const SEED_USERS: AssignedUser[] = [
     jobTitle: "Sales Lead",
     team: "Sales",
     assignedDate: "Mar 18, 2024",
-    role: "Team Admin",
+    role: "Area Coordinator",
   },
   {
     id: "u-luca",
@@ -435,7 +463,7 @@ const SEED_USERS: AssignedUser[] = [
     jobTitle: "Marketing Manager",
     team: "Marketing",
     assignedDate: "Apr 04, 2024",
-    role: "Team Admin",
+    role: "Area Coordinator",
   },
   {
     id: "u-sara",

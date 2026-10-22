@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import {
   AppShell,
@@ -58,6 +58,7 @@ import {
   Eye,
   EyeOff,
   Copy,
+  UserCog,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
@@ -277,7 +278,21 @@ function ContactsPage() {
           ? `${visibleContacts.length} contacts in this audience`
           : activeView === "mine"
             ? `${visibleContacts.length} contacts assigned to you`
-            : `${liveContacts.length} contacts · ${lists.length} audiences`
+            : activeView === "ba"
+              ? `${visibleContacts.length} Beauty Ambassadors`
+              : `${liveContacts.length} contacts · ${lists.length} audiences`
+      }
+      actions={
+        activeView === "ba" ? (
+          // This view lists BAs as people; their LMS accounts — brand, store,
+          // credentials — are managed on their own page.
+          <Link
+            to="/ba"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
+          >
+            <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
+          </Link>
+        ) : undefined
       }
       noPadding
     >

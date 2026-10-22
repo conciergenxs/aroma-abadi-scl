@@ -134,19 +134,23 @@ type NavItem = {
   icon: typeof LayoutDashboard;
   exact?: boolean;
   badge?: number;
+  /** Hidden from anyone whose role doesn't carry this. */
+  needs?: Capability;
 };
 const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/inbox", label: "Inbox", icon: Inbox },
-  { to: "/contacts", label: "Contacts", icon: Users },
-  { to: "/broadcasts", label: "Broadcast", icon: Megaphone },
-  { to: "/templates", label: "Templates", icon: FileText },
-  { to: "/sku", label: "SKU & Knowledge", icon: Package },
-  { to: "/transactions", label: "Transactions", icon: Receipt },
-  { to: "/promo-codes", label: "Promo Codes", icon: Tag },
-  { to: "/referral", label: "Referral", icon: Share2 },
+  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox" },
+  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts" },
+  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view" },
+  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view" },
+  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view" },
+  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce" },
+  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce" },
+  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce" },
 ];
-const bottomNav: NavItem[] = [{ to: "/settings", label: "Settings", icon: Settings }];
+const bottomNav: NavItem[] = [
+  { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
+];
 
 /** Whether the sidebar is expanded, remembered per browser. */
 const SIDEBAR_KEY = "aroma_sidebar_expanded";
@@ -167,6 +171,11 @@ export function AppShell({
   backTo?: string;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // A page nobody in this role may open shouldn't be offered in the first
+  // place — an Area Coordinator has no business on the commercial pages.
+  const currentUser = useCurrentUser();
+  const visibleTopNav = topNav.filter((i) => !i.needs || roleCan(currentUser.role, i.needs));
+  const visibleBottomNav = bottomNav.filter((i) => !i.needs || roleCan(currentUser.role, i.needs));
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
   // AppShell remounts on every route change, so this has to outlive it or the
@@ -256,7 +265,7 @@ export function AppShell({
         <nav
           className={`flex-1 w-full py-5 flex flex-col gap-1.5 ${expanded ? "px-2" : "items-center"}`}
         >
-          {topNav.map((item) => {
+          {visibleTopNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
@@ -281,7 +290,7 @@ export function AppShell({
             onClick={() => setInviteOpen(true)}
             expanded={expanded}
           />
-          {bottomNav.map((item) => {
+          {visibleBottomNav.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
@@ -323,7 +332,7 @@ export function AppShell({
               </button>
             </div>
             <nav className="flex-1 overflow-y-auto px-2 py-4 flex flex-col gap-1.5">
-              {topNav.map((item) => (
+              {visibleTopNav.map((item) => (
                 <SidebarLink
                   key={item.to}
                   to={item.to}
@@ -345,7 +354,7 @@ export function AppShell({
                 }}
                 expanded
               />
-              {bottomNav.map((item) => (
+              {visibleBottomNav.map((item) => (
                 <SidebarLink
                   key={item.to}
                   to={item.to}
@@ -499,10 +508,17 @@ export function AppShell({
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 pl-1 pr-2 h-9 rounded-md border border-border bg-card/60 hover:bg-card transition-colors">
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
-                    AK
+                    {currentUser.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
                   </div>
                   <span className="text-[13px] font-medium text-foreground hidden lg:block">
-                    Aria Kapoor
+                    {currentUser.name}
+                  </span>
+                  <span className="text-[12px] text-muted-foreground hidden xl:block">
+                    · {currentUser.role}
                   </span>
                   <ChevronDown className="h-3 w-3 text-muted-foreground hidden lg:block" />
                 </button>
@@ -557,6 +573,7 @@ export function AppShell({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150"
               onClick={() => {
                 if (typeof window !== "undefined") window.localStorage.removeItem("scl_authed");
+                sessionStore.signOut();
                 navigate({ to: "/auth" });
               }}
             >
@@ -715,6 +732,7 @@ export function ChannelDot({ channel }: { channel: "whatsapp" }) {
   );
 }
 
+import { sessionStore, useCurrentUser, roleCan, type Capability } from "./session-store";
 import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 
