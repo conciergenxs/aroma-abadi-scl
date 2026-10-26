@@ -83,6 +83,62 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
     headerMediaName: broadcast.headerMediaName ?? template?.headerMediaName,
   };
 
+  const isMediaHeader = header.headerType === "image" || header.headerType === "video";
+
+  // A template send always has a header slot, even when it is empty — saying so
+  // is clearer than a missing field. A manual message has no such slot.
+  const headerBlock =
+    broadcast.contentMode === "template" ? (
+      <ReadBlock label={`Header · ${headerSummary(header.headerType)}`}>
+        {header.headerType && header.headerType !== "none" ? (
+          header.headerType === "text" ? (
+            <div className="text-[14px] font-semibold leading-relaxed">{header.headerText}</div>
+          ) : (
+            <div className={isMediaHeader ? "" : "max-w-[320px]"}>
+              <MessageHeader {...header} />
+            </div>
+          )
+        ) : (
+          <div className="text-[13px] text-muted-foreground">
+            This template sends without a header.
+          </div>
+        )}
+      </ReadBlock>
+    ) : null;
+
+  const messageBlock = (
+    <ReadBlock label="Message Content">
+      <div className="whitespace-pre-wrap break-words text-[14px] leading-relaxed">
+        {renderWithVars(broadcast.body ?? "")}
+      </div>
+    </ReadBlock>
+  );
+
+  const footerBlock = broadcast.footer ? (
+    <ReadBlock label="Footer">
+      <div className="text-[13px] text-muted-foreground">{broadcast.footer}</div>
+    </ReadBlock>
+  ) : null;
+
+  const buttonsBlock =
+    broadcast.buttons && broadcast.buttons.length > 0 ? (
+      <ReadBlock label="Buttons">
+        <div className="flex flex-wrap gap-1.5">
+          {broadcast.buttons.map((b, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[12px]"
+            >
+              {b.label}
+              <span className="ml-1 text-[12px] text-muted-foreground">
+                · {b.kind === "url" ? "URL" : b.kind === "phone" ? "Phone" : "Reply"}
+              </span>
+            </span>
+          ))}
+        </div>
+      </ReadBlock>
+    ) : null;
+
   const selectedLists = (broadcast.listIds ?? [])
     .map((id) => lists.find((l) => l.id === id))
     .filter(Boolean) as { id: string; name: string }[];
@@ -225,59 +281,32 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
             )}
           </ReadGrid>
           <div className="mt-4 space-y-3">
-            {/* A template send always has a header slot, even when it is empty —
-                saying so is clearer than a missing field. A manual message has
-                no such slot, so nothing is shown for one. */}
-            {broadcast.contentMode === "template" && (
-              <ReadBlock label={`Header · ${headerSummary(header.headerType)}`}>
-                {header.headerType && header.headerType !== "none" ? (
-                  header.headerType === "text" ? (
-                    <div className="text-[14px] font-semibold leading-relaxed">
-                      {header.headerText}
-                    </div>
-                  ) : (
-                    <div className="max-w-[260px]">
-                      <MessageHeader {...header} />
-                    </div>
-                  )
-                ) : (
-                  <div className="text-[13px] text-muted-foreground">
-                    This template sends without a header.
+            {/* A picture or a video is tall, so it sits in half the row and the
+                words run down the other half. Text and documents are a line
+                each — they take the full width and the body follows below. */}
+            {isMediaHeader ? (
+              <>
+                <div className="grid grid-cols-1 items-stretch gap-3 xl:grid-cols-2">
+                  {headerBlock}
+                  <div className="flex flex-col gap-3">
+                    {messageBlock}
+                    {footerBlock}
                   </div>
-                )}
-              </ReadBlock>
+                </div>
+                {buttonsBlock}
+              </>
+            ) : (
+              <>
+                {headerBlock}
+                {messageBlock}
+                {/* Footer and Buttons are both short — side by side on a wide
+                    screen, stacked only when there isn't room. */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 items-stretch gap-3">
+                  {footerBlock}
+                  {buttonsBlock}
+                </div>
+              </>
             )}
-            <ReadBlock label="Message Content">
-              <div className="whitespace-pre-wrap break-words text-[14px] leading-relaxed">
-                {renderWithVars(broadcast.body ?? "")}
-              </div>
-            </ReadBlock>
-            {/* Footer and Buttons are both short — side by side on a wide screen,
-                stacked only when there isn't room. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 items-stretch gap-3">
-              {broadcast.footer && (
-                <ReadBlock label="Footer">
-                  <div className="text-[13px] text-muted-foreground">{broadcast.footer}</div>
-                </ReadBlock>
-              )}
-              {broadcast.buttons && broadcast.buttons.length > 0 && (
-                <ReadBlock label="Buttons">
-                  <div className="flex flex-wrap gap-1.5">
-                    {broadcast.buttons.map((b, i) => (
-                      <span
-                        key={i}
-                        className="inline-flex items-center rounded-md border border-border bg-background/40 px-2 py-1 text-[12px]"
-                      >
-                        {b.label}
-                        <span className="ml-1 text-[12px] text-muted-foreground">
-                          · {b.kind === "url" ? "URL" : b.kind === "phone" ? "Phone" : "Reply"}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </ReadBlock>
-              )}
-            </div>
           </div>
         </Section>
       </div>
