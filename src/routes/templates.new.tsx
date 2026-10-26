@@ -25,6 +25,7 @@ import {
   Lightbulb,
   Image as ImageIcon,
   Video,
+  Paperclip,
   FileText,
   ExternalLink,
   MessageSquare,
@@ -52,7 +53,17 @@ const HEADER_OPTIONS = [
     icon: <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" />,
   },
   { value: "video", label: "Video", icon: <Video className="h-3.5 w-3.5 text-muted-foreground" /> },
+  {
+    value: "document",
+    label: "Document",
+    icon: <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />,
+  },
 ];
+
+/** Header types that carry a file rather than a line of text. */
+const MEDIA_HEADERS = ["image", "video", "document"];
+
+const DOC_ACCEPT = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt";
 
 const BUTTON_OPTIONS = [
   { value: "none", label: "None" },
@@ -192,7 +203,7 @@ export function TemplateForm({ existing }: { existing?: Template }) {
     reader.onerror = () => toast.error("Could not read that file.");
     reader.onload = () => {
       const url = String(reader.result);
-      if (headerType === "video") {
+      if (headerType !== "image") {
         setHeaderMedia({ url, name: file.name });
         return;
       }
@@ -220,12 +231,10 @@ export function TemplateForm({ existing }: { existing?: Template }) {
       body: body.trim(),
       groupId: groupId === "none" ? undefined : groupId,
       language,
-      headerType: headerType as "none" | "text" | "image" | "video",
+      headerType: headerType as "none" | "text" | "image" | "video" | "document",
       headerText: headerType === "text" ? headerText.trim() || undefined : undefined,
-      headerMediaUrl:
-        headerType === "image" || headerType === "video" ? headerMedia?.url : undefined,
-      headerMediaName:
-        headerType === "image" || headerType === "video" ? headerMedia?.name : undefined,
+      headerMediaUrl: MEDIA_HEADERS.includes(headerType) ? headerMedia?.url : undefined,
+      headerMediaName: MEDIA_HEADERS.includes(headerType) ? headerMedia?.name : undefined,
       footer: footer.trim() || undefined,
       promoCodeId: linkedPromoId,
     };
@@ -352,12 +361,18 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                     className="mt-2 w-full h-9 rounded-md border border-border bg-white px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                   />
                 )}
-                {(headerType === "image" || headerType === "video") && (
+                {MEDIA_HEADERS.includes(headerType) && (
                   <div className="mt-2 animate-fade-in">
                     <input
                       ref={headerFileRef}
                       type="file"
-                      accept={headerType === "image" ? "image/*" : "video/*"}
+                      accept={
+                        headerType === "image"
+                          ? "image/*"
+                          : headerType === "video"
+                            ? "video/*"
+                            : DOC_ACCEPT
+                      }
                       className="hidden"
                       onChange={handleHeaderFile}
                     />
@@ -369,17 +384,26 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                             alt=""
                             className="img-fade h-12 w-12 shrink-0 rounded object-cover"
                           />
-                        ) : (
+                        ) : headerType === "video" ? (
                           <video
                             src={headerMedia.url}
                             className="h-12 w-12 shrink-0 rounded object-cover"
                             muted
                           />
+                        ) : (
+                          <div className="grid h-12 w-12 shrink-0 place-items-center rounded border border-border bg-background/40">
+                            <Paperclip className="h-5 w-5 text-muted-foreground" />
+                          </div>
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-[12px] font-medium">{headerMedia.name}</div>
                           <div className="text-[11px] text-muted-foreground">
-                            {headerType === "image" ? "Image" : "Video"} header
+                            {headerType === "image"
+                              ? "Image"
+                              : headerType === "video"
+                                ? "Video"
+                                : "Document"}{" "}
+                            header
                           </div>
                         </div>
                         <button
@@ -406,16 +430,25 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                       >
                         {headerType === "image" ? (
                           <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                        ) : (
+                        ) : headerType === "video" ? (
                           <Video className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <Paperclip className="h-5 w-5 text-muted-foreground" />
                         )}
                         <span className="text-[12px] font-medium text-foreground">
-                          Upload {headerType === "image" ? "image" : "video"}
+                          Upload{" "}
+                          {headerType === "image"
+                            ? "image"
+                            : headerType === "video"
+                              ? "video"
+                              : "document"}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
                           {headerType === "image"
                             ? "JPG, PNG or WebP · 1.91:1 works best"
-                            : "MP4 · up to 16 MB"}
+                            : headerType === "video"
+                              ? "MP4 · up to 16 MB"
+                              : "PDF, DOC, XLSX or PPT · up to 100 MB"}
                         </span>
                       </button>
                     )}
@@ -601,6 +634,12 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                       <Video className="h-4 w-4" />
                     </div>
                   ))}
+                {headerType === "document" && (
+                  <div className="mb-2 flex items-center gap-1.5 rounded border border-border bg-white/[0.05] px-2 py-1.5 text-[10px] text-muted-foreground">
+                    <Paperclip className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{headerMedia?.name ?? "Document header"}</span>
+                  </div>
+                )}
                 {body.trim() ? (
                   <div className="whitespace-pre-wrap break-words">{renderWithVars(body)}</div>
                 ) : (
