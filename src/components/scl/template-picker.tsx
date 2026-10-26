@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { Search, Star, X as XIcon, FileText, ExternalLink, Plus } from "lucide-react";
 import { templatesStore, useTemplatesStore } from "@/components/scl/templates-store";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { MessageHeader } from "./message-header";
 
 import type { Template } from "@/components/scl/mock-data";
 
@@ -262,8 +263,22 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">
                     Preview
                   </div>
-                  <div className="rounded-lg border border-border bg-background/40 px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap">
-                    {renderPreview(selected.body)}
+                  <div className="rounded-lg border border-border bg-background/40 px-3.5 py-2.5 text-[13px] leading-relaxed">
+                    {/* The header is part of the message, so it is part of the
+                        preview — otherwise the composer shows one thing and the
+                        picker another. */}
+                    <MessageHeader
+                      headerType={selected.headerType}
+                      headerText={selected.headerText}
+                      headerMediaUrl={selected.headerMediaUrl}
+                      headerMediaName={selected.headerMediaName}
+                    />
+                    <div className="whitespace-pre-wrap">{renderPreview(selected.body)}</div>
+                    {selected.footer && (
+                      <div className="mt-2 text-[11px] text-muted-foreground">
+                        {selected.footer}
+                      </div>
+                    )}
                   </div>
                   {extractVars(selected.body).length > 0 && (
                     <>

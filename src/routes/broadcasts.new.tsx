@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { variableLabel } from "@/components/scl/template-vars";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { MessageHeader } from "@/components/scl/message-header";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
@@ -260,6 +261,13 @@ function CreateBroadcastPage() {
       createdAt: `Today · ${nowLabel}`,
       contentMode,
       templateId: templateId ?? undefined,
+      // The template's chrome is copied onto the broadcast, not pointed at:
+      // editing the template tomorrow must not rewrite what went out today.
+      headerType: contentMode === "template" ? template?.headerType : undefined,
+      headerText: contentMode === "template" ? template?.headerText : undefined,
+      headerMediaUrl: contentMode === "template" ? template?.headerMediaUrl : undefined,
+      headerMediaName: contentMode === "template" ? template?.headerMediaName : undefined,
+      footer: contentMode === "template" ? template?.footer : undefined,
       promoCodeId: linkedPromo?.id,
       // Kept for a scheduled send too, so the codes the user set aren't lost;
       // they are only handed out (written onto the promo) once it is sent.
@@ -979,11 +987,14 @@ function CreateBroadcastPage() {
               >
                 {previewBody.trim() ? (
                   <div className="space-y-1.5">
-                    {contentMode === "template" &&
-                      template?.headerType === "text" &&
-                      template.headerText && (
-                        <div className="font-semibold text-[12px]">{template.headerText}</div>
-                      )}
+                    {contentMode === "template" && (
+                      <MessageHeader
+                        headerType={template?.headerType}
+                        headerText={template?.headerText}
+                        headerMediaUrl={template?.headerMediaUrl}
+                        headerMediaName={template?.headerMediaName}
+                      />
+                    )}
                     <div className="whitespace-pre-wrap break-words">
                       {renderWithVars(previewBody)}
                     </div>

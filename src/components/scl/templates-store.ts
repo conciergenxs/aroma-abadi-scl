@@ -20,7 +20,9 @@ type State = {
 // re-seed instead of rendering stale records against new code.
 // v3: categories joined groups as editable records.
 // v4: seeded bodies swapped numbered placeholders for named variables.
-const STORAGE_KEY = "aroma_templates_store_v4";
+// v5: three seeded templates carry a text header, the way a real WhatsApp
+// template does — the broadcast detail reads it back.
+const STORAGE_KEY = "aroma_templates_store_v5";
 
 function seedState(): State {
   return {
