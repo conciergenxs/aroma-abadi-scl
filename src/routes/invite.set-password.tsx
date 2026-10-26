@@ -22,11 +22,16 @@ export const Route = createFileRoute("/invite/set-password")({
 });
 
 const DEFAULT_INVITED_PHONE = "+62 812 3456 7890";
-const DEFAULT_INVITED_ROLE = "Member";
+const DEFAULT_INVITED_ROLE = "Staff";
 
 function SetPasswordPage() {
   const navigate = useNavigate();
   const { phone: invitedPhone, role: invitedRole } = Route.useSearch();
+  // An invite carries a phone number and a role, not a name — the person
+  // types their own, and the workspace needs it before the account exists.
+  // Kept as two fields, the way the workspace stores and greets people.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,12 +41,14 @@ function SetPasswordPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    if (firstName.trim().length < 2) return setError("Please enter your first name.");
+    if (!lastName.trim()) return setError("Please enter your last name.");
     if (password.length < 6) return setError("Password must be at least 6 characters.");
     if (password !== confirmPassword) return setError("Passwords don't match.");
     setLoading(true);
     await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
-    toast.success("Password set. You can now sign in.");
+    toast.success(`Welcome, ${firstName.trim()}. You can now sign in.`);
     navigate({ to: "/auth" });
   }
 
@@ -54,10 +61,35 @@ function SetPasswordPage() {
           You've been invited to join the Aroma Abadi workspace as{" "}
           <span className="text-foreground">{invitedPhone || DEFAULT_INVITED_PHONE}</span>, with the
           role of <span className="text-foreground">{invitedRole || DEFAULT_INVITED_ROLE}</span>.
-          Create a password to finish setting up your account.
+          Tell us your name and create a password to finish setting up your account.
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="First Name">
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="e.g. Sarah"
+                className={inputCls}
+                autoComplete="given-name"
+                autoFocus
+              />
+            </Field>
+
+            <Field label="Last Name">
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="e.g. Amelia"
+                className={inputCls}
+                autoComplete="family-name"
+              />
+            </Field>
+          </div>
+
           <Field label="Password">
             <div className="relative">
               <input
@@ -67,7 +99,6 @@ function SetPasswordPage() {
                 placeholder="••••••••"
                 className={`${inputCls} pr-10`}
                 autoComplete="new-password"
-                autoFocus
               />
               <button
                 type="button"

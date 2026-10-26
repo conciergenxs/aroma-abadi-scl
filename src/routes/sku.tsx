@@ -18,6 +18,11 @@ import {
   type OdooProduct,
 } from "@/components/scl/sku-store";
 import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
+import { useCan } from "@/components/scl/session-store";
+
+/** Knowledge is what every Beauty Ambassador reads in the LMS, so editing it
+ *  is held to the two roles that answer for it. */
+const KNOWLEDGE_LOCKED = "Only an Admin or Super Admin can change knowledge content.";
 import { RichTextEditor, htmlToText } from "@/components/scl/rich-text-editor";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatIDR } from "@/components/scl/transactions-store";
@@ -410,6 +415,7 @@ function DeleteConfirmDialog(props: ConfirmDialogProps) {
 
 function SkuPage() {
   const { brands } = useSkuStore();
+  const canManage = useCan("knowledge.manage");
   const [view, setView] = useState<View>({ kind: "brands" });
   const [showBrandForm, setShowBrandForm] = useState(false);
   const [importingSku, setImportingSku] = useState<{
@@ -438,6 +444,7 @@ function SkuPage() {
       {view.kind === "brands" && (
         <BrandsOverview
           brands={brands}
+          canManage={canManage}
           onOpen={(b) => setView({ kind: "brand", brandId: b.id })}
           onAdd={() => setShowBrandForm(true)}
         />
@@ -488,10 +495,12 @@ function SkuPage() {
 
 function BrandsOverview({
   brands,
+  canManage,
   onOpen,
   onAdd,
 }: {
   brands: Brand[];
+  canManage: boolean;
   onOpen: (b: Brand) => void;
   onAdd: () => void;
 }) {
@@ -513,7 +522,9 @@ function BrandsOverview({
         </div>
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+          disabled={!canManage}
+          title={canManage ? undefined : KNOWLEDGE_LOCKED}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           <Plus className="h-4 w-4" /> Add New Brand
         </button>
@@ -1311,6 +1322,7 @@ function SkuRow({
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingSku, setEditingSku] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const canManageKnowledge = useCan("knowledge.manage");
 
   return (
     <li className="p-4">
@@ -1366,7 +1378,9 @@ function SkuRow({
                   setEditing(null);
                   setShowForm(true);
                 }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+                disabled={!canManageKnowledge}
+                title={canManageKnowledge ? undefined : KNOWLEDGE_LOCKED}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Add New
               </button>
@@ -1750,13 +1764,16 @@ function OdooProductPickerModal({
  * own Knowledge Cards; it's reference material, not a purchasable SKU. */
 function AddModuleButton({ onSubmit }: { onSubmit: (input: ModuleInput) => void }) {
   const [open, setOpen] = useState(false);
+  const canManage = useCan("knowledge.manage");
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 transition-colors duration-150"
+        disabled={!canManage}
+        title={canManage ? undefined : KNOWLEDGE_LOCKED}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Add Module
       </button>
@@ -2016,6 +2033,7 @@ function ModuleRow({
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingModule, setEditingModule] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const canManageKnowledge = useCan("knowledge.manage");
 
   return (
     <li className="p-4">
@@ -2062,7 +2080,9 @@ function ModuleRow({
                   setEditing(null);
                   setShowForm(true);
                 }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+                disabled={!canManageKnowledge}
+                title={canManageKnowledge ? undefined : KNOWLEDGE_LOCKED}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Add New
               </button>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { nowWIB } from "@/lib/wib";
 import { fmtDateEN } from "@/lib/fmt";
 import { Toggle } from "@/components/scl/toggle";
-import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { AppShell, SectionCard, StatusPill } from "@/components/scl/app-shell";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FloatingMenu } from "@/components/scl/floating-menu";
 import {
@@ -26,12 +26,11 @@ import {
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
-import { armaPersonasStore, useArmaPersonas } from "@/components/scl/arma-personas-store";
-import { type ArmaPersona } from "@/components/scl/agents";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { DataManagementModule } from "@/components/scl/data-management";
+import { useCurrentUser, type WorkspaceRole } from "@/components/scl/session-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -51,11 +50,9 @@ const NAV: NavSection[] = [
   },
   {
     id: "company",
-    label: "Company settings",
+    label: "Workspace",
     items: [
-      { id: "company-details", label: "Company Details", enabled: true },
       { id: "user-management", label: "User Management", enabled: true },
-      { id: "team-management", label: "Team Management", enabled: true },
       { id: "roles", label: "Roles & Permissions", enabled: true },
     ],
   },
@@ -64,7 +61,6 @@ const NAV: NavSection[] = [
     label: "Data management",
     items: [
       { id: "labels", label: "Labels", enabled: true },
-      { id: "contact-properties", label: "Contact Properties", enabled: true },
       { id: "customer-lifecycle", label: "Customer Lifecycle", enabled: true },
       { id: "recently-deleted", label: "Recently Deleted Contacts", enabled: true },
     ],
@@ -131,23 +127,11 @@ function SettingsPage() {
 
         <div className="space-y-6 min-w-0 self-start">
           {active === "general" && <GeneralPage />}
-          {active === "company-details" && <CompanyDetailsPage />}
           {active === "user-management" && <UserManagementPage />}
-          {active === "team-management" && <TeamManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
           {(active === "labels" ||
-            active === "contact-properties" ||
             active === "customer-lifecycle" ||
             active === "recently-deleted") && <DataManagementModule section={active} />}
-          {active !== "general" &&
-            active !== "company-details" &&
-            active !== "user-management" &&
-            active !== "team-management" &&
-            active !== "roles" &&
-            active !== "labels" &&
-            active !== "contact-properties" &&
-            active !== "customer-lifecycle" &&
-            active !== "recently-deleted" && <ComingSoonPanel id={active} />}
         </div>
       </div>
     </AppShell>
@@ -167,7 +151,7 @@ function GeneralPage() {
       <div className="px-1 pt-0.5">
         <h2 className="text-xl font-semibold leading-tight m-0">General</h2>
         <p className="text-xs text-muted-foreground mt-1 m-0">
-          Your personal profile and conversation entry points
+          Your personal profile, and how customers reach Arma on WhatsApp
         </p>
       </div>
 
@@ -176,7 +160,7 @@ function GeneralPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`relative px-3 py-2 text-sm transition ${
+            className={`relative px-3 py-2 text-[14px] transition-colors duration-150 ${
               tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -195,17 +179,14 @@ function GeneralPage() {
 
 // ---------- Profile Tab ----------
 
-const TEAM_OPTIONS = ["Customer Support", "Sales", "Marketing", "Operations"];
-
 function ProfileTab() {
+  const user = useCurrentUser();
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [first, setFirst] = useState("Aria");
-  const [last, setLast] = useState("Kapoor");
-  const [username, setUsername] = useState("aria.kapoor");
-  const [phone, setPhone] = useState("+62 811 5500 0001");
-  const [job, setJob] = useState("Workspace Owner");
-  const [teams, setTeams] = useState<string[]>(["Customer Support", "Marketing"]);
-  const [link, setLink] = useState("aria-kapoor");
+  const [first, setFirst] = useState(user.name.split(" ")[0] ?? "");
+  const [last, setLast] = useState(user.name.split(" ").slice(1).join(" "));
+  const [username, setUsername] = useState(user.username);
+  const [phone, setPhone] = useState(user.phone);
+  const [job, setJob] = useState(user.job);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fullName = `${first} ${last}`.trim();
@@ -262,32 +243,130 @@ function ProfileTab() {
           <TextField label="Username" value={username} onChange={setUsername} />
           <TextField label="Phone number" value={phone} onChange={setPhone} />
           <TextField label="Job title" value={job} onChange={setJob} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Teams">
-        <div className="p-5">
-          <TeamMultiSelect value={teams} onChange={setTeams} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Unique link">
-        <div className="p-5 space-y-2">
-          <div className="flex items-center rounded-md border border-border bg-background/60 overflow-hidden focus-within:ring-1 focus-within:ring-primary/40">
-            <span className="px-3 text-xs text-muted-foreground border-r border-border">
-              scl.app/u/
-            </span>
-            <input
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-              className="flex-1 h-9 bg-transparent px-3 text-sm focus:outline-none"
-            />
+          {/* Read-only: a role is granted in Roles & Permissions by an admin,
+              never chosen by the person it applies to. */}
+          <div className="space-y-1">
+            <div className="text-[12px] text-muted-foreground">Role</div>
+            <div className="flex h-9 items-center gap-2">
+              <StatusPill tone={user.role === "Staff" ? "neutral" : "positive"}>
+                {user.role}
+              </StatusPill>
+              <span className="text-[12px] text-muted-foreground">
+                Set in Roles &amp; Permissions.
+              </span>
+            </div>
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            Used for direct assignment and QR code routing.
-          </p>
         </div>
       </SectionCard>
+    </div>
+  );
+}
+
+// ---------- WhatsApp QR Tab ----------
+
+/* The entry point customers use to reach Arma. The workspace answers on one
+ * WhatsApp number, so there is nothing to pick here — only the message the
+ * conversation opens with. */
+
+function WhatsAppQrTab() {
+  const arma = WHATSAPP_CHANNELS[0];
+  const [message, setMessage] = useState("Hi Arma, I'd like to know more about Aroma Abadi.");
+
+  const waLink = useMemo(() => {
+    const phone = arma.phone.replace(/[^\d]/g, "");
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }, [arma.phone, message]);
+
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&bgcolor=ffffff&data=${encodeURIComponent(
+    waLink,
+  )}`;
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(waLink);
+    toast.success("WhatsApp link copied");
+  };
+
+  const download = async () => {
+    try {
+      const res = await fetch(qrSrc);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "arma-whatsapp-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("QR code downloaded");
+    } catch {
+      toast.error("Could not download QR code");
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <SectionCard title="Arma on WhatsApp">
+        <div className="p-5 text-[14px] text-muted-foreground">
+          Put this QR code on packaging, counters or campaign material. Scanning it — or opening the
+          link — starts a WhatsApp chat with Arma, pre-filled with the message below, and the
+          conversation lands in Inbox.
+        </div>
+      </SectionCard>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] items-start gap-5">
+        <SectionCard title="Opening message">
+          <div className="p-5 space-y-4">
+            <label className="block">
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Pre-filled message
+              </span>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={4}
+                className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-[14px] focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
+              />
+              <p className="mt-1.5 text-[12px] text-muted-foreground">
+                What the customer sends when the chat opens — Arma replies from there.
+              </p>
+            </label>
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Preview">
+          <div className="p-5 flex flex-col items-center text-center gap-3">
+            <div className="rounded-lg border border-border bg-white p-2">
+              <img
+                src={qrSrc}
+                alt="QR code that opens a WhatsApp chat with Arma"
+                className="h-[240px] w-[240px] block"
+              />
+            </div>
+            <div>
+              <div className="text-[14px] font-semibold flex items-center gap-1.5 justify-center">
+                <QrCode className="h-3.5 w-3.5 text-muted-foreground" />
+                {arma.name}
+              </div>
+              <div className="text-[12px] text-muted-foreground">{arma.phone}</div>
+            </div>
+            <div className="flex items-center gap-2 pt-1 w-full">
+              <button
+                onClick={download}
+                className="press flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-[12px] font-medium hover:bg-gray-100 transition-colors duration-150"
+              >
+                <Download className="h-3.5 w-3.5" /> Download QR
+              </button>
+              <button
+                onClick={copy}
+                className="press flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors duration-150"
+              >
+                <Copy className="h-3.5 w-3.5" /> Copy link
+              </button>
+            </div>
+          </div>
+        </SectionCard>
+      </div>
     </div>
   );
 }
@@ -318,429 +397,7 @@ function TextField({
   );
 }
 
-function TeamMultiSelect({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (v: string[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const toggle = (t: string) =>
-    onChange(value.includes(t) ? value.filter((v) => v !== t) : [...value, t]);
-
-  return (
-    <div className="relative">
-      <div
-        ref={triggerRef}
-        onClick={() => setOpen((o) => !o)}
-        className="flex flex-wrap items-center gap-1.5 min-h-9 rounded-md border border-border bg-background/60 px-2 py-1.5 cursor-pointer focus-within:ring-1 focus-within:ring-primary/40"
-      >
-        {value.length === 0 && (
-          <span className="text-sm text-muted-foreground px-1">Select teams…</span>
-        )}
-        {value.map((t) => (
-          <span
-            key={t}
-            className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/15 px-2 py-0.5 text-xs"
-          >
-            {t}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggle(t);
-              }}
-              className="hover:text-foreground/80 transition-colors duration-150"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </span>
-        ))}
-        <ChevronDown className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
-      </div>
-
-      <FloatingMenu
-        anchorRef={triggerRef}
-        open={open}
-        onClose={() => setOpen(false)}
-        className="rounded-md border border-border bg-popover glass shadow-xl p-1"
-      >
-        {TEAM_OPTIONS.map((t) => {
-          const checked = value.includes(t);
-          return (
-            <button
-              key={t}
-              onClick={() => toggle(t)}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-gray-50 transition-colors duration-150"
-            >
-              <span
-                className={`h-4 w-4 rounded border grid place-items-center ${
-                  checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
-                }`}
-              >
-                {checked && <Check className="h-3 w-3" />}
-              </span>
-              <span>{t}</span>
-            </button>
-          );
-        })}
-      </FloatingMenu>
-    </div>
-  );
-}
-
-// ---------- WhatsApp QR Tab ----------
-
-function WhatsAppQrTab() {
-  const [message, setMessage] = useState("Hi, I would like to learn more about your services.");
-  const [channelId, setChannelId] = useState(WHATSAPP_CHANNELS[0].id);
-  const channel = WHATSAPP_CHANNELS.find((c) => c.id === channelId) ?? WHATSAPP_CHANNELS[0];
-
-  const waLink = useMemo(() => {
-    const phone = channel.phone.replace(/[^\d]/g, "");
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  }, [channel, message]);
-
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&bgcolor=ffffff&data=${encodeURIComponent(
-    waLink,
-  )}`;
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(waLink);
-    toast.success("WhatsApp link copied");
-  };
-
-  const download = async () => {
-    try {
-      const res = await fetch(qrSrc);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `whatsapp-qr-${channel.id}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast.success("QR code downloaded");
-    } catch {
-      toast.error("Could not download QR code");
-    }
-  };
-
-  return (
-    <div className="space-y-5">
-      <SectionCard title="WhatsApp QR code">
-        <div className="p-5 text-sm text-muted-foreground">
-          Customers can scan this QR code or open the generated link to start a WhatsApp
-          conversation with your team — pre-filled with the message below.
-        </div>
-      </SectionCard>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-5">
-        <div className="space-y-5">
-          <SectionCard title="Configuration">
-            <div className="p-5 space-y-4">
-              <label className="block">
-                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Pre-filled message
-                </span>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={4}
-                  className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  WhatsApp channel
-                </span>
-                <div className="relative mt-1">
-                  <select
-                    value={channelId}
-                    onChange={(e) => setChannelId(e.target.value)}
-                    className="h-9 w-full appearance-none rounded-md border border-border bg-background/60 px-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-                  >
-                    {WHATSAPP_CHANNELS.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} — {c.phone}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                </div>
-              </label>
-            </div>
-          </SectionCard>
-        </div>
-
-        <SectionCard title="Preview">
-          <div className="p-5 flex flex-col items-center text-center gap-3">
-            <div className="rounded-lg border border-border bg-white p-2">
-              <img
-                src={qrSrc}
-                alt={`QR for ${channel.name}`}
-                className="h-[240px] w-[240px] block"
-              />
-            </div>
-            <div>
-              <div className="text-sm font-semibold flex items-center gap-1.5 justify-center">
-                <QrCode className="h-3.5 w-3.5 text-muted-foreground" />
-                {channel.name}
-              </div>
-              <div className="text-xs text-muted-foreground">{channel.phone}</div>
-            </div>
-            <div className="flex items-center gap-2 pt-1 w-full">
-              <button
-                onClick={download}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md border border-border bg-white/[0.03] text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
-              >
-                <Download className="h-3.5 w-3.5" /> Download QR
-              </button>
-              <button
-                onClick={copy}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-md bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors duration-150"
-              >
-                <Copy className="h-3.5 w-3.5" /> Copy link
-              </button>
-            </div>
-          </div>
-        </SectionCard>
-      </div>
-    </div>
-  );
-}
-
-// ---------- Coming soon ----------
-
-function ComingSoonPanel({ id }: { id: string }) {
-  const label = NAV.flatMap((s) => s.items).find((i) => i.id === id)?.label ?? "Coming soon";
-  return (
-    <SectionCard title={label}>
-      <div className="p-10 text-center text-sm text-muted-foreground">
-        This settings area is coming soon.
-      </div>
-    </SectionCard>
-  );
-}
-
-// ============================================================
-// Company Details
-// ============================================================
-
-const TIMEZONES = ["(UTC+07:00) Jakarta", "(UTC+08:00) Singapore", "(UTC+00:00) London"];
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-type WorkingHours = { open: boolean; from: string; to: string };
-
-const DEFAULT_HOURS: Record<string, WorkingHours> = {
-  Monday: { open: true, from: "09:00", to: "18:00" },
-  Tuesday: { open: true, from: "09:00", to: "18:00" },
-  Wednesday: { open: true, from: "09:00", to: "18:00" },
-  Thursday: { open: true, from: "09:00", to: "18:00" },
-  Friday: { open: true, from: "09:00", to: "18:00" },
-  Saturday: { open: false, from: "09:00", to: "18:00" },
-  Sunday: { open: false, from: "09:00", to: "18:00" },
-};
-
-function CompanyDetailsPage() {
-  const [tab, setTab] = useState<"Settings" | "Security">("Settings");
-  return (
-    <div className="space-y-5">
-      <div className="px-1 pt-0.5">
-        <h2 className="text-xl font-semibold leading-tight m-0">Company Details</h2>
-        <p className="text-xs text-muted-foreground mt-1 m-0">
-          Workspace-wide identity, working hours, and security
-        </p>
-      </div>
-      <div className="flex items-center gap-1 border-b border-border">
-        {(["Settings", "Security"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`relative px-3 py-2 text-sm transition ${
-              tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t}
-            {tab === t && (
-              <span className="animate-grow-x absolute inset-x-0 -bottom-px h-0.5 bg-primary rounded-full" />
-            )}
-          </button>
-        ))}
-      </div>
-      {tab === "Settings" ? <CompanySettingsTab /> : <CompanySecurityTab />}
-    </div>
-  );
-}
-
-function CompanySettingsTab() {
-  const [name, setName] = useState("Northstar Commerce");
-  const [tz, setTz] = useState(TIMEZONES[0]);
-  const [hoursOn, setHoursOn] = useState(false);
-  const [hours, setHours] = useState(DEFAULT_HOURS);
-
-  return (
-    <div className="space-y-5">
-      <SectionCard title="Company">
-        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextField label="Company name" value={name} onChange={setName} />
-          <label className="block">
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              Default time zone
-            </span>
-            <div className="relative mt-1">
-              <select
-                value={tz}
-                onChange={(e) => setTz(e.target.value)}
-                className="h-9 w-full appearance-none rounded-md border border-border bg-background/60 px-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-              >
-                {TIMEZONES.map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            </div>
-          </label>
-        </div>
-      </SectionCard>
-
-      <SectionCard
-        title="Working hours"
-        action={<Toggle checked={hoursOn} onChange={setHoursOn} />}
-      >
-        <div className="p-5 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            Used for analytics, SLA reporting, and response-time calculations.
-          </p>
-          {hoursOn && (
-            <div className="rounded-lg border border-border divide-y divide-border">
-              {DAYS.map((d) => {
-                const h = hours[d];
-                return (
-                  <div key={d} className="flex items-center gap-3 px-4 py-2.5">
-                    <div className="w-28 text-sm">{d}</div>
-                    <Toggle
-                      checked={h.open}
-                      onChange={(v) => setHours((s) => ({ ...s, [d]: { ...s[d], open: v } }))}
-                    />
-                    {h.open ? (
-                      <div className="flex items-center gap-2 ml-auto">
-                        <input
-                          type="time"
-                          value={h.from}
-                          onChange={(e) =>
-                            setHours((s) => ({
-                              ...s,
-                              [d]: { ...s[d], from: e.target.value },
-                            }))
-                          }
-                          className="h-8 rounded-md border border-border bg-background/60 px-2 text-xs"
-                        />
-                        <span className="text-xs text-muted-foreground">–</span>
-                        <input
-                          type="time"
-                          value={h.to}
-                          onChange={(e) =>
-                            setHours((s) => ({
-                              ...s,
-                              [d]: { ...s[d], to: e.target.value },
-                            }))
-                          }
-                          className="h-8 rounded-md border border-border bg-background/60 px-2 text-xs"
-                        />
-                      </div>
-                    ) : (
-                      <span className="ml-auto text-xs text-muted-foreground">Closed</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </SectionCard>
-    </div>
-  );
-}
-
-function CompanySecurityTab() {
-  const [twoFA, setTwoFA] = useState(false);
-  const [ipOn, setIpOn] = useState(false);
-  const [ips, setIps] = useState<string[]>(["103.22.xxx.xxx", "180.12.xxx.xxx"]);
-  const [draft, setDraft] = useState("");
-
-  return (
-    <div className="space-y-5">
-      <SectionCard
-        title="Two-factor authentication"
-        action={<Toggle checked={twoFA} onChange={setTwoFA} />}
-      >
-        <div className="p-5 text-sm text-muted-foreground">
-          Add an additional layer of protection beyond email and password.
-        </div>
-      </SectionCard>
-
-      <SectionCard title="IP allowlisting" action={<Toggle checked={ipOn} onChange={setIpOn} />}>
-        <div className="p-5 space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Restrict workspace access to approved IP addresses only.
-          </p>
-          {ipOn && (
-            <div className="space-y-3">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Allowed IP addresses
-              </div>
-              <div className="rounded-lg border border-border divide-y divide-border">
-                {ips.map((ip, i) => (
-                  <div key={i} className="flex items-center px-4 py-2.5 text-sm font-mono">
-                    <Shield className="h-3.5 w-3.5 text-muted-foreground mr-2" />
-                    {ip}
-                    <button
-                      onClick={() => setIps((s) => s.filter((_, j) => j !== i))}
-                      className="tap ml-auto h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder="0.0.0.0"
-                  className="h-9 flex-1 rounded-md border border-border bg-background/60 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-primary/40"
-                />
-                <button
-                  onClick={() => {
-                    if (!draft.trim()) return;
-                    setIps((s) => [...s, draft.trim()]);
-                    setDraft("");
-                    toast.success("IP added to allowlist");
-                  }}
-                  className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-                >
-                  <Plus className="h-3.5 w-3.5" /> Add IP address
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </SectionCard>
-    </div>
-  );
-}
-
-// ============================================================
-// User Management
-// ============================================================
-
-type UserRole = "Super Admin" | "Admin" | "Team Admin" | "Staff";
+type UserRole = WorkspaceRole;
 type UserStatus = "Online" | "Offline" | "Away";
 type UserState = "Active" | "Pending";
 
@@ -786,7 +443,7 @@ const USERS_SEED: WorkspaceUser[] = [
     name: "Mei Tanaka",
     email: "mei.tanaka@northstar.co",
     job: "Sales Lead",
-    role: "Team Admin",
+    role: "Area Coordinator",
     status: "Away",
     teams: ["Sales"],
     joinedOn: "Mar 18, 2024",
@@ -797,7 +454,7 @@ const USERS_SEED: WorkspaceUser[] = [
     name: "Luca Romano",
     email: "luca.romano@northstar.co",
     job: "Marketing Manager",
-    role: "Team Admin",
+    role: "Area Coordinator",
     status: "Offline",
     teams: ["Marketing"],
     joinedOn: "Apr 04, 2024",
@@ -849,7 +506,7 @@ const USERS_SEED: WorkspaceUser[] = [
   },
 ];
 
-const ROLE_OPTIONS: UserRole[] = ["Super Admin", "Admin", "Team Admin", "Staff"];
+const ROLE_OPTIONS: UserRole[] = ["Super Admin", "Admin", "Area Coordinator", "Staff"];
 const TEAM_FILTER_OPTIONS = ["All teams", "Customer Support", "Sales", "Marketing", "Operations"];
 
 const statusDot: Record<UserStatus, string> = {
@@ -1105,9 +762,6 @@ function UserManagementPage() {
         </div>
       </SectionCard>
 
-      <ConnectedAgentsSection />
-      <ArmaConfigSection />
-
       <ConfirmDialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
@@ -1158,890 +812,3 @@ const AGENT_META: Record<string, { conversations: number; connectedOn: string }>
   "support-ai": { conversations: 142, connectedOn: "Jan 18, 2024" },
   "sales-ai": { conversations: 87, connectedOn: "Feb 24, 2024" },
 };
-
-function ConnectedAgentsSection() {
-  const agents = useWorkspaceAgents();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [confirm, setConfirm] = useState(false);
-  const [disconnected, setDisconnected] = useState<string[]>([]);
-
-  const visible = agents.filter((a) => !disconnected.includes(a.id));
-  const allSelected = visible.length > 0 && visible.every((a) => selected.includes(a.id));
-
-  const toggleAll = () => setSelected(allSelected ? [] : visible.map((a) => a.id));
-  const toggleOne = (id: string) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const handleDisconnect = () => {
-    setDisconnected((d) => [...d, ...selected]);
-    toast.success(`${selected.length} agent(s) disconnected`);
-    setSelected([]);
-  };
-
-  return (
-    <SectionCard
-      title="Connected AI Agents"
-      description="AI agents that can participate in assignments, collaboration, and conversation ownership."
-    >
-      {selected.length > 0 && (
-        <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
-          <span className="font-medium">{selected.length} selected</span>
-          <button
-            onClick={() => setConfirm(true)}
-            className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Disconnect agent
-          </button>
-        </div>
-      )}
-      <div className="overflow-x-auto scl-scroll">
-        <table className="w-full text-sm min-w-[1100px]">
-          <thead>
-            <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
-              <th className="px-4 py-2.5 text-left w-8">
-                <Checkbox checked={allSelected} onChange={toggleAll} />
-              </th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Agent name</th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Description</th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Webhook URL</th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Status</th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned conversations</th>
-              <th className="px-4 py-2.5 text-left whitespace-nowrap">Connected on</th>
-            </tr>
-          </thead>
-          <tbody className="stagger">
-            {visible.map((a) => {
-              const meta = AGENT_META[a.id] ?? {
-                conversations: 0,
-                connectedOn: "Today",
-              };
-              return (
-                <tr
-                  key={a.id}
-                  className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150"
-                >
-                  <td className="px-4 py-3 align-middle">
-                    <Checkbox checked={selected.includes(a.id)} onChange={() => toggleOne(a.id)} />
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-md bg-primary/15 border border-primary/30 grid place-items-center text-primary">
-                        <Bot className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="font-medium">{a.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground max-w-sm">
-                    <span className="block truncate">{a.description}</span>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground font-mono text-xs max-w-xs">
-                    <span className="block truncate">{a.webhookUrl}</span>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      {a.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {meta.conversations}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
-                    {meta.connectedOn}
-                  </td>
-                </tr>
-              );
-            })}
-            {visible.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                  No AI agents connected.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <ConfirmDialog
-        open={confirm}
-        onClose={() => setConfirm(false)}
-        onConfirm={handleDisconnect}
-        title="Disconnect selected AI agent(s)?"
-        description="The agent will stop receiving assignments and automation events."
-        confirmLabel="Disconnect"
-      />
-    </SectionCard>
-  );
-}
-// ============================================================
-// Arma Configuration
-// ============================================================
-
-function ArmaConfigSection() {
-  const [active, setActive] = useState<ArmaPersona["id"]>("customer");
-  const saved = useArmaPersonas();
-  // Edits are held here until Save Configuration commits them, so an operator
-  // can back out of a half-written prompt by simply leaving the page.
-  const [personas, setPersonas] = useState(saved);
-  const persona = personas.find((p) => p.id === active) ?? personas[0];
-  const dirty = JSON.stringify(personas) !== JSON.stringify(saved);
-
-  useEffect(() => {
-    setPersonas(saved);
-  }, [saved]);
-
-  const update = (id: ArmaPersona["id"], patch: Partial<ArmaPersona>) =>
-    setPersonas((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
-
-  const COLORS: Record<ArmaPersona["id"], { tab: string; dot: string }> = {
-    customer: { tab: "border-sky-400 text-sky-600", dot: "bg-sky-400" },
-    ba: { tab: "border-violet-400 text-violet-600", dot: "bg-violet-400" },
-    operation: { tab: "border-emerald-400 text-emerald-600", dot: "bg-emerald-400" },
-  };
-
-  return (
-    <SectionCard
-      title="Arma Configuration"
-      description="Set Arma's behavior and audience for each user type."
-    >
-      {/* Tabs */}
-      <div className="border-b border-border px-4 flex items-center gap-1">
-        {personas.map((p) => {
-          const isActive = active === p.id;
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => setActive(p.id)}
-              className={`flex items-center gap-2 px-3 h-10 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                isActive
-                  ? `${COLORS[p.id].tab} border-current`
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span
-                className={`h-2 w-2 rounded-full ${COLORS[p.id].dot} ${p.status === "inactive" ? "opacity-30" : ""}`}
-              />
-              {p.label}
-              {p.status === "inactive" && (
-                <span className="text-[9px] bg-muted text-muted-foreground px-1 rounded">OFF</span>
-              )}
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          onClick={() =>
-            update(active, { status: persona.status === "active" ? "inactive" : "active" })
-          }
-          className={`ml-auto h-7 px-3 rounded-md text-[12px] font-medium border transition-colors ${
-            persona.status === "active"
-              ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-              : "border-border bg-card text-muted-foreground hover:bg-muted"
-          }`}
-        >
-          {persona.status === "active" ? "● Active" : "○ Inactive"}
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: identity + behavior */}
-        <div className="space-y-5">
-          <div className={`rounded-xl border p-4 ${persona.bgColor}`}>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-              Type
-            </div>
-            <div className={`text-base font-semibold ${persona.color}`}>{persona.label}</div>
-            <div className="text-sm text-muted-foreground mt-1 leading-relaxed">
-              {persona.description}
-            </div>
-          </div>
-
-          {/* WA Number */}
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-              WhatsApp Number
-            </label>
-            <input
-              value={persona.waNumber}
-              onChange={(e) => update(active, { waNumber: e.target.value })}
-              className="h-9 w-full rounded-md border border-border bg-card/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-            <div className="text-[11px] text-muted-foreground">
-              Account name: <span className="text-foreground font-medium">{persona.waName}</span>
-            </div>
-          </div>
-
-          {/* Behavior */}
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-              Behavior
-            </label>
-            <textarea
-              value={persona.behavior}
-              onChange={(e) => update(active, { behavior: e.target.value })}
-              rows={3}
-              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              disabled={!dirty}
-              onClick={() => {
-                armaPersonasStore.save(personas);
-                toast.success(`${persona.label} configuration saved`);
-              }}
-              className="press h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Save Configuration
-            </button>
-            {dirty && (
-              <span className="text-[12px] text-muted-foreground animate-fade-in">
-                Unsaved changes
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Right: example messages */}
-        <div className="space-y-3">
-          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-            Sample Message
-          </div>
-          <div className="space-y-2.5">
-            {persona.examples.map((ex, i) => (
-              <div key={i} className="rounded-lg border border-border bg-card/60 px-4 py-3">
-                <div className="flex items-start gap-2">
-                  <div
-                    className={`mt-0.5 h-5 w-5 rounded-full grid place-items-center text-[10px] font-bold text-white shrink-0 ${
-                      active === "customer"
-                        ? "bg-sky-500"
-                        : active === "ba"
-                          ? "bg-violet-500"
-                          : "bg-emerald-500"
-                    }`}
-                  >
-                    A
-                  </div>
-                  <p className="text-[13px] text-foreground leading-relaxed">{ex}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-lg border border-dashed border-border p-3 text-[11px] text-muted-foreground">
-            💡 The message above is a sample of Arma's response for the{" "}
-            <span className="font-medium text-foreground">{persona.label}</span> type. Actual
-            behavior is determined by the configuration above and connected data.
-          </div>
-        </div>
-      </div>
-    </SectionCard>
-  );
-}
-
-// ============================================================
-// Team Management
-// ============================================================
-
-type Team = {
-  id: string;
-  name: string;
-  channelId: string | null;
-  memberIds: string[];
-  updatedOn: string;
-};
-
-const INITIAL_TEAMS: Team[] = [
-  {
-    id: "team-cs",
-    name: "Customer Support",
-    channelId: "northstar-support",
-    memberIds: ["u-tom", "u-sara", "u-aria", "u-pending-2"],
-    updatedOn: "Jun 12, 2026",
-  },
-  {
-    id: "team-mkt",
-    name: "Marketing",
-    channelId: "northstar-marketing",
-    memberIds: ["u-luca", "u-aria"],
-    updatedOn: "Jun 09, 2026",
-  },
-  {
-    id: "team-sales",
-    name: "Sales",
-    channelId: "northstar-sales",
-    memberIds: ["u-mei", "u-pending-1"],
-    updatedOn: "Jun 05, 2026",
-  },
-];
-
-function channelLabel(id: string | null): string {
-  if (!id) return "—";
-  const c = WHATSAPP_CHANNELS.find((x) => x.id === id);
-  return c ? c.name : "—";
-}
-
-function TeamManagementPage() {
-  const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS);
-  const [users, setUsers] = useState<WorkspaceUser[]>(USERS_SEED);
-  const [openTeamId, setOpenTeamId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string[]>([]);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
-  const openTeam = teams.find((t) => t.id === openTeamId) ?? null;
-
-  if (openTeam) {
-    return (
-      <TeamDetailPage
-        team={openTeam}
-        users={users}
-        onBack={() => setOpenTeamId(null)}
-        onUpdate={(patch) =>
-          setTeams((s) =>
-            s.map((t) =>
-              t.id === openTeam.id ? { ...t, ...patch, updatedOn: fmtDateEN(nowWIB()) } : t,
-            ),
-          )
-        }
-        onUsersChange={setUsers}
-      />
-    );
-  }
-
-  const filtered = teams.filter((t) =>
-    search.trim() ? t.name.toLowerCase().includes(search.toLowerCase()) : true,
-  );
-
-  const allSelected = filtered.length > 0 && filtered.every((t) => selected.includes(t.id));
-  const toggleAll = () => setSelected(allSelected ? [] : filtered.map((t) => t.id));
-  const toggleOne = (id: string) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const handleDelete = () => {
-    setTeams((s) => s.filter((t) => !selected.includes(t.id)));
-    toast.success(`${selected.length} team(s) deleted`);
-    setSelected([]);
-  };
-
-  const handleCreate = (name: string, channelId: string | null) => {
-    const id = `team-${Date.now()}`;
-    setTeams((s) => [...s, { id, name, channelId, memberIds: [], updatedOn: fmtDateEN(nowWIB()) }]);
-    toast.success("Team created");
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="flex items-start justify-between gap-4 px-1 pt-0.5">
-        <div>
-          <h2 className="text-xl font-semibold leading-tight m-0">Team Management</h2>
-          <p className="text-xs text-muted-foreground mt-1 m-0">
-            Manage workspace teams and dedicated channel ownership
-          </p>
-        </div>
-        <button
-          onClick={() => setCreateOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-        >
-          <Plus className="h-3.5 w-3.5" /> Create Team
-        </button>
-      </div>
-
-      <SectionCard>
-        <div className="p-4 flex flex-wrap items-center gap-2 border-b border-border">
-          <div className="relative flex-1 min-w-[220px]">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by team name"
-              className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </div>
-        </div>
-
-        {selected.length > 0 && (
-          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
-            <span className="font-medium">{selected.length} selected</span>
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Delete Team
-            </button>
-          </div>
-        )}
-
-        <div className="overflow-x-auto scl-scroll">
-          <table className="w-full text-sm min-w-[900px]">
-            <thead>
-              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
-                <th className="px-4 py-2.5 text-left w-8">
-                  <Checkbox checked={allSelected} onChange={toggleAll} />
-                </th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team Name</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Members</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Dedicated Channel</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Last Updated</th>
-              </tr>
-            </thead>
-            <tbody className="stagger">
-              {filtered.map((t) => (
-                <tr
-                  key={t.id}
-                  onClick={() => setOpenTeamId(t.id)}
-                  className="border-b border-border/60 hover:bg-gray-50 h-14 cursor-pointer transition-colors duration-150"
-                >
-                  <td className="px-4 py-3 align-middle" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox checked={selected.includes(t.id)} onChange={() => toggleOne(t.id)} />
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-md bg-primary/15 border border-primary/30 grid place-items-center text-primary">
-                        <Users className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="font-medium">{t.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {t.memberIds.length}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    {t.channelId ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
-                        WhatsApp · {channelLabel(t.channelId)}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
-                    {t.updatedOn}
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                    No teams found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </SectionCard>
-
-      {createOpen && (
-        <TeamFormModal
-          title="Create Team"
-          submitLabel="Create Team"
-          onClose={() => setCreateOpen(false)}
-          onSubmit={(name, channelId) => {
-            handleCreate(name, channelId);
-            setCreateOpen(false);
-          }}
-        />
-      )}
-
-      <ConfirmDialog
-        open={confirmDelete}
-        onClose={() => setConfirmDelete(false)}
-        onConfirm={handleDelete}
-        title="Delete Team"
-        description="Are you sure you want to delete this team?"
-        confirmLabel="Delete"
-      />
-    </div>
-  );
-}
-
-function TeamFormModal({
-  title,
-  submitLabel,
-  initialName = "",
-  initialChannelId = null,
-  onClose,
-  onSubmit,
-}: {
-  title: string;
-  submitLabel: string;
-  initialName?: string;
-  initialChannelId?: string | null;
-  onClose: () => void;
-  onSubmit: (name: string, channelId: string | null) => void;
-}) {
-  const [name, setName] = useState(initialName);
-  const [channelId, setChannelId] = useState<string | null>(initialChannelId);
-
-  const channelOptions = [
-    { value: "__none", label: "No dedicated channel" },
-    ...WHATSAPP_CHANNELS.map((c) => ({
-      value: c.id,
-      label: c.name,
-      trailing: c.phone,
-    })),
-  ];
-
-  return (
-    <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content"
-      >
-        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
-          <h2 className="text-sm font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="px-5 py-4 space-y-4 border-t border-border">
-          <label className="block">
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              Team name <span className="text-destructive">*</span>
-            </span>
-            <input
-              autoFocus
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Customer Support"
-              className="mt-1 h-9 w-full rounded-md border border-border bg-background/60 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </label>
-          <label className="block">
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              Dedicated channel (optional)
-            </span>
-            <div className="mt-1">
-              <SclSelect
-                value={channelId ?? "__none"}
-                onChange={(v) => setChannelId(v === "__none" ? null : v)}
-                options={channelOptions}
-                placeholder="Select a channel"
-              />
-            </div>
-          </label>
-        </div>
-        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={!name.trim()}
-            onClick={() => onSubmit(name.trim(), channelId)}
-            className="inline-flex items-center rounded-md px-4 h-9 text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-          >
-            {submitLabel}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TeamDetailPage({
-  team,
-  users,
-  onBack,
-  onUpdate,
-  onUsersChange: _onUsersChange,
-}: {
-  team: Team;
-  users: WorkspaceUser[];
-  onBack: () => void;
-  onUpdate: (patch: Partial<Team>) => void;
-  onUsersChange: (users: WorkspaceUser[]) => void;
-}) {
-  const [editOpen, setEditOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [confirmRemove, setConfirmRemove] = useState(false);
-
-  const members = users.filter((u) => team.memberIds.includes(u.id));
-  const allSelected = members.length > 0 && members.every((m) => selected.includes(m.id));
-  const toggleAll = () => setSelected(allSelected ? [] : members.map((m) => m.id));
-  const toggleOne = (id: string) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const handleRemove = () => {
-    onUpdate({ memberIds: team.memberIds.filter((id) => !selected.includes(id)) });
-    toast.success(`${selected.length} member(s) removed`);
-    setSelected([]);
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="px-1 pt-0.5">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-3 transition-colors duration-150"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Team Management
-        </button>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold leading-tight m-0">{team.name}</h2>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                Dedicated Channel
-              </span>
-              {team.channelId ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 px-2 py-0.5 text-[10px]">
-                  WhatsApp · {channelLabel(team.channelId)}
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground">None</span>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setEditOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md border border-border bg-white/[0.03] px-3 text-xs font-medium hover:bg-gray-100 transition-colors duration-150"
-            >
-              Edit Team
-            </button>
-            <button
-              onClick={() => setAddOpen(true)}
-              className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-            >
-              <UserPlus className="h-3.5 w-3.5" /> Add Team Members
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <SectionCard
-        title="Team members"
-        description={`${members.length} member${members.length === 1 ? "" : "s"} in this team`}
-      >
-        {selected.length > 0 && (
-          <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
-            <span className="font-medium">{selected.length} selected</span>
-            <button
-              onClick={() => setConfirmRemove(true)}
-              className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Remove From Team
-            </button>
-          </div>
-        )}
-        <div className="overflow-x-auto scl-scroll">
-          <table className="w-full text-sm min-w-[900px]">
-            <thead>
-              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
-                <th className="px-4 py-2.5 text-left w-8">
-                  <Checkbox checked={allSelected} onChange={toggleAll} />
-                </th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Role</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Date Added</th>
-              </tr>
-            </thead>
-            <tbody className="stagger">
-              {members.map((u) => (
-                <tr
-                  key={u.id}
-                  className="border-b border-border/60 hover:bg-gray-50 h-14 transition-colors duration-150"
-                >
-                  <td className="px-4 py-3 align-middle">
-                    <Checkbox checked={selected.includes(u.id)} onChange={() => toggleOne(u.id)} />
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
-                        {u.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join("")}
-                      </div>
-                      <span className="font-medium">{u.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {u.email}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">{u.role}</td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {u.job}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
-                    {u.joinedOn}
-                  </td>
-                </tr>
-              ))}
-              {members.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                    No members yet. Click “Add Team Members” to invite users to this team.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </SectionCard>
-
-      {editOpen && (
-        <TeamFormModal
-          title="Edit Team"
-          submitLabel="Save Changes"
-          initialName={team.name}
-          initialChannelId={team.channelId}
-          onClose={() => setEditOpen(false)}
-          onSubmit={(name, channelId) => {
-            onUpdate({ name, channelId });
-            setEditOpen(false);
-            toast.success("Team updated");
-          }}
-        />
-      )}
-
-      {addOpen && (
-        <AddMembersModal
-          users={users}
-          existingIds={team.memberIds}
-          onClose={() => setAddOpen(false)}
-          onSubmit={(ids) => {
-            onUpdate({ memberIds: Array.from(new Set([...team.memberIds, ...ids])) });
-            setAddOpen(false);
-            toast.success(`${ids.length} member(s) added`);
-          }}
-        />
-      )}
-
-      <ConfirmDialog
-        open={confirmRemove}
-        onClose={() => setConfirmRemove(false)}
-        onConfirm={handleRemove}
-        title="Remove Members"
-        description="Are you sure you want to remove the selected members from this team?"
-        confirmLabel="Remove"
-      />
-    </div>
-  );
-}
-
-function AddMembersModal({
-  users,
-  existingIds,
-  onClose,
-  onSubmit,
-}: {
-  users: WorkspaceUser[];
-  existingIds: string[];
-  onClose: () => void;
-  onSubmit: (ids: string[]) => void;
-}) {
-  const candidates = users.filter((u) => !existingIds.includes(u.id));
-  const [picked, setPicked] = useState<string[]>([]);
-  const [query, setQuery] = useState("");
-
-  const toggle = (id: string) =>
-    setPicked((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const filtered = candidates.filter((u) =>
-    query.trim() ? (u.name + u.email).toLowerCase().includes(query.toLowerCase()) : true,
-  );
-
-  return (
-    <div
-      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden modal-content"
-      >
-        <div className="px-5 pt-5 pb-3 flex items-start justify-between">
-          <h2 className="text-sm font-semibold">Add Team Members</h2>
-          <button
-            onClick={onClose}
-            className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="px-5 py-4 space-y-3 border-t border-border">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Members</div>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search users…"
-              className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </div>
-          <div className="max-h-72 overflow-auto scl-scroll rounded-md border border-border divide-y divide-border">
-            {filtered.map((u) => {
-              const checked = picked.includes(u.id);
-              return (
-                <button
-                  key={u.id}
-                  onClick={() => toggle(u.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150"
-                >
-                  <Checkbox checked={checked} onChange={() => toggle(u.id)} />
-                  <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
-                    {u.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join("")}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium truncate">{u.name}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">{u.email}</div>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">{u.role}</span>
-                </button>
-              );
-            })}
-            {filtered.length === 0 && (
-              <div className="px-3 py-8 text-center text-xs text-muted-foreground">
-                No users available to add.
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="inline-flex items-center rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={picked.length === 0}
-            onClick={() => onSubmit(picked)}
-            className="inline-flex items-center rounded-md px-4 h-9 text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-          >
-            Add Members
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}

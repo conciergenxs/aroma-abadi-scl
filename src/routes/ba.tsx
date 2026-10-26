@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { useCurrentUser, useCan, cannotReason } from "@/components/scl/session-store";
 import { useBaStore, baStore, BA_POSITIONS, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
@@ -40,6 +41,9 @@ export const Route = createFileRoute("/ba")({
 
 function BAPage() {
   const { bas } = useBaStore();
+  const user = useCurrentUser();
+  const canManage = useCan("ba.manage");
+  const manageReason = cannotReason(user.role, "ba.manage");
   const { brands } = useSkuStore();
   const [search, setSearch] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
@@ -67,6 +71,9 @@ function BAPage() {
   const filtered = useMemo(
     () =>
       bas.filter((b) => {
+        // An Area Coordinator only ever sees the BAs they look after.
+        if (user.role === "Area Coordinator" && b.areaCoordinator !== user.areaCoordinator)
+          return false;
         if (search) {
           const q = search.toLowerCase();
           if (
@@ -83,7 +90,16 @@ function BAPage() {
         if (filterStore && b.store !== filterStore) return false;
         return true;
       }),
-    [bas, search, filterBrand, filterGender, filterPosisi, filterStore],
+    [
+      bas,
+      search,
+      filterBrand,
+      filterGender,
+      filterPosisi,
+      filterStore,
+      user.role,
+      user.areaCoordinator,
+    ],
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -208,7 +224,9 @@ function BAPage() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 transition-opacity"
+              disabled={!canManage}
+              title={manageReason || undefined}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
             >
               <Plus className="h-3.5 w-3.5" /> Add BA
             </button>

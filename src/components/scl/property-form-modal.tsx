@@ -5,7 +5,7 @@ import { useEscapeKey } from "@/lib/use-escape-key";
 
 /**
  * Shared Add/Edit Property modal used by:
- * - Contacts → Manage Properties
+ * - Contacts → Filter Properties
  * - Settings → Data Management → Contact Properties
  *
  * Single source of truth for the property create/update form.

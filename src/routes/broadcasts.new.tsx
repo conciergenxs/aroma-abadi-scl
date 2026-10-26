@@ -37,6 +37,7 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useWorkspaceTimeZone } from "@/components/scl/session-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
 
 export const Route = createFileRoute("/broadcasts/new")({
@@ -125,6 +126,7 @@ function CreateBroadcastPage() {
   const [sendMode, setSendMode] = useState<SendMode>("now");
   const [scheduleDate, setScheduleDate] = useState<string>("");
   const [scheduleTime, setScheduleTime] = useState<string>("09:00");
+  const workspaceTimeZone = useWorkspaceTimeZone();
   const [repeat, setRepeat] = useState<Repeat>("none");
   const isRecurring = sendMode === "schedule" && repeat !== "none";
 
@@ -489,8 +491,11 @@ function CreateBroadcastPage() {
                         className="w-full h-9 rounded-md border border-border bg-background/40 px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary/40"
                       />
                     </div>
+                    {/* The workspace default from Settings → General, not the
+                        browser's zone: a schedule has to mean the same thing
+                        for everyone who reads it. */}
                     <div className="text-[11px] text-muted-foreground pb-2 sm:pb-2.5">
-                      {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                      {workspaceTimeZone}
                     </div>
                     {/* Picking a cadence is what makes this a recurring series
                         rather than a single scheduled send. */}
