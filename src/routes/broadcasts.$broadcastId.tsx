@@ -3,6 +3,7 @@ import { variableLabel } from "@/components/scl/template-vars";
 import { fmtNum } from "@/lib/fmt";
 import { AppShell, StatusPill } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { MessageHeader, headerSummary } from "@/components/scl/message-header";
 import { useBroadcastsStore, broadcastRuns } from "@/components/scl/broadcasts-store";
 import { useContactsStore } from "@/components/scl/contacts-store";
 import { usePromoStore } from "@/components/scl/promo-store";
@@ -72,6 +73,16 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
   const template = broadcast.templateId
     ? templates.find((t) => t.id === broadcast.templateId)
     : null;
+  // What went out, with the template as the fallback: broadcasts sent before
+  // the header was stored on the record still have one to show, and it is the
+  // template's — which is where theirs came from.
+  const header = {
+    headerType: broadcast.headerType ?? template?.headerType,
+    headerText: broadcast.headerText ?? template?.headerText,
+    headerMediaUrl: broadcast.headerMediaUrl ?? template?.headerMediaUrl,
+    headerMediaName: broadcast.headerMediaName ?? template?.headerMediaName,
+  };
+
   const selectedLists = (broadcast.listIds ?? [])
     .map((id) => lists.find((l) => l.id === id))
     .filter(Boolean) as { id: string; name: string }[];
@@ -214,6 +225,28 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
             )}
           </ReadGrid>
           <div className="mt-4 space-y-3">
+            {/* A template send always has a header slot, even when it is empty —
+                saying so is clearer than a missing field. A manual message has
+                no such slot, so nothing is shown for one. */}
+            {broadcast.contentMode === "template" && (
+              <ReadBlock label={`Header · ${headerSummary(header.headerType)}`}>
+                {header.headerType && header.headerType !== "none" ? (
+                  header.headerType === "text" ? (
+                    <div className="text-[14px] font-semibold leading-relaxed">
+                      {header.headerText}
+                    </div>
+                  ) : (
+                    <div className="max-w-[260px]">
+                      <MessageHeader {...header} />
+                    </div>
+                  )
+                ) : (
+                  <div className="text-[13px] text-muted-foreground">
+                    This template sends without a header.
+                  </div>
+                )}
+              </ReadBlock>
+            )}
             <ReadBlock label="Message Content">
               <div className="whitespace-pre-wrap break-words text-[14px] leading-relaxed">
                 {renderWithVars(broadcast.body ?? "")}
@@ -268,6 +301,7 @@ function BroadcastDetails({ broadcast }: { broadcast: Broadcast }) {
             >
               {broadcast.body ? (
                 <>
+                  <MessageHeader {...header} />
                   <div className="whitespace-pre-wrap break-words">
                     {renderWithVars(broadcast.body)}
                   </div>
