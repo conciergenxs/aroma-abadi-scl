@@ -27,6 +27,10 @@ type Props = {
   /** Placeholder for the search input when `searchable` is set (defaults to "Search…"). */
   searchPlaceholder?: string;
   ariaLabel?: string;
+  /** Locks the control; pair it with `title` so the reason is readable. */
+  disabled?: boolean;
+  /** Native tooltip — the reason, when the control is disabled. */
+  title?: string;
 };
 
 /**
@@ -45,6 +49,8 @@ export function SclSelect({
   searchable = false,
   searchPlaceholder = "Search…",
   ariaLabel,
+  disabled = false,
+  title,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -65,8 +71,12 @@ export function SclSelect({
         ref={btnRef}
         type="button"
         aria-label={ariaLabel}
-        onClick={() => setOpen((o) => !o)}
-        className={`inline-flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card/60 hover:bg-card focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors ${hClass}`}
+        title={title}
+        disabled={disabled}
+        onClick={() => !disabled && setOpen((o) => !o)}
+        className={`inline-flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card/60 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors ${hClass} ${
+          disabled ? "cursor-not-allowed opacity-50" : "hover:bg-card"
+        }`}
       >
         <span className="flex items-center gap-2 min-w-0">
           {selected?.icon ? (

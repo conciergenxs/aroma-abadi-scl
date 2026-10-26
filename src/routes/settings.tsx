@@ -402,11 +402,10 @@ type UserState = "Active" | "Pending";
 type WorkspaceUser = {
   id: string;
   name: string;
-  email: string;
-  job: string;
+  /** How this person signs in, and the only address the workspace holds. */
+  phone: string;
   role: UserRole;
   status: UserStatus;
-  teams: string[];
   joinedOn: string;
   state: UserState;
   owner?: boolean;
@@ -416,11 +415,9 @@ const USERS_SEED: WorkspaceUser[] = [
   {
     id: "u-aria",
     name: "Aria Kapoor",
-    email: "aria.kapoor@northstar.co",
-    job: "Workspace Owner",
+    phone: "+62 811 5500 0001",
     role: "Super Admin",
     status: "Online",
-    teams: ["Customer Support", "Marketing"],
     joinedOn: "Jan 12, 2024",
     state: "Active",
     owner: true,
@@ -428,85 +425,69 @@ const USERS_SEED: WorkspaceUser[] = [
   {
     id: "u-tom",
     name: "Tomas Bergstrom",
-    email: "tomas.b@northstar.co",
-    job: "Head of Support",
+    phone: "+62 811 5500 0002",
     role: "Admin",
     status: "Online",
-    teams: ["Customer Support"],
     joinedOn: "Feb 02, 2024",
     state: "Active",
   },
   {
     id: "u-mei",
     name: "Mei Tanaka",
-    email: "mei.tanaka@northstar.co",
-    job: "Sales Lead",
+    phone: "+62 811 5500 0003",
     role: "Area Coordinator",
     status: "Away",
-    teams: ["Sales"],
     joinedOn: "Mar 18, 2024",
     state: "Active",
   },
   {
     id: "u-luca",
     name: "Luca Romano",
-    email: "luca.romano@northstar.co",
-    job: "Marketing Manager",
+    phone: "+62 811 5500 0004",
     role: "Area Coordinator",
     status: "Offline",
-    teams: ["Marketing"],
     joinedOn: "Apr 04, 2024",
     state: "Active",
   },
   {
     id: "u-sara",
     name: "Sara Iqbal",
-    email: "sara.iqbal@northstar.co",
-    job: "Support Specialist",
+    phone: "+62 811 5500 0005",
     role: "Staff",
     status: "Online",
-    teams: ["Customer Support"],
     joinedOn: "May 22, 2024",
     state: "Active",
   },
   {
     id: "u-dimas",
     name: "Dimas Pratama",
-    email: "dimas.p@northstar.co",
-    job: "Operations Analyst",
+    phone: "+62 811 5500 0006",
     role: "Staff",
     status: "Offline",
-    teams: ["Operations"],
     joinedOn: "Jun 09, 2024",
     state: "Active",
   },
   {
     id: "u-pending-1",
     name: "Hana Wijaya",
-    email: "hana.wijaya@northstar.co",
-    job: "Sales Associate",
+    phone: "+62 812 8899 0011",
     role: "Staff",
     status: "Offline",
-    teams: ["Sales"],
     joinedOn: "—",
     state: "Pending",
   },
   {
     id: "u-pending-2",
     name: "Marco Silva",
-    email: "marco.silva@northstar.co",
-    job: "Support Agent",
+    phone: "+62 813 5566 7788",
     role: "Staff",
     status: "Offline",
-    teams: ["Customer Support"],
     joinedOn: "—",
     state: "Pending",
   },
 ];
 
 const ROLE_OPTIONS: UserRole[] = ["Super Admin", "Admin", "Area Coordinator", "Staff"];
-const TEAM_FILTER_OPTIONS = ["All teams", "Customer Support", "Sales", "Marketing", "Operations"];
-
 const statusDot: Record<UserStatus, string> = {
   Online: "bg-emerald-400",
   Away: "bg-amber-400",
@@ -519,7 +500,6 @@ function UserManagementPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"All" | UserRole>("All");
-  const [teamFilter, setTeamFilter] = useState<string>("All teams");
   const [joinedFilter, setJoinedFilter] = useState<string>("Anytime");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -527,13 +507,18 @@ function UserManagementPage() {
   const filtered = useMemo(() => {
     return users
       .filter((u) => u.state === tab)
-      .filter((u) =>
-        search.trim() ? (u.name + u.email).toLowerCase().includes(search.toLowerCase()) : true,
-      )
+      .filter((u) => {
+        const q = search.trim().toLowerCase();
+        if (!q) return true;
+        const digits = q.replace(/\D/g, "");
+        return (
+          u.name.toLowerCase().includes(q) ||
+          (digits.length > 0 && u.phone.replace(/\D/g, "").includes(digits))
+        );
+      })
       .filter((u) => (roleFilter === "All" ? true : u.role === roleFilter))
-      .filter((u) => (teamFilter === "All teams" ? true : u.teams.includes(teamFilter)))
       .sort((a, b) => (a.owner ? -1 : b.owner ? 1 : 0));
-  }, [users, tab, search, roleFilter, teamFilter]);
+  }, [users, tab, search, roleFilter]);
 
   const selectableIds = filtered.filter((u) => !u.owner).map((u) => u.id);
   const allSelected =
@@ -548,7 +533,6 @@ function UserManagementPage() {
   const resetFilters = () => {
     setSearch("");
     setRoleFilter("All");
-    setTeamFilter("All teams");
     setJoinedFilter("Anytime");
   };
 
@@ -567,7 +551,7 @@ function UserManagementPage() {
         <div>
           <h2 className="text-xl font-semibold leading-tight m-0">User Management</h2>
           <p className="text-xs text-muted-foreground mt-1 m-0">
-            Manage workspace members, roles, and team assignments
+            Manage workspace members and the role each one holds
           </p>
         </div>
         <button
@@ -611,7 +595,7 @@ function UserManagementPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email"
+              placeholder="Search by name or WA number"
               className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
@@ -619,15 +603,11 @@ function UserManagementPage() {
             ariaLabel="Role"
             value={roleFilter}
             onChange={(v) => setRoleFilter(v as "All" | UserRole)}
-            options={["All", ...ROLE_OPTIONS].map((o) => ({ value: o, label: o }))}
+            options={[
+              { value: "All", label: "All roles" },
+              ...ROLE_OPTIONS.map((o) => ({ value: o, label: o })),
+            ]}
             className="w-40"
-          />
-          <SclSelect
-            ariaLabel="Team"
-            value={teamFilter}
-            onChange={setTeamFilter}
-            options={TEAM_FILTER_OPTIONS.map((o) => ({ value: o, label: o }))}
-            className="w-44"
           />
           <SclSelect
             ariaLabel="Joined on"
@@ -660,18 +640,16 @@ function UserManagementPage() {
         )}
 
         <div className="overflow-x-auto scl-scroll">
-          <table className="w-full text-sm min-w-[1100px]">
+          <table className="w-full text-sm min-w-[760px]">
             <thead>
               <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="px-4 py-2.5 text-left w-8">
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Job title</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Role</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Status</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Teams</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Joined on</th>
               </tr>
             </thead>
@@ -706,15 +684,16 @@ function UserManagementPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {u.email}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {u.job}
+                    {u.phone}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap">
                     {u.owner ? (
                       <span className="text-xs">Super Admin</span>
                     ) : (
+                      /* A pending member keeps the role their invite was sent
+                         with — it is what the invite link says, so changing it
+                         here would leave the two disagreeing. Once they accept,
+                         the account exists and the role can move. */
                       <SclSelect
                         ariaLabel="Role"
                         value={u.role}
@@ -722,6 +701,12 @@ function UserManagementPage() {
                         options={ROLE_OPTIONS.map((r) => ({ value: r, label: r }))}
                         size="sm"
                         className="w-36"
+                        disabled={u.state === "Pending"}
+                        title={
+                          u.state === "Pending"
+                            ? "This role was sent with the invite — it can be changed once they accept."
+                            : undefined
+                        }
                       />
                     )}
                   </td>
@@ -731,18 +716,6 @@ function UserManagementPage() {
                       {u.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      {u.teams.map((t) => (
-                        <span
-                          key={t}
-                          className="inline-flex items-center rounded-full border border-border bg-white/[0.04] px-2 py-0.5 text-[10px]"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
                     {u.joinedOn}
                   </td>
@@ -750,7 +723,7 @@ function UserManagementPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No users match the current filters.
                   </td>
                 </tr>
