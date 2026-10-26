@@ -1489,6 +1489,8 @@ export const templates: Template[] = [
     channel: "whatsapp",
     status: "Approved",
     updated: "2h ago",
+    headerType: "text",
+    headerText: "Velvet Rouge sudah hadir",
     body: "Hi {{name}}, koleksi Velvet Rouge baru saja launching! VIP Beauty Club dapat akses 24 jam lebih awal — tap untuk belanja.",
     groupId: "tg-promotions",
     language: "id_ID",
@@ -1500,6 +1502,8 @@ export const templates: Template[] = [
     channel: "whatsapp",
     status: "Approved",
     updated: "1d ago",
+    headerType: "text",
+    headerText: "Pesanan kamu dalam perjalanan",
     body: "Order kamu {{order}} sudah dikirim. Lacak di sini: {{tracking}}",
     groupId: "tg-transactional",
     language: "id_ID",
@@ -1544,6 +1548,8 @@ export const templates: Template[] = [
     channel: "whatsapp",
     status: "Draft",
     updated: "30m ago",
+    headerType: "text",
+    headerText: "Selamat datang di tier Platinum",
     body: "Selamat {{name}}! Kamu naik ke tier Platinum. Berikut benefit baru untukmu.",
     groupId: "tg-loyalty",
     language: "id_ID",
@@ -1671,6 +1677,13 @@ export type Broadcast = {
    * and the individual code each recipient received. */
   promoCodeId?: string;
   recipientCodes?: { contactId: string; contactName: string; code: string }[];
+  /** The message's header, as it went out. WhatsApp puts it above the body:
+   * a line of text, or an image or video. Captured from the template at send
+   * time, so editing the template later doesn't rewrite what was sent. */
+  headerType?: "none" | "text" | "image" | "video";
+  headerText?: string;
+  headerMediaUrl?: string;
+  headerMediaName?: string;
   body?: string;
   footer?: string;
   buttons?: { label: string; kind: "quick_reply" | "url" | "phone" }[];
