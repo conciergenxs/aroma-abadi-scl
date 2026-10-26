@@ -184,7 +184,6 @@ function ProfileTab() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [first, setFirst] = useState(user.name.split(" ")[0] ?? "");
   const [last, setLast] = useState(user.name.split(" ").slice(1).join(" "));
-  const [username, setUsername] = useState(user.username);
   const [phone, setPhone] = useState(user.phone);
   const [job, setJob] = useState(user.job);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -239,15 +238,14 @@ function ProfileTab() {
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextField label="First name" value={first} onChange={setFirst} />
           <TextField label="Last name" value={last} onChange={setLast} />
-          <TextField label="Email" value="aria.kapoor@scl.app" onChange={() => {}} readOnly />
-          <TextField label="Username" value={username} onChange={setUsername} />
+          <TextField label="Email" value={user.email} onChange={() => {}} readOnly />
           <TextField label="Phone number" value={phone} onChange={setPhone} />
           <TextField label="Job title" value={job} onChange={setJob} />
           {/* Read-only: a role is granted in Roles & Permissions by an admin,
               never chosen by the person it applies to. */}
-          <div className="space-y-1">
-            <div className="text-[12px] text-muted-foreground">Role</div>
-            <div className="flex h-9 items-center gap-2">
+          <div>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Role</span>
+            <div className="mt-1 flex h-9 items-center gap-2">
               <StatusPill tone={user.role === "Staff" ? "neutral" : "positive"}>
                 {user.role}
               </StatusPill>
