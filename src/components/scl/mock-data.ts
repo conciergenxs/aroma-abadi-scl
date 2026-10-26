@@ -1429,10 +1429,11 @@ export type Template = {
   groupId?: string;
   language?: string;
   /** WhatsApp template chrome around the body. */
-  headerType?: "none" | "text" | "image" | "video";
+  headerType?: "none" | "text" | "image" | "video" | "document";
   headerText?: string;
-  /** Data URL of the uploaded header image or video, when headerType is one of
-   * those. Data URLs keep the prototype self-contained — no upload endpoint. */
+  /** Data URL of the uploaded header image, video or document, when headerType
+   * is one of those. Data URLs keep the prototype self-contained — no upload
+   * endpoint. */
   headerMediaUrl?: string;
   headerMediaName?: string;
   footer?: string;
@@ -1680,7 +1681,7 @@ export type Broadcast = {
   /** The message's header, as it went out. WhatsApp puts it above the body:
    * a line of text, or an image or video. Captured from the template at send
    * time, so editing the template later doesn't rewrite what was sent. */
-  headerType?: "none" | "text" | "image" | "video";
+  headerType?: "none" | "text" | "image" | "video" | "document";
   headerText?: string;
   headerMediaUrl?: string;
   headerMediaName?: string;
