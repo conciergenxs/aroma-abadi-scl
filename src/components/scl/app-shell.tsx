@@ -146,7 +146,7 @@ const topNav: NavItem[] = [
   { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view" },
   { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce" },
   { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce" },
-  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce" },
+  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
