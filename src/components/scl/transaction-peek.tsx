@@ -7,6 +7,7 @@ import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store
 import { benefitFor, rewardKindLabel, usePromoStore } from "./promo-store";
 import { useReferralStore } from "./referral-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 // ── Transaction side peek ─────────────────────────────────────────────────────
 // Opened from any table that names an ARMA order, so the full order can be read
@@ -68,7 +69,9 @@ export function TransactionPeek({
         };
       }
     }
-    for (const season of seasons) {
+    // The lite build doesn't show referral anywhere, so an order's code is
+    // either a promo or nothing.
+    for (const season of LITE_MODE ? [] : seasons) {
       const hit = season.uses.find((u) => u.transactionId === tx.id);
       if (hit) {
         return {

@@ -60,6 +60,7 @@ import {
   referralActivityFor,
   type ReferralUseWithSeason,
 } from "@/components/scl/referral-store";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 const SYSTEM_KEYS = new Set([
   "name",
@@ -260,10 +261,11 @@ function ContactDetailPage() {
       referred: activity.referred.filter((u) => inRange(u.usedAt)),
     };
   }, [seasons, contact, dateFrom, dateTo]);
-  const redeemCount =
-    filteredRedemptions.length +
-    (filteredReferral.usedCode ? 1 : 0) +
-    filteredReferral.referred.length;
+  const redeemCount = LITE_MODE
+    ? filteredRedemptions.length
+    : filteredRedemptions.length +
+      (filteredReferral.usedCode ? 1 : 0) +
+      filteredReferral.referred.length;
 
   if (!contact) {
     return (
@@ -1074,7 +1076,9 @@ function RedeemedTab({
   const th =
     "px-4 py-2.5 text-left text-[11px] uppercase tracking-wide text-muted-foreground font-medium";
 
-  const [sub, setSub] = useState<SubTab>("referral");
+  // The lite build has no referral side, so there is nothing to switch
+  // between — the promo list stands on its own without a one-sided control.
+  const [sub, setSub] = useState<SubTab>(LITE_MODE ? "promo" : "referral");
   // What the Referral side holds: a code they used, plus every use of their
   // own — the same arithmetic the parent tab's count already does.
   const referralCount = referred.length + (usedCode ? 1 : 0);
@@ -1086,7 +1090,7 @@ function RedeemedTab({
           scroll. A segmented control rather than another underline: the tabs
           above are the page's navigation, and a second underlined row would
           read as a competing one rather than a cut of what is already open. */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className={`flex items-center gap-3 flex-wrap ${LITE_MODE ? "hidden" : ""}`}>
         <div className="relative inline-flex rounded-lg border border-border bg-muted/40 p-0.5">
           {/* The filled pill slides between the two rather than blinking from
               one to the other, so the eye can follow where it went. */}
@@ -1463,7 +1467,7 @@ function RightPanel({
               <span className="capitalize">{contact.channel}</span>
             </div>
           </FieldRow>
-          {contact.referralCode && (
+          {!LITE_MODE && contact.referralCode && (
             <FieldRow icon={<Share2 className="h-3.5 w-3.5" />} label="Referral">
               <div className="flex items-center gap-1.5 px-2 py-1">
                 <code className="font-mono text-xs font-semibold tracking-wide text-foreground bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">

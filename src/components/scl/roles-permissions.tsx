@@ -14,6 +14,7 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
+import { LITE_MODE } from "@/lib/feature-flags";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
@@ -208,9 +209,11 @@ const SCHEMA: CategorySection[] = [
     categories: [
       {
         id: "commerce",
-        label: "Promo, Referral & Transactions",
+        label: LITE_MODE ? "Promo & Transactions" : "Promo, Referral & Transactions",
         masterLabel: "Commerce Access",
-        masterDescription: "Promo codes, referral seasons and the transaction ledger.",
+        masterDescription: LITE_MODE
+          ? "Promo codes and the transaction ledger."
+          : "Promo codes, referral seasons and the transaction ledger.",
         groups: [
           {
             id: "commerce-read",
@@ -218,7 +221,9 @@ const SCHEMA: CategorySection[] = [
             items: [
               {
                 id: "commerce-view",
-                label: "View Promo, Referral & Transactions",
+                label: LITE_MODE
+                  ? "View Promo & Transactions"
+                  : "View Promo, Referral & Transactions",
                 defaultChecked: true,
               },
             ],
@@ -228,7 +233,10 @@ const SCHEMA: CategorySection[] = [
             label: "Creating",
             items: [
               { id: "promo-manage", label: "Create & Edit Promo Codes" },
-              { id: "referral-manage", label: "Create & Edit Referral Seasons" },
+              // The lite build has no referral seasons to permit.
+              ...(LITE_MODE
+                ? []
+                : [{ id: "referral-manage", label: "Create & Edit Referral Seasons" }]),
               { id: "transactions-manage", label: "Record Transactions" },
             ],
           },
@@ -383,7 +391,9 @@ const SEED_ROLES: Role[] = [
   {
     id: "r-staff",
     name: "Staff",
-    description: "Conversations, contacts, and the promo, referral and transaction pages.",
+    description: LITE_MODE
+      ? "Conversations, contacts, and the promo and transaction pages."
+      : "Conversations, contacts, and the promo, referral and transaction pages.",
     state: buildStateForRole("Staff"),
   },
 ];

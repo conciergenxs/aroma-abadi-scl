@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/scl/app-shell";
@@ -11,8 +11,13 @@ import {
   validateSeasonForm,
   type SeasonFormState,
 } from "@/components/scl/referral-season-form";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/referral/new")({
+  // The lite build doesn't carry Referral, so the URL doesn't either.
+  beforeLoad: () => {
+    if (LITE_MODE) throw redirect({ to: "/" });
+  },
   head: () => ({ meta: [{ title: "New Referral Season — Aroma Abadi" }] }),
   component: NewSeasonPage,
 });

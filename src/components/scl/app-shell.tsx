@@ -136,6 +136,8 @@ type NavItem = {
   badge?: number;
   /** Hidden from anyone whose role doesn't carry this. */
   needs?: Capability;
+  /** Only in the full build — the lite deployment doesn't carry this page. */
+  full?: boolean;
 };
 const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -146,7 +148,7 @@ const topNav: NavItem[] = [
   { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view" },
   { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce" },
   { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce" },
-  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce" },
+  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
@@ -174,8 +176,10 @@ export function AppShell({
   // A page nobody in this role may open shouldn't be offered in the first
   // place — an Area Coordinator has no business on the commercial pages.
   const currentUser = useCurrentUser();
-  const visibleTopNav = topNav.filter((i) => !i.needs || roleCan(currentUser.role, i.needs));
-  const visibleBottomNav = bottomNav.filter((i) => !i.needs || roleCan(currentUser.role, i.needs));
+  const canSee = (i: NavItem) =>
+    (!i.needs || roleCan(currentUser.role, i.needs)) && !(i.full && LITE_MODE);
+  const visibleTopNav = topNav.filter(canSee);
+  const visibleBottomNav = bottomNav.filter(canSee);
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
   // AppShell remounts on every route change, so this has to outlive it or the
@@ -733,6 +737,7 @@ export function ChannelDot({ channel }: { channel: "whatsapp" }) {
 }
 
 import { sessionStore, useCurrentUser, roleCan, type Capability } from "./session-store";
+import { LITE_MODE } from "@/lib/feature-flags";
 import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 

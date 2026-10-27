@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { AppShell, SectionCard, TabCount } from "@/components/scl/app-shell";
@@ -17,8 +17,13 @@ import {
   clampPage,
   DeleteSeasonDialog,
 } from "@/components/scl/referral-ui";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/referral/")({
+  // The lite build doesn't carry Referral, so the URL doesn't either.
+  beforeLoad: () => {
+    if (LITE_MODE) throw redirect({ to: "/" });
+  },
   head: () => ({ meta: [{ title: "Referral — Aroma Abadi" }] }),
   component: ReferralPage,
 });
