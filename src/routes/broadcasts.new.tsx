@@ -3,6 +3,7 @@ import { variableLabel } from "@/components/scl/template-vars";
 import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { MessageHeader } from "@/components/scl/message-header";
+import { LITE_MODE } from "@/lib/feature-flags";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
@@ -366,8 +367,14 @@ function CreateBroadcastPage() {
         owners.set(a.code.toUpperCase(), `promo ${p.code}`);
       });
     });
+    // Referral codes still occupy their strings in the full build; the lite
+    // build never mentions referral, so a clash there reads as "in use".
     contacts.forEach((c) => {
-      if (c.referralCode) owners.set(c.referralCode.toUpperCase(), `${c.name}'s referral code`);
+      if (!c.referralCode) return;
+      owners.set(
+        c.referralCode.toUpperCase(),
+        LITE_MODE ? `a code already issued to ${c.name}` : `${c.name}'s referral code`,
+      );
     });
     return owners;
   }, [promos, contacts, recipients, linkedPromo]);

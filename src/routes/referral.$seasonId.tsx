@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useParams, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/scl/app-shell";
@@ -8,11 +8,16 @@ import {
   getSeasonStatus,
   type ReferralSeason,
 } from "@/components/scl/referral-store";
+import { LITE_MODE } from "@/lib/feature-flags";
 import { describePromoRule } from "@/components/scl/promo-store";
 import { SeasonReportView } from "@/components/scl/referral-report";
 import { SeasonStatusBadge, DeleteSeasonDialog } from "@/components/scl/referral-ui";
 
 export const Route = createFileRoute("/referral/$seasonId")({
+  // The lite build doesn't carry Referral, so the URL doesn't either.
+  beforeLoad: () => {
+    if (LITE_MODE) throw redirect({ to: "/" });
+  },
   head: () => ({ meta: [{ title: "Referral Season — Aroma Abadi" }] }),
   component: SeasonReportPage,
 });
