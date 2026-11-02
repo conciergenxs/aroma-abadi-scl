@@ -148,6 +148,7 @@ export function Step({
   n,
   title,
   body,
+  points,
   screen,
   caption,
   highlight = false,
@@ -156,23 +157,24 @@ export function Step({
   n: number;
   title: string;
   body: string;
+  points?: { label: string; value: string }[];
   screen?: ReactNode;
   caption?: string;
   highlight?: boolean;
   last?: boolean;
 }) {
   return (
-    <div className="relative pl-12 pb-10 last:pb-0 sm:pl-16">
+    <div className="relative pl-10 pb-10 last:pb-0 sm:pl-16">
       {!last ? (
         <span
           aria-hidden
-          className={`absolute left-[15px] top-[38px] bottom-0 w-px sm:left-[19px] ${
+          className={`absolute left-[14px] top-[34px] bottom-0 w-px sm:left-[19px] sm:top-[38px] ${
             highlight ? "bg-[#4C6FE8]/40" : "bg-[#FBF7F0]/14"
           }`}
         />
       ) : null}
       <span
-        className={`lp-display absolute left-0 top-0 grid h-[32px] w-[32px] place-items-center rounded-full border text-[15px] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
+        className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
           highlight
             ? "border-[#4C6FE8] bg-[#4C6FE8] text-white"
             : "border-[#D9B892]/45 text-[#D9B892]"
@@ -184,7 +186,7 @@ export function Step({
       <div
         className={
           highlight
-            ? "rounded-[14px] border border-[#4C6FE8]/45 bg-[#15204A]/70 p-5 sm:p-7"
+            ? "rounded-[14px] border border-[#4C6FE8]/45 bg-[#15204A]/70 p-4 sm:p-7"
             : undefined
         }
       >
@@ -208,6 +210,19 @@ export function Step({
             >
               {body}
             </p>
+            {points ? (
+              <dl className="mt-6 border-t border-[#8FA8FF]/25">
+                {points.map((point) => (
+                  <div
+                    key={point.label}
+                    className="grid gap-1 border-b border-[#8FA8FF]/25 py-[10px] sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5"
+                  >
+                    <dt className="text-[13px] leading-[1.5] text-[#9DB4FF]">{point.label}</dt>
+                    <dd className="text-[14px] leading-[1.5] text-[#EEF2FF]">{point.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
           </div>
           {screen ? (
             <figure className="m-0 w-full max-w-[320px] lg:max-w-none">

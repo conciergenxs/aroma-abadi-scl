@@ -1410,6 +1410,7 @@ function RightPanel({
   onToggleBrand: (brandId: string) => void;
   onSetCustomProperty: (key: string, value: unknown, displayName: string) => void;
 }) {
+  const editGate = usePermission("contacts-edit");
   const { brands } = useSkuStore();
   const [revealed, setRevealed] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -1510,6 +1511,8 @@ function RightPanel({
 
       <RightSection title="Labels">
         <LabelSelector
+          locked={!editGate.allowed}
+          lockReason={editGate.reason}
           labels={labels}
           selectedIds={contact.labelIds}
           onToggle={onToggleLabel}
@@ -1558,6 +1561,8 @@ function RightPanel({
 
       <RightSection title="Audience">
         <ListSelector
+          locked={!editGate.allowed}
+          lockReason={editGate.reason}
           lists={lists}
           selectedIds={contact.listIds}
           onToggle={onToggleList}
@@ -1765,11 +1770,15 @@ function LabelSelector({
   selectedIds,
   onToggle,
   onCreate,
+  locked,
+  lockReason,
 }: {
   labels: ContactLabel[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   onCreate: (name: string) => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -1824,8 +1833,10 @@ function LabelSelector({
       </div>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
+        onClick={() => !locked && setOpen((v) => !v)}
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add label
@@ -1897,11 +1908,15 @@ function ListSelector({
   selectedIds,
   onToggle,
   onCreate,
+  locked,
+  lockReason,
 }: {
   lists: { id: string; name: string }[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   onCreate: (name: string) => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -1956,8 +1971,10 @@ function ListSelector({
       </div>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
+        onClick={() => !locked && setOpen((v) => !v)}
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add to list

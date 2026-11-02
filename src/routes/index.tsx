@@ -373,6 +373,20 @@ function CompanyPage() {
             highlight
             title="Pembayaran melalui Xendit"
             body="Dari rincian itu ARMA mengirim satu tautan pembayaran yang dibuat lewat Xendit. Tautan membuka halaman pembayaran Xendit, tempat pelanggan memilih metode dan menyelesaikan transaksi. Seluruh data pembayaran dimasukkan di halaman Xendit, bukan di WhatsApp, dan tidak pernah melewati sistem kami."
+            points={[
+              {
+                label: "Tautan pembayaran",
+                value: "Dibuat lewat Xendit untuk tiap pesanan, berlaku 24 jam",
+              },
+              {
+                label: "Metode tersedia",
+                value: "QRIS, Virtual Account, kartu kredit dan debit",
+              },
+              {
+                label: "Yang kami terima",
+                value: "Status pembayaran dan nomor invoice, tanpa data kartu",
+              },
+            ]}
             screen={
               <CheckoutScreen
                 invoice="Invoice AA-2611"
