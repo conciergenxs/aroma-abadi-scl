@@ -952,8 +952,6 @@ function ContactsTable({
   const showBaBrand = isBaView && isVisible("brand");
   const showBaGender = isBaView && isVisible("gender");
   const showBaPosition = isBaView && isVisible("position");
-  const showBaStore = isBaView && isVisible("store");
-  const showBaCity = isBaView && isVisible("city");
   const showBaPassword = isBaView && isVisible("password");
 
   // colSpan for empty state — base columns (checkbox, name, WA number, contact
@@ -967,8 +965,6 @@ function ContactsTable({
       showBaBrand,
       showBaGender,
       showBaPosition,
-      showBaStore,
-      showBaCity,
       showBaPassword,
     ].filter(Boolean).length;
 
@@ -1007,8 +1003,6 @@ function ContactsTable({
             {showBaBrand && <th className={thCls}>Brand</th>}
             {showBaGender && <th className={thCls}>Gender</th>}
             {showBaPosition && <th className={thCls}>Position</th>}
-            {showBaStore && <th className={thCls}>Store</th>}
-            {showBaCity && <th className={thCls}>City</th>}
             {showBaPassword && <th className={thCls}>Password</th>}
           </tr>
         </thead>
@@ -1085,16 +1079,6 @@ function ContactsTable({
                 {showBaPosition && (
                   <td className={tdCls}>
                     {ba?.position ?? <span className="text-muted-foreground">—</span>}
-                  </td>
-                )}
-                {showBaStore && (
-                  <td className={tdCls}>
-                    {ba?.store ?? <span className="text-muted-foreground">—</span>}
-                  </td>
-                )}
-                {showBaCity && (
-                  <td className={tdCls}>
-                    {ba?.city ?? <span className="text-muted-foreground">—</span>}
                   </td>
                 )}
                 {showBaPassword && (

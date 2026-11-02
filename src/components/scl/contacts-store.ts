@@ -112,8 +112,6 @@ export const DEFAULT_PROPERTIES: ContactProperty[] = [
     type: "date",
     visible: false,
   },
-  { id: "p-store", key: "store", name: "Store", type: "text", visible: false },
-  { id: "p-city", key: "city", name: "City", type: "text", visible: false },
   {
     id: "p-position",
     key: "position",

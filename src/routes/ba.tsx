@@ -261,7 +261,6 @@ function BAPage() {
                 <Th>Password</Th>
                 <Th>Area Coordinator</Th>
                 <Th>Position</Th>
-                <Th>Store · City</Th>
                 <Th>&nbsp;</Th>
               </tr>
             </thead>
@@ -321,9 +320,6 @@ function BAPage() {
                     </Td>
                     <Td>{b.areaCoordinator || "—"}</Td>
                     <Td>{b.position}</Td>
-                    <Td>
-                      {b.store} · <span className="text-muted-foreground">{b.city}</span>
-                    </Td>
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
                         <button
