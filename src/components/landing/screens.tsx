@@ -213,7 +213,10 @@ function ChatHeader({ compact = false, status }: { compact?: boolean; status?: s
         <>
           <Video className="h-[19px] w-[19px] shrink-0 text-white" strokeWidth={2} />
           <Phone className="ml-[14px] h-[17px] w-[17px] shrink-0 text-white" strokeWidth={2.2} />
-          <MoreVertical className="ml-[10px] h-[18px] w-[18px] shrink-0 text-white" strokeWidth={2} />
+          <MoreVertical
+            className="ml-[10px] h-[18px] w-[18px] shrink-0 text-white"
+            strokeWidth={2}
+          />
         </>
       )}
     </div>

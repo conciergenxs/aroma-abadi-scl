@@ -886,6 +886,52 @@ html {
   font-variant-numeric: lining-nums;
 }
 
+/* ---- Inside the phone ----
+   A WhatsApp screenshot that is set in the page's own typefaces stops
+   looking like WhatsApp, so everything inside a device switches to Roboto,
+   the face the Android app ships with. */
+.lp-wa {
+  font-family:
+    Roboto,
+    "Helvetica Neue",
+    -apple-system,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+/* WhatsApp hangs a small flag off the top corner of a bubble. Drawn as a
+   clipped box so each one picks up its own bubble colour. */
+.lp-tail-in,
+.lp-tail-out {
+  border-top-left-radius: 7.5px;
+  border-top-right-radius: 7.5px;
+}
+.lp-tail-in {
+  border-top-left-radius: 0;
+}
+.lp-tail-out {
+  border-top-right-radius: 0;
+}
+.lp-tail-in::before,
+.lp-tail-out::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 13px;
+}
+.lp-tail-in::before {
+  left: -8px;
+  background: #ffffff;
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+.lp-tail-out::before {
+  right: -8px;
+  background: #d9fdd3;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
 /* ---- Reading-paced reveal ----
    A block settles as it arrives, once. Elements already on screen when the
    page loads are never armed, so nothing above the fold animates in. */

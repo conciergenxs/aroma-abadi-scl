@@ -348,7 +348,7 @@ export const Route = createFileRoute("/")({
     links: [
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap",
       },
     ],
   }),
@@ -631,7 +631,7 @@ function CompanyPage() {
                   key={brand.name}
                   src={brand.src}
                   alt={brand.name}
-                  className="lp-brandmark h-[104px] w-[200px] shrink-0 object-contain sm:w-[240px]"
+                  className="lp-brandmark h-[150px] w-[250px] shrink-0 object-contain sm:w-[320px]"
                 />
               ))}
             </Marquee>
