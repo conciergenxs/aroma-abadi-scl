@@ -21,6 +21,7 @@ import {
   Filter,
   RefreshCw,
 } from "lucide-react";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
@@ -40,10 +41,24 @@ export const Route = createFileRoute("/ba")({
 });
 
 function BAPage() {
+  usePreviewGate("ba-view");
   const { bas } = useBaStore();
   const user = useCurrentUser();
-  const canManage = useCan("ba.manage");
-  const manageReason = cannotReason(user.role, "ba.manage");
+  const createGate = usePermission(
+    "ba-create",
+    useCan("ba.manage"),
+    cannotReason(user.role, "ba.manage"),
+  );
+  const editGate = usePermission(
+    "ba-edit",
+    useCan("ba.manage"),
+    cannotReason(user.role, "ba.manage"),
+  );
+  const passwordGate = usePermission("ba-password");
+  // "See Every Area" is what lets anyone look past their own patch.
+  const everyArea = usePermission("ba-scope");
+  const canManage = createGate.allowed;
+  const manageReason = createGate.reason;
   const { brands } = useSkuStore();
   const [search, setSearch] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
@@ -72,8 +87,9 @@ function BAPage() {
     () =>
       bas.filter((b) => {
         // An Area Coordinator only ever sees the BAs they look after.
-        if (user.role === "Area Coordinator" && b.areaCoordinator !== user.areaCoordinator)
-          return false;
+        const ownAreaOnly = user.role === "Area Coordinator" || !everyArea.allowed;
+        const ownArea = user.areaCoordinator ?? "Citra Dewanti";
+        if (ownAreaOnly && b.areaCoordinator !== ownArea) return false;
         if (search) {
           const q = search.toLowerCase();
           if (
@@ -99,6 +115,7 @@ function BAPage() {
       filterStore,
       user.role,
       user.areaCoordinator,
+      everyArea.allowed,
     ],
   );
 
@@ -266,9 +283,13 @@ function BAPage() {
                           {shown ? b.password : "••••••••••••"}
                         </code>
                         <button
-                          onClick={() => toggleReveal(b)}
-                          className="text-muted-foreground hover:text-foreground transition-colors"
-                          title={shown ? "Hide" : "Show (requires your account password)"}
+                          onClick={() => passwordGate.allowed && toggleReveal(b)}
+                          disabled={!passwordGate.allowed}
+                          className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          title={
+                            passwordGate.reason ||
+                            (shown ? "Hide" : "Show (requires your account password)")
+                          }
                         >
                           {shown ? (
                             <EyeOff className="h-3.5 w-3.5" />
@@ -289,9 +310,10 @@ function BAPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => setResetConfirm(b)}
-                          className="text-muted-foreground hover:text-foreground transition-colors"
-                          title="Reset password"
+                          onClick={() => passwordGate.allowed && setResetConfirm(b)}
+                          disabled={!passwordGate.allowed}
+                          className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          title={passwordGate.reason || "Reset password"}
                         >
                           <KeyRound className="h-3.5 w-3.5" />
                         </button>
@@ -305,8 +327,10 @@ function BAPage() {
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
                         <button
-                          onClick={() => setEditing(b)}
-                          className="rounded px-2 h-8 text-[14px] border border-border hover:bg-gray-50 transition-colors"
+                          onClick={() => editGate.allowed && setEditing(b)}
+                          disabled={!editGate.allowed}
+                          title={editGate.reason || undefined}
+                          className="rounded px-2 h-8 text-[14px] border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           Edit
                         </button>

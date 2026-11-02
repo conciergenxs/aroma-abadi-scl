@@ -8,6 +8,7 @@ import {
   type Transaction,
   type TxStatus,
 } from "@/components/scl/transactions-store";
+import { usePreviewGate } from "@/components/scl/permission-preview";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import { Search, Receipt, TrendingUp, Wallet, Package, X } from "lucide-react";
 import { TransactionPeek } from "@/components/scl/transaction-peek";
@@ -61,6 +62,7 @@ const PAGE_NAV_BTN =
   "disabled:opacity-40 disabled:cursor-not-allowed transition-colors";
 
 function TransactionsPage() {
+  usePreviewGate("commerce-view");
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");

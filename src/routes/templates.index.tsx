@@ -40,6 +40,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 
@@ -83,6 +84,8 @@ const STATUS_OPTIONS = [
 ];
 
 function TemplatesPage() {
+  usePreviewGate("templates-view");
+  const manageGate = usePermission("templates-manage");
   const { templates, groups, categories, starred } = useTemplatesStore();
   const categoryColor = useCategoryColor(categories);
   const [query, setQuery] = useState("");
@@ -198,12 +201,22 @@ function TemplatesPage() {
             >
               <Tags className="h-3.5 w-3.5" /> Manage Groups
             </button>
-            <Link
-              to="/templates/new"
-              className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-            >
-              <Plus className="h-3.5 w-3.5" /> New Template
-            </Link>
+            {manageGate.allowed ? (
+              <Link
+                to="/templates/new"
+                className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              >
+                <Plus className="h-3.5 w-3.5" /> New Template
+              </Link>
+            ) : (
+              <button
+                disabled
+                title={manageGate.reason}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground opacity-40 cursor-not-allowed"
+              >
+                <Plus className="h-3.5 w-3.5" /> New Template
+              </button>
+            )}
           </div>
         </div>
 

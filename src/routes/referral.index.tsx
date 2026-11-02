@@ -17,6 +17,7 @@ import {
   clampPage,
   DeleteSeasonDialog,
 } from "@/components/scl/referral-ui";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { LITE_MODE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/referral/")({
@@ -31,6 +32,8 @@ export const Route = createFileRoute("/referral/")({
 type SeasonTab = "ongoing" | "upcoming" | "past";
 
 function ReferralPage() {
+  usePreviewGate("commerce-view");
+  const manageGate = usePermission("referral-manage");
   const { seasons } = useReferralStore();
   const [deleting, setDeleting] = useState<ReferralSeason | null>(null);
   const [tab, setTab] = useState<SeasonTab>("ongoing");
@@ -79,12 +82,22 @@ function ReferralPage() {
           {/* Sits on the tabs' row rather than up in the page header, so the
               action and the thing it acts on read as one band. `pb-2` lifts it
               clear of the tab underline. */}
-          <Link
-            to="/referral/new"
-            className="press icon-pop ml-auto mb-1.5 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" /> New Season
-          </Link>
+          {manageGate.allowed ? (
+            <Link
+              to="/referral/new"
+              className="press icon-pop ml-auto mb-1.5 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Plus className="h-3.5 w-3.5" /> New Season
+            </Link>
+          ) : (
+            <button
+              disabled
+              title={manageGate.reason}
+              className="ml-auto mb-1.5 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground opacity-40 cursor-not-allowed"
+            >
+              <Plus className="h-3.5 w-3.5" /> New Season
+            </button>
+          )}
         </div>
 
         {tab === "ongoing" &&

@@ -31,6 +31,11 @@ import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { DataManagementModule } from "@/components/scl/data-management";
 import { useCurrentUser, type WorkspaceRole } from "@/components/scl/session-store";
+import {
+  usePreviewGate,
+  usePreviewedCondition,
+  usePermission,
+} from "@/components/scl/permission-preview";
 import { baStore, useBaStore } from "@/components/scl/ba-store";
 
 export const Route = createFileRoute("/settings")({
@@ -40,7 +45,7 @@ export const Route = createFileRoute("/settings")({
 
 // ---------- Navigation structure ----------
 
-type NavItem = { id: string; label: string; enabled?: boolean };
+type NavItem = { id: string; label: string; enabled?: boolean; perm?: string };
 type NavSection = { id: string; label: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
@@ -53,8 +58,8 @@ const NAV: NavSection[] = [
     id: "company",
     label: "Workspace",
     items: [
-      { id: "user-management", label: "User Management", enabled: true },
-      { id: "roles", label: "Roles & Permissions", enabled: true },
+      { id: "user-management", label: "User Management", enabled: true, perm: "settings-users" },
+      { id: "roles", label: "Roles & Permissions", enabled: true, perm: "settings-roles" },
     ],
   },
   {
@@ -69,7 +74,14 @@ const NAV: NavSection[] = [
 ];
 
 function SettingsPage() {
+  usePreviewGate("settings-view");
+  const previewed = usePreviewedCondition();
   const [active, setActive] = useState("general");
+  // A section the preview has closed can't stay open behind the reader.
+  useEffect(() => {
+    const closed = NAV.flatMap((sec) => sec.items).find((i) => i.perm && i.perm === previewed?.id);
+    if (closed && active === closed.id) setActive("general");
+  }, [previewed, active]);
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(NAV.map((s) => [s.id, true])),
   );
@@ -95,30 +107,32 @@ function SettingsPage() {
                 ) : null}
                 {isOpen && (
                   <div className={`space-y-0.5 ${section.id !== "company" ? "mt-1" : ""}`}>
-                    {section.items.map((item) => {
-                      const isActive = active === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => item.enabled && setActive(item.id)}
-                          disabled={!item.enabled}
-                          className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition flex items-center justify-between ${
-                            isActive
-                              ? "bg-primary/15 text-foreground border border-primary/30"
-                              : item.enabled
-                                ? "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
-                                : "text-muted-foreground/40 cursor-not-allowed border border-transparent"
-                          }`}
-                        >
-                          <span>{item.label}</span>
-                          {!item.enabled && (
-                            <span className="text-[9px] uppercase tracking-wider text-muted-foreground/40">
-                              Soon
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                    {section.items
+                      .filter((item) => !(item.perm && item.perm === previewed?.id))
+                      .map((item) => {
+                        const isActive = active === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => item.enabled && setActive(item.id)}
+                            disabled={!item.enabled}
+                            className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition flex items-center justify-between ${
+                              isActive
+                                ? "bg-primary/15 text-foreground border border-primary/30"
+                                : item.enabled
+                                  ? "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
+                                  : "text-muted-foreground/40 cursor-not-allowed border border-transparent"
+                            }`}
+                          >
+                            <span>{item.label}</span>
+                            {!item.enabled && (
+                              <span className="text-[9px] uppercase tracking-wider text-muted-foreground/40">
+                                Soon
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -514,6 +528,7 @@ function UserManagementPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const { bas } = useBaStore();
+  const inviteGate = usePermission("settings-users");
   const [handover, setHandover] = useState<Handover | null>(null);
 
   const filtered = useMemo(() => {
@@ -617,7 +632,9 @@ function UserManagementPage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          disabled={!inviteGate.allowed}
+          title={inviteGate.reason || undefined}
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Invite user
         </button>

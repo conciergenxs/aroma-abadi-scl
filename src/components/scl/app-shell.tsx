@@ -180,6 +180,7 @@ export function AppShell({
   // place — an Area Coordinator has no business on the commercial pages.
   const currentUser = useCurrentUser();
   const previewed = usePreviewedCondition();
+  const invite = usePermission("settings-users");
   const canSee = (i: NavItem) =>
     (!i.needs || roleCan(currentUser.role, i.needs)) &&
     !(i.full && LITE_MODE) &&
@@ -296,6 +297,8 @@ export function AppShell({
         >
           <SidebarButton
             label="Invite Members"
+            disabled={!invite.allowed}
+            disabledReason={invite.reason}
             Icon={UserPlus}
             onClick={() => setInviteOpen(true)}
             expanded={expanded}
@@ -357,6 +360,8 @@ export function AppShell({
             <nav className="border-t border-sidebar-border px-2 pb-3 pt-2 flex flex-col gap-1.5">
               <SidebarButton
                 label="Invite Members"
+                disabled={!invite.allowed}
+                disabledReason={invite.reason}
                 Icon={UserPlus}
                 onClick={() => {
                   setMobileNavOpen(false);
@@ -683,11 +688,15 @@ function SidebarButton({
   Icon,
   onClick,
   expanded,
+  disabled,
+  disabledReason,
 }: {
   label: string;
   Icon: typeof LayoutDashboard;
   onClick: () => void;
   expanded: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   if (expanded) {
     return (
@@ -695,7 +704,9 @@ function SidebarButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Icon className="h-[18px] w-[18px] shrink-0" />
         <span className="flex-1 truncate text-left">{label}</span>
@@ -708,7 +719,9 @@ function SidebarButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Icon className="h-[18px] w-[18px]" />
       </button>
@@ -762,7 +775,11 @@ export function ChannelDot({ channel }: { channel: "whatsapp" }) {
 
 import { sessionStore, useCurrentUser, roleCan, type Capability } from "./session-store";
 import { LITE_MODE } from "@/lib/feature-flags";
-import { usePreviewedCondition, permissionPreview } from "@/components/scl/permission-preview";
+import {
+  usePreviewedCondition,
+  usePermission,
+  permissionPreview,
+} from "@/components/scl/permission-preview";
 import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 

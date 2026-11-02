@@ -23,6 +23,7 @@ import {
   Play,
   Pause,
 } from "lucide-react";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import type { Broadcast } from "@/components/scl/mock-data";
 import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -61,6 +62,8 @@ const STATUS_TONE: Record<LifecycleStatus, "positive" | "warning" | "neutral" | 
 type StatusFilter = "All" | LifecycleStatus;
 
 function BroadcastListPage() {
+  usePreviewGate("broadcast-view");
+  const createGate = usePermission("broadcast-create");
   const navigate = useNavigate();
   const { broadcasts } = useBroadcastsStore();
   const [query, setQuery] = useState("");
@@ -186,12 +189,22 @@ function BroadcastListPage() {
                 Search, filter, and manage campaigns.
               </p>
             </div>
-            <Link
-              to="/broadcasts/new"
-              className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-            >
-              <Plus className="h-3.5 w-3.5" /> Create Broadcast
-            </Link>
+            {createGate.allowed ? (
+              <Link
+                to="/broadcasts/new"
+                className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              >
+                <Plus className="h-3.5 w-3.5" /> Create Broadcast
+              </Link>
+            ) : (
+              <button
+                disabled
+                title={createGate.reason}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground opacity-40 cursor-not-allowed"
+              >
+                <Plus className="h-3.5 w-3.5" /> Create Broadcast
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-border">
             <div className="relative">
@@ -469,6 +482,7 @@ function BroadcastListPage() {
  * a recurring series can be switched off and on for as long as it runs, and a
  * live series has to be switched off before it can be deleted. */
 function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
+  const recurringGate = usePermission("broadcast-recurring");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -504,8 +518,11 @@ function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
           {canToggle && (
             <button
               type="button"
-              disabled={!isActive && activationReason !== ""}
-              title={!isActive ? activationReason || undefined : undefined}
+              disabled={!recurringGate.allowed || (!isActive && activationReason !== "")}
+              title={
+                recurringGate.reason ||
+                (!isActive ? activationReason || undefined : undefined)
+              }
               onClick={() => {
                 broadcastsStore.setActivation(broadcast.id, isActive ? "inactive" : "active");
                 toast.success(isActive ? "Broadcast deactivated" : "Broadcast activated");
