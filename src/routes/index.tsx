@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   Award,
   Ban,
@@ -302,6 +302,42 @@ const POLICIES = [
   },
 ];
 
+const CONTACT: {
+  icon?: typeof Clock;
+  wa?: boolean;
+  label: string;
+  value: ReactNode;
+  wide?: boolean;
+}[] = [
+  {
+    wa: true,
+    label: "WhatsApp pelanggan",
+    value: (
+      <a
+        href={WA_LINK}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+      >
+        {WA_NUMBER}
+      </a>
+    ),
+  },
+  { icon: Clock, label: "Jam layanan", value: <Pending field="jam operasional" tone="maroon" /> },
+  { icon: Mail, label: "Email resmi", value: <Pending field="alamat email" tone="maroon" /> },
+  { icon: Phone, label: "Telepon kantor", value: <Pending field="nomor telepon" tone="maroon" /> },
+  {
+    icon: MapPin,
+    label: "Alamat kantor",
+    wide: true,
+    value: (
+      <>
+        <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI Jakarta
+      </>
+    ),
+  },
+];
+
 const DESCRIPTION =
   "PT Aroma Abadi mendistribusikan produk kecantikan premium di Indonesia dan menjalankan program CRM serta loyalitas lewat WhatsApp. Halaman ini menjelaskan profil bisnis, mekanisme program, dan alur transaksi pelanggan termasuk titik pembayaran melalui Xendit.";
 
@@ -328,6 +364,27 @@ export const Route = createFileRoute("/")({
   }),
   component: CompanyPage,
 });
+
+/** WhatsApp's mark drawn as an outline, so it sits with the line icons
+ * everywhere it appears. The floating button keeps the full-colour glyph —
+ * that one is meant to read as the app's own button. */
+function WhatsAppIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M20.3 11.9a8.4 8.4 0 0 1-12.5 7.3L3.4 20.6l1.5-4.3A8.4 8.4 0 1 1 20.3 11.9z" />
+      <path d="M9.1 9.3c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.4l.6 1.5c.1.2 0 .4-.1.6l-.3.4c-.1.2-.2.3 0 .6a6.4 6.4 0 0 0 2.7 2.3c.2.1.4.1.6-.1l.4-.5c.1-.2.3-.2.5-.1l1.4.7c.2.1.3.2.3.4v.5c0 .4-.3.8-.7 1-.5.2-1.1.2-1.8.1a9.9 9.9 0 0 1-5.6-4.7c-.4-.8-.4-1.6-.2-2.1l.4-1z" />
+    </svg>
+  );
+}
 
 /** Masthead behaviour: out of the way going down, back the moment a reader
  * turns around, with a hairline showing how far through the page they are. */
@@ -432,9 +489,9 @@ function CompanyPage() {
               href={WA_LINK}
               target="_blank"
               rel="noreferrer noopener"
-              className="press ml-auto hidden items-center gap-[9px] rounded-full bg-[#D7B69A] py-[9px] pl-[10px] pr-[18px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
+              className="press ml-auto hidden items-center gap-[8px] rounded-full bg-[#D7B69A] px-[18px] py-[10px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
             >
-              <img src={whatsappMark} alt="" className="h-[22px] w-[22px]" />
+              <WhatsAppIcon className="h-[19px] w-[19px]" />
               Chat dengan ARMA
             </a>
 
@@ -513,7 +570,7 @@ function CompanyPage() {
                 >
                   <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#8A6246]">
                     {fact.wa ? (
-                      <img src={whatsappMark} alt="" className="h-[15px] w-[15px]" />
+                      <WhatsAppIcon className="h-[15px] w-[15px]" />
                     ) : fact.icon ? (
                       <fact.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
                     ) : null}
@@ -550,7 +607,7 @@ function CompanyPage() {
                     key={brand.name}
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[190px] w-[290px] shrink-0 object-contain sm:w-[380px]"
+                    className="lp-brandmark h-[250px] w-[340px] shrink-0 object-contain sm:w-[470px]"
                   />
                 ))}
               </Marquee>
@@ -827,73 +884,52 @@ function CompanyPage() {
       {/* ── Kontak & footer ─────────────────────────────────────────── */}
       <footer id="kontak" className="lp-dark scroll-mt-[86px] bg-[#3A000A]">
         <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-20">
-          <div className="grid gap-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-16">
+          <div className="grid gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] md:gap-16">
             <div>
               <img src={armaMark} alt="Aroma Abadi" className="w-[56px]" />
               <h2 className="lp-display mt-6 text-[clamp(1.6rem,1.1rem+1.4vw,2.1rem)] leading-[1.14] text-[#FBFAF8]">
                 Kontak Resmi
               </h2>
               <span className="mt-4 block h-px w-10 bg-[#E7CF95]/45" />
-              <p className="mt-4 max-w-[34ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
-                Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra. Seluruh pesanan dan
-                pembayaran berjalan lewat nomor WhatsApp di samping.
+              <p className="mt-4 max-w-[32ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
+                Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra.
               </p>
               <a
                 href={WA_LINK}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="press mt-7 inline-flex items-center gap-[10px] rounded-full bg-[#D7B69A] py-[11px] pl-[12px] pr-[22px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
+                className="press mt-7 inline-flex items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
               >
-                <img src={whatsappMark} alt="" className="h-[24px] w-[24px]" />
+                <WhatsAppIcon className="h-[20px] w-[20px]" />
                 Chat dengan ARMA
               </a>
             </div>
 
             <Reveal>
-              <Facts
-                tone="maroon"
-                items={[
-                  {
-                    iconNode: <img src={whatsappMark} alt="" className="h-[15px] w-[15px]" />,
-                    label: "WhatsApp pelanggan",
-                    value: (
-                      <a
-                        href={WA_LINK}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="underline decoration-[#E7CF95]/50 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
-                      >
-                        {WA_NUMBER}
-                      </a>
-                    ),
-                  },
-                  {
-                    icon: Clock,
-                    label: "Jam layanan",
-                    value: <Pending field="jam operasional" tone="maroon" />,
-                  },
-                  {
-                    icon: Mail,
-                    label: "Email resmi",
-                    value: <Pending field="alamat email" tone="maroon" />,
-                  },
-                  {
-                    icon: Phone,
-                    label: "Telepon kantor",
-                    value: <Pending field="nomor telepon" tone="maroon" />,
-                  },
-                  {
-                    icon: MapPin,
-                    label: "Alamat kantor",
-                    value: (
-                      <>
-                        <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI
-                        Jakarta
-                      </>
-                    ),
-                  },
-                ]}
-              />
+              <div className="grid gap-px overflow-hidden rounded-[16px] border border-[#F3F0EC]/15 bg-[#F3F0EC]/15 sm:grid-cols-2">
+                {CONTACT.map((item) => (
+                  <div
+                    key={item.label}
+                    className={`group bg-[#3A000A] p-5 transition-colors duration-300 hover:bg-[#4A000D] ${
+                      item.wide ? "sm:col-span-2" : ""
+                    }`}
+                  >
+                    <p className="flex items-center gap-[10px] text-[12px] text-[#E7CF95]">
+                      <span className="grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#E7CF95]/12 text-[#E7CF95] transition-colors duration-300 group-hover:bg-[#E7CF95]/20">
+                        {item.wa ? (
+                          <WhatsAppIcon className="h-[15px] w-[15px]" />
+                        ) : item.icon ? (
+                          <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                        ) : null}
+                      </span>
+                      {item.label}
+                    </p>
+                    <p className="mt-[10px] pl-[38px] text-[15px] leading-[1.5] text-[#FBFAF8]">
+                      {item.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </Reveal>
           </div>
 
