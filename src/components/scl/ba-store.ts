@@ -373,6 +373,21 @@ export const baStore = {
     state = { ...state, bas: state.bas.map((b) => (b.id === id ? { ...b, ...patch } : b)) };
     emit();
   },
+  /** Hand every BA under these coordinators to another one. Their LMS
+   * password is left alone — it was issued to the BA, not to the coordinator,
+   * and changing it would lock them out of a course mid-way. */
+  reassignCoordinator(from: string[], to: string) {
+    const leaving = new Set(from);
+    const moved = state.bas.filter((b) => leaving.has(b.areaCoordinator)).length;
+    state = {
+      ...state,
+      bas: state.bas.map((b) =>
+        leaving.has(b.areaCoordinator) ? { ...b, areaCoordinator: to } : b,
+      ),
+    };
+    emit();
+    return moved;
+  },
   remove(id: string) {
     state = { ...state, bas: state.bas.filter((b) => b.id !== id) };
     emit();

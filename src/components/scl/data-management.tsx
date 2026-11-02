@@ -542,7 +542,12 @@ function RecentlyDeletedContactsPage() {
   const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  const visibleProps = useMemo(() => properties.filter((p) => p.visible), [properties]);
+  // The BA password column belongs on the BA record, not on a list of
+  // contacts waiting to be restored.
+  const visibleProps = useMemo(
+    () => properties.filter((p) => p.visible && p.key !== "password"),
+    [properties],
+  );
 
   const deletedContacts = useMemo(() => {
     const base = contacts.filter((c) => c.deleted);
@@ -642,7 +647,7 @@ function RecentlyDeletedContactsPage() {
                     </th>
                   ))}
                   <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">Deleted</th>
-                  <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Actions</th>
+                  <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border stagger">
@@ -659,7 +664,7 @@ function RecentlyDeletedContactsPage() {
                     <td className="px-3 py-3 text-xs text-muted-foreground whitespace-nowrap">
                       {c.deletedAt ? fmtDate(c.deletedAt) : "—"}
                     </td>
-                    <td className="px-3 py-3 text-right whitespace-nowrap">
+                    <td className="px-3 py-3 text-left whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
