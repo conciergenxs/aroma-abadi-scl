@@ -1,15 +1,20 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  Camera,
   Check,
   CreditCard,
   Landmark,
   Lock,
+  MoreVertical,
+  Paperclip,
   Phone,
   QrCode,
   Send,
+  Smile,
   Video,
   Wallet,
+  Wifi,
 } from "lucide-react";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 
@@ -17,9 +22,13 @@ import armaMark from "@/assets/aroma-abadi-icon-sand.png";
  *
  * The whole business runs inside a WhatsApp thread, so the thread is the one
  * artefact worth showing: it is where the order is agreed, where the payment
- * link arrives, and where the receipt lands. Nothing here is interactive —
- * these are pictures of a conversation, not a working form, and no screen
- * takes a keystroke. */
+ * link arrives, and where the receipt lands.
+ *
+ * Everything inside the device is drawn to WhatsApp's own conventions — its
+ * greens, its bubble tails and tails' tick marks, and its type (Roboto, the
+ * Android app's face) rather than the Aroma Abadi faces used by the rest of
+ * the page. Nothing here is interactive: these are pictures of a
+ * conversation, not a working form, and no screen takes a keystroke. */
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -68,15 +77,15 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
   return (
     <div className={`${mine ? "justify-end" : "justify-start"} ${hidden ? "lp-msg" : "lp-msg-in"}`}>
       <div
-        className={`relative ${structured ? "w-[88%]" : "max-w-[86%]"} rounded-[8px] px-[9px] py-[6px] text-[13.5px] leading-[1.42] text-[#111B21] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
-          mine ? "rounded-tr-[2px] bg-[#D9FDD3]" : "rounded-tl-[2px] bg-white"
+        className={`relative ${structured ? "w-[86%]" : "max-w-[84%]"} rounded-[7.5px] px-[9px] py-[6px] text-[14.2px] leading-[19px] text-[#111B21] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
+          mine ? "lp-tail-out bg-[#D9FDD3]" : "lp-tail-in bg-white"
         }`}
       >
         {message.text ? <p>{message.text}</p> : null}
 
         {message.order ? (
           <div>
-            <p className="font-semibold">{message.order.title}</p>
+            <p className="font-medium">{message.order.title}</p>
             <ul className="mt-[6px] space-y-[3px]">
               {message.order.items.map((item) => (
                 <li key={item.name} className="flex gap-3">
@@ -92,7 +101,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
             </ul>
             <div className="my-[6px] border-t border-dashed border-[#111B21]/15" />
             <Rows rows={message.order.rows} muted />
-            <div className="mt-[6px] flex justify-between gap-3 border-t border-[#111B21]/15 pt-[6px] font-semibold">
+            <div className="mt-[6px] flex justify-between gap-3 border-t border-[#111B21]/15 pt-[6px] font-medium">
               <span>Total</span>
               <span className="tabular-nums">{message.order.total}</span>
             </div>
@@ -102,13 +111,13 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
         {message.link ? (
           <div>
             <div className="rounded-[6px] bg-[#F5F6F6] p-[8px]">
-              <p className="text-[12.5px] font-semibold leading-snug">{message.link.title}</p>
-              <p className="mt-[2px] text-[12px] leading-snug text-[#667781]">
+              <p className="text-[13px] font-medium leading-[17px]">{message.link.title}</p>
+              <p className="mt-[2px] text-[12.5px] leading-[16px] text-[#667781]">
                 {message.link.note}
               </p>
-              <p className="mt-[5px] text-[12px] text-[#8696A0]">{message.link.host}</p>
+              <p className="mt-[5px] text-[12.5px] text-[#8696A0]">{message.link.host}</p>
             </div>
-            <p className="mt-[5px] break-all text-[12.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
+            <p className="mt-[5px] break-all text-[13.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
               {message.link.url}
             </p>
           </div>
@@ -116,7 +125,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
 
         {message.receipt ? (
           <div>
-            <p className="flex items-center gap-[5px] font-semibold">
+            <p className="flex items-center gap-[5px] font-medium">
               <Check className="h-[14px] w-[14px] text-[#1FA855]" strokeWidth={3} />
               {message.receipt.title}
             </p>
@@ -127,7 +136,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
           </div>
         ) : null}
 
-        <p className="mt-[2px] flex items-center justify-end gap-[3px] text-[12px] leading-none text-[#667781]">
+        <p className="mt-[2px] flex items-center justify-end gap-[3px] text-[11.5px] leading-none text-[#667781]">
           {message.time}
           {mine ? <Ticks /> : null}
         </p>
@@ -139,7 +148,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
 function TypingBubble() {
   return (
     <div className="lp-msg-in justify-start">
-      <div className="rounded-[8px] rounded-tl-[2px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
+      <div className="lp-tail-in relative rounded-[7.5px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
         <span className="flex items-center gap-[4px]">
           <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" />
           <i
@@ -156,25 +165,55 @@ function TypingBubble() {
   );
 }
 
+/** The Android status bar: carrier bars, wi-fi, and a battery drawn as a
+ * capsule with a cap and a real fill level. */
+function StatusBar() {
+  return (
+    <div className="flex items-center justify-between bg-[#008069] px-[14px] pb-[4px] pt-[7px] text-[12.5px] font-medium text-white">
+      <span className="tracking-[0.01em]">09.41</span>
+      <span className="flex items-center gap-[6px]">
+        <span className="flex items-end gap-[1.5px]">
+          <i className="h-[4px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[6px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[8px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[10px] w-[2.5px] rounded-[1px] bg-white/45" />
+        </span>
+        <Wifi className="h-[13px] w-[13px]" strokeWidth={2.4} />
+        <span className="flex items-center">
+          <span className="flex h-[10.5px] w-[20px] items-center rounded-[3px] border border-white/80 p-[1.5px]">
+            <span className="block h-full w-[68%] rounded-[1px] bg-white" />
+          </span>
+          <span className="ml-[1px] h-[4px] w-[1.5px] rounded-r-[1px] bg-white/80" />
+        </span>
+      </span>
+    </div>
+  );
+}
+
 function ChatHeader({ compact = false, status }: { compact?: boolean; status?: string }) {
   return (
     <div
-      className={`flex items-center gap-[9px] bg-[#075E54] ${compact ? "px-[11px] py-[9px]" : "px-[12px] py-[10px]"}`}
+      className={`flex items-center bg-[#008069] ${compact ? "gap-[9px] px-[11px] py-[9px]" : "gap-[9px] px-[10px] pb-[9px] pt-[4px]"}`}
     >
       {compact ? null : (
-        <ArrowLeft className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
+        <ArrowLeft className="h-[19px] w-[19px] shrink-0 text-white" strokeWidth={2.1} />
       )}
-      <span className="grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full bg-[#710014]">
-        <img src={armaMark} alt="" className="w-[18px]" />
+      <span className="grid h-[33px] w-[33px] shrink-0 place-items-center rounded-full bg-[#710014]">
+        <img src={armaMark} alt="" className="w-[19px]" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[14px] font-medium text-white">Aroma Abadi</span>
-        <span className="block text-[12px] text-white/65">{status ?? "online"}</span>
+        <span className="block truncate text-[15px] font-medium leading-[19px] text-white">
+          Aroma Abadi
+        </span>
+        <span className="block text-[12.5px] leading-[16px] text-white/75">
+          {status ?? "online"}
+        </span>
       </span>
       {compact ? null : (
         <>
-          <Video className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
-          <Phone className="h-[15px] w-[15px] shrink-0 text-white/85" strokeWidth={2} />
+          <Video className="h-[19px] w-[19px] shrink-0 text-white" strokeWidth={2} />
+          <Phone className="ml-[14px] h-[17px] w-[17px] shrink-0 text-white" strokeWidth={2.2} />
+          <MoreVertical className="ml-[10px] h-[18px] w-[18px] shrink-0 text-white" strokeWidth={2} />
         </>
       )}
     </div>
@@ -191,10 +230,10 @@ export function ChatScreen({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)] ${className}`}
+      className={`lp-wa overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)] ${className}`}
     >
       <ChatHeader compact />
-      <div className="lp-wallpaper space-y-[6px] px-[10px] py-[12px]">
+      <div className="lp-wallpaper space-y-[8px] px-[9px] py-[12px]">
         {messages.map((message, index) => (
           <Bubble key={index} message={message} hidden={false} />
         ))}
@@ -329,6 +368,7 @@ export function LiveChat({
   const [armaTyping, setArmaTyping] = useState(false);
   const [paying, setPaying] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
 
   useIsoLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -395,28 +435,29 @@ export function LiveChat({
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [sent, armaTyping]);
+  }, [sent, armaTyping, draft]);
+
+  // The field grows with the draft, up to five lines, then scrolls — so the
+  // line being typed is always the one in view.
+  useEffect(() => {
+    const el = fieldRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [draft]);
 
   const count = live ? sent : messages.length;
 
   return (
     <div className={`lp-phone relative ${className}`}>
       <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
-        <div className="relative overflow-hidden rounded-[26px] bg-[#EFE7DE]">
-          <div className="flex items-center justify-between bg-[#075E54] px-[15px] pb-[2px] pt-[7px] text-[11.5px] font-medium text-white/90">
-            <span>09.41</span>
-            <span className="flex items-center gap-[4px]">
-              <span className="h-[7px] w-[7px] rounded-full bg-white/80" />
-              <span className="h-[9px] w-[16px] rounded-[3px] border border-white/70" />
-            </span>
-          </div>
+        <div className="lp-wa relative flex h-[556px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
+          <StatusBar />
           <ChatHeader status={armaTyping ? "mengetik…" : "online"} />
 
           <div
             ref={threadRef}
-            className="lp-wallpaper scrollbar-none h-[418px] space-y-[6px] overflow-y-auto px-[10px] py-[12px]"
+            className="lp-wallpaper scrollbar-none min-h-0 flex-1 space-y-[8px] overflow-y-auto px-[9px] py-[12px]"
           >
-            <p className="mx-auto w-fit rounded-[7px] bg-white/85 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
+            <p className="mx-auto w-fit rounded-[7px] bg-white/90 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
               Hari ini
             </p>
             {messages.map((message, index) => (
@@ -425,23 +466,30 @@ export function LiveChat({
             {armaTyping ? <TypingBubble /> : null}
           </div>
 
-          <div className="flex items-center gap-[8px] bg-[#F0F2F5] px-[10px] py-[8px]">
-            <span className="flex h-[32px] flex-1 items-center overflow-hidden rounded-full bg-white px-[12px] text-[13px]">
-              {draft ? (
-                <span className="truncate text-[#111B21]">
-                  {draft}
-                  <i className="lp-caret ml-[1px] inline-block h-[14px] w-[1.5px] translate-y-[2px] bg-[#111B21]" />
-                </span>
-              ) : (
-                <span className="text-[#8696A0]">Ketik pesan</span>
-              )}
-            </span>
-            <span
-              className={`grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full transition-colors duration-200 ${
-                draft ? "bg-[#00A884]" : "bg-[#00A884]/70"
-              }`}
-            >
-              <Send className="h-[15px] w-[15px] translate-x-[-1px] text-white" strokeWidth={2.2} />
+          <div className="flex items-end gap-[6px] bg-[#F0F2F5] px-[8px] py-[7px]">
+            <div className="flex min-h-[40px] flex-1 items-end gap-[7px] rounded-[20px] bg-white px-[10px] py-[9px]">
+              <Smile className="h-[19px] w-[19px] shrink-0 text-[#8696A0]" strokeWidth={1.8} />
+              <div
+                ref={fieldRef}
+                className="scrollbar-none max-h-[95px] flex-1 overflow-y-auto text-[14.5px] leading-[19px]"
+              >
+                {draft ? (
+                  <span className="text-[#111B21]">
+                    {draft}
+                    <i className="lp-caret ml-[1px] inline-block h-[14px] w-[1.5px] translate-y-[2px] bg-[#111B21]" />
+                  </span>
+                ) : (
+                  <span className="text-[#8696A0]">Ketik pesan..</span>
+                )}
+              </div>
+              <Paperclip
+                className="h-[18px] w-[18px] shrink-0 -rotate-45 text-[#8696A0]"
+                strokeWidth={1.8}
+              />
+              <Camera className="h-[18px] w-[18px] shrink-0 text-[#8696A0]" strokeWidth={1.8} />
+            </div>
+            <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-full bg-[#00A884]">
+              <Send className="h-[17px] w-[17px] translate-x-[-1px] text-white" strokeWidth={2.1} />
             </span>
           </div>
 
