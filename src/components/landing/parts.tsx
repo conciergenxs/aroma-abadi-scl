@@ -13,7 +13,10 @@ export type Tone = "light" | "dark";
 const TITLE_COLOR: Record<Tone, string> = { light: "text-[#71252A]", dark: "text-[#FBF7F0]" };
 const BODY_COLOR: Record<Tone, string> = { light: "text-[#50443D]", dark: "text-[#E8DCCB]/80" };
 const META_COLOR: Record<Tone, string> = { light: "text-[#8A7A6D]", dark: "text-[#D9B892]" };
-const RULE_COLOR: Record<Tone, string> = { light: "border-[#3A2F2B]/12", dark: "border-[#FBF7F0]/14" };
+const RULE_COLOR: Record<Tone, string> = {
+  light: "border-[#3A2F2B]/12",
+  dark: "border-[#FBF7F0]/14",
+};
 
 export function Section({
   id,

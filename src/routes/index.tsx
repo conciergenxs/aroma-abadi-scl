@@ -160,7 +160,11 @@ function CompanyPage() {
       {/* ── Masthead ─────────────────────────────────────────────────── */}
       <header className="lp-dark sticky top-0 z-30 border-b border-[#FBF7F0]/10 bg-[#2A0D12]/95 backdrop-blur-sm">
         <div className="mx-auto flex h-[62px] w-full max-w-[1180px] items-center gap-6 px-6 md:px-10">
-          <a href="#top" className="shrink-0 rounded-sm" aria-label="PT Aroma Abadi, ke atas halaman">
+          <a
+            href="#top"
+            className="shrink-0 rounded-sm"
+            aria-label="PT Aroma Abadi, ke atas halaman"
+          >
             <img src={logo} alt="Aroma Abadi" className="h-[21px] w-auto" />
           </a>
           <nav className="hidden flex-1 items-center justify-center gap-5 lg:flex xl:gap-7">
@@ -456,7 +460,8 @@ function CompanyPage() {
                 },
                 {
                   label: "Rincian biaya",
-                  value: "Subtotal, potongan, PPN, dan biaya layanan tampil sebelum pelanggan membayar",
+                  value:
+                    "Subtotal, potongan, PPN, dan biaya layanan tampil sebelum pelanggan membayar",
                 },
                 { label: "Mata uang", value: "Rupiah (IDR)" },
                 {
@@ -488,9 +493,9 @@ function CompanyPage() {
               kredit belanja.
             </Block>
             <Block title="Pembatalan">
-              Pesanan yang belum dibayar batal sendiri ketika tautan pembayaran kedaluwarsa.
-              Pesanan yang sudah dibayar tetapi belum dikirim bisa dibatalkan lewat WhatsApp, dan
-              dananya dikembalikan penuh melalui Xendit ke metode pembayaran asal.
+              Pesanan yang belum dibayar batal sendiri ketika tautan pembayaran kedaluwarsa. Pesanan
+              yang sudah dibayar tetapi belum dikirim bisa dibatalkan lewat WhatsApp, dan dananya
+              dikembalikan penuh melalui Xendit ke metode pembayaran asal.
             </Block>
             <Block title="Privasi data">
               Kami menyimpan nomor WhatsApp, nama, alamat pengiriman, dan riwayat pesanan untuk

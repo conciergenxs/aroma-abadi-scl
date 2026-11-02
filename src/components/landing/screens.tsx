@@ -44,7 +44,9 @@ function Bubble({
     >
       <div
         className={`${structured ? "w-[88%]" : "max-w-[85%]"} rounded-[10px] px-[10px] py-[7px] text-[14px] leading-[1.45] shadow-[0_1px_1px_rgba(11,20,26,0.13)] ${
-          mine ? "rounded-tr-[3px] bg-[#DCF8C6] text-[#111B21]" : "rounded-tl-[3px] bg-white text-[#111B21]"
+          mine
+            ? "rounded-tr-[3px] bg-[#DCF8C6] text-[#111B21]"
+            : "rounded-tl-[3px] bg-white text-[#111B21]"
         }`}
       >
         {message.text ? <p>{message.text}</p> : null}
@@ -85,7 +87,9 @@ function Bubble({
               <p className="text-[13px] font-semibold leading-snug text-[#111B21]">
                 {message.link.title}
               </p>
-              <p className="mt-[3px] text-[12px] leading-snug text-[#667781]">{message.link.note}</p>
+              <p className="mt-[3px] text-[12px] leading-snug text-[#667781]">
+                {message.link.note}
+              </p>
               <p className="mt-[6px] text-[12px] text-[#8696A0]">{message.link.host}</p>
             </div>
             <p className="mt-[6px] break-all text-[13px] text-[#027EB5] underline decoration-[#027EB5]/40">
@@ -114,7 +118,9 @@ function Bubble({
           </div>
         ) : null}
 
-        <p className="mt-[3px] text-right text-[12px] leading-none text-[#667781]">{message.time}</p>
+        <p className="mt-[3px] text-right text-[12px] leading-none text-[#667781]">
+          {message.time}
+        </p>
       </div>
     </div>
   );
@@ -204,15 +210,21 @@ export function CheckoutScreen({
               >
                 <Icon className="h-[17px] w-[17px] shrink-0 text-[#2544B8]" strokeWidth={1.6} />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-medium text-[#111B21]">{method.name}</span>
-                  <span className="block text-[12px] leading-snug text-[#6B7590]">{method.note}</span>
+                  <span className="block text-[14px] font-medium text-[#111B21]">
+                    {method.name}
+                  </span>
+                  <span className="block text-[12px] leading-snug text-[#6B7590]">
+                    {method.note}
+                  </span>
                 </span>
                 <span
                   className={`grid h-[16px] w-[16px] shrink-0 place-items-center rounded-full border ${
                     index === 0 ? "border-[#2544B8]" : "border-[#111B21]/25"
                   }`}
                 >
-                  {index === 0 ? <span className="h-[8px] w-[8px] rounded-full bg-[#2544B8]" /> : null}
+                  {index === 0 ? (
+                    <span className="h-[8px] w-[8px] rounded-full bg-[#2544B8]" />
+                  ) : null}
                 </span>
               </li>
             );
