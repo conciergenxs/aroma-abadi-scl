@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
@@ -84,9 +84,14 @@ import {
   type FunnelStage,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
-import { LITE_MODE } from "@/lib/feature-flags";
+import { LITE_MODE, PUBLIC_SITE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/")({
+  // On the public-site deployment the root belongs to the company page, not
+  // to the workspace — see PUBLIC_SITE.
+  beforeLoad: () => {
+    if (PUBLIC_SITE) throw redirect({ to: "/company" });
+  },
   head: () => ({
     meta: [
       { title: "Overview — Aroma Abadi" },
