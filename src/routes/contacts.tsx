@@ -79,6 +79,7 @@ const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "viol
 
 function ContactsPage() {
   usePreviewGate("contacts-view");
+  const baGate = usePermission("ba-view");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");
   const exportGate = usePermission("contacts-export");
@@ -294,12 +295,22 @@ function ContactsPage() {
         activeView === "ba" ? (
           // This view lists BAs as people; their LMS accounts — brand, store,
           // credentials — are managed on their own page.
-          <Link
-            to="/ba"
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
-          >
-            <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
-          </Link>
+          baGate.allowed ? (
+            <Link
+              to="/ba"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
+            >
+              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
+            </Link>
+          ) : (
+            <button
+              disabled
+              title={baGate.reason}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 h-9 text-[13px] font-medium opacity-40 cursor-not-allowed"
+            >
+              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
+            </button>
+          )
         ) : undefined
       }
       noPadding

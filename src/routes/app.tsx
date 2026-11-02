@@ -86,7 +86,7 @@ import {
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
 import { LITE_MODE } from "@/lib/feature-flags";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "Overview — Aroma Abadi" },

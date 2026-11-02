@@ -60,6 +60,7 @@ import {
   referralActivityFor,
   type ReferralUseWithSeason,
 } from "@/components/scl/referral-store";
+import { usePermission } from "@/components/scl/permission-preview";
 import { LITE_MODE } from "@/lib/feature-flags";
 
 const SYSTEM_KEYS = new Set([
@@ -90,6 +91,8 @@ type ContactRedemption = PromoRedemption & {
 };
 
 function ContactDetailPage() {
+  const editGate = usePermission("contacts-edit");
+  const deleteGate = usePermission("contacts-delete");
   const { contactId } = useParams({ from: "/contacts/$contactId" });
   const state = useContactsStore();
   const { contacts, labels, lists, properties, activities } = state;
@@ -445,6 +448,8 @@ function ContactDetailPage() {
                 <h1 className="text-base font-semibold truncate">{contact.name}</h1>
                 {!isBA && (
                   <LifecycleDropdown
+                    disabled={!editGate.allowed}
+                    disabledReason={editGate.reason}
                     value={contact.lifecycleStage ?? null}
                     onChange={setLifecycle}
                   />
@@ -459,7 +464,9 @@ function ContactDetailPage() {
                 </Link>
                 <button
                   onClick={() => setConfirmDelete(true)}
-                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
+                  disabled={!deleteGate.allowed}
+                  title={deleteGate.reason || undefined}
+                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>
@@ -663,9 +670,13 @@ const LIFECYCLE_STAGES: LifecycleStage[] = [
 function LifecycleDropdown({
   value,
   onChange,
+  disabled,
+  disabledReason,
 }: {
   value: LifecycleStage | null;
   onChange: (s: LifecycleStage | null) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -684,8 +695,10 @@ function LifecycleDropdown({
     <div ref={ref} className="relative inline-block">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
           style ? style.badge : "border-border text-muted-foreground hover:border-foreground/30"
         }`}
       >

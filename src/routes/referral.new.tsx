@@ -16,7 +16,7 @@ import { LITE_MODE } from "@/lib/feature-flags";
 export const Route = createFileRoute("/referral/new")({
   // The lite build doesn't carry Referral, so the URL doesn't either.
   beforeLoad: () => {
-    if (LITE_MODE) throw redirect({ to: "/" });
+    if (LITE_MODE) throw redirect({ to: "/app" });
   },
   head: () => ({ meta: [{ title: "New Referral Season — Aroma Abadi" }] }),
   component: NewSeasonPage,

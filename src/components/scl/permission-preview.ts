@@ -75,7 +75,7 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     id: "contacts-export",
     label: "Export Contacts",
     section: "Conversations & Contacts",
-    effect: "Export is locked.",
+    effect: "Nothing changes on screen — contacts have no export action in the product yet.",
   },
   {
     id: "contacts-properties",
@@ -207,7 +207,7 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     id: "transactions-manage",
     label: "Record Transactions",
     section: "Commerce",
-    effect: "The transaction ledger is read-only.",
+    effect: "Nothing changes on screen — the ledger is already read-only, filled from ARMA.",
   },
 
   // ── Workspace ───────────────────────────────────────────────────────────
@@ -312,7 +312,7 @@ export function previewLockReason(id: string): string {
 
 /** The link that opens the dashboard with one permission switched off. */
 export function previewLink(id: string, origin = ""): string {
-  return `${origin}/?${PREVIEW_PARAM}=${encodeURIComponent(id)}`;
+  return `${origin}/app?${PREVIEW_PARAM}=${encodeURIComponent(id)}`;
 }
 
 /** For a page that a permission opens: sends the viewer to Overview while that
@@ -322,7 +322,7 @@ export function usePreviewGate(id: string): boolean {
   const allowed = usePermAllows(id);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!allowed) navigate({ to: "/" });
+    if (!allowed) navigate({ to: "/app" });
   }, [allowed, navigate]);
   return allowed;
 }
