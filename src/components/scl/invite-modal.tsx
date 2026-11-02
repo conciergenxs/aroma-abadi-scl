@@ -31,10 +31,7 @@ export function useWorkspaceAgents() {
   return agents;
 }
 
-type Tab = "whatsapp" | "agent";
-
 export function InviteModal({ onClose }: { onClose: () => void }) {
-  const [tab, setTab] = useState<Tab>("whatsapp");
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -54,7 +51,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="text-sm font-semibold">Invite to workspace</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              Invite humans or connect an AI agent
+              Send a WhatsApp invite and set the role it arrives with
             </p>
           </div>
           <button
@@ -65,65 +62,11 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="px-5 pt-3 border-b border-border">
-          <div className="flex gap-1">
-            <TabBtn
-              active={tab === "whatsapp"}
-              onClick={() => setTab("whatsapp")}
-              icon={<img src={whatsappAsset} alt="" className="h-3.5 w-3.5" />}
-            >
-              Invite by WhatsApp
-            </TabBtn>
-            <TabBtn
-              active={tab === "agent"}
-              onClick={() => setTab("agent")}
-              icon={<Bot className="h-3.5 w-3.5" />}
-            >
-              Connect Agent
-            </TabBtn>
-          </div>
-        </div>
-
         <div className="p-5">
-          {tab === "whatsapp" && <WhatsAppTab onClose={onClose} />}
-          {tab === "agent" && (
-            <AgentTab
-              onClose={onClose}
-              onConnect={(agent) => {
-                addWorkspaceAgent(agent);
-                toast.success(`${agent.name} connected`);
-              }}
-            />
-          )}
+          <WhatsAppTab onClose={onClose} />
         </div>
       </div>
     </div>
-  );
-}
-
-function TabBtn({
-  active,
-  onClick,
-  icon,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs border-b-2 -mb-px transition-colors ${
-        active
-          ? "border-primary text-foreground"
-          : "border-transparent text-muted-foreground hover:text-foreground"
-      }`}
-    >
-      {icon}
-      {children}
-    </button>
   );
 }
 
@@ -236,117 +179,6 @@ function WhatsAppTab({ onClose }: { onClose: () => void }) {
           className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Send Invitation
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AgentTab({
-  onClose,
-  onConnect,
-}: {
-  onClose: () => void;
-  onConnect: (agent: AIAgent) => void;
-}) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [webhook, setWebhook] = useState("");
-  const [authType, setAuthType] = useState<"None" | "API Key" | "Bearer Token">("None");
-  const [credential, setCredential] = useState("");
-  const [testing, setTesting] = useState(false);
-
-  const handleTest = () => {
-    if (!webhook) return toast.error("Webhook URL is required");
-    setTesting(true);
-    setTimeout(() => {
-      setTesting(false);
-      toast.success("Connection successful · 200 OK · 142ms");
-    }, 900);
-  };
-
-  const handleConnect = () => {
-    if (!name) return toast.error("Agent name is required");
-    if (!webhook) return toast.error("Webhook URL is required");
-    onConnect({
-      id: `agent-${Date.now()}`,
-      name,
-      description: description || "Custom AI agent",
-      status: "Connected",
-      webhookUrl: webhook,
-      authType,
-    });
-    onClose();
-  };
-
-  return (
-    <div className="space-y-3">
-      <Field label="Agent Name" required>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Returns AI"
-          className={inputCls}
-        />
-      </Field>
-      <Field label="Description">
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={2}
-          placeholder="What does this agent handle?"
-          className={`${inputCls} h-auto py-2 resize-none`}
-        />
-      </Field>
-      <Field label="Webhook URL" required>
-        <input
-          value={webhook}
-          onChange={(e) => setWebhook(e.target.value)}
-          placeholder="https://api.example.com/agent/webhook"
-          className={`${inputCls} font-mono`}
-        />
-      </Field>
-      <Field label="Authentication Type">
-        <select
-          value={authType}
-          onChange={(e) => setAuthType(e.target.value as typeof authType)}
-          className={inputCls}
-        >
-          <option>None</option>
-          <option>API Key</option>
-          <option>Bearer Token</option>
-        </select>
-      </Field>
-      {authType !== "None" && (
-        <Field label={authType} required>
-          <input
-            type="password"
-            value={credential}
-            onChange={(e) => setCredential(e.target.value)}
-            placeholder={authType === "API Key" ? "sk_live_…" : "eyJhbGciOiJIUzI1NiI…"}
-            className={`${inputCls} font-mono`}
-          />
-        </Field>
-      )}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <button
-          onClick={handleTest}
-          disabled={testing}
-          className="h-9 px-3 rounded-md border border-border text-xs hover:bg-gray-50 inline-flex items-center gap-1.5 disabled:opacity-60 transition-colors duration-150"
-        >
-          {testing ? (
-            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Zap className="h-3.5 w-3.5" />
-          )}
-          Test Connection
-        </button>
-        <button
-          onClick={handleConnect}
-          className="h-9 px-4 rounded-md bg-primary text-[14px] font-medium text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 transition-colors duration-150"
-        >
-          <Bot className="h-3.5 w-3.5" /> Connect Agent
         </button>
       </div>
     </div>

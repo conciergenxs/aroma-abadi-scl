@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
-import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
+import { InviteModal } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
