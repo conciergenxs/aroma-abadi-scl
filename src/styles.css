@@ -860,19 +860,23 @@ html {
 
 /* ═══════════════════════════════════════════════════════════════════════
    PUBLIC COMPANY PAGE ("/")
-   Scoped to the one public route. The workspace keeps Inter throughout;
-   the company page sets its headlines in Newsreader, an editorial serif
-   that reads as a document rather than a product UI. The font is loaded
-   from that route's own <head>, so no workspace page pays for it.
+   Scoped to the one public route, and set in the house typefaces rather
+   than the workspace's: Playfair Display and Montserrat, the pair the
+   Aroma Abadi LMS already uses, loaded from this route's own <head> so no
+   workspace page pays for them.
 
-   House palette: white ground, #71222A merah hati, #8B6B51 coklat,
-   #D9B892 sand on the dark bands. Nothing else is introduced.
+   Palette is the LMS brand set verbatim: #710014 brand, #F3F0EC cream,
+   #C9A455 gold, #BF9877 tan, #E6D8CD rule, #161616 ink.
    ═══════════════════════════════════════════════════════════════════════ */
 
+.lp-page {
+  font-family: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 .lp-display {
-  font-family: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  letter-spacing: -0.012em;
+  font-family: "Playfair Display", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: -0.008em;
   font-variant-numeric: lining-nums;
 }
 
@@ -951,7 +955,7 @@ html {
 /* WhatsApp's wallpaper, suggested rather than copied. */
 .lp-wallpaper {
   background-color: #efe7de;
-  background-image: radial-gradient(circle at 1px 1px, rgba(43, 33, 29, 0.055) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(22, 22, 22, 0.05) 1px, transparent 0);
   background-size: 18px 18px;
 }
 
@@ -967,7 +971,7 @@ html {
   right: 0;
   bottom: -7px;
   height: 1px;
-  background: #d9b892;
+  background: #c9a455;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -978,24 +982,9 @@ html {
 }
 
 /* The workspace's maroon focus ring is all but invisible on the page's dark
-   bands, so anything focusable inside one switches to the sand accent. */
+   bands, so anything focusable inside one switches to the gold accent. */
 .lp-dark :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
-  outline-color: #d9b892;
-}
-
-/* Brand marks ship as black artwork on a white square. Multiply drops the
-   square out against the warm ground so the row reads as marks, not tiles. */
-.lp-brandmark {
-  mix-blend-mode: multiply;
-  filter: grayscale(1);
-  opacity: 0.8;
-  transition:
-    opacity 0.35s ease,
-    filter 0.35s ease;
-}
-.lp-brandmark:hover {
-  opacity: 1;
-  filter: grayscale(0);
+  outline-color: #e7cf95;
 }
 
 /* ---- Composer caret ----
@@ -1035,15 +1024,51 @@ html {
   }
 }
 
+/* Brand marks ship as black artwork on a white square. Multiply drops the
+   square out against the warm ground so the row reads as marks, not tiles. */
+.lp-brandmark {
+  mix-blend-mode: multiply;
+  filter: grayscale(1);
+  opacity: 0.8;
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease;
+}
+.lp-brandmark:hover {
+  opacity: 1;
+  filter: grayscale(0);
+}
+
 /* ---- Paper ----
    A hairline weave on the warm bands. At this contrast it reads as texture
-   rather than pattern, and it keeps the large cream areas from going flat. */
+   rather than pattern, and it keeps large cream areas from going flat. */
 .lp-paper {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(113, 34, 42, 0.022) 0 1px,
+    rgba(113, 0, 20, 0.022) 0 1px,
     transparent 1px 7px
   );
+}
+
+/* ---- Floating WhatsApp ----
+   A slow breath, so the button reads as live without ever pulling focus
+   from the page. Hover takes over the scale, which is why the animation is
+   paused rather than left to fight the transform. */
+.lp-float {
+  animation: lp-breathe 5.5s ease-in-out infinite;
+}
+.lp-float:hover {
+  animation-play-state: paused;
+}
+
+@keyframes lp-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.055);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
