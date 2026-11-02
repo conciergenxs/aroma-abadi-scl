@@ -988,7 +988,7 @@ html {
 .lp-brandmark {
   mix-blend-mode: multiply;
   filter: grayscale(1);
-  opacity: 0.55;
+  opacity: 0.8;
   transition:
     opacity 0.35s ease,
     filter 0.35s ease;

@@ -131,7 +131,7 @@ export function Split({
     <div className="grid gap-x-14 gap-y-9 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
       <Reveal className="self-start md:sticky md:top-[104px]">
         <h2
-          className={`lp-display text-balance text-[clamp(1.7rem,1.1rem+1.6vw,2.35rem)] leading-[1.1] ${TITLE[tone]}`}
+          className={`lp-display text-[clamp(1.7rem,1.1rem+1.6vw,2.35rem)] leading-[1.1] ${TITLE[tone]}`}
         >
           {title}
         </h2>
@@ -279,25 +279,31 @@ export function Step({
             : ""
         }`}
       >
-        {highlight ? (
-          <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#71222A]/8 px-[11px] py-[4px] text-[13px] font-medium text-[#71222A]">
-            <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#71222A]" />
-            Titik integrasi Xendit
-          </p>
-        ) : null}
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-start lg:gap-12">
+        <div
+          className={`grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:gap-12 ${
+            highlight ? "lg:items-center" : "lg:items-start"
+          }`}
+        >
           <div className="min-w-0">
+            {highlight ? (
+              <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#71222A]/8 px-[11px] py-[4px] text-[13px] font-medium text-[#71222A]">
+                <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#71222A]" />
+                Titik integrasi Xendit
+              </p>
+            ) : null}
             <h3 className="text-[17px] font-semibold leading-snug text-[#2B211D]">{title}</h3>
             <p className="mt-[10px] max-w-[56ch] text-pretty text-[15px] leading-[1.65] text-[#5B4C44]">
               {body}
             </p>
+            {/* Part of the same block as the prose above it, not a table
+                bolted on underneath: tinted, inset, and tight to the text. */}
             {points ? (
-              <dl className="mt-5 overflow-hidden rounded-[12px] border border-[#2B211D]/10 bg-[#FAF5EF]">
+              <dl className="mt-6 overflow-hidden rounded-[12px] border border-[#2B211D]/10 bg-[#FAF5EF]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`grid gap-[3px] px-4 py-[11px] sm:grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] sm:gap-4 ${
-                      index ? "border-t border-[#2B211D]/8" : ""
+                    className={`grid gap-[2px] px-4 py-[11px] sm:grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] sm:items-baseline sm:gap-4 ${
+                      index ? "border-t border-[#2B211D]/10" : ""
                     }`}
                   >
                     <dt className="text-[12.5px] leading-[1.5] text-[#8B6B51]">{point.label}</dt>
