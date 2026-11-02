@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
 import { InviteModal } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { useEscapeKey } from "@/lib/use-escape-key";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { DataManagementModule } from "@/components/scl/data-management";
@@ -866,6 +867,8 @@ function CoordinatorHandoverModal({
   onClose: () => void;
   onConfirm: (to: string) => void;
 }) {
+  // Escape closes it, the way every other overlay in the app does.
+  useEscapeKey(true, onClose);
   const [to, setTo] = useState(options[0] ?? "");
   const leaving = handover.names.join(" and ");
   const plural = baCount === 1 ? "" : "s";

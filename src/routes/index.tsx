@@ -95,8 +95,8 @@ const RECEIPT_THREAD: ChatMessage[] = [
 ];
 
 const NAV = [
-  { href: "#profil", label: "Profil Bisnis" },
-  { href: "#program", label: "Program Loyalitas" },
+  { href: "#profil", label: "Profil" },
+  { href: "#program", label: "Program" },
   { href: "#alur", label: "Alur Transaksi" },
   { href: "#pembayaran", label: "Pembayaran" },
   { href: "#kebijakan", label: "Kebijakan" },
@@ -163,12 +163,12 @@ function CompanyPage() {
           <a href="#top" className="shrink-0 rounded-sm" aria-label="PT Aroma Abadi, ke atas halaman">
             <img src={logo} alt="Aroma Abadi" className="h-[21px] w-auto" />
           </a>
-          <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+          <nav className="hidden flex-1 items-center justify-center gap-5 lg:flex xl:gap-7">
             {NAV.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="text-[14px] text-[#E8DCCB]/70 transition-colors hover:text-[#FBF7F0]"
+                className="whitespace-nowrap text-[14px] text-[#E8DCCB]/70 transition-colors hover:text-[#FBF7F0]"
               >
                 {item.label}
               </a>
@@ -271,13 +271,16 @@ function CompanyPage() {
 
           <div className="mt-12">
             <p className="text-[13px] text-[#8A7A6D]">Brand yang kami distribusikan</p>
-            <ul className="mt-4 flex flex-wrap items-center gap-x-10 gap-y-6">
+            {/* The marks ship as square artwork with their own whitespace, so
+                they are given equal cells rather than being packed in a row —
+                otherwise the wordmarks render far smaller than they look. */}
+            <ul className="mt-3 grid grid-cols-3 items-center gap-x-4 gap-y-1 sm:grid-cols-5">
               {BRANDS.map((brand) => (
                 <li key={brand.name}>
                   <img
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[52px] w-auto opacity-80"
+                    className="lp-brandmark h-[92px] w-full object-contain opacity-85"
                   />
                 </li>
               ))}
