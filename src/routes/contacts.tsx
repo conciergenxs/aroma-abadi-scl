@@ -70,8 +70,11 @@ import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
-  validateSearch: (search: Record<string, unknown>): { audience?: string } =>
-    typeof search.audience === "string" ? { audience: search.audience } : {},
+  // ?view=ba opens the BA Contacts view, so a link can land on it.
+  validateSearch: (search: Record<string, unknown>): { audience?: string; view?: string } => ({
+    ...(typeof search.audience === "string" ? { audience: search.audience } : {}),
+    ...(typeof search.view === "string" ? { view: search.view } : {}),
+  }),
   component: ContactsPage,
 });
 
@@ -102,8 +105,8 @@ function ContactsPage() {
   const [audiencePage, setAudiencePage] = useState(1);
   const safeAudiencePage = clampPage(audiencePage, lists.length);
   const [infoContact, setInfoContact] = useState<Contact | null>(null);
-  const { audience: audienceParam } = Route.useSearch();
-  const [activeView, setActiveView] = useState<string>(() => audienceParam ?? "all"); // "all" | "mine" | listId | brand:id
+  const { audience: audienceParam, view: viewParam } = Route.useSearch();
+  const [activeView, setActiveView] = useState<string>(() => viewParam ?? audienceParam ?? "all"); // "all" | "mine" | listId | brand:id
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");

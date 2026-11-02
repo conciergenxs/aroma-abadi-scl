@@ -1,23 +1,103 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /* Page furniture for the public company page.
  *
- * The page is built as an annotated document: a narrow column on the left
- * names the subject, a wider column on the right carries the content. Two
- * grounds alternate — ink for the parts a reader looks at (the conversation,
- * the transaction flow), ivory for the parts a reader reads. Radius carries
- * meaning here: paper edges stay nearly square, screens keep a device radius. */
+ * The page is an annotated document: a narrow column names the subject, a
+ * wider one carries the content. The palette is the house palette — white
+ * ground, merah hati for structure, brown for the quiet type — and the only
+ * thing allowed to break the rhythm is the step where the customer pays.
+ *
+ * Motion is tied to reading: a block settles as it comes into view, once,
+ * and the numerals of the transaction flow fill in as a reader reaches
+ * them. Nothing loops except the hero, and nothing moves for anyone who
+ * asked their system to minimise motion. */
 
-export type Tone = "light" | "dark";
+export type Tone = "white" | "cream" | "maroon";
 
-const TITLE_COLOR: Record<Tone, string> = { light: "text-[#71252A]", dark: "text-[#FBF7F0]" };
-const BODY_COLOR: Record<Tone, string> = { light: "text-[#50443D]", dark: "text-[#E8DCCB]/80" };
-const META_COLOR: Record<Tone, string> = { light: "text-[#8A7A6D]", dark: "text-[#D9B892]" };
-const RULE_COLOR: Record<Tone, string> = { light: "border-[#3A2F2B]/12", dark: "border-[#FBF7F0]/14" };
+const GROUND: Record<Tone, string> = {
+  white: "bg-white",
+  cream: "bg-[#FAF5EF]",
+  maroon: "lp-dark bg-[#3E1319]",
+};
+const TITLE: Record<Tone, string> = {
+  white: "text-[#71222A]",
+  cream: "text-[#71222A]",
+  maroon: "text-[#FBF7F0]",
+};
+const BODY: Record<Tone, string> = {
+  white: "text-[#5B4C44]",
+  cream: "text-[#5B4C44]",
+  maroon: "text-[#EADFD2]/80",
+};
+const LABEL: Record<Tone, string> = {
+  white: "text-[#8B6B51]",
+  cream: "text-[#8B6B51]",
+  maroon: "text-[#D9B892]",
+};
+const VALUE: Record<Tone, string> = {
+  white: "text-[#2B211D]",
+  cream: "text-[#2B211D]",
+  maroon: "text-[#FBF7F0]",
+};
+const RULE: Record<Tone, string> = {
+  white: "border-[#2B211D]/10",
+  cream: "border-[#2B211D]/10",
+  maroon: "border-[#FBF7F0]/14",
+};
+
+/** Fires once, when the element first comes into view. */
+function useInView<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  // Visible by default: the markup the server sends is already readable, and
+  // only elements still below the fold are armed for the reveal.
+  const [inView, setInView] = useState(true);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+
+    setInView(false);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setInView(true);
+        io.disconnect();
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return { ref, inView };
+}
+
+export function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const { ref, inView } = useInView<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`lp-reveal ${inView ? "is-in" : ""} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 export function Section({
   id,
-  tone = "light",
+  tone = "white",
   className = "",
   children,
 }: {
@@ -27,10 +107,7 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section
-      id={id}
-      className={`scroll-mt-20 ${tone === "dark" ? "lp-dark bg-[#2A0D12]" : "bg-[#FBF7F0]"} ${className}`}
-    >
+    <section id={id} className={`scroll-mt-[86px] ${GROUND[tone]} ${className}`}>
       <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-24">{children}</div>
     </section>
   );
@@ -38,7 +115,7 @@ export function Section({
 
 /** Title and standfirst on the left, content on the right. */
 export function Split({
-  tone = "light",
+  tone = "white",
   title,
   lede,
   children,
@@ -49,108 +126,96 @@ export function Split({
   children: ReactNode;
 }) {
   return (
-    <div className="grid gap-x-14 gap-y-9 md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
-      <div className="self-start md:sticky md:top-24">
+    <div className="grid gap-x-14 gap-y-9 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
+      <Reveal className="self-start md:sticky md:top-[104px]">
         <h2
-          className={`lp-display text-[clamp(1.65rem,1.1rem+1.5vw,2.3rem)] leading-[1.12] ${TITLE_COLOR[tone]}`}
+          className={`lp-display text-[clamp(1.7rem,1.1rem+1.6vw,2.35rem)] leading-[1.1] ${TITLE[tone]}`}
         >
           {title}
         </h2>
-        <p className={`mt-3 max-w-[30ch] text-[15px] leading-[1.6] ${BODY_COLOR[tone]}`}>{lede}</p>
-      </div>
+        <span className="mt-4 block h-px w-10 bg-[#8B6B51]/40" />
+        <p className={`mt-4 max-w-[30ch] text-[15px] leading-[1.6] ${BODY[tone]}`}>{lede}</p>
+      </Reveal>
       <div className="min-w-0">{children}</div>
     </div>
   );
 }
 
-export function Prose({ tone = "light", children }: { tone?: Tone; children: ReactNode }) {
+export function Prose({ tone = "white", children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <div className={`max-w-[62ch] space-y-4 text-[16px] leading-[1.68] ${BODY_COLOR[tone]}`}>
+    <div className={`max-w-[62ch] space-y-4 text-[16px] leading-[1.68] ${BODY[tone]}`}>
       {children}
     </div>
   );
 }
 
-/** A label-and-value table. Used for the things a reviewer checks line by line. */
+/** A label-and-value table: the things a reviewer checks line by line. */
 export function Facts({
-  tone = "light",
+  tone = "white",
   items,
 }: {
   tone?: Tone;
   items: { label: string; value: ReactNode }[];
 }) {
   return (
-    <dl className={`border-t ${RULE_COLOR[tone]}`}>
+    <dl className={`border-t ${RULE[tone]}`}>
       {items.map((item) => (
         <div
           key={item.label}
-          className={`grid gap-1 border-b py-3 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5 ${RULE_COLOR[tone]}`}
+          className={`group grid gap-1 border-b px-2 py-[13px] transition-colors duration-200 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5 ${RULE[tone]} ${
+            tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#71222A]/[0.035]"
+          }`}
         >
-          <dt className={`text-[13px] leading-[1.5] ${META_COLOR[tone]}`}>{item.label}</dt>
-          <dd
-            className={`text-[15px] leading-[1.55] ${tone === "dark" ? "text-[#FBF7F0]" : "text-[#3A2F2B]"}`}
-          >
-            {item.value}
-          </dd>
+          <dt className={`text-[13px] leading-[1.5] ${LABEL[tone]}`}>{item.label}</dt>
+          <dd className={`text-[15px] leading-[1.55] ${VALUE[tone]}`}>{item.value}</dd>
         </div>
       ))}
     </dl>
   );
 }
 
-/** A block of content under its own heading, ruled rather than boxed. */
-export function Block({
-  tone = "light",
-  title,
-  children,
-}: {
-  tone?: Tone;
-  title: string;
-  children: ReactNode;
-}) {
+/** Equal cells, whatever the copy length — pair with `auto-rows-fr` so every
+ * panel in the grid is the same height as well as the same width. */
+export function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className={`border-t pt-4 ${RULE_COLOR[tone]}`}>
-      <h3
-        className={`text-[16px] font-semibold leading-snug ${tone === "dark" ? "text-[#FBF7F0]" : "text-[#3A2F2B]"}`}
-      >
+    <div className="group flex h-full flex-col rounded-[14px] border border-[#2B211D]/10 bg-white p-6 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#71222A]/25 hover:shadow-[0_18px_40px_-24px_rgba(62,19,25,0.4)]">
+      <h3 className="flex items-baseline gap-[10px] text-[16px] font-semibold leading-snug text-[#2B211D]">
+        <span className="h-[6px] w-[6px] shrink-0 translate-y-[-2px] rounded-full bg-[#71222A] transition-transform duration-300 group-hover:scale-150" />
         {title}
       </h3>
-      <p className={`mt-2 max-w-[58ch] text-[15px] leading-[1.62] ${BODY_COLOR[tone]}`}>
-        {children}
-      </p>
+      <p className="mt-[10px] text-[15px] leading-[1.62] text-[#5B4C44]">{children}</p>
     </div>
   );
 }
 
-/** Marks a value Aroma Abadi still has to supply. Deliberately conspicuous:
- * these are the only things on the page that are not yet true. */
-export function Pending({ field, tone = "light" }: { field: string; tone?: Tone }) {
+/** Marks a value Aroma Abadi still has to supply — deliberately the loudest
+ * thing on a quiet page, so none of them ships unfilled. */
+export function Pending({ field, tone = "white" }: { field: string; tone?: Tone }) {
   return (
     <span
       title="Belum diisi — lengkapi sebelum halaman ini dikirim ke Xendit."
       className={`inline-flex items-center gap-[7px] rounded-[5px] border border-dashed px-[8px] py-[2px] align-middle text-[14px] ${
-        tone === "dark"
+        tone === "maroon"
           ? "border-[#E8B96A]/55 bg-[#E8B96A]/10 text-[#E8B96A]"
           : "border-[#B07A1F]/55 bg-[#B07A1F]/8 text-[#8A5E12]"
       }`}
     >
       <span
-        className={`h-[5px] w-[5px] rounded-full ${tone === "dark" ? "bg-[#E8B96A]" : "bg-[#B07A1F]"}`}
+        className={`h-[5px] w-[5px] rounded-full ${tone === "maroon" ? "bg-[#E8B96A]" : "bg-[#B07A1F]"}`}
       />
       {field}
     </span>
   );
 }
 
-/** One step of the transaction flow. The spine runs through the numerals, and
- * breaks open at the step where the customer leaves WhatsApp for Xendit. */
+/** One step of the transaction flow. The spine runs through the numerals and
+ * fills in as a reader arrives; the payment step lifts off the page. */
 export function Step({
   n,
   title,
   body,
   points,
   screen,
-  caption,
   highlight = false,
   last = false,
 }: {
@@ -159,83 +224,63 @@ export function Step({
   body: string;
   points?: { label: string; value: string }[];
   screen?: ReactNode;
-  caption?: string;
   highlight?: boolean;
   last?: boolean;
 }) {
+  const { ref, inView } = useInView<HTMLDivElement>();
+
   return (
-    <div className="relative pl-10 pb-10 last:pb-0 sm:pl-16">
+    <div ref={ref} className="relative pb-12 pl-11 last:pb-0 sm:pl-16">
       {!last ? (
         <span
           aria-hidden
-          className={`absolute left-[14px] top-[34px] bottom-0 w-px sm:left-[19px] sm:top-[38px] ${
-            highlight ? "bg-[#4C6FE8]/40" : "bg-[#FBF7F0]/14"
-          }`}
+          className="absolute bottom-0 left-[15px] top-[34px] w-px bg-[#2B211D]/12 sm:left-[19px] sm:top-[38px]"
         />
       ) : null}
       <span
-        className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
-          highlight
-            ? "border-[#4C6FE8] bg-[#4C6FE8] text-white"
-            : "border-[#D9B892]/45 text-[#D9B892]"
+        className={`lp-display absolute left-0 top-0 grid h-[30px] w-[30px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
+          inView
+            ? "border-[#71222A] bg-[#71222A] text-white"
+            : "scale-90 border-[#2B211D]/20 bg-white text-[#8B6B51]"
         }`}
       >
         {n}
       </span>
 
       <div
-        className={
+        className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[14px] border border-[#4C6FE8]/45 bg-[#15204A]/70 p-4 sm:p-7"
-            : undefined
-        }
+            ? "rounded-[18px] border border-[#71222A]/22 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(62,19,25,0.5)] sm:p-8"
+            : ""
+        }`}
       >
         {highlight ? (
-          <p className="mb-3 inline-flex items-center gap-[7px] rounded-full border border-[#8FA8FF]/40 px-[10px] py-[3px] text-[13px] text-[#9DB4FF]">
-            <span className="h-[6px] w-[6px] rounded-full bg-[#9DB4FF]" />
+          <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#71222A]/8 px-[11px] py-[4px] text-[13px] font-medium text-[#71222A]">
+            <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#71222A]" />
             Titik integrasi Xendit
           </p>
         ) : null}
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-10">
-          <div className="min-w-0">
-            <h3
-              className={`text-[17px] font-semibold leading-snug ${highlight ? "text-white" : "text-[#FBF7F0]"}`}
-            >
-              {title}
-            </h3>
-            <p
-              className={`mt-2 max-w-[56ch] text-[15px] leading-[1.65] ${
-                highlight ? "text-[#DCE3FF]/85" : "text-[#E8DCCB]/80"
-              }`}
-            >
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-stretch lg:gap-12">
+          <div className="flex min-w-0 flex-col">
+            <h3 className="text-[17px] font-semibold leading-snug text-[#2B211D]">{title}</h3>
+            <p className="mt-[10px] max-w-[56ch] text-[15px] leading-[1.65] text-[#5B4C44]">
               {body}
             </p>
             {points ? (
-              <dl className="mt-6 border-t border-[#8FA8FF]/25">
+              <dl className="mt-8 border-t border-[#2B211D]/10 lg:mt-auto lg:pt-8">
                 {points.map((point) => (
                   <div
                     key={point.label}
-                    className="grid gap-1 border-b border-[#8FA8FF]/25 py-[10px] sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5"
+                    className="grid gap-1 border-b border-[#2B211D]/10 py-[10px] sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] sm:gap-5"
                   >
-                    <dt className="text-[13px] leading-[1.5] text-[#9DB4FF]">{point.label}</dt>
-                    <dd className="text-[14px] leading-[1.5] text-[#EEF2FF]">{point.value}</dd>
+                    <dt className="text-[13px] leading-[1.5] text-[#8B6B51]">{point.label}</dt>
+                    <dd className="text-[14px] leading-[1.5] text-[#2B211D]">{point.value}</dd>
                   </div>
                 ))}
               </dl>
             ) : null}
           </div>
-          {screen ? (
-            <figure className="m-0 w-full max-w-[320px] lg:max-w-none">
-              {screen}
-              {caption ? (
-                <figcaption
-                  className={`mt-3 text-[13px] leading-[1.5] ${highlight ? "text-[#9DB4FF]" : "text-[#D9B892]"}`}
-                >
-                  {caption}
-                </figcaption>
-              ) : null}
-            </figure>
-          ) : null}
+          {screen ? <div className="w-full max-w-[300px] lg:max-w-none">{screen}</div> : null}
         </div>
       </div>
     </div>
