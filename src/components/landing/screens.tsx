@@ -164,8 +164,8 @@ function ChatHeader({ compact = false, status }: { compact?: boolean; status?: s
       {compact ? null : (
         <ArrowLeft className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
       )}
-      <span className="grid h-[31px] w-[31px] shrink-0 place-items-center rounded-full bg-[#5C1F24]">
-        <img src={armaMark} alt="" className="h-[17px] w-[17px]" />
+      <span className="grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full bg-[#710014]">
+        <img src={armaMark} alt="" className="w-[18px]" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[14px] font-medium text-white">Aroma Abadi</span>
@@ -191,7 +191,7 @@ export function ChatScreen({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[16px] border border-[#2B211D]/10 bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(62,19,25,0.45)] ${className}`}
+      className={`overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)] ${className}`}
     >
       <ChatHeader compact />
       <div className="lp-wallpaper space-y-[6px] px-[10px] py-[12px]">
@@ -231,23 +231,23 @@ export function CheckoutScreen({
     <div
       className={`overflow-hidden bg-white ${
         framed
-          ? "rounded-[16px] border border-[#2B211D]/10 shadow-[0_18px_44px_-24px_rgba(62,19,25,0.45)]"
+          ? "rounded-[16px] border border-[#E6D8CD] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)]"
           : ""
       } ${className}`}
     >
-      <div className="border-b border-[#2B211D]/10 bg-[#FAF5EF] px-[15px] py-[13px]">
+      <div className="border-b border-[#E6D8CD] bg-[#F3F0EC] px-[15px] py-[13px]">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[12.5px] text-[#6B5A50]">PT Aroma Abadi</span>
-          <span className="text-[13px] font-semibold tracking-tight text-[#2B211D]">xendit</span>
+          <span className="text-[12.5px] text-[#55504B]">PT Aroma Abadi</span>
+          <span className="text-[13px] font-semibold tracking-tight text-[#161616]">xendit</span>
         </div>
-        <p className="mt-[9px] text-[12px] text-[#6B5A50]">Total pembayaran · {invoice}</p>
-        <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#2B211D]">
+        <p className="mt-[9px] text-[12px] text-[#55504B]">Total pembayaran · {invoice}</p>
+        <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#161616]">
           {amount}
         </p>
-        <p className="mt-[3px] text-[12px] text-[#8B6B51]">Bayar sebelum {expiry}</p>
+        <p className="mt-[3px] text-[12px] text-[#8A6246]">Bayar sebelum {expiry}</p>
       </div>
       <div className="px-[15px] py-[13px]">
-        <p className="text-[12.5px] text-[#6B5A50]">Pilih metode pembayaran</p>
+        <p className="text-[12.5px] text-[#55504B]">Pilih metode pembayaran</p>
         <ul className="mt-[9px] space-y-[6px]">
           {methods.map((method, index) => {
             const Icon = METHOD_ICON[method.id];
@@ -256,36 +256,36 @@ export function CheckoutScreen({
               <li
                 key={method.id}
                 className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
-                  on ? "border-[#71222A] bg-[#71222A]/5" : "border-[#2B211D]/12"
+                  on ? "border-[#710014] bg-[#710014]/5" : "border-[#E6D8CD]"
                 }`}
               >
                 <Icon
-                  className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#71222A]" : "text-[#8B6B51]"}`}
+                  className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#710014]" : "text-[#8A6246]"}`}
                   strokeWidth={1.6}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13.5px] font-medium text-[#2B211D]">
+                  <span className="block text-[13.5px] font-medium text-[#161616]">
                     {method.name}
                   </span>
-                  <span className="block text-[12px] leading-snug text-[#6B5A50]">
+                  <span className="block text-[12px] leading-snug text-[#55504B]">
                     {method.note}
                   </span>
                 </span>
                 <span
                   className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
-                    on ? "border-[#71222A]" : "border-[#2B211D]/25"
+                    on ? "border-[#710014]" : "border-[#161616]/25"
                   }`}
                 >
-                  {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#71222A]" /> : null}
+                  {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#710014]" /> : null}
                 </span>
               </li>
             );
           })}
         </ul>
-        <p className="mt-[12px] rounded-[8px] bg-[#71222A] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
+        <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
           Bayar Sekarang
         </p>
-        <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#6B5A50]">
+        <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
           <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
           Dihosting dan diproses oleh Xendit
         </p>
@@ -401,7 +401,7 @@ export function LiveChat({
 
   return (
     <div className={`lp-phone relative ${className}`}>
-      <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#17100E] bg-[#17100E] shadow-[0_40px_90px_-32px_rgba(62,19,25,0.55)]">
+      <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
         <div className="relative overflow-hidden rounded-[26px] bg-[#EFE7DE]">
           <div className="flex items-center justify-between bg-[#075E54] px-[15px] pb-[2px] pt-[7px] text-[11.5px] font-medium text-white/90">
             <span>09.41</span>
@@ -451,7 +451,7 @@ export function LiveChat({
             }`}
           >
             <div
-              className={`absolute inset-0 bg-[#17100E]/45 transition-opacity duration-300 ${
+              className={`absolute inset-0 bg-[#161616]/45 transition-opacity duration-300 ${
                 paying ? "opacity-100" : "opacity-0"
               }`}
             />
@@ -460,9 +460,9 @@ export function LiveChat({
                 paying ? "translate-y-0" : "translate-y-full"
               }`}
             >
-              <p className="flex items-center justify-between border-b border-[#2B211D]/10 px-[15px] py-[9px] text-[12px] text-[#6B5A50]">
+              <p className="flex items-center justify-between border-b border-[#E6D8CD] px-[15px] py-[9px] text-[12px] text-[#55504B]">
                 <span className="truncate">checkout.xendit.co</span>
-                <span className="h-[4px] w-[34px] rounded-full bg-[#2B211D]/15" />
+                <span className="h-[4px] w-[34px] rounded-full bg-[#161616]/15" />
               </p>
               <CheckoutScreen framed={false} {...checkout} />
             </div>

@@ -870,7 +870,13 @@ html {
    ═══════════════════════════════════════════════════════════════════════ */
 
 .lp-page {
-  font-family: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    "Montserrat",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
 }
 
 .lp-display {

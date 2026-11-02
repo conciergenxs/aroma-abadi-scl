@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 
 /* Page furniture for the public company page.
  *
  * The page is an annotated document: a narrow column names the subject, a
- * wider one carries the content. The palette is the house palette — white
- * ground, merah hati for structure, brown for the quiet type — and the only
- * thing allowed to break the rhythm is the step where the customer pays.
+ * wider one carries the content. Type and colour are the LMS house set —
+ * Playfair Display over Montserrat, #710014 on cream — and the only thing
+ * allowed to break the rhythm is the step where the customer pays.
  *
  * Motion is tied to reading: a block settles as it comes into view, once,
  * and the numerals of the transaction flow fill in as a reader reaches
@@ -16,33 +17,33 @@ export type Tone = "white" | "cream" | "maroon";
 
 const GROUND: Record<Tone, string> = {
   white: "bg-white",
-  cream: "bg-[#FAF5EF]",
-  maroon: "lp-dark bg-[#3E1319]",
+  cream: "bg-[#F3F0EC]",
+  maroon: "lp-dark bg-[#4A000D]",
 };
 const TITLE: Record<Tone, string> = {
-  white: "text-[#71222A]",
-  cream: "text-[#71222A]",
-  maroon: "text-[#FBF7F0]",
+  white: "text-[#710014]",
+  cream: "text-[#710014]",
+  maroon: "text-[#FBFAF8]",
 };
 const BODY: Record<Tone, string> = {
-  white: "text-[#5B4C44]",
-  cream: "text-[#5B4C44]",
-  maroon: "text-[#EADFD2]/80",
+  white: "text-[#55504B]",
+  cream: "text-[#55504B]",
+  maroon: "text-[#F3F0EC]/75",
 };
 const LABEL: Record<Tone, string> = {
-  white: "text-[#8B6B51]",
-  cream: "text-[#8B6B51]",
-  maroon: "text-[#D9B892]",
+  white: "text-[#8A6246]",
+  cream: "text-[#8A6246]",
+  maroon: "text-[#E7CF95]",
 };
 const VALUE: Record<Tone, string> = {
-  white: "text-[#2B211D]",
-  cream: "text-[#2B211D]",
-  maroon: "text-[#FBF7F0]",
+  white: "text-[#161616]",
+  cream: "text-[#161616]",
+  maroon: "text-[#FBFAF8]",
 };
 const RULE: Record<Tone, string> = {
-  white: "border-[#2B211D]/10",
-  cream: "border-[#2B211D]/10",
-  maroon: "border-[#FBF7F0]/14",
+  white: "border-[#E6D8CD]",
+  cream: "border-[#E0D4C8]",
+  maroon: "border-[#F3F0EC]/15",
 };
 
 /** Fires once, when the element first comes into view. */
@@ -116,12 +117,14 @@ export function Section({
 /** Title and standfirst on the left, content on the right. */
 export function Split({
   tone = "white",
+  icon: Icon,
   title,
   lede,
   aside,
   children,
 }: {
   tone?: Tone;
+  icon?: LucideIcon;
   title: string;
   lede: string;
   aside?: ReactNode;
@@ -130,13 +133,24 @@ export function Split({
   return (
     <div className="grid gap-x-14 gap-y-9 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
       <Reveal className="self-start md:sticky md:top-[104px]">
+        {Icon ? (
+          <span
+            className={`mb-5 grid h-[42px] w-[42px] place-items-center rounded-full ${
+              tone === "maroon" ? "bg-[#E7CF95]/15 text-[#E7CF95]" : "bg-[#710014]/7 text-[#710014]"
+            }`}
+          >
+            <Icon className="h-[20px] w-[20px]" strokeWidth={1.6} />
+          </span>
+        ) : null}
         <h2
-          className={`lp-display text-[clamp(1.7rem,1.1rem+1.6vw,2.35rem)] leading-[1.1] ${TITLE[tone]}`}
+          className={`lp-display text-[clamp(1.6rem,1.05rem+1.5vw,2.2rem)] leading-[1.14] ${TITLE[tone]}`}
         >
           {title}
         </h2>
-        <span className="mt-4 block h-px w-10 bg-[#8B6B51]/40" />
-        <p className={`mt-4 max-w-[30ch] text-pretty text-[15px] leading-[1.6] ${BODY[tone]}`}>
+        <span
+          className={`mt-4 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#BF9877]"}`}
+        />
+        <p className={`mt-4 max-w-[30ch] text-pretty text-[14.5px] leading-[1.62] ${BODY[tone]}`}>
           {lede}
         </p>
         {aside}
@@ -148,7 +162,7 @@ export function Split({
 
 export function Prose({ tone = "white", children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <div className={`max-w-[62ch] space-y-4 text-pretty text-[16px] leading-[1.68] ${BODY[tone]}`}>
+    <div className={`max-w-[62ch] space-y-4 text-pretty text-[15.5px] leading-[1.7] ${BODY[tone]}`}>
       {children}
     </div>
   );
@@ -161,7 +175,7 @@ export function Facts({
   cols = 1,
 }: {
   tone?: Tone;
-  items: { label: string; value: ReactNode }[];
+  items: { label: string; value: ReactNode; icon?: LucideIcon }[];
   cols?: 1 | 2;
 }) {
   const two = cols === 2;
@@ -172,10 +186,13 @@ export function Facts({
           key={item.label}
           className={`group border-b py-[13px] transition-colors duration-200 ${RULE[tone]} ${
             two ? "px-1" : "grid gap-1 px-2 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5"
-          } ${tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#71222A]/[0.035]"}`}
+          } ${tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#710014]/[0.03]"}`}
         >
-          <dt className={`text-[12.5px] leading-[1.5] ${LABEL[tone]}`}>{item.label}</dt>
-          <dd className={`${two ? "mt-[5px] " : ""}text-[15px] leading-[1.55] ${VALUE[tone]}`}>
+          <dt className={`flex items-center gap-2 text-[12.5px] leading-[1.5] ${LABEL[tone]}`}>
+            {item.icon ? <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} /> : null}
+            {item.label}
+          </dt>
+          <dd className={`${two ? "mt-[5px] " : ""}text-[14.5px] leading-[1.55] ${VALUE[tone]}`}>
             {item.value}
           </dd>
         </div>
@@ -201,14 +218,22 @@ export function Marquee({ children }: { children: ReactNode }) {
 
 /** Equal cells, whatever the copy length — pair with `auto-rows-fr` so every
  * panel in the grid is the same height as well as the same width. */
-export function Panel({ title, children }: { title: string; children: ReactNode }) {
+export function Panel({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: LucideIcon;
+  title: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="group flex h-full flex-col rounded-[14px] border border-[#2B211D]/10 bg-white p-6 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#71222A]/25 hover:shadow-[0_18px_40px_-24px_rgba(62,19,25,0.4)]">
-      <h3 className="flex items-baseline gap-[10px] text-[16px] font-semibold leading-snug text-[#2B211D]">
-        <span className="h-[6px] w-[6px] shrink-0 translate-y-[-2px] rounded-full bg-[#71222A] transition-transform duration-300 group-hover:scale-150" />
-        {title}
-      </h3>
-      <p className="mt-[10px] text-pretty text-[15px] leading-[1.62] text-[#5B4C44]">{children}</p>
+    <div className="group flex h-full flex-col rounded-[14px] border border-[#E6D8CD] bg-white p-6 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#710014]/30 hover:shadow-[0_18px_40px_-24px_rgba(113,0,20,0.4)]">
+      <span className="grid h-[40px] w-[40px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
+        <Icon className="h-[19px] w-[19px]" strokeWidth={1.6} />
+      </span>
+      <h3 className="mt-4 text-[15.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
+      <p className="mt-[8px] text-pretty text-[14.5px] leading-[1.65] text-[#55504B]">{children}</p>
     </div>
   );
 }
@@ -219,14 +244,14 @@ export function Pending({ field, tone = "white" }: { field: string; tone?: Tone 
   return (
     <span
       title="Belum diisi — lengkapi sebelum halaman ini dikirim ke Xendit."
-      className={`inline-flex items-center gap-[7px] rounded-[5px] border border-dashed px-[8px] py-[2px] align-middle text-[14px] ${
+      className={`inline-flex items-center gap-[7px] rounded-[5px] border border-dashed px-[8px] py-[2px] align-middle text-[13.5px] ${
         tone === "maroon"
-          ? "border-[#E8B96A]/55 bg-[#E8B96A]/10 text-[#E8B96A]"
+          ? "border-[#E7CF95]/55 bg-[#E7CF95]/10 text-[#E7CF95]"
           : "border-[#B07A1F]/55 bg-[#B07A1F]/8 text-[#8A5E12]"
       }`}
     >
       <span
-        className={`h-[5px] w-[5px] rounded-full ${tone === "maroon" ? "bg-[#E8B96A]" : "bg-[#B07A1F]"}`}
+        className={`h-[5px] w-[5px] rounded-full ${tone === "maroon" ? "bg-[#E7CF95]" : "bg-[#B07A1F]"}`}
       />
       {field}
     </span>
@@ -247,7 +272,7 @@ export function Step({
   n: number;
   title: string;
   body: string;
-  points?: { label: string; value: string }[];
+  points?: { label: string; value: string; icon?: LucideIcon }[];
   screen?: ReactNode;
   highlight?: boolean;
   last?: boolean;
@@ -259,14 +284,14 @@ export function Step({
       {!last ? (
         <span
           aria-hidden
-          className="absolute bottom-0 left-[15px] top-[34px] w-px bg-[#2B211D]/12 sm:left-[19px] sm:top-[38px]"
+          className="absolute bottom-0 left-[14px] top-[34px] w-px bg-[#161616]/12 sm:left-[19px] sm:top-[38px]"
         />
       ) : null}
       <span
-        className={`lp-display absolute left-0 top-0 grid h-[30px] w-[30px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
+        className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
           inView
-            ? "border-[#71222A] bg-[#71222A] text-white"
-            : "scale-90 border-[#2B211D]/20 bg-white text-[#8B6B51]"
+            ? "border-[#710014] bg-[#710014] text-white"
+            : "scale-90 border-[#E6D8CD] bg-white text-[#8A6246]"
         }`}
       >
         {n}
@@ -275,46 +300,50 @@ export function Step({
       <div
         className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[18px] border border-[#71222A]/22 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(62,19,25,0.5)] sm:p-8"
+            ? "rounded-[18px] border border-[#710014]/20 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(113,0,20,0.45)] sm:p-8"
             : ""
         }`}
       >
-        <div
-          className={`grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:gap-12 ${
-            highlight ? "lg:items-center" : "lg:items-start"
-          }`}
-        >
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-start lg:gap-12">
           <div className="min-w-0">
             {highlight ? (
-              <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#71222A]/8 px-[11px] py-[4px] text-[13px] font-medium text-[#71222A]">
-                <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#71222A]" />
+              <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#710014]/8 px-[11px] py-[4px] text-[12.5px] font-medium text-[#710014]">
+                <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#710014]" />
                 Titik integrasi Xendit
               </p>
             ) : null}
-            <h3 className="text-[17px] font-semibold leading-snug text-[#2B211D]">{title}</h3>
-            <p className="mt-[10px] max-w-[56ch] text-pretty text-[15px] leading-[1.65] text-[#5B4C44]">
+            <h3 className="text-[16.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
+            <p className="mt-[10px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.7] text-[#55504B]">
               {body}
             </p>
-            {/* Part of the same block as the prose above it, not a table
-                bolted on underneath: tinted, inset, and tight to the text. */}
-            {points ? (
-              <dl className="mt-6 overflow-hidden rounded-[12px] border border-[#2B211D]/10 bg-[#FAF5EF]">
-                {points.map((point, index) => (
-                  <div
-                    key={point.label}
-                    className={`grid gap-[2px] px-4 py-[11px] sm:grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] sm:items-baseline sm:gap-4 ${
-                      index ? "border-t border-[#2B211D]/10" : ""
-                    }`}
-                  >
-                    <dt className="text-[12.5px] leading-[1.5] text-[#8B6B51]">{point.label}</dt>
-                    <dd className="text-[14px] leading-[1.5] text-[#2B211D]">{point.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
           </div>
           {screen ? <div className="w-full max-w-[300px] lg:max-w-none">{screen}</div> : null}
         </div>
+
+        {/* Runs edge to edge inside the card, so the detail reads as the
+            block's own footing rather than a table parked underneath it. */}
+        {points ? (
+          <dl className="-mx-5 -mb-5 mt-7 grid overflow-hidden rounded-b-[17px] border-t border-[#E6D8CD] bg-[#F3F0EC] sm:-mx-8 sm:-mb-8 sm:grid-cols-3">
+            {points.map((point, index) => (
+              <div
+                key={point.label}
+                className={`px-5 py-[15px] ${
+                  index ? "border-t border-[#E0D4C8] sm:border-l sm:border-t-0" : ""
+                }`}
+              >
+                <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#8A6246]">
+                  {point.icon ? (
+                    <point.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                  ) : null}
+                  {point.label}
+                </dt>
+                <dd className="mt-[5px] text-[13.5px] leading-[1.5] text-[#161616]">
+                  {point.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
       </div>
     </div>
   );
