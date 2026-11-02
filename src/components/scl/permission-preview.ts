@@ -356,7 +356,7 @@ export function previewLockReason(id: string): string {
  * off. Falls back to the workspace home for anything without a page. */
 export function previewLink(id: string, origin = ""): string {
   const c = conditionFor(id);
-  const path = c?.where ?? "/app";
+  const path = c?.where ?? "/";
   const sep = path.includes("?") ? "&" : "?";
   return `${origin}${path}${sep}${PREVIEW_PARAM}=${encodeURIComponent(id)}`;
 }
@@ -368,7 +368,7 @@ export function usePreviewGate(id: string): boolean {
   const allowed = usePermAllows(id);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!allowed) navigate({ to: "/app" });
+    if (!allowed) navigate({ to: "/" });
   }, [allowed, navigate]);
   return allowed;
 }

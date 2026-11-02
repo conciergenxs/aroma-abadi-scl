@@ -120,7 +120,7 @@ const MOCK_NOTIFS: MockNotif[] = [
 
 type NavItem = {
   to:
-    | "/app"
+    | "/"
     | "/inbox"
     | "/contacts"
     | "/broadcasts"
@@ -143,7 +143,7 @@ type NavItem = {
   perm?: string;
 };
 const topNav: NavItem[] = [
-  { to: "/app", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox-view" },
   { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts-view" },
   { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view", perm: "broadcast-view" },

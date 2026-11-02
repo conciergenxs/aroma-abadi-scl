@@ -11,10 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BaRouteImport } from './routes/ba'
 import { Route as ChannelsRouteImport } from './routes/channels'
+import { Route as CompanyRouteImport } from './routes/company'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -53,11 +53,6 @@ const AccessDeniedRoute = AccessDeniedRouteImport.update({
   path: '/access-denied',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -71,6 +66,11 @@ const BaRoute = BaRouteImport.update({
 const ChannelsRoute = ChannelsRouteImport.update({
   id: '/channels',
   path: '/channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsRoute = ContactsRouteImport.update({
@@ -214,10 +214,10 @@ const ContactsAudienceAddAudienceIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
-  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
+  '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -249,10 +249,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
-  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
+  '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -285,10 +285,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
-  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
+  '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
   '/settings': typeof SettingsRoute
@@ -322,10 +322,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/access-denied'
-    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
+    | '/company'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -357,10 +357,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/access-denied'
-    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
+    | '/company'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -392,10 +392,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/access-denied'
-    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
+    | '/company'
     | '/contacts'
     | '/inbox'
     | '/settings'
@@ -428,10 +428,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
-  AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   BaRoute: typeof BaRoute
   ChannelsRoute: typeof ChannelsRoute
+  CompanyRoute: typeof CompanyRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
   SettingsRoute: typeof SettingsRoute
@@ -472,13 +472,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccessDeniedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -498,6 +491,13 @@ declare module '@tanstack/react-router' {
       path: '/channels'
       fullPath: '/channels'
       preLoaderRoute: typeof ChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacts': {
@@ -723,10 +723,10 @@ const SkuRouteWithChildren = SkuRoute._addFileChildren(SkuRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
-  AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   BaRoute: BaRoute,
   ChannelsRoute: ChannelsRoute,
+  CompanyRoute: CompanyRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
   SettingsRoute: SettingsRoute,

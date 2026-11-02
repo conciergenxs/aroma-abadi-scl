@@ -341,7 +341,7 @@ const CONTACT: {
 const DESCRIPTION =
   "PT Aroma Abadi mendistribusikan produk kecantikan premium di Indonesia dan menjalankan program CRM serta loyalitas lewat WhatsApp. Halaman ini menjelaskan profil bisnis, mekanisme program, dan alur transaksi pelanggan termasuk titik pembayaran melalui Xendit.";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/company")({
   head: () => ({
     meta: [
       { title: "PT Aroma Abadi — Distribusi produk kecantikan & program loyalitas WhatsApp" },

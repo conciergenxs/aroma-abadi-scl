@@ -158,10 +158,11 @@ function RootComponent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const authed = window.localStorage.getItem("scl_authed") === "1";
-    // "/" is the public company page — the only route a visitor can land on
-    // without an account. Everything else is the workspace and needs a session.
+    // "/company" is the public company page — the only route a visitor can
+    // land on without an account. Everything else, "/" included, is the
+    // workspace and needs a session.
     const isPublicRoute =
-      pathname === "/" ||
+      pathname === "/company" ||
       pathname === "/auth" ||
       pathname === "/access-denied" ||
       pathname === "/invite/set-password";
