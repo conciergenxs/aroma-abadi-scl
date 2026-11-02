@@ -66,6 +66,12 @@ export const Route = createFileRoute("/sku")({
       },
     ],
   }),
+  // ?brand=&category= opens that level directly, so a link can land on the
+  // page it is about instead of the brand grid.
+  validateSearch: (search: Record<string, unknown>): { brand?: string; category?: string } => ({
+    ...(typeof search.brand === "string" ? { brand: search.brand } : {}),
+    ...(typeof search.category === "string" ? { category: search.category } : {}),
+  }),
   component: SkuPage,
 });
 
@@ -417,13 +423,16 @@ function DeleteConfirmDialog(props: ConfirmDialogProps) {
 function SkuPage() {
   usePreviewGate("knowledge-view");
   const { brands } = useSkuStore();
-  const brandGate = usePermission(
-    "knowledge-brands",
-    useCan("knowledge.manage"),
-    KNOWLEDGE_LOCKED,
-  );
+  const { brand: brandParam, category: categoryParam } = Route.useSearch();
+  const brandGate = usePermission("knowledge-brands", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
   const canManage = brandGate.allowed;
-  const [view, setView] = useState<View>({ kind: "brands" });
+  const [view, setView] = useState<View>(() =>
+    brandParam && categoryParam
+      ? { kind: "category", brandId: brandParam, categoryId: categoryParam }
+      : brandParam
+        ? { kind: "brand", brandId: brandParam }
+        : { kind: "brands" },
+  );
   const [showBrandForm, setShowBrandForm] = useState(false);
   const [importingSku, setImportingSku] = useState<{
     product: OdooProduct;
@@ -2043,7 +2052,8 @@ function ModuleRow({
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingModule, setEditingModule] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const canManageKnowledge = useCan("knowledge.manage");
+  const cardGate = usePermission("knowledge-cards", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
+  const canManageKnowledge = cardGate.allowed;
 
   return (
     <li className="p-4">
@@ -2091,7 +2101,7 @@ function ModuleRow({
                   setShowForm(true);
                 }}
                 disabled={!canManageKnowledge}
-                title={canManageKnowledge ? undefined : KNOWLEDGE_LOCKED}
+                title={canManageKnowledge ? undefined : cardGate.reason}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Add New

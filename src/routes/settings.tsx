@@ -41,6 +41,10 @@ import { baStore, useBaStore } from "@/components/scl/ba-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
+  // ?section=labels opens that page directly, so a link can point at the
+  // setting it is about rather than at the first one.
+  validateSearch: (search: Record<string, unknown>): { section?: string } =>
+    typeof search.section === "string" ? { section: search.section } : {},
   component: SettingsPage,
 });
 
@@ -77,7 +81,9 @@ const NAV: NavSection[] = [
 function SettingsPage() {
   usePreviewGate("settings-view");
   const previewed = usePreviewedCondition();
-  const [active, setActive] = useState("general");
+  const { section } = Route.useSearch();
+  const known = NAV.flatMap((s) => s.items).some((i) => i.id === section);
+  const [active, setActive] = useState(known ? section! : "general");
   // A section the preview has closed can't stay open behind the reader.
   useEffect(() => {
     const closed = NAV.flatMap((sec) => sec.items).find((i) => i.perm && i.perm === previewed?.id);
