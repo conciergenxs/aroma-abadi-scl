@@ -7,6 +7,7 @@ import {
   Plus,
   Trash2,
   Check,
+  Copy,
   ChevronRight,
   Pencil,
   X,
@@ -15,6 +16,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { LITE_MODE } from "@/lib/feature-flags";
+import { PREVIEW_CONDITIONS, previewLink } from "@/components/scl/permission-preview";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
@@ -403,9 +405,7 @@ const SEED_ROLES: Role[] = [
 export type AssignedUser = {
   id: string;
   name: string;
-  email: string;
   jobTitle: string;
-  team: string;
   assignedDate: string;
   /** Role name; matched against Role.name. */
   role: string;
@@ -415,108 +415,84 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-aria",
     name: "Aria Kapoor",
-    email: "aria.kapoor@northstar.co",
     jobTitle: "Workspace Owner",
-    team: "Customer Support",
     assignedDate: "Jan 12, 2024",
     role: "Super Admin",
   },
   {
     id: "u-jonas",
     name: "Jonas Weber",
-    email: "jonas.weber@northstar.co",
     jobTitle: "CTO",
-    team: "Operations",
     assignedDate: "Jan 14, 2024",
     role: "Super Admin",
   },
   {
     id: "u-ines",
     name: "Ines Carvalho",
-    email: "ines.c@northstar.co",
     jobTitle: "VP Customer",
-    team: "Customer Support",
     assignedDate: "Jan 20, 2024",
     role: "Super Admin",
   },
   {
     id: "u-tom",
     name: "Tomas Bergstrom",
-    email: "tomas.b@northstar.co",
     jobTitle: "Head of Support",
-    team: "Customer Support",
     assignedDate: "Feb 02, 2024",
     role: "Admin",
   },
   {
     id: "u-priya",
     name: "Priya Shah",
-    email: "priya.shah@northstar.co",
     jobTitle: "Operations Manager",
-    team: "Operations",
     assignedDate: "Feb 18, 2024",
     role: "Admin",
   },
   {
     id: "u-mei",
     name: "Mei Tanaka",
-    email: "mei.tanaka@northstar.co",
     jobTitle: "Sales Lead",
-    team: "Sales",
     assignedDate: "Mar 18, 2024",
     role: "Area Coordinator",
   },
   {
     id: "u-luca",
     name: "Luca Romano",
-    email: "luca.romano@northstar.co",
     jobTitle: "Marketing Manager",
-    team: "Marketing",
     assignedDate: "Apr 04, 2024",
     role: "Area Coordinator",
   },
   {
     id: "u-sara",
     name: "Sara Iqbal",
-    email: "sara.iqbal@northstar.co",
     jobTitle: "Support Specialist",
-    team: "Customer Support",
     assignedDate: "May 22, 2024",
     role: "Staff",
   },
   {
     id: "u-dimas",
     name: "Dimas Pratama",
-    email: "dimas.p@northstar.co",
     jobTitle: "Operations Analyst",
-    team: "Operations",
     assignedDate: "Jun 09, 2024",
     role: "Staff",
   },
   {
     id: "u-hana",
     name: "Hana Wijaya",
-    email: "hana.wijaya@northstar.co",
     jobTitle: "Sales Associate",
-    team: "Sales",
     assignedDate: "Jul 03, 2024",
     role: "Staff",
   },
   {
     id: "u-marco",
     name: "Marco Silva",
-    email: "marco.silva@northstar.co",
     jobTitle: "Support Agent",
-    team: "Customer Support",
     assignedDate: "Aug 15, 2024",
     role: "Staff",
   },
   {
     id: "u-noor",
     name: "Noor Hassan",
-    email: "noor.h@northstar.co",
     jobTitle: "Customer Insights",
-    team: "Marketing",
     assignedDate: "Sep 01, 2024",
     role: "Staff",
   },
@@ -755,6 +731,8 @@ export function RolesPermissionsModule() {
         </div>
       </SectionCard>
 
+      <PermissionPreviewLinks />
+
       <ConfirmDialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
@@ -764,6 +742,83 @@ export function RolesPermissionsModule() {
         confirmLabel="Delete"
       />
     </div>
+  );
+}
+
+/* ── One link per condition ───────────────────────────────────────────────
+ * A checkbox in the tree above is a sentence about what someone can do; this
+ * turns each one into something you can click. Every link opens the dashboard
+ * with that single permission switched off, so a reviewer can see the result
+ * instead of imagining it. */
+
+function PermissionPreviewLinks() {
+  const [copied, setCopied] = useState<string | null>(null);
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  const sections = Array.from(new Set(PREVIEW_CONDITIONS.map((c) => c.section)));
+
+  const copy = async (c: (typeof PREVIEW_CONDITIONS)[number]) => {
+    await navigator.clipboard.writeText(previewLink(c.id, origin));
+    setCopied(c.id);
+    toast.success(`Link copied — ${c.label}`);
+    window.setTimeout(() => setCopied(null), 1600);
+  };
+
+  return (
+    <SectionCard>
+      <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-border">
+        <div>
+          <h3 className="text-[14px] font-semibold m-0">Preview Links</h3>
+          <p className="mt-0.5 text-[12px] text-muted-foreground m-0">
+            Each link opens the dashboard with one permission switched off, so the effect can be
+            seen rather than described. The preview lasts until Exit Preview, and changes nothing
+            for anyone else.
+          </p>
+        </div>
+        <span className="text-[12px] text-muted-foreground">
+          {PREVIEW_CONDITIONS.length} conditions
+        </span>
+      </div>
+
+      <div className="divide-y divide-border">
+        {sections.map((section) => (
+          <div key={section} className="px-5 py-3">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-2">
+              {section}
+            </div>
+            <ul className="space-y-1.5">
+              {PREVIEW_CONDITIONS.filter((c) => c.section === section).map((c) => (
+                <li
+                  key={c.id}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md px-2 py-1.5 hover:bg-gray-50 transition-colors duration-150"
+                >
+                  <span className="text-[14px] font-medium">Without “{c.label}”</span>
+                  <span className="min-w-0 flex-1 truncate text-[12px] text-muted-foreground">
+                    {c.effect}
+                  </span>
+                  <button
+                    onClick={() => copy(c)}
+                    className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 h-8 text-[12px] hover:bg-card transition-colors duration-150"
+                  >
+                    {copied === c.id ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
+                    Copy Link
+                  </button>
+                  <a
+                    href={previewLink(c.id, origin)}
+                    className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+                  >
+                    Open
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
   );
 }
 
@@ -1302,9 +1357,7 @@ function RoleDetailPage({
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
               </tr>
             </thead>
@@ -1330,15 +1383,7 @@ function RoleDetailPage({
                     </div>
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
-                    {u.email}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
                     {u.jobTitle}
-                  </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/40 px-2 py-0.5 text-[10px]">
-                      {u.team}
-                    </span>
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
                     {u.assignedDate}
@@ -1347,7 +1392,7 @@ function RoleDetailPage({
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No users assigned to this role.
                   </td>
                 </tr>
@@ -1410,12 +1455,7 @@ function AssignUsersModal({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allUsers;
-    return allUsers.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.team.toLowerCase().includes(q),
-    );
+    return allUsers.filter((u) => u.name.toLowerCase().includes(q));
   }, [allUsers, query]);
 
   const toggle = (id: string) =>
@@ -1452,7 +1492,7 @@ function AssignUsersModal({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, email, or team"
+              placeholder="Search by name"
               className="h-9 w-full rounded-md border border-border bg-background/30 pl-8 pr-3 text-xs outline-none focus:border-primary/60"
             />
           </div>
@@ -1463,8 +1503,6 @@ function AssignUsersModal({
               <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="px-4 py-2.5 text-left w-8" />
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Email</th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Team</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Current Role</th>
               </tr>
             </thead>
@@ -1488,14 +1526,6 @@ function AssignUsersModal({
                       />
                     </td>
                     <td className="px-4 align-middle whitespace-nowrap font-medium">{u.name}</td>
-                    <td className="px-4 align-middle whitespace-nowrap text-muted-foreground text-xs">
-                      {u.email}
-                    </td>
-                    <td className="px-4 align-middle whitespace-nowrap text-xs">
-                      <span className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[10px]">
-                        {u.team}
-                      </span>
-                    </td>
                     <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
                       {already ? (
                         <span className="text-[10px] uppercase tracking-wider text-primary">

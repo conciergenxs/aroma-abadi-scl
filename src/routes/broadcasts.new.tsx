@@ -4,6 +4,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { MessageHeader } from "@/components/scl/message-header";
 import { LITE_MODE } from "@/lib/feature-flags";
+import { usePermission } from "@/components/scl/permission-preview";
 import { TemplatePicker } from "@/components/scl/template-picker";
 import { connectedChannels, type Template, type Broadcast } from "@/components/scl/mock-data";
 import { useTemplatesStore } from "@/components/scl/templates-store";
@@ -438,7 +439,11 @@ function CreateBroadcastPage() {
                 : linkedPromo && duplicateCodes.size > 0
                   ? "Two recipients have been given the same code"
                   : null;
-  const valid = !blocker;
+  // Sending is its own permission: a draft can still be built and saved
+  // without it, which is exactly what the preview shows.
+  const sendGate = usePermission("broadcast-send");
+  const valid = !blocker && sendGate.allowed;
+  const sendBlocker = sendGate.reason || blocker;
 
   return (
     <AppShell backTo="/broadcasts">
@@ -941,9 +946,9 @@ function CreateBroadcastPage() {
 
           {/* Save actions */}
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {blocker && (
+            {(sendBlocker ?? null) && (
               <span className="mr-auto text-[12px] text-destructive animate-fade-in">
-                {blocker}
+                {sendBlocker}
               </span>
             )}
             <button
@@ -956,7 +961,7 @@ function CreateBroadcastPage() {
               <button
                 onClick={() => submit("schedule")}
                 disabled={!valid}
-                title={blocker ?? undefined}
+                title={sendBlocker ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <CalendarClock className="h-3.5 w-3.5" />{" "}
@@ -966,7 +971,7 @@ function CreateBroadcastPage() {
               <button
                 onClick={() => submit("send")}
                 disabled={!valid}
-                title={blocker ?? undefined}
+                title={sendBlocker ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Send className="h-3.5 w-3.5" /> Send broadcast

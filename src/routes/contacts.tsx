@@ -64,6 +64,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { Toggle } from "@/components/scl/toggle";
 import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
@@ -77,6 +78,12 @@ export const Route = createFileRoute("/contacts")({
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
 function ContactsPage() {
+  usePreviewGate("contacts-view");
+  const baGate = usePermission("ba-view");
+  const createGate = usePermission("contacts-create");
+  const deleteGate = usePermission("contacts-delete");
+  const exportGate = usePermission("contacts-export");
+  const propsGate = usePermission("contacts-properties");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChildRoute = pathname !== "/contacts";
 
@@ -288,12 +295,22 @@ function ContactsPage() {
         activeView === "ba" ? (
           // This view lists BAs as people; their LMS accounts — brand, store,
           // credentials — are managed on their own page.
-          <Link
-            to="/ba"
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
-          >
-            <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
-          </Link>
+          baGate.allowed ? (
+            <Link
+              to="/ba"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
+            >
+              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
+            </Link>
+          ) : (
+            <button
+              disabled
+              title={baGate.reason}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 h-9 text-[13px] font-medium opacity-40 cursor-not-allowed"
+            >
+              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
+            </button>
+          )
         ) : undefined
       }
       noPadding
@@ -441,7 +458,9 @@ function ContactsPage() {
               </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
-                className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+                disabled={!createGate.allowed}
+                title={createGate.reason || undefined}
+                className="press icon-pop inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> New Contact
               </button>
@@ -483,6 +502,8 @@ function ContactsPage() {
               />
               <button
                 onClick={() => setBulkDeleteOpen(true)}
+                disabled={!deleteGate.allowed}
+                title={deleteGate.reason || undefined}
                 className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Contacts
@@ -538,6 +559,8 @@ function ContactsPage() {
 
       {showFilterProps && (
         <FilterPropertiesModal
+          canManage={propsGate.allowed}
+          lockReason={propsGate.reason}
           properties={properties}
           onClose={() => setShowFilterProps(false)}
           onChange={(next) => {
@@ -1232,10 +1255,14 @@ function FilterPropertiesModal({
   properties,
   onClose,
   onChange,
+  canManage,
+  lockReason,
 }: {
   properties: ContactProperty[];
   onClose: () => void;
   onChange: (next: ContactProperty[]) => void;
+  canManage: boolean;
+  lockReason: string;
 }) {
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState<ContactProperty | null>(null);
@@ -1309,8 +1336,14 @@ function FilterPropertiesModal({
           <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setResetOpen(true)}
-              disabled={isDefault}
-              title={isDefault ? "Already showing the default properties" : undefined}
+              disabled={isDefault || !canManage}
+              title={
+                !canManage
+                  ? lockReason
+                  : isDefault
+                    ? "Already showing the default properties"
+                    : undefined
+              }
               className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset to Default
@@ -1320,7 +1353,9 @@ function FilterPropertiesModal({
                 setEditing(null);
                 setShowAdd(true);
               }}
-              className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+              disabled={!canManage}
+              title={canManage ? undefined : lockReason}
+              className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <Plus className="h-3.5 w-3.5" /> Add Property
             </button>

@@ -9,6 +9,9 @@ type Props = {
   onChange: (next: LifecycleStage | null) => void;
   size?: "sm" | "md";
   className?: string;
+  /** Read-only, with the reason on hover. */
+  disabled?: boolean;
+  disabledReason?: string;
 };
 
 /**
@@ -16,7 +19,14 @@ type Props = {
  * - Always allows clearing the selection (lifecycle is optional).
  * - Reuses the Kanban STAGE_COLORS — never introduce new colors here.
  */
-export function LifecycleSelect({ value, onChange, size = "md", className = "" }: Props) {
+export function LifecycleSelect({
+  value,
+  onChange,
+  size = "md",
+  className = "",
+  disabled,
+  disabledReason,
+}: Props) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const { lifecycleStages } = useContactsStore();
@@ -35,8 +45,10 @@ export function LifecycleSelect({ value, onChange, size = "md", className = "" }
       <button
         ref={btnRef}
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`inline-flex w-full items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] ${hClass} text-foreground hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 transition-colors`}
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className={`inline-flex w-full items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] ${hClass} text-foreground hover:bg-white/[0.06] focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/[0.04] transition-colors`}
       >
         <span className="flex items-center gap-2 min-w-0">
           {color ? (

@@ -31,6 +31,7 @@ import {
   Package,
   BadgeCheck,
   ChevronsLeft,
+  Eye,
   ChevronsRight,
   Menu,
   MessageCircle,
@@ -119,7 +120,7 @@ const MOCK_NOTIFS: MockNotif[] = [
 
 type NavItem = {
   to:
-    | "/"
+    | "/app"
     | "/inbox"
     | "/contacts"
     | "/broadcasts"
@@ -138,20 +139,22 @@ type NavItem = {
   needs?: Capability;
   /** Only in the full build — the lite deployment doesn't carry this page. */
   full?: boolean;
+  /** The permission that opens this page, for the preview links. */
+  perm?: string;
 };
 const topNav: NavItem[] = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox" },
-  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts" },
-  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view" },
-  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view" },
-  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view" },
-  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce" },
-  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce" },
-  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true },
+  { to: "/app", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox-view" },
+  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts-view" },
+  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view", perm: "broadcast-view" },
+  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view", perm: "templates-view" },
+  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view", perm: "knowledge-view" },
+  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce", perm: "commerce-view" },
+  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce", perm: "commerce-view" },
+  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true, perm: "commerce-view" },
 ];
 const bottomNav: NavItem[] = [
-  { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
+  { to: "/settings", label: "Settings", icon: Settings, needs: "settings", perm: "settings-view" },
 ];
 
 /** Whether the sidebar is expanded, remembered per browser. */
@@ -176,8 +179,12 @@ export function AppShell({
   // A page nobody in this role may open shouldn't be offered in the first
   // place — an Area Coordinator has no business on the commercial pages.
   const currentUser = useCurrentUser();
+  const previewed = usePreviewedCondition();
+  const invite = usePermission("settings-users");
   const canSee = (i: NavItem) =>
-    (!i.needs || roleCan(currentUser.role, i.needs)) && !(i.full && LITE_MODE);
+    (!i.needs || roleCan(currentUser.role, i.needs)) &&
+    !(i.full && LITE_MODE) &&
+    !(i.perm && previewed?.id === i.perm);
   const visibleTopNav = topNav.filter(canSee);
   const visibleBottomNav = bottomNav.filter(canSee);
   const navigate = useNavigate();
@@ -290,6 +297,8 @@ export function AppShell({
         >
           <SidebarButton
             label="Invite Members"
+            disabled={!invite.allowed}
+            disabledReason={invite.reason}
             Icon={UserPlus}
             onClick={() => setInviteOpen(true)}
             expanded={expanded}
@@ -351,6 +360,8 @@ export function AppShell({
             <nav className="border-t border-sidebar-border px-2 pb-3 pt-2 flex flex-col gap-1.5">
               <SidebarButton
                 label="Invite Members"
+                disabled={!invite.allowed}
+                disabledReason={invite.reason}
                 Icon={UserPlus}
                 onClick={() => {
                   setMobileNavOpen(false);
@@ -547,6 +558,24 @@ export function AppShell({
           </div>
         </header>
 
+        {previewed && (
+          <div className="shrink-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 sm:px-6">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
+              <Eye className="h-3 w-3" /> Permission preview
+            </span>
+            <span className="text-[13px] text-foreground">
+              <span className="font-medium">{previewed.label}</span> is switched off.
+            </span>
+            <span className="text-[12px] text-muted-foreground">{previewed.effect}</span>
+            <button
+              onClick={() => permissionPreview.exit()}
+              className="press ml-auto h-7 rounded-md border border-amber-500/40 bg-white/60 px-2.5 text-[12px] font-medium hover:bg-white transition-colors duration-150"
+            >
+              Exit Preview
+            </button>
+          </div>
+        )}
+
         <main
           className={
             noPadding
@@ -659,11 +688,15 @@ function SidebarButton({
   Icon,
   onClick,
   expanded,
+  disabled,
+  disabledReason,
 }: {
   label: string;
   Icon: typeof LayoutDashboard;
   onClick: () => void;
   expanded: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   if (expanded) {
     return (
@@ -671,7 +704,9 @@ function SidebarButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Icon className="h-[18px] w-[18px] shrink-0" />
         <span className="flex-1 truncate text-left">{label}</span>
@@ -684,7 +719,9 @@ function SidebarButton({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent"
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className="relative grid h-11 w-11 place-items-center rounded-lg transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Icon className="h-[18px] w-[18px]" />
       </button>
@@ -738,6 +775,11 @@ export function ChannelDot({ channel }: { channel: "whatsapp" }) {
 
 import { sessionStore, useCurrentUser, roleCan, type Capability } from "./session-store";
 import { LITE_MODE } from "@/lib/feature-flags";
+import {
+  usePreviewedCondition,
+  usePermission,
+  permissionPreview,
+} from "@/components/scl/permission-preview";
 import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 

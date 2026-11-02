@@ -25,12 +25,19 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { WHATSAPP_CHANNELS } from "@/routes/channels";
-import { InviteModal, useWorkspaceAgents } from "@/components/scl/invite-modal";
+import { InviteModal } from "@/components/scl/invite-modal";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
+import { useEscapeKey } from "@/lib/use-escape-key";
 import { SclSelect } from "@/components/scl/scl-select";
 import { RolesPermissionsModule } from "@/components/scl/roles-permissions";
 import { DataManagementModule } from "@/components/scl/data-management";
 import { useCurrentUser, type WorkspaceRole } from "@/components/scl/session-store";
+import {
+  usePreviewGate,
+  usePreviewedCondition,
+  usePermission,
+} from "@/components/scl/permission-preview";
+import { baStore, useBaStore } from "@/components/scl/ba-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -39,7 +46,7 @@ export const Route = createFileRoute("/settings")({
 
 // ---------- Navigation structure ----------
 
-type NavItem = { id: string; label: string; enabled?: boolean };
+type NavItem = { id: string; label: string; enabled?: boolean; perm?: string };
 type NavSection = { id: string; label: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
@@ -52,8 +59,8 @@ const NAV: NavSection[] = [
     id: "company",
     label: "Workspace",
     items: [
-      { id: "user-management", label: "User Management", enabled: true },
-      { id: "roles", label: "Roles & Permissions", enabled: true },
+      { id: "user-management", label: "User Management", enabled: true, perm: "settings-users" },
+      { id: "roles", label: "Roles & Permissions", enabled: true, perm: "settings-roles" },
     ],
   },
   {
@@ -68,7 +75,14 @@ const NAV: NavSection[] = [
 ];
 
 function SettingsPage() {
+  usePreviewGate("settings-view");
+  const previewed = usePreviewedCondition();
   const [active, setActive] = useState("general");
+  // A section the preview has closed can't stay open behind the reader.
+  useEffect(() => {
+    const closed = NAV.flatMap((sec) => sec.items).find((i) => i.perm && i.perm === previewed?.id);
+    if (closed && active === closed.id) setActive("general");
+  }, [previewed, active]);
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(NAV.map((s) => [s.id, true])),
   );
@@ -94,30 +108,32 @@ function SettingsPage() {
                 ) : null}
                 {isOpen && (
                   <div className={`space-y-0.5 ${section.id !== "company" ? "mt-1" : ""}`}>
-                    {section.items.map((item) => {
-                      const isActive = active === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => item.enabled && setActive(item.id)}
-                          disabled={!item.enabled}
-                          className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition flex items-center justify-between ${
-                            isActive
-                              ? "bg-primary/15 text-foreground border border-primary/30"
-                              : item.enabled
-                                ? "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
-                                : "text-muted-foreground/40 cursor-not-allowed border border-transparent"
-                          }`}
-                        >
-                          <span>{item.label}</span>
-                          {!item.enabled && (
-                            <span className="text-[9px] uppercase tracking-wider text-muted-foreground/40">
-                              Soon
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                    {section.items
+                      .filter((item) => !(item.perm && item.perm === previewed?.id))
+                      .map((item) => {
+                        const isActive = active === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => item.enabled && setActive(item.id)}
+                            disabled={!item.enabled}
+                            className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition flex items-center justify-between ${
+                              isActive
+                                ? "bg-primary/15 text-foreground border border-primary/30"
+                                : item.enabled
+                                  ? "text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-transparent"
+                                  : "text-muted-foreground/40 cursor-not-allowed border border-transparent"
+                            }`}
+                          >
+                            <span>{item.label}</span>
+                            {!item.enabled && (
+                              <span className="text-[9px] uppercase tracking-wider text-muted-foreground/40">
+                                Soon
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -432,21 +448,30 @@ const USERS_SEED: WorkspaceUser[] = [
     state: "Active",
   },
   {
-    id: "u-mei",
-    name: "Mei Tanaka",
-    phone: "+62 811 5500 0003",
+    id: "u-citra",
+    name: "Citra Dewanti",
+    phone: "+62 811 5500 0011",
     role: "Area Coordinator",
     status: "Away",
     joinedOn: "Mar 18, 2024",
     state: "Active",
   },
   {
-    id: "u-luca",
-    name: "Luca Romano",
-    phone: "+62 811 5500 0004",
+    id: "u-bagas",
+    name: "Bagas Wirawan",
+    phone: "+62 811 5500 0012",
     role: "Area Coordinator",
     status: "Offline",
     joinedOn: "Apr 04, 2024",
+    state: "Active",
+  },
+  {
+    id: "u-farhan",
+    name: "Farhan Nugraha",
+    phone: "+62 811 5500 0013",
+    role: "Area Coordinator",
+    status: "Online",
+    joinedOn: "May 06, 2024",
     state: "Active",
   },
   {
@@ -503,6 +528,9 @@ function UserManagementPage() {
   const [joinedFilter, setJoinedFilter] = useState<string>("Anytime");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const { bas } = useBaStore();
+  const inviteGate = usePermission("settings-users");
+  const [handover, setHandover] = useState<Handover | null>(null);
 
   const filtered = useMemo(() => {
     return users
@@ -536,13 +564,62 @@ function UserManagementPage() {
     setJoinedFilter("Anytime");
   };
 
-  const updateRole = (id: string, role: UserRole) =>
+  const applyRole = (id: string, role: UserRole) =>
     setUsers((s) => s.map((u) => (u.id === id ? { ...u, role } : u)));
 
-  const handleDelete = () => {
+  const applyDelete = () => {
     setUsers((s) => s.filter((u) => !selected.includes(u.id) || u.owner));
     toast.success(`${selected.length} user(s) removed`);
     setSelected([]);
+  };
+
+  /* ── Handing over a coordinator's team ──────────────────────────────────
+   * Every Beauty Ambassador reports to an Area Coordinator, so the last thing
+   * that happens before one stops being a coordinator — by changing role or by
+   * being removed — is deciding who takes their BAs. With no one else to take
+   * them, the change doesn't happen at all. */
+  const basUnder = (names: string[]) => bas.filter((b) => names.includes(b.areaCoordinator)).length;
+
+  const coordinatorsExcept = (names: string[]) =>
+    users
+      .filter(
+        (u) => u.role === "Area Coordinator" && u.state === "Active" && !names.includes(u.name),
+      )
+      .map((u) => u.name);
+
+  const requestRoleChange = (u: WorkspaceUser, role: UserRole) => {
+    const leaving = u.role === "Area Coordinator" && role !== "Area Coordinator";
+    if (leaving && basUnder([u.name]) > 0) {
+      setHandover({ kind: "role", names: [u.name], userId: u.id, nextRole: role });
+      return;
+    }
+    applyRole(u.id, role);
+  };
+
+  const requestDelete = () => {
+    const leaving = users
+      .filter((u) => selected.includes(u.id) && !u.owner && u.role === "Area Coordinator")
+      .map((u) => u.name);
+    if (leaving.length > 0 && basUnder(leaving) > 0) {
+      setHandover({ kind: "delete", names: leaving });
+      return;
+    }
+    setConfirmDelete(true);
+  };
+
+  const completeHandover = (to: string) => {
+    if (!handover) return;
+    const moved = baStore.reassignCoordinator(handover.names, to);
+    if (handover.kind === "role") {
+      applyRole(handover.userId, handover.nextRole);
+      toast.success(
+        `${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to} · role updated`,
+      );
+    } else {
+      applyDelete();
+      toast.success(`${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to}`);
+    }
+    setHandover(null);
   };
 
   return (
@@ -556,7 +633,9 @@ function UserManagementPage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+          disabled={!inviteGate.allowed}
+          title={inviteGate.reason || undefined}
+          className="h-9 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           <UserPlus className="h-3.5 w-3.5" /> Invite user
         </button>
@@ -595,7 +674,7 @@ function UserManagementPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or WA number"
+              placeholder={tab === "Active" ? "Search by name or WA number" : "Search by WA number"}
               className="h-9 w-full rounded-md border border-border bg-background/60 pl-8 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
             />
           </div>
@@ -631,7 +710,7 @@ function UserManagementPage() {
           <div className="px-4 py-2 flex items-center gap-3 bg-primary/10 border-b border-primary/20 text-xs">
             <span className="font-medium">{selected.length} selected</span>
             <button
-              onClick={() => setConfirmDelete(true)}
+              onClick={requestDelete}
               className="ml-auto h-8 inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors duration-150"
             >
               <Trash2 className="h-3.5 w-3.5" /> Delete users
@@ -646,7 +725,9 @@ function UserManagementPage() {
                 <th className="px-4 py-2.5 text-left w-8">
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
-                <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                {tab === "Active" && (
+                  <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                )}
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Role</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Status</th>
@@ -666,23 +747,25 @@ function UserManagementPage() {
                       disabled={u.owner}
                     />
                   </td>
-                  <td className="px-4 py-3 align-middle whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
-                        {u.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join("")}
+                  {tab === "Active" && (
+                    <td className="px-4 py-3 align-middle whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/0 grid place-items-center text-[10px] font-semibold">
+                          {u.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .slice(0, 2)
+                            .join("")}
+                        </div>
+                        <span className="font-medium">{u.name}</span>
+                        {u.owner && (
+                          <span className="text-[9px] uppercase tracking-wider rounded border border-primary/40 bg-primary/15 text-primary px-1.5 py-0.5">
+                            Owner
+                          </span>
+                        )}
                       </div>
-                      <span className="font-medium">{u.name}</span>
-                      {u.owner && (
-                        <span className="text-[9px] uppercase tracking-wider rounded border border-primary/40 bg-primary/15 text-primary px-1.5 py-0.5">
-                          Owner
-                        </span>
-                      )}
-                    </div>
-                  </td>
+                    </td>
+                  )}
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
                     {u.phone}
                   </td>
@@ -697,7 +780,7 @@ function UserManagementPage() {
                       <SclSelect
                         ariaLabel="Role"
                         value={u.role}
-                        onChange={(v) => updateRole(u.id, v as UserRole)}
+                        onChange={(v) => requestRoleChange(u, v as UserRole)}
                         options={ROLE_OPTIONS.map((r) => ({ value: r, label: r }))}
                         size="sm"
                         className="w-36"
@@ -723,7 +806,10 @@ function UserManagementPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td
+                    colSpan={tab === "Active" ? 6 : 5}
+                    className="px-4 py-10 text-center text-sm text-muted-foreground"
+                  >
                     No users match the current filters.
                   </td>
                 </tr>
@@ -736,12 +822,137 @@ function UserManagementPage() {
       <ConfirmDialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
-        onConfirm={handleDelete}
+        onConfirm={applyDelete}
         title="Are you sure you want to remove these users?"
         description="This action cannot be undone."
         confirmLabel="Delete users"
       />
+      {handover && (
+        <CoordinatorHandoverModal
+          handover={handover}
+          baCount={basUnder(handover.names)}
+          options={coordinatorsExcept(handover.names)}
+          countFor={(name) => bas.filter((b) => b.areaCoordinator === name).length}
+          onClose={() => setHandover(null)}
+          onConfirm={completeHandover}
+        />
+      )}
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
+    </div>
+  );
+}
+
+/* ── Area Coordinator handover ────────────────────────────────────────────
+ * Opened the moment a coordinator is about to stop being one. It is the only
+ * way past that point, and with no other coordinator to receive the team there
+ * is no way past at all — a BA without a coordinator has no one to answer to
+ * and drops out of every area view. */
+
+type Handover =
+  | { kind: "role"; names: string[]; userId: string; nextRole: UserRole }
+  | { kind: "delete"; names: string[] };
+
+function CoordinatorHandoverModal({
+  handover,
+  baCount,
+  options,
+  countFor,
+  onClose,
+  onConfirm,
+}: {
+  handover: Handover;
+  baCount: number;
+  options: string[];
+  countFor: (name: string) => number;
+  onClose: () => void;
+  onConfirm: (to: string) => void;
+}) {
+  // Escape closes it, the way every other overlay in the app does.
+  useEscapeKey(true, onClose);
+  const [to, setTo] = useState(options[0] ?? "");
+  const leaving = handover.names.join(" and ");
+  const plural = baCount === 1 ? "" : "s";
+  const what =
+    handover.kind === "role"
+      ? `changing ${handover.names.length > 1 ? "their roles" : "their role"}`
+      : "removing the account";
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-[460px] rounded-xl border border-border bg-popover shadow-xl modal-content"
+      >
+        <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+            <Users className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold">
+              {options.length === 0 ? "No Other Area Coordinator" : "Move Beauty Ambassadors First"}
+            </h3>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              {leaving} coordinate{handover.names.length > 1 ? "" : "s"}{" "}
+              <span className="font-medium text-foreground">
+                {baCount} Beauty Ambassador{plural}
+              </span>
+              .
+            </p>
+          </div>
+        </div>
+
+        <div className="px-5 py-4 space-y-3">
+          {options.length === 0 ? (
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
+              Every Beauty Ambassador reports to an Area Coordinator, and there is no one else to
+              take this team. Give another user the Area Coordinator role first, then come back to
+              this one.
+            </p>
+          ) : (
+            <>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                Every Beauty Ambassador reports to an Area Coordinator. Choose who takes this team
+                over before {what}.
+              </p>
+              <div className="space-y-1">
+                <div className="text-[12px] text-muted-foreground">Move them to</div>
+                <SclSelect
+                  ariaLabel="Area Coordinator to move the team to"
+                  value={to}
+                  onChange={setTo}
+                  options={options.map((name) => ({
+                    value: name,
+                    label: name,
+                    trailing: `${countFor(name)} BA${countFor(name) === 1 ? "" : "s"} now`,
+                  }))}
+                  className="w-full"
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border">
+          <button
+            onClick={onClose}
+            className="press h-9 rounded-md border border-border px-3 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+          >
+            {options.length === 0 ? "Close" : "Cancel"}
+          </button>
+          {options.length > 0 && (
+            <button
+              onClick={() => onConfirm(to)}
+              disabled={!to}
+              className="press h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            >
+              Move {baCount} BA{plural} &amp; Continue
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

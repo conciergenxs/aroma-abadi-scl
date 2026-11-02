@@ -16,7 +16,7 @@ import { SeasonStatusBadge, DeleteSeasonDialog } from "@/components/scl/referral
 export const Route = createFileRoute("/referral/$seasonId")({
   // The lite build doesn't carry Referral, so the URL doesn't either.
   beforeLoad: () => {
-    if (LITE_MODE) throw redirect({ to: "/" });
+    if (LITE_MODE) throw redirect({ to: "/app" });
   },
   head: () => ({ meta: [{ title: "Referral Season — Aroma Abadi" }] }),
   component: SeasonReportPage,

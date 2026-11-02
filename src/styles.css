@@ -857,3 +857,51 @@ html {
     transform: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PUBLIC COMPANY PAGE ("/")
+   Scoped to the one public route. The workspace keeps Inter throughout;
+   the company page sets its headlines in Newsreader, an editorial serif
+   that reads as a document rather than a product UI. The font is loaded
+   from that route's own <head>, so no workspace page pays for it.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.lp-display {
+  font-family: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  font-variant-numeric: lining-nums;
+}
+
+/* The page's single piece of non-user-triggered motion: the hero thread
+   arrives one message at a time, the way the real conversation does. Every
+   other screen on the page is still. `backwards` for the reason documented
+   at the top of the stagger section; the reduced-motion block above already
+   collapses both the duration and the delay to nothing. */
+@keyframes lp-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lp-bubble {
+  animation: lp-bubble-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Brand marks ship as black artwork on a white square. Multiply drops the
+   square out against the ivory ground so the row reads as marks, not tiles. */
+.lp-brandmark {
+  mix-blend-mode: multiply;
+}
+
+/* The workspace's maroon focus ring is all but invisible on this page's ink
+   ground, so anything focusable inside a dark band switches to the sand
+   accent. Outranks the global :where() rule on specificity alone. */
+.lp-dark :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline-color: #d9b892;
+}

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BaRouteImport } from './routes/ba'
 import { Route as ChannelsRouteImport } from './routes/channels'
@@ -50,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
 const AccessDeniedRoute = AccessDeniedRouteImport.update({
   id: '/access-denied',
   path: '/access-denied',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -208,6 +214,7 @@ const ContactsAudienceAddAudienceIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
@@ -313,6 +322,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/access-denied'
+    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/access-denied'
+    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/access-denied'
+    | '/app'
     | '/auth'
     | '/ba'
     | '/channels'
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
+  AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   BaRoute: typeof BaRoute
   ChannelsRoute: typeof ChannelsRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/access-denied'
       fullPath: '/access-denied'
       preLoaderRoute: typeof AccessDeniedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -703,6 +723,7 @@ const SkuRouteWithChildren = SkuRoute._addFileChildren(SkuRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
+  AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   BaRoute: BaRoute,
   ChannelsRoute: ChannelsRoute,

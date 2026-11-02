@@ -60,6 +60,7 @@ import {
   referralActivityFor,
   type ReferralUseWithSeason,
 } from "@/components/scl/referral-store";
+import { usePermission } from "@/components/scl/permission-preview";
 import { LITE_MODE } from "@/lib/feature-flags";
 
 const SYSTEM_KEYS = new Set([
@@ -90,6 +91,8 @@ type ContactRedemption = PromoRedemption & {
 };
 
 function ContactDetailPage() {
+  const editGate = usePermission("contacts-edit");
+  const deleteGate = usePermission("contacts-delete");
   const { contactId } = useParams({ from: "/contacts/$contactId" });
   const state = useContactsStore();
   const { contacts, labels, lists, properties, activities } = state;
@@ -445,6 +448,8 @@ function ContactDetailPage() {
                 <h1 className="text-base font-semibold truncate">{contact.name}</h1>
                 {!isBA && (
                   <LifecycleDropdown
+                    disabled={!editGate.allowed}
+                    disabledReason={editGate.reason}
                     value={contact.lifecycleStage ?? null}
                     onChange={setLifecycle}
                   />
@@ -459,7 +464,9 @@ function ContactDetailPage() {
                 </Link>
                 <button
                   onClick={() => setConfirmDelete(true)}
-                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 transition-colors"
+                  disabled={!deleteGate.allowed}
+                  title={deleteGate.reason || undefined}
+                  className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[14px] text-destructive hover:bg-destructive/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>
@@ -663,9 +670,13 @@ const LIFECYCLE_STAGES: LifecycleStage[] = [
 function LifecycleDropdown({
   value,
   onChange,
+  disabled,
+  disabledReason,
 }: {
   value: LifecycleStage | null;
   onChange: (s: LifecycleStage | null) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -684,8 +695,10 @@ function LifecycleDropdown({
     <div ref={ref} className="relative inline-block">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
           style ? style.badge : "border-border text-muted-foreground hover:border-foreground/30"
         }`}
       >
@@ -1397,6 +1410,7 @@ function RightPanel({
   onToggleBrand: (brandId: string) => void;
   onSetCustomProperty: (key: string, value: unknown, displayName: string) => void;
 }) {
+  const editGate = usePermission("contacts-edit");
   const { brands } = useSkuStore();
   const [revealed, setRevealed] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -1497,6 +1511,8 @@ function RightPanel({
 
       <RightSection title="Labels">
         <LabelSelector
+          locked={!editGate.allowed}
+          lockReason={editGate.reason}
           labels={labels}
           selectedIds={contact.labelIds}
           onToggle={onToggleLabel}
@@ -1545,6 +1561,8 @@ function RightPanel({
 
       <RightSection title="Audience">
         <ListSelector
+          locked={!editGate.allowed}
+          lockReason={editGate.reason}
           lists={lists}
           selectedIds={contact.listIds}
           onToggle={onToggleList}
@@ -1752,11 +1770,15 @@ function LabelSelector({
   selectedIds,
   onToggle,
   onCreate,
+  locked,
+  lockReason,
 }: {
   labels: ContactLabel[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   onCreate: (name: string) => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -1811,8 +1833,10 @@ function LabelSelector({
       </div>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
+        onClick={() => !locked && setOpen((v) => !v)}
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add label
@@ -1884,11 +1908,15 @@ function ListSelector({
   selectedIds,
   onToggle,
   onCreate,
+  locked,
+  lockReason,
 }: {
   lists: { id: string; name: string }[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   onCreate: (name: string) => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -1943,8 +1971,10 @@ function ListSelector({
       </div>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 transition-colors duration-150"
+        onClick={() => !locked && setOpen((v) => !v)}
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="w-full inline-flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-white px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors duration-150"
       >
         <span className="inline-flex items-center gap-1">
           <Plus className="h-3 w-3" /> Add to list

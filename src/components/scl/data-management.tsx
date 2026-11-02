@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { SectionCard } from "./app-shell";
 import { ConfirmDialog } from "./confirm-dialog";
+import { usePermission } from "./permission-preview";
 import { SclSelect } from "./scl-select";
 import {
   contactsStore,
@@ -104,18 +105,21 @@ function PrimaryButton({
   onClick,
   type = "button",
   disabled,
+  title,
 }: {
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
   disabled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
+      title={disabled ? title : undefined}
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
     >
       {children}
     </button>
@@ -175,6 +179,7 @@ function SearchInput({
 const LIFECYCLE_COLOR_KEYS = Object.keys(LIFECYCLE_COLORS) as LifecycleColorKey[];
 
 function CustomerLifecyclePage() {
+  const manage = usePermission("contacts-labels");
   const { lifecycleStages } = useContactsStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [createGroup, setCreateGroup] = useState<LifecycleGroup | null>(null);
@@ -216,6 +221,8 @@ function CustomerLifecyclePage() {
           onCancelEdit={() => setEditingId(null)}
           onDelete={(s) => setDeleteTarget(s)}
           onCreate={() => setCreateGroup("active")}
+          locked={!manage.allowed}
+          lockReason={manage.reason}
         />
         <div className="h-px bg-border" />
         <LifecycleGroupSection
@@ -229,6 +236,8 @@ function CustomerLifecyclePage() {
           onCancelEdit={() => setEditingId(null)}
           onDelete={(s) => setDeleteTarget(s)}
           onCreate={() => setCreateGroup("lost")}
+          locked={!manage.allowed}
+          lockReason={manage.reason}
         />
       </SectionCard>
 
@@ -278,6 +287,8 @@ function LifecycleGroupSection({
   onCancelEdit,
   onDelete,
   onCreate,
+  locked,
+  lockReason,
 }: {
   title: string;
   stages: LifecycleStageDef[];
@@ -289,6 +300,8 @@ function LifecycleGroupSection({
   onCancelEdit: () => void;
   onDelete: (s: LifecycleStageDef) => void;
   onCreate: () => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   return (
     <div className="px-5 py-4">
@@ -316,8 +329,10 @@ function LifecycleGroupSection({
               onDragStart={() => setDragId(s.id)}
               onDragEnd={() => setDragId(null)}
               onDropTarget={() => onDropTarget(s.id)}
-              onEdit={() => onEdit(s.id)}
-              onDelete={() => onDelete(s)}
+              onEdit={() => !locked && onEdit(s.id)}
+              onDelete={() => !locked && onDelete(s)}
+              locked={locked}
+              lockReason={lockReason}
             />
           ),
         )}
@@ -330,7 +345,9 @@ function LifecycleGroupSection({
       <button
         type="button"
         onClick={onCreate}
-        className="mt-3 inline-flex items-center gap-1.5 text-xs text-primary hover:underline transition-colors duration-150"
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="mt-3 inline-flex items-center gap-1.5 text-xs text-primary hover:underline disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Create
       </button>
@@ -346,6 +363,8 @@ function LifecycleStageRow({
   onDropTarget,
   onEdit,
   onDelete,
+  locked,
+  lockReason,
 }: {
   stage: LifecycleStageDef;
   dragging: boolean;
@@ -354,6 +373,8 @@ function LifecycleStageRow({
   onDropTarget: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  locked?: boolean;
+  lockReason?: string;
 }) {
   const c = LIFECYCLE_COLORS[stage.color];
   return (
@@ -386,7 +407,9 @@ function LifecycleStageRow({
       <button
         type="button"
         onClick={onEdit}
-        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
+        disabled={locked}
+        title={locked ? lockReason : undefined}
+        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         aria-label="Edit stage"
       >
         <Pencil className="h-3.5 w-3.5" />
@@ -395,7 +418,9 @@ function LifecycleStageRow({
         <button
           type="button"
           onClick={onDelete}
-          className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
+          disabled={locked}
+          title={locked ? lockReason : undefined}
+          className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
           aria-label="Delete stage"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -542,7 +567,12 @@ function RecentlyDeletedContactsPage() {
   const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  const visibleProps = useMemo(() => properties.filter((p) => p.visible), [properties]);
+  // The BA password column belongs on the BA record, not on a list of
+  // contacts waiting to be restored.
+  const visibleProps = useMemo(
+    () => properties.filter((p) => p.visible && p.key !== "password"),
+    [properties],
+  );
 
   const deletedContacts = useMemo(() => {
     const base = contacts.filter((c) => c.deleted);
@@ -642,7 +672,7 @@ function RecentlyDeletedContactsPage() {
                     </th>
                   ))}
                   <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">Deleted</th>
-                  <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Actions</th>
+                  <th className="px-3 py-2.5 text-left font-medium whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border stagger">
@@ -659,7 +689,7 @@ function RecentlyDeletedContactsPage() {
                     <td className="px-3 py-3 text-xs text-muted-foreground whitespace-nowrap">
                       {c.deletedAt ? fmtDate(c.deletedAt) : "—"}
                     </td>
-                    <td className="px-3 py-3 text-right whitespace-nowrap">
+                    <td className="px-3 py-3 text-left whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
@@ -998,6 +1028,7 @@ const COLOR_FILTER_OPTIONS = [
 ];
 
 function LabelsPage() {
+  const manage = usePermission("contacts-labels");
   // The real thing — the very labels contacts are tagged with.
   const { labels, contacts } = useContactsStore();
   const setLabels = contactsStore.setLabels;
@@ -1083,7 +1114,11 @@ function LabelsPage() {
         title="Labels"
         description="Create and manage labels used to organize contacts."
         action={
-          <PrimaryButton onClick={() => setCreateOpen(true)}>
+          <PrimaryButton
+            onClick={() => setCreateOpen(true)}
+            disabled={!manage.allowed}
+            title={manage.reason}
+          >
             <Plus className="h-3.5 w-3.5" /> Create New Label
           </PrimaryButton>
         }
@@ -1137,7 +1172,11 @@ function LabelsPage() {
             title="No Labels Found"
             description="Create your first label to organize contacts."
             action={
-              <PrimaryButton onClick={() => setCreateOpen(true)}>
+              <PrimaryButton
+                onClick={() => setCreateOpen(true)}
+                disabled={!manage.allowed}
+                title={manage.reason}
+              >
                 <Plus className="h-3.5 w-3.5" /> Create Label
               </PrimaryButton>
             }
