@@ -1,5 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, CreditCard, Landmark, Phone, Plus, QrCode, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  CreditCard,
+  Landmark,
+  Lock,
+  Phone,
+  QrCode,
+  Send,
+  Video,
+  Wallet,
+} from "lucide-react";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 
 /* The screens a customer actually sees.
@@ -16,16 +27,13 @@ export type ChatMessage = {
   from: "arma" | "customer";
   time: string;
   text?: string;
-  /** The breakdown ARMA sends before any money moves. */
   order?: {
     title: string;
     items: { name: string; qty: number; price: string }[];
     rows: { label: string; value: string }[];
     total: string;
   };
-  /** The Xendit payment link that follows the breakdown. */
   link?: { title: string; note: string; host: string; url: string };
-  /** What lands once Xendit reports the payment as settled. */
   receipt?: { title: string; rows: { label: string; value: string }[]; note: string };
 };
 
@@ -58,11 +66,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
   const mine = message.from === "customer";
   const structured = Boolean(message.order || message.link || message.receipt);
   return (
-    <div
-      className={`flex ${mine ? "justify-end" : "justify-start"} ${
-        hidden ? "lp-msg" : "lp-msg lp-msg-in"
-      }`}
-    >
+    <div className={`${mine ? "justify-end" : "justify-start"} ${hidden ? "lp-msg" : "lp-msg-in"}`}>
       <div
         className={`relative ${structured ? "w-[88%]" : "max-w-[86%]"} rounded-[8px] px-[9px] py-[6px] text-[13.5px] leading-[1.42] text-[#111B21] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
           mine ? "rounded-tr-[2px] bg-[#D9FDD3]" : "rounded-tl-[2px] bg-white"
@@ -132,9 +136,9 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
   );
 }
 
-function Typing() {
+function TypingBubble() {
   return (
-    <div className="flex justify-start">
+    <div className="lp-msg-in justify-start">
       <div className="rounded-[8px] rounded-tl-[2px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
         <span className="flex items-center gap-[4px]">
           <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" />
@@ -152,7 +156,7 @@ function Typing() {
   );
 }
 
-function ChatHeader({ compact = false }: { compact?: boolean }) {
+function ChatHeader({ compact = false, status }: { compact?: boolean; status?: string }) {
   return (
     <div
       className={`flex items-center gap-[9px] bg-[#075E54] ${compact ? "px-[11px] py-[9px]" : "px-[12px] py-[10px]"}`}
@@ -165,7 +169,7 @@ function ChatHeader({ compact = false }: { compact?: boolean }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[14px] font-medium text-white">Aroma Abadi</span>
-        <span className="block text-[12px] text-white/65">online</span>
+        <span className="block text-[12px] text-white/65">{status ?? "online"}</span>
       </span>
       {compact ? null : (
         <>
@@ -199,21 +203,26 @@ export function ChatScreen({
   );
 }
 
-const METHOD_ICON = { qris: QrCode, va: Landmark, card: CreditCard };
+/* ── The Xendit payment page ─────────────────────────────────────────────
+ * Grouped the way Xendit's own hosted page groups its Indonesian channels:
+ * QRIS, virtual account, e-wallet and cards, each naming the networks it
+ * actually covers. Drawn in our styling and labelled as Xendit's — it
+ * stands in for the screen, it does not imitate it, and it asks nothing. */
+
+const METHOD_ICON = { qris: QrCode, va: Landmark, ewallet: Wallet, card: CreditCard };
 export type PaymentMethod = { id: keyof typeof METHOD_ICON; name: string; note: string };
 
-/** The Xendit-hosted payment page the link opens. Drawn in our own styling and
- * labelled as Xendit's: it stands in for the screen, it does not imitate it,
- * and it asks for nothing. */
 export function CheckoutScreen({
   invoice,
   amount,
+  expiry,
   methods,
   className = "",
   framed = true,
 }: {
   invoice: string;
   amount: string;
+  expiry: string;
   methods: PaymentMethod[];
   className?: string;
   framed?: boolean;
@@ -231,10 +240,11 @@ export function CheckoutScreen({
           <span className="text-[12.5px] text-[#6B5A50]">PT Aroma Abadi</span>
           <span className="text-[13px] font-semibold tracking-tight text-[#2B211D]">xendit</span>
         </div>
-        <p className="mt-[8px] text-[12px] text-[#6B5A50]">{invoice}</p>
-        <p className="text-[24px] font-semibold tabular-nums tracking-tight text-[#2B211D]">
+        <p className="mt-[9px] text-[12px] text-[#6B5A50]">Total pembayaran · {invoice}</p>
+        <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#2B211D]">
           {amount}
         </p>
+        <p className="mt-[3px] text-[12px] text-[#8B6B51]">Bayar sebelum {expiry}</p>
       </div>
       <div className="px-[15px] py-[13px]">
         <p className="text-[12.5px] text-[#6B5A50]">Pilih metode pembayaran</p>
@@ -245,7 +255,7 @@ export function CheckoutScreen({
             return (
               <li
                 key={method.id}
-                className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] transition-colors ${
+                className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
                   on ? "border-[#71222A] bg-[#71222A]/5" : "border-[#2B211D]/12"
                 }`}
               >
@@ -275,8 +285,9 @@ export function CheckoutScreen({
         <p className="mt-[12px] rounded-[8px] bg-[#71222A] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
           Bayar Sekarang
         </p>
-        <p className="mt-[9px] text-center text-[12px] leading-snug text-[#6B5A50]">
-          Halaman pembayaran dihosting dan diproses oleh Xendit.
+        <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#6B5A50]">
+          <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
+          Dihosting dan diproses oleh Xendit
         </p>
       </div>
     </div>
@@ -284,95 +295,114 @@ export function CheckoutScreen({
 }
 
 /* ── The hero: one transaction, played on a loop ─────────────────────────
- * A still screenshot can't show that paying never leaves the conversation,
- * so the hero plays the whole thing: the customer asks, ARMA answers, the
- * breakdown and the link arrive, the Xendit page slides up over the thread,
- * and the receipt lands back in the same chat. Then it starts again.
+ * A still can't show that paying never leaves the conversation, so the hero
+ * plays the whole thing at reading pace: the customer types into the
+ * composer, the message sends, ARMA answers, the breakdown and the link
+ * arrive, the Xendit page slides up over the thread, and the receipt lands
+ * back in the same chat. Then it starts again.
  *
  * Server-rendered with every message in place, so the thread is in the HTML
  * whether or not the script runs, and left that way for anyone who asked
  * their system to minimise motion. */
 
-type Beat = { after: number; show?: number; typing?: boolean; checkout?: boolean; reset?: boolean };
+export type Beat =
+  | { t: "pause"; ms: number }
+  | { t: "type"; i: number }
+  | { t: "armaTyping"; ms: number }
+  | { t: "send"; i: number }
+  | { t: "checkout"; ms: number };
 
 export function LiveChat({
   messages,
+  script,
   checkout,
   className = "",
 }: {
   messages: ChatMessage[];
-  checkout: { invoice: string; amount: string; methods: PaymentMethod[] };
+  script: Beat[];
+  checkout: { invoice: string; amount: string; expiry: string; methods: PaymentMethod[] };
   className?: string;
 }) {
-  const [shown, setShown] = useState<number | null>(null);
-  const [typing, setTyping] = useState(false);
+  const [live, setLive] = useState(false);
+  const [sent, setSent] = useState(0);
+  const [draft, setDraft] = useState("");
+  const [armaTyping, setArmaTyping] = useState(false);
   const [paying, setPaying] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
 
   useIsoLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setShown(0);
+    setLive(true);
   }, []);
 
   useEffect(() => {
-    if (shown === null) return;
-    const beats: Beat[] = [
-      { after: 450, show: 1 },
-      { after: 500, typing: true },
-      { after: 1250, typing: false, show: 2 },
-      { after: 1150, show: 3 },
-      { after: 550, typing: true },
-      { after: 1150, typing: false, show: 4 },
-      { after: 800, typing: true },
-      { after: 950, typing: false, show: 5 },
-      { after: 1300, checkout: true },
-      { after: 2800, checkout: false },
-      { after: 450, typing: true },
-      { after: 950, typing: false, show: 6 },
-      { after: 3200, reset: true },
-    ];
+    if (!live) return;
     let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-    let i = 0;
-    const run = () => {
-      if (cancelled) return;
-      const beat = beats[i % beats.length];
-      timer = setTimeout(() => {
-        if (cancelled) return;
-        if (beat.reset) {
-          setShown(0);
-          setTyping(false);
-          setPaying(false);
-        } else {
-          if (beat.typing !== undefined) setTyping(beat.typing);
-          if (beat.show !== undefined) setShown(beat.show);
-          if (beat.checkout !== undefined) setPaying(beat.checkout);
+    const timers: number[] = [];
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timers.push(window.setTimeout(resolve, ms));
+      });
+
+    const run = async () => {
+      while (!cancelled) {
+        setSent(0);
+        setDraft("");
+        setArmaTyping(false);
+        setPaying(false);
+        await wait(900);
+
+        for (const beat of script) {
+          if (cancelled) return;
+          if (beat.t === "pause") {
+            await wait(beat.ms);
+          } else if (beat.t === "type") {
+            const text = messages[beat.i].text ?? "";
+            for (let c = 1; c <= text.length; c += 1) {
+              if (cancelled) return;
+              setDraft(text.slice(0, c));
+              await wait(text[c - 1] === " " ? 58 : 34);
+            }
+            await wait(420);
+            if (cancelled) return;
+            setDraft("");
+            setSent(beat.i + 1);
+          } else if (beat.t === "armaTyping") {
+            setArmaTyping(true);
+            await wait(beat.ms);
+            if (cancelled) return;
+            setArmaTyping(false);
+          } else if (beat.t === "send") {
+            setSent(beat.i + 1);
+          } else if (beat.t === "checkout") {
+            setPaying(true);
+            await wait(beat.ms);
+            if (cancelled) return;
+            setPaying(false);
+          }
         }
-        i += 1;
-        run();
-      }, beat.after);
+        await wait(4200);
+      }
     };
+
     run();
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      timers.forEach((id) => window.clearTimeout(id));
     };
-    // The timeline is fixed; it is started once and restarts itself.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shown === null]);
+  }, [live, messages, script]);
 
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [shown, typing]);
+  }, [sent, armaTyping]);
 
-  const count = shown === null ? messages.length : shown;
+  const count = live ? sent : messages.length;
 
   return (
     <div className={`lp-phone relative ${className}`}>
       <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#17100E] bg-[#17100E] shadow-[0_40px_90px_-32px_rgba(62,19,25,0.55)]">
         <div className="relative overflow-hidden rounded-[26px] bg-[#EFE7DE]">
-          {/* Status bar */}
           <div className="flex items-center justify-between bg-[#075E54] px-[15px] pb-[2px] pt-[7px] text-[11.5px] font-medium text-white/90">
             <span>09.41</span>
             <span className="flex items-center gap-[4px]">
@@ -380,11 +410,11 @@ export function LiveChat({
               <span className="h-[9px] w-[16px] rounded-[3px] border border-white/70" />
             </span>
           </div>
-          <ChatHeader />
+          <ChatHeader status={armaTyping ? "mengetik…" : "online"} />
 
           <div
             ref={threadRef}
-            className="lp-wallpaper scrollbar-none h-[430px] space-y-[6px] overflow-y-auto px-[10px] py-[12px]"
+            className="lp-wallpaper scrollbar-none h-[418px] space-y-[6px] overflow-y-auto px-[10px] py-[12px]"
           >
             <p className="mx-auto w-fit rounded-[7px] bg-white/85 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
               Hari ini
@@ -392,23 +422,32 @@ export function LiveChat({
             {messages.map((message, index) => (
               <Bubble key={index} message={message} hidden={index >= count} />
             ))}
-            {typing ? <Typing /> : null}
+            {armaTyping ? <TypingBubble /> : null}
           </div>
 
-          {/* Composer */}
           <div className="flex items-center gap-[8px] bg-[#F0F2F5] px-[10px] py-[8px]">
-            <span className="flex h-[32px] flex-1 items-center rounded-full bg-white px-[12px] text-[13px] text-[#8696A0]">
-              Ketik pesan
+            <span className="flex h-[32px] flex-1 items-center overflow-hidden rounded-full bg-white px-[12px] text-[13px]">
+              {draft ? (
+                <span className="truncate text-[#111B21]">
+                  {draft}
+                  <i className="lp-caret ml-[1px] inline-block h-[14px] w-[1.5px] translate-y-[2px] bg-[#111B21]" />
+                </span>
+              ) : (
+                <span className="text-[#8696A0]">Ketik pesan</span>
+              )}
             </span>
-            <span className="grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full bg-[#00A884]">
-              <Plus className="h-[16px] w-[16px] text-white" strokeWidth={2.4} />
+            <span
+              className={`grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full transition-colors duration-200 ${
+                draft ? "bg-[#00A884]" : "bg-[#00A884]/70"
+              }`}
+            >
+              <Send className="h-[15px] w-[15px] translate-x-[-1px] text-white" strokeWidth={2.2} />
             </span>
           </div>
 
-          {/* The Xendit page, opened from the link without leaving the phone */}
           <div
-            className={`absolute inset-0 flex flex-col justify-end transition-[opacity] duration-300 ${
-              paying ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+            className={`absolute inset-0 flex flex-col justify-end ${
+              paying ? "pointer-events-auto" : "pointer-events-none"
             }`}
           >
             <div
@@ -417,7 +456,7 @@ export function LiveChat({
               }`}
             />
             <div
-              className={`relative max-h-full overflow-hidden rounded-t-[20px] bg-white transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`relative max-h-full overflow-hidden rounded-t-[20px] bg-white transition-transform duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 paying ? "translate-y-0" : "translate-y-full"
               }`}
             >

@@ -998,6 +998,54 @@ html {
   filter: grayscale(0);
 }
 
+/* ---- Composer caret ----
+   The hero types its messages before sending them, so the field needs a
+   cursor that behaves like one. */
+.lp-caret {
+  animation: lp-caret 1.05s step-end infinite;
+}
+
+@keyframes lp-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- Drifting brand row ----
+   The track holds the marks twice, so translating it exactly half its width
+   lands on an identical frame and the loop has no seam. */
+.lp-marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.lp-marquee-track {
+  animation: lp-marquee 42s linear infinite;
+}
+.lp-marquee:hover .lp-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes lp-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---- Paper ----
+   A hairline weave on the warm bands. At this contrast it reads as texture
+   rather than pattern, and it keeps the large cream areas from going flat. */
+.lp-paper {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(113, 34, 42, 0.022) 0 1px,
+    transparent 1px 7px
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lp-reveal {
     opacity: 1;
