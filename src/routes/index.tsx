@@ -158,7 +158,7 @@ function CompanyPage() {
   return (
     <main className="bg-[#FBF7F0]">
       {/* ── Masthead ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-[#FBF7F0]/10 bg-[#2A0D12]/95 backdrop-blur-sm">
+      <header className="lp-dark sticky top-0 z-30 border-b border-[#FBF7F0]/10 bg-[#2A0D12]/95 backdrop-blur-sm">
         <div className="mx-auto flex h-[62px] w-full max-w-[1180px] items-center gap-6 px-6 md:px-10">
           <a href="#top" className="shrink-0 rounded-sm" aria-label="PT Aroma Abadi, ke atas halaman">
             <img src={logo} alt="Aroma Abadi" className="h-[21px] w-auto" />
@@ -187,7 +187,7 @@ function CompanyPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section id="top" className="bg-[#2A0D12]">
+      <section id="top" className="lp-dark bg-[#2A0D12]">
         <div className="mx-auto grid w-full max-w-[1180px] gap-14 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-20">
           <div>
             <h1 className="lp-display max-w-[16ch] text-[clamp(2.2rem,1.3rem+3.2vw,3.9rem)] leading-[1.06] text-[#FBF7F0]">
@@ -551,7 +551,7 @@ function CompanyPage() {
         </Split>
       </Section>
 
-      <footer className="bg-[#2A0D12] pb-12">
+      <footer className="lp-dark bg-[#2A0D12] pb-12">
         <div className="mx-auto w-full max-w-[1180px] border-t border-[#FBF7F0]/12 px-6 pt-8 md:px-10">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">

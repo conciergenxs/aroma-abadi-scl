@@ -29,7 +29,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={`scroll-mt-20 ${tone === "dark" ? "bg-[#2A0D12]" : "bg-[#FBF7F0]"} ${className}`}
+      className={`scroll-mt-20 ${tone === "dark" ? "lp-dark bg-[#2A0D12]" : "bg-[#FBF7F0]"} ${className}`}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-24">{children}</div>
     </section>

@@ -898,3 +898,10 @@ html {
 .lp-brandmark {
   mix-blend-mode: multiply;
 }
+
+/* The workspace's maroon focus ring is all but invisible on this page's ink
+   ground, so anything focusable inside a dark band switches to the sand
+   accent. Outranks the global :where() rule on specificity alone. */
+.lp-dark :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline-color: #d9b892;
+}
