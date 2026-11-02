@@ -260,14 +260,14 @@ export function Step({
             Titik integrasi Xendit
           </p>
         ) : null}
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-start lg:gap-12">
-          <div className="min-w-0">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-stretch lg:gap-12">
+          <div className="flex min-w-0 flex-col">
             <h3 className="text-[17px] font-semibold leading-snug text-[#2B211D]">{title}</h3>
             <p className="mt-[10px] max-w-[56ch] text-[15px] leading-[1.65] text-[#5B4C44]">
               {body}
             </p>
             {points ? (
-              <dl className="mt-6 border-t border-[#2B211D]/10">
+              <dl className="mt-8 border-t border-[#2B211D]/10 lg:mt-auto lg:pt-8">
                 {points.map((point) => (
                   <div
                     key={point.label}

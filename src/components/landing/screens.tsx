@@ -33,7 +33,10 @@ function Ticks() {
   return (
     <span className="relative inline-block h-[11px] w-[15px] align-middle">
       <Check className="absolute left-0 top-0 h-[11px] w-[11px] text-[#53BDEB]" strokeWidth={3.5} />
-      <Check className="absolute left-[4px] top-0 h-[11px] w-[11px] text-[#53BDEB]" strokeWidth={3.5} />
+      <Check
+        className="absolute left-[4px] top-0 h-[11px] w-[11px] text-[#53BDEB]"
+        strokeWidth={3.5}
+      />
     </span>
   );
 }
@@ -73,11 +76,13 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
             <ul className="mt-[6px] space-y-[3px]">
               {message.order.items.map((item) => (
                 <li key={item.name} className="flex gap-3">
+                  {/* Quantity leads the line so a wrapping product name can
+                      never strand it on a line of its own. */}
                   <span className="flex-1">
+                    <span className="text-[#667781]">{item.qty}× </span>
                     {item.name}
-                    <span className="text-[#667781]"> ×{item.qty}</span>
                   </span>
-                  <span className="tabular-nums">{item.price}</span>
+                  <span className="shrink-0 tabular-nums">{item.price}</span>
                 </li>
               ))}
             </ul>
@@ -94,7 +99,9 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
           <div>
             <div className="rounded-[6px] bg-[#F5F6F6] p-[8px]">
               <p className="text-[12.5px] font-semibold leading-snug">{message.link.title}</p>
-              <p className="mt-[2px] text-[12px] leading-snug text-[#667781]">{message.link.note}</p>
+              <p className="mt-[2px] text-[12px] leading-snug text-[#667781]">
+                {message.link.note}
+              </p>
               <p className="mt-[5px] text-[12px] text-[#8696A0]">{message.link.host}</p>
             </div>
             <p className="mt-[5px] break-all text-[12.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
@@ -131,8 +138,14 @@ function Typing() {
       <div className="rounded-[8px] rounded-tl-[2px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
         <span className="flex items-center gap-[4px]">
           <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" />
-          <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" style={{ animationDelay: "0.16s" }} />
-          <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" style={{ animationDelay: "0.32s" }} />
+          <i
+            className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]"
+            style={{ animationDelay: "0.16s" }}
+          />
+          <i
+            className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]"
+            style={{ animationDelay: "0.32s" }}
+          />
         </span>
       </div>
     </div>
@@ -141,8 +154,12 @@ function Typing() {
 
 function ChatHeader({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`flex items-center gap-[9px] bg-[#075E54] ${compact ? "px-[11px] py-[9px]" : "px-[12px] py-[10px]"}`}>
-      {compact ? null : <ArrowLeft className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />}
+    <div
+      className={`flex items-center gap-[9px] bg-[#075E54] ${compact ? "px-[11px] py-[9px]" : "px-[12px] py-[10px]"}`}
+    >
+      {compact ? null : (
+        <ArrowLeft className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
+      )}
       <span className="grid h-[31px] w-[31px] shrink-0 place-items-center rounded-full bg-[#5C1F24]">
         <img src={armaMark} alt="" className="h-[17px] w-[17px]" />
       </span>
@@ -161,7 +178,13 @@ function ChatHeader({ compact = false }: { compact?: boolean }) {
 }
 
 /** A still of the thread, used beside each step of the transaction flow. */
-export function ChatScreen({ messages, className = "" }: { messages: ChatMessage[]; className?: string }) {
+export function ChatScreen({
+  messages,
+  className = "",
+}: {
+  messages: ChatMessage[];
+  className?: string;
+}) {
   return (
     <div
       className={`overflow-hidden rounded-[16px] border border-[#2B211D]/10 bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(62,19,25,0.45)] ${className}`}
@@ -231,8 +254,12 @@ export function CheckoutScreen({
                   strokeWidth={1.6}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13.5px] font-medium text-[#2B211D]">{method.name}</span>
-                  <span className="block text-[12px] leading-snug text-[#6B5A50]">{method.note}</span>
+                  <span className="block text-[13.5px] font-medium text-[#2B211D]">
+                    {method.name}
+                  </span>
+                  <span className="block text-[12px] leading-snug text-[#6B5A50]">
+                    {method.note}
+                  </span>
                 </span>
                 <span
                   className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
