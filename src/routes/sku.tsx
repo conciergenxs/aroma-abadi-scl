@@ -19,6 +19,7 @@ import {
 } from "@/components/scl/sku-store";
 import { ConfirmDialog, type ConfirmDialogProps } from "@/components/scl/confirm-dialog";
 import { useCan } from "@/components/scl/session-store";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 
 /** Knowledge is what every Beauty Ambassador reads in the LMS, so editing it
  *  is held to the two roles that answer for it. */
@@ -414,8 +415,14 @@ function DeleteConfirmDialog(props: ConfirmDialogProps) {
 }
 
 function SkuPage() {
+  usePreviewGate("knowledge-view");
   const { brands } = useSkuStore();
-  const canManage = useCan("knowledge.manage");
+  const brandGate = usePermission(
+    "knowledge-brands",
+    useCan("knowledge.manage"),
+    KNOWLEDGE_LOCKED,
+  );
+  const canManage = brandGate.allowed;
   const [view, setView] = useState<View>({ kind: "brands" });
   const [showBrandForm, setShowBrandForm] = useState(false);
   const [importingSku, setImportingSku] = useState<{
@@ -504,6 +511,7 @@ function BrandsOverview({
   onOpen: (b: Brand) => void;
   onAdd: () => void;
 }) {
+  const brandGate = usePermission("knowledge-brands", canManage, KNOWLEDGE_LOCKED);
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
@@ -522,8 +530,8 @@ function BrandsOverview({
         </div>
         <button
           onClick={onAdd}
-          disabled={!canManage}
-          title={canManage ? undefined : KNOWLEDGE_LOCKED}
+          disabled={!brandGate.allowed}
+          title={brandGate.allowed ? undefined : brandGate.reason}
           className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-9 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
         >
           <Plus className="h-4 w-4" /> Add New Brand
@@ -1322,7 +1330,8 @@ function SkuRow({
   const [editing, setEditing] = useState<KnowledgeCard | null>(null);
   const [editingSku, setEditingSku] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const canManageKnowledge = useCan("knowledge.manage");
+  const cardGate = usePermission("knowledge-cards", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
+  const canManageKnowledge = cardGate.allowed;
 
   return (
     <li className="p-4">
@@ -1379,7 +1388,7 @@ function SkuRow({
                   setShowForm(true);
                 }}
                 disabled={!canManageKnowledge}
-                title={canManageKnowledge ? undefined : KNOWLEDGE_LOCKED}
+                title={canManageKnowledge ? undefined : cardGate.reason}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Plus className="h-3.5 w-3.5" /> Add New
@@ -1764,7 +1773,8 @@ function OdooProductPickerModal({
  * own Knowledge Cards; it's reference material, not a purchasable SKU. */
 function AddModuleButton({ onSubmit }: { onSubmit: (input: ModuleInput) => void }) {
   const [open, setOpen] = useState(false);
-  const canManage = useCan("knowledge.manage");
+  const gate = usePermission("knowledge-modules", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
+  const canManage = gate.allowed;
 
   return (
     <>
@@ -1772,7 +1782,7 @@ function AddModuleButton({ onSubmit }: { onSubmit: (input: ModuleInput) => void 
         type="button"
         onClick={() => setOpen(true)}
         disabled={!canManage}
-        title={canManage ? undefined : KNOWLEDGE_LOCKED}
+        title={canManage ? undefined : gate.reason}
         className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-4 h-8 text-[14px] font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Add Module

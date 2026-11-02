@@ -31,6 +31,7 @@ import {
   Package,
   BadgeCheck,
   ChevronsLeft,
+  Eye,
   ChevronsRight,
   Menu,
   MessageCircle,
@@ -138,20 +139,22 @@ type NavItem = {
   needs?: Capability;
   /** Only in the full build — the lite deployment doesn't carry this page. */
   full?: boolean;
+  /** The permission that opens this page, for the preview links. */
+  perm?: string;
 };
 const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox" },
-  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts" },
-  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view" },
-  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view" },
-  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view" },
-  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce" },
-  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce" },
-  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true },
+  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox-view" },
+  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts-view" },
+  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view", perm: "broadcast-view" },
+  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view", perm: "templates-view" },
+  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view", perm: "knowledge-view" },
+  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce", perm: "commerce-view" },
+  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce", perm: "commerce-view" },
+  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true, perm: "commerce-view" },
 ];
 const bottomNav: NavItem[] = [
-  { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
+  { to: "/settings", label: "Settings", icon: Settings, needs: "settings", perm: "settings-view" },
 ];
 
 /** Whether the sidebar is expanded, remembered per browser. */
@@ -176,8 +179,11 @@ export function AppShell({
   // A page nobody in this role may open shouldn't be offered in the first
   // place — an Area Coordinator has no business on the commercial pages.
   const currentUser = useCurrentUser();
+  const previewed = usePreviewedCondition();
   const canSee = (i: NavItem) =>
-    (!i.needs || roleCan(currentUser.role, i.needs)) && !(i.full && LITE_MODE);
+    (!i.needs || roleCan(currentUser.role, i.needs)) &&
+    !(i.full && LITE_MODE) &&
+    !(i.perm && previewed?.id === i.perm);
   const visibleTopNav = topNav.filter(canSee);
   const visibleBottomNav = bottomNav.filter(canSee);
   const navigate = useNavigate();
@@ -547,6 +553,24 @@ export function AppShell({
           </div>
         </header>
 
+        {previewed && (
+          <div className="shrink-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 sm:px-6">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
+              <Eye className="h-3 w-3" /> Permission preview
+            </span>
+            <span className="text-[13px] text-foreground">
+              <span className="font-medium">{previewed.label}</span> is switched off.
+            </span>
+            <span className="text-[12px] text-muted-foreground">{previewed.effect}</span>
+            <button
+              onClick={() => permissionPreview.exit()}
+              className="press ml-auto h-7 rounded-md border border-amber-500/40 bg-white/60 px-2.5 text-[12px] font-medium hover:bg-white transition-colors duration-150"
+            >
+              Exit Preview
+            </button>
+          </div>
+        )}
+
         <main
           className={
             noPadding
@@ -738,6 +762,7 @@ export function ChannelDot({ channel }: { channel: "whatsapp" }) {
 
 import { sessionStore, useCurrentUser, roleCan, type Capability } from "./session-store";
 import { LITE_MODE } from "@/lib/feature-flags";
+import { usePreviewedCondition, permissionPreview } from "@/components/scl/permission-preview";
 import type { LabelColor, ContactLabel } from "./mock-data";
 import { X } from "lucide-react";
 

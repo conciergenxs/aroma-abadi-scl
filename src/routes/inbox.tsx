@@ -80,6 +80,7 @@ import {
   type ReplyRef,
   type SentMsg,
 } from "@/components/scl/inbox-store";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 
 export const Route = createFileRoute("/inbox")({
   head: () => ({ meta: [{ title: "Inbox — SCL" }] }),
@@ -124,6 +125,8 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
+  usePreviewGate("inbox-view");
+  const sendGate = usePermission("inbox-send");
   const { labels, lists, lifecycleStages, contacts: allContacts } = useContactsStore();
   // A contact moved to Recently Deleted must not keep a live conversation.
   const contacts = useLiveContacts();
@@ -1099,7 +1102,8 @@ function InboxPage() {
                     </button>
                     <button
                       onClick={submitReply}
-                      disabled={!replyText.trim()}
+                      disabled={!replyText.trim() || !sendGate.allowed}
+                      title={sendGate.reason || undefined}
                       className="inline-flex items-center gap-2 h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className="h-3.5 w-3.5" /> Send
@@ -1468,6 +1472,7 @@ function OwnerSelect({
   value: string | null;
   onChange: (id: string | null) => void;
 }) {
+  const assignGate = usePermission("inbox-assign");
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -1480,8 +1485,10 @@ function OwnerSelect({
       <button
         ref={btnRef}
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-gray-50 text-xs transition-colors duration-150"
+        onClick={() => assignGate.allowed && setOpen((o) => !o)}
+        disabled={!assignGate.allowed}
+        title={assignGate.reason || undefined}
+        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-gray-50 text-xs transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/[0.04]"
       >
         {current ? (
           <>
