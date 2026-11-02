@@ -1,972 +1,821 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
+import { AppShell, SectionCard } from "@/components/scl/app-shell";
+import { conversations, recentActivity } from "@/components/scl/mock-data";
+import { useLiveContacts } from "@/components/scl/contacts-store";
+import { nowWIB } from "@/lib/wib";
+import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
-  Award,
-  Ban,
+  avgMessagesBetweenTransaction,
+  computeAverages,
+  computeBroadcastMetrics,
+  computeFunnelRates,
+  computeOrdersAndSales,
+  computeRangeScale,
+  getTransactionDateBounds,
+  mostAskedProducts,
+  mostUnfulfilledProducts,
+  scaleRankedProducts,
+  scaledAudienceSegmentation,
+  scaledTotalConversations,
+  type BroadcastMetrics,
+  type DateRange,
+  type OrdersAndSales,
+  type RankedProduct,
+} from "@/components/scl/overview-metrics";
+import { Link } from "@tanstack/react-router";
+import {
+  Users,
+  UserCheck,
   BadgeCheck,
-  BellRing,
-  Boxes,
-  Building2,
-  Clock,
-  CreditCard,
-  FileCheck,
-  Globe,
-  Landmark,
-  Link2,
-  Lock,
-  Mail,
-  MapPin,
-  MessageCircle,
-  MessagesSquare,
-  Menu,
-  Phone,
-  QrCode,
-  RefreshCcw,
-  Scale,
-  ShieldCheck,
+  MoonStar,
   Sparkles,
-  Ticket,
-  Truck,
+  Radio,
+  Megaphone,
+  MessageSquare,
+  HelpCircle,
+  ShoppingCart,
+  PackageX,
+  ClipboardList,
+  Receipt,
+  CircleDollarSign,
+  Repeat,
   Wallet,
-  Workflow,
-  X,
+  Tags,
+  ShoppingBasket,
+  Reply,
+  TrendingUp,
+  CheckCheck,
+  Eye,
+  Calendar,
+  ChevronDown,
 } from "lucide-react";
-import { useEscapeKey } from "@/lib/use-escape-key";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
-  Facts,
-  FactTiles,
-  Marquee,
-  Panel,
-  Pending,
-  Prose,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
+import {
+  chartTooltipStyle,
+  chartLabelStyle,
+  chartItemStyle,
+  axisColor,
+  gridColor,
+  cursorFill,
+  axisTick,
+  BRAND_COLORS,
+  CAPTION,
+  fmtPct,
+  useRevealOnScroll,
   Reveal,
-  Section,
-  Split,
-  Step,
-} from "@/components/landing/parts";
-import {
-  ChatScreen,
-  CheckoutScreen,
-  LiveChat,
-  type Beat,
-  type ChatMessage,
-  type PaymentMethod,
-} from "@/components/landing/screens";
-import armaMark from "@/assets/aroma-abadi-icon-sand.png";
-import whatsappMark from "@/assets/whatsapp.png";
-import brandDG from "@/assets/brand-dolce-gabbana.png";
-import brandSisley from "@/assets/brand-sisley.png";
-import brandRimmel from "@/assets/brand-rimmel.png";
-import brandLaura from "@/assets/brand-laura-mercier.png";
-import brandBareMinerals from "@/assets/brand-baremineral.png";
+  InfoHint,
+  MetricStat,
+  CornerStat,
+  StepFunnel,
+  type FunnelStage,
+} from "@/components/scl/dashboard-ui";
+import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
+import { LITE_MODE } from "@/lib/feature-flags";
 
-/* The public company page.
- *
- * Audience: Xendit's verification team. It is not a storefront — nothing
- * here sells, and there is no cart. Its job is to let a reviewer answer
- * three questions without having to ask: who is the legal entity, what does
- * the loyalty programme do, and at which screen does a customer pay through
- * Xendit. Everything is arranged around that last question, which is why the
- * hero plays a whole transaction and the payment step is the one block
- * allowed to lift off the page.
- *
- * Type and colour follow the Aroma Abadi LMS: Playfair Display over
- * Montserrat, #710014 brand red, #F3F0EC cream, #C9A455 gold.
- *
- * Values Aroma Abadi still has to supply are wrapped in <Pending>: the only
- * loud thing here, so none of them ships unfilled. */
-
-const WA_NUMBER = "+62 811 9001 2233";
-const WA_LINK = "https://wa.me/6281190012233";
-
-const NAV = [
-  { href: "#profil", id: "profil", label: "Profil" },
-  { href: "#program", id: "program", label: "Program" },
-  { href: "#alur", id: "alur", label: "Alur Transaksi" },
-  { href: "#pembayaran", id: "pembayaran", label: "Pembayaran" },
-  { href: "#kontak", id: "kontak", label: "Kontak" },
-];
-
-/* The channels Xendit actually carries in Indonesia, grouped the way its own
- * hosted payment page groups them. */
-const METHODS: PaymentMethod[] = [
-  { id: "qris", name: "QRIS", note: "Semua aplikasi bank dan e‑wallet" },
-  { id: "va", name: "Virtual Account", note: "BCA, Mandiri, BNI, BRI, Permata" },
-  { id: "ewallet", name: "E-Wallet", note: "OVO, DANA, ShopeePay, LinkAja" },
-  { id: "card", name: "Kartu kredit atau debit", note: "Visa, Mastercard, JCB" },
-];
-
-const CHECKOUT = {
-  invoice: "AA-2611",
-  amount: "Rp 2.714.310",
-  expiry: "3 Nov 2026, 09.40",
-  methods: METHODS,
-};
-
-const ORDER = {
-  title: "Rincian pesanan AA-2611",
-  items: [
-    { name: "Real Flawless Foundation", qty: 1, price: "1.950.000" },
-    { name: "Translucent Setting Powder", qty: 1, price: "750.000" },
-  ],
-  rows: [
-    { label: "Subtotal", value: "2.700.000" },
-    { label: "Kode PRESTIGE10", value: "−270.000" },
-    { label: "PPN 11%", value: "267.300" },
-    { label: "Biaya layanan QRIS", value: "17.010" },
-  ],
-  total: "Rp 2.714.310",
-};
-
-const PAY_LINK = {
-  title: "Pembayaran pesanan AA-2611",
-  note: "Berlaku 24 jam. QRIS, transfer bank, e-wallet, atau kartu.",
-  host: "checkout.xendit.co",
-  url: "checkout.xendit.co/od/aroma-abadi",
-};
-
-const RECEIPT = {
-  title: "Pembayaran diterima",
-  rows: [
-    { label: "Invoice", value: "AA-2611" },
-    { label: "Metode", value: "QRIS" },
-    { label: "Dibayar", value: "Rp 2.714.310" },
-  ],
-  note: "Poin loyalitas sudah masuk. Nomor resi aku kirim di chat ini begitu paket diserahkan ke kurir.",
-};
-
-/** The hero loop: one full transaction, start to finish. */
-const HERO_THREAD: ChatMessage[] = [
-  { from: "customer", time: "09.38", text: "Halo, aku cari foundation untuk kulit kering." },
-  {
-    from: "arma",
-    time: "09.38",
-    text: "Halo Kak! Real Flawless Foundation dari Sisley hasilnya dewy dan tahan seharian, cocok untuk kulit kering. Aku tambahkan setting powder biar makin tahan?",
-  },
-  { from: "customer", time: "09.39", text: "Boleh, dua-duanya ya." },
-  { from: "arma", time: "09.39", order: ORDER },
-  { from: "arma", time: "09.40", link: PAY_LINK },
-  { from: "arma", time: "09.42", receipt: RECEIPT },
-];
-
-/** Paced for reading, not for showing off: the customer types, ARMA takes a
- * beat to answer, and the payment page stays open long enough to be read. */
-const HERO_SCRIPT: Beat[] = [
-  { t: "type", i: 0 },
-  { t: "pause", ms: 650 },
-  { t: "armaTyping", ms: 2700 },
-  { t: "send", i: 1 },
-  { t: "pause", ms: 2900 },
-  { t: "type", i: 2 },
-  { t: "pause", ms: 550 },
-  { t: "armaTyping", ms: 2500 },
-  { t: "send", i: 3 },
-  { t: "pause", ms: 2800 },
-  { t: "armaTyping", ms: 2000 },
-  { t: "send", i: 4 },
-  { t: "pause", ms: 2700 },
-  { t: "checkout", ms: 5400 },
-  { t: "pause", ms: 900 },
-  { t: "armaTyping", ms: 2200 },
-  { t: "send", i: 5 },
-];
-
-const STEP_OPENING: ChatMessage[] = [
-  { from: "customer", time: "09.37", text: "Halo, masih buka?" },
-  {
-    from: "arma",
-    time: "09.37",
-    text: "Halo Kak, masih! Aku Arma dari Aroma Abadi. Ada yang bisa aku bantu cari hari ini?",
-  },
-];
-
-const STEP_CONSULT: ChatMessage[] = [
-  { from: "customer", time: "09.38", text: "Aku cari foundation untuk kulit kering." },
-  {
-    from: "arma",
-    time: "09.38",
-    text: "Real Flawless Foundation dari Sisley, shade 2N Ivory, stok ada. Hasilnya dewy dan tahan seharian. Mau sekalian setting powder-nya?",
-  },
-  { from: "customer", time: "09.39", text: "Boleh, dua-duanya ya." },
-];
-
-const STEP_ORDER: ChatMessage[] = [{ from: "arma", time: "09.39", order: ORDER }];
-const STEP_RECEIPT: ChatMessage[] = [{ from: "arma", time: "09.42", receipt: RECEIPT }];
-const STEP_SHIPPING: ChatMessage[] = [
-  {
-    from: "arma",
-    time: "14.05",
-    text: "Pesanan AA-2611 sudah diserahkan ke kurir. Nomor resi JNE 0098 7712 3344, estimasi tiba 2 hari kerja.",
-  },
-];
-
-const BRANDS = [
-  { src: brandSisley, name: "Sisley Paris" },
-  { src: brandLaura, name: "Laura Mercier" },
-  { src: brandDG, name: "Dolce & Gabbana Beauty" },
-  { src: brandBareMinerals, name: "bareMinerals" },
-  { src: brandRimmel, name: "Rimmel London" },
-];
-
-const PILLARS = [
-  {
-    icon: ShieldCheck,
-    title: "Distribusi Resmi",
-    body: "Produk datang dari principal, bukan dari pasar paralel.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Izin Edar BPOM",
-    body: "Setiap produk punya nomor izin edar yang bisa dicek.",
-  },
-  {
-    icon: Globe,
-    title: "Kirim Se-Indonesia",
-    body: "Dari gudang kami sendiri, lewat kurir rekanan nasional.",
-  },
-];
-
-const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
-  { icon: Building2, label: "Badan hukum", value: "PT Aroma Abadi" },
-  { icon: Boxes, label: "Bidang usaha", value: "Distribusi produk kecantikan" },
-  { wa: true, label: "Kanal transaksi", value: "WhatsApp (ARMA)" },
-  { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
-];
-
-const PROGRAM = [
-  {
-    icon: Sparkles,
-    title: "Konsultasi Produk",
-    body: "ARMA menjawab pertanyaan soal jenis kulit, shade, dan cara pakai, lalu merekomendasikan produk yang stoknya tersedia.",
-  },
-  {
-    icon: Award,
-    title: "Poin dan Tingkat Keanggotaan",
-    body: "Setiap pesanan yang dibayar menambah poin. Poin menentukan tingkat, dari Prestige sampai Icon, dan tiap tingkat punya benefitnya.",
-  },
-  {
-    icon: Ticket,
-    title: "Kode Promo",
-    body: "Dua jenis: kode unik untuk satu pelanggan, dan kode bersama dengan batas pemakaian. Potongannya terlihat sebelum pembayaran.",
-  },
-  {
-    icon: BellRing,
-    title: "Kabar Program",
-    body: "Hanya dikirim ke pelanggan yang menyetujui. Setiap pesan punya cara berhenti, dan yang berhenti tidak kami kirimi lagi.",
-  },
-];
-
-const PAYMENT_PANELS = [
-  {
-    icon: QrCode,
-    title: "QRIS",
-    body: "Pelanggan memindai satu kode dari aplikasi bank atau e-wallet mana pun. Ini kanal yang paling sering dipakai pelanggan kami.",
-  },
-  {
-    icon: Landmark,
-    title: "Virtual Account",
-    body: "Nomor transfer khusus untuk tiap pesanan, bisa dibayar dari bank mana saja, dan tercatat otomatis begitu dana masuk.",
-  },
-  {
-    icon: Wallet,
-    title: "E-Wallet",
-    body: "OVO, DANA, ShopeePay, dan LinkAja, dibuka langsung dari halaman pembayaran tanpa menyalin nomor apa pun.",
-  },
-  {
-    icon: CreditCard,
-    title: "Kartu Kredit dan Debit",
-    body: "Visa, Mastercard, dan JCB, diproses di halaman Xendit dengan autentikasi 3D Secure dari bank penerbit.",
-  },
-];
-
-const POLICIES = [
-  {
-    icon: Truck,
-    title: "Pengiriman",
-    body: "Pesanan yang sudah dibayar diproses pada hari kerja berikutnya dan dikirim lewat kurir rekanan. Nomor resi dikirim lewat WhatsApp.",
-  },
-  {
-    icon: RefreshCcw,
-    title: "Pengembalian dan Penukaran",
-    body: "Diajukan lewat WhatsApp maksimal 7 hari setelah paket diterima. Produk tersegel dikembalikan dengan dana penuh; yang sudah dibuka ditukar.",
-  },
-  {
-    icon: Ban,
-    title: "Pembatalan",
-    body: "Pesanan yang belum dibayar batal sendiri saat tautan kedaluwarsa. Yang sudah dibayar tetapi belum dikirim dikembalikan penuh lewat Xendit.",
-  },
-  {
-    icon: Lock,
-    title: "Privasi Data",
-    body: "Kami menyimpan nomor WhatsApp, nama, alamat, dan riwayat pesanan untuk memproses transaksi. Data tidak dijual atau dibagikan ke pihak lain.",
-  },
-];
-
-const CONTACT: {
-  icon?: typeof Clock;
-  wa?: boolean;
-  label: string;
-  value: ReactNode;
-  wide?: boolean;
-}[] = [
-  {
-    wa: true,
-    label: "WhatsApp pelanggan",
-    value: (
-      <a
-        href={WA_LINK}
-        target="_blank"
-        rel="noreferrer noopener"
-        className="underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
-      >
-        {WA_NUMBER}
-      </a>
-    ),
-  },
-  { icon: Clock, label: "Jam layanan", value: <Pending field="jam operasional" tone="maroon" /> },
-  { icon: Mail, label: "Email resmi", value: <Pending field="alamat email" tone="maroon" /> },
-  { icon: Phone, label: "Telepon kantor", value: <Pending field="nomor telepon" tone="maroon" /> },
-  {
-    icon: MapPin,
-    label: "Alamat kantor",
-    wide: true,
-    value: (
-      <>
-        <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI Jakarta
-      </>
-    ),
-  },
-];
-
-const DESCRIPTION =
-  "PT Aroma Abadi mendistribusikan produk kecantikan premium di Indonesia dan menjalankan program CRM serta loyalitas lewat WhatsApp. Halaman ini menjelaskan profil bisnis, mekanisme program, dan alur transaksi pelanggan termasuk titik pembayaran melalui Xendit.";
-
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "PT Aroma Abadi — Distribusi produk kecantikan & program loyalitas WhatsApp" },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: "PT Aroma Abadi" },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: "/og-aroma-abadi.png" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "PT Aroma Abadi" },
-      { name: "twitter:description", content: DESCRIPTION },
-      { name: "twitter:image", content: "/og-aroma-abadi.png" },
-    ],
-    links: [
+      { title: "Overview — Aroma Abadi" },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap",
+        name: "description",
+        content: "WhatsApp engagement platform for Aroma Abadi — makeup & beauty.",
+      },
+      { property: "og:title", content: "Aroma Abadi — SCL" },
+      {
+        property: "og:description",
+        content: "Manage WhatsApp conversations for Aroma Abadi in one workspace.",
       },
     ],
   }),
-  component: CompanyPage,
+  component: Dashboard,
 });
 
-/** WhatsApp's mark drawn as an outline, so it sits with the line icons
- * everywhere it appears. The floating button keeps the full-colour glyph —
- * that one is meant to read as the app's own button. */
-function WhatsAppIcon({ className = "" }: { className?: string }) {
+// ── Ranked product list — horizontal progress bars (Section C) ───────────
+function RankedBarList({ items, color }: { items: RankedProduct[]; color: string }) {
+  const max = Math.max(...items.map((i) => i.count), 1);
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.7}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden
-    >
-      <path d="M20.3 11.9a8.4 8.4 0 0 1-12.5 7.3L3.4 20.6l1.5-4.3A8.4 8.4 0 1 1 20.3 11.9z" />
-      <path d="M9.1 9.3c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.4l.6 1.5c.1.2 0 .4-.1.6l-.3.4c-.1.2-.2.3 0 .6a6.4 6.4 0 0 0 2.7 2.3c.2.1.4.1.6-.1l.4-.5c.1-.2.3-.2.5-.1l1.4.7c.2.1.3.2.3.4v.5c0 .4-.3.8-.7 1-.5.2-1.1.2-1.8.1a9.9 9.9 0 0 1-5.6-4.7c-.4-.8-.4-1.6-.2-2.1l.4-1z" />
-    </svg>
+    <div className="p-4 space-y-2">
+      {items.map((item, i) => (
+        <div key={item.name} className="flex items-center gap-2.5">
+          <span className="text-[11px] w-3.5 shrink-0 text-muted-foreground tabular-nums">
+            {i + 1}
+          </span>
+          <span className="text-[12px] flex-1 min-w-0 truncate text-foreground" title={item.name}>
+            {item.name}
+          </span>
+          <div className="w-16 shrink-0 h-1.5 rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full animate-grow-x"
+              style={{ width: `${(item.count / max) * 100}%`, background: color }}
+            />
+          </div>
+          <span className="text-[12px] font-semibold text-foreground w-8 text-right shrink-0 tabular-nums">
+            {fmtNum(item.count)}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
-/** Masthead behaviour: out of the way going down, back the moment a reader
- * turns around, with a hairline showing how far through the page they are. */
-function useMasthead() {
-  const [hidden, setHidden] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState("");
-
-  useEffect(() => {
-    let last = window.scrollY;
-    let queued = false;
-
-    const measure = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(max > 0 ? Math.min(1, y / max) : 0);
-      setScrolled(y > 420);
-      if (y <= 140) setHidden(false);
-      else if (y > last + 5) setHidden(true);
-      else if (y < last - 5) setHidden(false);
-      if (Math.abs(y - last) > 5) last = y;
-      queued = false;
-    };
-
-    const onScroll = () => {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(measure);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    measure();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const sections = NAV.map((item) => document.getElementById(item.id)).filter(
-      (el): el is HTMLElement => Boolean(el),
-    );
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting);
-        if (visible.length) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    );
-    sections.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  return { hidden, progress, scrolled, active };
+function RankedListColumn({
+  title,
+  icon: Icon,
+  items,
+  color,
+}: {
+  title: string;
+  icon: React.ElementType;
+  items: RankedProduct[];
+  color: string;
+}) {
+  return (
+    <div>
+      <div className={`flex items-center gap-1.5 px-4 pt-3 pb-0.5 ${CAPTION}`}>
+        <Icon className="h-3 w-3" /> {title}
+      </div>
+      <RankedBarList items={items} color={color} />
+    </div>
+  );
 }
 
-function CompanyPage() {
-  const { hidden, progress, scrolled, active } = useMasthead();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
-  useEscapeKey(menuOpen, closeMenu);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [menuOpen]);
-
+// ── A. Audience & Segmentation ───────────────────────────────────────────
+function AudienceSection({ scale }: { scale: number }) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  const audience = scaledAudienceSegmentation(scale);
   return (
-    <main className="lp-page bg-white">
-      {/* ── Masthead ─────────────────────────────────────────────────── */}
-      <header
-        className={`lp-dark sticky top-0 z-40 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          hidden && !menuOpen ? "-translate-y-full" : "translate-y-0"
-        }`}
-      >
-        <div className="bg-[#4A000D]">
-          <div className="mx-auto flex h-[76px] w-full max-w-[1180px] items-center gap-6 px-6 md:px-10">
-            <a
-              href="#top"
-              aria-label="PT Aroma Abadi, ke atas halaman"
-              className="shrink-0 rounded-sm transition-transform duration-300 hover:scale-105"
-            >
-              <img src={armaMark} alt="Aroma Abadi" className="w-[48px]" />
-            </a>
-
-            <nav className="hidden flex-1 items-center justify-center gap-9 lg:flex xl:gap-12">
-              {NAV.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  data-active={active === item.id}
-                  className="lp-navlink whitespace-nowrap text-[13.5px] font-medium text-[#F3F0EC]/70 transition-colors duration-200 hover:text-[#FBFAF8] data-[active=true]:text-[#FBFAF8]"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="press ml-auto hidden items-center gap-[8px] rounded-full bg-[#D7B69A] px-[18px] py-[10px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
-            >
-              <WhatsAppIcon className="h-[19px] w-[19px]" />
-              Chat dengan ARMA
-            </a>
-
-            <button
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-              className="press ml-auto grid h-[42px] w-[42px] place-items-center rounded-full border border-[#F3F0EC]/20 text-[#FBFAF8] transition-colors duration-200 hover:bg-[#F3F0EC]/10 sm:ml-3 lg:hidden"
-            >
-              {menuOpen ? (
-                <X className="h-[19px] w-[19px]" strokeWidth={1.8} />
-              ) : (
-                <Menu className="h-[19px] w-[19px]" strokeWidth={1.8} />
-              )}
-            </button>
-          </div>
-        </div>
-        <div className="h-[2px] bg-[#F3F0EC]/10">
-          <div
-            className="h-full origin-left bg-[#C9A455]"
-            style={{ transform: `scaleX(${progress})` }}
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard title="Audience & Segmentation">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
+          <MetricStat
+            icon={Users}
+            label="Contacts"
+            value={fmtNum(audience.contacts)}
+            info="Total number of contacts you own (Total Users)."
+          />
+          <MetricStat
+            icon={UserCheck}
+            label="Active Contacts"
+            value={fmtNum(audience.activeContacts)}
+            info="Contacts who interacted with you in the last 6 months."
+          />
+          <MetricStat
+            icon={BadgeCheck}
+            label="Active Customers"
+            value={fmtNum(audience.activeCustomers)}
+            info="Contacts who made a transaction in the last 6 months."
+          />
+          <MetricStat
+            icon={MoonStar}
+            label="Sleeping Customers"
+            value={fmtNum(audience.sleepingCustomers)}
+            info="Contacts who transacted before, but not in the last 6 months."
+          />
+          <MetricStat
+            icon={Sparkles}
+            label="Potential Customers"
+            value={fmtNum(audience.potentialCustomers)}
+            info="Active Contacts who have never made a transaction."
           />
         </div>
-      </header>
+      </SectionCard>
+    </Reveal>
+  );
+}
 
-      {/* ── Mobile navigation ────────────────────────────────────────── */}
-      <div
-        className={`lp-dark fixed inset-0 z-30 bg-[#4A000D] transition-opacity duration-300 lg:hidden ${
-          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      >
-        <nav className="flex h-full flex-col justify-center gap-2 px-8 pb-16 pt-24">
-          {NAV.map((item, index) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={closeMenu}
-              style={{ transitionDelay: menuOpen ? `${80 + index * 45}ms` : "0ms" }}
-              className={`lp-display border-b border-[#F3F0EC]/10 py-4 text-[29px] leading-none text-[#FBFAF8] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                menuOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section id="top" className="relative overflow-hidden bg-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(113,0,20,0.07),transparent_68%)]"
-        />
-        <div className="relative mx-auto grid w-full max-w-[1180px] gap-14 px-6 py-16 md:px-10 md:py-20 lg:grid-cols-[minmax(0,1fr)_336px] lg:items-center lg:gap-20 lg:py-24">
-          <div>
-            <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#8A6246]">
-              <span className="h-px w-8 bg-[#BF9877]" />
-              PT Aroma Abadi
-            </p>
-            <h1 className="lp-display mt-5 max-w-[19ch] text-balance text-[clamp(2.15rem,1.2rem+3vw,3.5rem)] leading-[1.08] text-[#161616]">
-              Pesan dan bayar dalam satu percakapan WhatsApp.
-            </h1>
-            <p className="mt-6 max-w-[54ch] text-pretty text-[16px] leading-[1.7] text-[#55504B]">
-              Kami mendistribusikan produk kecantikan premium di Indonesia. Pelanggan berbelanja
-              lewat ARMA, asisten WhatsApp resmi kami, lalu membayar melalui Xendit tanpa pernah
-              meninggalkan percakapan.
-            </p>
-
-            <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-4">
-              {HERO_FACTS.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="group bg-white px-4 py-[18px] transition-colors duration-300 hover:bg-[#F3F0EC]"
-                >
-                  <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#8A6246]">
-                    {fact.wa ? (
-                      <WhatsAppIcon className="h-[15px] w-[15px]" />
-                    ) : fact.icon ? (
-                      <fact.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                    ) : null}
-                    {fact.label}
-                  </dt>
-                  <dd className="mt-[7px] text-[14.5px] font-semibold leading-snug text-[#161616]">
-                    {fact.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div className="w-full max-w-[336px] justify-self-center lg:justify-self-end">
-            <LiveChat messages={HERO_THREAD} script={HERO_SCRIPT} checkout={CHECKOUT} />
-          </div>
+// ── B. Broadcast & Messaging ─────────────────────────────────────────────
+function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  const stages: FunnelStage[] = [
+    { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-1)" },
+    { label: "Delivered", value: broadcast.delivered, color: "var(--chart-2)" },
+    { label: "Read", value: broadcast.read, color: "var(--chart-3)" },
+  ];
+  return (
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard title="Broadcast & Messaging">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 stagger">
+          <MetricStat
+            icon={Radio}
+            label="Broadcast Sent"
+            value={fmtNum(broadcast.broadcastSent)}
+            sub="campaigns sent"
+            info="Number of broadcast campaigns sent."
+          />
+          <MetricStat
+            icon={Megaphone}
+            label="Broadcast Reach"
+            value={fmtNum(broadcast.reach)}
+            info="Number of contacts a broadcast message reached."
+          />
+          <MetricStat
+            icon={MessageSquare}
+            label="Message Received"
+            value={fmtNum(broadcast.messageReceived)}
+            info="Number of messages received from customer-initiated conversations."
+          />
         </div>
-      </section>
-
-      {/* ── Profil bisnis ────────────────────────────────────────────── */}
-      <Section
-        id="profil"
-        tone="cream"
-        className="lp-paper"
-        bleed={
-          <div>
-            <p className="text-center text-[12.5px] text-[#8A6246]">
-              Brand yang kami distribusikan
-            </p>
-            <div className="mt-6">
-              <Marquee>
-                {BRANDS.map((brand) => (
-                  <img
-                    key={brand.name}
-                    src={brand.src}
-                    alt={brand.name}
-                    className="lp-brandmark h-[250px] w-[340px] shrink-0 object-contain sm:w-[470px]"
-                  />
-                ))}
-              </Marquee>
+        {inView && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 border-t border-border p-4">
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card/60 glass">
+              <StepFunnel stages={stages} />
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              <MetricStat
+                icon={CheckCheck}
+                label="Delivery Rate"
+                value={fmtPct(broadcast.deliveryRate)}
+                info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)."
+              />
+              <MetricStat
+                icon={Eye}
+                label="Read Rate"
+                value={fmtPct(broadcast.readRate)}
+                info="Share of delivered broadcast messages that were read (Read ÷ Delivered)."
+              />
             </div>
           </div>
+        )}
+      </SectionCard>
+    </Reveal>
+  );
+}
+
+// ── C. Conversation & Product Intelligence ───────────────────────────────
+function ConversationSection({
+  orders,
+  scale,
+  totalConversations,
+}: {
+  orders: OrdersAndSales;
+  scale: number;
+  totalConversations: number;
+}) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard
+        title="Conversation & Product Intelligence"
+        action={
+          <CornerStat
+            value={fmtNum(totalConversations)}
+            label="Total Conversations"
+            info="Number of conversations that took place."
+          />
         }
       >
-        <Split
-          tone="cream"
-          icon={Building2}
-          title="Profil Bisnis"
-          lede="Badan usaha terdaftar, dengan produk ber-izin edar BPOM."
-        >
-          <Reveal>
-            <Prose tone="cream">
-              <p>
-                PT Aroma Abadi mendistribusikan brand kecantikan internasional di Indonesia lewat
-                jaringan gerai retail dan tim Beauty Advisor, dan sejak program CRM berjalan, lewat
-                WhatsApp.
-              </p>
-            </Prose>
-          </Reveal>
+        {inView && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
+            <RankedListColumn
+              title="Most Asked"
+              icon={HelpCircle}
+              items={scaleRankedProducts(mostAskedProducts, scale)}
+              color="var(--chart-1)"
+            />
+            <RankedListColumn
+              title="Most Added to Cart"
+              icon={ShoppingCart}
+              items={orders.mostAddedToCart}
+              color="var(--chart-2)"
+            />
+            <RankedListColumn
+              title="Most Unfulfilled"
+              icon={PackageX}
+              items={scaleRankedProducts(mostUnfulfilledProducts, scale)}
+              color="var(--chart-3)"
+            />
+          </div>
+        )}
+      </SectionCard>
+    </Reveal>
+  );
+}
 
-          <div className="mt-8 grid gap-4 sm:auto-rows-fr sm:grid-cols-3">
-            {PILLARS.map((pillar, index) => (
-              <Reveal key={pillar.title} delay={index * 70}>
-                <div className="group flex h-full flex-col rounded-[12px] border border-[#E0D4C8] bg-white/70 p-5 transition-[transform,border-color,background-color] duration-300 hover:-translate-y-[2px] hover:border-[#710014]/25 hover:bg-white">
-                  <pillar.icon
-                    className="h-[20px] w-[20px] text-[#710014] transition-transform duration-300 group-hover:scale-110"
-                    strokeWidth={1.6}
+// ── D. Orders & Sales ─────────────────────────────────────────────────────
+function OrdersSection({ orders }: { orders: OrdersAndSales }) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard title="Orders & Sales">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 stagger">
+          <MetricStat
+            icon={ClipboardList}
+            label="Total Orders"
+            value={fmtNum(orders.totalOrders)}
+            info="Number of incoming orders (total count)."
+          />
+          <MetricStat
+            icon={Receipt}
+            label="Total Transactions"
+            value={fmtNum(orders.totalTransactions)}
+            info="Number of transactions completed / paid (total count)."
+          />
+          <MetricStat
+            icon={CircleDollarSign}
+            label="Total Sales"
+            value={fmtIDR(orders.totalSales)}
+            info="Total sales value (IDR)."
+          />
+        </div>
+        <div className="border-t border-border p-4">
+          <div className={`${CAPTION} mb-2`}>Sales Trend</div>
+          <div className="h-52">
+            {inView && (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={orders.dailySales}
+                  margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="salesTrend" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    stroke={axisColor}
+                    tick={axisTick}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(d: string) => fmtDateEN(d).slice(0, 6)}
                   />
-                  <h3 className="mt-3 text-[14.5px] font-semibold text-[#161616]">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-[6px] text-pretty text-[13.5px] leading-[1.6] text-[#55504B]">
-                    {pillar.body}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+                  <YAxis
+                    stroke={axisColor}
+                    tick={axisTick}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v: number) =>
+                      v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}jt` : fmtNum(v)
+                    }
+                  />
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={chartLabelStyle}
+                    itemStyle={chartItemStyle}
+                    labelFormatter={(d: string) => fmtDateEN(d)}
+                    formatter={(v: number) => [fmtIDR(Number(v)), "Sales"]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="sales"
+                    stroke="var(--chart-1)"
+                    fill="url(#salesTrend)"
+                    strokeWidth={2}
+                    isAnimationActive
+                    animationDuration={700}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
-
-          <Reveal delay={60} className="mt-12">
-            <Facts
-              tone="cream"
-              cols={2}
-              items={[
-                { icon: Building2, label: "Nama badan hukum", value: "PT Aroma Abadi" },
-                { icon: Boxes, label: "Bidang usaha", value: "Perdagangan produk kecantikan" },
-                {
-                  icon: MapPin,
-                  label: "Kantor terdaftar",
-                  value: (
-                    <>
-                      <Pending field="alamat lengkap" />, Jakarta Selatan
-                    </>
-                  ),
-                },
-                { icon: FileCheck, label: "NIB", value: <Pending field="nomor induk berusaha" /> },
-                { icon: FileCheck, label: "NPWP", value: <Pending field="nomor NPWP" /> },
-                {
-                  icon: MessageCircle,
-                  label: "Kanal penjualan",
-                  value: "WhatsApp (ARMA) dan gerai retail",
-                },
-                { icon: Globe, label: "Wilayah pengiriman", value: "Seluruh Indonesia" },
-                { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
-              ]}
-            />
-          </Reveal>
-        </Split>
-      </Section>
-
-      {/* ── Program loyalitas ────────────────────────────────────────── */}
-      <Section id="program">
-        <Split
-          icon={MessagesSquare}
-          title="Mekanisme CRM dan Loyalitas"
-          lede="Satu nomor WhatsApp untuk konsultasi, pesanan, poin, dan promo."
-        >
-          <Reveal>
-            <Prose>
-              <p>
-                ARMA adalah asisten WhatsApp resmi Aroma Abadi. Pelanggan cukup menyimpan satu
-                nomor: bertanya, memesan, membayar, dan melacak pesanan terjadi di percakapan yang
-                sama.
-              </p>
-            </Prose>
-          </Reveal>
-
-          <div className="mt-10 grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
-            {PROGRAM.map((item, index) => (
-              <Reveal key={item.title} delay={index * 60}>
-                <Panel icon={item.icon} title={item.title}>
-                  {item.body}
-                </Panel>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={80} className="mt-5">
-            <div className="relative overflow-hidden rounded-[16px] bg-[#4A000D] p-6 sm:p-7">
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,rgba(231,207,149,0.16),transparent_70%)]"
-              />
-              <div className="relative flex items-start gap-4">
-                <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full bg-[#E7CF95]/15 text-[#E7CF95]">
-                  <Lock className="h-[19px] w-[19px]" strokeWidth={1.6} />
-                </span>
-                <div>
-                  <h3 className="text-[16px] font-semibold text-[#FBFAF8]">
-                    Jalur Terpisah untuk Beauty Advisor
-                  </h3>
-                  <p className="mt-[9px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
-                    Beauty Advisor kami memakai ARMA versi internal untuk product knowledge dan SOP
-                    layanan. Jalur itu hanya untuk karyawan dan mitra gerai, dan tidak memproses
-                    pembayaran apa pun.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </Split>
-      </Section>
-
-      {/* ── Alur transaksi ───────────────────────────────────────────── */}
-      <Section id="alur" tone="cream" className="lp-paper">
-        <Reveal className="max-w-[48ch]">
-          <span className="mb-5 grid h-[42px] w-[42px] place-items-center rounded-full bg-[#710014]/7 text-[#710014]">
-            <Workflow className="h-[20px] w-[20px]" strokeWidth={1.6} />
-          </span>
-          <h2 className="lp-display text-[clamp(1.75rem,1.1rem+1.8vw,2.45rem)] leading-[1.1] text-[#710014]">
-            Alur Transaksi Pelanggan
-          </h2>
-          <span className="mt-4 block h-px w-10 bg-[#BF9877]" />
-          <p className="mt-4 text-pretty text-[15.5px] leading-[1.7] text-[#55504B]">
-            Enam langkah, dari sapaan pertama sampai paket dikirim. Langkah keempat adalah titik
-            pembayaran: di sanalah pelanggan membuka halaman Xendit.
-          </p>
-        </Reveal>
-
-        <div className="mt-14">
-          <Step
-            n={1}
-            title="Pelanggan Membuka Percakapan"
-            body="Pelanggan menghubungi nomor WhatsApp resmi Aroma Abadi, atau membalas pesan program yang sebelumnya mereka setujui. Seluruh transaksi berlangsung di satu thread."
-            screen={<ChatScreen messages={STEP_OPENING} />}
-          />
-          <Step
-            n={2}
-            title="Konsultasi dan Pemilihan Produk"
-            body="ARMA merekomendasikan produk sesuai kebutuhan pelanggan beserta ketersediaan stoknya, lalu mencatat jumlah dan alamat pengiriman. Kode promo dipakai di tahap ini."
-            screen={<ChatScreen messages={STEP_CONSULT} />}
-          />
-          <Step
-            n={3}
-            title="Rincian Pesanan Dikirim"
-            body="Sebelum ada uang yang berpindah, ARMA mengirim rincian lengkap: produk dan jumlahnya, subtotal, potongan kode promo, PPN, biaya layanan sesuai metode pembayaran, dan total akhir."
-            screen={<ChatScreen messages={STEP_ORDER} />}
-          />
-          <Step
-            n={4}
-            highlight
-            title="Pembayaran melalui Xendit"
-            body="Dari rincian itu ARMA mengirim satu tautan pembayaran yang dibuat lewat Xendit. Tautan membuka halaman pembayaran Xendit, tempat pelanggan memilih metode dan menyelesaikan transaksi. Seluruh data pembayaran diisi di halaman Xendit, bukan di WhatsApp, dan tidak pernah melewati sistem kami."
-            points={[
-              {
-                icon: Link2,
-                label: "Tautan pembayaran",
-                value: "Dibuat per pesanan, berlaku 24 jam",
-              },
-              {
-                icon: Wallet,
-                label: "Metode tersedia",
-                value: "QRIS, Virtual Account, e-wallet, kartu",
-              },
-              {
-                icon: FileCheck,
-                label: "Yang kami terima",
-                value: "Status pembayaran dan nomor invoice",
-              },
-            ]}
-            screen={<CheckoutScreen {...CHECKOUT} />}
-          />
-          <Step
-            n={5}
-            title="Konfirmasi Otomatis"
-            body="Xendit memberi tahu sistem kami begitu pembayaran berhasil. ARMA langsung mengirim konfirmasi dan nomor invoice ke pelanggan, dan poin loyalitas masuk pada saat yang sama."
-            screen={<ChatScreen messages={STEP_RECEIPT} />}
-          />
-          <Step
-            n={6}
-            last
-            title="Pemrosesan dan Pengiriman"
-            body="Pesanan yang sudah dibayar diteruskan ke gudang kami. Nomor resi dikirim ke percakapan yang sama, dan pelanggan bisa menanyakan status pesanan kapan saja ke ARMA."
-            screen={<ChatScreen messages={STEP_SHIPPING} />}
-          />
         </div>
-      </Section>
-
-      {/* ── Pembayaran ───────────────────────────────────────────────── */}
-      <Section id="pembayaran">
-        <Split
-          icon={ShieldCheck}
-          title="Metode Pembayaran dan Keamanan"
-          lede="Semua pembayaran pelanggan berjalan di atas Xendit, dalam Rupiah."
-        >
-          <div className="grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
-            {PAYMENT_PANELS.map((item, index) => (
-              <Reveal key={item.title} delay={index * 60}>
-                <Panel icon={item.icon} title={item.title}>
-                  {item.body}
-                </Panel>
-              </Reveal>
-            ))}
+        <div className="border-t border-border p-4">
+          <div className={`${CAPTION} mb-2 inline-flex items-center gap-1`}>
+            Qty Sold — by Brand <InfoHint text="Number of items sold, by brand." />
           </div>
-
-          <Reveal delay={80} className="mt-12">
-            <FactTiles
-              items={[
-                {
-                  icon: Lock,
-                  label: "Halaman pembayaran",
-                  value: "Dihosting dan diproses oleh Xendit",
-                },
-                {
-                  icon: CreditCard,
-                  label: "Data kartu",
-                  value: "Tidak tersimpan di sistem Aroma Abadi",
-                },
-                {
-                  icon: FileCheck,
-                  label: "Status pembayaran",
-                  value: "Diterima otomatis, dicatat per invoice",
-                },
-                {
-                  icon: Scale,
-                  label: "Rincian biaya",
-                  value: "Tampil penuh sebelum pelanggan membayar",
-                },
-                { icon: Landmark, label: "Mata uang", value: "Rupiah (IDR)" },
-                {
-                  icon: RefreshCcw,
-                  label: "Pengembalian dana",
-                  value: "Lewat Xendit ke metode pembayaran asal",
-                },
-              ]}
-            />
-          </Reveal>
-        </Split>
-      </Section>
-
-      {/* ── Kebijakan ────────────────────────────────────────────────── */}
-      <Section id="kebijakan" tone="cream" className="lp-paper">
-        <Split
-          tone="cream"
-          icon={Scale}
-          title="Kebijakan Pelanggan"
-          lede="Aturan yang berlaku untuk setiap pesanan lewat WhatsApp."
-        >
-          <div className="grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
-            {POLICIES.map((item, index) => (
-              <Reveal key={item.title} delay={index * 60}>
-                <Panel icon={item.icon} title={item.title}>
-                  {item.body}
-                </Panel>
-              </Reveal>
-            ))}
-          </div>
-        </Split>
-      </Section>
-
-      {/* ── Kontak & footer ─────────────────────────────────────────── */}
-      <footer id="kontak" className="lp-dark scroll-mt-[86px] bg-[#3A000A]">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-20">
-          <div className="grid gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] md:gap-16">
-            <div>
-              <img src={armaMark} alt="Aroma Abadi" className="w-[56px]" />
-              <h2 className="lp-display mt-6 text-[clamp(1.6rem,1.1rem+1.4vw,2.1rem)] leading-[1.14] text-[#FBFAF8]">
-                Kontak Resmi
-              </h2>
-              <span className="mt-4 block h-px w-10 bg-[#E7CF95]/45" />
-              <p className="mt-4 max-w-[32ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
-                Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra.
-              </p>
-              <a
-                href={WA_LINK}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="press mt-7 inline-flex items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
-              >
-                <WhatsAppIcon className="h-[20px] w-[20px]" />
-                Chat dengan ARMA
-              </a>
-            </div>
-
-            <Reveal>
-              <div className="grid gap-px overflow-hidden rounded-[16px] border border-[#F3F0EC]/15 bg-[#F3F0EC]/15 sm:grid-cols-2">
-                {CONTACT.map((item) => (
-                  <div
-                    key={item.label}
-                    className={`group bg-[#3A000A] p-5 transition-colors duration-300 hover:bg-[#4A000D] ${
-                      item.wide ? "sm:col-span-2" : ""
-                    }`}
+          <div className="h-40">
+            {inView && (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={orders.qtyByBrand}
+                  layout="vertical"
+                  margin={{ top: 4, right: 20, left: 4, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                  <XAxis
+                    type="number"
+                    stroke={axisColor}
+                    tick={axisTick}
+                    tickLine={false}
+                    axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="brand"
+                    stroke={axisColor}
+                    tick={axisTick}
+                    tickLine={false}
+                    axisLine={false}
+                    width={100}
+                  />
+                  <Tooltip
+                    cursor={{ fill: cursorFill }}
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={chartLabelStyle}
+                    itemStyle={chartItemStyle}
+                    formatter={(v: number) => [fmtNum(Number(v)), "Units sold"]}
+                  />
+                  <Bar
+                    dataKey="qty"
+                    radius={[0, 6, 6, 0]}
+                    barSize={18}
+                    isAnimationActive
+                    animationDuration={700}
                   >
-                    <p className="flex items-center gap-[10px] text-[12px] text-[#E7CF95]">
-                      <span className="grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#E7CF95]/12 text-[#E7CF95] transition-colors duration-300 group-hover:bg-[#E7CF95]/20">
-                        {item.wa ? (
-                          <WhatsAppIcon className="h-[15px] w-[15px]" />
-                        ) : item.icon ? (
-                          <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                        ) : null}
-                      </span>
-                      {item.label}
-                    </p>
-                    <p className="mt-[10px] pl-[38px] text-[15px] leading-[1.5] text-[#FBFAF8]">
-                      {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-
-          <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[#F3F0EC]/12 pt-6">
-            <p className="text-[12.5px] text-[#F3F0EC]/45">
-              Halaman resmi PT Aroma Abadi. Pembayaran diproses oleh Xendit dalam Rupiah.
-            </p>
-            <p className="text-[12.5px] text-[#F3F0EC]/60">
-              © {new Date().getFullYear()} PT Aroma Abadi
-            </p>
+                    {orders.qtyByBrand.map((d, i) => (
+                      <Cell key={d.brand} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
-      </footer>
+      </SectionCard>
+    </Reveal>
+  );
+}
 
-      {/* ── Floating WhatsApp ────────────────────────────────────────── */}
-      <a
-        href={WA_LINK}
-        target="_blank"
-        rel="noreferrer noopener"
-        aria-label="Chat dengan ARMA di WhatsApp"
-        className={`group fixed bottom-5 right-5 z-40 transition-[transform,opacity] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:bottom-7 sm:right-7 ${
-          scrolled && !menuOpen
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-4 opacity-0"
-        }`}
-      >
-        <span className="lp-float relative flex items-center rounded-full bg-[#25D366] pr-0 shadow-[0_10px_26px_-8px_rgba(37,211,102,0.55),0_3px_10px_rgba(22,22,22,0.2)] transition-[padding,box-shadow] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:shadow-[0_16px_34px_-8px_rgba(37,211,102,0.7),0_4px_12px_rgba(22,22,22,0.25)] sm:group-hover:pr-[18px]">
-          <span
-            aria-hidden
-            className="absolute inset-0 -z-10 rounded-full bg-[#25D366]/40 blur-[12px]"
+// ── E. Averages / Basket Economics ───────────────────────────────────────
+function AveragesSection({ averages }: { averages: ReturnType<typeof computeAverages> }) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard title="Averages & Basket Economics">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 stagger">
+          <MetricStat
+            icon={Repeat}
+            label="Avg. Messages / Transaction"
+            value={avgMessagesBetweenTransaction.toFixed(1)}
+            info="Average number of messages exchanged between transactions."
           />
-          <img src={whatsappMark} alt="" className="h-[52px] w-[52px] shrink-0" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap text-[13.5px] font-semibold text-white opacity-0 transition-[max-width,opacity,padding] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:group-hover:max-w-[170px] sm:group-hover:pl-[10px] sm:group-hover:opacity-100">
-            Chat dengan ARMA
-          </span>
-        </span>
-      </a>
-    </main>
+          <MetricStat
+            icon={Wallet}
+            label="Avg. Order Value"
+            value={fmtIDR(averages.avgOrderValue)}
+            info="Average value per order (Sales ÷ Orders)."
+          />
+          <MetricStat
+            icon={Tags}
+            label="Avg. Selling Price"
+            value={fmtIDR(averages.avgSellingPrice)}
+            info="Average selling price per item (Sales ÷ Qty Sold)."
+          />
+          <MetricStat
+            icon={ShoppingBasket}
+            label="Avg. Basket Size"
+            value={averages.avgBasketSize.toFixed(1)}
+            sub="items / order"
+            info="Average number of items per order (Qty Sold ÷ Orders)."
+          />
+        </div>
+      </SectionCard>
+    </Reveal>
+  );
+}
+
+// ── F. Funnel & Conversion ───────────────────────────────────────────────
+function ConversionSection({
+  broadcast,
+  orders,
+  funnelRates,
+  totalConversations,
+}: {
+  broadcast: BroadcastMetrics;
+  orders: OrdersAndSales;
+  funnelRates: ReturnType<typeof computeFunnelRates>;
+  totalConversations: number;
+}) {
+  const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  const stages: FunnelStage[] = [
+    { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-1)" },
+    { label: "Conversations", value: totalConversations, color: "var(--chart-2)" },
+    { label: "Transactions", value: orders.totalTransactions, color: "var(--chart-3)" },
+  ];
+  return (
+    <Reveal innerRef={ref} inView={inView}>
+      <SectionCard title="Funnel & Conversion">
+        {inView && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4">
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card/60 glass">
+              <StepFunnel stages={stages} />
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              <MetricStat
+                icon={Reply}
+                label="Conversation Rate"
+                value={fmtPct(funnelRates.conversationRate)}
+                info="Rate of conversations started since a broadcast was sent (Replies ÷ Broadcast Reach)."
+              />
+              <MetricStat
+                icon={TrendingUp}
+                label="Conversion Rate"
+                value={fmtPct(funnelRates.conversionRate)}
+                info="Rate of transactions resulting from conversations (Transactions ÷ Conversations)."
+              />
+            </div>
+          </div>
+        )}
+      </SectionCard>
+    </Reveal>
+  );
+}
+
+// ── Date range popover — filters every metric on the page down to the
+// selected window (presets or a custom from/to pair). ──────────────────────
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+// Both helpers work directly on the "YYYY-MM-DD" components — parsing via
+// `new Date(iso)` interprets local vs. UTC differently depending on whether
+// a time component is present, which can silently shift the date by a day
+// depending on the machine's timezone (and SSR/client can disagree too).
+function fmtShortDate(iso: string) {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
+}
+function addDaysIso(iso: string, days: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+function DateRangePopover({
+  range,
+  fullRange,
+  onChange,
+}: {
+  range: DateRange;
+  fullRange: DateRange;
+  onChange: (r: DateRange) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  // Presets can clamp to an identical range once the window is short enough
+  // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
+  // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
+  // just because it's listed first. Track the actual click instead.
+  const [selectedLabel, setSelectedLabel] = useState<string | null>("Last 90 Days");
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  // Presets can't reach further back than the real data actually goes.
+  const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
+  const presets: { label: string; range: DateRange }[] = [
+    {
+      label: "Last 7 Days",
+      range: { start: clampStart(addDaysIso(fullRange.end, -6)), end: fullRange.end },
+    },
+    {
+      label: "Last 30 Days",
+      range: { start: clampStart(addDaysIso(fullRange.end, -29)), end: fullRange.end },
+    },
+    {
+      label: "Last 90 Days",
+      range: { start: clampStart(addDaysIso(fullRange.end, -89)), end: fullRange.end },
+    },
+  ];
+  const isKnownPreset = presets.some(
+    (p) => p.range.start === range.start && p.range.end === range.end,
+  );
+  const label =
+    isKnownPreset && selectedLabel
+      ? selectedLabel
+      : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1.5 h-7 rounded-md border border-border bg-card/60 px-2.5 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+      >
+        <Calendar className="h-3 w-3 shrink-0" />
+        <span className="max-w-[160px] truncate">{label}</span>
+        <ChevronDown
+          className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
+          <div className="space-y-0.5">
+            {presets.map((p) => {
+              const active = selectedLabel === p.label;
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => {
+                    setSelectedLabel(p.label);
+                    onChange(p.range);
+                    setOpen(false);
+                  }}
+                  className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
+                    active
+                      ? "bg-primary/15 text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="my-2 border-t border-border" />
+          <div className="px-1 pb-1 space-y-1.5">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">
+              Custom Range
+            </div>
+            <input
+              type="date"
+              value={range.start}
+              min={fullRange.start}
+              max={range.end}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedLabel(null);
+                  onChange({ start: e.target.value, end: range.end });
+                }
+              }}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+            />
+            <input
+              type="date"
+              value={range.end}
+              min={range.start}
+              max={fullRange.end}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedLabel(null);
+                  onChange({ start: range.start, end: e.target.value });
+                }
+              }}
+              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+function Dashboard() {
+  const today = fmtDateEN(nowWIB());
+  const contacts = useLiveContacts();
+  const txState = useTransactionsStore();
+
+  const fullRange = useMemo(
+    () => getTransactionDateBounds(txState.transactions),
+    [txState.transactions],
+  );
+  const [range, setRange] = useState<DateRange>(fullRange);
+
+  const scale = useMemo(() => computeRangeScale(range, fullRange), [range, fullRange]);
+  const orders = useMemo(
+    () => computeOrdersAndSales(txState.transactions, range),
+    [txState.transactions, range],
+  );
+  const broadcast = useMemo(() => computeBroadcastMetrics(range, scale), [range, scale]);
+  const averages = useMemo(() => computeAverages(orders), [orders]);
+  const conversationsCount = useMemo(() => scaledTotalConversations(scale), [scale]);
+  const funnelRates = useMemo(
+    () => computeFunnelRates(broadcast, conversationsCount, orders.totalTransactions),
+    [broadcast, conversationsCount, orders.totalTransactions],
+  );
+
+  return (
+    <TooltipProvider delayDuration={150}>
+      <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
+        <div className="space-y-5 pb-[50px]">
+          {/* Header row */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="text-lg font-semibold">Hello, Aria 👋</div>
+              <span className="text-muted-foreground/40 text-[15px] select-none">|</span>
+              <DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                to="/inbox"
+                className="press inline-flex items-center h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Open Inbox
+              </Link>
+              <Link
+                to="/broadcasts"
+                className="inline-flex items-center h-9 rounded-md border border-border bg-card/60 px-4 text-[14px] font-medium hover:bg-card transition-colors"
+              >
+                New Broadcast
+              </Link>
+            </div>
+          </div>
+
+          <AudienceSection scale={scale} />
+          <BroadcastSection broadcast={broadcast} />
+          <ConversationSection
+            orders={orders}
+            scale={scale}
+            totalConversations={conversationsCount}
+          />
+          <OrdersSection orders={orders} />
+          <AveragesSection averages={averages} />
+          <ConversionSection
+            broadcast={broadcast}
+            orders={orders}
+            funnelRates={funnelRates}
+            totalConversations={conversationsCount}
+          />
+
+          {!LITE_MODE && <CrmLoyaltyAnalytics />}
+
+          {/* Activity + Conversations */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <SectionCard title="Recent Activity" className="lg:col-span-1">
+              <ul className="divide-y divide-border">
+                {recentActivity.slice(0, 5).map((a) => (
+                  <li key={a.id} className="px-5 py-3 flex items-start gap-3">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
+                    <div className="flex-1">
+                      <p className="text-xs leading-relaxed">{a.text}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{a.time}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </SectionCard>
+
+            <SectionCard
+              title="Recent Conversations"
+              className="lg:col-span-2"
+              action={
+                <Link
+                  to="/inbox"
+                  className="text-[11px] font-semibold text-primary hover:underline transition-colors duration-150"
+                >
+                  OPEN INBOX →
+                </Link>
+              }
+            >
+              <ul className="divide-y divide-border stagger">
+                {conversations.slice(0, 6).map((c) => {
+                  const contact = contacts.find((x) => x.id === c.contactId);
+                  // A contact moved to Recently Deleted drops out of the feed
+                  // rather than crashing the dashboard.
+                  if (!contact) return null;
+                  return (
+                    <li
+                      key={c.id}
+                      className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-150"
+                    >
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
+                        {contact.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium truncate">{contact.name}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{c.preview}</p>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">{c.time}</div>
+                      {c.unread > 0 && (
+                        <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                          {c.unread}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </SectionCard>
+          </div>
+        </div>
+      </AppShell>
+    </TooltipProvider>
   );
 }
