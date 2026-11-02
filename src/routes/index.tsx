@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
-import { Block, Facts, Pending, Prose, Section, Split, Step } from "@/components/landing/parts";
+import { Facts, Panel, Pending, Prose, Section, Split, Step } from "@/components/landing/parts";
 import { ChatScreen, CheckoutScreen, type ChatMessage } from "@/components/landing/screens";
 import logo from "@/assets/aroma-abadi-logo-sand.png";
 import brandDG from "@/assets/brand-dolce-gabbana.png";
@@ -308,26 +308,26 @@ function CompanyPage() {
           </Prose>
 
           <div className="mt-10 grid gap-x-12 gap-y-8 sm:grid-cols-2">
-            <Block title="Konsultasi dan rekomendasi produk">
+            <Panel title="Konsultasi dan rekomendasi produk">
               ARMA menjawab pertanyaan soal jenis kulit, pilihan shade, dan cara pemakaian, lalu
               merekomendasikan produk yang stoknya tersedia. Pelanggan yang butuh bantuan manusia
               dialihkan ke tim kami di percakapan yang sama.
-            </Block>
-            <Block title="Poin dan tingkat keanggotaan">
+            </Panel>
+            <Panel title="Poin dan tingkat keanggotaan">
               Setiap pesanan yang berhasil dibayar menambah poin pelanggan. Poin menentukan tingkat
               keanggotaan: Prestige, Atelier, Legacy, Élite, dan Icon. Tiap tingkat membuka benefit
               yang berbeda, seperti potongan harga dan akses lebih awal ke produk baru.
-            </Block>
-            <Block title="Kode promo">
+            </Panel>
+            <Panel title="Kode promo">
               Ada dua jenis kode: kode unik yang hanya berlaku untuk satu pelanggan, dan kode
               bersama dengan batas jumlah pemakaian. Kode dipakai saat pesanan dibuat, dan
               potongannya terlihat di rincian sebelum pelanggan membayar.
-            </Block>
-            <Block title="Kabar program dan pengingat">
+            </Panel>
+            <Panel title="Kabar program dan pengingat">
               Pelanggan yang setuju menerima pesan dari kami mendapat kabar promo dan pengingat
               pesanan. Setiap pesan punya cara berhenti, dan pelanggan yang berhenti tidak kami
               kirimi lagi.
-            </Block>
+            </Panel>
           </div>
 
           <div className="mt-10 rounded-[10px] border border-[#3A2F2B]/12 bg-[#F3EDE3] p-6">
@@ -430,20 +430,20 @@ function CompanyPage() {
           lede="Semua pembayaran pelanggan berjalan di atas Xendit, dalam Rupiah."
         >
           <div className="grid gap-x-12 gap-y-8 sm:grid-cols-2">
-            <Block title="QRIS">
+            <Panel title="QRIS">
               Pelanggan memindai kode dari aplikasi bank atau e-wallet mereka. Ini metode yang
               paling sering dipakai pelanggan kami.
-            </Block>
-            <Block title="Virtual Account">
+            </Panel>
+            <Panel title="Virtual Account">
               Nomor transfer khusus per pesanan, bisa dibayar dari bank mana saja, dan tercatat
               otomatis begitu dana masuk.
-            </Block>
-            <Block title="Kartu kredit">
+            </Panel>
+            <Panel title="Kartu kredit">
               Diproses di halaman Xendit dengan autentikasi 3D Secure dari bank penerbit kartu.
-            </Block>
-            <Block title="Kartu debit">
+            </Panel>
+            <Panel title="Kartu debit">
               Untuk kartu debit berlogo jaringan internasional, lewat halaman pembayaran yang sama.
-            </Block>
+            </Panel>
           </div>
 
           <div className="mt-12">
@@ -481,28 +481,28 @@ function CompanyPage() {
           lede="Aturan yang berlaku untuk setiap pesanan lewat WhatsApp."
         >
           <div className="grid gap-x-12 gap-y-8 sm:grid-cols-2">
-            <Block title="Pengiriman">
+            <Panel title="Pengiriman">
               Pesanan yang sudah dibayar diproses pada hari kerja berikutnya dan dikirim ke seluruh
               Indonesia lewat kurir rekanan. Nomor resi dikirim lewat WhatsApp begitu paket
               diserahkan ke kurir.
-            </Block>
-            <Block title="Pengembalian dan penukaran">
+            </Panel>
+            <Panel title="Pengembalian dan penukaran">
               Permintaan diajukan lewat WhatsApp maksimal 7 hari setelah paket diterima, dengan
               nomor invoice dan foto produk. Produk yang masih tersegel dapat dikembalikan dengan
               pengembalian dana penuh; produk yang sudah dibuka dapat ditukar atau diganti dengan
               kredit belanja.
-            </Block>
-            <Block title="Pembatalan">
+            </Panel>
+            <Panel title="Pembatalan">
               Pesanan yang belum dibayar batal sendiri ketika tautan pembayaran kedaluwarsa. Pesanan
               yang sudah dibayar tetapi belum dikirim bisa dibatalkan lewat WhatsApp, dan dananya
               dikembalikan penuh melalui Xendit ke metode pembayaran asal.
-            </Block>
-            <Block title="Privasi data">
+            </Panel>
+            <Panel title="Privasi data">
               Kami menyimpan nomor WhatsApp, nama, alamat pengiriman, dan riwayat pesanan untuk
               memproses transaksi dan menjalankan program loyalitas. Data tidak dijual atau
               dibagikan di luar kebutuhan pengiriman dan pembayaran. Pelanggan bisa meminta datanya
               dihapus lewat kontak resmi di bawah.
-            </Block>
+            </Panel>
           </div>
         </Split>
       </Section>
