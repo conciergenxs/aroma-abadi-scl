@@ -36,3 +36,4 @@ vite.config.*.timestamp-*.mjs
 # autodeploy.sh runtime state (local only)
 .autodeploy.lock
 .autodeploy.last-push
+.env*
