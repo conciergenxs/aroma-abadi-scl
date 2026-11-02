@@ -1,5 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { LITE_MODE } from "@/lib/feature-flags";
 
 /* Permission preview — one link per condition.
  *
@@ -30,8 +31,7 @@ export type PreviewCondition = {
   where: string;
 };
 
-/** Every condition that has a link. One per checkbox in the permission tree. */
-export const PREVIEW_CONDITIONS: PreviewCondition[] = [
+const ALL_CONDITIONS: PreviewCondition[] = [
   // ── Conversations & Contacts ────────────────────────────────────────────
   {
     id: "inbox-view",
@@ -266,6 +266,12 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     where: "/settings?section=roles",
   },
 ];
+
+/* One per checkbox in the permission tree — so the lite build, whose tree has
+ * no referral seasons to permit, has no link for them either. */
+export const PREVIEW_CONDITIONS: PreviewCondition[] = ALL_CONDITIONS.filter(
+  (c) => !(LITE_MODE && c.id === "referral-manage"),
+);
 
 export const conditionFor = (id: string | null) =>
   id ? (PREVIEW_CONDITIONS.find((c) => c.id === id) ?? null) : null;
