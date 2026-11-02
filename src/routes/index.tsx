@@ -8,7 +8,6 @@ import {
   Boxes,
   Building2,
   Clock,
-  Compass,
   CreditCard,
   FileCheck,
   Globe,
@@ -35,6 +34,7 @@ import {
 import { useEscapeKey } from "@/lib/use-escape-key";
 import {
   Facts,
+  FactTiles,
   Marquee,
   Panel,
   Pending,
@@ -154,20 +154,20 @@ const HERO_THREAD: ChatMessage[] = [
 const HERO_SCRIPT: Beat[] = [
   { t: "type", i: 0 },
   { t: "pause", ms: 650 },
-  { t: "armaTyping", ms: 2100 },
+  { t: "armaTyping", ms: 2700 },
   { t: "send", i: 1 },
-  { t: "pause", ms: 2400 },
+  { t: "pause", ms: 2900 },
   { t: "type", i: 2 },
   { t: "pause", ms: 550 },
-  { t: "armaTyping", ms: 1900 },
+  { t: "armaTyping", ms: 2500 },
   { t: "send", i: 3 },
-  { t: "pause", ms: 2300 },
-  { t: "armaTyping", ms: 1400 },
+  { t: "pause", ms: 2800 },
+  { t: "armaTyping", ms: 2000 },
   { t: "send", i: 4 },
-  { t: "pause", ms: 2200 },
+  { t: "pause", ms: 2700 },
   { t: "checkout", ms: 5400 },
   { t: "pause", ms: 900 },
-  { t: "armaTyping", ms: 1600 },
+  { t: "armaTyping", ms: 2200 },
   { t: "send", i: 5 },
 ];
 
@@ -226,10 +226,10 @@ const PILLARS = [
   },
 ];
 
-const HERO_FACTS = [
+const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
   { icon: Building2, label: "Badan hukum", value: "PT Aroma Abadi" },
   { icon: Boxes, label: "Bidang usaha", value: "Distribusi produk kecantikan" },
-  { icon: MessageCircle, label: "Kanal transaksi", value: "WhatsApp (ARMA)" },
+  { wa: true, label: "Kanal transaksi", value: "WhatsApp (ARMA)" },
   { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
 ];
 
@@ -299,32 +299,6 @@ const POLICIES = [
     icon: Lock,
     title: "Privasi Data",
     body: "Kami menyimpan nomor WhatsApp, nama, alamat, dan riwayat pesanan untuk memproses transaksi. Data tidak dijual atau dibagikan ke pihak lain.",
-  },
-];
-
-const FOOTER_COLUMNS = [
-  {
-    icon: Compass,
-    title: "Navigasi",
-    items: NAV.map((item) => ({ label: item.label, href: item.href })),
-  },
-  {
-    icon: Building2,
-    title: "Perusahaan",
-    items: [
-      { label: "PT Aroma Abadi" },
-      { label: "Distribusi produk kecantikan" },
-      { label: "Jakarta Selatan, DKI Jakarta" },
-    ],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Pembayaran",
-    items: [
-      { label: "Diproses oleh Xendit" },
-      { label: "QRIS, Virtual Account, e-wallet, kartu" },
-      { label: "Rupiah (IDR)" },
-    ],
   },
 ];
 
@@ -458,9 +432,9 @@ function CompanyPage() {
               href={WA_LINK}
               target="_blank"
               rel="noreferrer noopener"
-              className="press ml-auto hidden items-center gap-2 rounded-full bg-[#C9A455] px-[18px] py-[10px] text-[13.5px] font-semibold text-[#2B0008] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E7CF95] hover:shadow-[0_10px_24px_-12px_rgba(201,164,85,0.9)] sm:inline-flex lg:ml-0"
+              className="press ml-auto hidden items-center gap-[9px] rounded-full bg-[#D7B69A] py-[9px] pl-[10px] pr-[18px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
             >
-              <MessageCircle className="h-[16px] w-[16px]" strokeWidth={2} />
+              <img src={whatsappMark} alt="" className="h-[22px] w-[22px]" />
               Chat dengan ARMA
             </a>
 
@@ -538,7 +512,11 @@ function CompanyPage() {
                   className="group bg-white px-4 py-[18px] transition-colors duration-300 hover:bg-[#F3F0EC]"
                 >
                   <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#8A6246]">
-                    <fact.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                    {fact.wa ? (
+                      <img src={whatsappMark} alt="" className="h-[15px] w-[15px]" />
+                    ) : fact.icon ? (
+                      <fact.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                    ) : null}
                     {fact.label}
                   </dt>
                   <dd className="mt-[7px] text-[14.5px] font-semibold leading-snug text-[#161616]">
@@ -556,7 +534,30 @@ function CompanyPage() {
       </section>
 
       {/* ── Profil bisnis ────────────────────────────────────────────── */}
-      <Section id="profil" tone="cream" className="lp-paper">
+      <Section
+        id="profil"
+        tone="cream"
+        className="lp-paper"
+        bleed={
+          <div>
+            <p className="text-center text-[12.5px] text-[#8A6246]">
+              Brand yang kami distribusikan
+            </p>
+            <div className="mt-6">
+              <Marquee>
+                {BRANDS.map((brand) => (
+                  <img
+                    key={brand.name}
+                    src={brand.src}
+                    alt={brand.name}
+                    className="lp-brandmark h-[190px] w-[290px] shrink-0 object-contain sm:w-[380px]"
+                  />
+                ))}
+              </Marquee>
+            </div>
+          </div>
+        }
+      >
         <Split
           tone="cream"
           icon={Building2}
@@ -621,22 +622,6 @@ function CompanyPage() {
             />
           </Reveal>
         </Split>
-
-        <div className="mt-16">
-          <p className="text-center text-[12.5px] text-[#8A6246]">Brand yang kami distribusikan</p>
-          <div className="mt-5">
-            <Marquee>
-              {BRANDS.map((brand) => (
-                <img
-                  key={brand.name}
-                  src={brand.src}
-                  alt={brand.name}
-                  className="lp-brandmark h-[150px] w-[250px] shrink-0 object-contain sm:w-[320px]"
-                />
-              ))}
-            </Marquee>
-          </div>
-        </div>
       </Section>
 
       {/* ── Program loyalitas ────────────────────────────────────────── */}
@@ -667,19 +652,25 @@ function CompanyPage() {
           </div>
 
           <Reveal delay={80} className="mt-5">
-            <div className="flex items-start gap-4 rounded-[14px] border border-[#E6D8CD] bg-[#F3F0EC] p-6">
-              <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-full bg-[#710014]/8 text-[#710014]">
-                <Lock className="h-[17px] w-[17px]" strokeWidth={1.6} />
-              </span>
-              <div>
-                <h3 className="text-[15.5px] font-semibold text-[#161616]">
-                  Jalur Terpisah untuk Beauty Advisor
-                </h3>
-                <p className="mt-[8px] max-w-[62ch] text-pretty text-[14.5px] leading-[1.65] text-[#55504B]">
-                  Beauty Advisor kami memakai ARMA versi internal untuk product knowledge dan SOP
-                  layanan. Jalur itu hanya untuk karyawan dan mitra gerai, dan tidak memproses
-                  pembayaran apa pun.
-                </p>
+            <div className="relative overflow-hidden rounded-[16px] bg-[#4A000D] p-6 sm:p-7">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,rgba(231,207,149,0.16),transparent_70%)]"
+              />
+              <div className="relative flex items-start gap-4">
+                <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full bg-[#E7CF95]/15 text-[#E7CF95]">
+                  <Lock className="h-[19px] w-[19px]" strokeWidth={1.6} />
+                </span>
+                <div>
+                  <h3 className="text-[16px] font-semibold text-[#FBFAF8]">
+                    Jalur Terpisah untuk Beauty Advisor
+                  </h3>
+                  <p className="mt-[9px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
+                    Beauty Advisor kami memakai ARMA versi internal untuk product knowledge dan SOP
+                    layanan. Jalur itu hanya untuk karyawan dan mitra gerai, dan tidak memproses
+                    pembayaran apa pun.
+                  </p>
+                </div>
               </div>
             </div>
           </Reveal>
@@ -779,8 +770,7 @@ function CompanyPage() {
           </div>
 
           <Reveal delay={80} className="mt-12">
-            <Facts
-              cols={2}
+            <FactTiles
               items={[
                 {
                   icon: Lock,
@@ -834,127 +824,82 @@ function CompanyPage() {
         </Split>
       </Section>
 
-      {/* ── Kontak ───────────────────────────────────────────────────── */}
-      <Section id="kontak" tone="maroon">
-        <Split
-          tone="maroon"
-          icon={Phone}
-          title="Kontak Resmi"
-          lede="Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra."
-          aside={
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="press mt-6 inline-flex items-center gap-2 rounded-full bg-[#C9A455] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#2B0008] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E7CF95] hover:shadow-[0_16px_34px_-16px_rgba(201,164,85,0.6)]"
-            >
-              <MessageCircle className="h-[17px] w-[17px]" strokeWidth={2} />
-              Chat dengan ARMA
-            </a>
-          }
-        >
-          <Reveal>
-            <Facts
-              tone="maroon"
-              items={[
-                {
-                  icon: MessageCircle,
-                  label: "WhatsApp pelanggan",
-                  value: (
-                    <a
-                      href={WA_LINK}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="underline decoration-[#E7CF95]/50 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
-                    >
-                      {WA_NUMBER}
-                    </a>
-                  ),
-                },
-                {
-                  icon: Clock,
-                  label: "Jam layanan",
-                  value: <Pending field="jam operasional" tone="maroon" />,
-                },
-                {
-                  icon: Mail,
-                  label: "Email resmi",
-                  value: <Pending field="alamat email" tone="maroon" />,
-                },
-                {
-                  icon: Phone,
-                  label: "Telepon kantor",
-                  value: <Pending field="nomor telepon" tone="maroon" />,
-                },
-                {
-                  icon: MapPin,
-                  label: "Alamat kantor",
-                  value: (
-                    <>
-                      <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI Jakarta
-                    </>
-                  ),
-                },
-              ]}
-            />
-          </Reveal>
-        </Split>
-      </Section>
-
-      {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer className="lp-dark bg-[#3A000A]">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-14 md:px-10 md:py-16">
-          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      {/* ── Kontak & footer ─────────────────────────────────────────── */}
+      <footer id="kontak" className="lp-dark scroll-mt-[86px] bg-[#3A000A]">
+        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-20">
+          <div className="grid gap-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-16">
             <div>
               <img src={armaMark} alt="Aroma Abadi" className="w-[56px]" />
-              <p className="lp-display mt-6 max-w-[17ch] text-[clamp(1.35rem,1rem+1.1vw,1.85rem)] leading-[1.18] text-[#FBFAF8]">
-                Pesan dan bayar dalam satu percakapan.
+              <h2 className="lp-display mt-6 text-[clamp(1.6rem,1.1rem+1.4vw,2.1rem)] leading-[1.14] text-[#FBFAF8]">
+                Kontak Resmi
+              </h2>
+              <span className="mt-4 block h-px w-10 bg-[#E7CF95]/45" />
+              <p className="mt-4 max-w-[34ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
+                Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra. Seluruh pesanan dan
+                pembayaran berjalan lewat nomor WhatsApp di samping.
               </p>
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="press mt-7 inline-flex items-center gap-[10px] rounded-full bg-[#D7B69A] py-[11px] pl-[12px] pr-[22px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
+              >
+                <img src={whatsappMark} alt="" className="h-[24px] w-[24px]" />
+                Chat dengan ARMA
+              </a>
             </div>
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="press group inline-flex shrink-0 items-center gap-3 rounded-full border border-[#F3F0EC]/20 py-[10px] pl-[12px] pr-[20px] transition-colors duration-300 hover:border-[#C9A455]/60 hover:bg-[#C9A455]/10"
-            >
-              <img src={whatsappMark} alt="" className="h-[34px] w-[34px]" />
-              <span className="text-left">
-                <span className="block text-[12px] text-[#E7CF95]">WhatsApp resmi</span>
-                <span className="block text-[14px] font-medium text-[#FBFAF8]">{WA_NUMBER}</span>
-              </span>
-            </a>
+
+            <Reveal>
+              <Facts
+                tone="maroon"
+                items={[
+                  {
+                    iconNode: <img src={whatsappMark} alt="" className="h-[15px] w-[15px]" />,
+                    label: "WhatsApp pelanggan",
+                    value: (
+                      <a
+                        href={WA_LINK}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="underline decoration-[#E7CF95]/50 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+                      >
+                        {WA_NUMBER}
+                      </a>
+                    ),
+                  },
+                  {
+                    icon: Clock,
+                    label: "Jam layanan",
+                    value: <Pending field="jam operasional" tone="maroon" />,
+                  },
+                  {
+                    icon: Mail,
+                    label: "Email resmi",
+                    value: <Pending field="alamat email" tone="maroon" />,
+                  },
+                  {
+                    icon: Phone,
+                    label: "Telepon kantor",
+                    value: <Pending field="nomor telepon" tone="maroon" />,
+                  },
+                  {
+                    icon: MapPin,
+                    label: "Alamat kantor",
+                    value: (
+                      <>
+                        <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI
+                        Jakarta
+                      </>
+                    ),
+                  },
+                ]}
+              />
+            </Reveal>
           </div>
 
-          <div className="mt-12 grid gap-10 border-t border-[#F3F0EC]/15 pt-10 sm:grid-cols-3">
-            {FOOTER_COLUMNS.map((column) => (
-              <div key={column.title}>
-                <p className="flex items-center gap-2 text-[12px] font-medium text-[#E7CF95]">
-                  <column.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                  {column.title}
-                </p>
-                <ul className="mt-4 space-y-[10px]">
-                  {column.items.map((item) => (
-                    <li key={item.label}>
-                      {"href" in item && item.href ? (
-                        <a
-                          href={item.href}
-                          className="text-[13.5px] text-[#F3F0EC]/70 transition-colors duration-200 hover:text-[#FBFAF8]"
-                        >
-                          {item.label}
-                        </a>
-                      ) : (
-                        <span className="text-[13.5px] text-[#F3F0EC]/70">{item.label}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[#F3F0EC]/12 pt-6">
+          <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[#F3F0EC]/12 pt-6">
             <p className="text-[12.5px] text-[#F3F0EC]/45">
-              Halaman resmi PT Aroma Abadi. Seluruh transaksi dalam Rupiah.
+              Halaman resmi PT Aroma Abadi. Pembayaran diproses oleh Xendit dalam Rupiah.
             </p>
             <p className="text-[12.5px] text-[#F3F0EC]/60">
               © {new Date().getFullYear()} PT Aroma Abadi

@@ -101,15 +101,25 @@ export function Section({
   tone = "white",
   className = "",
   children,
+  bleed,
 }: {
   id?: string;
   tone?: Tone;
   className?: string;
   children: ReactNode;
+  /** Rendered outside the reading column, edge to edge. */
+  bleed?: ReactNode;
 }) {
   return (
     <section id={id} className={`scroll-mt-[86px] ${GROUND[tone]} ${className}`}>
-      <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-24">{children}</div>
+      <div
+        className={`mx-auto w-full max-w-[1180px] px-6 pt-16 md:px-10 md:pt-24 ${
+          bleed ? "pb-10 md:pb-14" : "pb-16 md:pb-24"
+        }`}
+      >
+        {children}
+      </div>
+      {bleed ? <div className="pb-14 md:pb-20">{bleed}</div> : null}
     </section>
   );
 }
@@ -175,7 +185,7 @@ export function Facts({
   cols = 1,
 }: {
   tone?: Tone;
-  items: { label: string; value: ReactNode; icon?: LucideIcon }[];
+  items: { label: string; value: ReactNode; icon?: LucideIcon; iconNode?: ReactNode }[];
   cols?: 1 | 2;
 }) {
   const two = cols === 2;
@@ -189,7 +199,8 @@ export function Facts({
           } ${tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#710014]/[0.03]"}`}
         >
           <dt className={`flex items-center gap-2 text-[12.5px] leading-[1.5] ${LABEL[tone]}`}>
-            {item.icon ? <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} /> : null}
+            {item.iconNode ??
+              (item.icon ? <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} /> : null)}
             {item.label}
           </dt>
           <dd className={`${two ? "mt-[5px] " : ""}text-[14.5px] leading-[1.55] ${VALUE[tone]}`}>
@@ -212,6 +223,34 @@ export function Marquee({ children }: { children: ReactNode }) {
           {children}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The same facts as <Facts>, but given weight: a hairline grid of tiles,
+ * each led by its own mark. For the handful of statements a reviewer is
+ * actually looking for. */
+export function FactTiles({
+  items,
+}: {
+  items: { icon: LucideIcon; label: string; value: string }[];
+}) {
+  return (
+    <div className="grid gap-px overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="group bg-white p-5 transition-colors duration-300 hover:bg-[#F3F0EC]"
+        >
+          <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
+            <item.icon className="h-[16px] w-[16px]" strokeWidth={1.7} />
+          </span>
+          <p className="mt-3 text-[12.5px] leading-[1.4] text-[#8A6246]">{item.label}</p>
+          <p className="mt-[4px] text-pretty text-[14px] font-medium leading-[1.45] text-[#161616]">
+            {item.value}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -316,34 +355,29 @@ export function Step({
             <p className="mt-[10px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.7] text-[#55504B]">
               {body}
             </p>
+            {points ? (
+              <dl className="mt-6 max-w-[46ch] overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#F3F0EC]">
+                {points.map((point, index) => (
+                  <div
+                    key={point.label}
+                    className={`px-4 py-[12px] ${index ? "border-t border-[#E0D4C8]" : ""}`}
+                  >
+                    <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#8A6246]">
+                      {point.icon ? (
+                        <point.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                      ) : null}
+                      {point.label}
+                    </dt>
+                    <dd className="mt-[4px] text-[13.5px] leading-[1.5] text-[#161616]">
+                      {point.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
           </div>
           {screen ? <div className="w-full max-w-[300px] lg:max-w-none">{screen}</div> : null}
         </div>
-
-        {/* Runs edge to edge inside the card, so the detail reads as the
-            block's own footing rather than a table parked underneath it. */}
-        {points ? (
-          <dl className="-mx-5 -mb-5 mt-7 grid overflow-hidden rounded-b-[17px] border-t border-[#E6D8CD] bg-[#F3F0EC] sm:-mx-8 sm:-mb-8 sm:grid-cols-3">
-            {points.map((point, index) => (
-              <div
-                key={point.label}
-                className={`px-5 py-[15px] ${
-                  index ? "border-t border-[#E0D4C8] sm:border-l sm:border-t-0" : ""
-                }`}
-              >
-                <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#8A6246]">
-                  {point.icon ? (
-                    <point.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                  ) : null}
-                  {point.label}
-                </dt>
-                <dd className="mt-[5px] text-[13.5px] leading-[1.5] text-[#161616]">
-                  {point.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        ) : null}
       </div>
     </div>
   );

@@ -1004,13 +1004,13 @@ html {
   }
 }
 
-/* WhatsApp's wallpaper: the same idea — sparse outline doodles, barely
-   there, on warm beige — drawn here rather than lifted, so the screens read
-   as the real app without copying its artwork. */
+/* The chat ground: WhatsApp's warm beige with a faint tint, left plain
+   rather than patterned — a hand-drawn stand-in for its doodles read as
+   someone else's wallpaper, not as WhatsApp. */
 .lp-wallpaper {
   background-color: #efe7de;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='260'%20viewBox='0%200%20260%20260'%3E%20%3Cg%20fill='none'%20stroke='%23cbbfb1'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'%20opacity='0.75'%3E%20%3Cpath%20d='M18%2026h28a6%206%200%200%201%206%206v15a6%206%200%200%201-6%206H32l-9%208v-8h-5a6%206%200%200%201-6-6V32a6%206%200%200%201%206-6z'/%3E%20%3Cpath%20d='M106%2034c0-7%2010-10%2013-4%203-6%2013-3%2013%204%200%209-13%2016-13%2016s-13-7-13-16z'/%3E%20%3Cpath%20d='M232%2030h-9l-3-5h-15l-3%205h-9a4%204%200%200%200-4%204v23a4%204%200%200%200%204%204h39a4%204%200%200%200%204-4V34a4%204%200%200%200-4-4z'/%3E%20%3Ccircle%20cx='212'%20cy='45'%20r='10'/%3E%20%3Ccircle%20cx='50'%20cy='122'%20r='17'/%3E%3Ccircle%20cx='44'%20cy='117'%20r='1.7'/%3E%3Ccircle%20cx='56'%20cy='117'%20r='1.7'/%3E%20%3Cpath%20d='M42%20128c4%206%2012%206%2016%200'/%3E%20%3Cpath%20d='M124%20110v28'/%3E%3Cpath%20d='M124%20110l18-4v28'/%3E%3Ccircle%20cx='119'%20cy='140'%20r='5.5'/%3E%3Ccircle%20cx='137'%20cy='136'%20r='5.5'/%3E%20%3Cpath%20d='M212%20112l5%2012%2013%201-10%209%203%2013-11-7-11%207%203-13-10-9%2013-1z'/%3E%20%3Cpath%20d='M26%20206h30v15a10%2010%200%200%201-10%2010H36a10%2010%200%200%201-10-10z'/%3E%20%3Cpath%20d='M56%20210h7a6%206%200%200%201%200%2013h-7'/%3E%3Cpath%20d='M33%20196c2-4-2-7%200-11M43%20196c2-4-2-7%200-11'/%3E%20%3Cpath%20d='M108%20228l48-18-15%2033-9-11z'/%3E%3Cpath%20d='M132%20232l9-11'/%3E%20%3Ccircle%20cx='214'%20cy='206'%20r='10'/%3E%20%3Cpath%20d='M214%20189v-7M214%20230v-7M231%20206h7M190%20206h7M226%20194l5-5M197%20223l5-5M226%20218l5%205M197%20189l5%205'/%3E%20%3Cpath%20d='M150%2070c6-5%2014-5%2020%200'/%3E%3Cpath%20d='M154%2078c4-3%208-3%2012%200'/%3E%3Ccircle%20cx='160'%20cy='86'%20r='1.8'/%3E%20%3Cpath%20d='M78%2062l10%2010-10%2010-10-10z'/%3E%20%3Cpath%20d='M166%20160a8%208%200%200%201%2016%200c0%206-8%208-8%2014'/%3E%3Ccircle%20cx='174'%20cy='182'%20r='1.8'/%3E%20%3Cpath%20d='M64%20168h22v16H72l-8%207z'/%3E%20%3Cpath%20d='M98%20196c5-6%2013-6%2018%200-5%206-13%206-18%200z'/%3E%3Ccircle%20cx='107'%20cy='196'%20r='2.4'/%3E%20%3C/g%3E%3C/svg%3E");
-  background-size: 260px 260px;
+  background-image: radial-gradient(circle at 1px 1px, rgba(22, 22, 22, 0.05) 1px, transparent 0);
+  background-size: 18px 18px;
 }
 
 /* ---- Masthead ---- */
@@ -1061,10 +1061,6 @@ html {
 /* ---- Drifting brand row ----
    The track holds the marks twice, so translating it exactly half its width
    lands on an identical frame and the loop has no seam. */
-.lp-marquee {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-}
 .lp-marquee-track {
   animation: lp-marquee 42s linear infinite;
 }

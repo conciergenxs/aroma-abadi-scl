@@ -404,9 +404,9 @@ export function LiveChat({
             for (let c = 1; c <= text.length; c += 1) {
               if (cancelled) return;
               setDraft(text.slice(0, c));
-              await wait(text[c - 1] === " " ? 58 : 34);
+              await wait(text[c - 1] === " " ? 95 : 54);
             }
-            await wait(420);
+            await wait(620);
             if (cancelled) return;
             setDraft("");
             setSent(beat.i + 1);
