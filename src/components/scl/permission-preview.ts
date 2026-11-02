@@ -24,6 +24,10 @@ export type PreviewCondition = {
   section: string;
   /** What the dashboard does without it — shown in the preview banner. */
   effect: string;
+  /** The page the link opens: where the effect is visible, not the home
+   * screen. A page the permission closes is still the right landing spot —
+   * arriving there and being sent to Overview is the demonstration. */
+  where: string;
 };
 
 /** Every condition that has a link. One per checkbox in the permission tree. */
@@ -34,60 +38,70 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     label: "View Conversations",
     section: "Conversations & Contacts",
     effect: "Inbox is gone from the sidebar, and its URL lands on Overview.",
+    where: "/inbox",
   },
   {
     id: "inbox-send",
     label: "Send Messages",
     section: "Conversations & Contacts",
     effect: "Conversations can be read, but the reply box won't send.",
+    where: "/inbox",
   },
   {
     id: "inbox-assign",
     label: "Assign & Transfer Conversations",
     section: "Conversations & Contacts",
     effect: "A conversation can't be handed to another agent.",
+    where: "/inbox",
   },
   {
     id: "contacts-view",
     label: "View Contacts",
     section: "Conversations & Contacts",
     effect: "Contacts is gone from the sidebar, and its URL lands on Overview.",
+    where: "/contacts",
   },
   {
     id: "contacts-create",
     label: "Create Contacts",
     section: "Conversations & Contacts",
     effect: "New Contact is locked.",
+    where: "/contacts",
   },
   {
     id: "contacts-edit",
     label: "Edit Contacts",
     section: "Conversations & Contacts",
     effect: "A contact's details, labels and audiences are read-only.",
+    where: "/contacts/c3",
   },
   {
     id: "contacts-delete",
     label: "Delete Contacts",
     section: "Conversations & Contacts",
     effect: "Deleting a contact is locked, in the list and on the contact itself.",
+    where: "/contacts/c3",
   },
   {
     id: "contacts-export",
     label: "Export Contacts",
     section: "Conversations & Contacts",
     effect: "Nothing changes on screen — contacts have no export action in the product yet.",
+    where: "/contacts",
   },
   {
     id: "contacts-properties",
     label: "Manage Contact Properties",
     section: "Conversations & Contacts",
     effect: "Filter Properties still opens, but nothing in it can be changed.",
+    where: "/contacts",
   },
   {
     id: "contacts-labels",
     label: "Manage Labels & Lifecycle Stages",
     section: "Conversations & Contacts",
     effect: "Labels and Customer Lifecycle are read-only in Settings.",
+    where: "/settings?section=labels",
   },
 
   // ── Outbound ────────────────────────────────────────────────────────────
@@ -96,36 +110,42 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     label: "View Broadcasts & Logs",
     section: "Outbound",
     effect: "Broadcast is gone from the sidebar, and its URL lands on Overview.",
+    where: "/broadcasts",
   },
   {
     id: "broadcast-create",
     label: "Create & Edit Broadcasts",
     section: "Outbound",
     effect: "Broadcasts can be read; Create Broadcast is locked.",
+    where: "/broadcasts",
   },
   {
     id: "broadcast-send",
     label: "Send & Schedule Broadcasts",
     section: "Outbound",
     effect: "The composer opens and saves drafts, but won't send or schedule.",
+    where: "/broadcasts/new",
   },
   {
     id: "broadcast-recurring",
     label: "Start & Stop Recurring Broadcasts",
     section: "Outbound",
     effect: "A recurring series can't be activated or paused.",
+    where: "/broadcasts",
   },
   {
     id: "templates-view",
     label: "View Templates",
     section: "Outbound",
     effect: "Templates is gone from the sidebar, and its URL lands on Overview.",
+    where: "/templates",
   },
   {
     id: "templates-manage",
     label: "Create & Edit Templates",
     section: "Outbound",
     effect: "Templates can be read; creating and editing is locked.",
+    where: "/templates",
   },
 
   // ── BA Enablement ───────────────────────────────────────────────────────
@@ -134,54 +154,63 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     label: "View Knowledge Content",
     section: "BA Enablement",
     effect: "SKU & Knowledge is gone from the sidebar, and its URL lands on Overview.",
+    where: "/sku",
   },
   {
     id: "knowledge-brands",
     label: "Manage Brands & Categories",
     section: "BA Enablement",
     effect: "Add New Brand and Add Category are locked.",
+    where: "/sku",
   },
   {
     id: "knowledge-modules",
     label: "Manage Modules",
     section: "BA Enablement",
     effect: "Add Module is locked.",
+    where: "/sku?brand=brand-dg&category=cat-dg-lip",
   },
   {
     id: "knowledge-cards",
     label: "Manage Knowledge Cards",
     section: "BA Enablement",
     effect: "Adding and editing knowledge cards is locked.",
+    where: "/sku?brand=brand-dg&category=cat-dg-lip",
   },
   {
     id: "ba-view",
     label: "View Beauty Ambassadors",
     section: "BA Enablement",
     effect: "The BA directory can't be opened from BA Contacts.",
+    where: "/contacts?view=ba",
   },
   {
     id: "ba-scope",
     label: "See Every Area",
     section: "BA Enablement",
     effect: "The BA list shows only the signed-in coordinator's own area.",
+    where: "/ba",
   },
   {
     id: "ba-create",
     label: "Add Beauty Ambassadors",
     section: "BA Enablement",
     effect: "Add BA is locked.",
+    where: "/ba",
   },
   {
     id: "ba-edit",
     label: "Edit BA Details & Brand Assignment",
     section: "BA Enablement",
     effect: "A BA record is read-only.",
+    where: "/ba",
   },
   {
     id: "ba-password",
     label: "Reveal & Reset LMS Passwords",
     section: "BA Enablement",
     effect: "A BA's LMS password can't be revealed or reset.",
+    where: "/ba",
   },
 
   // ── Commerce ────────────────────────────────────────────────────────────
@@ -190,24 +219,28 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     label: "View Promo & Transactions",
     section: "Commerce",
     effect: "Transactions, Promo Codes and Referral are gone from the sidebar.",
+    where: "/transactions",
   },
   {
     id: "promo-manage",
     label: "Create & Edit Promo Codes",
     section: "Commerce",
     effect: "Promo codes can be read; creating and editing is locked.",
+    where: "/promo-codes",
   },
   {
     id: "referral-manage",
     label: "Create & Edit Referral Seasons",
     section: "Commerce",
     effect: "Referral seasons can be read; creating and editing is locked.",
+    where: "/referral",
   },
   {
     id: "transactions-manage",
     label: "Record Transactions",
     section: "Commerce",
     effect: "Nothing changes on screen — the ledger is already read-only, filled from ARMA.",
+    where: "/transactions",
   },
 
   // ── Workspace ───────────────────────────────────────────────────────────
@@ -216,18 +249,21 @@ export const PREVIEW_CONDITIONS: PreviewCondition[] = [
     label: "Open Settings",
     section: "Workspace",
     effect: "Settings is gone from the sidebar, and its URL lands on Overview.",
+    where: "/settings",
   },
   {
     id: "settings-users",
     label: "Invite & Manage Users",
     section: "Workspace",
     effect: "User Management is closed, and inviting is locked.",
+    where: "/settings?section=user-management",
   },
   {
     id: "settings-roles",
     label: "Manage Roles & Permissions",
     section: "Workspace",
     effect: "Roles & Permissions is closed.",
+    where: "/settings?section=roles",
   },
 ];
 
@@ -310,9 +346,13 @@ export function previewLockReason(id: string): string {
   return c ? `"${c.label}" is switched off in this preview.` : "";
 }
 
-/** The link that opens the dashboard with one permission switched off. */
+/** The link that opens the page this permission changes, with it switched
+ * off. Falls back to the workspace home for anything without a page. */
 export function previewLink(id: string, origin = ""): string {
-  return `${origin}/app?${PREVIEW_PARAM}=${encodeURIComponent(id)}`;
+  const c = conditionFor(id);
+  const path = c?.where ?? "/app";
+  const sep = path.includes("?") ? "&" : "?";
+  return `${origin}${path}${sep}${PREVIEW_PARAM}=${encodeURIComponent(id)}`;
 }
 
 /** For a page that a permission opens: sends the viewer to Overview while that
