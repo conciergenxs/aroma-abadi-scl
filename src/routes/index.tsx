@@ -780,7 +780,6 @@ function CompanyPage() {
                   </a>
                 </li>
                 <li>Jakarta Selatan, DKI Jakarta</li>
-                <li>Senin–Jumat, jam kerja</li>
               </ul>
             </div>
           </div>
