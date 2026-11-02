@@ -1392,6 +1392,9 @@ function ConversationHeader({
 
       {/* RIGHT — actions */}
       <div className="ml-auto flex items-center gap-3">
+        {/* Who owns this conversation. The list filters by it and the store
+            has always accepted the change; this is where it is made. */}
+        <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
         <div className="flex items-center gap-0.5 text-muted-foreground/70">
           <button
             onClick={onToggleSearch}

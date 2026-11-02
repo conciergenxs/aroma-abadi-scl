@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -42,6 +43,11 @@ import { Route as ReferralEditSeasonIdRouteImport } from './routes/referral.edit
 import { Route as TemplatesEditTemplateIdRouteImport } from './routes/templates.edit.$templateId'
 import { Route as ContactsAudienceAddAudienceIdRouteImport } from './routes/contacts.audience.add.$audienceId'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccessDeniedRoute = AccessDeniedRouteImport.update({
   id: '/access-denied',
   path: '/access-denied',
@@ -206,6 +212,7 @@ const ContactsAudienceAddAudienceIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/contacts/audience/add/$audienceId': typeof ContactsAudienceAddAudienceIdRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -275,6 +283,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -311,6 +320,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/access-denied'
     | '/app'
     | '/auth'
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/contacts/audience/add/$audienceId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/access-denied'
     | '/app'
     | '/auth'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/contacts/audience/add/$audienceId'
   id:
     | '__root__'
+    | '/'
     | '/access-denied'
     | '/app'
     | '/auth'
@@ -414,6 +426,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
@@ -445,6 +458,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/access-denied': {
       id: '/access-denied'
       path: '/access-denied'
@@ -701,6 +721,7 @@ const SkuRouteChildren: SkuRouteChildren = {
 const SkuRouteWithChildren = SkuRoute._addFileChildren(SkuRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
