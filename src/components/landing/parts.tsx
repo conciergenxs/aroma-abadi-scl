@@ -327,7 +327,7 @@ export function Step({
   n: number;
   title: string;
   body: string | string[];
-  points?: { label: string; value: string }[];
+  points?: { icon: LucideIcon; label: string; value: string }[];
   screen?: ReactNode;
   highlight?: boolean;
   last?: boolean;
@@ -383,13 +383,17 @@ export function Step({
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
+                    className={`group/pt flex items-start gap-[13px] px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
                       index ? "border-t border-[#C9A455]/25" : ""
                     }`}
                   >
-                    <dt className="lp-display text-[16px] leading-tight text-[#710014]">
-                      {point.label}
-                    </dt>
+                    <span className="mt-[2px] grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full border border-[#C9A455]/45 bg-white text-[#710014] transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/pt:-rotate-6 group-hover/pt:bg-[#710014] group-hover/pt:text-[#FFF4ED]">
+                      <point.icon className="h-[15px] w-[15px]" strokeWidth={1.6} />
+                    </span>
+                    <div className="min-w-0">
+                      <dt className="lp-display text-[16px] leading-tight text-[#710014]">
+                        {point.label}
+                      </dt>
                     <dd className="mt-[6px] text-pretty text-[14px] leading-[1.5] text-[#161616]">
                       {point.value}
                     </dd>
