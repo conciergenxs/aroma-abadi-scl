@@ -17,7 +17,7 @@ export type Tone = "white" | "cream" | "maroon";
 
 const GROUND: Record<Tone, string> = {
   white: "bg-white",
-  cream: "bg-[#F3F0EC]",
+  cream: "bg-[#FFF4ED]",
   maroon: "lp-dark bg-[#4A000D]",
 };
 const TITLE: Record<Tone, string> = {
@@ -31,8 +31,8 @@ const BODY: Record<Tone, string> = {
   maroon: "text-[#F3F0EC]/75",
 };
 const LABEL: Record<Tone, string> = {
-  white: "text-[#8A6246]",
-  cream: "text-[#8A6246]",
+  white: "text-[#9A5A63]",
+  cream: "text-[#9A5A63]",
   maroon: "text-[#E7CF95]",
 };
 const VALUE: Record<Tone, string> = {
@@ -41,8 +41,8 @@ const VALUE: Record<Tone, string> = {
   maroon: "text-[#FBFAF8]",
 };
 const RULE: Record<Tone, string> = {
-  white: "border-[#E6D8CD]",
-  cream: "border-[#E0D4C8]",
+  white: "border-[#EAD3D7]",
+  cream: "border-[#E8D3D6]",
   maroon: "border-[#F3F0EC]/15",
 };
 
@@ -158,7 +158,7 @@ export function Split({
           {title}
         </h2>
         <span
-          className={`mt-3 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#BF9877]"}`}
+          className={`mt-3 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#D9A9B0]"}`}
         />
         <p className={`mt-3 max-w-[30ch] text-pretty text-[14.5px] leading-[1.58] ${BODY[tone]}`}>
           {lede}
@@ -229,30 +229,47 @@ export function Marquee({ children }: { children: ReactNode }) {
   );
 }
 
-/** The same facts as <Facts>, but given weight: a hairline grid of tiles,
- * each led by its own mark. For the handful of statements a reviewer is
- * actually looking for. */
-export function FactTiles({
+/** A single titled panel of statements about one topic. The payment
+ * section needed this: six bare tiles under four method cards read as more
+ * methods, when they are actually the handling rules behind them. */
+export function SpecPanel({
+  icon: Icon,
+  title,
+  intro,
   items,
 }: {
+  icon: LucideIcon;
+  title: string;
+  intro: string;
   items: { icon: LucideIcon; label: string; value: string }[];
 }) {
   return (
-    <div className="grid gap-px overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="group bg-white p-4 transition-colors duration-300 hover:bg-[#F3F0EC]"
-        >
-          <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
-            <item.icon className="h-[16px] w-[16px]" strokeWidth={1.7} />
-          </span>
-          <p className="mt-3 text-[12.5px] leading-[1.4] text-[#8A6246]">{item.label}</p>
-          <p className="mt-[4px] text-pretty text-[14px] font-medium leading-[1.45] text-[#161616]">
-            {item.value}
-          </p>
+    <div className="overflow-hidden rounded-[20px] border border-[#EAD3D7] bg-white">
+      <div className="flex items-start gap-3 border-b border-[#EAD3D7] bg-[#FFF4ED] px-5 py-[15px]">
+        <span className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-full bg-[#710014]/8 text-[#710014]">
+          <Icon className="h-[16px] w-[16px]" strokeWidth={1.6} />
+        </span>
+        <div className="min-w-0">
+          <h3 className="text-[15px] font-semibold leading-snug text-[#161616]">{title}</h3>
+          <p className="mt-[3px] text-pretty text-[13px] leading-[1.5] text-[#6B5A50]">{intro}</p>
         </div>
-      ))}
+      </div>
+      <dl className="grid sm:grid-cols-2">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className="flex gap-3 border-b border-[#EAD3D7]/70 px-5 py-[14px] transition-colors duration-200 last:border-b-0 hover:bg-[#FFF4ED]/60 sm:[&:nth-last-child(2)]:border-b-0 sm:odd:border-r sm:odd:border-[#EAD3D7]/70"
+          >
+            <item.icon className="mt-[2px] h-[15px] w-[15px] shrink-0 text-[#9A5A63]" strokeWidth={1.7} />
+            <div className="min-w-0">
+              <dt className="text-[12.5px] leading-[1.4] text-[#9A5A63]">{item.label}</dt>
+              <dd className="mt-[3px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
+                {item.value}
+              </dd>
+            </div>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }
@@ -269,7 +286,7 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <div className="group flex h-full flex-col rounded-[14px] border border-[#E6D8CD] bg-white p-5 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#710014]/30 hover:shadow-[0_18px_40px_-24px_rgba(113,0,20,0.4)]">
+    <div className="group flex h-full flex-col rounded-[18px] border border-[#EAD3D7] bg-white p-5 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#710014]/30 hover:shadow-[0_18px_40px_-24px_rgba(154,90,99,0.38)]">
       <span className="grid h-[36px] w-[36px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
         <Icon className="h-[17px] w-[17px]" strokeWidth={1.6} />
       </span>
@@ -332,7 +349,7 @@ export function Step({
         className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[34px] sm:w-[34px] sm:text-[16px] ${
           inView
             ? "border-[#710014] bg-[#710014] text-white"
-            : "scale-90 border-[#E6D8CD] bg-white text-[#8A6246]"
+            : "scale-90 border-[#EAD3D7] bg-white text-[#9A5A63]"
         }`}
       >
         {n}
@@ -341,7 +358,7 @@ export function Step({
       <div
         className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[18px] border border-[#710014]/20 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(113,0,20,0.45)] sm:p-6"
+            ? "rounded-[22px] border border-[#710014]/18 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(154,90,99,0.4)] sm:p-6"
             : ""
         }`}
       >
@@ -358,13 +375,13 @@ export function Step({
               {body}
             </p>
             {points ? (
-              <dl className="mt-5 max-w-[46ch] overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#F3F0EC]">
+              <dl className="mt-5 max-w-[46ch] overflow-hidden rounded-[14px] border border-[#EAD3D7] bg-[#FFF4ED]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`px-4 py-[10px] ${index ? "border-t border-[#E0D4C8]" : ""}`}
+                    className={`px-4 py-[10px] ${index ? "border-t border-[#E8D3D6]" : ""}`}
                   >
-                    <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#8A6246]">
+                    <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#9A5A63]">
                       {point.icon ? (
                         <point.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
                       ) : null}
