@@ -613,19 +613,33 @@ function UserManagementPage() {
     setConfirmDelete(true);
   };
 
-  const completeHandover = (to: string) => {
+  const finishHandover = (moved: number, where: string) => {
     if (!handover) return;
-    const moved = baStore.reassignCoordinator(handover.names, to);
     if (handover.kind === "role") {
       applyRole(handover.userId, handover.nextRole);
-      toast.success(
-        `${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to} · role updated`,
-      );
+      toast.success(`${moved} moved to ${where} · role updated`);
     } else {
       applyDelete();
-      toast.success(`${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to}`);
+      toast.success(`${moved} moved to ${where}`);
     }
     setHandover(null);
+  };
+
+  /** Everyone to the same coordinator. */
+  const completeHandover = (to: string) => {
+    if (!handover) return;
+    finishHandover(baStore.reassignCoordinator(handover.names, to), to);
+  };
+
+  /** One coordinator per person, as chosen in the one-by-one list. */
+  const completeHandoverEach = (assignments: Record<string, string>) => {
+    const entries = Object.entries(assignments);
+    entries.forEach(([baId, to]) => baStore.update(baId, { areaCoordinator: to }));
+    const names = [...new Set(entries.map(([, to]) => to))];
+    finishHandover(
+      entries.length,
+      names.length === 1 ? names[0] : `${names.length} coordinators`,
+    );
   };
 
   return (
@@ -839,8 +853,10 @@ function UserManagementPage() {
           baCount={basUnder(handover.names)}
           options={coordinatorsExcept(handover.names)}
           countFor={(name) => bas.filter((b) => b.areaCoordinator === name).length}
+          team={bas.filter((b) => handover.names.includes(b.areaCoordinator))}
           onClose={() => setHandover(null)}
           onConfirm={completeHandover}
+          onConfirmEach={completeHandoverEach}
         />
       )}
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
