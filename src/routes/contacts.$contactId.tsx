@@ -4,6 +4,7 @@ import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-s
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   ChevronLeft,
+  ArrowLeftRight,
   Phone,
   MessageCircle,
   Trash2,
@@ -46,8 +47,7 @@ import {
   type Transaction,
 } from "@/components/scl/transactions-store";
 import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
-import { useBaStore, type BA } from "@/components/scl/ba-store";
-import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
+import { baStore, useBaStore, type BA } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import {
   usePromoStore,
@@ -1413,14 +1413,25 @@ function RightPanel({
   const editGate = usePermission("contacts-edit");
   const { brands } = useSkuStore();
   const [revealed, setRevealed] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [movingLeader, setMovingLeader] = useState(false);
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
         <RightSection title="BA Login Credentials">
           <div className="space-y-2.5">
             <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Leader">
-              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.leader || "—"}</div>
+              <div className="flex items-center gap-1.5 px-2 py-1">
+                <span className="text-xs text-foreground/90">{baRecord.leader || "—"}</span>
+                <button
+                  type="button"
+                  onClick={() => setMovingLeader(true)}
+                  title="Move to another Leader"
+                  aria-label="Move to another Leader"
+                  className="press text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </FieldRow>
             <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
               <div className="flex items-center gap-1.5 px-2 py-1">
@@ -1428,9 +1439,9 @@ function RightPanel({
                   {revealed ? baRecord.password : "••••••••••••"}
                 </code>
                 <button
-                  onClick={() => (revealed ? setRevealed(false) : setShowConfirm(true))}
+                  onClick={() => setRevealed((r) => !r)}
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  title={revealed ? "Hide" : "Show (requires your account password)"}
+                  title={revealed ? "Hide password" : "Show password"}
                 >
                   {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                 </button>
@@ -1449,13 +1460,14 @@ function RightPanel({
               </div>
             </FieldRow>
           </div>
-          {showConfirm && (
-            <RevealPasswordModal
-              label={baRecord.name}
-              onClose={() => setShowConfirm(false)}
-              onConfirmed={() => {
-                setRevealed(true);
-                setShowConfirm(false);
+          {movingLeader && (
+            <MoveLeaderModal
+              ba={baRecord}
+              onClose={() => setMovingLeader(false)}
+              onMove={(to) => {
+                baStore.update(baRecord.id, { leader: to });
+                toast.success(`${baRecord.name} now reports to ${to}`);
+                setMovingLeader(false);
               }}
             />
           )}
