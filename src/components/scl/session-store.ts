@@ -216,9 +216,10 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
   ],
   // Looks after the BAs in their own area; the commercial pages are not theirs.
   "Area Coordinator": ["inbox", "contacts", "knowledge.view", "ba.view", "ba.manage"],
-  // Day-to-day desk work: conversations, contacts, and the commercial pages,
-  // but never the LMS curriculum or BA accounts.
-  Staff: ["inbox", "contacts", "broadcast.view", "knowledge.view", "ba.view", "commerce"],
+  // Day-to-day desk work: conversations, contacts, and the commercial pages.
+  // Outbound is not theirs — a broadcast goes out under someone else's name —
+  // and neither are the BA accounts or the LMS curriculum.
+  Staff: ["inbox", "contacts", "knowledge.view", "commerce"],
 };
 
 export function roleCan(role: WorkspaceRole, capability: Capability): boolean {

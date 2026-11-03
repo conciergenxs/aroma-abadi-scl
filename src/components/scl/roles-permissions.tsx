@@ -289,16 +289,16 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
     categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
     items: ["*", "-settings-roles"],
   },
-  // Looks after their own area's BAs; reads knowledge but never edits it, and
-  // the commercial pages aren't theirs at all.
+  // Runs the BAs in their own area and the conversations around them: reads
+  // the contact list without changing it, reads knowledge without editing it,
+  // and never touches outbound or the commercial pages.
   "Area Coordinator": {
     categories: ["inbox", "contacts", "knowledge", "ba"],
     items: [
       "inbox-view",
       "inbox-send",
+      "inbox-assign",
       "contacts-view",
-      "contacts-create",
-      "contacts-edit",
       "knowledge-view",
       "ba-view",
       "ba-create",
@@ -306,23 +306,18 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "ba-password",
     ],
   },
-  // Desk work: conversations, contacts and the commercial pages.
+  // Desk work: conversations, the contact list, and reading the commercial
+  // pages — recording a transaction is the one thing they create there.
   Staff: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
+    categories: ["inbox", "contacts", "knowledge", "commerce"],
     items: [
       "inbox-view",
       "inbox-send",
       "contacts-view",
       "contacts-create",
       "contacts-edit",
-      "broadcast-view",
-      "broadcast-create",
-      "templates-view",
       "knowledge-view",
-      "ba-view",
       "commerce-view",
-      "promo-manage",
-      "referral-manage",
       "transactions-manage",
     ],
   },
