@@ -4,6 +4,8 @@ import { AppShell, labelColorClass, labelColorDot } from "@/components/scl/app-s
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import {
   ChevronLeft,
+  ChevronRight,
+  ArrowLeftRight,
   Phone,
   MessageCircle,
   Trash2,
@@ -46,8 +48,8 @@ import {
   type Transaction,
 } from "@/components/scl/transactions-store";
 import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
-import { useBaStore, type BA } from "@/components/scl/ba-store";
-import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
+import { baStore, useBaStore, type BA } from "@/components/scl/ba-store";
+import { useEscapeKey } from "@/lib/use-escape-key";
 import { useSkuStore } from "@/components/scl/sku-store";
 import {
   usePromoStore,
@@ -1413,14 +1415,25 @@ function RightPanel({
   const editGate = usePermission("contacts-edit");
   const { brands } = useSkuStore();
   const [revealed, setRevealed] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [movingLeader, setMovingLeader] = useState(false);
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
         <RightSection title="BA Login Credentials">
           <div className="space-y-2.5">
             <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Leader">
-              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.leader || "—"}</div>
+              <div className="flex items-center gap-1.5 px-2 py-1">
+                <span className="text-xs text-foreground/90">{baRecord.leader || "—"}</span>
+                <button
+                  type="button"
+                  onClick={() => setMovingLeader(true)}
+                  title="Move to another Leader"
+                  aria-label="Move to another Leader"
+                  className="press text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </FieldRow>
             <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
               <div className="flex items-center gap-1.5 px-2 py-1">
@@ -1428,9 +1441,9 @@ function RightPanel({
                   {revealed ? baRecord.password : "••••••••••••"}
                 </code>
                 <button
-                  onClick={() => (revealed ? setRevealed(false) : setShowConfirm(true))}
+                  onClick={() => setRevealed((r) => !r)}
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  title={revealed ? "Hide" : "Show (requires your account password)"}
+                  title={revealed ? "Hide password" : "Show password"}
                 >
                   {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                 </button>
@@ -1449,13 +1462,14 @@ function RightPanel({
               </div>
             </FieldRow>
           </div>
-          {showConfirm && (
-            <RevealPasswordModal
-              label={baRecord.name}
-              onClose={() => setShowConfirm(false)}
-              onConfirmed={() => {
-                setRevealed(true);
-                setShowConfirm(false);
+          {movingLeader && (
+            <MoveLeaderModal
+              ba={baRecord}
+              onClose={() => setMovingLeader(false)}
+              onMove={(to) => {
+                baStore.update(baRecord.id, { leader: to });
+                toast.success(`${baRecord.name} now reports to ${to}`);
+                setMovingLeader(false);
               }}
             />
           )}
@@ -1567,6 +1581,140 @@ function RightPanel({
           onCreate={onCreateList}
         />
       </RightSection>
+    </div>
+  );
+}
+
+/* ── Moving one BA to another Leader ──────────────────────────────────────
+ * Opened from the Leader row on a BA's record. The roster is every Leader
+ * the BA records name, two to a row and ten to a page, so a workspace with
+ * thirty of them is paged rather than scrolled. */
+
+const LEADER_PAGE_SIZE = 10;
+
+function MoveLeaderModal({
+  ba,
+  onClose,
+  onMove,
+}: {
+  ba: BA;
+  onClose: () => void;
+  onMove: (to: string) => void;
+}) {
+  useEscapeKey(true, onClose);
+  const { bas } = useBaStore();
+  const [picked, setPicked] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+
+  const leaders = useMemo(() => {
+    const counts = new Map<string, number>();
+    bas.forEach((b) => b.leader && counts.set(b.leader, (counts.get(b.leader) ?? 0) + 1));
+    return [...counts.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [bas]);
+
+  const pageCount = Math.max(1, Math.ceil(leaders.length / LEADER_PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const rows = leaders.slice((current - 1) * LEADER_PAGE_SIZE, current * LEADER_PAGE_SIZE);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[85vh] w-full max-w-[560px] flex-col rounded-xl border border-border bg-popover shadow-xl modal-content"
+      >
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold">Move to Another Leader</h3>
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
+            {ba.name} reports to{" "}
+            <span className="font-medium text-foreground">{ba.leader || "nobody"}</span>. Pick who
+            takes them on.
+          </p>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto scl-scroll p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {rows.map((l) => {
+              const isCurrent = l.name === ba.leader;
+              const isPicked = picked === l.name;
+              return (
+                <button
+                  key={l.name}
+                  type="button"
+                  disabled={isCurrent}
+                  onClick={() => setPicked(l.name)}
+                  title={isCurrent ? "Already their Leader" : undefined}
+                  className={`press flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors duration-150 ${
+                    isPicked
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-card/60 hover:bg-card"
+                  } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card/60`}
+                >
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/40 to-primary/0 text-[10px] font-semibold">
+                    {l.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[14px] font-medium">{l.name}</span>
+                    <span className="block text-[12px] text-muted-foreground">
+                      {l.count} BA{l.count === 1 ? "" : "s"}
+                      {isCurrent ? " · current" : ""}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-border px-5 py-3">
+          {pageCount > 1 && (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={current === 1}
+                aria-label="Previous page"
+                className="press grid h-8 w-8 place-items-center rounded-md border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <span className="text-[12px] text-muted-foreground tabular-nums">
+                Page {current} of {pageCount}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={current === pageCount}
+                aria-label="Next page"
+                className="press grid h-8 w-8 place-items-center rounded-md border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="press h-9 rounded-md border border-border px-3 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => picked && onMove(picked)}
+              disabled={!picked}
+              className="press h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            >
+              {picked ? `Move to ${picked}` : "Move"}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
