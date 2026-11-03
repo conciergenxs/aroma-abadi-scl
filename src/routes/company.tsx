@@ -8,12 +8,14 @@ import {
   CreditCard,
   HeartHandshake,
   Landmark,
+  Link2,
   Megaphone,
   Package,
   Lock,
   MessagesSquare,
   Menu,
   QrCode,
+  ReceiptText,
   RefreshCcw,
   Scale,
   ShieldCheck,
@@ -48,9 +50,10 @@ import {
 } from "@/components/landing/screens";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 import whatsappMark from "@/assets/whatsapp.png";
-import shotLifestyle from "@/assets/kc-cover-1.jpg";
-import shotLipstick from "@/assets/sku-caviar-lipstick.jpg";
-import shotFoundation from "@/assets/sku-real-flawless-foundation.jpg";
+import shotRetail from "@/assets/shot-retail-counter.jpg";
+import shotGold from "@/assets/shot-gold-fragrance.jpg";
+import shotRose from "@/assets/shot-rose-fragrance.jpg";
+import shotAmber from "@/assets/shot-amber-set.jpg";
 
 /* Every mark in src/assets/brands, in filename order. Dropping a new SVG in
  * that folder puts it on the page; nothing here needs editing. */
@@ -241,9 +244,10 @@ const VALUES: { title: string; body: string }[] = [
 ];
 
 const SHOTS = [
-  { src: shotLifestyle, alt: "Lipsticks, blush and a fragrance bottle arranged with rose petals" },
-  { src: shotLipstick, alt: "A gold lipstick case with a red bullet" },
-  { src: shotFoundation, alt: "A liquid foundation bottle on a soft background" },
+  { src: shotRetail, alt: "Beauty products arranged on the shelves of a retail counter" },
+  { src: shotGold, alt: "A gold fragrance bottle resting on soft fabric" },
+  { src: shotRose, alt: "A cut-glass fragrance bottle on blush silk" },
+  { src: shotAmber, alt: "Amber glass bottles with gold caps in warm light" },
 ];
 
 const HERO_FACTS: { label: string; value: string }[] = [
@@ -330,7 +334,7 @@ const CONTACT: { label: string; value: ReactNode }[] = [
         href={WA_LINK}
         target="_blank"
         rel="noreferrer noopener"
-        className="lp-underline -my-1 inline-block py-1 text-[#FBFAF8] hover:text-[#E7CF95]"
+        className="-my-1 inline-block py-1 text-[#FBFAF8] transition-colors duration-200 hover:text-[#E7CF95]"
       >
         {WA_NUMBER}
       </a>
@@ -342,7 +346,7 @@ const CONTACT: { label: string; value: ReactNode }[] = [
     value: (
       <a
         href="mailto:arma@aromaabadi.com"
-        className="lp-underline -my-1 inline-block py-1 text-[#FBFAF8] hover:text-[#E7CF95]"
+        className="-my-1 inline-block py-1 text-[#FBFAF8] transition-colors duration-200 hover:text-[#E7CF95]"
       >
         arma@aromaabadi.com
       </a>
@@ -574,8 +578,8 @@ function CompanyPage() {
               className="lp-enter mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]"
             >
               PT Aroma Abadi develops and distributes more than 25 of the world&rsquo;s leading
-              beauty brands. Customers order through ARMA, our official WhatsApp assistant, and pay
-              with Xendit without ever leaving the conversation.
+              beauty brands. Customers order through ARMA on WhatsApp and pay with Xendit without
+              leaving the chat.
             </p>
 
             <dl
@@ -642,33 +646,30 @@ function CompanyPage() {
             <Prose tone="cream">
               <p>
                 PT Aroma Abadi distributes international beauty brands across Indonesia through
-                partner retail counters and a team of Beauty Advisors — and, since our CRM program
-                began, through WhatsApp.
+                partner retail counters and a trained team of Beauty Advisors who know the portfolio
+                — and, since our CRM program began, through WhatsApp.
               </p>
             </Prose>
           </Reveal>
 
           {/* Supporting imagery: the category the company actually works in. */}
           <Reveal delay={40} className="mt-7">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <figure className="col-span-2 m-0 overflow-hidden rounded-[18px] shadow-[0_18px_40px_-26px_rgba(154,90,99,0.55)]">
+            <div className="lp-stagger grid grid-cols-3 gap-3">
+              <figure className="lp-shot col-span-3 m-0 overflow-hidden rounded-[18px]">
                 <img
                   src={SHOTS[0].src}
                   alt={SHOTS[0].alt}
                   loading="lazy"
-                  className="h-[150px] w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] sm:h-[180px]"
+                  className="h-[170px] w-full object-cover sm:h-[214px]"
                 />
               </figure>
               {SHOTS.slice(1).map((shot) => (
-                <figure
-                  key={shot.alt}
-                  className="m-0 overflow-hidden rounded-[18px] shadow-[0_18px_40px_-26px_rgba(154,90,99,0.55)]"
-                >
+                <figure key={shot.alt} className="lp-shot m-0 overflow-hidden rounded-[18px]">
                   <img
                     src={shot.src}
                     alt={shot.alt}
                     loading="lazy"
-                    className="h-[150px] w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] sm:h-[180px]"
+                    className="h-[108px] w-full object-cover sm:h-[150px]"
                   />
                 </figure>
               ))}
@@ -694,7 +695,7 @@ function CompanyPage() {
             How We Work
           </p>
           <Reveal delay={40}>
-            <dl className="mt-4 grid overflow-hidden rounded-[18px] border border-[#C9A455]/45 bg-white/75 sm:grid-cols-3">
+            <dl className="lp-stagger mt-4 grid overflow-hidden rounded-[18px] border border-[#C9A455]/45 bg-white/75 sm:grid-cols-3">
               {VALUES.map((value, index) => (
                 <div
                   key={value.title}
@@ -841,15 +842,18 @@ function CompanyPage() {
             ]}
             points={[
               {
-                label: "Payment link",
+                icon: Link2,
+                label: "Payment Link",
                 value: "Created per order, valid for 24 hours",
               },
               {
-                label: "Methods available",
-                value: "QRIS, virtual account, e-wallet, card",
+                icon: Wallet,
+                label: "Methods Available",
+                value: "QRIS, virtual account, e\u2011wallet, card",
               },
               {
-                label: "What we receive",
+                icon: ReceiptText,
+                label: "What We Receive",
                 value: "Payment status and invoice number",
               },
             ]}
@@ -956,7 +960,7 @@ function CompanyPage() {
               href={WA_LINK}
               target="_blank"
               rel="noreferrer noopener"
-              className="press inline-flex shrink-0 items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
+              className="press inline-flex shrink-0 items-center gap-[9px] rounded-full border border-[#D7B69A]/60 px-[22px] py-[11px] text-[14.5px] font-semibold text-[#E6CBB2] transition-[background-color,border-color,color,transform] duration-300 hover:-translate-y-[2px] hover:border-[#D7B69A] hover:bg-[#D7B69A]/12 hover:text-[#FBFAF8]"
             >
               <WhatsAppIcon className="h-[20px] w-[20px]" />
               Chat with ARMA

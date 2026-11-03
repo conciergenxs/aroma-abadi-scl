@@ -355,7 +355,7 @@ export function Step({
       <div
         className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[22px] border border-[#710014]/18 bg-white/85 p-5 shadow-[0_26px_60px_-34px_rgba(154,90,99,0.4)] backdrop-blur-[6px] sm:p-6"
+            ? "lp-glow relative rounded-[22px] border border-[#710014]/18 bg-white/85 p-5 shadow-[0_26px_60px_-34px_rgba(154,90,99,0.4)] backdrop-blur-[6px] sm:p-6"
             : ""
         }`}
       >
@@ -379,11 +379,11 @@ export function Step({
               </p>
             ))}
             {points ? (
-              <dl className="mt-6 overflow-hidden rounded-[16px] border border-[#C9A455]/45 bg-[#FFF4ED]">
+              <dl className="lp-stagger mt-6 overflow-hidden rounded-[16px] border border-[#C9A455]/45 bg-[#FFF4ED]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`group/pt flex items-start gap-[13px] px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
+                    className={`group/pt lp-edge flex items-start gap-[13px] px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
                       index ? "border-t border-[#C9A455]/25" : ""
                     }`}
                   >
@@ -394,9 +394,10 @@ export function Step({
                       <dt className="lp-display text-[16px] leading-tight text-[#710014]">
                         {point.label}
                       </dt>
-                    <dd className="mt-[6px] text-pretty text-[14px] leading-[1.5] text-[#161616]">
-                      {point.value}
-                    </dd>
+                      <dd className="mt-[5px] text-pretty text-[14px] leading-[1.5] text-[#161616]">
+                        {point.value}
+                      </dd>
+                    </div>
                   </div>
                 ))}
               </dl>
