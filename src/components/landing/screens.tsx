@@ -282,14 +282,14 @@ export function CheckoutScreen({
           <span className="text-[12.5px] text-[#55504B]">PT Aroma Abadi</span>
           <span className="text-[13px] font-semibold tracking-tight text-[#161616]">xendit</span>
         </div>
-        <p className="mt-[9px] text-[12px] text-[#55504B]">Total pembayaran · {invoice}</p>
+        <p className="mt-[9px] text-[12px] text-[#55504B]">Total payment · {invoice}</p>
         <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#161616]">
           {amount}
         </p>
-        <p className="mt-[3px] text-[12px] text-[#8A6246]">Bayar sebelum {expiry}</p>
+        <p className="mt-[3px] text-[12px] text-[#8A6246]">Pay before {expiry}</p>
       </div>
       <div className="px-[15px] py-[13px]">
-        <p className="text-[12.5px] text-[#55504B]">Pilih metode pembayaran</p>
+        <p className="text-[12.5px] text-[#55504B]">Choose a payment method</p>
         <ul className="mt-[9px] space-y-[6px]">
           {methods.map((method, index) => {
             const Icon = METHOD_ICON[method.id];
@@ -325,11 +325,11 @@ export function CheckoutScreen({
           })}
         </ul>
         <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
-          Bayar Sekarang
+          Pay Now
         </p>
         <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
           <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
-          Dihosting dan diproses oleh Xendit
+          Hosted and processed by Xendit
         </p>
       </div>
     </div>
@@ -452,7 +452,7 @@ export function LiveChat({
   return (
     <div className={`lp-phone relative ${className}`}>
       <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
-        <div className="lp-wa relative flex h-[556px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
+        <div className="lp-wa relative flex h-[618px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
           <StatusBar />
           <ChatHeader status={armaTyping ? "mengetik…" : "online"} />
 
@@ -461,7 +461,7 @@ export function LiveChat({
             className="lp-wallpaper scrollbar-none min-h-0 flex-1 space-y-[8px] overflow-y-auto px-[9px] py-[12px]"
           >
             <p className="mx-auto w-fit rounded-[7px] bg-white/90 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
-              Hari ini
+              Today
             </p>
             {messages.map((message, index) => (
               <Bubble key={index} message={message} hidden={index >= count} />
@@ -482,7 +482,7 @@ export function LiveChat({
                     <i className="lp-caret ml-[1px] inline-block h-[14px] w-[1.5px] translate-y-[2px] bg-[#111B21]" />
                   </span>
                 ) : (
-                  <span className="text-[#8696A0]">Ketik pesan..</span>
+                  <span className="text-[#8696A0]">Message</span>
                 )}
               </div>
               <Paperclip
