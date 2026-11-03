@@ -11,6 +11,7 @@ import {
 } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { BAForm } from "@/components/scl/ba-form";
+import { useCan } from "@/components/scl/session-store";
 import { baStore } from "@/components/scl/ba-store";
 import {
   type Contact,
@@ -31,7 +32,6 @@ import {
   getStageStyle,
 } from "@/components/scl/contacts-store";
 import { useBaStore, type BA } from "@/components/scl/ba-store";
-import { RevealPasswordModal } from "@/components/scl/ba-password-reveal";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import { toast } from "sonner";
@@ -82,6 +82,10 @@ const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "viol
 
 function ContactsPage() {
   usePreviewGate("contacts");
+  // Without the Beauty Ambassadors module there is no BA view and no BA in the
+  // list at all — Contacts reads as customers only.
+  const baGate = usePermission("ba", useCan("ba.view"));
+  const baSeen = baGate.allowed;
   const baCreateGate = usePermission("ba-create");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");
@@ -123,7 +127,7 @@ function ContactsPage() {
   // child routes, which React detects as "Rendered fewer hooks than expected."
   const visibleContacts = useMemo(() => {
     let base: Contact[];
-    const live = contacts.filter((c) => !c.deleted);
+    const live = contacts.filter((c) => !c.deleted && (baSeen || !c.labelIds.includes("lb-ba")));
     if (activeView === "all") base = live;
     else if (activeView === "mine") base = live.filter((c) => !c.labelIds.includes("lb-ba"));
     else if (activeView === "ba") base = live.filter((c) => c.labelIds.includes("lb-ba"));
@@ -140,7 +144,11 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeView, query]);
+  }, [contacts, activeView, query, baSeen]);
+
+  useEffect(() => {
+    if (!baSeen && activeView === "ba") setActiveView("all");
+  }, [baSeen, activeView]);
 
   const totalPages = Math.max(1, Math.ceil(visibleContacts.length / perPage));
   useEffect(() => {
@@ -165,7 +173,9 @@ function ContactsPage() {
   const listById = (id: string) => lists.find((l) => l.id === id);
   const activeList =
     activeView !== "all" && activeView !== "mine" ? (listById(activeView) ?? null) : null;
-  const liveContacts = contacts.filter((c) => !c.deleted);
+  const liveContacts = contacts.filter(
+    (c) => !c.deleted && (baSeen || !c.labelIds.includes("lb-ba")),
+  );
   const myCount = liveContacts.filter((c) => !c.labelIds.includes("lb-ba")).length;
   const baCount = liveContacts.filter((c) => c.labelIds.includes("lb-ba")).length;
 
@@ -347,22 +357,24 @@ function ContactsPage() {
               </span>
               <span className="text-[10px] text-muted-foreground">{myCount}</span>
             </button>
-            <button
-              onClick={() => {
-                setActiveView("ba");
-                setSelected([]);
-              }}
-              className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
-                activeView === "ba"
-                  ? "bg-primary/15 text-foreground"
-                  : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
-              }`}
-            >
-              <span className="inline-flex items-center gap-2">
-                <UserCircle2 className="h-3.5 w-3.5" /> BA Contacts
-              </span>
-              <span className="text-[10px] text-muted-foreground">{baCount}</span>
-            </button>
+            {baSeen && (
+              <button
+                onClick={() => {
+                  setActiveView("ba");
+                  setSelected([]);
+                }}
+                className={`w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-xs transition ${
+                  activeView === "ba"
+                    ? "bg-primary/15 text-foreground"
+                    : "text-muted-foreground hover:bg-gray-50 hover:text-foreground"
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <UserCircle2 className="h-3.5 w-3.5" /> BA Contacts
+                </span>
+                <span className="text-[10px] text-muted-foreground">{baCount}</span>
+              </button>
+            )}
           </div>
 
           <BrandsNav
@@ -914,8 +926,8 @@ function ContactsTable({
   const { transactions } = useTransactionsStore();
   const brandName = (id: string) =>
     brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
+  const passwordGate = usePermission("ba-password");
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
-  const [revealTarget, setRevealTarget] = useState<BA | null>(null);
   // Filter Properties' Visible toggle governs which of these optional
   // columns render — a property missing from the list defaults to shown so
   // this never silently hides a column no one configured.
@@ -969,16 +981,13 @@ function ContactsTable({
     ].filter(Boolean).length;
 
   function toggleReveal(ba: BA | undefined) {
-    if (!ba) return;
-    if (revealed.has(ba.id)) {
-      setRevealed((s) => {
-        const n = new Set(s);
-        n.delete(ba.id);
-        return n;
-      });
-      return;
-    }
-    setRevealTarget(ba);
+    if (!ba || !passwordGate.allowed) return;
+    setRevealed((s) => {
+      const n = new Set(s);
+      if (n.has(ba.id)) n.delete(ba.id);
+      else n.add(ba.id);
+      return n;
+    });
   }
 
   return (
@@ -1090,9 +1099,14 @@ function ContactsTable({
                         </code>
                         <button
                           onClick={() => toggleReveal(ba)}
-                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          disabled={!passwordGate.allowed}
+                          className="text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                           title={
-                            revealed.has(ba.id) ? "Hide" : "Show (requires your account password)"
+                            passwordGate.allowed
+                              ? revealed.has(ba.id)
+                                ? "Hide password"
+                                : "Show password"
+                              : passwordGate.reason
                           }
                         >
                           {revealed.has(ba.id) ? (
@@ -1136,17 +1150,6 @@ function ContactsTable({
           )}
         </tbody>
       </table>
-
-      {revealTarget && (
-        <RevealPasswordModal
-          label={revealTarget.name}
-          onClose={() => setRevealTarget(null)}
-          onConfirmed={() => {
-            setRevealed((s) => new Set(s).add(revealTarget.id));
-            setRevealTarget(null);
-          }}
-        />
-      )}
     </>
   );
 }

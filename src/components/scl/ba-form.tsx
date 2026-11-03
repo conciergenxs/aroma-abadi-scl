@@ -346,13 +346,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 /* Resetting an LMS password is a one-way door — the BA's current credentials
  * stop working the moment it happens — so it always asks first and hands back
  * the new password rather than leaving it to be hunted for. */
-export function ResetPasswordDialog({
-  ba,
-  onClose,
-}: {
-  ba: BA;
-  onClose: () => void;
-}) {
+export function ResetPasswordDialog({ ba, onClose }: { ba: BA; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 modal-backdrop">
       <div className="w-full max-w-sm bg-background border border-border rounded-xl overflow-hidden modal-content">
