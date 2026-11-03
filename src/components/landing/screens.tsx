@@ -454,7 +454,7 @@ export function LiveChat({
       <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
         <div className="lp-wa relative flex h-[618px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
           <StatusBar />
-          <ChatHeader status={armaTyping ? "mengetik…" : "online"} />
+          <ChatHeader status={armaTyping ? "typing…" : "online"} />
 
           <div
             ref={threadRef}

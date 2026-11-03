@@ -80,70 +80,70 @@ const WA_NUMBER = "+62 811 9001 2233";
 const WA_LINK = "https://wa.me/6281190012233";
 
 const NAV = [
-  { href: "#profil", id: "profil", label: "Profil" },
+  { href: "#profil", id: "profil", label: "Profile" },
   { href: "#program", id: "program", label: "Program" },
-  { href: "#alur", id: "alur", label: "Alur Transaksi" },
-  { href: "#pembayaran", id: "pembayaran", label: "Pembayaran" },
-  { href: "#kontak", id: "kontak", label: "Kontak" },
+  { href: "#alur", id: "alur", label: "Transaction Flow" },
+  { href: "#pembayaran", id: "pembayaran", label: "Payments" },
+  { href: "#kontak", id: "kontak", label: "Contact" },
 ];
 
 /* The channels Xendit actually carries in Indonesia, grouped the way its own
  * hosted payment page groups them. */
 const METHODS: PaymentMethod[] = [
-  { id: "qris", name: "QRIS", note: "Semua aplikasi bank dan e‑wallet" },
+  { id: "qris", name: "QRIS", note: "Any bank or e‑wallet app" },
   { id: "va", name: "Virtual Account", note: "BCA, Mandiri, BNI, BRI, Permata" },
   { id: "ewallet", name: "E-Wallet", note: "OVO, DANA, ShopeePay, LinkAja" },
-  { id: "card", name: "Kartu kredit atau debit", note: "Visa, Mastercard, JCB" },
+  { id: "card", name: "Credit or debit card", note: "Visa, Mastercard, JCB" },
 ];
 
 const CHECKOUT = {
   invoice: "AA-2611",
-  amount: "Rp 2.714.310",
+  amount: "Rp 2,714,310",
   expiry: "3 Nov 2026, 09.40",
   methods: METHODS,
 };
 
 const ORDER = {
-  title: "Rincian pesanan AA-2611",
+  title: "Order summary AA-2611",
   items: [
-    { name: "Real Flawless Foundation", qty: 1, price: "1.950.000" },
-    { name: "Translucent Setting Powder", qty: 1, price: "750.000" },
+    { name: "Real Flawless Foundation", qty: 1, price: "1,950,000" },
+    { name: "Translucent Setting Powder", qty: 1, price: "750,000" },
   ],
   rows: [
-    { label: "Subtotal", value: "2.700.000" },
-    { label: "Kode PRESTIGE10", value: "−270.000" },
-    { label: "PPN 11%", value: "267.300" },
-    { label: "Biaya layanan QRIS", value: "17.010" },
+    { label: "Subtotal", value: "2,700,000" },
+    { label: "PRESTIGE10 code", value: "−270,000" },
+    { label: "VAT 11%", value: "267,300" },
+    { label: "QRIS service fee", value: "17,010" },
   ],
-  total: "Rp 2.714.310",
+  total: "Rp 2,714,310",
 };
 
 const PAY_LINK = {
-  title: "Pembayaran pesanan AA-2611",
-  note: "Berlaku 24 jam. QRIS, transfer bank, e-wallet, atau kartu.",
+  title: "Payment for order AA-2611",
+  note: "Valid for 24 hours. QRIS, bank transfer, e-wallet or card.",
   host: "checkout.xendit.co",
   url: "checkout.xendit.co/od/aroma-abadi",
 };
 
 const RECEIPT = {
-  title: "Pembayaran diterima",
+  title: "Payment received",
   rows: [
     { label: "Invoice", value: "AA-2611" },
-    { label: "Metode", value: "QRIS" },
-    { label: "Dibayar", value: "Rp 2.714.310" },
+    { label: "Method", value: "QRIS" },
+    { label: "Paid", value: "Rp 2,714,310" },
   ],
-  note: "Poin loyalitas sudah masuk. Nomor resi aku kirim di chat ini begitu paket diserahkan ke kurir.",
+  note: "Your loyalty points are in. I'll send the tracking number here as soon as the parcel is with the courier.",
 };
 
 /** The hero loop: one full transaction, start to finish. */
 const HERO_THREAD: ChatMessage[] = [
-  { from: "customer", time: "09.38", text: "Halo, aku cari foundation untuk kulit kering." },
+  { from: "customer", time: "09.38", text: "Hi, I'm looking for a foundation for dry skin." },
   {
     from: "arma",
     time: "09.38",
-    text: "Halo Kak! Real Flawless Foundation dari Sisley hasilnya dewy dan tahan seharian, cocok untuk kulit kering. Aku tambahkan setting powder biar makin tahan?",
+    text: "Hi! Sisley Real Flawless Foundation gives a dewy finish and lasts all day, so it suits dry skin well. Shall I add the setting powder too?",
   },
-  { from: "customer", time: "09.39", text: "Boleh, dua-duanya ya." },
+  { from: "customer", time: "09.39", text: "Yes please, both." },
   { from: "arma", time: "09.39", order: ORDER },
   { from: "arma", time: "09.40", link: PAY_LINK },
   { from: "arma", time: "09.42", receipt: RECEIPT },
@@ -172,22 +172,22 @@ const HERO_SCRIPT: Beat[] = [
 ];
 
 const STEP_OPENING: ChatMessage[] = [
-  { from: "customer", time: "09.37", text: "Halo, masih buka?" },
+  { from: "customer", time: "09.37", text: "Hi, are you still open?" },
   {
     from: "arma",
     time: "09.37",
-    text: "Halo Kak, masih! Aku Arma dari Aroma Abadi. Ada yang bisa aku bantu cari hari ini?",
+    text: "Hi, we are! I'm Arma from Aroma Abadi. What can I help you find today?",
   },
 ];
 
 const STEP_CONSULT: ChatMessage[] = [
-  { from: "customer", time: "09.38", text: "Aku cari foundation untuk kulit kering." },
+  { from: "customer", time: "09.38", text: "I'm looking for a foundation for dry skin." },
   {
     from: "arma",
     time: "09.38",
-    text: "Real Flawless Foundation dari Sisley, shade 2N Ivory, stok ada. Hasilnya dewy dan tahan seharian. Mau sekalian setting powder-nya?",
+    text: "Sisley Real Flawless Foundation, shade 2N Ivory, in stock. Dewy finish and it lasts all day. Shall I add the setting powder as well?",
   },
-  { from: "customer", time: "09.39", text: "Boleh, dua-duanya ya." },
+  { from: "customer", time: "09.39", text: "Yes please, both." },
 ];
 
 const STEP_ORDER: ChatMessage[] = [{ from: "arma", time: "09.39", order: ORDER }];
@@ -196,7 +196,7 @@ const STEP_SHIPPING: ChatMessage[] = [
   {
     from: "arma",
     time: "14.05",
-    text: "Pesanan AA-2611 sudah diserahkan ke kurir. Nomor resi JNE 0098 7712 3344, estimasi tiba 2 hari kerja.",
+    text: "Order AA-2611 is with the courier. Tracking number JNE 0098 7712 3344, arriving in about 2 working days.",
   },
 ];
 
@@ -211,48 +211,48 @@ const BRANDS = [
 const PILLARS = [
   {
     icon: ShieldCheck,
-    title: "Distribusi Resmi",
-    body: "Produk datang dari principal, bukan dari pasar paralel.",
+    title: "Official Distribution",
+    body: "Products come from the principal, never the grey market.",
   },
   {
     icon: BadgeCheck,
-    title: "Izin Edar BPOM",
-    body: "Setiap produk punya nomor izin edar yang bisa dicek.",
+    title: "BPOM Licensed",
+    body: "Every product carries a registration number you can verify.",
   },
   {
     icon: Globe,
-    title: "Kirim Se-Indonesia",
-    body: "Dari gudang kami sendiri, lewat kurir rekanan nasional.",
+    title: "Nationwide Delivery",
+    body: "Shipped from our own warehouse by national couriers.",
   },
 ];
 
 const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
-  { icon: Building2, label: "Badan hukum", value: "PT Aroma Abadi" },
-  { icon: Boxes, label: "Bidang usaha", value: "Distribusi produk kecantikan" },
-  { wa: true, label: "Kanal transaksi", value: "WhatsApp (ARMA)" },
+  { icon: Building2, label: "Legal entity", value: "PT Aroma Abadi" },
+  { icon: Boxes, label: "Line of business", value: "Beauty distribution" },
+  { wa: true, label: "Sales channel", value: "WhatsApp (ARMA)" },
   { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
 ];
 
 const PROGRAM = [
   {
     icon: Sparkles,
-    title: "Konsultasi Produk",
-    body: "ARMA menjawab pertanyaan soal jenis kulit, shade, dan cara pakai, lalu merekomendasikan produk yang stoknya tersedia.",
+    title: "Product Advice",
+    body: "ARMA answers questions about skin type, shade and application, then recommends products that are actually in stock.",
   },
   {
     icon: Award,
-    title: "Poin dan Tingkat Keanggotaan",
-    body: "Setiap pesanan yang dibayar menambah poin. Poin menentukan tingkat, dari Prestige sampai Icon, dan tiap tingkat punya benefitnya.",
+    title: "Points and Membership Tiers",
+    body: "Every paid order earns points. Points set the tier, from Prestige up to Icon, and each tier unlocks its own benefits.",
   },
   {
     icon: Ticket,
-    title: "Kode Promo",
-    body: "Dua jenis: kode unik untuk satu pelanggan, dan kode bersama dengan batas pemakaian. Potongannya terlihat sebelum pembayaran.",
+    title: "Promo Codes",
+    body: "Two kinds: a unique code for one customer, and a shared code with a usage cap. The discount is visible before payment.",
   },
   {
     icon: BellRing,
-    title: "Kabar Program",
-    body: "Hanya dikirim ke pelanggan yang menyetujui. Setiap pesan punya cara berhenti, dan yang berhenti tidak kami kirimi lagi.",
+    title: "Program Updates",
+    body: "Sent only to customers who opted in. Every message carries a way to stop, and anyone who stops is not messaged again.",
   },
 ];
 
@@ -260,45 +260,45 @@ const PAYMENT_PANELS = [
   {
     icon: QrCode,
     title: "QRIS",
-    body: "Pelanggan memindai satu kode dari aplikasi bank atau e-wallet mana pun. Ini kanal yang paling sering dipakai pelanggan kami.",
+    body: "The customer scans one code from any bank or e-wallet app. This is the method our customers reach for most.",
   },
   {
     icon: Landmark,
     title: "Virtual Account",
-    body: "Nomor transfer khusus untuk tiap pesanan, bisa dibayar dari bank mana saja, dan tercatat otomatis begitu dana masuk.",
+    body: "A dedicated transfer number per order, payable from any bank, recorded automatically the moment funds arrive.",
   },
   {
     icon: Wallet,
     title: "E-Wallet",
-    body: "OVO, DANA, ShopeePay, dan LinkAja, dibuka langsung dari halaman pembayaran tanpa menyalin nomor apa pun.",
+    body: "OVO, DANA, ShopeePay and LinkAja, opened straight from the payment page with no number to copy.",
   },
   {
     icon: CreditCard,
-    title: "Kartu Kredit dan Debit",
-    body: "Visa, Mastercard, dan JCB, diproses di halaman Xendit dengan autentikasi 3D Secure dari bank penerbit.",
+    title: "Credit and Debit Cards",
+    body: "Visa, Mastercard and JCB, processed on Xendit's page with 3D Secure from the issuing bank.",
   },
 ];
 
 const POLICIES = [
   {
     icon: Truck,
-    title: "Pengiriman",
-    body: "Pesanan yang sudah dibayar diproses pada hari kerja berikutnya dan dikirim lewat kurir rekanan. Nomor resi dikirim lewat WhatsApp.",
+    title: "Delivery",
+    body: "Paid orders are processed the next working day and shipped by partner couriers. The tracking number goes out over WhatsApp.",
   },
   {
     icon: RefreshCcw,
-    title: "Pengembalian dan Penukaran",
-    body: "Diajukan lewat WhatsApp maksimal 7 hari setelah paket diterima. Produk tersegel dikembalikan dengan dana penuh; yang sudah dibuka ditukar.",
+    title: "Returns and Exchanges",
+    body: "Raised over WhatsApp within 7 days of delivery. Sealed products are refunded in full; opened products are exchanged.",
   },
   {
     icon: Ban,
-    title: "Pembatalan",
-    body: "Pesanan yang belum dibayar batal sendiri saat tautan kedaluwarsa. Yang sudah dibayar tetapi belum dikirim dikembalikan penuh lewat Xendit.",
+    title: "Cancellation",
+    body: "Unpaid orders lapse when the payment link expires. Paid orders that have not shipped are refunded in full through Xendit.",
   },
   {
     icon: Lock,
-    title: "Privasi Data",
-    body: "Kami menyimpan nomor WhatsApp, nama, alamat, dan riwayat pesanan untuk memproses transaksi. Data tidak dijual atau dibagikan ke pihak lain.",
+    title: "Data Privacy",
+    body: "We keep the WhatsApp number, name, address and order history needed to process orders. Data is never sold or shared elsewhere.",
   },
 ];
 
@@ -311,7 +311,7 @@ const CONTACT: {
 }[] = [
   {
     wa: true,
-    label: "WhatsApp pelanggan",
+    label: "Customer WhatsApp",
     value: (
       <a
         href={WA_LINK}
@@ -323,28 +323,38 @@ const CONTACT: {
       </a>
     ),
   },
-  { icon: Clock, label: "Jam layanan", value: <Pending field="jam operasional" tone="maroon" /> },
-  { icon: Mail, label: "Email resmi", value: <Pending field="alamat email" tone="maroon" /> },
-  { icon: Phone, label: "Telepon kantor", value: <Pending field="nomor telepon" tone="maroon" /> },
+  { icon: Clock, label: "Service hours", value: "24 hours, every day" },
+  {
+    icon: Mail,
+    label: "Official email",
+    value: (
+      <a
+        href="mailto:arma@aromaabadi.com"
+        className="underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+      >
+        arma@aromaabadi.com
+      </a>
+    ),
+  },
   {
     icon: MapPin,
-    label: "Alamat kantor",
+    label: "Registered office",
     wide: true,
     value: (
       <>
-        <Pending field="alamat lengkap" tone="maroon" />, Jakarta Selatan, DKI Jakarta
+        <Pending field="full address" tone="maroon" />, South Jakarta, DKI Jakarta
       </>
     ),
   },
 ];
 
 const DESCRIPTION =
-  "PT Aroma Abadi mendistribusikan produk kecantikan premium di Indonesia dan menjalankan program CRM serta loyalitas lewat WhatsApp. Halaman ini menjelaskan profil bisnis, mekanisme program, dan alur transaksi pelanggan termasuk titik pembayaran melalui Xendit.";
+  "PT Aroma Abadi distributes premium beauty products across Indonesia and runs its CRM and loyalty program over WhatsApp. This page sets out the company profile, how the program works, and the customer transaction flow, including the point where payment is processed through Xendit.";
 
 export const Route = createFileRoute("/company")({
   head: () => ({
     meta: [
-      { title: "PT Aroma Abadi — Distribusi produk kecantikan & program loyalitas WhatsApp" },
+      { title: "PT Aroma Abadi — Beauty distribution and WhatsApp loyalty program" },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "PT Aroma Abadi" },
       { property: "og:description", content: DESCRIPTION },
@@ -466,7 +476,7 @@ function CompanyPage() {
           <div className="mx-auto flex h-[76px] w-full max-w-[1180px] items-center gap-6 px-6 md:px-10">
             <a
               href="#top"
-              aria-label="PT Aroma Abadi, ke atas halaman"
+              aria-label="PT Aroma Abadi, back to top"
               className="shrink-0 rounded-sm transition-transform duration-300 hover:scale-105"
             >
               <img src={armaMark} alt="Aroma Abadi" className="w-[48px]" />
@@ -492,14 +502,14 @@ function CompanyPage() {
               className="press ml-auto hidden items-center gap-[8px] rounded-full bg-[#D7B69A] px-[18px] py-[10px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
             >
               <WhatsAppIcon className="h-[19px] w-[19px]" />
-              Chat dengan ARMA
+              Chat with ARMA
             </a>
 
             <button
               type="button"
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
               className="press ml-auto grid h-[42px] w-[42px] place-items-center rounded-full border border-[#F3F0EC]/20 text-[#FBFAF8] transition-colors duration-200 hover:bg-[#F3F0EC]/10 sm:ml-3 lg:hidden"
             >
               {menuOpen ? (
@@ -547,26 +557,26 @@ function CompanyPage() {
           aria-hidden
           className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(113,0,20,0.07),transparent_68%)]"
         />
-        <div className="relative mx-auto grid w-full max-w-[1180px] gap-14 px-6 py-16 md:px-10 md:py-20 lg:grid-cols-[minmax(0,1fr)_336px] lg:items-center lg:gap-20 lg:py-24">
+        <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-6 py-12 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
           <div>
             <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#8A6246]">
               <span className="h-px w-8 bg-[#BF9877]" />
               PT Aroma Abadi
             </p>
-            <h1 className="lp-display mt-5 max-w-[19ch] text-balance text-[clamp(2.15rem,1.2rem+3vw,3.5rem)] leading-[1.08] text-[#161616]">
-              Pesan dan bayar dalam satu percakapan WhatsApp.
+            <h1 className="lp-display mt-4 max-w-[19ch] text-balance text-[clamp(2.1rem,1.2rem+2.9vw,3.3rem)] leading-[1.08] text-[#161616]">
+              Order and pay inside a single WhatsApp conversation.
             </h1>
-            <p className="mt-6 max-w-[54ch] text-pretty text-[16px] leading-[1.7] text-[#55504B]">
-              Kami mendistribusikan produk kecantikan premium di Indonesia. Pelanggan berbelanja
-              lewat ARMA, asisten WhatsApp resmi kami, lalu membayar melalui Xendit tanpa pernah
-              meninggalkan percakapan.
+            <p className="mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]">
+              We distribute premium beauty products across Indonesia. Customers shop through ARMA,
+              our official WhatsApp assistant, and pay through Xendit without ever leaving the
+              chat.
             </p>
 
-            <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-4">
+            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-4">
               {HERO_FACTS.map((fact) => (
                 <div
                   key={fact.label}
-                  className="group bg-white px-4 py-[18px] transition-colors duration-300 hover:bg-[#F3F0EC]"
+                  className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#F3F0EC]"
                 >
                   <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#8A6246]">
                     {fact.wa ? (
@@ -584,7 +594,7 @@ function CompanyPage() {
             </dl>
           </div>
 
-          <div className="w-full max-w-[336px] justify-self-center lg:justify-self-end">
+          <div className="w-full max-w-[308px] justify-self-center lg:justify-self-end">
             <LiveChat messages={HERO_THREAD} script={HERO_SCRIPT} checkout={CHECKOUT} />
           </div>
         </div>
@@ -597,10 +607,10 @@ function CompanyPage() {
         className="lp-paper"
         bleed={
           <div>
-            <p className="text-center text-[12.5px] text-[#8A6246]">
-              Brand yang kami distribusikan
+            <p className="lp-display text-center text-[clamp(1.3rem,1rem+0.9vw,1.75rem)] leading-tight text-[#710014]">
+              Brands we distribute
             </p>
-            <div className="mt-6">
+            <div className="mt-5">
               <Marquee>
                 {BRANDS.map((brand) => (
                   <img
@@ -618,15 +628,15 @@ function CompanyPage() {
         <Split
           tone="cream"
           icon={Building2}
-          title="Profil Bisnis"
-          lede="Badan usaha terdaftar, dengan produk ber-izin edar BPOM."
+          title="Business Profile"
+          lede="A registered company, selling only BPOM-licensed products."
         >
           <Reveal>
             <Prose tone="cream">
               <p>
-                PT Aroma Abadi mendistribusikan brand kecantikan internasional di Indonesia lewat
-                jaringan gerai retail dan tim Beauty Advisor, dan sejak program CRM berjalan, lewat
-                WhatsApp.
+                PT Aroma Abadi distributes international beauty brands across Indonesia through
+                partner retail counters and a team of Beauty Advisors — and, since our CRM program
+                began, through WhatsApp.
               </p>
             </Prose>
           </Reveal>
@@ -655,25 +665,28 @@ function CompanyPage() {
               tone="cream"
               cols={2}
               items={[
-                { icon: Building2, label: "Nama badan hukum", value: "PT Aroma Abadi" },
-                { icon: Boxes, label: "Bidang usaha", value: "Perdagangan produk kecantikan" },
+                { icon: Building2, label: "Registered name", value: "PT Aroma Abadi" },
+                { icon: Boxes, label: "Line of business", value: "Beauty product trading" },
                 {
                   icon: MapPin,
-                  label: "Kantor terdaftar",
+                  label: "Registered office",
                   value: (
                     <>
-                      <Pending field="alamat lengkap" />, Jakarta Selatan
+                      <Pending field="full address" />, South Jakarta
                     </>
                   ),
                 },
-                { icon: FileCheck, label: "NIB", value: <Pending field="nomor induk berusaha" /> },
-                { icon: FileCheck, label: "NPWP", value: <Pending field="nomor NPWP" /> },
+                {
+                  icon: FileCheck,
+                  label: "Business registration",
+                  value: <Pending field="NIB number" />,
+                },
                 {
                   icon: MessageCircle,
-                  label: "Kanal penjualan",
-                  value: "WhatsApp (ARMA) dan gerai retail",
+                  label: "Sales channels",
+                  value: "WhatsApp (ARMA) and partner retail",
                 },
-                { icon: Globe, label: "Wilayah pengiriman", value: "Seluruh Indonesia" },
+                { icon: Globe, label: "Delivery area", value: "Across Indonesia" },
                 { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
               ]}
             />
@@ -685,15 +698,14 @@ function CompanyPage() {
       <Section id="program">
         <Split
           icon={MessagesSquare}
-          title="Mekanisme CRM dan Loyalitas"
-          lede="Satu nomor WhatsApp untuk konsultasi, pesanan, poin, dan promo."
+          title="CRM and Loyalty Program"
+          lede="One WhatsApp number for advice, orders, points and promotions."
         >
           <Reveal>
             <Prose>
               <p>
-                ARMA adalah asisten WhatsApp resmi Aroma Abadi. Pelanggan cukup menyimpan satu
-                nomor: bertanya, memesan, membayar, dan melacak pesanan terjadi di percakapan yang
-                sama.
+                ARMA is the official Aroma Abadi WhatsApp assistant. Customers save a single
+                number: asking, ordering, paying and tracking all happen in the same conversation.
               </p>
             </Prose>
           </Reveal>
@@ -720,12 +732,12 @@ function CompanyPage() {
                 </span>
                 <div>
                   <h3 className="text-[16px] font-semibold text-[#FBFAF8]">
-                    Jalur Terpisah untuk Beauty Advisor
+                    A Separate Channel for Beauty Advisors
                   </h3>
-                  <p className="mt-[9px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
-                    Beauty Advisor kami memakai ARMA versi internal untuk product knowledge dan SOP
-                    layanan. Jalur itu hanya untuk karyawan dan mitra gerai, dan tidak memproses
-                    pembayaran apa pun.
+                  <p className="mt-[8px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/75">
+                    Our Beauty Advisors use an internal version of ARMA for product knowledge and
+                    service procedures. That channel is for staff and retail partners only, and it
+                    processes no payments.
                   </p>
                 </div>
               </div>
@@ -741,69 +753,69 @@ function CompanyPage() {
             <Workflow className="h-[20px] w-[20px]" strokeWidth={1.6} />
           </span>
           <h2 className="lp-display text-[clamp(1.75rem,1.1rem+1.8vw,2.45rem)] leading-[1.1] text-[#710014]">
-            Alur Transaksi Pelanggan
+            Customer Transaction Flow
           </h2>
           <span className="mt-4 block h-px w-10 bg-[#BF9877]" />
           <p className="mt-4 text-pretty text-[15.5px] leading-[1.7] text-[#55504B]">
-            Enam langkah, dari sapaan pertama sampai paket dikirim. Langkah keempat adalah titik
-            pembayaran: di sanalah pelanggan membuka halaman Xendit.
+            Six steps, from the first message to the parcel leaving our warehouse. Step four is
+            the payment point: that is where the customer opens the Xendit page.
           </p>
         </Reveal>
 
         <div className="mt-14">
           <Step
             n={1}
-            title="Pelanggan Membuka Percakapan"
-            body="Pelanggan menghubungi nomor WhatsApp resmi Aroma Abadi, atau membalas pesan program yang sebelumnya mereka setujui. Seluruh transaksi berlangsung di satu thread."
+            title="The Customer Opens a Conversation"
+            body="A customer messages the official Aroma Abadi WhatsApp number, or replies to a program message they opted into. The whole transaction stays in one thread."
             screen={<ChatScreen messages={STEP_OPENING} />}
           />
           <Step
             n={2}
-            title="Konsultasi dan Pemilihan Produk"
-            body="ARMA merekomendasikan produk sesuai kebutuhan pelanggan beserta ketersediaan stoknya, lalu mencatat jumlah dan alamat pengiriman. Kode promo dipakai di tahap ini."
+            title="Advice and Product Selection"
+            body="ARMA recommends products that match what the customer needs and confirms stock, then records the quantity and delivery address. Promo codes are applied at this stage."
             screen={<ChatScreen messages={STEP_CONSULT} />}
           />
           <Step
             n={3}
-            title="Rincian Pesanan Dikirim"
-            body="Sebelum ada uang yang berpindah, ARMA mengirim rincian lengkap: produk dan jumlahnya, subtotal, potongan kode promo, PPN, biaya layanan sesuai metode pembayaran, dan total akhir."
+            title="The Order Summary Is Sent"
+            body="Before any money moves, ARMA sends the full breakdown: products and quantities, subtotal, promo discount, VAT, the service fee for the chosen payment method, and the final total."
             screen={<ChatScreen messages={STEP_ORDER} />}
           />
           <Step
             n={4}
             highlight
-            title="Pembayaran melalui Xendit"
-            body="Dari rincian itu ARMA mengirim satu tautan pembayaran yang dibuat lewat Xendit. Tautan membuka halaman pembayaran Xendit, tempat pelanggan memilih metode dan menyelesaikan transaksi. Seluruh data pembayaran diisi di halaman Xendit, bukan di WhatsApp, dan tidak pernah melewati sistem kami."
+            title="Payment Through Xendit"
+            body="From that summary ARMA sends a single payment link created through Xendit. The link opens the Xendit payment page, where the customer picks a method and completes the transaction. Every payment detail is entered on Xendit's page, not in WhatsApp, and none of it passes through our systems."
             points={[
               {
                 icon: Link2,
-                label: "Tautan pembayaran",
-                value: "Dibuat per pesanan, berlaku 24 jam",
+                label: "Payment link",
+                value: "Created per order, valid for 24 hours",
               },
               {
                 icon: Wallet,
-                label: "Metode tersedia",
-                value: "QRIS, Virtual Account, e-wallet, kartu",
+                label: "Methods available",
+                value: "QRIS, virtual account, e-wallet, card",
               },
               {
                 icon: FileCheck,
-                label: "Yang kami terima",
-                value: "Status pembayaran dan nomor invoice",
+                label: "What we receive",
+                value: "Payment status and invoice number",
               },
             ]}
             screen={<CheckoutScreen {...CHECKOUT} />}
           />
           <Step
             n={5}
-            title="Konfirmasi Otomatis"
-            body="Xendit memberi tahu sistem kami begitu pembayaran berhasil. ARMA langsung mengirim konfirmasi dan nomor invoice ke pelanggan, dan poin loyalitas masuk pada saat yang sama."
+            title="Automatic Confirmation"
+            body="Xendit notifies our system the moment a payment succeeds. ARMA sends the confirmation and invoice number straight away, and the loyalty points land at the same time."
             screen={<ChatScreen messages={STEP_RECEIPT} />}
           />
           <Step
             n={6}
             last
-            title="Pemrosesan dan Pengiriman"
-            body="Pesanan yang sudah dibayar diteruskan ke gudang kami. Nomor resi dikirim ke percakapan yang sama, dan pelanggan bisa menanyakan status pesanan kapan saja ke ARMA."
+            title="Fulfilment and Delivery"
+            body="Paid orders go through to our warehouse. The tracking number is sent to the same conversation, and the customer can ask ARMA for status at any time."
             screen={<ChatScreen messages={STEP_SHIPPING} />}
           />
         </div>
@@ -813,8 +825,8 @@ function CompanyPage() {
       <Section id="pembayaran">
         <Split
           icon={ShieldCheck}
-          title="Metode Pembayaran dan Keamanan"
-          lede="Semua pembayaran pelanggan berjalan di atas Xendit, dalam Rupiah."
+          title="Payment Methods and Security"
+          lede="Every customer payment runs through Xendit, in Rupiah."
         >
           <div className="grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
             {PAYMENT_PANELS.map((item, index) => (
@@ -831,29 +843,29 @@ function CompanyPage() {
               items={[
                 {
                   icon: Lock,
-                  label: "Halaman pembayaran",
-                  value: "Dihosting dan diproses oleh Xendit",
+                  label: "Payment page",
+                  value: "Hosted and processed by Xendit",
                 },
                 {
                   icon: CreditCard,
-                  label: "Data kartu",
-                  value: "Tidak tersimpan di sistem Aroma Abadi",
+                  label: "Card data",
+                  value: "Never stored in Aroma Abadi systems",
                 },
                 {
                   icon: FileCheck,
-                  label: "Status pembayaran",
-                  value: "Diterima otomatis, dicatat per invoice",
+                  label: "Payment status",
+                  value: "Received automatically, logged per invoice",
                 },
                 {
                   icon: Scale,
-                  label: "Rincian biaya",
-                  value: "Tampil penuh sebelum pelanggan membayar",
+                  label: "Fee breakdown",
+                  value: "Shown in full before the customer pays",
                 },
-                { icon: Landmark, label: "Mata uang", value: "Rupiah (IDR)" },
+                { icon: Landmark, label: "Currency", value: "Indonesian Rupiah (IDR)" },
                 {
                   icon: RefreshCcw,
-                  label: "Pengembalian dana",
-                  value: "Lewat Xendit ke metode pembayaran asal",
+                  label: "Refunds",
+                  value: "Through Xendit, back to the original method",
                 },
               ]}
             />
@@ -866,8 +878,8 @@ function CompanyPage() {
         <Split
           tone="cream"
           icon={Scale}
-          title="Kebijakan Pelanggan"
-          lede="Aturan yang berlaku untuk setiap pesanan lewat WhatsApp."
+          title="Customer Policies"
+          lede="The rules that apply to every order placed over WhatsApp."
         >
           <div className="grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
             {POLICIES.map((item, index) => (
@@ -883,16 +895,16 @@ function CompanyPage() {
 
       {/* ── Kontak & footer ─────────────────────────────────────────── */}
       <footer id="kontak" className="lp-dark scroll-mt-[86px] bg-[#3A000A]">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-10 md:py-20">
-          <div className="grid gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] md:gap-16">
+        <div className="mx-auto w-full max-w-[1180px] px-6 py-12 md:px-10 md:py-14">
+          <div className="grid gap-10 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] md:gap-12">
             <div>
               <img src={armaMark} alt="Aroma Abadi" className="w-[56px]" />
               <h2 className="lp-display mt-6 text-[clamp(1.6rem,1.1rem+1.4vw,2.1rem)] leading-[1.14] text-[#FBFAF8]">
-                Kontak Resmi
+                Official Contact
               </h2>
               <span className="mt-4 block h-px w-10 bg-[#E7CF95]/45" />
               <p className="mt-4 max-w-[32ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
-                Saluran resmi PT Aroma Abadi untuk pelanggan dan mitra.
+                The official channels of PT Aroma Abadi, for customers and partners alike.
               </p>
               <a
                 href={WA_LINK}
@@ -901,7 +913,7 @@ function CompanyPage() {
                 className="press mt-7 inline-flex items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
               >
                 <WhatsAppIcon className="h-[20px] w-[20px]" />
-                Chat dengan ARMA
+                Chat with ARMA
               </a>
             </div>
 
@@ -933,10 +945,7 @@ function CompanyPage() {
             </Reveal>
           </div>
 
-          <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[#F3F0EC]/12 pt-6">
-            <p className="text-[12.5px] text-[#F3F0EC]/45">
-              Halaman resmi PT Aroma Abadi. Pembayaran diproses oleh Xendit dalam Rupiah.
-            </p>
+          <div className="mt-10 flex flex-wrap items-center justify-end gap-3 border-t border-[#F3F0EC]/12 pt-5">
             <p className="text-[12.5px] text-[#F3F0EC]/60">
               © {new Date().getFullYear()} PT Aroma Abadi
             </p>
@@ -949,7 +958,7 @@ function CompanyPage() {
         href={WA_LINK}
         target="_blank"
         rel="noreferrer noopener"
-        aria-label="Chat dengan ARMA di WhatsApp"
+        aria-label="Chat with ARMA on WhatsApp"
         className={`group fixed bottom-5 right-5 z-40 transition-[transform,opacity] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:bottom-7 sm:right-7 ${
           scrolled && !menuOpen
             ? "translate-y-0 opacity-100"
@@ -963,7 +972,7 @@ function CompanyPage() {
           />
           <img src={whatsappMark} alt="" className="h-[52px] w-[52px] shrink-0" />
           <span className="max-w-0 overflow-hidden whitespace-nowrap text-[13.5px] font-semibold text-white opacity-0 transition-[max-width,opacity,padding] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:group-hover:max-w-[170px] sm:group-hover:pl-[10px] sm:group-hover:opacity-100">
-            Chat dengan ARMA
+            Chat with ARMA
           </span>
         </span>
       </a>

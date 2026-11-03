@@ -111,15 +111,15 @@ export function Section({
   bleed?: ReactNode;
 }) {
   return (
-    <section id={id} className={`scroll-mt-[86px] ${GROUND[tone]} ${className}`}>
+    <section id={id} className={`scroll-mt-[76px] ${GROUND[tone]} ${className}`}>
       <div
-        className={`mx-auto w-full max-w-[1180px] px-6 pt-16 md:px-10 md:pt-24 ${
-          bleed ? "pb-10 md:pb-14" : "pb-16 md:pb-24"
+        className={`mx-auto w-full max-w-[1180px] px-6 pt-12 md:px-10 md:pt-16 ${
+          bleed ? "pb-8 md:pb-10" : "pb-12 md:pb-16"
         }`}
       >
         {children}
       </div>
-      {bleed ? <div className="pb-14 md:pb-20">{bleed}</div> : null}
+      {bleed ? <div className="pb-10 md:pb-14">{bleed}</div> : null}
     </section>
   );
 }
@@ -141,15 +141,15 @@ export function Split({
   children: ReactNode;
 }) {
   return (
-    <div className="grid gap-x-14 gap-y-9 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
-      <Reveal className="self-start md:sticky md:top-[104px]">
+    <div className="grid gap-x-10 gap-y-7 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+      <Reveal className="self-start md:sticky md:top-[92px]">
         {Icon ? (
           <span
-            className={`mb-5 grid h-[42px] w-[42px] place-items-center rounded-full ${
+            className={`mb-4 grid h-[38px] w-[38px] place-items-center rounded-full ${
               tone === "maroon" ? "bg-[#E7CF95]/15 text-[#E7CF95]" : "bg-[#710014]/7 text-[#710014]"
             }`}
           >
-            <Icon className="h-[20px] w-[20px]" strokeWidth={1.6} />
+            <Icon className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </span>
         ) : null}
         <h2
@@ -158,9 +158,9 @@ export function Split({
           {title}
         </h2>
         <span
-          className={`mt-4 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#BF9877]"}`}
+          className={`mt-3 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#BF9877]"}`}
         />
-        <p className={`mt-4 max-w-[30ch] text-pretty text-[14.5px] leading-[1.62] ${BODY[tone]}`}>
+        <p className={`mt-3 max-w-[30ch] text-pretty text-[14.5px] leading-[1.58] ${BODY[tone]}`}>
           {lede}
         </p>
         {aside}
@@ -172,7 +172,7 @@ export function Split({
 
 export function Prose({ tone = "white", children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <div className={`max-w-[62ch] space-y-4 text-pretty text-[15.5px] leading-[1.7] ${BODY[tone]}`}>
+    <div className={`max-w-[62ch] space-y-3 text-pretty text-[15.5px] leading-[1.62] ${BODY[tone]}`}>
       {children}
     </div>
   );
@@ -194,7 +194,7 @@ export function Facts({
       {items.map((item) => (
         <div
           key={item.label}
-          className={`group border-b py-[13px] transition-colors duration-200 ${RULE[tone]} ${
+          className={`group border-b py-[10px] transition-colors duration-200 ${RULE[tone]} ${
             two ? "px-1" : "grid gap-1 px-2 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5"
           } ${tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#710014]/[0.03]"}`}
         >
@@ -240,7 +240,7 @@ export function FactTiles({
       {items.map((item) => (
         <div
           key={item.label}
-          className="group bg-white p-5 transition-colors duration-300 hover:bg-[#F3F0EC]"
+          className="group bg-white p-4 transition-colors duration-300 hover:bg-[#F3F0EC]"
         >
           <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
             <item.icon className="h-[16px] w-[16px]" strokeWidth={1.7} />
@@ -267,12 +267,12 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <div className="group flex h-full flex-col rounded-[14px] border border-[#E6D8CD] bg-white p-6 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#710014]/30 hover:shadow-[0_18px_40px_-24px_rgba(113,0,20,0.4)]">
-      <span className="grid h-[40px] w-[40px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
-        <Icon className="h-[19px] w-[19px]" strokeWidth={1.6} />
+    <div className="group flex h-full flex-col rounded-[14px] border border-[#E6D8CD] bg-white p-5 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-[#710014]/30 hover:shadow-[0_18px_40px_-24px_rgba(113,0,20,0.4)]">
+      <span className="grid h-[36px] w-[36px] place-items-center rounded-full bg-[#710014]/7 text-[#710014] transition-colors duration-300 group-hover:bg-[#710014] group-hover:text-white">
+        <Icon className="h-[17px] w-[17px]" strokeWidth={1.6} />
       </span>
-      <h3 className="mt-4 text-[15.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
-      <p className="mt-[8px] text-pretty text-[14.5px] leading-[1.65] text-[#55504B]">{children}</p>
+      <h3 className="mt-3 text-[15.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
+      <p className="mt-[7px] text-pretty text-[14.5px] leading-[1.6] text-[#55504B]">{children}</p>
     </div>
   );
 }
@@ -282,7 +282,7 @@ export function Panel({
 export function Pending({ field, tone = "white" }: { field: string; tone?: Tone }) {
   return (
     <span
-      title="Belum diisi — lengkapi sebelum halaman ini dikirim ke Xendit."
+      title="Not filled in yet — complete this before the page goes to Xendit."
       className={`inline-flex items-center gap-[7px] rounded-[5px] border border-dashed px-[8px] py-[2px] align-middle text-[13.5px] ${
         tone === "maroon"
           ? "border-[#E7CF95]/55 bg-[#E7CF95]/10 text-[#E7CF95]"
@@ -319,15 +319,15 @@ export function Step({
   const { ref, inView } = useInView<HTMLDivElement>();
 
   return (
-    <div ref={ref} className="relative pb-12 pl-11 last:pb-0 sm:pl-16">
+    <div ref={ref} className="relative pb-9 pl-10 last:pb-0 sm:pl-14">
       {!last ? (
         <span
           aria-hidden
-          className="absolute bottom-0 left-[14px] top-[34px] w-px bg-[#161616]/12 sm:left-[19px] sm:top-[38px]"
+          className="absolute bottom-0 left-[14px] top-[32px] w-px bg-[#161616]/12 sm:left-[17px] sm:top-[36px]"
         />
       ) : null}
       <span
-        className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[38px] sm:w-[38px] sm:text-[17px] ${
+        className={`lp-display absolute left-0 top-0 grid h-[28px] w-[28px] place-items-center rounded-full border text-[14px] transition-[background-color,color,border-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[34px] sm:w-[34px] sm:text-[16px] ${
           inView
             ? "border-[#710014] bg-[#710014] text-white"
             : "scale-90 border-[#E6D8CD] bg-white text-[#8A6246]"
@@ -339,11 +339,11 @@ export function Step({
       <div
         className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[18px] border border-[#710014]/20 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(113,0,20,0.45)] sm:p-8"
+            ? "rounded-[18px] border border-[#710014]/20 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(113,0,20,0.45)] sm:p-6"
             : ""
         }`}
       >
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_288px] lg:items-start lg:gap-12">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_282px] lg:items-start lg:gap-10">
           <div className="min-w-0">
             {highlight ? (
               <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#710014]/8 px-[11px] py-[4px] text-[12.5px] font-medium text-[#710014]">
@@ -352,15 +352,15 @@ export function Step({
               </p>
             ) : null}
             <h3 className="text-[16.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
-            <p className="mt-[10px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.7] text-[#55504B]">
+            <p className="mt-[9px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B]">
               {body}
             </p>
             {points ? (
-              <dl className="mt-6 max-w-[46ch] overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#F3F0EC]">
+              <dl className="mt-5 max-w-[46ch] overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#F3F0EC]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`px-4 py-[12px] ${index ? "border-t border-[#E0D4C8]" : ""}`}
+                    className={`px-4 py-[10px] ${index ? "border-t border-[#E0D4C8]" : ""}`}
                   >
                     <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#8A6246]">
                       {point.icon ? (
