@@ -113,7 +113,11 @@ function load() {
     const rawUser = window.localStorage.getItem(USER_KEY);
     const user = rawUser ? (JSON.parse(rawUser) as CurrentUser) : DEFAULT_USER;
     const timeZone = window.localStorage.getItem(TZ_KEY) ?? DEFAULT_TZ;
-    state = { user: user?.role ? user : DEFAULT_USER, timeZone };
+    // A session saved before the roles were renamed holds a role this
+    // workspace no longer has; signing back in as the owner beats asking the
+    // capability map about a role it has never heard of.
+    const known = user?.role && user.role in ROLE_CAPABILITIES;
+    state = { user: known ? user : DEFAULT_USER, timeZone };
   } catch {
     /* a malformed entry just means the default workspace owner */
   }
@@ -255,7 +259,7 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
 };
 
 export function roleCan(role: WorkspaceRole, capability: Capability): boolean {
-  return ROLE_CAPABILITIES[role].includes(capability);
+  return (ROLE_CAPABILITIES[role] ?? []).includes(capability);
 }
 
 export function useCan(capability: Capability): boolean {
