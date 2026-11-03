@@ -4,26 +4,15 @@ import {
   Award,
   Ban,
   BellRing,
-  Boxes,
   Building2,
-  Clock,
   CreditCard,
-  FileCheck,
-  Eye,
-  Globe,
   HeartHandshake,
   Landmark,
-  Lightbulb,
   Megaphone,
   Package,
-  Link2,
   Lock,
-  Mail,
-  MapPin,
-  MessageCircle,
   MessagesSquare,
   Menu,
-  Phone,
   QrCode,
   RefreshCcw,
   Scale,
@@ -245,10 +234,10 @@ const SERVICES = [
   },
 ];
 
-const VALUES = [
-  { icon: ShieldCheck, title: "Integrity", body: "Honest dealing in every interaction." },
-  { icon: Eye, title: "Transparency", body: "Clear terms, pricing and records." },
-  { icon: Lightbulb, title: "Innovation", body: "New ways to reach and serve customers." },
+const VALUES: { title: string; body: string }[] = [
+  { title: "Integrity", body: "Honest dealing in every interaction." },
+  { title: "Transparency", body: "Clear terms, pricing and records." },
+  { title: "Innovation", body: "New ways to reach and serve customers." },
 ];
 
 const SHOTS = [
@@ -257,11 +246,11 @@ const SHOTS = [
   { src: shotFoundation, alt: "A liquid foundation bottle on a soft background" },
 ];
 
-const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
-  { icon: Building2, label: "Legal Entity", value: "PT Aroma Abadi" },
-  { icon: Boxes, label: "Line of Business", value: "Beauty distribution" },
-  { wa: true, label: "Sales Channel", value: "WhatsApp (ARMA)" },
-  { icon: CreditCard, label: "Payment Gateway", value: "Xendit" },
+const HERO_FACTS: { label: string; value: string }[] = [
+  { label: "Legal Entity", value: "PT Aroma Abadi" },
+  { label: "Line of Business", value: "Beauty distribution" },
+  { label: "Sales Channel", value: "WhatsApp (ARMA)" },
+  { label: "Payment Gateway", value: "Xendit" },
 ];
 
 const PROGRAM = [
@@ -333,14 +322,8 @@ const POLICIES = [
   },
 ];
 
-const CONTACT: {
-  icon?: typeof Clock;
-  wa?: boolean;
-  label: string;
-  value: ReactNode;
-}[] = [
+const CONTACT: { label: string; value: ReactNode }[] = [
   {
-    wa: true,
     label: "Customer WhatsApp",
     value: (
       <a
@@ -353,9 +336,8 @@ const CONTACT: {
       </a>
     ),
   },
-  { icon: Clock, label: "Service Hours", value: "24 hours, every day" },
+  { label: "Service Hours", value: "24 hours, every day" },
   {
-    icon: Mail,
     label: "Official Email",
     value: (
       <a
@@ -367,7 +349,6 @@ const CONTACT: {
     ),
   },
   {
-    icon: MapPin,
     label: "Registered Office",
     value: (
       <>
@@ -579,7 +560,7 @@ function CompanyPage() {
         <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-6 py-12 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
           <div>
             <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#9A5A63]">
-              <span className="h-px w-8 bg-[#D9A9B0]" />
+              <span className="h-px w-8 bg-[#C9A455]" />
               PT Aroma Abadi
             </p>
             <h1 className="lp-display mt-4 max-w-[19ch] text-balance text-[clamp(2.1rem,1.2rem+2.9vw,3.3rem)] leading-[1.08] text-[#161616]">
@@ -597,14 +578,7 @@ function CompanyPage() {
                   key={fact.label}
                   className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#FFF4ED]"
                 >
-                  <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#9A5A63]">
-                    {fact.wa ? (
-                      <WhatsAppIcon className="h-[15px] w-[15px]" />
-                    ) : fact.icon ? (
-                      <fact.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                    ) : null}
-                    {fact.label}
-                  </dt>
+                  <dt className="text-[12px] leading-tight text-[#9A5A63]">{fact.label}</dt>
                   <dd className="mt-[7px] text-[14.5px] font-semibold leading-snug text-[#161616]">
                     {fact.value}
                   </dd>
@@ -625,7 +599,7 @@ function CompanyPage() {
         tone="cream"
         className="lp-paper"
         bleed={
-          <div>
+          <div className="border-y border-[#C9A455]/35 py-9">
             <p className="lp-display text-center text-[clamp(1.3rem,1rem+0.9vw,1.75rem)] leading-tight text-[#710014]">
               Brands we represent
             </p>
@@ -687,7 +661,8 @@ function CompanyPage() {
             </div>
           </Reveal>
 
-          <p className="mt-10 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+          <p className="mt-10 flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+            <span aria-hidden className="h-px w-5 bg-[#C9A455]" />
             What We Do
           </p>
           <div className="mt-4 grid gap-4 sm:auto-rows-fr sm:grid-cols-2">
@@ -700,23 +675,18 @@ function CompanyPage() {
             ))}
           </div>
 
-          <p className="mt-10 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+          <p className="mt-10 flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+            <span aria-hidden className="h-px w-5 bg-[#C9A455]" />
             How We Work
           </p>
           <Reveal delay={40}>
             <dl className="mt-4 grid gap-x-8 gap-y-4 border-t border-[#EAD3D7] pt-4 sm:grid-cols-3">
               {VALUES.map((value) => (
-                <div key={value.title} className="flex gap-3">
-                  <value.icon
-                    className="mt-[2px] h-[16px] w-[16px] shrink-0 text-[#710014]"
-                    strokeWidth={1.6}
-                  />
-                  <div>
-                    <dt className="text-[14px] font-semibold text-[#161616]">{value.title}</dt>
-                    <dd className="mt-[3px] text-pretty text-[13.5px] leading-[1.55] text-[#55504B]">
-                      {value.body}
-                    </dd>
-                  </div>
+                <div key={value.title} className="border-l border-[#C9A455] pl-4">
+                  <dt className="text-[14px] font-semibold text-[#161616]">{value.title}</dt>
+                  <dd className="mt-[4px] text-pretty text-[13.5px] leading-[1.55] text-[#55504B]">
+                    {value.body}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -727,10 +697,9 @@ function CompanyPage() {
               tone="cream"
               cols={2}
               items={[
-                { icon: Building2, label: "Registered Name", value: "PT Aroma Abadi" },
-                { icon: Boxes, label: "Line of Business", value: "Beauty product trading" },
+                { label: "Registered Name", value: "PT Aroma Abadi" },
+                { label: "Line of Business", value: "Beauty product trading" },
                 {
-                  icon: MapPin,
                   label: "Registered Office",
                   value: (
                     <>
@@ -739,17 +708,15 @@ function CompanyPage() {
                   ),
                 },
                 {
-                  icon: FileCheck,
                   label: "Business Registration",
                   value: <Pending field="NIB number" />,
                 },
                 {
-                  icon: MessageCircle,
                   label: "Sales Channels",
                   value: "WhatsApp (ARMA) and partner retail",
                 },
-                { icon: Globe, label: "Delivery Area", value: "Across Indonesia" },
-                { icon: CreditCard, label: "Payment Gateway", value: "Xendit" },
+                { label: "Delivery Area", value: "Across Indonesia" },
+                { label: "Payment Gateway", value: "Xendit" },
               ]}
             />
           </Reveal>
@@ -853,17 +820,14 @@ function CompanyPage() {
             ]}
             points={[
               {
-                icon: Link2,
                 label: "Payment link",
                 value: "Created per order, valid for 24 hours",
               },
               {
-                icon: Wallet,
                 label: "Methods available",
                 value: "QRIS, virtual account, e-wallet, card",
               },
               {
-                icon: FileCheck,
                 label: "What we receive",
                 value: "Payment status and invoice number",
               },
@@ -909,25 +873,21 @@ function CompanyPage() {
               title="How a Payment Is Handled"
               intro="Whichever of the methods above a customer chooses, the handling is the same."
               items={[
-                { icon: Lock, label: "Payment page", value: "Hosted and processed by Xendit" },
+                { label: "Payment page", value: "Hosted and processed by Xendit" },
                 {
-                  icon: CreditCard,
                   label: "Card data",
                   value: "Never stored in Aroma Abadi systems",
                 },
                 {
-                  icon: FileCheck,
                   label: "Payment status",
                   value: "Received automatically, logged per invoice",
                 },
                 {
-                  icon: Scale,
                   label: "Fee breakdown",
                   value: "Shown in full before the customer pays",
                 },
-                { icon: Landmark, label: "Currency", value: "Indonesian Rupiah (IDR)" },
+                { label: "Currency", value: "Indonesian Rupiah (IDR)" },
                 {
-                  icon: RefreshCcw,
                   label: "Refunds",
                   value: "Through Xendit, back to the original method",
                 },
@@ -984,17 +944,10 @@ function CompanyPage() {
 
           {/* Laid out on hairlines rather than in boxes: a contact block
               should read as a column of details, not a row of cards. */}
-          <dl className="mt-11 grid gap-x-10 gap-y-8 border-t border-[#F3F0EC]/15 pt-9 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {CONTACT.map((item) => (
               <div key={item.label}>
-                <dt className="flex items-center gap-[8px] text-[13px] text-[#E7CF95]">
-                  {item.wa ? (
-                    <WhatsAppIcon className="h-[14px] w-[14px]" />
-                  ) : item.icon ? (
-                    <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                  ) : null}
-                  {item.label}
-                </dt>
+                <dt className="text-[13px] text-[#E7CF95]">{item.label}</dt>
                 <dd className="mt-[10px] text-pretty text-[14.5px] leading-[1.55] text-[#FBFAF8]">
                   {item.value}
                 </dd>
@@ -1002,10 +955,9 @@ function CompanyPage() {
             ))}
           </dl>
 
-          <div className="mt-11 border-t border-[#F3F0EC]/12 pt-6">
-            <p className="text-[12.5px] text-[#F3F0EC]/55">
-              © {new Date().getFullYear()} PT Aroma Abadi
-            </p>
+          <div className="mt-12 flex items-center justify-between gap-4 border-t border-[#F3F0EC]/12 pt-6">
+            <p className="text-[12.5px] text-[#F3F0EC]/55">© {new Date().getFullYear()}</p>
+            <p className="text-[12.5px] text-[#F3F0EC]/55">PT Aroma Abadi</p>
           </div>
         </div>
       </footer>
