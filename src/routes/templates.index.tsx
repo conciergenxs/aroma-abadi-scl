@@ -86,6 +86,7 @@ const STATUS_OPTIONS = [
 function TemplatesPage() {
   usePreviewGate("templates");
   const createGate = usePermission("templates-create");
+  const deleteGate = usePermission("templates-delete");
   const { templates, groups, categories, starred } = useTemplatesStore();
   const categoryColor = useCategoryColor(categories);
   const [query, setQuery] = useState("");
@@ -238,7 +239,9 @@ function TemplatesPage() {
               </button>
               <button
                 onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
+                disabled={!deleteGate.allowed}
+                title={deleteGate.allowed ? undefined : deleteGate.reason}
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Templates
               </button>
@@ -663,6 +666,7 @@ function ManageGroupsModal({ onClose }: { onClose: () => void }) {
 }
 
 function TemplateDetailModal({ template, onClose }: { template: Template; onClose: () => void }) {
+  const deleteGate = usePermission("templates-delete");
   const categoryColor = useCategoryColor(useTemplatesStore().categories);
   const { groups } = useTemplatesStore();
   const group: TemplateGroup | undefined = groups.find((g) => g.id === template.groupId);
@@ -945,7 +949,9 @@ function TemplateDetailModal({ template, onClose }: { template: Template; onClos
           )}
           <button
             onClick={() => setConfirmDelete(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 transition-colors duration-150"
+            disabled={!deleteGate.allowed}
+            title={deleteGate.allowed ? undefined : deleteGate.reason}
+            className="inline-flex items-center gap-1.5 rounded-md bg-destructive px-3 h-9 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-destructive transition-colors duration-150"
           >
             <Trash2 className="h-3.5 w-3.5" /> Delete Template
           </button>

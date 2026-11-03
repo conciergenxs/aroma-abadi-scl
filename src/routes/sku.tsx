@@ -701,6 +701,7 @@ function BrandDetail({
   onBack: () => void;
   onOpenCategory: (c: Category) => void;
 }) {
+  const brandGate = usePermission("knowledge-brands", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const brandSkuCount = brand.categories.reduce((n, c) => n + c.skus.length, 0);
 

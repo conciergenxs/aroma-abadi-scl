@@ -183,7 +183,7 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "templates-delete",
     label: "Delete Template",
     section: "Outbound",
-    effect: "A template can't be deleted, on its own or in bulk.",
+    effect: "Open a template: Delete Template is locked, and so is the bulk delete.",
     where: "/templates",
   },
 
@@ -257,7 +257,7 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "promo-edit",
     label: "Edit Promo Codes",
     section: "Commerce",
-    effect: "An existing promo code can't be edited.",
+    effect: "A code's row menu opens, but Edit and Delete are locked.",
     where: "/promo-codes",
   },
   {

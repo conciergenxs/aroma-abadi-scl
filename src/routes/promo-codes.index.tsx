@@ -94,6 +94,9 @@ function ActionMenu({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  // Editing and deleting a code are the same privilege: both rewrite a promo
+  // that may already be in a BA's hands.
+  const editGate = usePermission("promo-edit");
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -125,7 +128,9 @@ function ActionMenu({
             setOpen(false);
             onEdit();
           }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left transition-colors duration-150"
+          disabled={!editGate.allowed}
+          title={editGate.allowed ? undefined : editGate.reason}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent text-left transition-colors duration-150"
         >
           <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Edit
         </button>
@@ -148,7 +153,9 @@ function ActionMenu({
             setOpen(false);
             onDelete();
           }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 text-destructive text-left transition-colors duration-150"
+          disabled={!editGate.allowed}
+          title={editGate.allowed ? undefined : editGate.reason}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-destructive/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent text-destructive text-left transition-colors duration-150"
         >
           <Trash2 className="h-3.5 w-3.5" /> Delete
         </button>
