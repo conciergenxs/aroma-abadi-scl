@@ -1,14 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-<<<<<<< HEAD
   "framework": null,
   "installCommand": "bun install",
-  "buildCommand": "NITRO_PRESET=vercel vite build"
-=======
+  "buildCommand": "NITRO_PRESET=vercel vite build",
   "git": {
     "deploymentEnabled": {
       "main": false
     }
   }
->>>>>>> 55e40a2 (Stop Git from deploying this repo; deploys are manual now)
 }
