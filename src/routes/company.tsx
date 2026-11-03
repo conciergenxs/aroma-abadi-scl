@@ -3,15 +3,19 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   Award,
   Ban,
-  BadgeCheck,
   BellRing,
   Boxes,
   Building2,
   Clock,
   CreditCard,
   FileCheck,
+  Eye,
   Globe,
+  HeartHandshake,
   Landmark,
+  Lightbulb,
+  Megaphone,
+  Package,
   Link2,
   Lock,
   Mail,
@@ -25,6 +29,7 @@ import {
   Scale,
   ShieldCheck,
   Sparkles,
+  Store,
   Ticket,
   Truck,
   Wallet,
@@ -34,7 +39,7 @@ import {
 import { useEscapeKey } from "@/lib/use-escape-key";
 import {
   Facts,
-  FactTiles,
+  SpecPanel,
   Marquee,
   Panel,
   Pending,
@@ -59,6 +64,9 @@ import brandSisley from "@/assets/brand-sisley.png";
 import brandRimmel from "@/assets/brand-rimmel.png";
 import brandLaura from "@/assets/brand-laura-mercier.png";
 import brandBareMinerals from "@/assets/brand-baremineral.png";
+import shotLifestyle from "@/assets/kc-cover-1.jpg";
+import shotLipstick from "@/assets/sku-caviar-lipstick.jpg";
+import shotFoundation from "@/assets/sku-real-flawless-foundation.jpg";
 
 /* The public company page.
  *
@@ -208,22 +216,39 @@ const BRANDS = [
   { src: brandRimmel, name: "Rimmel London" },
 ];
 
-const PILLARS = [
+const SERVICES = [
   {
-    icon: ShieldCheck,
-    title: "Official Distribution",
-    body: "Products come from the principal, never the grey market.",
+    icon: Package,
+    title: "Independent Distribution",
+    body: "Premium cosmetics, fragrance and skincare, sourced from the principal.",
   },
   {
-    icon: BadgeCheck,
-    title: "BPOM Licensed",
-    body: "Every product carries a registration number you can verify.",
+    icon: Megaphone,
+    title: "Marketing Support",
+    body: "Campaign planning and brand visibility across every channel we hold.",
   },
   {
-    icon: Globe,
-    title: "Nationwide Delivery",
-    body: "Shipped from our own warehouse by national couriers.",
+    icon: Store,
+    title: "Retail Strategy",
+    body: "Counter placement and assortment planning that lifts sell-out.",
   },
+  {
+    icon: HeartHandshake,
+    title: "Customer Service",
+    body: "A dedicated team holding the relationship with brand and customer.",
+  },
+];
+
+const VALUES = [
+  { icon: ShieldCheck, title: "Integrity", body: "Honest dealing in every interaction." },
+  { icon: Eye, title: "Transparency", body: "Clear terms, pricing and records." },
+  { icon: Lightbulb, title: "Innovation", body: "New ways to reach and serve customers." },
+];
+
+const SHOTS = [
+  { src: shotLifestyle, alt: "Lipsticks, blush and a fragrance bottle arranged with rose petals" },
+  { src: shotLipstick, alt: "A gold lipstick case with a red bullet" },
+  { src: shotFoundation, alt: "A liquid foundation bottle on a soft background" },
 ];
 
 const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
@@ -379,18 +404,8 @@ export const Route = createFileRoute("/company")({
  * that one is meant to read as the app's own button. */
 function WhatsAppIcon({ className = "" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.7}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden
-    >
-      <path d="M20.3 11.9a8.4 8.4 0 0 1-12.5 7.3L3.4 20.6l1.5-4.3A8.4 8.4 0 1 1 20.3 11.9z" />
-      <path d="M9.1 9.3c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.4l.6 1.5c.1.2 0 .4-.1.6l-.3.4c-.1.2-.2.3 0 .6a6.4 6.4 0 0 0 2.7 2.3c.2.1.4.1.6-.1l.4-.5c.1-.2.3-.2.5-.1l1.4.7c.2.1.3.2.3.4v.5c0 .4-.3.8-.7 1-.5.2-1.1.2-1.8.1a9.9 9.9 0 0 1-5.6-4.7c-.4-.8-.4-1.6-.2-2.1l.4-1z" />
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
     </svg>
   );
 }
@@ -481,7 +496,7 @@ function CompanyPage() {
               <img src={armaMark} alt="Aroma Abadi" className="w-[48px]" />
             </a>
 
-            <nav className="hidden flex-1 items-center justify-center gap-9 lg:flex xl:gap-12">
+            <nav className="hidden flex-1 items-center justify-center gap-7 lg:flex xl:gap-9">
               {NAV.map((item) => (
                 <a
                   key={item.href}
@@ -509,7 +524,7 @@ function CompanyPage() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="press ml-auto grid h-[42px] w-[42px] place-items-center rounded-full border border-[#F3F0EC]/20 text-[#FBFAF8] transition-colors duration-200 hover:bg-[#F3F0EC]/10 sm:ml-3 lg:hidden"
+              className="press ml-auto grid h-[42px] w-[42px] place-items-center rounded-full border border-[#F3F0EC]/20 text-[#FBFAF8] transition-colors duration-200 hover:bg-[#FFF4ED]/10 sm:ml-3 lg:hidden"
             >
               {menuOpen ? (
                 <X className="h-[19px] w-[19px]" strokeWidth={1.8} />
@@ -519,7 +534,7 @@ function CompanyPage() {
             </button>
           </div>
         </div>
-        <div className="h-[2px] bg-[#F3F0EC]/10">
+        <div className="h-[2px] bg-[#FFF4ED]/10">
           <div
             className="h-full origin-left bg-[#C9A455]"
             style={{ transform: `scaleX(${progress})` }}
@@ -554,29 +569,30 @@ function CompanyPage() {
       <section id="top" className="relative overflow-hidden bg-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(113,0,20,0.07),transparent_68%)]"
+          className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(192,112,124,0.12),transparent_68%)]"
         />
         <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-6 py-12 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
           <div>
-            <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#8A6246]">
-              <span className="h-px w-8 bg-[#BF9877]" />
+            <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#9A5A63]">
+              <span className="h-px w-8 bg-[#D9A9B0]" />
               PT Aroma Abadi
             </p>
             <h1 className="lp-display mt-4 max-w-[19ch] text-balance text-[clamp(2.1rem,1.2rem+2.9vw,3.3rem)] leading-[1.08] text-[#161616]">
-              Order and pay inside a single WhatsApp conversation.
+              Indonesia&rsquo;s market leader in luxury cosmetics and fragrance.
             </h1>
             <p className="mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]">
-              We distribute premium beauty products across Indonesia. Customers shop through ARMA,
-              our official WhatsApp assistant, and pay through Xendit without ever leaving the chat.
+              PT Aroma Abadi develops and distributes more than 25 of the world&rsquo;s leading
+              beauty brands. Customers order through ARMA, our official WhatsApp assistant, and pay
+              through Xendit without leaving the conversation.
             </p>
 
-            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-4">
+            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4">
               {HERO_FACTS.map((fact) => (
                 <div
                   key={fact.label}
-                  className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#F3F0EC]"
+                  className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#FFF4ED]"
                 >
-                  <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#8A6246]">
+                  <dt className="flex items-center gap-[7px] text-[12px] leading-tight text-[#9A5A63]">
                     {fact.wa ? (
                       <WhatsAppIcon className="h-[15px] w-[15px]" />
                     ) : fact.icon ? (
@@ -606,7 +622,10 @@ function CompanyPage() {
         bleed={
           <div>
             <p className="lp-display text-center text-[clamp(1.3rem,1rem+0.9vw,1.75rem)] leading-tight text-[#710014]">
-              Brands we distribute
+              Brands we represent
+            </p>
+            <p className="mt-2 text-center text-[13.5px] text-[#9A5A63]">
+              Five of the more than 25 brands in our portfolio
             </p>
             <div className="mt-5">
               <Marquee>
@@ -615,7 +634,7 @@ function CompanyPage() {
                     key={brand.name}
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[200px] w-[300px] shrink-0 object-contain sm:w-[410px]"
+                    className="lp-brandmark h-[250px] w-[330px] shrink-0 object-contain sm:w-[460px]"
                   />
                 ))}
               </Marquee>
@@ -639,24 +658,67 @@ function CompanyPage() {
             </Prose>
           </Reveal>
 
-          <div className="mt-8 grid gap-4 sm:auto-rows-fr sm:grid-cols-3">
-            {PILLARS.map((pillar, index) => (
-              <Reveal key={pillar.title} delay={index * 70}>
-                <div className="group flex h-full flex-col rounded-[12px] border border-[#E0D4C8] bg-white/70 p-5 transition-[transform,border-color,background-color] duration-300 hover:-translate-y-[2px] hover:border-[#710014]/25 hover:bg-white">
-                  <pillar.icon
-                    className="h-[20px] w-[20px] text-[#710014] transition-transform duration-300 group-hover:scale-110"
-                    strokeWidth={1.6}
+          {/* Supporting imagery: the category the company actually works in. */}
+          <Reveal delay={40} className="mt-7">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <figure className="col-span-2 m-0 overflow-hidden rounded-[18px] shadow-[0_18px_40px_-26px_rgba(154,90,99,0.55)]">
+                <img
+                  src={SHOTS[0].src}
+                  alt={SHOTS[0].alt}
+                  loading="lazy"
+                  className="h-[150px] w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] sm:h-[180px]"
+                />
+              </figure>
+              {SHOTS.slice(1).map((shot) => (
+                <figure
+                  key={shot.alt}
+                  className="m-0 overflow-hidden rounded-[18px] shadow-[0_18px_40px_-26px_rgba(154,90,99,0.55)]"
+                >
+                  <img
+                    src={shot.src}
+                    alt={shot.alt}
+                    loading="lazy"
+                    className="h-[150px] w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] sm:h-[180px]"
                   />
-                  <h3 className="mt-3 text-[14.5px] font-semibold text-[#161616]">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-[6px] text-pretty text-[13.5px] leading-[1.6] text-[#55504B]">
-                    {pillar.body}
-                  </p>
-                </div>
+                </figure>
+              ))}
+            </div>
+          </Reveal>
+
+          <h3 className="mt-10 text-[13px] font-medium tracking-[0.02em] text-[#9A5A63]">
+            What we do for the brands we carry
+          </h3>
+          <div className="mt-4 grid gap-4 sm:auto-rows-fr sm:grid-cols-2">
+            {SERVICES.map((service, index) => (
+              <Reveal key={service.title} delay={index * 60}>
+                <Panel icon={service.icon} title={service.title}>
+                  {service.body}
+                </Panel>
               </Reveal>
             ))}
           </div>
+
+          <h3 className="mt-10 text-[13px] font-medium tracking-[0.02em] text-[#9A5A63]">
+            How we work
+          </h3>
+          <Reveal delay={40}>
+            <dl className="mt-4 grid gap-x-8 gap-y-4 border-t border-[#EAD3D7] pt-4 sm:grid-cols-3">
+              {VALUES.map((value) => (
+                <div key={value.title} className="flex gap-3">
+                  <value.icon
+                    className="mt-[2px] h-[16px] w-[16px] shrink-0 text-[#710014]"
+                    strokeWidth={1.6}
+                  />
+                  <div>
+                    <dt className="text-[14px] font-semibold text-[#161616]">{value.title}</dt>
+                    <dd className="mt-[3px] text-pretty text-[13.5px] leading-[1.55] text-[#55504B]">
+                      {value.body}
+                    </dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </Reveal>
 
           <Reveal delay={60} className="mt-12">
             <Facts
@@ -702,8 +764,8 @@ function CompanyPage() {
           <Reveal>
             <Prose>
               <p>
-                ARMA is the official Aroma Abadi WhatsApp assistant. Customers save a single number:
-                asking, ordering, paying and tracking all happen in the same conversation.
+                ARMA is the official Aroma Abadi WhatsApp assistant. Asking, ordering, paying and
+                tracking all happen in one conversation.
               </p>
             </Prose>
           </Reveal>
@@ -719,7 +781,7 @@ function CompanyPage() {
           </div>
 
           <Reveal delay={80} className="mt-5">
-            <div className="relative overflow-hidden rounded-[16px] bg-[#4A000D] p-6 sm:p-7">
+            <div className="relative overflow-hidden rounded-[20px] bg-[#4A000D] p-6 sm:p-7">
               <span
                 aria-hidden
                 className="pointer-events-none absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,rgba(231,207,149,0.16),transparent_70%)]"
@@ -753,10 +815,10 @@ function CompanyPage() {
           <h2 className="lp-display text-[clamp(1.75rem,1.1rem+1.8vw,2.45rem)] leading-[1.1] text-[#710014]">
             Customer Transaction Flow
           </h2>
-          <span className="mt-4 block h-px w-10 bg-[#BF9877]" />
+          <span className="mt-4 block h-px w-10 bg-[#D9A9B0]" />
           <p className="mt-4 text-pretty text-[15.5px] leading-[1.7] text-[#55504B]">
-            Six steps, from the first message to the parcel leaving our warehouse. Step four is the
-            payment point: that is where the customer opens the Xendit page.
+            Six steps, from first message to dispatch. Step four is where the customer leaves
+            WhatsApp for the Xendit page.
           </p>
         </Reveal>
 
@@ -836,14 +898,13 @@ function CompanyPage() {
             ))}
           </div>
 
-          <Reveal delay={80} className="mt-12">
-            <FactTiles
+          <Reveal delay={80} className="mt-10">
+            <SpecPanel
+              icon={ShieldCheck}
+              title="How a payment is handled"
+              intro="The same rules apply whichever of the methods above a customer picks."
               items={[
-                {
-                  icon: Lock,
-                  label: "Payment page",
-                  value: "Hosted and processed by Xendit",
-                },
+                { icon: Lock, label: "Payment page", value: "Hosted and processed by Xendit" },
                 {
                   icon: CreditCard,
                   label: "Card data",
@@ -916,7 +977,7 @@ function CompanyPage() {
             </div>
 
             <Reveal>
-              <div className="grid gap-px overflow-hidden rounded-[16px] border border-[#F3F0EC]/15 bg-[#F3F0EC]/15 sm:grid-cols-2">
+              <div className="grid gap-px overflow-hidden rounded-[20px] border border-[#F3F0EC]/15 bg-[#FFF4ED]/15 sm:grid-cols-2">
                 {CONTACT.map((item) => (
                   <div
                     key={item.label}

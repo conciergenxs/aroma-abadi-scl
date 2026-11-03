@@ -260,7 +260,10 @@ export function SpecPanel({
             key={item.label}
             className="flex gap-3 border-b border-[#EAD3D7]/70 px-5 py-[14px] transition-colors duration-200 last:border-b-0 hover:bg-[#FFF4ED]/60 sm:[&:nth-last-child(2)]:border-b-0 sm:odd:border-r sm:odd:border-[#EAD3D7]/70"
           >
-            <item.icon className="mt-[2px] h-[15px] w-[15px] shrink-0 text-[#9A5A63]" strokeWidth={1.7} />
+            <item.icon
+              className="mt-[2px] h-[15px] w-[15px] shrink-0 text-[#9A5A63]"
+              strokeWidth={1.7}
+            />
             <div className="min-w-0">
               <dt className="text-[12.5px] leading-[1.4] text-[#9A5A63]">{item.label}</dt>
               <dd className="mt-[3px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
@@ -358,7 +361,7 @@ export function Step({
       <div
         className={`lp-reveal ${inView ? "is-in" : ""} ${
           highlight
-            ? "rounded-[22px] border border-[#710014]/18 bg-white p-5 shadow-[0_26px_60px_-34px_rgba(154,90,99,0.4)] sm:p-6"
+            ? "rounded-[22px] border border-[#710014]/18 bg-white/85 p-5 shadow-[0_26px_60px_-34px_rgba(154,90,99,0.4)] backdrop-blur-[6px] sm:p-6"
             : ""
         }`}
       >
