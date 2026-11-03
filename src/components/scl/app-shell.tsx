@@ -146,12 +146,43 @@ const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox-view" },
   { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts-view" },
-  { to: "/broadcasts", label: "Broadcast", icon: Megaphone, needs: "broadcast.view", perm: "broadcast-view" },
-  { to: "/templates", label: "Templates", icon: FileText, needs: "broadcast.view", perm: "templates-view" },
-  { to: "/sku", label: "SKU & Knowledge", icon: Package, needs: "knowledge.view", perm: "knowledge-view" },
-  { to: "/transactions", label: "Transactions", icon: Receipt, needs: "commerce", perm: "commerce-view" },
+  {
+    to: "/broadcasts",
+    label: "Broadcast",
+    icon: Megaphone,
+    needs: "broadcast.view",
+    perm: "broadcast-view",
+  },
+  {
+    to: "/templates",
+    label: "Templates",
+    icon: FileText,
+    needs: "broadcast.view",
+    perm: "templates-view",
+  },
+  {
+    to: "/sku",
+    label: "SKU & Knowledge",
+    icon: Package,
+    needs: "knowledge.view",
+    perm: "knowledge-view",
+  },
+  {
+    to: "/transactions",
+    label: "Transactions",
+    icon: Receipt,
+    needs: "commerce",
+    perm: "commerce-view",
+  },
   { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce", perm: "commerce-view" },
-  { to: "/referral", label: "Referral", icon: Share2, needs: "commerce", full: true, perm: "commerce-view" },
+  {
+    to: "/referral",
+    label: "Referral",
+    icon: Share2,
+    needs: "commerce",
+    full: true,
+    perm: "commerce-view",
+  },
 ];
 const bottomNav: NavItem[] = [
   { to: "/settings", label: "Settings", icon: Settings, needs: "settings", perm: "settings-view" },
@@ -177,7 +208,7 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // A page nobody in this role may open shouldn't be offered in the first
-  // place — an Area Coordinator has no business on the commercial pages.
+  // place — a Leader has no business on the commercial pages.
   const currentUser = useCurrentUser();
   const previewed = usePreviewedCondition();
   const invite = usePermission("settings-users");

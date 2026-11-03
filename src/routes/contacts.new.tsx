@@ -39,7 +39,7 @@ function NewContactPage() {
   // BA-specific
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [position, setPosition] = useState("");
-  const [areaCoordinator, setAreaCoordinator] = useState("");
+  const [leader, setAreaCoordinator] = useState("");
 
   // Customer-specific
   const [pointBalance, setPointBalance] = useState("");
@@ -47,11 +47,11 @@ function NewContactPage() {
   const [labelIds, setLabelIds] = useState<string[]>([]);
   const [listIds, setListIds] = useState<string[]>([]);
 
-  // Existing Area Coordinators, drawn from current BA records — kept
+  // Existing Leaders, drawn from current BA records — kept
   // searchable (select2-style) since the roster can grow over time.
   const arcoOptions = useMemo(
     () =>
-      Array.from(new Set(bas.map((b) => b.areaCoordinator).filter(Boolean)))
+      Array.from(new Set(bas.map((b) => b.leader).filter(Boolean)))
         .sort()
         .map((name) => ({ value: name, label: name })),
     [bas],
@@ -103,8 +103,8 @@ function NewContactPage() {
       toast.error("Position is required");
       return;
     }
-    if (!areaCoordinator.trim()) {
-      toast.error("Area Coordinator is required");
+    if (!leader.trim()) {
+      toast.error("Leader is required");
       return;
     }
 
@@ -150,7 +150,7 @@ function NewContactPage() {
       city: "",
       store: "",
       position,
-      areaCoordinator: areaCoordinator.trim(),
+      leader: leader.trim(),
     });
 
     toast.success("BA Contact created successfully");
@@ -336,15 +336,15 @@ function NewContactPage() {
                         ]}
                       />
                     </Field>
-                    <Field label="Area Coordinator (ARCO)" required>
+                    <Field label="Leader" required>
                       <SclSelect
-                        value={areaCoordinator || null}
+                        value={leader || null}
                         onChange={setAreaCoordinator}
                         options={arcoOptions}
                         placeholder="Enter ARCO name.."
                         searchable
                         searchPlaceholder="Enter ARCO name.."
-                        ariaLabel="Area Coordinator"
+                        ariaLabel="Leader"
                       />
                     </Field>
                   </FormGrid>

@@ -10,7 +10,9 @@ type State = { broadcasts: Broadcast[] };
 // gave broadcasts a per-send run history.
 // v5 adds the activation state a scheduled or recurring broadcast carries,
 // plus the blocked scheduled example.
-const STORAGE_KEY = "aroma_broadcasts_store_v5";
+// v6 spreads the seeded sends across the days the Overview date picker can
+// reach, so narrowing the range actually moves the broadcast numbers.
+const STORAGE_KEY = "aroma_broadcasts_store_v6";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];

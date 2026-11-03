@@ -520,8 +520,7 @@ function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
               type="button"
               disabled={!recurringGate.allowed || (!isActive && activationReason !== "")}
               title={
-                recurringGate.reason ||
-                (!isActive ? activationReason || undefined : undefined)
+                recurringGate.reason || (!isActive ? activationReason || undefined : undefined)
               }
               onClick={() => {
                 broadcastsStore.setActivation(broadcast.id, isActive ? "inactive" : "active");

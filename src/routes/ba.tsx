@@ -86,10 +86,11 @@ function BAPage() {
   const filtered = useMemo(
     () =>
       bas.filter((b) => {
-        // An Area Coordinator only ever sees the BAs they look after.
-        const ownAreaOnly = user.role === "Area Coordinator" || !everyArea.allowed;
-        const ownArea = user.areaCoordinator ?? "Citra Dewanti";
-        if (ownAreaOnly && b.areaCoordinator !== ownArea) return false;
+        // An Leader only ever sees the BAs they look after.
+        // "See Every Area" is what opens the whole directory; without it a
+        // Leader sees the team that reports to them and nobody else.
+        const ownTeam = user.leader ?? "Citra Dewanti";
+        if (!everyArea.allowed && b.leader !== ownTeam) return false;
         if (search) {
           const q = search.toLowerCase();
           if (
@@ -114,7 +115,7 @@ function BAPage() {
       filterPosisi,
       filterStore,
       user.role,
-      user.areaCoordinator,
+      user.leader,
       everyArea.allowed,
     ],
   );
@@ -259,7 +260,7 @@ function BAPage() {
                 <Th>Gender</Th>
                 <Th>WA (Login)</Th>
                 <Th>Password</Th>
-                <Th>Area Coordinator</Th>
+                <Th>Leader</Th>
                 <Th>Position</Th>
                 <Th>&nbsp;</Th>
               </tr>
@@ -318,7 +319,7 @@ function BAPage() {
                         </button>
                       </div>
                     </Td>
-                    <Td>{b.areaCoordinator || "—"}</Td>
+                    <Td>{b.leader || "—"}</Td>
                     <Td>{b.position}</Td>
                     <Td>
                       <div className="flex items-center gap-1 justify-end">
@@ -496,11 +497,11 @@ function BAForm({
 }) {
   const { brands } = useSkuStore();
   const [name, setName] = useState(initial?.name || "");
-  const [areaCoordinator, setAreaCoordinator] = useState(initial?.areaCoordinator || "");
+  const [leader, setAreaCoordinator] = useState(initial?.leader || "");
   const [brandId, setBrandId] = useState<string>(initial?.brandIds?.[0] || brands[0]?.id || "");
   const [gender, setGender] = useState<BA["gender"]>(initial?.gender || "Female");
   const [password, setPassword] = useState(
-    initial?.password || baStore.generatePassword(areaCoordinator, name),
+    initial?.password || baStore.generatePassword(leader, name),
   );
   const [spinning, setSpinning] = useState(false);
   const [waNumber, setWaNumber] = useState(initial?.waNumber || "+62 ");
@@ -513,9 +514,9 @@ function BAForm({
   // credentials untouched unless Regenerate is pressed explicitly.
   useEffect(() => {
     if (initial) return;
-    setPassword(baStore.generatePassword(areaCoordinator, name));
+    setPassword(baStore.generatePassword(leader, name));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, areaCoordinator]);
+  }, [name, leader]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -534,7 +535,7 @@ function BAForm({
         city,
         store,
         position,
-        areaCoordinator,
+        leader,
       },
       initial?.id,
     );
@@ -573,11 +574,11 @@ function BAForm({
               className={inputCls}
             />
           </Field>
-          <Field label="Area Coordinator (ARCO)">
+          <Field label="Leader">
             <input
-              value={areaCoordinator}
+              value={leader}
               onChange={(e) => setAreaCoordinator(e.target.value)}
-              placeholder="Enter Area Coordinator name…"
+              placeholder="Enter Leader name…"
               className={inputCls}
             />
           </Field>
@@ -626,7 +627,7 @@ function BAForm({
                   type="button"
                   onClick={() => {
                     setSpinning(true);
-                    setPassword(baStore.generatePassword(areaCoordinator, name));
+                    setPassword(baStore.generatePassword(leader, name));
                     setTimeout(() => setSpinning(false), 420);
                   }}
                   className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"

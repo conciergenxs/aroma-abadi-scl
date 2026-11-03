@@ -948,6 +948,64 @@ html {
   transform: none;
 }
 
+/* ---- Opening ----
+   The page introduces itself once: the eyebrow, the headline and what sits
+   under them arrive a beat apart, then nothing above the fold moves again. */
+.lp-enter {
+  animation: lp-enter 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes lp-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Drawn rules ----
+   The gold hairline under a section title draws itself as the title lands,
+   which is the whole of the gesture: one line, once, left to right. */
+.lp-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s;
+}
+.lp-reveal.is-in .lp-rule,
+.is-in > .lp-rule {
+  transform: scaleX(1);
+}
+
+/* ---- Link underlines ----
+   An underline that thickens and settles rather than blinking on. */
+.lp-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  padding-bottom: 2px;
+  transition:
+    background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s ease;
+}
+.lp-underline:hover {
+  background-size: 100% 2px;
+}
+
+/* A screen lifts a little when a reader points at it. */
+.lp-screen {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+}
+.lp-screen:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 56px -28px rgba(113, 0, 20, 0.5);
+}
+
 /* ---- The hero thread ----
    Messages that have not been "sent" yet take no room, so the thread grows
    the way a real one does instead of sitting at full height from the start. */

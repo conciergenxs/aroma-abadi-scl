@@ -1419,10 +1419,8 @@ function RightPanel({
       {baRecord && (
         <RightSection title="BA Login Credentials">
           <div className="space-y-2.5">
-            <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Area Coordinator">
-              <div className="text-xs text-foreground/90 px-2 py-1">
-                {baRecord.areaCoordinator || "—"}
-              </div>
+            <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Leader">
+              <div className="text-xs text-foreground/90 px-2 py-1">{baRecord.leader || "—"}</div>
             </FieldRow>
             <FieldRow icon={<KeyRound className="h-3.5 w-3.5" />} label="Password">
               <div className="flex items-center gap-1.5 px-2 py-1">

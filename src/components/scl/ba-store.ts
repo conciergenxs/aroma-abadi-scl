@@ -15,8 +15,9 @@ export type BA = {
   city: string;
   store: string;
   position: string;
-  /** Area Coordinator overseeing this BA — feeds the first 3 letters of the auto-generated password. */
-  areaCoordinator: string;
+  /** The Leader this BA reports to — feeds the first 3 letters of the
+   * auto-generated password. */
+  leader: string;
 };
 
 type State = { bas: BA[]; currentBaId: string | null };
@@ -28,19 +29,19 @@ function first3(name: string): string {
   return (first + "XXX").slice(0, 3).toUpperCase();
 }
 
-// Format: 3 letters of the Area Coordinator's name + 3 letters of the BA's
+// Format: 3 letters of the Leader's name + 3 letters of the BA's
 // name + 6 random symbol/number/letter characters.
 const RANDOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*";
-function genPassword(arcoName: string, baName: string) {
+function genPassword(leaderName: string, baName: string) {
   let suffix = "";
   for (let i = 0; i < 6; i++)
     suffix += RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)];
-  return `${first3(arcoName)}${first3(baName)}${suffix}`;
+  return `${first3(leaderName)}${first3(baName)}${suffix}`;
 }
 
 function seed(): BA[] {
   // Phone numbers MUST match BA contacts in mock-data.ts (c4, c8, c10, c23-c30)
-  // Passwords follow the ARCO format: 3 letters of the Area Coordinator's name
+  // Passwords follow the ARCO format: 3 letters of the Leader's name
   // + 3 letters of the BA's name + 6 random symbol/number/letter characters.
   return [
     {
@@ -54,7 +55,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Paris van Java",
       position: "Senior BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba2",
@@ -67,7 +68,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Plaza Indonesia",
       position: "BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba3",
@@ -80,7 +81,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Trans Studio Mall",
       position: "BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba4",
@@ -93,7 +94,7 @@ function seed(): BA[] {
       city: "Surabaya",
       store: "Pakuwon Mall",
       position: "BA",
-      areaCoordinator: "Farhan Nugraha",
+      leader: "Farhan Nugraha",
     },
     {
       id: "ba5",
@@ -106,7 +107,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Pondok Indah Mall",
       position: "Senior BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba6",
@@ -119,7 +120,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Plaza Indonesia",
       position: "BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba7",
@@ -132,7 +133,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Paris van Java",
       position: "BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba8",
@@ -145,7 +146,7 @@ function seed(): BA[] {
       city: "Surabaya",
       store: "Pakuwon Mall",
       position: "Senior BA",
-      areaCoordinator: "Farhan Nugraha",
+      leader: "Farhan Nugraha",
     },
     {
       id: "ba9",
@@ -158,7 +159,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Trans Studio Mall",
       position: "Supervisor",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba10",
@@ -171,7 +172,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Pondok Indah Mall",
       position: "BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba11",
@@ -184,7 +185,7 @@ function seed(): BA[] {
       city: "Surabaya",
       store: "Pakuwon Mall",
       position: "BA",
-      areaCoordinator: "Farhan Nugraha",
+      leader: "Farhan Nugraha",
     },
     {
       id: "ba12",
@@ -197,7 +198,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Grand Indonesia",
       position: "BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba13",
@@ -210,7 +211,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Ciwalk",
       position: "BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba14",
@@ -223,7 +224,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Grand Indonesia",
       position: "Senior BA",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba15",
@@ -236,7 +237,7 @@ function seed(): BA[] {
       city: "Surabaya",
       store: "Tunjungan Plaza",
       position: "BA",
-      areaCoordinator: "Farhan Nugraha",
+      leader: "Farhan Nugraha",
     },
     {
       id: "ba16",
@@ -249,7 +250,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Ciwalk",
       position: "BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
     {
       id: "ba17",
@@ -262,7 +263,7 @@ function seed(): BA[] {
       city: "Jakarta",
       store: "Plaza Indonesia",
       position: "Supervisor",
-      areaCoordinator: "Bagas Wirawan",
+      leader: "Bagas Wirawan",
     },
     {
       id: "ba18",
@@ -275,7 +276,7 @@ function seed(): BA[] {
       city: "Surabaya",
       store: "Tunjungan Plaza",
       position: "BA",
-      areaCoordinator: "Farhan Nugraha",
+      leader: "Farhan Nugraha",
     },
     {
       id: "ba19",
@@ -288,7 +289,7 @@ function seed(): BA[] {
       city: "Bandung",
       store: "Trans Studio Mall",
       position: "BA",
-      areaCoordinator: "Citra Dewanti",
+      leader: "Citra Dewanti",
     },
   ];
 }
@@ -362,7 +363,7 @@ export const baStore = {
   add(input: Omit<BA, "id" | "password"> & { password?: string }) {
     const ba: BA = {
       id: `ba-${Date.now()}`,
-      password: input.password || genPassword(input.areaCoordinator, input.name),
+      password: input.password || genPassword(input.leader, input.name),
       ...input,
     };
     state = { ...state, bas: [ba, ...state.bas] };
@@ -373,17 +374,15 @@ export const baStore = {
     state = { ...state, bas: state.bas.map((b) => (b.id === id ? { ...b, ...patch } : b)) };
     emit();
   },
-  /** Hand every BA under these coordinators to another one. Their LMS
-   * password is left alone — it was issued to the BA, not to the coordinator,
+  /** Hand every BA under these Leaders to another one. Their LMS
+   * password is left alone — it was issued to the BA, not to the Leader,
    * and changing it would lock them out of a course mid-way. */
-  reassignCoordinator(from: string[], to: string) {
+  reassignLeader(from: string[], to: string) {
     const leaving = new Set(from);
-    const moved = state.bas.filter((b) => leaving.has(b.areaCoordinator)).length;
+    const moved = state.bas.filter((b) => leaving.has(b.leader)).length;
     state = {
       ...state,
-      bas: state.bas.map((b) =>
-        leaving.has(b.areaCoordinator) ? { ...b, areaCoordinator: to } : b,
-      ),
+      bas: state.bas.map((b) => (leaving.has(b.leader) ? { ...b, leader: to } : b)),
     };
     emit();
     return moved;
@@ -394,7 +393,7 @@ export const baStore = {
   },
   regeneratePassword(id: string) {
     const ba = state.bas.find((b) => b.id === id);
-    const pw = genPassword(ba?.areaCoordinator ?? "", ba?.name ?? "");
+    const pw = genPassword(ba?.leader ?? "", ba?.name ?? "");
     state = { ...state, bas: state.bas.map((b) => (b.id === id ? { ...b, password: pw } : b)) };
     emit();
     return pw;

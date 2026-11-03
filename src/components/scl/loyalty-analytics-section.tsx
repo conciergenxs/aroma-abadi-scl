@@ -350,9 +350,11 @@ function TierMovementSankey() {
   const [hover, setHover] = useState<SankeyHoverInfo | null>(null);
 
   const nodes: SankeyNodeDatum[] = [
-    ...LOYALTY_TIERS.map(
-      (t): SankeyNodeDatum => ({ name: `${t} · Start`, tier: t, side: "start" }),
-    ),
+    ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({
+      name: `${t} · Start`,
+      tier: t,
+      side: "start",
+    })),
     ...LOYALTY_TIERS.map((t): SankeyNodeDatum => ({ name: `${t} · Now`, tier: t, side: "end" })),
   ];
   const links = TIER_MOVEMENT.map((f) => ({

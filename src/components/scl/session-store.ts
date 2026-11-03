@@ -10,7 +10,7 @@ import { useSyncExternalStore } from "react";
  * Permissions by an admin — never chosen by the person it applies to — so the
  * profile page shows it read-only. */
 
-export type WorkspaceRole = "Super Admin" | "Admin" | "Area Coordinator" | "Staff";
+export type WorkspaceRole = "Super Admin" | "Admin" | "Leader" | "Brand" | "Trainer" | "Management";
 
 export type CurrentUser = {
   id: string;
@@ -20,8 +20,8 @@ export type CurrentUser = {
   phone: string;
   job: string;
   role: WorkspaceRole;
-  /** Set for an Area Coordinator: the BAs they look after carry this name. */
-  areaCoordinator?: string;
+  /** Set for a Leader: the BAs reporting to them carry this name. */
+  leader?: string;
 };
 
 /** The accounts this workspace can sign in as. Matched by email at login, so
@@ -51,9 +51,9 @@ export const WORKSPACE_ACCOUNTS: CurrentUser[] = [
     username: "citra.dewanti",
     email: "citra.dewanti@northstar.co",
     phone: "+62 811 5500 0011",
-    job: "Area Coordinator",
-    role: "Area Coordinator",
-    areaCoordinator: "Citra Dewanti",
+    job: "Leader",
+    role: "Leader",
+    leader: "Citra Dewanti",
   },
   {
     id: "u-bagas",
@@ -61,9 +61,9 @@ export const WORKSPACE_ACCOUNTS: CurrentUser[] = [
     username: "bagas.wirawan",
     email: "bagas.wirawan@northstar.co",
     phone: "+62 811 5500 0012",
-    job: "Area Coordinator",
-    role: "Area Coordinator",
-    areaCoordinator: "Bagas Wirawan",
+    job: "Leader",
+    role: "Leader",
+    leader: "Bagas Wirawan",
   },
   {
     id: "u-sara",
@@ -71,8 +71,26 @@ export const WORKSPACE_ACCOUNTS: CurrentUser[] = [
     username: "sara.iqbal",
     email: "sara.iqbal@northstar.co",
     phone: "+62 811 5500 0005",
-    job: "Customer Support",
-    role: "Staff",
+    job: "Brand Executive",
+    role: "Brand",
+  },
+  {
+    id: "u-nadia",
+    name: "Nadia Prameswari",
+    username: "nadia.p",
+    email: "nadia.p@northstar.co",
+    phone: "+62 811 5500 0009",
+    job: "Product Trainer",
+    role: "Trainer",
+  },
+  {
+    id: "u-dimas",
+    name: "Dimas Pratama",
+    username: "dimas.pratama",
+    email: "dimas.p@northstar.co",
+    phone: "+62 811 5500 0006",
+    job: "Business Management",
+    role: "Management",
   },
 ];
 
@@ -214,12 +232,26 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
     "commerce",
     "settings",
   ],
-  // Looks after the BAs in their own area; the commercial pages are not theirs.
-  "Area Coordinator": ["inbox", "contacts", "knowledge.view", "ba.view", "ba.manage"],
-  // Day-to-day desk work: conversations, contacts, and the commercial pages.
-  // Outbound is not theirs — a broadcast goes out under someone else's name —
-  // and neither are the BA accounts or the LMS curriculum.
-  Staff: ["inbox", "contacts", "knowledge.view", "commerce"],
+  // The BAs report to a Leader: they open the accounts, edit the records and
+  // hold the LMS passwords. Outbound and the knowledge itself are read-only.
+  Leader: [
+    "inbox",
+    "contacts",
+    "broadcast.view",
+    "knowledge.view",
+    "ba.view",
+    "ba.manage",
+    "commerce",
+    "settings",
+  ],
+  // Brand-side: reads everything the campaigns and the commerce pages show,
+  // writes none of it.
+  Brand: ["inbox", "contacts", "broadcast.view", "knowledge.view", "ba.view", "commerce"],
+  // Teaches from the knowledge base and keeps it current — modules and cards
+  // are theirs; contacts and commerce are not.
+  Trainer: ["inbox", "knowledge.view", "knowledge.manage", "ba.view"],
+  // Oversight: the whole picture, read-only.
+  Management: ["inbox", "contacts", "broadcast.view", "knowledge.view", "ba.view", "commerce"],
 };
 
 export function roleCan(role: WorkspaceRole, capability: Capability): boolean {
@@ -235,10 +267,10 @@ export function useCan(capability: Capability): boolean {
 export function cannotReason(role: WorkspaceRole, capability: Capability): string {
   if (roleCan(role, capability)) return "";
   const what: Partial<Record<Capability, string>> = {
-    "knowledge.manage": "Only an Admin or Super Admin can change knowledge content.",
-    "ba.manage": "Only an Area Coordinator, Admin, or Super Admin can manage BA accounts.",
+    "knowledge.manage": "Only a Trainer, Admin, or Super Admin can change knowledge content.",
+    "ba.manage": "Only a Leader, Admin, or Super Admin can manage BA accounts.",
     "broadcast.send": "Only an Admin or Super Admin can send a broadcast.",
-    commerce: "This page isn't part of an Area Coordinator's access.",
+    commerce: "The commercial pages aren't part of this role's access.",
   };
   return what[capability] ?? `Your role (${role}) doesn't include this.`;
 }

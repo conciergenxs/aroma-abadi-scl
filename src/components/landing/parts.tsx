@@ -158,7 +158,9 @@ export function Split({
           {title}
         </h2>
         <span
-          className={`mt-3 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#D9A9B0]"}`}
+          className={`lp-rule mt-3 block h-px w-10 ${
+            tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#C9A455]/70"
+          }`}
         />
         <p className={`mt-3 max-w-[30ch] text-pretty text-[14.5px] leading-[1.58] ${BODY[tone]}`}>
           {lede}
@@ -187,7 +189,7 @@ export function Facts({
   cols = 1,
 }: {
   tone?: Tone;
-  items: { label: string; value: ReactNode; icon?: LucideIcon; iconNode?: ReactNode }[];
+  items: { label: string; value: ReactNode }[];
   cols?: 1 | 2;
 }) {
   const two = cols === 2;
@@ -200,11 +202,7 @@ export function Facts({
             two ? "px-1" : "grid gap-1 px-2 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-5"
           } ${tone === "maroon" ? "hover:bg-white/[0.04]" : "hover:bg-[#710014]/[0.03]"}`}
         >
-          <dt className={`flex items-center gap-2 text-[12.5px] leading-[1.5] ${LABEL[tone]}`}>
-            {item.iconNode ??
-              (item.icon ? <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} /> : null)}
-            {item.label}
-          </dt>
+          <dt className={`text-[12.5px] leading-[1.5] ${LABEL[tone]}`}>{item.label}</dt>
           <dd className={`${two ? "mt-[5px] " : ""}text-[14.5px] leading-[1.55] ${VALUE[tone]}`}>
             {item.value}
           </dd>
@@ -241,7 +239,7 @@ export function SpecPanel({
   icon: LucideIcon;
   title: string;
   intro: string;
-  items: { icon: LucideIcon; label: string; value: string }[];
+  items: { label: string; value: string }[];
 }) {
   return (
     <div className="overflow-hidden rounded-[20px] border border-[#EAD3D7] bg-white">
@@ -258,20 +256,14 @@ export function SpecPanel({
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex gap-3 border-b border-[#EAD3D7]/70 px-5 py-[14px] transition-colors duration-200 last:border-b-0 hover:bg-[#FFF4ED]/60 sm:[&:nth-last-child(2)]:border-b-0 sm:odd:border-r sm:odd:border-[#EAD3D7]/70"
+            className="border-b border-[#EAD3D7]/70 px-5 py-[14px] transition-colors duration-200 last:border-b-0 hover:bg-[#FFF4ED]/60 sm:[&:nth-last-child(2)]:border-b-0 sm:odd:border-r sm:odd:border-[#EAD3D7]/70"
           >
-            <item.icon
-              className="mt-[2px] h-[15px] w-[15px] shrink-0 text-[#9A5A63]"
-              strokeWidth={1.7}
-            />
-            <div className="min-w-0">
-              <dt className="text-[12px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
-                {item.label}
-              </dt>
-              <dd className="mt-[4px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
-                {item.value}
-              </dd>
-            </div>
+            <dt className="text-[12px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
+              {item.label}
+            </dt>
+            <dd className="mt-[5px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
+              {item.value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -335,7 +327,7 @@ export function Step({
   n: number;
   title: string;
   body: string | string[];
-  points?: { label: string; value: string; icon?: LucideIcon }[];
+  points?: { label: string; value: string }[];
   screen?: ReactNode;
   highlight?: boolean;
   last?: boolean;
@@ -387,27 +379,28 @@ export function Step({
               </p>
             ))}
             {points ? (
-              <dl className="mt-5 overflow-hidden rounded-[14px] border border-[#710014]/15 bg-[#FFF4ED]">
+              <dl className="mt-6 overflow-hidden rounded-[16px] border border-[#C9A455]/45 bg-[#FFF4ED]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`flex flex-col gap-[2px] px-4 py-[10px] sm:flex-row sm:items-baseline sm:gap-4 ${
-                      index ? "border-t border-[#EAD3D7]" : ""
+                    className={`px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
+                      index ? "border-t border-[#C9A455]/25" : ""
                     }`}
                   >
-                    <dt className="flex shrink-0 items-center gap-[7px] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
-                      {point.icon ? (
-                        <point.icon className="h-[13px] w-[13px]" strokeWidth={1.8} />
-                      ) : null}
+                    <dt className="lp-display text-[16px] leading-tight text-[#710014]">
                       {point.label}
                     </dt>
-                    <dd className="text-[13.5px] leading-[1.5] text-[#161616]">{point.value}</dd>
+                    <dd className="mt-[6px] text-pretty text-[14px] leading-[1.5] text-[#161616]">
+                      {point.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
             ) : null}
           </div>
-          {screen ? <div className="w-full max-w-[300px] lg:max-w-none">{screen}</div> : null}
+          {screen ? (
+            <div className="lp-screen w-full max-w-[300px] lg:max-w-none">{screen}</div>
+          ) : null}
         </div>
       </div>
     </div>
