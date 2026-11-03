@@ -23,6 +23,8 @@ import {
   KeyRound,
   Ticket,
   Share2,
+  Pencil,
+  RefreshCw,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
@@ -49,6 +51,7 @@ import {
 } from "@/components/scl/transactions-store";
 import { TransactionPeek, TransactionCell } from "@/components/scl/transaction-peek";
 import { baStore, useBaStore, type BA } from "@/components/scl/ba-store";
+import { BAForm, ResetPasswordDialog } from "@/components/scl/ba-form";
 import { useEscapeKey } from "@/lib/use-escape-key";
 import { useSkuStore } from "@/components/scl/sku-store";
 import {
@@ -1414,22 +1417,40 @@ function RightPanel({
 }) {
   const editGate = usePermission("contacts-edit");
   const { brands } = useSkuStore();
+  const baEditGate = usePermission("ba-edit");
+  const baPasswordGate = usePermission("ba-password");
   const [revealed, setRevealed] = useState(false);
   const [movingLeader, setMovingLeader] = useState(false);
+  const [editingBa, setEditingBa] = useState(false);
+  const [resettingBa, setResettingBa] = useState(false);
   return (
     <div className="p-4 space-y-6">
       {baRecord && (
-        <RightSection title="BA Login Credentials">
+        <RightSection
+          title="BA Login Credentials"
+          action={
+            <button
+              type="button"
+              onClick={() => baEditGate.allowed && setEditingBa(true)}
+              disabled={!baEditGate.allowed}
+              title={baEditGate.allowed ? undefined : baEditGate.reason}
+              className="press inline-flex items-center gap-1 rounded border border-border bg-card/60 px-2 h-6 text-[11px] font-medium hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card/60 transition-colors duration-150"
+            >
+              <Pencil className="h-3 w-3" /> Edit
+            </button>
+          }
+        >
           <div className="space-y-2.5">
             <FieldRow icon={<User2 className="h-3.5 w-3.5" />} label="Leader">
               <div className="flex items-center gap-1.5 px-2 py-1">
                 <span className="text-xs text-foreground/90">{baRecord.leader || "—"}</span>
                 <button
                   type="button"
-                  onClick={() => setMovingLeader(true)}
-                  title="Move to another Leader"
+                  onClick={() => baEditGate.allowed && setMovingLeader(true)}
+                  disabled={!baEditGate.allowed}
+                  title={baEditGate.allowed ? "Move to another Leader" : baEditGate.reason}
                   aria-label="Move to another Leader"
-                  className="press text-muted-foreground hover:text-foreground transition-colors"
+                  className="press text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowLeftRight className="h-3.5 w-3.5" />
                 </button>
@@ -1441,13 +1462,20 @@ function RightPanel({
                   {revealed ? baRecord.password : "••••••••••••"}
                 </code>
                 <button
-                  onClick={() => setRevealed((r) => !r)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  title={revealed ? "Hide password" : "Show password"}
+                  onClick={() => baPasswordGate.allowed && setRevealed((r) => !r)}
+                  disabled={!baPasswordGate.allowed}
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title={
+                    baPasswordGate.allowed
+                      ? revealed
+                        ? "Hide password"
+                        : "Show password"
+                      : baPasswordGate.reason
+                  }
                 >
                   {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                 </button>
-                {revealed && (
+                {revealed && baPasswordGate.allowed && (
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(baRecord.password);
@@ -1459,9 +1487,32 @@ function RightPanel({
                     <Copy className="h-3.5 w-3.5" />
                   </button>
                 )}
+                <button
+                  onClick={() => baEditGate.allowed && setResettingBa(true)}
+                  disabled={!baEditGate.allowed}
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title={baEditGate.allowed ? "Reset password" : baEditGate.reason}
+                  aria-label="Reset password"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
               </div>
             </FieldRow>
           </div>
+          {editingBa && (
+            <BAForm
+              initial={baRecord}
+              onClose={() => setEditingBa(false)}
+              onSubmit={(input, id) => {
+                if (id) baStore.update(id, input);
+                toast.success("BA account updated");
+                setEditingBa(false);
+              }}
+            />
+          )}
+          {resettingBa && (
+            <ResetPasswordDialog ba={baRecord} onClose={() => setResettingBa(false)} />
+          )}
           {movingLeader && (
             <MoveLeaderModal
               ba={baRecord}
@@ -1719,10 +1770,21 @@ function MoveLeaderModal({
   );
 }
 
-function RightSection({ title, children }: { title: string; children: React.ReactNode }) {
+function RightSection({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{title}</div>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{title}</div>
+        {action}
+      </div>
       {children}
     </div>
   );

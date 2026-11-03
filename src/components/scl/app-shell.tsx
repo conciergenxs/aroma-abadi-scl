@@ -127,7 +127,6 @@ type NavItem = {
     | "/templates"
     | "/transactions"
     | "/sku"
-    | "/ba"
     | "/promo-codes"
     | "/referral"
     | "/settings";

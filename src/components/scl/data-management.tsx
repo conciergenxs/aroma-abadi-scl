@@ -1040,9 +1040,11 @@ function Pagination({
 
 type LabelRow = ContactLabel;
 
+// The colour is the point of the filter, so each option carries its own swatch
+// rather than asking someone to remember which name is which.
 const COLOR_FILTER_OPTIONS = [
   { value: "all", label: "All Colors" },
-  ...LABEL_COLORS.map((c) => ({ value: c.key, label: c.name })),
+  ...LABEL_COLORS.map((c) => ({ value: c.key, label: c.name, dot: c.dot })),
 ];
 
 function LabelsPage() {
