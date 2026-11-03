@@ -202,13 +202,15 @@ export type Capability =
   | "contacts"
   | "broadcast.view"
   | "broadcast.send"
+  | "templates.view"
   | "knowledge.view"
   | "knowledge.manage"
   | "ba.view"
   | "ba.manage"
-  | "commerce" // promo codes, referral, transactions
+  | "promo"
+  | "transactions"
   | "settings"
-  | "settings.roles";
+  | "settings.roles"
 
 const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
   "Super Admin": [
@@ -216,11 +218,13 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
     "contacts",
     "broadcast.view",
     "broadcast.send",
+    "templates.view",
     "knowledge.view",
     "knowledge.manage",
     "ba.view",
     "ba.manage",
-    "commerce",
+    "promo",
+    "transactions",
     "settings",
     "settings.roles",
   ],
@@ -229,11 +233,13 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
     "contacts",
     "broadcast.view",
     "broadcast.send",
+    "templates.view",
     "knowledge.view",
     "knowledge.manage",
     "ba.view",
     "ba.manage",
-    "commerce",
+    "promo",
+    "transactions",
     "settings",
   ],
   // The BAs report to a Leader: they open the accounts, edit the records and
@@ -242,20 +248,41 @@ const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
     "inbox",
     "contacts",
     "broadcast.view",
+    "templates.view",
     "knowledge.view",
     "ba.view",
     "ba.manage",
-    "commerce",
+    "promo",
+    "transactions",
     "settings",
   ],
-  // Brand-side: reads everything the campaigns and the commerce pages show,
-  // writes none of it.
-  Brand: ["inbox", "contacts", "broadcast.view", "knowledge.view", "ba.view", "commerce"],
+  // Brand-side: reads the campaigns and the commerce pages, writes none of it.
+  Brand: [
+    "inbox",
+    "contacts",
+    "broadcast.view",
+    "templates.view",
+    "knowledge.view",
+    "ba.view",
+    "promo",
+    "transactions",
+    "settings",
+  ],
   // Teaches from the knowledge base and keeps it current — modules and cards
   // are theirs; contacts and commerce are not.
-  Trainer: ["inbox", "knowledge.view", "knowledge.manage", "ba.view"],
+  Trainer: ["inbox", "knowledge.view", "knowledge.manage", "ba.view", "settings"],
   // Oversight: the whole picture, read-only.
-  Management: ["inbox", "contacts", "broadcast.view", "knowledge.view", "ba.view", "commerce"],
+  Management: [
+    "inbox",
+    "contacts",
+    "broadcast.view",
+    "templates.view",
+    "knowledge.view",
+    "ba.view",
+    "promo",
+    "transactions",
+    "settings",
+  ],
 };
 
 export function roleCan(role: WorkspaceRole, capability: Capability): boolean {
@@ -274,7 +301,8 @@ export function cannotReason(role: WorkspaceRole, capability: Capability): strin
     "knowledge.manage": "Only a Trainer, Admin, or Super Admin can change knowledge content.",
     "ba.manage": "Only a Leader, Admin, or Super Admin can manage BA accounts.",
     "broadcast.send": "Only an Admin or Super Admin can send a broadcast.",
-    commerce: "The commercial pages aren't part of this role's access.",
+    promo: "The promo pages aren't part of this role's access.",
+    transactions: "The transaction ledger isn't part of this role's access.",
   };
   return what[capability] ?? `Your role (${role}) doesn't include this.`;
 }

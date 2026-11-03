@@ -62,7 +62,7 @@ const STATUS_TONE: Record<LifecycleStatus, "positive" | "warning" | "neutral" | 
 type StatusFilter = "All" | LifecycleStatus;
 
 function BroadcastListPage() {
-  usePreviewGate("broadcast-view");
+  usePreviewGate("broadcast");
   const createGate = usePermission("broadcast-create");
   const navigate = useNavigate();
   const { broadcasts } = useBroadcastsStore();

@@ -62,7 +62,7 @@ const PAGE_NAV_BTN =
   "disabled:opacity-40 disabled:cursor-not-allowed transition-colors";
 
 function TransactionsPage() {
-  usePreviewGate("commerce-view");
+  usePreviewGate("transactions");
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");

@@ -41,7 +41,7 @@ export const Route = createFileRoute("/ba")({
 });
 
 function BAPage() {
-  usePreviewGate("ba-view");
+  usePreviewGate("ba");
   const { bas } = useBaStore();
   const user = useCurrentUser();
   const createGate = usePermission(

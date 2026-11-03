@@ -84,8 +84,8 @@ const STATUS_OPTIONS = [
 ];
 
 function TemplatesPage() {
-  usePreviewGate("templates-view");
-  const manageGate = usePermission("templates-manage");
+  usePreviewGate("templates");
+  const createGate = usePermission("templates-create");
   const { templates, groups, categories, starred } = useTemplatesStore();
   const categoryColor = useCategoryColor(categories);
   const [query, setQuery] = useState("");
@@ -201,7 +201,7 @@ function TemplatesPage() {
             >
               <Tags className="h-3.5 w-3.5" /> Manage Groups
             </button>
-            {manageGate.allowed ? (
+            {createGate.allowed ? (
               <Link
                 to="/templates/new"
                 className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
@@ -211,7 +211,7 @@ function TemplatesPage() {
             ) : (
               <button
                 disabled
-                title={manageGate.reason}
+                title={createGate.reason}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground opacity-40 cursor-not-allowed"
               >
                 <Plus className="h-3.5 w-3.5" /> New Template

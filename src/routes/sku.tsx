@@ -421,7 +421,7 @@ function DeleteConfirmDialog(props: ConfirmDialogProps) {
 }
 
 function SkuPage() {
-  usePreviewGate("knowledge-view");
+  usePreviewGate("knowledge");
   const { brands } = useSkuStore();
   const { brand: brandParam, category: categoryParam } = Route.useSearch();
   const brandGate = usePermission("knowledge-brands", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);

@@ -144,8 +144,8 @@ type NavItem = {
 };
 const topNav: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox-view" },
-  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts-view" },
+  { to: "/inbox", label: "Inbox", icon: Inbox, needs: "inbox", perm: "inbox" },
+  { to: "/contacts", label: "Contacts", icon: Users, needs: "contacts", perm: "contacts" },
   {
     to: "/broadcasts",
     label: "Broadcast",
@@ -171,21 +171,21 @@ const topNav: NavItem[] = [
     to: "/transactions",
     label: "Transactions",
     icon: Receipt,
-    needs: "commerce",
-    perm: "commerce-view",
+    needs: "transactions",
+    perm: "transactions",
   },
-  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "commerce", perm: "commerce-view" },
+  { to: "/promo-codes", label: "Promo Codes", icon: Tag, needs: "promo", perm: "promo" },
   {
     to: "/referral",
     label: "Referral",
     icon: Share2,
-    needs: "commerce",
+    needs: "promo",
     full: true,
-    perm: "commerce-view",
+    perm: "promo",
   },
 ];
 const bottomNav: NavItem[] = [
-  { to: "/settings", label: "Settings", icon: Settings, needs: "settings", perm: "settings-view" },
+  { to: "/settings", label: "Settings", icon: Settings, needs: "settings" },
 ];
 
 /** Whether the sidebar is expanded, remembered per browser. */

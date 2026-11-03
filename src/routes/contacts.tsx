@@ -81,7 +81,7 @@ export const Route = createFileRoute("/contacts")({
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
 function ContactsPage() {
-  usePreviewGate("contacts-view");
+  usePreviewGate("contacts");
   const baGate = usePermission("ba-view");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");

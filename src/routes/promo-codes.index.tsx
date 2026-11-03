@@ -160,8 +160,8 @@ function ActionMenu({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 function PromoCodesPage() {
-  usePreviewGate("commerce-view");
-  const manageGate = usePermission("promo-manage");
+  usePreviewGate("promo");
+  const createGate = usePermission("promo-create");
   const navigate = useNavigate();
   const { promos } = usePromoStore();
   const [search, setSearch] = useState("");
@@ -236,8 +236,8 @@ function PromoCodesPage() {
         <button
           type="button"
           onClick={() => navigate({ to: "/promo-codes/new" })}
-          disabled={!manageGate.allowed}
-          title={manageGate.reason || undefined}
+          disabled={!createGate.allowed}
+          title={createGate.reason || undefined}
           className="press icon-pop ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Create Promo

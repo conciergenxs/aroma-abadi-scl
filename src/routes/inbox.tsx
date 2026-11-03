@@ -125,7 +125,7 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  usePreviewGate("inbox-view");
+  usePreviewGate("inbox");
   const sendGate = usePermission("inbox-send");
   const { labels, lists, lifecycleStages, contacts: allContacts } = useContactsStore();
   // A contact moved to Recently Deleted must not keep a live conversation.
