@@ -182,7 +182,7 @@ const SCHEMA: CategorySection[] = [
         label: "Beauty Ambassadors",
         masterLabel: "BA Access",
         masterDescription:
-          "The BA directory and their LMS credentials. An Area Coordinator sees only their own area.",
+          "The BA directory and their LMS credentials. Without “See Every Area”, only the signed-in Leader's own team.",
         groups: [
           {
             id: "ba-read",
@@ -283,42 +283,77 @@ function flattenItems(items: PermItem[]): PermItem[] {
 
 /* What each seeded role starts with. Previously every role was built from the
  * same defaults, so the four of them differed in name only. */
+/* Straight from the client's checklist (Arma Dashboard Role Permission
+ * Checklist For Production). Six roles, ordered by access: a Leader runs the
+ * BAs in the field, Brand and Management read the picture from either side,
+ * and a Trainer keeps the knowledge current. Referral has no row in the
+ * checklist, so it follows the promo codes beside it. */
 const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
   "Super Admin": { categories: ["*"], items: ["*"] },
   Admin: {
     categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
     items: ["*", "-settings-roles"],
   },
-  // Runs the BAs in their own area and the conversations around them: reads
-  // the contact list without changing it, reads knowledge without editing it,
-  // and never touches outbound or the commercial pages.
-  "Area Coordinator": {
-    categories: ["inbox", "contacts", "knowledge", "ba"],
+  Leader: {
+    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
     items: [
       "inbox-view",
       "inbox-send",
       "inbox-assign",
       "contacts-view",
+      "contacts-export",
+      "contacts-labels",
+      "broadcast-view",
+      "templates-view",
       "knowledge-view",
       "ba-view",
+      "ba-scope",
       "ba-create",
       "ba-edit",
       "ba-password",
+      "commerce-view",
+      "transactions-manage",
+      "settings-view",
     ],
   },
-  // Desk work: conversations, the contact list, and reading the commercial
-  // pages — recording a transaction is the one thing they create there.
-  Staff: {
-    categories: ["inbox", "contacts", "knowledge", "commerce"],
+  Brand: {
+    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
     items: [
       "inbox-view",
       "inbox-send",
       "contacts-view",
-      "contacts-create",
-      "contacts-edit",
+      "broadcast-view",
+      "templates-view",
       "knowledge-view",
+      "ba-view",
+      "ba-scope",
       "commerce-view",
       "transactions-manage",
+    ],
+  },
+  Trainer: {
+    categories: ["inbox", "knowledge", "ba"],
+    items: [
+      "inbox-view",
+      "inbox-send",
+      "knowledge-view",
+      "knowledge-modules",
+      "knowledge-cards",
+      "ba-view",
+      "ba-scope",
+    ],
+  },
+  Management: {
+    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
+    items: [
+      "inbox-view",
+      "contacts-view",
+      "broadcast-view",
+      "templates-view",
+      "knowledge-view",
+      "ba-view",
+      "ba-scope",
+      "commerce-view",
     ],
   },
 };
@@ -351,7 +386,7 @@ function buildStateForRole(roleName: string): PermState {
 
 /** A brand-new custom role starts from the quietest sensible position. */
 function buildDefaultState(): PermState {
-  return buildStateForRole("Staff");
+  return buildStateForRole("Management");
 }
 
 // ----- Public types -----
@@ -380,17 +415,29 @@ const SEED_ROLES: Role[] = [
     state: buildStateForRole("Admin"),
   },
   {
-    id: "r-area-coordinator",
-    name: "Area Coordinator",
-    description:
-      "Runs the Beauty Ambassadors in their own area, and the conversations around them.",
-    state: buildStateForRole("Area Coordinator"),
+    id: "r-leader",
+    name: "Leader",
+    description: "Holds a team of Beauty Ambassadors: their accounts, their passwords, their day.",
+    state: buildStateForRole("Leader"),
   },
   {
-    id: "r-staff",
-    name: "Staff",
-    description: "Conversations, the contact list, and reading the commercial pages.",
-    state: buildStateForRole("Staff"),
+    id: "r-brand",
+    name: "Brand",
+    description:
+      "Follows the campaigns and the commerce pages for their brand, without editing them.",
+    state: buildStateForRole("Brand"),
+  },
+  {
+    id: "r-trainer",
+    name: "Trainer",
+    description: "Keeps the knowledge current — modules and cards — and teaches from it.",
+    state: buildStateForRole("Trainer"),
+  },
+  {
+    id: "r-management",
+    name: "Management",
+    description: "Oversight across the workspace, read-only.",
+    state: buildStateForRole("Management"),
   },
 ];
 
@@ -452,65 +499,65 @@ const SEED_USERS: AssignedUser[] = [
     id: "u-citra",
     name: "Citra Dewanti",
     phone: "+62 811 5500 0011",
-    jobTitle: "Area Coordinator",
+    jobTitle: "Leader",
     assignedDate: "Mar 18, 2024",
-    role: "Area Coordinator",
+    role: "Leader",
   },
   {
     id: "u-bagas",
     name: "Bagas Wirawan",
     phone: "+62 811 5500 0012",
-    jobTitle: "Area Coordinator",
+    jobTitle: "Leader",
     assignedDate: "Apr 04, 2024",
-    role: "Area Coordinator",
+    role: "Leader",
   },
   {
     id: "u-farhan",
     name: "Farhan Nugraha",
     phone: "+62 811 5500 0013",
-    jobTitle: "Area Coordinator",
+    jobTitle: "Leader",
     assignedDate: "May 06, 2024",
-    role: "Area Coordinator",
+    role: "Leader",
   },
   {
     id: "u-sara",
     name: "Sara Iqbal",
     phone: "+62 811 5500 0005",
-    jobTitle: "Support Specialist",
+    jobTitle: "Brand Executive",
     assignedDate: "May 22, 2024",
-    role: "Staff",
+    role: "Brand",
   },
   {
     id: "u-dimas",
     name: "Dimas Pratama",
     phone: "+62 811 5500 0006",
-    jobTitle: "Operations Analyst",
+    jobTitle: "Business Management",
     assignedDate: "Jun 09, 2024",
-    role: "Staff",
+    role: "Management",
   },
   {
     id: "u-hana",
     name: "Hana Wijaya",
     phone: "+62 812 8899 0011",
-    jobTitle: "Sales Associate",
+    jobTitle: "Product Trainer",
     assignedDate: "Jul 03, 2024",
-    role: "Staff",
+    role: "Trainer",
   },
   {
     id: "u-marco",
     name: "Marco Silva",
     phone: "+62 813 5566 7788",
-    jobTitle: "Support Agent",
+    jobTitle: "Brand Executive",
     assignedDate: "Aug 15, 2024",
-    role: "Staff",
+    role: "Brand",
   },
   {
     id: "u-noor",
     name: "Noor Hassan",
     phone: "+62 811 5500 0008",
-    jobTitle: "Customer Insights",
+    jobTitle: "Product Trainer",
     assignedDate: "Sep 01, 2024",
-    role: "Staff",
+    role: "Trainer",
   },
 ];
 

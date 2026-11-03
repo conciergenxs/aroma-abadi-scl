@@ -188,7 +188,7 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "ba-scope",
     label: "See Every Area",
     section: "BA Enablement",
-    effect: "The BA list shows only the signed-in coordinator's own area.",
+    effect: "The BA list shows only the team reporting to the signed-in Leader.",
     where: "/ba",
   },
   {

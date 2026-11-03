@@ -268,7 +268,9 @@ function ProfileTab() {
           <div>
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Role</span>
             <div className="mt-1 flex h-9 items-center gap-2">
-              <StatusPill tone={user.role === "Staff" ? "neutral" : "positive"}>
+              <StatusPill
+                tone={user.role === "Super Admin" || user.role === "Admin" ? "positive" : "neutral"}
+              >
                 {user.role}
               </StatusPill>
               <span className="text-[12px] text-muted-foreground">
@@ -457,7 +459,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-citra",
     name: "Citra Dewanti",
     phone: "+62 811 5500 0011",
-    role: "Area Coordinator",
+    role: "Leader",
     status: "Away",
     joinedOn: "Mar 18, 2024",
     state: "Active",
@@ -466,7 +468,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-bagas",
     name: "Bagas Wirawan",
     phone: "+62 811 5500 0012",
-    role: "Area Coordinator",
+    role: "Leader",
     status: "Offline",
     joinedOn: "Apr 04, 2024",
     state: "Active",
@@ -475,7 +477,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-farhan",
     name: "Farhan Nugraha",
     phone: "+62 811 5500 0013",
-    role: "Area Coordinator",
+    role: "Leader",
     status: "Online",
     joinedOn: "May 06, 2024",
     state: "Active",
@@ -484,7 +486,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-sara",
     name: "Sara Iqbal",
     phone: "+62 811 5500 0005",
-    role: "Staff",
+    role: "Brand",
     status: "Online",
     joinedOn: "May 22, 2024",
     state: "Active",
@@ -493,7 +495,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-dimas",
     name: "Dimas Pratama",
     phone: "+62 811 5500 0006",
-    role: "Staff",
+    role: "Management",
     status: "Offline",
     joinedOn: "Jun 09, 2024",
     state: "Active",
@@ -502,7 +504,7 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-pending-1",
     name: "Hana Wijaya",
     phone: "+62 812 8899 0011",
-    role: "Staff",
+    role: "Trainer",
     status: "Offline",
     joinedOn: "—",
     state: "Pending",
@@ -511,14 +513,21 @@ const USERS_SEED: WorkspaceUser[] = [
     id: "u-pending-2",
     name: "Marco Silva",
     phone: "+62 813 5566 7788",
-    role: "Staff",
+    role: "Brand",
     status: "Offline",
     joinedOn: "—",
     state: "Pending",
   },
 ];
 
-const ROLE_OPTIONS: UserRole[] = ["Super Admin", "Admin", "Area Coordinator", "Staff"];
+const ROLE_OPTIONS: UserRole[] = [
+  "Super Admin",
+  "Admin",
+  "Leader",
+  "Brand",
+  "Trainer",
+  "Management",
+];
 const statusDot: Record<UserStatus, string> = {
   Online: "bg-emerald-400",
   Away: "bg-amber-400",
@@ -579,22 +588,20 @@ function UserManagementPage() {
     setSelected([]);
   };
 
-  /* ── Handing over a coordinator's team ──────────────────────────────────
-   * Every Beauty Ambassador reports to an Area Coordinator, so the last thing
-   * that happens before one stops being a coordinator — by changing role or by
+  /* ── Handing over a Leader's team ──────────────────────────────────
+   * Every Beauty Ambassador reports to a Leader, so the last thing
+   * that happens before one stops being a Leader — by changing role or by
    * being removed — is deciding who takes their BAs. With no one else to take
    * them, the change doesn't happen at all. */
-  const basUnder = (names: string[]) => bas.filter((b) => names.includes(b.areaCoordinator)).length;
+  const basUnder = (names: string[]) => bas.filter((b) => names.includes(b.leader)).length;
 
-  const coordinatorsExcept = (names: string[]) =>
+  const leadersExcept = (names: string[]) =>
     users
-      .filter(
-        (u) => u.role === "Area Coordinator" && u.state === "Active" && !names.includes(u.name),
-      )
+      .filter((u) => u.role === "Leader" && u.state === "Active" && !names.includes(u.name))
       .map((u) => u.name);
 
   const requestRoleChange = (u: WorkspaceUser, role: UserRole) => {
-    const leaving = u.role === "Area Coordinator" && role !== "Area Coordinator";
+    const leaving = u.role === "Leader" && role !== "Leader";
     if (leaving && basUnder([u.name]) > 0) {
       setHandover({ kind: "role", names: [u.name], userId: u.id, nextRole: role });
       return;
@@ -604,7 +611,7 @@ function UserManagementPage() {
 
   const requestDelete = () => {
     const leaving = users
-      .filter((u) => selected.includes(u.id) && !u.owner && u.role === "Area Coordinator")
+      .filter((u) => selected.includes(u.id) && !u.owner && u.role === "Leader")
       .map((u) => u.name);
     if (leaving.length > 0 && basUnder(leaving) > 0) {
       setHandover({ kind: "delete", names: leaving });
@@ -625,18 +632,18 @@ function UserManagementPage() {
     setHandover(null);
   };
 
-  /** Everyone to the same coordinator. */
+  /** Everyone to the same Leader. */
   const completeHandover = (to: string) => {
     if (!handover) return;
-    finishHandover(baStore.reassignCoordinator(handover.names, to), to);
+    finishHandover(baStore.reassignLeader(handover.names, to), to);
   };
 
-  /** One coordinator per person, as chosen in the one-by-one list. */
+  /** One Leader per person, as chosen in the one-by-one list. */
   const completeHandoverEach = (assignments: Record<string, string>) => {
     const entries = Object.entries(assignments);
-    entries.forEach(([baId, to]) => baStore.update(baId, { areaCoordinator: to }));
+    entries.forEach(([baId, to]) => baStore.update(baId, { leader: to }));
     const names = [...new Set(entries.map(([, to]) => to))];
-    finishHandover(entries.length, names.length === 1 ? names[0] : `${names.length} coordinators`);
+    finishHandover(entries.length, names.length === 1 ? names[0] : `${names.length} Leaders`);
   };
 
   return (
@@ -848,9 +855,9 @@ function UserManagementPage() {
         <CoordinatorHandoverModal
           handover={handover}
           baCount={basUnder(handover.names)}
-          options={coordinatorsExcept(handover.names)}
-          countFor={(name) => bas.filter((b) => b.areaCoordinator === name).length}
-          team={bas.filter((b) => handover.names.includes(b.areaCoordinator))}
+          options={leadersExcept(handover.names)}
+          countFor={(name) => bas.filter((b) => b.leader === name).length}
+          team={bas.filter((b) => handover.names.includes(b.leader))}
           onClose={() => setHandover(null)}
           onConfirm={completeHandover}
           onConfirmEach={completeHandoverEach}
@@ -861,10 +868,10 @@ function UserManagementPage() {
   );
 }
 
-/* ── Area Coordinator handover ────────────────────────────────────────────
- * Opened the moment a coordinator is about to stop being one. It is the only
- * way past that point, and with no other coordinator to receive the team there
- * is no way past at all — a BA without a coordinator has no one to answer to
+/* ── Leader handover ────────────────────────────────────────────
+ * Opened the moment a Leader is about to stop being one. It is the only
+ * way past that point, and with no other Leader to receive the team there
+ * is no way past at all — a BA without a Leader has no one to answer to
  * and drops out of every area view. */
 
 type Handover =
@@ -930,7 +937,7 @@ function CoordinatorHandoverModal({
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-semibold">
-              {none ? "No One Left to Take Over" : "Hand Over the Team"}
+              {none ? "No Other Leader to Take Over" : "Hand Over the Team"}
             </h3>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
               {leaving} looks after{" "}
@@ -945,14 +952,14 @@ function CoordinatorHandoverModal({
         <div className="px-5 py-4 space-y-3">
           {none ? (
             <p className="text-[13px] leading-relaxed text-muted-foreground">
-              Each one has to report to an Area Coordinator, and there is nobody else holding that
-              role. Give another user the role first, then come back to this change.
+              Each one has to report to a Leader, and nobody else holds that role. Give another user
+              the Leader role first, then come back to this change.
             </p>
           ) : (
             <>
               <p className="text-[13px] leading-relaxed text-muted-foreground">
-                Each one has to report to an Area Coordinator. Pick who takes the team over, or hand
-                them out individually.
+                Each one has to report to a Leader. Pick who takes the team over, or hand them out
+                individually.
               </p>
               <div className="space-y-1">
                 <div className="flex items-end justify-between gap-3">
@@ -966,12 +973,12 @@ function CoordinatorHandoverModal({
                   </button>
                 </div>
                 <SclSelect
-                  ariaLabel="Area Coordinator to move the team to"
+                  ariaLabel="Leader to move the team to"
                   value={to}
                   onChange={setTo}
                   options={selectOptions}
                   searchable
-                  searchPlaceholder="Search coordinator…"
+                  searchPlaceholder="Search leader…"
                   className="w-full"
                 />
               </div>
@@ -1001,8 +1008,8 @@ function CoordinatorHandoverModal({
   );
 }
 
-/* One coordinator per person, for a team that doesn't all move to the same
- * place. Ten rows at a time: a coordinator with thirty people shouldn't have
+/* One Leader per person, for a team that doesn't all move to the same
+ * place. Ten rows at a time: a Leader with thirty people shouldn't have
  * to scroll a modal to find the one they are still deciding about. */
 
 const ASSIGN_PAGE_SIZE = 10;
@@ -1049,7 +1056,7 @@ function AssignOneByOneModal({
           <div className="min-w-0">
             <h3 className="text-sm font-semibold">Assign One by One</h3>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              {team.length} to place · choose a coordinator for each.
+              {team.length} to place · choose a Leader for each.
             </p>
           </div>
           <button
@@ -1083,13 +1090,13 @@ function AssignOneByOneModal({
                   </td>
                   <td className="px-4 py-2 align-middle">
                     <SclSelect
-                      ariaLabel={`Coordinator for ${b.name}`}
+                      ariaLabel={`Leader for ${b.name}`}
                       value={assignments[b.id] ?? ""}
                       placeholder="Not assigned"
                       onChange={(v) => setAssignments((a) => ({ ...a, [b.id]: v }))}
                       options={options}
                       searchable
-                      searchPlaceholder="Search coordinator…"
+                      searchPlaceholder="Search leader…"
                       size="sm"
                       className="w-48"
                     />
@@ -1137,7 +1144,7 @@ function AssignOneByOneModal({
             <button
               onClick={() => onConfirm(assignments)}
               disabled={done < team.length}
-              title={done < team.length ? "Every one of them needs a coordinator." : undefined}
+              title={done < team.length ? "Every one of them needs a Leader." : undefined}
               className="press h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
               Move {team.length} &amp; Continue

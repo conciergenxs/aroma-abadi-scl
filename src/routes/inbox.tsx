@@ -1203,8 +1203,8 @@ function InboxPage() {
                     />
                     <InfoRow
                       icon={<MapPin className="h-3 w-3" />}
-                      label="Area Coordinator"
-                      value={baRecord?.areaCoordinator ?? "—"}
+                      label="Leader"
+                      value={baRecord?.leader ?? "—"}
                     />
                   </>
                 ) : (
