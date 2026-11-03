@@ -59,14 +59,17 @@ import {
 } from "@/components/landing/screens";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 import whatsappMark from "@/assets/whatsapp.png";
-import brandDG from "@/assets/brand-dolce-gabbana.png";
-import brandSisley from "@/assets/brand-sisley.png";
-import brandRimmel from "@/assets/brand-rimmel.png";
-import brandLaura from "@/assets/brand-laura-mercier.png";
-import brandBareMinerals from "@/assets/brand-baremineral.png";
 import shotLifestyle from "@/assets/kc-cover-1.jpg";
 import shotLipstick from "@/assets/sku-caviar-lipstick.jpg";
 import shotFoundation from "@/assets/sku-real-flawless-foundation.jpg";
+
+/* Every mark in src/assets/brands, in filename order. Dropping a new SVG in
+ * that folder puts it on the page; nothing here needs editing. */
+const BRAND_FILES = import.meta.glob("/src/assets/brands/*.svg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
 
 /* The public company page.
  *
@@ -208,13 +211,17 @@ const STEP_SHIPPING: ChatMessage[] = [
   },
 ];
 
-const BRANDS = [
-  { src: brandSisley, name: "Sisley Paris" },
-  { src: brandLaura, name: "Laura Mercier" },
-  { src: brandDG, name: "Dolce & Gabbana Beauty" },
-  { src: brandBareMinerals, name: "bareMinerals" },
-  { src: brandRimmel, name: "Rimmel London" },
-];
+const BRANDS = Object.entries(BRAND_FILES)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, src]) => ({
+    src,
+    name: (path.split("/").pop() ?? "")
+      .replace(/^\d+_/, "")
+      .replace(/\.svg$/, "")
+      .replace(/_and_/g, " & ")
+      .replace(/_/g, " "),
+  }));
+
 
 const SERVICES = [
   {
@@ -252,10 +259,10 @@ const SHOTS = [
 ];
 
 const HERO_FACTS: { icon?: typeof Building2; wa?: boolean; label: string; value: string }[] = [
-  { icon: Building2, label: "Legal entity", value: "PT Aroma Abadi" },
-  { icon: Boxes, label: "Line of business", value: "Beauty distribution" },
-  { wa: true, label: "Sales channel", value: "WhatsApp (ARMA)" },
-  { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
+  { icon: Building2, label: "Legal Entity", value: "PT Aroma Abadi" },
+  { icon: Boxes, label: "Line of Business", value: "Beauty distribution" },
+  { wa: true, label: "Sales Channel", value: "WhatsApp (ARMA)" },
+  { icon: CreditCard, label: "Payment Gateway", value: "Xendit" },
 ];
 
 const PROGRAM = [
@@ -348,10 +355,10 @@ const CONTACT: {
       </a>
     ),
   },
-  { icon: Clock, label: "Service hours", value: "24 hours, every day" },
+  { icon: Clock, label: "Service Hours", value: "24 hours, every day" },
   {
     icon: Mail,
-    label: "Official email",
+    label: "Official Email",
     value: (
       <a
         href="mailto:arma@aromaabadi.com"
@@ -363,7 +370,7 @@ const CONTACT: {
   },
   {
     icon: MapPin,
-    label: "Registered office",
+    label: "Registered Office",
     value: (
       <>
         <Pending field="full address" tone="maroon" />, South Jakarta, DKI Jakarta
@@ -624,9 +631,6 @@ function CompanyPage() {
             <p className="lp-display text-center text-[clamp(1.3rem,1rem+0.9vw,1.75rem)] leading-tight text-[#710014]">
               Brands we represent
             </p>
-            <p className="mt-2 text-center text-[13.5px] text-[#9A5A63]">
-              Five of the more than 25 brands in our portfolio
-            </p>
             <div className="mt-5">
               <Marquee>
                 {BRANDS.map((brand) => (
@@ -634,7 +638,7 @@ function CompanyPage() {
                     key={brand.name}
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[250px] w-[330px] shrink-0 object-contain sm:w-[460px]"
+                    className="lp-brandmark h-[108px] w-[210px] shrink-0 object-contain px-7 sm:h-[124px] sm:w-[260px]"
                   />
                 ))}
               </Marquee>
@@ -685,8 +689,8 @@ function CompanyPage() {
             </div>
           </Reveal>
 
-          <h3 className="mt-10 text-[13px] font-medium tracking-[0.02em] text-[#9A5A63]">
-            What we do for the brands we carry
+          <h3 className="mt-10 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+            What We Do
           </h3>
           <div className="mt-4 grid gap-4 sm:auto-rows-fr sm:grid-cols-2">
             {SERVICES.map((service, index) => (
@@ -698,8 +702,8 @@ function CompanyPage() {
             ))}
           </div>
 
-          <h3 className="mt-10 text-[13px] font-medium tracking-[0.02em] text-[#9A5A63]">
-            How we work
+          <h3 className="mt-10 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+            How We Work
           </h3>
           <Reveal delay={40}>
             <dl className="mt-4 grid gap-x-8 gap-y-4 border-t border-[#EAD3D7] pt-4 sm:grid-cols-3">
@@ -725,11 +729,11 @@ function CompanyPage() {
               tone="cream"
               cols={2}
               items={[
-                { icon: Building2, label: "Registered name", value: "PT Aroma Abadi" },
-                { icon: Boxes, label: "Line of business", value: "Beauty product trading" },
+                { icon: Building2, label: "Registered Name", value: "PT Aroma Abadi" },
+                { icon: Boxes, label: "Line of Business", value: "Beauty product trading" },
                 {
                   icon: MapPin,
-                  label: "Registered office",
+                  label: "Registered Office",
                   value: (
                     <>
                       <Pending field="full address" />, South Jakarta
@@ -738,16 +742,16 @@ function CompanyPage() {
                 },
                 {
                   icon: FileCheck,
-                  label: "Business registration",
+                  label: "Business Registration",
                   value: <Pending field="NIB number" />,
                 },
                 {
                   icon: MessageCircle,
-                  label: "Sales channels",
+                  label: "Sales Channels",
                   value: "WhatsApp (ARMA) and partner retail",
                 },
-                { icon: Globe, label: "Delivery area", value: "Across Indonesia" },
-                { icon: CreditCard, label: "Payment gateway", value: "Xendit" },
+                { icon: Globe, label: "Delivery Area", value: "Across Indonesia" },
+                { icon: CreditCard, label: "Payment Gateway", value: "Xendit" },
               ]}
             />
           </Reveal>
