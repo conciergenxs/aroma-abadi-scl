@@ -1294,7 +1294,7 @@ function FilterPropertiesModal({
       onClick={onClose}
     >
       <div
-        className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+        className="w-[720px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl modal-content"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
@@ -1573,7 +1573,7 @@ function LabelManager({
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-[420px] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+            className="w-full max-w-[420px] rounded-xl border border-border bg-popover shadow-xl modal-content"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">

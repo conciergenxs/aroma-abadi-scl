@@ -55,7 +55,7 @@ export function PropertyFormModal({
       onClick={onClose}
     >
       <div
-        className="w-[440px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl glass modal-content"
+        className="w-[440px] max-w-[95vw] rounded-xl border border-border bg-popover shadow-xl modal-content"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
