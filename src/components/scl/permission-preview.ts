@@ -81,7 +81,10 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "promo",
     label: "Promo Access",
     section: "Module Access",
-    effect: "Promo Codes and Referral are gone from the sidebar.",
+    // Referral is a full-build page, so lite has nothing to name beside it.
+    effect: LITE_MODE
+      ? "Promo Codes is gone from the sidebar, and its URL lands on Overview."
+      : "Promo Codes and Referral are gone from the sidebar.",
     where: "/promo-codes",
   },
   {
