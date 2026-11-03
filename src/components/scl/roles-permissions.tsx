@@ -769,11 +769,12 @@ export function RolesPermissionsModule() {
 
 function PermissionPreviewLinks() {
   const [copied, setCopied] = useState<string | null>(null);
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
   const sections = Array.from(new Set(PREVIEW_CONDITIONS.map((c) => c.section)));
 
+  // The links render relative, so the server's HTML and the client's agree;
+  // the clipboard gets the whole URL, which is what gets pasted to someone.
   const copy = async (c: (typeof PREVIEW_CONDITIONS)[number]) => {
-    await navigator.clipboard.writeText(previewLink(c.id, origin));
+    await navigator.clipboard.writeText(previewLink(c.id, window.location.origin));
     setCopied(c.id);
     toast.success(`Link copied — ${c.label}`);
     window.setTimeout(() => setCopied(null), 1600);
@@ -823,7 +824,7 @@ function PermissionPreviewLinks() {
                     Copy Link
                   </button>
                   <a
-                    href={previewLink(c.id, origin)}
+                    href={previewLink(c.id)}
                     className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                   >
                     Open
