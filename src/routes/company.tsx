@@ -347,7 +347,7 @@ const CONTACT: {
         href={WA_LINK}
         target="_blank"
         rel="noreferrer noopener"
-        className="underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+        className="-my-1 inline-block py-1 underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
       >
         {WA_NUMBER}
       </a>
@@ -360,7 +360,7 @@ const CONTACT: {
     value: (
       <a
         href="mailto:arma@aromaabadi.com"
-        className="underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+        className="-my-1 inline-block py-1 underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
       >
         arma@aromaabadi.com
       </a>
@@ -687,9 +687,9 @@ function CompanyPage() {
             </div>
           </Reveal>
 
-          <h3 className="mt-10 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+          <p className="mt-10 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
             What We Do
-          </h3>
+          </p>
           <div className="mt-4 grid gap-4 sm:auto-rows-fr sm:grid-cols-2">
             {SERVICES.map((service, index) => (
               <Reveal key={service.title} delay={index * 60}>
@@ -700,9 +700,9 @@ function CompanyPage() {
             ))}
           </div>
 
-          <h3 className="mt-10 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+          <p className="mt-10 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
             How We Work
-          </h3>
+          </p>
           <Reveal delay={40}>
             <dl className="mt-4 grid gap-x-8 gap-y-4 border-t border-[#EAD3D7] pt-4 sm:grid-cols-3">
               {VALUES.map((value) => (

@@ -265,7 +265,7 @@ export function SpecPanel({
               strokeWidth={1.7}
             />
             <div className="min-w-0">
-              <dt className="text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
+              <dt className="text-[12px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
                 {item.label}
               </dt>
               <dd className="mt-[4px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
@@ -395,7 +395,7 @@ export function Step({
                       index ? "border-t border-[#EAD3D7]" : ""
                     }`}
                   >
-                    <dt className="flex shrink-0 items-center gap-[7px] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
+                    <dt className="flex shrink-0 items-center gap-[7px] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
                       {point.icon ? (
                         <point.icon className="h-[13px] w-[13px]" strokeWidth={1.8} />
                       ) : null}

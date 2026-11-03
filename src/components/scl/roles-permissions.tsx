@@ -382,15 +382,13 @@ const SEED_ROLES: Role[] = [
   {
     id: "r-area-coordinator",
     name: "Area Coordinator",
-    description: "Looks after the Beauty Ambassadors in their own area.",
+    description: "Runs the Beauty Ambassadors in their own area, and the conversations around them.",
     state: buildStateForRole("Area Coordinator"),
   },
   {
     id: "r-staff",
     name: "Staff",
-    description: LITE_MODE
-      ? "Conversations, contacts, and the promo and transaction pages."
-      : "Conversations, contacts, and the promo, referral and transaction pages.",
+    description: "Conversations, the contact list, and reading the commercial pages.",
     state: buildStateForRole("Staff"),
   },
 ];
@@ -400,6 +398,8 @@ const SEED_ROLES: Role[] = [
 export type AssignedUser = {
   id: string;
   name: string;
+  /** How they sign in — the workspace holds no email for anyone. */
+  phone: string;
   jobTitle: string;
   assignedDate: string;
   /** Role name; matched against Role.name. */
@@ -410,6 +410,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-aria",
     name: "Aria Kapoor",
+    phone: "+62 811 5500 0001",
     jobTitle: "Workspace Owner",
     assignedDate: "Jan 12, 2024",
     role: "Super Admin",
@@ -417,6 +418,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-jonas",
     name: "Jonas Weber",
+    phone: "+62 811 5500 0003",
     jobTitle: "CTO",
     assignedDate: "Jan 14, 2024",
     role: "Super Admin",
@@ -424,6 +426,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-ines",
     name: "Ines Carvalho",
+    phone: "+62 811 5500 0004",
     jobTitle: "VP Customer",
     assignedDate: "Jan 20, 2024",
     role: "Super Admin",
@@ -431,6 +434,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-tom",
     name: "Tomas Bergstrom",
+    phone: "+62 811 5500 0002",
     jobTitle: "Head of Support",
     assignedDate: "Feb 02, 2024",
     role: "Admin",
@@ -438,27 +442,39 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-priya",
     name: "Priya Shah",
+    phone: "+62 811 5500 0007",
     jobTitle: "Operations Manager",
     assignedDate: "Feb 18, 2024",
     role: "Admin",
   },
   {
-    id: "u-mei",
-    name: "Mei Tanaka",
-    jobTitle: "Sales Lead",
+    id: "u-citra",
+    name: "Citra Dewanti",
+    phone: "+62 811 5500 0011",
+    jobTitle: "Area Coordinator",
     assignedDate: "Mar 18, 2024",
     role: "Area Coordinator",
   },
   {
-    id: "u-luca",
-    name: "Luca Romano",
-    jobTitle: "Marketing Manager",
+    id: "u-bagas",
+    name: "Bagas Wirawan",
+    phone: "+62 811 5500 0012",
+    jobTitle: "Area Coordinator",
     assignedDate: "Apr 04, 2024",
+    role: "Area Coordinator",
+  },
+  {
+    id: "u-farhan",
+    name: "Farhan Nugraha",
+    phone: "+62 811 5500 0013",
+    jobTitle: "Area Coordinator",
+    assignedDate: "May 06, 2024",
     role: "Area Coordinator",
   },
   {
     id: "u-sara",
     name: "Sara Iqbal",
+    phone: "+62 811 5500 0005",
     jobTitle: "Support Specialist",
     assignedDate: "May 22, 2024",
     role: "Staff",
@@ -466,6 +482,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-dimas",
     name: "Dimas Pratama",
+    phone: "+62 811 5500 0006",
     jobTitle: "Operations Analyst",
     assignedDate: "Jun 09, 2024",
     role: "Staff",
@@ -473,6 +490,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-hana",
     name: "Hana Wijaya",
+    phone: "+62 812 8899 0011",
     jobTitle: "Sales Associate",
     assignedDate: "Jul 03, 2024",
     role: "Staff",
@@ -480,6 +498,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-marco",
     name: "Marco Silva",
+    phone: "+62 813 5566 7788",
     jobTitle: "Support Agent",
     assignedDate: "Aug 15, 2024",
     role: "Staff",
@@ -487,6 +506,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-noor",
     name: "Noor Hassan",
+    phone: "+62 811 5500 0008",
     jobTitle: "Customer Insights",
     assignedDate: "Sep 01, 2024",
     role: "Staff",
