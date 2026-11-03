@@ -55,8 +55,6 @@ function BAPage() {
     cannotReason(user.role, "ba.manage"),
   );
   const passwordGate = usePermission("ba-password");
-  // "See Every Area" is what lets anyone look past their own patch.
-  const everyArea = usePermission("ba-scope");
   const canManage = createGate.allowed;
   const manageReason = createGate.reason;
   const { brands } = useSkuStore();
@@ -87,10 +85,6 @@ function BAPage() {
     () =>
       bas.filter((b) => {
         // An Leader only ever sees the BAs they look after.
-        // "See Every Area" is what opens the whole directory; without it a
-        // Leader sees the team that reports to them and nobody else.
-        const ownTeam = user.leader ?? "Citra Dewanti";
-        if (!everyArea.allowed && b.leader !== ownTeam) return false;
         if (search) {
           const q = search.toLowerCase();
           if (
@@ -107,17 +101,7 @@ function BAPage() {
         if (filterStore && b.store !== filterStore) return false;
         return true;
       }),
-    [
-      bas,
-      search,
-      filterBrand,
-      filterGender,
-      filterPosisi,
-      filterStore,
-      user.role,
-      user.leader,
-      everyArea.allowed,
-    ],
+    [bas, search, filterBrand, filterGender, filterPosisi, filterStore, user.role],
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -310,10 +294,10 @@ function BAPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => passwordGate.allowed && setResetConfirm(b)}
-                          disabled={!passwordGate.allowed}
+                          onClick={() => editGate.allowed && setResetConfirm(b)}
+                          disabled={!editGate.allowed}
                           className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                          title={passwordGate.reason || "Reset password"}
+                          title={editGate.reason || "Reset password"}
                         >
                           <KeyRound className="h-3.5 w-3.5" />
                         </button>

@@ -210,7 +210,7 @@ export type Capability =
   | "promo"
   | "transactions"
   | "settings"
-  | "settings.roles"
+  | "settings.roles";
 
 const ROLE_CAPABILITIES: Record<WorkspaceRole, Capability[]> = {
   "Super Admin": [
