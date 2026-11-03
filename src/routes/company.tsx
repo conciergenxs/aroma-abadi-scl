@@ -96,7 +96,7 @@ const METHODS: PaymentMethod[] = [
   { id: "qris", name: "QRIS", note: "Any bank or e‑wallet app" },
   { id: "va", name: "Virtual Account", note: "BCA, Mandiri, BNI, BRI, Permata" },
   { id: "ewallet", name: "E-Wallet", note: "OVO, DANA, ShopeePay, LinkAja" },
-  { id: "card", name: "Credit or debit card", note: "Visa, Mastercard, JCB" },
+  { id: "card", name: "Credit or Debit Card", note: "Visa, Mastercard, JCB" },
 ];
 
 const CHECKOUT = {
@@ -179,7 +179,7 @@ const STEP_OPENING: ChatMessage[] = [
   {
     from: "arma",
     time: "09.37",
-    text: "Hi, we are! I'm Arma from Aroma Abadi. What can I help you find today?",
+    text: "Hi, we are! I'm ARMA from Aroma Abadi. What can I help you find today?",
   },
 ];
 
@@ -223,7 +223,7 @@ const SERVICES = [
   {
     icon: Megaphone,
     title: "Marketing Support",
-    body: "Campaign planning and brand visibility across every channel we operate.",
+    body: "Campaign planning and brand visibility across every channel we operate in.",
   },
   {
     icon: Store,
@@ -322,7 +322,7 @@ const POLICIES = [
   {
     icon: Lock,
     title: "Data Privacy",
-    body: "We keep the WhatsApp number, name, delivery address and order history needed to process an order. Data is never sold, and never shared beyond delivery and payment.",
+    body: "We keep the WhatsApp number, name, delivery address and order history needed to process an order. Data is never sold, and never shared beyond our delivery and payment partners.",
   },
 ];
 
@@ -640,7 +640,7 @@ function CompanyPage() {
           tone="cream"
           icon={Building2}
           title="Business Profile"
-          lede="A registered company, selling only BPOM-licensed products."
+          lede="A registered company selling only BPOM-licensed products."
         >
           <Reveal>
             <Prose tone="cream">
