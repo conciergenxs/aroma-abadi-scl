@@ -382,7 +382,8 @@ const SEED_ROLES: Role[] = [
   {
     id: "r-area-coordinator",
     name: "Area Coordinator",
-    description: "Runs the Beauty Ambassadors in their own area, and the conversations around them.",
+    description:
+      "Runs the Beauty Ambassadors in their own area, and the conversations around them.",
     state: buildStateForRole("Area Coordinator"),
   },
   {
@@ -1372,6 +1373,7 @@ function RoleDetailPage({
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
               </tr>
@@ -1398,6 +1400,9 @@ function RoleDetailPage({
                     </div>
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.phone}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
                     {u.jobTitle}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
@@ -1407,7 +1412,7 @@ function RoleDetailPage({
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No users assigned to this role.
                   </td>
                 </tr>
@@ -1470,7 +1475,12 @@ function AssignUsersModal({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allUsers;
-    return allUsers.filter((u) => u.name.toLowerCase().includes(q));
+    const digits = q.replace(/\D/g, "");
+    return allUsers.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        (digits.length > 0 && u.phone.replace(/\D/g, "").includes(digits)),
+    );
   }, [allUsers, query]);
 
   const toggle = (id: string) =>
@@ -1507,7 +1517,7 @@ function AssignUsersModal({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name"
+              placeholder="Search by name or WA number"
               className="h-9 w-full rounded-md border border-border bg-background/30 pl-8 pr-3 text-xs outline-none focus:border-primary/60"
             />
           </div>
@@ -1518,6 +1528,7 @@ function AssignUsersModal({
               <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="px-4 py-2.5 text-left w-8" />
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Current Role</th>
               </tr>
             </thead>
@@ -1541,6 +1552,9 @@ function AssignUsersModal({
                       />
                     </td>
                     <td className="px-4 align-middle whitespace-nowrap font-medium">{u.name}</td>
+                    <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
+                      {u.phone}
+                    </td>
                     <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
                       {already ? (
                         <span className="text-[10px] uppercase tracking-wider text-primary">
