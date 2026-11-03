@@ -289,16 +289,16 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
     categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
     items: ["*", "-settings-roles"],
   },
-  // Looks after their own area's BAs; reads knowledge but never edits it, and
-  // the commercial pages aren't theirs at all.
+  // Runs the BAs in their own area and the conversations around them: reads
+  // the contact list without changing it, reads knowledge without editing it,
+  // and never touches outbound or the commercial pages.
   "Area Coordinator": {
     categories: ["inbox", "contacts", "knowledge", "ba"],
     items: [
       "inbox-view",
       "inbox-send",
+      "inbox-assign",
       "contacts-view",
-      "contacts-create",
-      "contacts-edit",
       "knowledge-view",
       "ba-view",
       "ba-create",
@@ -306,23 +306,18 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "ba-password",
     ],
   },
-  // Desk work: conversations, contacts and the commercial pages.
+  // Desk work: conversations, the contact list, and reading the commercial
+  // pages — recording a transaction is the one thing they create there.
   Staff: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
+    categories: ["inbox", "contacts", "knowledge", "commerce"],
     items: [
       "inbox-view",
       "inbox-send",
       "contacts-view",
       "contacts-create",
       "contacts-edit",
-      "broadcast-view",
-      "broadcast-create",
-      "templates-view",
       "knowledge-view",
-      "ba-view",
       "commerce-view",
-      "promo-manage",
-      "referral-manage",
       "transactions-manage",
     ],
   },
@@ -387,15 +382,14 @@ const SEED_ROLES: Role[] = [
   {
     id: "r-area-coordinator",
     name: "Area Coordinator",
-    description: "Looks after the Beauty Ambassadors in their own area.",
+    description:
+      "Runs the Beauty Ambassadors in their own area, and the conversations around them.",
     state: buildStateForRole("Area Coordinator"),
   },
   {
     id: "r-staff",
     name: "Staff",
-    description: LITE_MODE
-      ? "Conversations, contacts, and the promo and transaction pages."
-      : "Conversations, contacts, and the promo, referral and transaction pages.",
+    description: "Conversations, the contact list, and reading the commercial pages.",
     state: buildStateForRole("Staff"),
   },
 ];
@@ -405,6 +399,8 @@ const SEED_ROLES: Role[] = [
 export type AssignedUser = {
   id: string;
   name: string;
+  /** How they sign in — the workspace holds no email for anyone. */
+  phone: string;
   jobTitle: string;
   assignedDate: string;
   /** Role name; matched against Role.name. */
@@ -415,6 +411,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-aria",
     name: "Aria Kapoor",
+    phone: "+62 811 5500 0001",
     jobTitle: "Workspace Owner",
     assignedDate: "Jan 12, 2024",
     role: "Super Admin",
@@ -422,6 +419,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-jonas",
     name: "Jonas Weber",
+    phone: "+62 811 5500 0003",
     jobTitle: "CTO",
     assignedDate: "Jan 14, 2024",
     role: "Super Admin",
@@ -429,6 +427,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-ines",
     name: "Ines Carvalho",
+    phone: "+62 811 5500 0004",
     jobTitle: "VP Customer",
     assignedDate: "Jan 20, 2024",
     role: "Super Admin",
@@ -436,6 +435,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-tom",
     name: "Tomas Bergstrom",
+    phone: "+62 811 5500 0002",
     jobTitle: "Head of Support",
     assignedDate: "Feb 02, 2024",
     role: "Admin",
@@ -443,27 +443,39 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-priya",
     name: "Priya Shah",
+    phone: "+62 811 5500 0007",
     jobTitle: "Operations Manager",
     assignedDate: "Feb 18, 2024",
     role: "Admin",
   },
   {
-    id: "u-mei",
-    name: "Mei Tanaka",
-    jobTitle: "Sales Lead",
+    id: "u-citra",
+    name: "Citra Dewanti",
+    phone: "+62 811 5500 0011",
+    jobTitle: "Area Coordinator",
     assignedDate: "Mar 18, 2024",
     role: "Area Coordinator",
   },
   {
-    id: "u-luca",
-    name: "Luca Romano",
-    jobTitle: "Marketing Manager",
+    id: "u-bagas",
+    name: "Bagas Wirawan",
+    phone: "+62 811 5500 0012",
+    jobTitle: "Area Coordinator",
     assignedDate: "Apr 04, 2024",
+    role: "Area Coordinator",
+  },
+  {
+    id: "u-farhan",
+    name: "Farhan Nugraha",
+    phone: "+62 811 5500 0013",
+    jobTitle: "Area Coordinator",
+    assignedDate: "May 06, 2024",
     role: "Area Coordinator",
   },
   {
     id: "u-sara",
     name: "Sara Iqbal",
+    phone: "+62 811 5500 0005",
     jobTitle: "Support Specialist",
     assignedDate: "May 22, 2024",
     role: "Staff",
@@ -471,6 +483,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-dimas",
     name: "Dimas Pratama",
+    phone: "+62 811 5500 0006",
     jobTitle: "Operations Analyst",
     assignedDate: "Jun 09, 2024",
     role: "Staff",
@@ -478,6 +491,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-hana",
     name: "Hana Wijaya",
+    phone: "+62 812 8899 0011",
     jobTitle: "Sales Associate",
     assignedDate: "Jul 03, 2024",
     role: "Staff",
@@ -485,6 +499,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-marco",
     name: "Marco Silva",
+    phone: "+62 813 5566 7788",
     jobTitle: "Support Agent",
     assignedDate: "Aug 15, 2024",
     role: "Staff",
@@ -492,6 +507,7 @@ const SEED_USERS: AssignedUser[] = [
   {
     id: "u-noor",
     name: "Noor Hassan",
+    phone: "+62 811 5500 0008",
     jobTitle: "Customer Insights",
     assignedDate: "Sep 01, 2024",
     role: "Staff",
@@ -753,11 +769,12 @@ export function RolesPermissionsModule() {
 
 function PermissionPreviewLinks() {
   const [copied, setCopied] = useState<string | null>(null);
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
   const sections = Array.from(new Set(PREVIEW_CONDITIONS.map((c) => c.section)));
 
+  // The links render relative, so the server's HTML and the client's agree;
+  // the clipboard gets the whole URL, which is what gets pasted to someone.
   const copy = async (c: (typeof PREVIEW_CONDITIONS)[number]) => {
-    await navigator.clipboard.writeText(previewLink(c.id, origin));
+    await navigator.clipboard.writeText(previewLink(c.id, window.location.origin));
     setCopied(c.id);
     toast.success(`Link copied — ${c.label}`);
     window.setTimeout(() => setCopied(null), 1600);
@@ -807,7 +824,7 @@ function PermissionPreviewLinks() {
                     Copy Link
                   </button>
                   <a
-                    href={previewLink(c.id, origin)}
+                    href={previewLink(c.id)}
                     className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
                   >
                     Open
@@ -1357,6 +1374,7 @@ function RoleDetailPage({
                   <Checkbox checked={allSelected} onChange={toggleAll} />
                 </th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Job Title</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Assigned Date</th>
               </tr>
@@ -1383,6 +1401,9 @@ function RoleDetailPage({
                     </div>
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
+                    {u.phone}
+                  </td>
+                  <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground">
                     {u.jobTitle}
                   </td>
                   <td className="px-4 py-3 align-middle whitespace-nowrap text-muted-foreground text-xs">
@@ -1392,7 +1413,7 @@ function RoleDetailPage({
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No users assigned to this role.
                   </td>
                 </tr>
@@ -1455,7 +1476,12 @@ function AssignUsersModal({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allUsers;
-    return allUsers.filter((u) => u.name.toLowerCase().includes(q));
+    const digits = q.replace(/\D/g, "");
+    return allUsers.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        (digits.length > 0 && u.phone.replace(/\D/g, "").includes(digits)),
+    );
   }, [allUsers, query]);
 
   const toggle = (id: string) =>
@@ -1492,7 +1518,7 @@ function AssignUsersModal({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name"
+              placeholder="Search by name or WA number"
               className="h-9 w-full rounded-md border border-border bg-background/30 pl-8 pr-3 text-xs outline-none focus:border-primary/60"
             />
           </div>
@@ -1503,6 +1529,7 @@ function AssignUsersModal({
               <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="px-4 py-2.5 text-left w-8" />
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">WA Number</th>
                 <th className="px-4 py-2.5 text-left whitespace-nowrap">Current Role</th>
               </tr>
             </thead>
@@ -1526,6 +1553,9 @@ function AssignUsersModal({
                       />
                     </td>
                     <td className="px-4 align-middle whitespace-nowrap font-medium">{u.name}</td>
+                    <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
+                      {u.phone}
+                    </td>
                     <td className="px-4 align-middle whitespace-nowrap text-xs text-muted-foreground">
                       {already ? (
                         <span className="text-[10px] uppercase tracking-wider text-primary">

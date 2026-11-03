@@ -265,7 +265,7 @@ export function SpecPanel({
               strokeWidth={1.7}
             />
             <div className="min-w-0">
-              <dt className="text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
+              <dt className="text-[12px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
                 {item.label}
               </dt>
               <dd className="mt-[4px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
@@ -334,7 +334,7 @@ export function Step({
 }: {
   n: number;
   title: string;
-  body: string;
+  body: string | string[];
   points?: { label: string; value: string; icon?: LucideIcon }[];
   screen?: ReactNode;
   highlight?: boolean;
@@ -376,9 +376,16 @@ export function Step({
               </p>
             ) : null}
             <h3 className="text-[16.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
-            <p className="mt-[9px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B]">
-              {body}
-            </p>
+            {(Array.isArray(body) ? body : [body]).map((paragraph, index) => (
+              <p
+                key={index}
+                className={`max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B] ${
+                  index === 0 ? "mt-[9px]" : "mt-[11px]"
+                }`}
+              >
+                {paragraph}
+              </p>
+            ))}
             {points ? (
               <dl className="mt-5 overflow-hidden rounded-[14px] border border-[#710014]/15 bg-[#FFF4ED]">
                 {points.map((point, index) => (
@@ -388,7 +395,7 @@ export function Step({
                       index ? "border-t border-[#EAD3D7]" : ""
                     }`}
                   >
-                    <dt className="flex shrink-0 items-center gap-[7px] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
+                    <dt className="flex shrink-0 items-center gap-[7px] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
                       {point.icon ? (
                         <point.icon className="h-[13px] w-[13px]" strokeWidth={1.8} />
                       ) : null}
