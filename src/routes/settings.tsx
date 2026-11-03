@@ -79,7 +79,6 @@ const NAV: NavSection[] = [
 ];
 
 function SettingsPage() {
-  usePreviewGate("settings-view");
   const previewed = usePreviewedCondition();
   const { section } = Route.useSearch();
   const known = NAV.flatMap((s) => s.items).some((i) => i.id === section);

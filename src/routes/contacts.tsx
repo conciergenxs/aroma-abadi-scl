@@ -66,7 +66,6 @@ import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { Toggle } from "@/components/scl/toggle";
-import { PropertyFormModal } from "@/components/scl/property-form-modal";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({ meta: [{ title: "Contacts — SCL" }] }),
@@ -81,12 +80,10 @@ export const Route = createFileRoute("/contacts")({
 const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "violet", "slate"];
 
 function ContactsPage() {
-  usePreviewGate("contacts-view");
+  usePreviewGate("contacts");
   const baGate = usePermission("ba-view");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");
-  const exportGate = usePermission("contacts-export");
-  const propsGate = usePermission("contacts-properties");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChildRoute = pathname !== "/contacts";
 
@@ -562,8 +559,6 @@ function ContactsPage() {
 
       {showFilterProps && (
         <FilterPropertiesModal
-          canManage={propsGate.allowed}
-          lockReason={propsGate.reason}
           properties={properties}
           onClose={() => setShowFilterProps(false)}
           onChange={(next) => {
@@ -1238,21 +1233,18 @@ function renderPropertyCell(
   }
 }
 
+/* Which properties show as columns, and in what order. Adding or removing a
+ * property is not offered here: a property is a column in the contact
+ * database, so it belongs to whoever owns that schema, not to a view filter. */
 function FilterPropertiesModal({
   properties,
   onClose,
   onChange,
-  canManage,
-  lockReason,
 }: {
   properties: ContactProperty[];
   onClose: () => void;
   onChange: (next: ContactProperty[]) => void;
-  canManage: boolean;
-  lockReason: string;
 }) {
-  const [showAdd, setShowAdd] = useState(false);
-  const [editing, setEditing] = useState<ContactProperty | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
 
@@ -1283,14 +1275,6 @@ function FilterPropertiesModal({
 
   const toggleVisible = (id: string) =>
     onChange(properties.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
-
-  const deleteProp = (id: string) => onChange(properties.filter((p) => p.id !== id));
-
-  const upsertProp = (prop: ContactProperty) => {
-    const exists = properties.some((p) => p.id === prop.id);
-    if (exists) onChange(properties.map((p) => (p.id === prop.id ? prop : p)));
-    else onChange([...properties, prop]);
-  };
 
   const handleDrop = (targetId: string) => {
     if (!dragId || dragId === targetId) return;
@@ -1323,28 +1307,11 @@ function FilterPropertiesModal({
           <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setResetOpen(true)}
-              disabled={isDefault || !canManage}
-              title={
-                !canManage
-                  ? lockReason
-                  : isDefault
-                    ? "Already showing the default properties"
-                    : undefined
-              }
+              disabled={isDefault}
+              title={isDefault ? "Already showing the default properties" : undefined}
               className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset to Default
-            </button>
-            <button
-              onClick={() => {
-                setEditing(null);
-                setShowAdd(true);
-              }}
-              disabled={!canManage}
-              title={canManage ? undefined : lockReason}
-              className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
-            >
-              <Plus className="h-3.5 w-3.5" /> Add Property
             </button>
             <button
               onClick={onClose}
@@ -1363,7 +1330,6 @@ function FilterPropertiesModal({
                 <th className="px-3 py-2 text-left font-medium">Property Name</th>
                 <th className="px-3 py-2 text-left font-medium">Property Type</th>
                 <th className="w-24 px-3 py-2 text-left font-medium">Visible</th>
-                <th className="w-24 px-3 py-2"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -1397,50 +1363,12 @@ function FilterPropertiesModal({
                       label={`Show ${p.name}`}
                     />
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="inline-flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditing(p);
-                          setShowAdd(true);
-                        }}
-                        className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-gray-50 hover:text-foreground transition-colors duration-150"
-                        title="Edit"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      {!p.system && (
-                        <button
-                          onClick={() => deleteProp(p.id)}
-                          className="tap h-7 w-7 grid place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-150"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-
-      {showAdd && (
-        <PropertyFormModal
-          initial={editing}
-          onClose={() => {
-            setShowAdd(false);
-            setEditing(null);
-          }}
-          onSave={(prop) => {
-            upsertProp(prop);
-            setShowAdd(false);
-            setEditing(null);
-          }}
-        />
-      )}
 
       <ConfirmDialog
         open={resetOpen}

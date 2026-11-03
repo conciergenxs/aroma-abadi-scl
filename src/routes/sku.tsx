@@ -421,7 +421,7 @@ function DeleteConfirmDialog(props: ConfirmDialogProps) {
 }
 
 function SkuPage() {
-  usePreviewGate("knowledge-view");
+  usePreviewGate("knowledge");
   const { brands } = useSkuStore();
   const { brand: brandParam, category: categoryParam } = Route.useSearch();
   const brandGate = usePermission("knowledge-brands", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
@@ -701,6 +701,7 @@ function BrandDetail({
   onBack: () => void;
   onOpenCategory: (c: Category) => void;
 }) {
+  const brandGate = usePermission("knowledge-brands", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const brandSkuCount = brand.categories.reduce((n, c) => n + c.skus.length, 0);
 
@@ -733,8 +734,9 @@ function BrandDetail({
         </nav>
         <button
           onClick={() => setConfirmDelete(true)}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
-          title="Delete brand"
+          disabled={!brandGate.allowed}
+          title={brandGate.allowed ? "Delete brand" : brandGate.reason}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent px-2 h-8 text-sm transition-colors duration-150"
         >
           <Trash2 className="h-4 w-4" /> Delete Brand
         </button>
@@ -817,6 +819,7 @@ function BrandDetail({
 }
 
 function AddCategoryButton({ brandId }: { brandId: string }) {
+  const gate = usePermission("knowledge-categories", useCan("knowledge.manage"), KNOWLEDGE_LOCKED);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -860,7 +863,9 @@ function AddCategoryButton({ brandId }: { brandId: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 transition-colors duration-150"
+        disabled={!gate.allowed}
+        title={gate.allowed ? undefined : gate.reason}
+        className="inline-flex items-center gap-1 rounded-md border border-border px-3 h-8 text-[13px] font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
       >
         <Plus className="h-3.5 w-3.5" /> Category
       </button>
@@ -1025,6 +1030,11 @@ function CategoryDetail({
   onBackToBrands: () => void;
   onPickProduct: (product: OdooProduct) => void;
 }) {
+  const categoryGate = usePermission(
+    "knowledge-categories",
+    useCan("knowledge.manage"),
+    KNOWLEDGE_LOCKED,
+  );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [skuLang, setSkuLang] = useState<ContentLang>("en");
 
@@ -1063,8 +1073,9 @@ function CategoryDetail({
         </nav>
         <button
           onClick={() => setConfirmDelete(true)}
-          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 px-2 h-8 text-sm transition-colors duration-150"
-          title="Delete"
+          disabled={!categoryGate.allowed}
+          title={categoryGate.allowed ? "Delete" : categoryGate.reason}
+          className="inline-flex items-center gap-1.5 rounded text-rose-500 hover:bg-rose-500/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent px-2 h-8 text-sm transition-colors duration-150"
         >
           <Trash2 className="h-4 w-4" /> Delete Category
         </button>

@@ -125,7 +125,7 @@ const userLabel = (id?: string | null) => {
 };
 
 function InboxPage() {
-  usePreviewGate("inbox-view");
+  usePreviewGate("inbox");
   const sendGate = usePermission("inbox-send");
   const { labels, lists, lifecycleStages, contacts: allContacts } = useContactsStore();
   // A contact moved to Recently Deleted must not keep a live conversation.
@@ -1093,6 +1093,11 @@ function InboxPage() {
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* A tooltip alone leaves a locked Send looking like an
+                        empty draft, so the reason sits beside the button. */}
+                    {!sendGate.allowed && (
+                      <span className="text-[12px] text-muted-foreground">{sendGate.reason}</span>
+                    )}
                     <button
                       type="button"
                       onClick={() => setAutopilot(active.id, true)}

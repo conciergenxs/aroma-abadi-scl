@@ -32,7 +32,7 @@ export const Route = createFileRoute("/referral/")({
 type SeasonTab = "ongoing" | "upcoming" | "past";
 
 function ReferralPage() {
-  usePreviewGate("commerce-view");
+  usePreviewGate("promo");
   const manageGate = usePermission("referral-manage");
   const { seasons } = useReferralStore();
   const [deleting, setDeleting] = useState<ReferralSeason | null>(null);

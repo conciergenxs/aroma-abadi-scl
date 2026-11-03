@@ -32,19 +32,73 @@ export type PreviewCondition = {
 };
 
 const ALL_CONDITIONS: PreviewCondition[] = [
-  // ── Conversations & Contacts ────────────────────────────────────────────
+  // ── Module access ───────────────────────────────────────────────────────
+  // A module's own toggle is what "view" means now, so these come first:
+  // switch one off and the module is gone, not merely locked.
   {
-    id: "inbox-view",
-    label: "View Conversations",
-    section: "Conversations & Contacts",
+    id: "inbox",
+    label: "Inbox Access",
+    section: "Module Access",
     effect: "Inbox is gone from the sidebar, and its URL lands on Overview.",
     where: "/inbox",
   },
   {
+    id: "contacts",
+    label: "Contacts Access",
+    section: "Module Access",
+    effect: "Contacts is gone from the sidebar, and its URL lands on Overview.",
+    where: "/contacts",
+  },
+  {
+    id: "broadcast",
+    label: "Broadcast Access",
+    section: "Module Access",
+    effect: "Broadcast is gone from the sidebar, and its URL lands on Overview.",
+    where: "/broadcasts",
+  },
+  {
+    id: "templates",
+    label: "Templates Access",
+    section: "Module Access",
+    effect: "Templates is gone from the sidebar, and its URL lands on Overview.",
+    where: "/templates",
+  },
+  {
+    id: "knowledge",
+    label: "Knowledge Access",
+    section: "Module Access",
+    effect: "SKU & Knowledge is gone from the sidebar, and its URL lands on Overview.",
+    where: "/sku",
+  },
+  {
+    id: "ba",
+    label: "BA Access",
+    section: "Module Access",
+    effect: "The BA directory can't be opened, and its URL lands on Overview.",
+    where: "/ba",
+  },
+  {
+    id: "promo",
+    label: "Promo Access",
+    section: "Module Access",
+    effect: "Promo Codes and Referral are gone from the sidebar.",
+    where: "/promo-codes",
+  },
+  {
+    id: "transactions",
+    label: "Transactions Access",
+    section: "Module Access",
+    effect: "Transactions is gone from the sidebar, and its URL lands on Overview.",
+    where: "/transactions",
+  },
+
+  // ── Conversations & Contacts ────────────────────────────────────────────
+  {
     id: "inbox-send",
     label: "Send Messages",
     section: "Conversations & Contacts",
-    effect: "Conversations can be read, but the reply box won't send.",
+    effect:
+      "Take over a conversation from Autopilot and the reply box opens, but Send stays locked.",
     where: "/inbox",
   },
   {
@@ -53,13 +107,6 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     section: "Conversations & Contacts",
     effect: "A conversation can't be handed to another agent.",
     where: "/inbox",
-  },
-  {
-    id: "contacts-view",
-    label: "View Contacts",
-    section: "Conversations & Contacts",
-    effect: "Contacts is gone from the sidebar, and its URL lands on Overview.",
-    where: "/contacts",
   },
   {
     id: "contacts-create",
@@ -72,7 +119,7 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "contacts-edit",
     label: "Edit Contacts",
     section: "Conversations & Contacts",
-    effect: "A contact's details, labels and audiences are read-only.",
+    effect: "A contact's lifecycle, labels and audiences are read-only.",
     where: "/contacts/c3",
   },
   {
@@ -83,85 +130,78 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     where: "/contacts/c3",
   },
   {
-    id: "contacts-export",
-    label: "Export Contacts",
+    id: "contacts-restore",
+    label: "Manage Recently Deleted Contacts",
     section: "Conversations & Contacts",
-    effect: "Nothing changes on screen — contacts have no export action in the product yet.",
-    where: "/contacts",
-  },
-  {
-    id: "contacts-properties",
-    label: "Manage Contact Properties",
-    section: "Conversations & Contacts",
-    effect: "Filter Properties still opens, but nothing in it can be changed.",
-    where: "/contacts",
+    effect: "Deleted contacts can be read, but not restored or purged.",
+    where: "/settings?section=recently-deleted",
   },
   {
     id: "contacts-labels",
-    label: "Manage Labels & Lifecycle Stages",
+    label: "Manage Labels",
     section: "Conversations & Contacts",
-    effect: "Labels and Customer Lifecycle are read-only in Settings.",
+    effect: "Labels are read-only in Settings.",
     where: "/settings?section=labels",
+  },
+  {
+    id: "contacts-lifecycle",
+    label: "Manage Lifecycle Stages",
+    section: "Conversations & Contacts",
+    effect: "Customer Lifecycle stages can't be added, edited or removed.",
+    where: "/settings?section=customer-lifecycle",
   },
 
   // ── Outbound ────────────────────────────────────────────────────────────
   {
-    id: "broadcast-view",
-    label: "View Broadcasts & Logs",
-    section: "Outbound",
-    effect: "Broadcast is gone from the sidebar, and its URL lands on Overview.",
-    where: "/broadcasts",
-  },
-  {
     id: "broadcast-create",
-    label: "Create & Edit Broadcasts",
+    label: "Create Broadcast",
     section: "Outbound",
     effect: "Broadcasts can be read; Create Broadcast is locked.",
     where: "/broadcasts",
   },
   {
     id: "broadcast-send",
-    label: "Send & Schedule Broadcasts",
+    label: "Send & Schedule Broadcast",
     section: "Outbound",
     effect: "The composer opens and saves drafts, but won't send or schedule.",
     where: "/broadcasts/new",
   },
   {
     id: "broadcast-recurring",
-    label: "Start & Stop Recurring Broadcasts",
+    label: "Start & Stop Recurring Broadcast",
     section: "Outbound",
     effect: "A recurring series can't be activated or paused.",
     where: "/broadcasts",
   },
   {
-    id: "templates-view",
-    label: "View Templates",
+    id: "templates-create",
+    label: "Create Template",
     section: "Outbound",
-    effect: "Templates is gone from the sidebar, and its URL lands on Overview.",
+    effect: "Templates can be read; New Template is locked.",
     where: "/templates",
   },
   {
-    id: "templates-manage",
-    label: "Create & Edit Templates",
+    id: "templates-delete",
+    label: "Delete Template",
     section: "Outbound",
-    effect: "Templates can be read; creating and editing is locked.",
+    effect: "Open a template: Delete Template is locked, and so is the bulk delete.",
     where: "/templates",
   },
 
   // ── BA Enablement ───────────────────────────────────────────────────────
   {
-    id: "knowledge-view",
-    label: "View Knowledge Content",
+    id: "knowledge-brands",
+    label: "Manage Brands",
     section: "BA Enablement",
-    effect: "SKU & Knowledge is gone from the sidebar, and its URL lands on Overview.",
+    effect: "Add New Brand is locked.",
     where: "/sku",
   },
   {
-    id: "knowledge-brands",
-    label: "Manage Brands & Categories",
+    id: "knowledge-categories",
+    label: "Manage Categories",
     section: "BA Enablement",
-    effect: "Add New Brand and Add Category are locked.",
-    where: "/sku",
+    effect: "Add Category is locked inside a brand.",
+    where: "/sku?brand=brand-dg",
   },
   {
     id: "knowledge-modules",
@@ -174,22 +214,15 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "knowledge-cards",
     label: "Manage Knowledge Cards",
     section: "BA Enablement",
-    effect: "Adding and editing knowledge cards is locked.",
+    effect: "Every Add New card button is locked, on a module and on a SKU.",
     where: "/sku?brand=brand-dg&category=cat-dg-lip",
   },
   {
     id: "ba-view",
     label: "View Beauty Ambassadors",
     section: "BA Enablement",
-    effect: "The BA directory can't be opened from BA Contacts.",
+    effect: "Contacts shows customers only — the BA view and the directory are closed.",
     where: "/contacts?view=ba",
-  },
-  {
-    id: "ba-scope",
-    label: "See Every Area",
-    section: "BA Enablement",
-    effect: "The BA list shows only the team reporting to the signed-in Leader.",
-    where: "/ba",
   },
   {
     id: "ba-create",
@@ -202,30 +235,30 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "ba-edit",
     label: "Edit BA Details & Brand Assignment",
     section: "BA Enablement",
-    effect: "A BA record is read-only.",
+    effect: "A BA record is read-only, and their password can't be reset.",
     where: "/ba",
   },
   {
     id: "ba-password",
-    label: "Reveal & Reset LMS Passwords",
+    label: "Reveal LMS Passwords",
     section: "BA Enablement",
-    effect: "A BA's LMS password can't be revealed or reset.",
+    effect: "A BA's LMS password stays hidden.",
     where: "/ba",
   },
 
   // ── Commerce ────────────────────────────────────────────────────────────
   {
-    id: "commerce-view",
-    label: "View Promo & Transactions",
+    id: "promo-create",
+    label: "Create Promo Codes",
     section: "Commerce",
-    effect: "Transactions, Promo Codes and Referral are gone from the sidebar.",
-    where: "/transactions",
+    effect: "Promo codes can be read; Create Promo is locked.",
+    where: "/promo-codes",
   },
   {
-    id: "promo-manage",
-    label: "Create & Edit Promo Codes",
+    id: "promo-edit",
+    label: "Edit Promo Codes",
     section: "Commerce",
-    effect: "Promo codes can be read; creating and editing is locked.",
+    effect: "A code's row menu opens, but Edit and Delete are locked.",
     where: "/promo-codes",
   },
   {
@@ -235,22 +268,8 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     effect: "Referral seasons can be read; creating and editing is locked.",
     where: "/referral",
   },
-  {
-    id: "transactions-manage",
-    label: "Record Transactions",
-    section: "Commerce",
-    effect: "Nothing changes on screen — the ledger is already read-only, filled from ARMA.",
-    where: "/transactions",
-  },
 
   // ── Workspace ───────────────────────────────────────────────────────────
-  {
-    id: "settings-view",
-    label: "Open Settings",
-    section: "Workspace",
-    effect: "Settings is gone from the sidebar, and its URL lands on Overview.",
-    where: "/settings",
-  },
   {
     id: "settings-users",
     label: "Invite & Manage Users",

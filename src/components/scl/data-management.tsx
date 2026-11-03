@@ -130,16 +130,22 @@ function GhostButton({
   children,
   onClick,
   type = "button",
+  disabled,
+  title,
 }: {
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium transition-colors duration-150"
+      disabled={disabled}
+      title={disabled ? title : undefined}
+      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
     >
       {children}
     </button>
@@ -179,7 +185,7 @@ function SearchInput({
 const LIFECYCLE_COLOR_KEYS = Object.keys(LIFECYCLE_COLORS) as LifecycleColorKey[];
 
 function CustomerLifecyclePage() {
-  const manage = usePermission("contacts-labels");
+  const manage = usePermission("contacts-lifecycle");
   const { lifecycleStages } = useContactsStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [createGroup, setCreateGroup] = useState<LifecycleGroup | null>(null);
@@ -561,6 +567,7 @@ function LifecycleColorPicker({
 // =========================================================
 
 function RecentlyDeletedContactsPage() {
+  const manage = usePermission("contacts-restore");
   const { contacts, labels, lists, properties } = useContactsStore();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -637,13 +644,19 @@ function RecentlyDeletedContactsPage() {
               <span className="font-semibold">{selected.size}</span> selected
             </div>
             <div className="flex items-center gap-2">
-              <GhostButton onClick={() => setBulkRestoreOpen(true)}>
+              <GhostButton
+                onClick={() => manage.allowed && setBulkRestoreOpen(true)}
+                disabled={!manage.allowed}
+                title={manage.reason}
+              >
                 <RotateCcw className="h-3.5 w-3.5" />{" "}
                 {selected.size === 1 ? "Restore" : "Restore Selected"}
               </GhostButton>
               <button
-                onClick={() => setBulkDeleteOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium transition-colors duration-150"
+                onClick={() => manage.allowed && setBulkDeleteOpen(true)}
+                disabled={!manage.allowed}
+                title={manage.allowed ? undefined : manage.reason}
+                className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 h-9 text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Trash2 className="h-3.5 w-3.5" />{" "}
                 {selected.size === 1 ? "Permanently Delete" : "Permanently Delete Selected"}
@@ -693,18 +706,23 @@ function RecentlyDeletedContactsPage() {
                       <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
-                          onClick={() => restore([c.id])}
-                          className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 py-1 text-[11px] transition-colors duration-150"
+                          onClick={() => manage.allowed && restore([c.id])}
+                          disabled={!manage.allowed}
+                          title={manage.allowed ? undefined : manage.reason}
+                          className="inline-flex items-center gap-1 rounded-md border border-border bg-card/60 hover:bg-card px-2 py-1 text-[11px] disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                         >
                           <RotateCcw className="h-3 w-3" /> Restore
                         </button>
                         <button
                           type="button"
                           onClick={() => {
+                            if (!manage.allowed) return;
                             setSelected(new Set([c.id]));
                             setBulkDeleteOpen(true);
                           }}
-                          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-2 py-1 text-[11px] transition-colors duration-150"
+                          disabled={!manage.allowed}
+                          title={manage.allowed ? undefined : manage.reason}
+                          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 px-2 py-1 text-[11px] disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                         >
                           <Trash2 className="h-3 w-3" /> Delete
                         </button>

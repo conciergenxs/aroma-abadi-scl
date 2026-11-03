@@ -65,6 +65,14 @@ type CategorySection = { id: string; label: string; categories: PermCategory[] }
  * monitoring — while saying nothing about the two things that actually carry
  * risk here: the knowledge every Beauty Ambassador reads in the LMS, and the
  * BA accounts themselves. */
+/* The permission tree, as the client's review left it.
+ *
+ * Two rules came out of that review and shape the whole thing. A module's own
+ * toggle decides whether the module is visible at all, so there are no "View
+ * X" permissions underneath it — reading is what access means. And a
+ * permission names one action: where a row used to say "Create & Edit" or
+ * "Brands & Categories", it is now two rows, because the two are granted to
+ * different people. */
 const SCHEMA: CategorySection[] = [
   {
     id: "conversations",
@@ -74,13 +82,12 @@ const SCHEMA: CategorySection[] = [
         id: "inbox",
         label: "Inbox",
         masterLabel: "Inbox Access",
-        masterDescription: "Handle WhatsApp conversations with customers and Beauty Ambassadors.",
+        masterDescription: "Read WhatsApp conversations with customers and Beauty Ambassadors.",
         groups: [
           {
             id: "inbox-basic",
             label: "Conversations",
             items: [
-              { id: "inbox-view", label: "View Conversations", defaultChecked: true },
               { id: "inbox-send", label: "Send Messages", defaultChecked: true },
               { id: "inbox-assign", label: "Assign & Transfer Conversations" },
             ],
@@ -91,25 +98,24 @@ const SCHEMA: CategorySection[] = [
         id: "contacts",
         label: "Contacts",
         masterLabel: "Contacts Access",
-        masterDescription: "The customer directory, its labels, lifecycle stages and properties.",
+        masterDescription: "Read the customer directory, its labels and lifecycle stages.",
         groups: [
           {
             id: "contacts-basic",
             label: "Contact Records",
             items: [
-              { id: "contacts-view", label: "View Contacts", defaultChecked: true },
               { id: "contacts-create", label: "Create Contacts", defaultChecked: true },
               { id: "contacts-edit", label: "Edit Contacts", defaultChecked: true },
               { id: "contacts-delete", label: "Delete Contacts" },
-              { id: "contacts-export", label: "Export Contacts" },
+              { id: "contacts-restore", label: "Manage Recently Deleted Contacts" },
             ],
           },
           {
             id: "contacts-schema",
             label: "Data Structure",
             items: [
-              { id: "contacts-properties", label: "Manage Contact Properties" },
-              { id: "contacts-labels", label: "Manage Labels & Lifecycle Stages" },
+              { id: "contacts-labels", label: "Manage Labels" },
+              { id: "contacts-lifecycle", label: "Manage Lifecycle Stages" },
             ],
           },
         ],
@@ -122,26 +128,33 @@ const SCHEMA: CategorySection[] = [
     categories: [
       {
         id: "broadcast",
-        label: "Broadcast & Templates",
+        label: "Broadcast",
         masterLabel: "Broadcast Access",
-        masterDescription: "Compose campaigns, and decide who may actually send them.",
+        masterDescription: "Read the campaigns that went out and what each send did.",
         groups: [
           {
             id: "broadcast-basic",
             label: "Campaigns",
             items: [
-              { id: "broadcast-view", label: "View Broadcasts & Logs", defaultChecked: true },
-              { id: "broadcast-create", label: "Create & Edit Broadcasts" },
-              { id: "broadcast-send", label: "Send & Schedule Broadcasts" },
-              { id: "broadcast-recurring", label: "Start & Stop Recurring Broadcasts" },
+              { id: "broadcast-create", label: "Create Broadcast" },
+              { id: "broadcast-send", label: "Send & Schedule Broadcast" },
+              { id: "broadcast-recurring", label: "Start & Stop Recurring Broadcast" },
             ],
           },
+        ],
+      },
+      {
+        id: "templates",
+        label: "Templates",
+        masterLabel: "Templates Access",
+        masterDescription: "Read the approved WhatsApp message templates.",
+        groups: [
           {
-            id: "broadcast-templates",
+            id: "templates-basic",
             label: "Templates",
             items: [
-              { id: "templates-view", label: "View Templates", defaultChecked: true },
-              { id: "templates-manage", label: "Create & Edit Templates" },
+              { id: "templates-create", label: "Create Template" },
+              { id: "templates-delete", label: "Delete Template" },
             ],
           },
         ],
@@ -156,21 +169,14 @@ const SCHEMA: CategorySection[] = [
         id: "knowledge",
         label: "SKU & Knowledge",
         masterLabel: "Knowledge Access",
-        masterDescription:
-          "Brands, categories, SKUs and the knowledge cards Beauty Ambassadors read in the LMS.",
+        masterDescription: "Read the brands, categories, modules and cards the LMS serves.",
         groups: [
-          {
-            id: "knowledge-read",
-            label: "Reading",
-            items: [
-              { id: "knowledge-view", label: "View Knowledge Content", defaultChecked: true },
-            ],
-          },
           {
             id: "knowledge-write",
             label: "Publishing",
             items: [
-              { id: "knowledge-brands", label: "Manage Brands & Categories" },
+              { id: "knowledge-brands", label: "Manage Brands" },
+              { id: "knowledge-categories", label: "Manage Categories" },
               { id: "knowledge-modules", label: "Manage Modules" },
               { id: "knowledge-cards", label: "Manage Knowledge Cards" },
             ],
@@ -181,15 +187,17 @@ const SCHEMA: CategorySection[] = [
         id: "ba",
         label: "Beauty Ambassadors",
         masterLabel: "BA Access",
-        masterDescription:
-          "The BA directory and their LMS credentials. Without “See Every Area”, only the signed-in Leader's own team.",
+        masterDescription: "The BA directory and their LMS credentials.",
         groups: [
           {
             id: "ba-read",
             label: "Directory",
             items: [
-              { id: "ba-view", label: "View Beauty Ambassadors", defaultChecked: true },
-              { id: "ba-scope", label: "See Every Area", select: "2", defaultAccess: "none" },
+              {
+                id: "ba-view",
+                label: "View Beauty Ambassadors",
+                defaultChecked: true,
+              },
             ],
           },
           {
@@ -198,7 +206,7 @@ const SCHEMA: CategorySection[] = [
             items: [
               { id: "ba-create", label: "Add Beauty Ambassadors" },
               { id: "ba-edit", label: "Edit BA Details & Brand Assignment" },
-              { id: "ba-password", label: "Reveal & Reset LMS Passwords" },
+              { id: "ba-password", label: "Reveal LMS Passwords" },
             ],
           },
         ],
@@ -210,39 +218,35 @@ const SCHEMA: CategorySection[] = [
     label: "Commerce",
     categories: [
       {
-        id: "commerce",
-        label: LITE_MODE ? "Promo & Transactions" : "Promo, Referral & Transactions",
-        masterLabel: "Commerce Access",
+        id: "promo",
+        label: LITE_MODE ? "Promo Codes" : "Promo Codes & Referral",
+        masterLabel: "Promo Access",
         masterDescription: LITE_MODE
-          ? "Promo codes and the transaction ledger."
-          : "Promo codes, referral seasons and the transaction ledger.",
+          ? "Read the promo codes and who redeemed them."
+          : "Read the promo codes, the referral seasons, and who redeemed them.",
         groups: [
           {
-            id: "commerce-read",
-            label: "Reading",
-            items: [
-              {
-                id: "commerce-view",
-                label: LITE_MODE
-                  ? "View Promo & Transactions"
-                  : "View Promo, Referral & Transactions",
-                defaultChecked: true,
-              },
-            ],
-          },
-          {
-            id: "commerce-write",
+            id: "promo-write",
             label: "Creating",
             items: [
-              { id: "promo-manage", label: "Create & Edit Promo Codes" },
-              // The lite build has no referral seasons to permit.
+              { id: "promo-create", label: "Create Promo Codes" },
+              { id: "promo-edit", label: "Edit Promo Codes" },
+              // The lite build carries no referral seasons to permit.
               ...(LITE_MODE
                 ? []
                 : [{ id: "referral-manage", label: "Create & Edit Referral Seasons" }]),
-              { id: "transactions-manage", label: "Record Transactions" },
             ],
           },
         ],
+      },
+      {
+        id: "transactions",
+        label: "Transactions",
+        masterLabel: "Transactions Access",
+        // Nothing writes to the ledger from here: ARMA records every order on
+        // WhatsApp, so access is the whole of this permission.
+        masterDescription: "Read the orders ARMA recorded on WhatsApp.",
+        groups: [],
       },
     ],
   },
@@ -254,13 +258,14 @@ const SCHEMA: CategorySection[] = [
         id: "settings",
         label: "Settings",
         masterLabel: "Settings Access",
-        masterDescription: "Workspace preferences, the people in it, and what they may do.",
+        // Settings itself is open to everyone — their own profile lives there.
+        // What each area inside it allows is the permission below.
+        masterDescription: "Open Settings. Each area inside it is granted separately.",
         groups: [
           {
             id: "settings-basic",
             label: "Settings",
             items: [
-              { id: "settings-view", label: "Open Settings" },
               { id: "settings-users", label: "Invite & Manage Users" },
               { id: "settings-roles", label: "Manage Roles & Permissions" },
             ],
@@ -288,73 +293,80 @@ function flattenItems(items: PermItem[]): PermItem[] {
  * BAs in the field, Brand and Management read the picture from either side,
  * and a Trainer keeps the knowledge current. Referral has no row in the
  * checklist, so it follows the promo codes beside it. */
+/* Who holds what, carried over from the client's checklist: a split row gives
+ * both halves to whoever held the row, and a module's toggle takes the grant
+ * its old "View X" row had. Settings opens for everyone — a person's own
+ * profile lives there — so only the areas inside it are granted. */
 const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
   "Super Admin": { categories: ["*"], items: ["*"] },
   Admin: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
+    categories: [
+      "inbox",
+      "contacts",
+      "broadcast",
+      "templates",
+      "knowledge",
+      "ba",
+      "promo",
+      "transactions",
+      "settings",
+    ],
     items: ["*", "-settings-roles"],
   },
   Leader: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce", "settings"],
+    categories: [
+      "inbox",
+      "contacts",
+      "broadcast",
+      "templates",
+      "knowledge",
+      "ba",
+      "promo",
+      "transactions",
+      "settings",
+    ],
     items: [
-      "inbox-view",
       "inbox-send",
       "inbox-assign",
-      "contacts-view",
-      "contacts-export",
       "contacts-labels",
-      "broadcast-view",
-      "templates-view",
-      "knowledge-view",
+      "contacts-lifecycle",
       "ba-view",
-      "ba-scope",
       "ba-create",
       "ba-edit",
       "ba-password",
-      "commerce-view",
-      "transactions-manage",
-      "settings-view",
     ],
   },
   Brand: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
-    items: [
-      "inbox-view",
-      "inbox-send",
-      "contacts-view",
-      "broadcast-view",
-      "templates-view",
-      "knowledge-view",
-      "ba-view",
-      "ba-scope",
-      "commerce-view",
-      "transactions-manage",
+    categories: [
+      "inbox",
+      "contacts",
+      "broadcast",
+      "templates",
+      "knowledge",
+      "ba",
+      "promo",
+      "transactions",
+      "settings",
     ],
+    items: ["inbox-send", "ba-view"],
   },
   Trainer: {
-    categories: ["inbox", "knowledge", "ba"],
-    items: [
-      "inbox-view",
-      "inbox-send",
-      "knowledge-view",
-      "knowledge-modules",
-      "knowledge-cards",
-      "ba-view",
-      "ba-scope",
-    ],
+    categories: ["inbox", "knowledge", "ba", "settings"],
+    items: ["inbox-send", "knowledge-modules", "knowledge-cards", "ba-view"],
   },
   Management: {
-    categories: ["inbox", "contacts", "broadcast", "knowledge", "ba", "commerce"],
-    items: [
-      "inbox-view",
-      "contacts-view",
-      "broadcast-view",
-      "templates-view",
-      "knowledge-view",
-      "ba-view",
-      "ba-scope",
-      "commerce-view",
+    categories: [
+      "inbox",
+      "contacts",
+      "broadcast",
+      "templates",
+      "knowledge",
+      "ba",
+      "promo",
+      "transactions",
+      "settings",
     ],
+    items: ["ba-view"],
   },
 };
 
