@@ -119,7 +119,7 @@ export function Section({
       >
         {children}
       </div>
-      {bleed ? <div className="pb-10 md:pb-14">{bleed}</div> : null}
+      {bleed ? <div className="pb-7 md:pb-9">{bleed}</div> : null}
     </section>
   );
 }
@@ -172,7 +172,9 @@ export function Split({
 
 export function Prose({ tone = "white", children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <div className={`max-w-[62ch] space-y-3 text-pretty text-[15.5px] leading-[1.62] ${BODY[tone]}`}>
+    <div
+      className={`max-w-[62ch] space-y-3 text-pretty text-[15.5px] leading-[1.62] ${BODY[tone]}`}
+    >
       {children}
     </div>
   );

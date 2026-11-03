@@ -339,7 +339,6 @@ const CONTACT: {
   {
     icon: MapPin,
     label: "Registered office",
-    wide: true,
     value: (
       <>
         <Pending field="full address" tone="maroon" />, South Jakarta, DKI Jakarta
@@ -568,8 +567,7 @@ function CompanyPage() {
             </h1>
             <p className="mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]">
               We distribute premium beauty products across Indonesia. Customers shop through ARMA,
-              our official WhatsApp assistant, and pay through Xendit without ever leaving the
-              chat.
+              our official WhatsApp assistant, and pay through Xendit without ever leaving the chat.
             </p>
 
             <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-[#E6D8CD] bg-[#E6D8CD] sm:grid-cols-4">
@@ -617,7 +615,7 @@ function CompanyPage() {
                     key={brand.name}
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[250px] w-[340px] shrink-0 object-contain sm:w-[470px]"
+                    className="lp-brandmark h-[200px] w-[300px] shrink-0 object-contain sm:w-[410px]"
                   />
                 ))}
               </Marquee>
@@ -704,8 +702,8 @@ function CompanyPage() {
           <Reveal>
             <Prose>
               <p>
-                ARMA is the official Aroma Abadi WhatsApp assistant. Customers save a single
-                number: asking, ordering, paying and tracking all happen in the same conversation.
+                ARMA is the official Aroma Abadi WhatsApp assistant. Customers save a single number:
+                asking, ordering, paying and tracking all happen in the same conversation.
               </p>
             </Prose>
           </Reveal>
@@ -757,8 +755,8 @@ function CompanyPage() {
           </h2>
           <span className="mt-4 block h-px w-10 bg-[#BF9877]" />
           <p className="mt-4 text-pretty text-[15.5px] leading-[1.7] text-[#55504B]">
-            Six steps, from the first message to the parcel leaving our warehouse. Step four is
-            the payment point: that is where the customer opens the Xendit page.
+            Six steps, from the first message to the parcel leaving our warehouse. Step four is the
+            payment point: that is where the customer opens the Xendit page.
           </p>
         </Reveal>
 
