@@ -260,7 +260,20 @@ export const DEFAULT_LIFECYCLE_STAGES: LifecycleStageDef[] = [
 // and a module-load clock differs between the server render and hydration.
 const SEED_EPOCH = Date.UTC(2026, 8, 18);
 
+/* The recycle bin isn't a hypothetical: contacts get deleted, and Settings →
+ * Recently Deleted is where they wait out their 30 days. These three sit there
+ * so the bin, its dates and its Restore controls have something to show. */
+const BIN: Record<string, number> = { c14: 4, c17: 11, c19: 23 };
+
 const initialContacts: Contact[] = seedContacts.map((c, idx) => {
+  const binnedDaysAgo = BIN[c.id];
+  if (binnedDaysAgo !== undefined) {
+    return {
+      ...c,
+      deleted: true,
+      deletedAt: new Date(SEED_EPOCH - binnedDaysAgo * 86400000).toISOString(),
+    };
+  }
   if (c.lifecycleStage) return c;
   // Leave roughly every 5th contact without a lifecycle stage — they appear
   // in the Contacts list but are intentionally excluded from the Kanban view.
