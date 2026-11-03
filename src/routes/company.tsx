@@ -226,22 +226,22 @@ const SERVICES = [
   {
     icon: Package,
     title: "Independent Distribution",
-    body: "Premium cosmetics, fragrance and skincare, sourced from the principal.",
+    body: "Premium cosmetics, fragrance and skincare, sourced directly from each principal.",
   },
   {
     icon: Megaphone,
     title: "Marketing Support",
-    body: "Campaign planning and brand visibility across every channel we hold.",
+    body: "Campaign planning and brand visibility across every channel we operate.",
   },
   {
     icon: Store,
     title: "Retail Strategy",
-    body: "Counter placement and assortment planning that lifts sell-out.",
+    body: "Counter placement and assortment planning that lifts retail performance.",
   },
   {
     icon: HeartHandshake,
     title: "Customer Service",
-    body: "A dedicated team holding the relationship with brand and customer.",
+    body: "A dedicated team looking after the relationship with each brand and customer.",
   },
 ];
 
@@ -278,12 +278,12 @@ const PROGRAM = [
   {
     icon: Ticket,
     title: "Promo Codes",
-    body: "Two kinds: a unique code for one customer, and a shared code with a usage cap. The discount is visible before payment.",
+    body: "There are two kinds: a unique code for a single customer, and a shared code with a usage cap. The discount is visible before payment.",
   },
   {
     icon: BellRing,
     title: "Program Updates",
-    body: "Sent only to customers who opted in. Every message carries a way to stop, and anyone who stops is not messaged again.",
+    body: "Updates go only to customers who have opted in. Every message carries a way to stop, and anyone who stops is not messaged again.",
   },
 ];
 
@@ -291,22 +291,22 @@ const PAYMENT_PANELS = [
   {
     icon: QrCode,
     title: "QRIS",
-    body: "The customer scans one code from any bank or e-wallet app. This is the method our customers reach for most.",
+    body: "The customer scans a single code from any bank or e-wallet app. This is the method our customers reach for most.",
   },
   {
     icon: Landmark,
     title: "Virtual Account",
-    body: "A dedicated transfer number per order, payable from any bank, recorded automatically the moment funds arrive.",
+    body: "Each order gets its own transfer number, payable from any bank and recorded automatically the moment the funds arrive.",
   },
   {
     icon: Wallet,
     title: "E-Wallet",
-    body: "OVO, DANA, ShopeePay and LinkAja, opened straight from the payment page with no number to copy.",
+    body: "The customer opens OVO, DANA, ShopeePay or LinkAja straight from the payment page, with no number to copy across.",
   },
   {
     icon: CreditCard,
     title: "Credit and Debit Cards",
-    body: "Visa, Mastercard and JCB, processed on Xendit's page with 3D Secure from the issuing bank.",
+    body: "Visa, Mastercard and JCB are processed on Xendit's page, with 3D Secure authentication from the issuing bank.",
   },
 ];
 
@@ -319,7 +319,7 @@ const POLICIES = [
   {
     icon: RefreshCcw,
     title: "Returns and Exchanges",
-    body: "Raised over WhatsApp within 7 days of delivery. Sealed products are refunded in full; opened products are exchanged.",
+    body: "Requests are raised over WhatsApp within 7 days of delivery. Sealed products are refunded in full; opened products are exchanged.",
   },
   {
     icon: Ban,
@@ -329,7 +329,7 @@ const POLICIES = [
   {
     icon: Lock,
     title: "Data Privacy",
-    body: "We keep the WhatsApp number, name, address and order history needed to process orders. Data is never sold or shared elsewhere.",
+    body: "We keep the WhatsApp number, name, delivery address and order history needed to process an order. Data is never sold, and never shared beyond delivery and payment.",
   },
 ];
 
@@ -588,7 +588,7 @@ function CompanyPage() {
             <p className="mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]">
               PT Aroma Abadi develops and distributes more than 25 of the world&rsquo;s leading
               beauty brands. Customers order through ARMA, our official WhatsApp assistant, and pay
-              through Xendit without leaving the conversation.
+              with Xendit without ever leaving the conversation.
             </p>
 
             <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4">
@@ -847,7 +847,10 @@ function CompanyPage() {
             n={4}
             highlight
             title="Payment Through Xendit"
-            body="From that summary ARMA sends a single payment link created through Xendit. The link opens the Xendit payment page, where the customer picks a method and completes the transaction. Every payment detail is entered on Xendit's page, not in WhatsApp, and none of it passes through our systems."
+            body={[
+              "From that summary ARMA sends a single payment link, created through Xendit for that order alone. Opening the link takes the customer to the Xendit payment page, where they choose a method and complete the transaction.",
+              "Every payment detail is entered on Xendit's page rather than in WhatsApp. Card numbers and banking credentials never reach our systems; what comes back to us is the payment status and the invoice it belongs to.",
+            ]}
             points={[
               {
                 icon: Link2,
@@ -870,14 +873,14 @@ function CompanyPage() {
           <Step
             n={5}
             title="Automatic Confirmation"
-            body="Xendit notifies our system the moment a payment succeeds. ARMA sends the confirmation and invoice number straight away, and the loyalty points land at the same time."
+            body="Xendit notifies our system the moment a payment succeeds, so nothing waits on a manual check. ARMA sends the confirmation and invoice number straight back into the thread, the order moves to paid in our records, and the customer's loyalty points land at the same time."
             screen={<ChatScreen messages={STEP_RECEIPT} />}
           />
           <Step
             n={6}
             last
-            title="Fulfilment and Delivery"
-            body="Paid orders go through to our warehouse. The tracking number is sent to the same conversation, and the customer can ask ARMA for status at any time."
+            title="Fulfillment and Delivery"
+            body="Paid orders pass to our warehouse, where they are picked, packed and handed to the courier. The tracking number goes back into the same conversation as soon as the parcel is collected, and the customer can ask ARMA where their order is at any point afterwards."
             screen={<ChatScreen messages={STEP_SHIPPING} />}
           />
         </div>
@@ -903,8 +906,8 @@ function CompanyPage() {
           <Reveal delay={80} className="mt-10">
             <SpecPanel
               icon={ShieldCheck}
-              title="How a payment is handled"
-              intro="The same rules apply whichever of the methods above a customer picks."
+              title="How a Payment Is Handled"
+              intro="Whichever of the methods above a customer chooses, the handling is the same."
               items={[
                 { icon: Lock, label: "Payment page", value: "Hosted and processed by Xendit" },
                 {
