@@ -334,7 +334,7 @@ export function Step({
 }: {
   n: number;
   title: string;
-  body: string;
+  body: string | string[];
   points?: { label: string; value: string; icon?: LucideIcon }[];
   screen?: ReactNode;
   highlight?: boolean;
@@ -376,9 +376,16 @@ export function Step({
               </p>
             ) : null}
             <h3 className="text-[16.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
-            <p className="mt-[9px] max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B]">
-              {body}
-            </p>
+            {(Array.isArray(body) ? body : [body]).map((paragraph, index) => (
+              <p
+                key={index}
+                className={`max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B] ${
+                  index === 0 ? "mt-[9px]" : "mt-[11px]"
+                }`}
+              >
+                {paragraph}
+              </p>
+            ))}
             {points ? (
               <dl className="mt-5 overflow-hidden rounded-[14px] border border-[#710014]/15 bg-[#FFF4ED]">
                 {points.map((point, index) => (
