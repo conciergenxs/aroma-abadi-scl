@@ -70,13 +70,19 @@ export function FloatingMenu({
       onClose();
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      // Escape dismisses the menu and stops there. Without this the modal
+      // underneath — which listens for Escape too — would close with it, and
+      // closing a dropdown would throw away the form behind it.
+      e.stopPropagation();
+      onClose();
     };
     document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
+    // Capture, so this runs before the listeners an overlay underneath added.
+    document.addEventListener("keydown", onKey, true);
     return () => {
       document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey, true);
     };
   }, [open, anchorRef, onClose]);
 

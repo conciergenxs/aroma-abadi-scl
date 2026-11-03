@@ -1062,7 +1062,7 @@ html {
    The track holds the marks twice, so translating it exactly half its width
    lands on an identical frame and the loop has no seam. */
 .lp-marquee-track {
-  animation: lp-marquee 42s linear infinite;
+  animation: lp-marquee 78s linear infinite;
 }
 .lp-marquee:hover .lp-marquee-track {
   animation-play-state: paused;
@@ -1077,16 +1077,14 @@ html {
 /* Brand marks ship as black artwork on a white square. Multiply drops the
    square out against the warm ground so the row reads as marks, not tiles. */
 .lp-brandmark {
-  mix-blend-mode: multiply;
-  filter: grayscale(1);
-  opacity: 0.8;
+  opacity: 0.72;
   transition:
     opacity 0.35s ease,
-    filter 0.35s ease;
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .lp-brandmark:hover {
   opacity: 1;
-  filter: grayscale(0);
+  transform: scale(1.06);
 }
 
 /* ---- Paper ----
