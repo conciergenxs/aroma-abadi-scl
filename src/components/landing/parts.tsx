@@ -158,7 +158,9 @@ export function Split({
           {title}
         </h2>
         <span
-          className={`mt-3 block h-px w-10 ${tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#C9A455]/70"}`}
+          className={`lp-rule mt-3 block h-px w-10 ${
+            tone === "maroon" ? "bg-[#E7CF95]/45" : "bg-[#C9A455]/70"
+          }`}
         />
         <p className={`mt-3 max-w-[30ch] text-pretty text-[14.5px] leading-[1.58] ${BODY[tone]}`}>
           {lede}
@@ -377,24 +379,28 @@ export function Step({
               </p>
             ))}
             {points ? (
-              <dl className="mt-6 border-l border-[#C9A455] pl-5">
+              <dl className="mt-6 overflow-hidden rounded-[16px] border border-[#C9A455]/45 bg-[#FFF4ED]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`flex flex-col gap-[1px] sm:flex-row sm:items-baseline sm:gap-5 ${
-                      index ? "mt-[13px]" : ""
+                    className={`px-5 py-[15px] transition-colors duration-300 hover:bg-white/60 ${
+                      index ? "border-t border-[#C9A455]/25" : ""
                     }`}
                   >
-                    <dt className="shrink-0 text-[13px] text-[#9A5A63] sm:w-[148px]">
+                    <dt className="lp-display text-[16px] leading-tight text-[#710014]">
                       {point.label}
                     </dt>
-                    <dd className="text-[14px] leading-[1.5] text-[#161616]">{point.value}</dd>
+                    <dd className="mt-[6px] text-pretty text-[14px] leading-[1.5] text-[#161616]">
+                      {point.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
             ) : null}
           </div>
-          {screen ? <div className="w-full max-w-[300px] lg:max-w-none">{screen}</div> : null}
+          {screen ? (
+            <div className="lp-screen w-full max-w-[300px] lg:max-w-none">{screen}</div>
+          ) : null}
         </div>
       </div>
     </div>

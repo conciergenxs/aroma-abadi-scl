@@ -330,7 +330,7 @@ const CONTACT: { label: string; value: ReactNode }[] = [
         href={WA_LINK}
         target="_blank"
         rel="noreferrer noopener"
-        className="-my-1 inline-block py-1 underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+        className="lp-underline -my-1 inline-block py-1 text-[#FBFAF8] hover:text-[#E7CF95]"
       >
         {WA_NUMBER}
       </a>
@@ -342,7 +342,7 @@ const CONTACT: { label: string; value: ReactNode }[] = [
     value: (
       <a
         href="mailto:arma@aromaabadi.com"
-        className="-my-1 inline-block py-1 underline decoration-[#E7CF95]/45 underline-offset-4 transition-colors duration-200 hover:text-[#E7CF95]"
+        className="lp-underline -my-1 inline-block py-1 text-[#FBFAF8] hover:text-[#E7CF95]"
       >
         arma@aromaabadi.com
       </a>
@@ -499,7 +499,7 @@ function CompanyPage() {
               href={WA_LINK}
               target="_blank"
               rel="noreferrer noopener"
-              className="press ml-auto hidden items-center gap-[8px] rounded-full bg-[#D7B69A] px-[18px] py-[10px] text-[13.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[1px] hover:bg-[#E6CBB2] hover:shadow-[0_10px_24px_-12px_rgba(215,182,154,0.95)] sm:inline-flex lg:ml-0"
+              className="press ml-auto hidden items-center gap-[8px] rounded-full border border-[#D7B69A]/60 px-[18px] py-[9px] text-[13.5px] font-semibold text-[#E6CBB2] transition-[background-color,border-color,color,transform] duration-300 hover:-translate-y-[1px] hover:border-[#D7B69A] hover:bg-[#D7B69A]/12 hover:text-[#FBFAF8] sm:inline-flex lg:ml-0"
             >
               <WhatsAppIcon className="h-[19px] w-[19px]" />
               Chat with ARMA
@@ -559,20 +559,29 @@ function CompanyPage() {
         />
         <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-6 py-12 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
           <div>
-            <p className="flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#9A5A63]">
+            <p className="lp-enter flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#9A5A63]">
               <span className="h-px w-8 bg-[#C9A455]" />
               PT Aroma Abadi
             </p>
-            <h1 className="lp-display mt-4 max-w-[19ch] text-balance text-[clamp(2.1rem,1.2rem+2.9vw,3.3rem)] leading-[1.08] text-[#161616]">
+            <h1
+              style={{ animationDelay: "80ms" }}
+              className="lp-enter lp-display mt-4 max-w-[19ch] text-balance text-[clamp(2.1rem,1.2rem+2.9vw,3.3rem)] leading-[1.08] text-[#161616]"
+            >
               Indonesia&rsquo;s market leader in luxury cosmetics and fragrance.
             </h1>
-            <p className="mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]">
+            <p
+              style={{ animationDelay: "160ms" }}
+              className="lp-enter mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-[1.62] text-[#55504B]"
+            >
               PT Aroma Abadi develops and distributes more than 25 of the world&rsquo;s leading
               beauty brands. Customers order through ARMA, our official WhatsApp assistant, and pay
               with Xendit without ever leaving the conversation.
             </p>
 
-            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4">
+            <dl
+              style={{ animationDelay: "240ms" }}
+              className="lp-enter mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4"
+            >
               {HERO_FACTS.map((fact) => (
                 <div
                   key={fact.label}
@@ -587,7 +596,10 @@ function CompanyPage() {
             </dl>
           </div>
 
-          <div className="w-full max-w-[308px] justify-self-center lg:justify-self-end">
+          <div
+            style={{ animationDelay: "300ms" }}
+            className="lp-enter w-full max-w-[308px] justify-self-center lg:justify-self-end"
+          >
             <LiveChat messages={HERO_THREAD} script={HERO_SCRIPT} checkout={CHECKOUT} />
           </div>
         </div>
@@ -600,8 +612,10 @@ function CompanyPage() {
         className="lp-paper"
         bleed={
           <div className="border-y border-[#C9A455]/35 py-9">
-            <p className="lp-display text-center text-[clamp(1.3rem,1rem+0.9vw,1.75rem)] leading-tight text-[#710014]">
-              Brands we represent
+            <p className="flex items-center justify-center gap-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9A5A63]">
+              <span aria-hidden className="h-px w-6 bg-[#C9A455]" />
+              Brands We Represent
+              <span aria-hidden className="h-px w-6 bg-[#C9A455]" />
             </p>
             <div className="mt-5">
               <Marquee>
@@ -680,11 +694,18 @@ function CompanyPage() {
             How We Work
           </p>
           <Reveal delay={40}>
-            <dl className="mt-4 grid gap-x-8 gap-y-4 border-t border-[#EAD3D7] pt-4 sm:grid-cols-3">
-              {VALUES.map((value) => (
-                <div key={value.title} className="border-l border-[#C9A455] pl-4">
-                  <dt className="text-[14px] font-semibold text-[#161616]">{value.title}</dt>
-                  <dd className="mt-[4px] text-pretty text-[13.5px] leading-[1.55] text-[#55504B]">
+            <dl className="mt-4 grid overflow-hidden rounded-[18px] border border-[#C9A455]/45 bg-white/75 sm:grid-cols-3">
+              {VALUES.map((value, index) => (
+                <div
+                  key={value.title}
+                  className={`px-6 py-[22px] transition-colors duration-300 hover:bg-[#FFF4ED]/70 ${
+                    index ? "border-t border-[#C9A455]/25 sm:border-l sm:border-t-0" : ""
+                  }`}
+                >
+                  <dt className="lp-display text-[19px] leading-tight text-[#710014]">
+                    {value.title}
+                  </dt>
+                  <dd className="mt-[7px] text-pretty text-[13.5px] leading-[1.6] text-[#55504B]">
                     {value.body}
                   </dd>
                 </div>
@@ -784,7 +805,7 @@ function CompanyPage() {
           <h2 className="lp-display text-[clamp(1.75rem,1.1rem+1.8vw,2.45rem)] leading-[1.1] text-[#710014]">
             Customer Transaction Flow
           </h2>
-          <span className="mt-4 block h-px w-10 bg-[#D9A9B0]" />
+          <span className="lp-rule mt-4 block h-px w-10 bg-[#C9A455]/70" />
           <p className="mt-4 text-pretty text-[15.5px] leading-[1.7] text-[#55504B]">
             Six steps, from first message to dispatch. Step four is where the customer leaves
             WhatsApp for the Xendit page.
