@@ -97,7 +97,8 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "inbox-send",
     label: "Send Messages",
     section: "Conversations & Contacts",
-    effect: "Conversations can be read, but the reply box won't send.",
+    effect:
+      "Take over a conversation from Autopilot and the reply box opens, but Send stays locked.",
     where: "/inbox",
   },
   {
