@@ -1301,7 +1301,7 @@ function FilterPropertiesModal({
           <div className="min-w-0">
             <div className="text-sm font-medium">Filter Properties</div>
             <div className="text-[11px] text-muted-foreground">
-              Choose which properties show as columns, reorder them, or add your own.
+              Choose which properties show as columns and the order they appear in.
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
