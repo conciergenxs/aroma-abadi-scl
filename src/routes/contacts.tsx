@@ -10,6 +10,8 @@ import {
   labelColorDot,
 } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
+import { BAForm } from "@/components/scl/ba-form";
+import { baStore } from "@/components/scl/ba-store";
 import {
   type Contact,
   type Channel,
@@ -60,7 +62,6 @@ import {
   Eye,
   EyeOff,
   Copy,
-  UserCog,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
@@ -81,7 +82,7 @@ const COLORS: LabelColor[] = ["indigo", "pink", "emerald", "amber", "sky", "viol
 
 function ContactsPage() {
   usePreviewGate("contacts");
-  const baGate = usePermission("ba-view");
+  const baCreateGate = usePermission("ba-create");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -97,6 +98,7 @@ function ContactsPage() {
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
   const [showFilterProps, setShowFilterProps] = useState(false);
+  const [addingBa, setAddingBa] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [audiencePage, setAudiencePage] = useState(1);
@@ -293,24 +295,16 @@ function ContactsPage() {
       }
       actions={
         activeView === "ba" ? (
-          // This view lists BAs as people; their LMS accounts — brand, store,
-          // credentials — are managed on their own page.
-          baGate.allowed ? (
-            <Link
-              to="/ba"
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 hover:bg-card px-3 h-9 text-[13px] font-medium transition-colors duration-150"
-            >
-              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
-            </Link>
-          ) : (
-            <button
-              disabled
-              title={baGate.reason}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-3 h-9 text-[13px] font-medium opacity-40 cursor-not-allowed"
-            >
-              <UserCog className="h-3.5 w-3.5" /> Manage BA Accounts
-            </button>
-          )
+          // A BA's LMS account is opened from here and changed on their own
+          // record — there is no separate directory page any more.
+          <button
+            onClick={() => baCreateGate.allowed && setAddingBa(true)}
+            disabled={!baCreateGate.allowed}
+            title={baCreateGate.allowed ? undefined : baCreateGate.reason}
+            className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary transition-colors duration-150"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add BA
+          </button>
         ) : undefined
       }
       noPadding
@@ -557,6 +551,17 @@ function ContactsPage() {
         </div>
       </div>
 
+      {addingBa && (
+        <BAForm
+          initial={null}
+          onClose={() => setAddingBa(false)}
+          onSubmit={(input) => {
+            const created = baStore.add(input);
+            toast.success(`BA added. Password: ${created.password}`);
+            setAddingBa(false);
+          }}
+        />
+      )}
       {showFilterProps && (
         <FilterPropertiesModal
           properties={properties}

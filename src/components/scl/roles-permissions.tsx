@@ -187,19 +187,8 @@ const SCHEMA: CategorySection[] = [
         id: "ba",
         label: "Beauty Ambassadors",
         masterLabel: "BA Access",
-        masterDescription: "The BA directory and their LMS credentials.",
+        masterDescription: "The BA view in Contacts and their LMS credentials.",
         groups: [
-          {
-            id: "ba-read",
-            label: "Directory",
-            items: [
-              {
-                id: "ba-view",
-                label: "View Beauty Ambassadors",
-                defaultChecked: true,
-              },
-            ],
-          },
           {
             id: "ba-write",
             label: "Accounts",
@@ -330,7 +319,6 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "inbox-assign",
       "contacts-labels",
       "contacts-lifecycle",
-      "ba-view",
       "ba-create",
       "ba-edit",
       "ba-password",
@@ -348,11 +336,11 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: ["inbox-send", "ba-view"],
+    items: ["inbox-send"],
   },
   Trainer: {
     categories: ["inbox", "knowledge", "ba", "settings"],
-    items: ["inbox-send", "knowledge-modules", "knowledge-cards", "ba-view"],
+    items: ["inbox-send", "knowledge-modules", "knowledge-cards"],
   },
   Management: {
     categories: [
@@ -366,7 +354,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: ["ba-view"],
+    items: [],
   },
 };
 

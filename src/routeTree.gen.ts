@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as BaRouteImport } from './routes/ba'
 import { Route as ChannelsRouteImport } from './routes/channels'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -56,11 +55,6 @@ const AccessDeniedRoute = AccessDeniedRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BaRoute = BaRouteImport.update({
-  id: '/ba',
-  path: '/ba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelsRoute = ChannelsRouteImport.update({
@@ -215,7 +209,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
-  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
@@ -250,7 +243,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
-  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
@@ -286,7 +278,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/auth': typeof AuthRoute
-  '/ba': typeof BaRoute
   '/channels': typeof ChannelsRoute
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
@@ -323,7 +314,6 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/auth'
-    | '/ba'
     | '/channels'
     | '/company'
     | '/contacts'
@@ -358,7 +348,6 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/auth'
-    | '/ba'
     | '/channels'
     | '/company'
     | '/contacts'
@@ -393,7 +382,6 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/auth'
-    | '/ba'
     | '/channels'
     | '/company'
     | '/contacts'
@@ -429,7 +417,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
   AuthRoute: typeof AuthRoute
-  BaRoute: typeof BaRoute
   ChannelsRoute: typeof ChannelsRoute
   CompanyRoute: typeof CompanyRoute
   ContactsRoute: typeof ContactsRouteWithChildren
@@ -477,13 +464,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ba': {
-      id: '/ba'
-      path: '/ba'
-      fullPath: '/ba'
-      preLoaderRoute: typeof BaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channels': {
@@ -724,7 +704,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
   AuthRoute: AuthRoute,
-  BaRoute: BaRoute,
   ChannelsRoute: ChannelsRoute,
   CompanyRoute: CompanyRoute,
   ContactsRoute: ContactsRouteWithChildren,
