@@ -265,8 +265,10 @@ export function SpecPanel({
               strokeWidth={1.7}
             />
             <div className="min-w-0">
-              <dt className="text-[12.5px] leading-[1.4] text-[#9A5A63]">{item.label}</dt>
-              <dd className="mt-[3px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
+              <dt className="text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-[#9A5A63]">
+                {item.label}
+              </dt>
+              <dd className="mt-[4px] text-pretty text-[14px] leading-[1.45] text-[#161616]">
                 {item.value}
               </dd>
             </div>
@@ -370,7 +372,7 @@ export function Step({
             {highlight ? (
               <p className="mb-4 inline-flex items-center gap-[8px] rounded-full bg-[#710014]/8 px-[11px] py-[4px] text-[12.5px] font-medium text-[#710014]">
                 <span className="lp-ping h-[6px] w-[6px] rounded-full bg-[#710014]" />
-                Titik integrasi Xendit
+                Xendit Integration Point
               </p>
             ) : null}
             <h3 className="text-[16.5px] font-semibold leading-snug text-[#161616]">{title}</h3>
@@ -378,21 +380,21 @@ export function Step({
               {body}
             </p>
             {points ? (
-              <dl className="mt-5 max-w-[46ch] overflow-hidden rounded-[14px] border border-[#EAD3D7] bg-[#FFF4ED]">
+              <dl className="mt-5 overflow-hidden rounded-[14px] border border-[#710014]/15 bg-[#FFF4ED]">
                 {points.map((point, index) => (
                   <div
                     key={point.label}
-                    className={`px-4 py-[10px] ${index ? "border-t border-[#E8D3D6]" : ""}`}
+                    className={`flex flex-col gap-[2px] px-4 py-[10px] sm:flex-row sm:items-baseline sm:gap-4 ${
+                      index ? "border-t border-[#EAD3D7]" : ""
+                    }`}
                   >
-                    <dt className="flex items-center gap-2 text-[12.5px] leading-[1.5] text-[#9A5A63]">
+                    <dt className="flex shrink-0 items-center gap-[7px] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9A5A63] sm:w-[164px]">
                       {point.icon ? (
-                        <point.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                        <point.icon className="h-[13px] w-[13px]" strokeWidth={1.8} />
                       ) : null}
                       {point.label}
                     </dt>
-                    <dd className="mt-[4px] text-[13.5px] leading-[1.5] text-[#161616]">
-                      {point.value}
-                    </dd>
+                    <dd className="text-[13.5px] leading-[1.5] text-[#161616]">{point.value}</dd>
                   </div>
                 ))}
               </dl>

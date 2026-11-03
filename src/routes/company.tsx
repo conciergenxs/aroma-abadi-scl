@@ -222,7 +222,6 @@ const BRANDS = Object.entries(BRAND_FILES)
       .replace(/_/g, " "),
   }));
 
-
 const SERVICES = [
   {
     icon: Package,
@@ -339,7 +338,6 @@ const CONTACT: {
   wa?: boolean;
   label: string;
   value: ReactNode;
-  wide?: boolean;
 }[] = [
   {
     wa: true,
@@ -638,7 +636,7 @@ function CompanyPage() {
                     key={brand.name}
                     src={brand.src}
                     alt={brand.name}
-                    className="lp-brandmark h-[108px] w-[210px] shrink-0 object-contain px-7 sm:h-[124px] sm:w-[260px]"
+                    className="lp-brandmark h-[80px] w-[168px] shrink-0 object-contain px-6 sm:h-[94px] sm:w-[205px]"
                   />
                 ))}
               </Marquee>
@@ -957,59 +955,52 @@ function CompanyPage() {
       </Section>
 
       {/* ── Kontak & footer ─────────────────────────────────────────── */}
-      <footer id="kontak" className="lp-dark scroll-mt-[86px] bg-[#3A000A]">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-12 md:px-10 md:py-14">
-          <div className="grid gap-10 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] md:gap-12">
+      <footer id="kontak" className="lp-dark scroll-mt-[76px] bg-[#3A000A]">
+        <div className="mx-auto w-full max-w-[1180px] px-6 py-12 md:px-10 md:py-16">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
-              <img src={armaMark} alt="Aroma Abadi" className="w-[56px]" />
-              <h2 className="lp-display mt-6 text-[clamp(1.6rem,1.1rem+1.4vw,2.1rem)] leading-[1.14] text-[#FBFAF8]">
+              <img src={armaMark} alt="Aroma Abadi" className="w-[52px]" />
+              <h2 className="lp-display mt-5 text-[clamp(1.55rem,1.1rem+1.3vw,2.05rem)] leading-[1.14] text-[#FBFAF8]">
                 Official Contact
               </h2>
-              <span className="mt-4 block h-px w-10 bg-[#E7CF95]/45" />
-              <p className="mt-4 max-w-[32ch] text-pretty text-[14.5px] leading-[1.68] text-[#F3F0EC]/75">
+              <span className="mt-3 block h-px w-10 bg-[#E7CF95]/45" />
+              <p className="mt-3 max-w-[38ch] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/70">
                 The official channels of PT Aroma Abadi, for customers and partners alike.
               </p>
-              <a
-                href={WA_LINK}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="press mt-7 inline-flex items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
-              >
-                <WhatsAppIcon className="h-[20px] w-[20px]" />
-                Chat with ARMA
-              </a>
             </div>
-
-            <Reveal>
-              <div className="grid gap-px overflow-hidden rounded-[20px] border border-[#F3F0EC]/15 bg-[#FFF4ED]/15 sm:grid-cols-2">
-                {CONTACT.map((item) => (
-                  <div
-                    key={item.label}
-                    className={`group bg-[#3A000A] p-5 transition-colors duration-300 hover:bg-[#4A000D] ${
-                      item.wide ? "sm:col-span-2" : ""
-                    }`}
-                  >
-                    <p className="flex items-center gap-[10px] text-[12px] text-[#E7CF95]">
-                      <span className="grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#E7CF95]/12 text-[#E7CF95] transition-colors duration-300 group-hover:bg-[#E7CF95]/20">
-                        {item.wa ? (
-                          <WhatsAppIcon className="h-[15px] w-[15px]" />
-                        ) : item.icon ? (
-                          <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                        ) : null}
-                      </span>
-                      {item.label}
-                    </p>
-                    <p className="mt-[10px] pl-[38px] text-[15px] leading-[1.5] text-[#FBFAF8]">
-                      {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
+            <a
+              href={WA_LINK}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="press inline-flex shrink-0 items-center gap-[9px] rounded-full bg-[#D7B69A] px-[22px] py-[12px] text-[14.5px] font-semibold text-[#3A000A] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#E6CBB2] hover:shadow-[0_16px_34px_-16px_rgba(215,182,154,0.7)]"
+            >
+              <WhatsAppIcon className="h-[20px] w-[20px]" />
+              Chat with ARMA
+            </a>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-end gap-3 border-t border-[#F3F0EC]/12 pt-5">
-            <p className="text-[12.5px] text-[#F3F0EC]/60">
+          {/* Laid out on hairlines rather than in boxes: a contact block
+              should read as a column of details, not a row of cards. */}
+          <dl className="mt-11 grid gap-x-10 gap-y-8 border-t border-[#F3F0EC]/15 pt-9 sm:grid-cols-2 lg:grid-cols-4">
+            {CONTACT.map((item) => (
+              <div key={item.label}>
+                <dt className="flex items-center gap-[8px] text-[13px] text-[#E7CF95]">
+                  {item.wa ? (
+                    <WhatsAppIcon className="h-[14px] w-[14px]" />
+                  ) : item.icon ? (
+                    <item.icon className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                  ) : null}
+                  {item.label}
+                </dt>
+                <dd className="mt-[10px] text-pretty text-[14.5px] leading-[1.55] text-[#FBFAF8]">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-11 border-t border-[#F3F0EC]/12 pt-6">
+            <p className="text-[12.5px] text-[#F3F0EC]/55">
               © {new Date().getFullYear()} PT Aroma Abadi
             </p>
           </div>
