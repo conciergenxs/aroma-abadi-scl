@@ -22,7 +22,10 @@ export type BA = {
 
 type State = { bas: BA[]; currentBaId: string | null };
 
-const STORAGE_KEY = "aroma_ba_store_v6";
+// v7 renamed the field that names who a BA reports to: areaCoordinator →
+// leader. A v6 record has no leader at all, which would leave every BA
+// unassigned and the handover modal with nothing to hand over.
+const STORAGE_KEY = "aroma_ba_store_v7";
 
 function first3(name: string): string {
   const first = name.trim().split(/\s+/)[0] || "";
