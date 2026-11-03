@@ -143,7 +143,7 @@ function AuthPage() {
       // with — what they can reach follows from it.
       const signedIn = sessionStore.signInAs(phone || email);
       toast.success(`Welcome back, ${signedIn.name.split(" ")[0]}.`);
-      navigate({ to: "/app" });
+      navigate({ to: "/" });
       return;
     }
 
@@ -166,7 +166,7 @@ function AuthPage() {
         window.localStorage.setItem("scl_account_password", password);
       }
       toast.success("Workspace created. Welcome to SCL.");
-      navigate({ to: "/app" });
+      navigate({ to: "/" });
       return;
     }
 

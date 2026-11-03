@@ -37,7 +37,7 @@ import {
   usePreviewedCondition,
   usePermission,
 } from "@/components/scl/permission-preview";
-import { baStore, useBaStore } from "@/components/scl/ba-store";
+import { baStore, useBaStore, type BA } from "@/components/scl/ba-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SCL" }] }),
@@ -613,19 +613,30 @@ function UserManagementPage() {
     setConfirmDelete(true);
   };
 
-  const completeHandover = (to: string) => {
+  const finishHandover = (moved: number, where: string) => {
     if (!handover) return;
-    const moved = baStore.reassignCoordinator(handover.names, to);
     if (handover.kind === "role") {
       applyRole(handover.userId, handover.nextRole);
-      toast.success(
-        `${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to} · role updated`,
-      );
+      toast.success(`${moved} moved to ${where} · role updated`);
     } else {
       applyDelete();
-      toast.success(`${moved} Beauty Ambassador${moved === 1 ? "" : "s"} moved to ${to}`);
+      toast.success(`${moved} moved to ${where}`);
     }
     setHandover(null);
+  };
+
+  /** Everyone to the same coordinator. */
+  const completeHandover = (to: string) => {
+    if (!handover) return;
+    finishHandover(baStore.reassignCoordinator(handover.names, to), to);
+  };
+
+  /** One coordinator per person, as chosen in the one-by-one list. */
+  const completeHandoverEach = (assignments: Record<string, string>) => {
+    const entries = Object.entries(assignments);
+    entries.forEach(([baId, to]) => baStore.update(baId, { areaCoordinator: to }));
+    const names = [...new Set(entries.map(([, to]) => to))];
+    finishHandover(entries.length, names.length === 1 ? names[0] : `${names.length} coordinators`);
   };
 
   return (
@@ -839,8 +850,10 @@ function UserManagementPage() {
           baCount={basUnder(handover.names)}
           options={coordinatorsExcept(handover.names)}
           countFor={(name) => bas.filter((b) => b.areaCoordinator === name).length}
+          team={bas.filter((b) => handover.names.includes(b.areaCoordinator))}
           onClose={() => setHandover(null)}
           onConfirm={completeHandover}
+          onConfirmEach={completeHandoverEach}
         />
       )}
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
@@ -863,25 +876,44 @@ function CoordinatorHandoverModal({
   baCount,
   options,
   countFor,
+  team,
   onClose,
   onConfirm,
+  onConfirmEach,
 }: {
   handover: Handover;
   baCount: number;
   options: string[];
   countFor: (name: string) => number;
+  team: BA[];
   onClose: () => void;
   onConfirm: (to: string) => void;
+  onConfirmEach: (assignments: Record<string, string>) => void;
 }) {
-  // Escape closes it, the way every other overlay in the app does.
   useEscapeKey(true, onClose);
   const [to, setTo] = useState(options[0] ?? "");
+  const [oneByOne, setOneByOne] = useState(false);
   const leaving = handover.names.join(" and ");
-  const plural = baCount === 1 ? "" : "s";
-  const what =
-    handover.kind === "role"
-      ? `changing ${handover.names.length > 1 ? "their roles" : "their role"}`
-      : "removing the account";
+  const none = options.length === 0;
+
+  const selectOptions = options.map((name) => ({
+    value: name,
+    label: name,
+    trailing: `${countFor(name)} now`,
+  }));
+
+  if (oneByOne) {
+    return (
+      <AssignOneByOneModal
+        team={team}
+        options={selectOptions}
+        fallback={to}
+        onBack={() => setOneByOne(false)}
+        onClose={onClose}
+        onConfirm={onConfirmEach}
+      />
+    );
+  }
 
   return (
     <div
@@ -890,7 +922,7 @@ function CoordinatorHandoverModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[460px] rounded-xl border border-border bg-popover shadow-xl modal-content"
+        className="w-full max-w-[480px] rounded-xl border border-border bg-popover shadow-xl modal-content"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
@@ -898,12 +930,12 @@ function CoordinatorHandoverModal({
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-semibold">
-              {options.length === 0 ? "No Other Area Coordinator" : "Move Beauty Ambassadors First"}
+              {none ? "No One Left to Take Over" : "Hand Over the Team"}
             </h3>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              {leaving} coordinate{handover.names.length > 1 ? "" : "s"}{" "}
+              {leaving} looks after{" "}
               <span className="font-medium text-foreground">
-                {baCount} Beauty Ambassador{plural}
+                {baCount} Beauty Ambassador{baCount === 1 ? "" : "s"}
               </span>
               .
             </p>
@@ -911,29 +943,35 @@ function CoordinatorHandoverModal({
         </div>
 
         <div className="px-5 py-4 space-y-3">
-          {options.length === 0 ? (
+          {none ? (
             <p className="text-[13px] leading-relaxed text-muted-foreground">
-              Every Beauty Ambassador reports to an Area Coordinator, and there is no one else to
-              take this team. Give another user the Area Coordinator role first, then come back to
-              this one.
+              Each one has to report to an Area Coordinator, and there is nobody else holding that
+              role. Give another user the role first, then come back to this change.
             </p>
           ) : (
             <>
               <p className="text-[13px] leading-relaxed text-muted-foreground">
-                Every Beauty Ambassador reports to an Area Coordinator. Choose who takes this team
-                over before {what}.
+                Each one has to report to an Area Coordinator. Pick who takes the team over, or hand
+                them out individually.
               </p>
               <div className="space-y-1">
-                <div className="text-[12px] text-muted-foreground">Move them to</div>
+                <div className="flex items-end justify-between gap-3">
+                  <div className="text-[12px] text-muted-foreground">Move them to</div>
+                  <button
+                    type="button"
+                    onClick={() => setOneByOne(true)}
+                    className="press text-[12px] font-medium text-primary hover:underline"
+                  >
+                    Assign One by One
+                  </button>
+                </div>
                 <SclSelect
                   ariaLabel="Area Coordinator to move the team to"
                   value={to}
                   onChange={setTo}
-                  options={options.map((name) => ({
-                    value: name,
-                    label: name,
-                    trailing: `${countFor(name)} BA${countFor(name) === 1 ? "" : "s"} now`,
-                  }))}
+                  options={selectOptions}
+                  searchable
+                  searchPlaceholder="Search coordinator…"
                   className="w-full"
                 />
               </div>
@@ -946,17 +984,165 @@ function CoordinatorHandoverModal({
             onClick={onClose}
             className="press h-9 rounded-md border border-border px-3 text-[14px] hover:bg-gray-50 transition-colors duration-150"
           >
-            {options.length === 0 ? "Close" : "Cancel"}
+            {none ? "Close" : "Cancel"}
           </button>
-          {options.length > 0 && (
+          {!none && (
             <button
               onClick={() => onConfirm(to)}
               disabled={!to}
               className="press h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             >
-              Move {baCount} BA{plural} &amp; Continue
+              Move All {baCount} &amp; Continue
             </button>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* One coordinator per person, for a team that doesn't all move to the same
+ * place. Ten rows at a time: a coordinator with thirty people shouldn't have
+ * to scroll a modal to find the one they are still deciding about. */
+
+const ASSIGN_PAGE_SIZE = 10;
+
+function AssignOneByOneModal({
+  team,
+  options,
+  fallback,
+  onBack,
+  onClose,
+  onConfirm,
+}: {
+  team: BA[];
+  options: { value: string; label: string; trailing: string }[];
+  fallback: string;
+  onBack: () => void;
+  onClose: () => void;
+  onConfirm: (assignments: Record<string, string>) => void;
+}) {
+  useEscapeKey(true, onClose);
+  const [assignments, setAssignments] = useState<Record<string, string>>({});
+  const [page, setPage] = useState(1);
+
+  const pageCount = Math.max(1, Math.ceil(team.length / ASSIGN_PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const rows = team.slice((current - 1) * ASSIGN_PAGE_SIZE, current * ASSIGN_PAGE_SIZE);
+  const done = team.filter((b) => assignments[b.id]).length;
+
+  const assignAll = () => {
+    if (!fallback) return;
+    setAssignments(Object.fromEntries(team.map((b) => [b.id, fallback])));
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/60 backdrop-blur-sm p-4 modal-backdrop"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[85vh] w-full max-w-[720px] flex-col rounded-xl border border-border bg-popover shadow-xl modal-content"
+      >
+        <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border">
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold">Assign One by One</h3>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              {team.length} to place · choose a coordinator for each.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={assignAll}
+            disabled={!fallback}
+            className="press shrink-0 text-[12px] font-medium text-primary hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
+          >
+            Fill All With {fallback || "—"}
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto scl-scroll">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-popover">
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-5 py-2.5 text-left whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Position</th>
+                <th className="px-4 py-2.5 text-left whitespace-nowrap">Moves to</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((b) => (
+                <tr key={b.id} className="border-b border-border/60 h-14">
+                  <td className="px-5 py-2 align-middle whitespace-nowrap">
+                    <div className="font-medium">{b.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{b.waNumber}</div>
+                  </td>
+                  <td className="px-4 py-2 align-middle whitespace-nowrap text-[12px] text-muted-foreground">
+                    {b.position || "—"}
+                  </td>
+                  <td className="px-4 py-2 align-middle">
+                    <SclSelect
+                      ariaLabel={`Coordinator for ${b.name}`}
+                      value={assignments[b.id] ?? ""}
+                      placeholder="Not assigned"
+                      onChange={(v) => setAssignments((a) => ({ ...a, [b.id]: v }))}
+                      options={options}
+                      searchable
+                      searchPlaceholder="Search coordinator…"
+                      size="sm"
+                      className="w-48"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-border px-5 py-3">
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-medium text-foreground">{done}</span> of {team.length} assigned
+          </span>
+          {pageCount > 1 && (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={current === 1}
+                aria-label="Previous page"
+                className="press grid h-8 w-8 place-items-center rounded-md border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+              >
+                <ChevronDown className="h-3.5 w-3.5 rotate-90" />
+              </button>
+              <span className="text-[12px] text-muted-foreground tabular-nums">
+                Page {current} of {pageCount}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={current === pageCount}
+                aria-label="Next page"
+                className="press grid h-8 w-8 place-items-center rounded-md border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+              >
+                <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
+              </button>
+            </div>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={onBack}
+              className="press h-9 rounded-md border border-border px-3 text-[14px] hover:bg-gray-50 transition-colors duration-150"
+            >
+              Back
+            </button>
+            <button
+              onClick={() => onConfirm(assignments)}
+              disabled={done < team.length}
+              title={done < team.length ? "Every one of them needs a coordinator." : undefined}
+              className="press h-9 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            >
+              Move {team.length} &amp; Continue
+            </button>
+          </div>
         </div>
       </div>
     </div>

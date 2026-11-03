@@ -860,20 +860,76 @@ html {
 
 /* ═══════════════════════════════════════════════════════════════════════
    PUBLIC COMPANY PAGE ("/")
-   Scoped to the one public route. The workspace keeps Inter throughout;
-   the company page sets its headlines in Newsreader, an editorial serif
-   that reads as a document rather than a product UI. The font is loaded
-   from that route's own <head>, so no workspace page pays for it.
+   Scoped to the one public route, and set in the house typefaces rather
+   than the workspace's: Playfair Display and Montserrat, the pair the
+   Aroma Abadi LMS already uses, loaded from this route's own <head> so no
+   workspace page pays for them.
 
-   House palette: white ground, #71222A merah hati, #8B6B51 coklat,
-   #D9B892 sand on the dark bands. Nothing else is introduced.
+   Palette is the LMS brand set verbatim: #710014 brand, #F3F0EC cream,
+   #C9A455 gold, #BF9877 tan, #E6D8CD rule, #161616 ink.
    ═══════════════════════════════════════════════════════════════════════ */
 
+.lp-page {
+  font-family:
+    "Montserrat",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+
 .lp-display {
-  font-family: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  letter-spacing: -0.012em;
+  font-family: "Playfair Display", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: -0.008em;
   font-variant-numeric: lining-nums;
+}
+
+/* ---- Inside the phone ----
+   A WhatsApp screenshot that is set in the page's own typefaces stops
+   looking like WhatsApp, so everything inside a device switches to Roboto,
+   the face the Android app ships with. */
+.lp-wa {
+  font-family:
+    Roboto,
+    "Helvetica Neue",
+    -apple-system,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+/* WhatsApp hangs a small flag off the top corner of a bubble. Drawn as a
+   clipped box so each one picks up its own bubble colour. */
+.lp-tail-in,
+.lp-tail-out {
+  border-top-left-radius: 7.5px;
+  border-top-right-radius: 7.5px;
+}
+.lp-tail-in {
+  border-top-left-radius: 0;
+}
+.lp-tail-out {
+  border-top-right-radius: 0;
+}
+.lp-tail-in::before,
+.lp-tail-out::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 13px;
+}
+.lp-tail-in::before {
+  left: -8px;
+  background: #ffffff;
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+.lp-tail-out::before {
+  right: -8px;
+  background: #d9fdd3;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 /* ---- Reading-paced reveal ----
@@ -901,13 +957,13 @@ html {
 }
 .lp-msg-in {
   display: flex;
-  animation: lp-msg-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: lp-msg-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @keyframes lp-msg-in {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.97);
+    transform: translateY(7px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -916,7 +972,7 @@ html {
 }
 
 .lp-dot {
-  animation: lp-dot 1.1s ease-in-out infinite;
+  animation: lp-dot 1.45s ease-in-out infinite;
 }
 
 @keyframes lp-dot {
@@ -948,10 +1004,12 @@ html {
   }
 }
 
-/* WhatsApp's wallpaper, suggested rather than copied. */
+/* The chat ground: WhatsApp's warm beige with a faint tint, left plain
+   rather than patterned — a hand-drawn stand-in for its doodles read as
+   someone else's wallpaper, not as WhatsApp. */
 .lp-wallpaper {
   background-color: #efe7de;
-  background-image: radial-gradient(circle at 1px 1px, rgba(43, 33, 29, 0.055) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(22, 22, 22, 0.05) 1px, transparent 0);
   background-size: 18px 18px;
 }
 
@@ -967,7 +1025,7 @@ html {
   right: 0;
   bottom: -7px;
   height: 1px;
-  background: #d9b892;
+  background: #c9a455;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -978,9 +1036,42 @@ html {
 }
 
 /* The workspace's maroon focus ring is all but invisible on the page's dark
-   bands, so anything focusable inside one switches to the sand accent. */
+   bands, so anything focusable inside one switches to the gold accent. */
 .lp-dark :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
-  outline-color: #d9b892;
+  outline-color: #e7cf95;
+}
+
+/* ---- Composer caret ----
+   The hero types its messages before sending them, so the field needs a
+   cursor that behaves like one. */
+.lp-caret {
+  animation: lp-caret 1.05s step-end infinite;
+}
+
+@keyframes lp-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- Drifting brand row ----
+   The track holds the marks twice, so translating it exactly half its width
+   lands on an identical frame and the loop has no seam. */
+.lp-marquee-track {
+  animation: lp-marquee 42s linear infinite;
+}
+.lp-marquee:hover .lp-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes lp-marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Brand marks ship as black artwork on a white square. Multiply drops the
@@ -988,7 +1079,7 @@ html {
 .lp-brandmark {
   mix-blend-mode: multiply;
   filter: grayscale(1);
-  opacity: 0.55;
+  opacity: 0.8;
   transition:
     opacity 0.35s ease,
     filter 0.35s ease;
@@ -996,6 +1087,38 @@ html {
 .lp-brandmark:hover {
   opacity: 1;
   filter: grayscale(0);
+}
+
+/* ---- Paper ----
+   A hairline weave on the warm bands. At this contrast it reads as texture
+   rather than pattern, and it keeps large cream areas from going flat. */
+.lp-paper {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(113, 0, 20, 0.022) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* ---- Floating WhatsApp ----
+   A slow breath, so the button reads as live without ever pulling focus
+   from the page. Hover takes over the scale, which is why the animation is
+   paused rather than left to fight the transform. */
+.lp-float {
+  animation: lp-breathe 5.5s ease-in-out infinite;
+}
+.lp-float:hover {
+  animation-play-state: paused;
+}
+
+@keyframes lp-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.055);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

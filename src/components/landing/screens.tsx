@@ -1,14 +1,34 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, CreditCard, Landmark, Phone, Plus, QrCode, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  Camera,
+  Check,
+  CreditCard,
+  Landmark,
+  Lock,
+  MoreVertical,
+  Paperclip,
+  Phone,
+  QrCode,
+  Send,
+  Smile,
+  Video,
+  Wallet,
+  Wifi,
+} from "lucide-react";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 
 /* The screens a customer actually sees.
  *
  * The whole business runs inside a WhatsApp thread, so the thread is the one
  * artefact worth showing: it is where the order is agreed, where the payment
- * link arrives, and where the receipt lands. Nothing here is interactive —
- * these are pictures of a conversation, not a working form, and no screen
- * takes a keystroke. */
+ * link arrives, and where the receipt lands.
+ *
+ * Everything inside the device is drawn to WhatsApp's own conventions — its
+ * greens, its bubble tails and tails' tick marks, and its type (Roboto, the
+ * Android app's face) rather than the Aroma Abadi faces used by the rest of
+ * the page. Nothing here is interactive: these are pictures of a
+ * conversation, not a working form, and no screen takes a keystroke. */
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -16,16 +36,13 @@ export type ChatMessage = {
   from: "arma" | "customer";
   time: string;
   text?: string;
-  /** The breakdown ARMA sends before any money moves. */
   order?: {
     title: string;
     items: { name: string; qty: number; price: string }[];
     rows: { label: string; value: string }[];
     total: string;
   };
-  /** The Xendit payment link that follows the breakdown. */
   link?: { title: string; note: string; host: string; url: string };
-  /** What lands once Xendit reports the payment as settled. */
   receipt?: { title: string; rows: { label: string; value: string }[]; note: string };
 };
 
@@ -58,21 +75,17 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
   const mine = message.from === "customer";
   const structured = Boolean(message.order || message.link || message.receipt);
   return (
-    <div
-      className={`flex ${mine ? "justify-end" : "justify-start"} ${
-        hidden ? "lp-msg" : "lp-msg lp-msg-in"
-      }`}
-    >
+    <div className={`${mine ? "justify-end" : "justify-start"} ${hidden ? "lp-msg" : "lp-msg-in"}`}>
       <div
-        className={`relative ${structured ? "w-[88%]" : "max-w-[86%]"} rounded-[8px] px-[9px] py-[6px] text-[13.5px] leading-[1.42] text-[#111B21] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
-          mine ? "rounded-tr-[2px] bg-[#D9FDD3]" : "rounded-tl-[2px] bg-white"
+        className={`relative ${structured ? "w-[86%]" : "max-w-[84%]"} rounded-[7.5px] px-[9px] py-[6px] text-[14.2px] leading-[19px] text-[#111B21] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
+          mine ? "lp-tail-out bg-[#D9FDD3]" : "lp-tail-in bg-white"
         }`}
       >
         {message.text ? <p>{message.text}</p> : null}
 
         {message.order ? (
           <div>
-            <p className="font-semibold">{message.order.title}</p>
+            <p className="font-medium">{message.order.title}</p>
             <ul className="mt-[6px] space-y-[3px]">
               {message.order.items.map((item) => (
                 <li key={item.name} className="flex gap-3">
@@ -88,7 +101,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
             </ul>
             <div className="my-[6px] border-t border-dashed border-[#111B21]/15" />
             <Rows rows={message.order.rows} muted />
-            <div className="mt-[6px] flex justify-between gap-3 border-t border-[#111B21]/15 pt-[6px] font-semibold">
+            <div className="mt-[6px] flex justify-between gap-3 border-t border-[#111B21]/15 pt-[6px] font-medium">
               <span>Total</span>
               <span className="tabular-nums">{message.order.total}</span>
             </div>
@@ -98,13 +111,13 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
         {message.link ? (
           <div>
             <div className="rounded-[6px] bg-[#F5F6F6] p-[8px]">
-              <p className="text-[12.5px] font-semibold leading-snug">{message.link.title}</p>
-              <p className="mt-[2px] text-[12px] leading-snug text-[#667781]">
+              <p className="text-[13px] font-medium leading-[17px]">{message.link.title}</p>
+              <p className="mt-[2px] text-[12.5px] leading-[16px] text-[#667781]">
                 {message.link.note}
               </p>
-              <p className="mt-[5px] text-[12px] text-[#8696A0]">{message.link.host}</p>
+              <p className="mt-[5px] text-[12.5px] text-[#8696A0]">{message.link.host}</p>
             </div>
-            <p className="mt-[5px] break-all text-[12.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
+            <p className="mt-[5px] break-all text-[13.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
               {message.link.url}
             </p>
           </div>
@@ -112,7 +125,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
 
         {message.receipt ? (
           <div>
-            <p className="flex items-center gap-[5px] font-semibold">
+            <p className="flex items-center gap-[5px] font-medium">
               <Check className="h-[14px] w-[14px] text-[#1FA855]" strokeWidth={3} />
               {message.receipt.title}
             </p>
@@ -123,7 +136,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
           </div>
         ) : null}
 
-        <p className="mt-[2px] flex items-center justify-end gap-[3px] text-[12px] leading-none text-[#667781]">
+        <p className="mt-[2px] flex items-center justify-end gap-[3px] text-[11.5px] leading-none text-[#667781]">
           {message.time}
           {mine ? <Ticks /> : null}
         </p>
@@ -132,10 +145,10 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
   );
 }
 
-function Typing() {
+function TypingBubble() {
   return (
-    <div className="flex justify-start">
-      <div className="rounded-[8px] rounded-tl-[2px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
+    <div className="lp-msg-in justify-start">
+      <div className="lp-tail-in relative rounded-[7.5px] bg-white px-[11px] py-[10px] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
         <span className="flex items-center gap-[4px]">
           <i className="lp-dot h-[6px] w-[6px] rounded-full bg-[#9AA6AC]" />
           <i
@@ -152,25 +165,58 @@ function Typing() {
   );
 }
 
-function ChatHeader({ compact = false }: { compact?: boolean }) {
+/** The Android status bar: carrier bars, wi-fi, and a battery drawn as a
+ * capsule with a cap and a real fill level. */
+function StatusBar() {
+  return (
+    <div className="flex items-center justify-between bg-[#008069] px-[14px] pb-[4px] pt-[7px] text-[12.5px] font-medium text-white">
+      <span className="tracking-[0.01em]">09.41</span>
+      <span className="flex items-center gap-[6px]">
+        <span className="flex items-end gap-[1.5px]">
+          <i className="h-[4px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[6px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[8px] w-[2.5px] rounded-[1px] bg-white" />
+          <i className="h-[10px] w-[2.5px] rounded-[1px] bg-white/45" />
+        </span>
+        <Wifi className="h-[13px] w-[13px]" strokeWidth={2.4} />
+        <span className="flex items-center">
+          <span className="flex h-[10.5px] w-[20px] items-center rounded-[3px] border border-white/80 p-[1.5px]">
+            <span className="block h-full w-[68%] rounded-[1px] bg-white" />
+          </span>
+          <span className="ml-[1px] h-[4px] w-[1.5px] rounded-r-[1px] bg-white/80" />
+        </span>
+      </span>
+    </div>
+  );
+}
+
+function ChatHeader({ compact = false, status }: { compact?: boolean; status?: string }) {
   return (
     <div
-      className={`flex items-center gap-[9px] bg-[#075E54] ${compact ? "px-[11px] py-[9px]" : "px-[12px] py-[10px]"}`}
+      className={`flex items-center bg-[#008069] ${compact ? "gap-[9px] px-[11px] py-[9px]" : "gap-[9px] px-[10px] pb-[9px] pt-[4px]"}`}
     >
       {compact ? null : (
-        <ArrowLeft className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
+        <ArrowLeft className="h-[19px] w-[19px] shrink-0 text-white" strokeWidth={2.1} />
       )}
-      <span className="grid h-[31px] w-[31px] shrink-0 place-items-center rounded-full bg-[#5C1F24]">
-        <img src={armaMark} alt="" className="h-[17px] w-[17px]" />
+      <span className="grid h-[33px] w-[33px] shrink-0 place-items-center rounded-full bg-[#710014]">
+        <img src={armaMark} alt="" className="w-[19px]" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[14px] font-medium text-white">Aroma Abadi</span>
-        <span className="block text-[12px] text-white/65">online</span>
+        <span className="block truncate text-[15px] font-medium leading-[19px] text-white">
+          Aroma Abadi
+        </span>
+        <span className="block text-[12.5px] leading-[16px] text-white/75">
+          {status ?? "online"}
+        </span>
       </span>
       {compact ? null : (
         <>
-          <Video className="h-[17px] w-[17px] shrink-0 text-white/85" strokeWidth={2} />
-          <Phone className="h-[15px] w-[15px] shrink-0 text-white/85" strokeWidth={2} />
+          <Video className="h-[19px] w-[19px] shrink-0 text-white" strokeWidth={2} />
+          <Phone className="ml-[14px] h-[17px] w-[17px] shrink-0 text-white" strokeWidth={2.2} />
+          <MoreVertical
+            className="ml-[10px] h-[18px] w-[18px] shrink-0 text-white"
+            strokeWidth={2}
+          />
         </>
       )}
     </div>
@@ -187,10 +233,10 @@ export function ChatScreen({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[16px] border border-[#2B211D]/10 bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(62,19,25,0.45)] ${className}`}
+      className={`lp-wa overflow-hidden rounded-[16px] border border-[#E6D8CD] bg-[#EFE7DE] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)] ${className}`}
     >
       <ChatHeader compact />
-      <div className="lp-wallpaper space-y-[6px] px-[10px] py-[12px]">
+      <div className="lp-wallpaper space-y-[8px] px-[9px] py-[12px]">
         {messages.map((message, index) => (
           <Bubble key={index} message={message} hidden={false} />
         ))}
@@ -199,21 +245,26 @@ export function ChatScreen({
   );
 }
 
-const METHOD_ICON = { qris: QrCode, va: Landmark, card: CreditCard };
+/* ── The Xendit payment page ─────────────────────────────────────────────
+ * Grouped the way Xendit's own hosted page groups its Indonesian channels:
+ * QRIS, virtual account, e-wallet and cards, each naming the networks it
+ * actually covers. Drawn in our styling and labelled as Xendit's — it
+ * stands in for the screen, it does not imitate it, and it asks nothing. */
+
+const METHOD_ICON = { qris: QrCode, va: Landmark, ewallet: Wallet, card: CreditCard };
 export type PaymentMethod = { id: keyof typeof METHOD_ICON; name: string; note: string };
 
-/** The Xendit-hosted payment page the link opens. Drawn in our own styling and
- * labelled as Xendit's: it stands in for the screen, it does not imitate it,
- * and it asks for nothing. */
 export function CheckoutScreen({
   invoice,
   amount,
+  expiry,
   methods,
   className = "",
   framed = true,
 }: {
   invoice: string;
   amount: string;
+  expiry: string;
   methods: PaymentMethod[];
   className?: string;
   framed?: boolean;
@@ -222,22 +273,23 @@ export function CheckoutScreen({
     <div
       className={`overflow-hidden bg-white ${
         framed
-          ? "rounded-[16px] border border-[#2B211D]/10 shadow-[0_18px_44px_-24px_rgba(62,19,25,0.45)]"
+          ? "rounded-[16px] border border-[#E6D8CD] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)]"
           : ""
       } ${className}`}
     >
-      <div className="border-b border-[#2B211D]/10 bg-[#FAF5EF] px-[15px] py-[13px]">
+      <div className="border-b border-[#E6D8CD] bg-[#F3F0EC] px-[15px] py-[13px]">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[12.5px] text-[#6B5A50]">PT Aroma Abadi</span>
-          <span className="text-[13px] font-semibold tracking-tight text-[#2B211D]">xendit</span>
+          <span className="text-[12.5px] text-[#55504B]">PT Aroma Abadi</span>
+          <span className="text-[13px] font-semibold tracking-tight text-[#161616]">xendit</span>
         </div>
-        <p className="mt-[8px] text-[12px] text-[#6B5A50]">{invoice}</p>
-        <p className="text-[24px] font-semibold tabular-nums tracking-tight text-[#2B211D]">
+        <p className="mt-[9px] text-[12px] text-[#55504B]">Total payment · {invoice}</p>
+        <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#161616]">
           {amount}
         </p>
+        <p className="mt-[3px] text-[12px] text-[#8A6246]">Pay before {expiry}</p>
       </div>
       <div className="px-[15px] py-[13px]">
-        <p className="text-[12.5px] text-[#6B5A50]">Pilih metode pembayaran</p>
+        <p className="text-[12.5px] text-[#55504B]">Choose a payment method</p>
         <ul className="mt-[9px] space-y-[6px]">
           {methods.map((method, index) => {
             const Icon = METHOD_ICON[method.id];
@@ -245,38 +297,39 @@ export function CheckoutScreen({
             return (
               <li
                 key={method.id}
-                className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] transition-colors ${
-                  on ? "border-[#71222A] bg-[#71222A]/5" : "border-[#2B211D]/12"
+                className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
+                  on ? "border-[#710014] bg-[#710014]/5" : "border-[#E6D8CD]"
                 }`}
               >
                 <Icon
-                  className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#71222A]" : "text-[#8B6B51]"}`}
+                  className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#710014]" : "text-[#8A6246]"}`}
                   strokeWidth={1.6}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13.5px] font-medium text-[#2B211D]">
+                  <span className="block text-[13.5px] font-medium text-[#161616]">
                     {method.name}
                   </span>
-                  <span className="block text-[12px] leading-snug text-[#6B5A50]">
+                  <span className="block text-[12px] leading-snug text-[#55504B]">
                     {method.note}
                   </span>
                 </span>
                 <span
                   className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
-                    on ? "border-[#71222A]" : "border-[#2B211D]/25"
+                    on ? "border-[#710014]" : "border-[#161616]/25"
                   }`}
                 >
-                  {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#71222A]" /> : null}
+                  {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#710014]" /> : null}
                 </span>
               </li>
             );
           })}
         </ul>
-        <p className="mt-[12px] rounded-[8px] bg-[#71222A] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
-          Bayar Sekarang
+        <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
+          Pay Now
         </p>
-        <p className="mt-[9px] text-center text-[12px] leading-snug text-[#6B5A50]">
-          Halaman pembayaran dihosting dan diproses oleh Xendit.
+        <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
+          <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
+          Hosted and processed by Xendit
         </p>
       </div>
     </div>
@@ -284,146 +337,183 @@ export function CheckoutScreen({
 }
 
 /* ── The hero: one transaction, played on a loop ─────────────────────────
- * A still screenshot can't show that paying never leaves the conversation,
- * so the hero plays the whole thing: the customer asks, ARMA answers, the
- * breakdown and the link arrive, the Xendit page slides up over the thread,
- * and the receipt lands back in the same chat. Then it starts again.
+ * A still can't show that paying never leaves the conversation, so the hero
+ * plays the whole thing at reading pace: the customer types into the
+ * composer, the message sends, ARMA answers, the breakdown and the link
+ * arrive, the Xendit page slides up over the thread, and the receipt lands
+ * back in the same chat. Then it starts again.
  *
  * Server-rendered with every message in place, so the thread is in the HTML
  * whether or not the script runs, and left that way for anyone who asked
  * their system to minimise motion. */
 
-type Beat = { after: number; show?: number; typing?: boolean; checkout?: boolean; reset?: boolean };
+export type Beat =
+  | { t: "pause"; ms: number }
+  | { t: "type"; i: number }
+  | { t: "armaTyping"; ms: number }
+  | { t: "send"; i: number }
+  | { t: "checkout"; ms: number };
 
 export function LiveChat({
   messages,
+  script,
   checkout,
   className = "",
 }: {
   messages: ChatMessage[];
-  checkout: { invoice: string; amount: string; methods: PaymentMethod[] };
+  script: Beat[];
+  checkout: { invoice: string; amount: string; expiry: string; methods: PaymentMethod[] };
   className?: string;
 }) {
-  const [shown, setShown] = useState<number | null>(null);
-  const [typing, setTyping] = useState(false);
+  const [live, setLive] = useState(false);
+  const [sent, setSent] = useState(0);
+  const [draft, setDraft] = useState("");
+  const [armaTyping, setArmaTyping] = useState(false);
   const [paying, setPaying] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
 
   useIsoLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setShown(0);
+    setLive(true);
   }, []);
 
   useEffect(() => {
-    if (shown === null) return;
-    const beats: Beat[] = [
-      { after: 450, show: 1 },
-      { after: 500, typing: true },
-      { after: 1250, typing: false, show: 2 },
-      { after: 1150, show: 3 },
-      { after: 550, typing: true },
-      { after: 1150, typing: false, show: 4 },
-      { after: 800, typing: true },
-      { after: 950, typing: false, show: 5 },
-      { after: 1300, checkout: true },
-      { after: 2800, checkout: false },
-      { after: 450, typing: true },
-      { after: 950, typing: false, show: 6 },
-      { after: 3200, reset: true },
-    ];
+    if (!live) return;
     let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-    let i = 0;
-    const run = () => {
-      if (cancelled) return;
-      const beat = beats[i % beats.length];
-      timer = setTimeout(() => {
-        if (cancelled) return;
-        if (beat.reset) {
-          setShown(0);
-          setTyping(false);
-          setPaying(false);
-        } else {
-          if (beat.typing !== undefined) setTyping(beat.typing);
-          if (beat.show !== undefined) setShown(beat.show);
-          if (beat.checkout !== undefined) setPaying(beat.checkout);
+    const timers: number[] = [];
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timers.push(window.setTimeout(resolve, ms));
+      });
+
+    const run = async () => {
+      while (!cancelled) {
+        setSent(0);
+        setDraft("");
+        setArmaTyping(false);
+        setPaying(false);
+        await wait(900);
+
+        for (const beat of script) {
+          if (cancelled) return;
+          if (beat.t === "pause") {
+            await wait(beat.ms);
+          } else if (beat.t === "type") {
+            const text = messages[beat.i].text ?? "";
+            for (let c = 1; c <= text.length; c += 1) {
+              if (cancelled) return;
+              setDraft(text.slice(0, c));
+              await wait(text[c - 1] === " " ? 95 : 54);
+            }
+            await wait(620);
+            if (cancelled) return;
+            setDraft("");
+            setSent(beat.i + 1);
+          } else if (beat.t === "armaTyping") {
+            setArmaTyping(true);
+            await wait(beat.ms);
+            if (cancelled) return;
+            setArmaTyping(false);
+          } else if (beat.t === "send") {
+            setSent(beat.i + 1);
+          } else if (beat.t === "checkout") {
+            setPaying(true);
+            await wait(beat.ms);
+            if (cancelled) return;
+            setPaying(false);
+          }
         }
-        i += 1;
-        run();
-      }, beat.after);
+        await wait(4200);
+      }
     };
+
     run();
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      timers.forEach((id) => window.clearTimeout(id));
     };
-    // The timeline is fixed; it is started once and restarts itself.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shown === null]);
+  }, [live, messages, script]);
 
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [shown, typing]);
+  }, [sent, armaTyping, draft]);
 
-  const count = shown === null ? messages.length : shown;
+  // The field grows with the draft, up to five lines, then scrolls — so the
+  // line being typed is always the one in view.
+  useEffect(() => {
+    const el = fieldRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [draft]);
+
+  const count = live ? sent : messages.length;
 
   return (
     <div className={`lp-phone relative ${className}`}>
-      <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#17100E] bg-[#17100E] shadow-[0_40px_90px_-32px_rgba(62,19,25,0.55)]">
-        <div className="relative overflow-hidden rounded-[26px] bg-[#EFE7DE]">
-          {/* Status bar */}
-          <div className="flex items-center justify-between bg-[#075E54] px-[15px] pb-[2px] pt-[7px] text-[11.5px] font-medium text-white/90">
-            <span>09.41</span>
-            <span className="flex items-center gap-[4px]">
-              <span className="h-[7px] w-[7px] rounded-full bg-white/80" />
-              <span className="h-[9px] w-[16px] rounded-[3px] border border-white/70" />
-            </span>
-          </div>
-          <ChatHeader />
+      <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
+        <div className="lp-wa relative flex h-[618px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
+          <StatusBar />
+          <ChatHeader status={armaTyping ? "typing…" : "online"} />
 
           <div
             ref={threadRef}
-            className="lp-wallpaper scrollbar-none h-[430px] space-y-[6px] overflow-y-auto px-[10px] py-[12px]"
+            className="lp-wallpaper scrollbar-none min-h-0 flex-1 space-y-[8px] overflow-y-auto px-[9px] py-[12px]"
           >
-            <p className="mx-auto w-fit rounded-[7px] bg-white/85 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
-              Hari ini
+            <p className="mx-auto w-fit rounded-[7px] bg-white/90 px-[9px] py-[3px] text-[12px] text-[#54656F] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)]">
+              Today
             </p>
             {messages.map((message, index) => (
               <Bubble key={index} message={message} hidden={index >= count} />
             ))}
-            {typing ? <Typing /> : null}
+            {armaTyping ? <TypingBubble /> : null}
           </div>
 
-          {/* Composer */}
-          <div className="flex items-center gap-[8px] bg-[#F0F2F5] px-[10px] py-[8px]">
-            <span className="flex h-[32px] flex-1 items-center rounded-full bg-white px-[12px] text-[13px] text-[#8696A0]">
-              Ketik pesan
-            </span>
-            <span className="grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full bg-[#00A884]">
-              <Plus className="h-[16px] w-[16px] text-white" strokeWidth={2.4} />
+          <div className="flex items-end gap-[6px] bg-[#F0F2F5] px-[8px] py-[7px]">
+            <div className="flex min-h-[40px] flex-1 items-end gap-[7px] rounded-[20px] bg-white px-[10px] py-[9px]">
+              <Smile className="h-[19px] w-[19px] shrink-0 text-[#8696A0]" strokeWidth={1.8} />
+              <div
+                ref={fieldRef}
+                className="scrollbar-none max-h-[95px] flex-1 overflow-y-auto text-[14.5px] leading-[19px]"
+              >
+                {draft ? (
+                  <span className="text-[#111B21]">
+                    {draft}
+                    <i className="lp-caret ml-[1px] inline-block h-[14px] w-[1.5px] translate-y-[2px] bg-[#111B21]" />
+                  </span>
+                ) : (
+                  <span className="text-[#8696A0]">Message</span>
+                )}
+              </div>
+              <Paperclip
+                className="h-[18px] w-[18px] shrink-0 -rotate-45 text-[#8696A0]"
+                strokeWidth={1.8}
+              />
+              <Camera className="h-[18px] w-[18px] shrink-0 text-[#8696A0]" strokeWidth={1.8} />
+            </div>
+            <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-full bg-[#00A884]">
+              <Send className="h-[17px] w-[17px] translate-x-[-1px] text-white" strokeWidth={2.1} />
             </span>
           </div>
 
-          {/* The Xendit page, opened from the link without leaving the phone */}
           <div
-            className={`absolute inset-0 flex flex-col justify-end transition-[opacity] duration-300 ${
-              paying ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+            className={`absolute inset-0 flex flex-col justify-end ${
+              paying ? "pointer-events-auto" : "pointer-events-none"
             }`}
           >
             <div
-              className={`absolute inset-0 bg-[#17100E]/45 transition-opacity duration-300 ${
+              className={`absolute inset-0 bg-[#161616]/45 transition-opacity duration-300 ${
                 paying ? "opacity-100" : "opacity-0"
               }`}
             />
             <div
-              className={`relative max-h-full overflow-hidden rounded-t-[20px] bg-white transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`relative max-h-full overflow-hidden rounded-t-[20px] bg-white transition-transform duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 paying ? "translate-y-0" : "translate-y-full"
               }`}
             >
-              <p className="flex items-center justify-between border-b border-[#2B211D]/10 px-[15px] py-[9px] text-[12px] text-[#6B5A50]">
+              <p className="flex items-center justify-between border-b border-[#E6D8CD] px-[15px] py-[9px] text-[12px] text-[#55504B]">
                 <span className="truncate">checkout.xendit.co</span>
-                <span className="h-[4px] w-[34px] rounded-full bg-[#2B211D]/15" />
+                <span className="h-[4px] w-[34px] rounded-full bg-[#161616]/15" />
               </p>
               <CheckoutScreen framed={false} {...checkout} />
             </div>
