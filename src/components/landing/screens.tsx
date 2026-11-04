@@ -118,7 +118,7 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
             <TextBlock
               lines={[
                 ...message.order.items.map(
-                  (item) => `${item.qty}\u00d7 ${item.name} \u2014 ${item.price}`,
+                  (item) => `${item.qty}\u00d7 ${item.name}: ${item.price}`,
                 ),
                 "",
                 ...message.order.rows.map((row) => `${row.label}: ${row.value}`),
