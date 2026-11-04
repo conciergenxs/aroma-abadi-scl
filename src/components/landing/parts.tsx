@@ -4,8 +4,7 @@ import type { LucideIcon } from "lucide-react";
 /* Page furniture for the public company page.
  *
  * The page is an annotated document: a narrow column names the subject, a
- * wider one carries the content. Type and colour are the LMS house set —
- * Playfair Display over Montserrat, #710014 on cream — and the only thing
+ * wider one carries the content. Type and colour are the LMS house set,  * Playfair Display over Montserrat, #710014 on cream, and the only thing
  * allowed to break the rhythm is the step where the customer pays.
  *
  * Motion is tied to reading: a block settles as it comes into view, once,
@@ -113,7 +112,7 @@ export function Section({
   return (
     <section id={id} className={`scroll-mt-[76px] ${GROUND[tone]} ${className}`}>
       <div
-        className={`mx-auto w-full max-w-[1180px] px-6 pt-12 md:px-10 md:pt-16 ${
+        className={`mx-auto w-full max-w-[1180px] px-4 pt-12 md:px-7 md:pt-16 ${
           bleed ? "pb-8 md:pb-10" : "pb-12 md:pb-16"
         }`}
       >
@@ -172,10 +171,20 @@ export function Split({
   );
 }
 
-export function Prose({ tone = "white", children }: { tone?: Tone; children: ReactNode }) {
+export function Prose({
+  tone = "white",
+  /** Let the text run the full width of the column, in line with whatever
+   *  sits under it, instead of holding the usual 62-character measure. */
+  full = false,
+  children,
+}: {
+  tone?: Tone;
+  full?: boolean;
+  children: ReactNode;
+}) {
   return (
     <div
-      className={`max-w-[62ch] space-y-3 text-pretty text-[15.5px] leading-[1.62] ${BODY[tone]}`}
+      className={`space-y-3 text-pretty text-[15.5px] leading-[1.62] ${full ? "" : "max-w-[62ch]"} ${BODY[tone]}`}
     >
       {children}
     </div>
@@ -271,7 +280,7 @@ export function SpecPanel({
   );
 }
 
-/** Equal cells, whatever the copy length — pair with `auto-rows-fr` so every
+/** Equal cells, whatever the copy length, pair with `auto-rows-fr` so every
  * panel in the grid is the same height as well as the same width. */
 export function Panel({
   icon: Icon,
@@ -293,12 +302,12 @@ export function Panel({
   );
 }
 
-/** Marks a value Aroma Abadi still has to supply — deliberately the loudest
+/** Marks a value Aroma Abadi still has to supply, deliberately the loudest
  * thing on a quiet page, so none of them ships unfilled. */
 export function Pending({ field, tone = "white" }: { field: string; tone?: Tone }) {
   return (
     <span
-      title="Not filled in yet — complete this before the page goes to Xendit."
+      title="Not filled in yet. Complete this before the page goes to Xendit."
       className={`inline-flex items-center gap-[7px] rounded-[5px] border border-dashed px-[8px] py-[2px] align-middle text-[13.5px] ${
         tone === "maroon"
           ? "border-[#E7CF95]/55 bg-[#E7CF95]/10 text-[#E7CF95]"

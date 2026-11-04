@@ -1122,9 +1122,8 @@ html {
 .lp-marquee-track {
   animation: lp-marquee 78s linear infinite;
 }
-.lp-marquee:hover .lp-marquee-track {
-  animation-play-state: paused;
-}
+/* The row keeps moving under the pointer; only the mark the pointer is on
+   answers, so hovering never costs the reader their place in the row. */
 
 @keyframes lp-marquee {
   to {
@@ -1304,5 +1303,62 @@ html {
   .lp-rule {
     transform: scaleX(1);
     transition: none;
+  }
+}
+
+/* ---- The hosted payment page ----
+   The sheet slides up once, then the page moves through its own steps inside
+   it. Swapping those steps outright read as a cut, so each one is dealt in:
+   the body cross-fades and settles, and the sheet keeps a floor height so the
+   frame never snaps between a tall step and a short one. */
+.lp-stage {
+  animation: lp-stage 0.46s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes lp-stage {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The QR earns a beat of its own: it reads as something being presented. */
+.lp-qr {
+  animation: lp-qr 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.06s backwards;
+}
+@keyframes lp-qr {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Paid: the tick lands, rather than appearing. */
+.lp-paid {
+  animation: lp-paid 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s backwards;
+}
+@keyframes lp-paid {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-stage,
+  .lp-qr,
+  .lp-paid {
+    animation: none;
   }
 }

@@ -24,7 +24,7 @@ import armaMark from "@/assets/aroma-abadi-icon-sand.png";
  * artefact worth showing: it is where the order is agreed, where the payment
  * link arrives, and where the receipt lands.
  *
- * Everything inside the device is drawn to WhatsApp's own conventions — its
+ * Everything inside the device is drawn to WhatsApp's own conventions, its
  * greens, its bubble tails and tails' tick marks, and its type (Roboto, the
  * Android app's face) rather than the Aroma Abadi faces used by the rest of
  * the page. Nothing here is interactive: these are pictures of a
@@ -42,7 +42,10 @@ export type ChatMessage = {
     rows: { label: string; value: string }[];
     total: string;
   };
-  link?: { title: string; note: string; host: string; url: string };
+  /** A real link preview is built by WhatsApp from the destination page's own
+   *  metadata, so `title`/`note`/`host` are Xendit's to set; anything ARMA
+   *  wants to say goes in `message`, the text of the message itself. */
+  link?: { message: string; title: string; note: string; host: string; url: string };
   receipt?: { title: string; rows: { label: string; value: string }[]; note: string };
 };
 
@@ -58,16 +61,37 @@ function Ticks() {
   );
 }
 
-function Rows({ rows, muted }: { rows: { label: string; value: string }[]; muted?: boolean }) {
+/* WhatsApp has no tables, rules or columns: a bubble is text, set in the app's
+ * own face. A monospace run (```like this```) would buy column alignment but
+ * switches typeface mid-thread, which reads as a different app. So the figures
+ * go out as ordinary "label: value" lines, the form most order bots use, and
+ * one the Cloud API's text endpoint sends verbatim. */
+function TextBlock({ lines }: { lines: string[] }) {
   return (
-    <ul className="space-y-[3px]">
-      {rows.map((row) => (
-        <li key={row.label} className="flex justify-between gap-3">
-          <span className={muted ? "text-[#667781]" : undefined}>{row.label}</span>
-          <span className="tabular-nums">{row.value}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="mt-[6px] space-y-[1px]">
+      {lines.map((line, i) =>
+        line === "" ? (
+          <div key={i} className="h-[6px]" />
+        ) : (
+          <p key={i} className="leading-[18px]">
+            {line}
+          </p>
+        ),
+      )}
+    </div>
+  );
+}
+
+/* WhatsApp sets the stamp over the bottom-right corner and lets the last line
+ * of text run up beside it; only a last line that fills the width pushes the
+ * stamp onto a line of its own. A blank inline run of the stamp's width at the
+ * end of the copy reproduces exactly that. */
+function Gap({ mine }: { mine: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={`inline-block h-[1px] align-bottom ${mine ? "w-[62px]" : "w-[44px]"}`}
+    />
   );
 }
 
@@ -81,30 +105,29 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
           mine ? "lp-tail-out bg-[#D9FDD3]" : "lp-tail-in bg-white"
         }`}
       >
-        {message.text ? <p>{message.text}</p> : null}
+        {message.text ? (
+          <p>
+            {message.text}
+            <Gap mine={mine} />
+          </p>
+        ) : null}
 
         {message.order ? (
           <div>
-            <p className="font-medium">{message.order.title}</p>
-            <ul className="mt-[6px] space-y-[3px]">
-              {message.order.items.map((item) => (
-                <li key={item.name} className="flex gap-3">
-                  {/* Quantity leads the line so a wrapping product name can
-                      never strand it on a line of its own. */}
-                  <span className="flex-1">
-                    <span className="text-[#667781]">{item.qty}× </span>
-                    {item.name}
-                  </span>
-                  <span className="shrink-0 tabular-nums">{item.price}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="my-[6px] border-t border-dashed border-[#111B21]/15" />
-            <Rows rows={message.order.rows} muted />
-            <div className="mt-[6px] flex justify-between gap-3 border-t border-[#111B21]/15 pt-[6px] font-medium">
-              <span>Total</span>
-              <span className="tabular-nums">{message.order.total}</span>
-            </div>
+            <p>{message.order.title}</p>
+            <TextBlock
+              lines={[
+                ...message.order.items.map(
+                  (item) => `${item.qty}\u00d7 ${item.name} \u2014 ${item.price}`,
+                ),
+                "",
+                ...message.order.rows.map((row) => `${row.label}: ${row.value}`),
+              ]}
+            />
+            <p className="mt-[6px]">
+              Total: {message.order.total}
+              <Gap mine={mine} />
+            </p>
           </div>
         ) : null}
 
@@ -117,29 +140,29 @@ function Bubble({ message, hidden }: { message: ChatMessage; hidden: boolean }) 
               </p>
               <p className="mt-[5px] text-[12.5px] text-[#8696A0]">{message.link.host}</p>
             </div>
-            <p className="mt-[5px] break-all text-[13.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
+            <p className="mt-[5px]">{message.link.message}</p>
+            <p className="mt-[3px] break-all text-[13.5px] text-[#027EB5] underline decoration-[#027EB5]/40">
               {message.link.url}
+              <Gap mine={mine} />
             </p>
           </div>
         ) : null}
 
         {message.receipt ? (
           <div>
-            <p className="flex items-center gap-[5px] font-medium">
-              <Check className="h-[14px] w-[14px] text-[#1FA855]" strokeWidth={3} />
-              {message.receipt.title}
+            <p>{message.receipt.title}</p>
+            <TextBlock lines={message.receipt.rows.map((row) => `${row.label}: ${row.value}`)} />
+            <p className="mt-[6px]">
+              {message.receipt.note}
+              <Gap mine={mine} />
             </p>
-            <div className="mt-[6px]">
-              <Rows rows={message.receipt.rows} muted />
-            </div>
-            <p className="mt-[6px] border-t border-[#111B21]/15 pt-[6px]">{message.receipt.note}</p>
           </div>
         ) : null}
 
-        <p className="mt-[2px] flex items-center justify-end gap-[3px] text-[11.5px] leading-none text-[#667781]">
+        <span className="absolute bottom-[5px] right-[9px] flex items-center gap-[3px] text-[11.5px] leading-none text-[#667781]">
           {message.time}
           {mine ? <Ticks /> : null}
-        </p>
+        </span>
       </div>
     </div>
   );
@@ -248,11 +271,281 @@ export function ChatScreen({
 /* ── The Xendit payment page ─────────────────────────────────────────────
  * Grouped the way Xendit's own hosted page groups its Indonesian channels:
  * QRIS, virtual account, e-wallet and cards, each naming the networks it
- * actually covers. Drawn in our styling and labelled as Xendit's — it
+ * actually covers. Drawn in our styling and labelled as Xendit's, it
  * stands in for the screen, it does not imitate it, and it asks nothing. */
 
 const METHOD_ICON = { qris: QrCode, va: Landmark, ewallet: Wallet, card: CreditCard };
 export type PaymentMethod = { id: keyof typeof METHOD_ICON; name: string; note: string };
+
+/* A QRIS mark for the mockup: the real finder squares and a fixed field of
+ * modules, drawn so the payment step looks like the thing it stands for. It
+ * encodes nothing and is not scannable, a picture of a QR, not a QR. */
+function QrMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 25 25" className={className} role="img" aria-label="QRIS code (illustration)">
+      <rect x={0} y={0} width={25} height={25} fill="#fff" />
+      <g fill="#161616">
+        <rect key="m0-8" x={8} y={0} width={1} height={1} />
+        <rect key="m0-10" x={10} y={0} width={1} height={1} />
+        <rect key="m0-11" x={11} y={0} width={1} height={1} />
+        <rect key="m0-13" x={13} y={0} width={1} height={1} />
+        <rect key="m0-14" x={14} y={0} width={1} height={1} />
+        <rect key="m0-15" x={15} y={0} width={1} height={1} />
+        <rect key="m0-16" x={16} y={0} width={1} height={1} />
+        <rect key="m1-8" x={8} y={1} width={1} height={1} />
+        <rect key="m1-9" x={9} y={1} width={1} height={1} />
+        <rect key="m1-13" x={13} y={1} width={1} height={1} />
+        <rect key="m1-14" x={14} y={1} width={1} height={1} />
+        <rect key="m1-15" x={15} y={1} width={1} height={1} />
+        <rect key="m1-16" x={16} y={1} width={1} height={1} />
+        <rect key="m2-8" x={8} y={2} width={1} height={1} />
+        <rect key="m2-9" x={9} y={2} width={1} height={1} />
+        <rect key="m2-11" x={11} y={2} width={1} height={1} />
+        <rect key="m2-15" x={15} y={2} width={1} height={1} />
+        <rect key="m3-8" x={8} y={3} width={1} height={1} />
+        <rect key="m3-9" x={9} y={3} width={1} height={1} />
+        <rect key="m3-10" x={10} y={3} width={1} height={1} />
+        <rect key="m3-11" x={11} y={3} width={1} height={1} />
+        <rect key="m3-15" x={15} y={3} width={1} height={1} />
+        <rect key="m3-16" x={16} y={3} width={1} height={1} />
+        <rect key="m4-9" x={9} y={4} width={1} height={1} />
+        <rect key="m4-10" x={10} y={4} width={1} height={1} />
+        <rect key="m4-11" x={11} y={4} width={1} height={1} />
+        <rect key="m4-12" x={12} y={4} width={1} height={1} />
+        <rect key="m4-15" x={15} y={4} width={1} height={1} />
+        <rect key="m4-16" x={16} y={4} width={1} height={1} />
+        <rect key="m5-9" x={9} y={5} width={1} height={1} />
+        <rect key="m5-10" x={10} y={5} width={1} height={1} />
+        <rect key="m5-11" x={11} y={5} width={1} height={1} />
+        <rect key="m5-12" x={12} y={5} width={1} height={1} />
+        <rect key="m5-14" x={14} y={5} width={1} height={1} />
+        <rect key="m5-16" x={16} y={5} width={1} height={1} />
+        <rect key="m6-11" x={11} y={6} width={1} height={1} />
+        <rect key="m6-13" x={13} y={6} width={1} height={1} />
+        <rect key="m7-11" x={11} y={7} width={1} height={1} />
+        <rect key="m7-12" x={12} y={7} width={1} height={1} />
+        <rect key="m7-13" x={13} y={7} width={1} height={1} />
+        <rect key="m7-14" x={14} y={7} width={1} height={1} />
+        <rect key="m7-15" x={15} y={7} width={1} height={1} />
+        <rect key="m8-0" x={0} y={8} width={1} height={1} />
+        <rect key="m8-2" x={2} y={8} width={1} height={1} />
+        <rect key="m8-3" x={3} y={8} width={1} height={1} />
+        <rect key="m8-5" x={5} y={8} width={1} height={1} />
+        <rect key="m8-6" x={6} y={8} width={1} height={1} />
+        <rect key="m8-7" x={7} y={8} width={1} height={1} />
+        <rect key="m8-8" x={8} y={8} width={1} height={1} />
+        <rect key="m8-11" x={11} y={8} width={1} height={1} />
+        <rect key="m8-12" x={12} y={8} width={1} height={1} />
+        <rect key="m8-13" x={13} y={8} width={1} height={1} />
+        <rect key="m8-14" x={14} y={8} width={1} height={1} />
+        <rect key="m8-15" x={15} y={8} width={1} height={1} />
+        <rect key="m8-18" x={18} y={8} width={1} height={1} />
+        <rect key="m8-20" x={20} y={8} width={1} height={1} />
+        <rect key="m8-22" x={22} y={8} width={1} height={1} />
+        <rect key="m8-23" x={23} y={8} width={1} height={1} />
+        <rect key="m9-0" x={0} y={9} width={1} height={1} />
+        <rect key="m9-1" x={1} y={9} width={1} height={1} />
+        <rect key="m9-5" x={5} y={9} width={1} height={1} />
+        <rect key="m9-6" x={6} y={9} width={1} height={1} />
+        <rect key="m9-7" x={7} y={9} width={1} height={1} />
+        <rect key="m9-8" x={8} y={9} width={1} height={1} />
+        <rect key="m9-10" x={10} y={9} width={1} height={1} />
+        <rect key="m9-12" x={12} y={9} width={1} height={1} />
+        <rect key="m9-13" x={13} y={9} width={1} height={1} />
+        <rect key="m9-15" x={15} y={9} width={1} height={1} />
+        <rect key="m9-18" x={18} y={9} width={1} height={1} />
+        <rect key="m9-24" x={24} y={9} width={1} height={1} />
+        <rect key="m10-0" x={0} y={10} width={1} height={1} />
+        <rect key="m10-1" x={1} y={10} width={1} height={1} />
+        <rect key="m10-3" x={3} y={10} width={1} height={1} />
+        <rect key="m10-7" x={7} y={10} width={1} height={1} />
+        <rect key="m10-9" x={9} y={10} width={1} height={1} />
+        <rect key="m10-13" x={13} y={10} width={1} height={1} />
+        <rect key="m10-14" x={14} y={10} width={1} height={1} />
+        <rect key="m10-15" x={15} y={10} width={1} height={1} />
+        <rect key="m10-17" x={17} y={10} width={1} height={1} />
+        <rect key="m10-18" x={18} y={10} width={1} height={1} />
+        <rect key="m10-22" x={22} y={10} width={1} height={1} />
+        <rect key="m10-24" x={24} y={10} width={1} height={1} />
+        <rect key="m11-0" x={0} y={11} width={1} height={1} />
+        <rect key="m11-1" x={1} y={11} width={1} height={1} />
+        <rect key="m11-2" x={2} y={11} width={1} height={1} />
+        <rect key="m11-3" x={3} y={11} width={1} height={1} />
+        <rect key="m11-7" x={7} y={11} width={1} height={1} />
+        <rect key="m11-8" x={8} y={11} width={1} height={1} />
+        <rect key="m11-9" x={9} y={11} width={1} height={1} />
+        <rect key="m11-10" x={10} y={11} width={1} height={1} />
+        <rect key="m11-11" x={11} y={11} width={1} height={1} />
+        <rect key="m11-14" x={14} y={11} width={1} height={1} />
+        <rect key="m11-15" x={15} y={11} width={1} height={1} />
+        <rect key="m11-16" x={16} y={11} width={1} height={1} />
+        <rect key="m11-19" x={19} y={11} width={1} height={1} />
+        <rect key="m11-20" x={20} y={11} width={1} height={1} />
+        <rect key="m11-21" x={21} y={11} width={1} height={1} />
+        <rect key="m11-22" x={22} y={11} width={1} height={1} />
+        <rect key="m11-23" x={23} y={11} width={1} height={1} />
+        <rect key="m12-1" x={1} y={12} width={1} height={1} />
+        <rect key="m12-2" x={2} y={12} width={1} height={1} />
+        <rect key="m12-3" x={3} y={12} width={1} height={1} />
+        <rect key="m12-4" x={4} y={12} width={1} height={1} />
+        <rect key="m12-7" x={7} y={12} width={1} height={1} />
+        <rect key="m12-8" x={8} y={12} width={1} height={1} />
+        <rect key="m12-9" x={9} y={12} width={1} height={1} />
+        <rect key="m12-10" x={10} y={12} width={1} height={1} />
+        <rect key="m12-11" x={11} y={12} width={1} height={1} />
+        <rect key="m12-14" x={14} y={12} width={1} height={1} />
+        <rect key="m12-16" x={16} y={12} width={1} height={1} />
+        <rect key="m12-18" x={18} y={12} width={1} height={1} />
+        <rect key="m12-19" x={19} y={12} width={1} height={1} />
+        <rect key="m12-21" x={21} y={12} width={1} height={1} />
+        <rect key="m12-23" x={23} y={12} width={1} height={1} />
+        <rect key="m12-24" x={24} y={12} width={1} height={1} />
+        <rect key="m13-1" x={1} y={13} width={1} height={1} />
+        <rect key="m13-2" x={2} y={13} width={1} height={1} />
+        <rect key="m13-3" x={3} y={13} width={1} height={1} />
+        <rect key="m13-4" x={4} y={13} width={1} height={1} />
+        <rect key="m13-6" x={6} y={13} width={1} height={1} />
+        <rect key="m13-8" x={8} y={13} width={1} height={1} />
+        <rect key="m13-9" x={9} y={13} width={1} height={1} />
+        <rect key="m13-11" x={11} y={13} width={1} height={1} />
+        <rect key="m13-14" x={14} y={13} width={1} height={1} />
+        <rect key="m13-20" x={20} y={13} width={1} height={1} />
+        <rect key="m13-21" x={21} y={13} width={1} height={1} />
+        <rect key="m13-24" x={24} y={13} width={1} height={1} />
+        <rect key="m14-3" x={3} y={14} width={1} height={1} />
+        <rect key="m14-5" x={5} y={14} width={1} height={1} />
+        <rect key="m14-9" x={9} y={14} width={1} height={1} />
+        <rect key="m14-10" x={10} y={14} width={1} height={1} />
+        <rect key="m14-11" x={11} y={14} width={1} height={1} />
+        <rect key="m14-13" x={13} y={14} width={1} height={1} />
+        <rect key="m14-14" x={14} y={14} width={1} height={1} />
+        <rect key="m14-18" x={18} y={14} width={1} height={1} />
+        <rect key="m14-20" x={20} y={14} width={1} height={1} />
+        <rect key="m14-21" x={21} y={14} width={1} height={1} />
+        <rect key="m14-23" x={23} y={14} width={1} height={1} />
+        <rect key="m14-24" x={24} y={14} width={1} height={1} />
+        <rect key="m15-3" x={3} y={15} width={1} height={1} />
+        <rect key="m15-4" x={4} y={15} width={1} height={1} />
+        <rect key="m15-5" x={5} y={15} width={1} height={1} />
+        <rect key="m15-6" x={6} y={15} width={1} height={1} />
+        <rect key="m15-7" x={7} y={15} width={1} height={1} />
+        <rect key="m15-10" x={10} y={15} width={1} height={1} />
+        <rect key="m15-11" x={11} y={15} width={1} height={1} />
+        <rect key="m15-12" x={12} y={15} width={1} height={1} />
+        <rect key="m15-15" x={15} y={15} width={1} height={1} />
+        <rect key="m15-16" x={16} y={15} width={1} height={1} />
+        <rect key="m15-17" x={17} y={15} width={1} height={1} />
+        <rect key="m15-18" x={18} y={15} width={1} height={1} />
+        <rect key="m15-19" x={19} y={15} width={1} height={1} />
+        <rect key="m15-21" x={21} y={15} width={1} height={1} />
+        <rect key="m15-22" x={22} y={15} width={1} height={1} />
+        <rect key="m15-23" x={23} y={15} width={1} height={1} />
+        <rect key="m16-0" x={0} y={16} width={1} height={1} />
+        <rect key="m16-3" x={3} y={16} width={1} height={1} />
+        <rect key="m16-4" x={4} y={16} width={1} height={1} />
+        <rect key="m16-5" x={5} y={16} width={1} height={1} />
+        <rect key="m16-6" x={6} y={16} width={1} height={1} />
+        <rect key="m16-7" x={7} y={16} width={1} height={1} />
+        <rect key="m16-10" x={10} y={16} width={1} height={1} />
+        <rect key="m16-12" x={12} y={16} width={1} height={1} />
+        <rect key="m16-14" x={14} y={16} width={1} height={1} />
+        <rect key="m16-15" x={15} y={16} width={1} height={1} />
+        <rect key="m16-17" x={17} y={16} width={1} height={1} />
+        <rect key="m16-19" x={19} y={16} width={1} height={1} />
+        <rect key="m16-20" x={20} y={16} width={1} height={1} />
+        <rect key="m16-21" x={21} y={16} width={1} height={1} />
+        <rect key="m16-23" x={23} y={16} width={1} height={1} />
+        <rect key="m16-24" x={24} y={16} width={1} height={1} />
+        <rect key="m17-10" x={10} y={17} width={1} height={1} />
+        <rect key="m17-16" x={16} y={17} width={1} height={1} />
+        <rect key="m17-17" x={17} y={17} width={1} height={1} />
+        <rect key="m17-20" x={20} y={17} width={1} height={1} />
+        <rect key="m17-21" x={21} y={17} width={1} height={1} />
+        <rect key="m17-22" x={22} y={17} width={1} height={1} />
+        <rect key="m17-24" x={24} y={17} width={1} height={1} />
+        <rect key="m18-9" x={9} y={18} width={1} height={1} />
+        <rect key="m18-10" x={10} y={18} width={1} height={1} />
+        <rect key="m18-14" x={14} y={18} width={1} height={1} />
+        <rect key="m18-16" x={16} y={18} width={1} height={1} />
+        <rect key="m18-17" x={17} y={18} width={1} height={1} />
+        <rect key="m18-19" x={19} y={18} width={1} height={1} />
+        <rect key="m18-20" x={20} y={18} width={1} height={1} />
+        <rect key="m18-22" x={22} y={18} width={1} height={1} />
+        <rect key="m18-23" x={23} y={18} width={1} height={1} />
+        <rect key="m19-8" x={8} y={19} width={1} height={1} />
+        <rect key="m19-11" x={11} y={19} width={1} height={1} />
+        <rect key="m19-12" x={12} y={19} width={1} height={1} />
+        <rect key="m19-13" x={13} y={19} width={1} height={1} />
+        <rect key="m19-14" x={14} y={19} width={1} height={1} />
+        <rect key="m19-15" x={15} y={19} width={1} height={1} />
+        <rect key="m19-17" x={17} y={19} width={1} height={1} />
+        <rect key="m19-18" x={18} y={19} width={1} height={1} />
+        <rect key="m19-19" x={19} y={19} width={1} height={1} />
+        <rect key="m19-22" x={22} y={19} width={1} height={1} />
+        <rect key="m20-8" x={8} y={20} width={1} height={1} />
+        <rect key="m20-10" x={10} y={20} width={1} height={1} />
+        <rect key="m20-11" x={11} y={20} width={1} height={1} />
+        <rect key="m20-13" x={13} y={20} width={1} height={1} />
+        <rect key="m20-15" x={15} y={20} width={1} height={1} />
+        <rect key="m20-16" x={16} y={20} width={1} height={1} />
+        <rect key="m20-17" x={17} y={20} width={1} height={1} />
+        <rect key="m20-19" x={19} y={20} width={1} height={1} />
+        <rect key="m20-20" x={20} y={20} width={1} height={1} />
+        <rect key="m20-22" x={22} y={20} width={1} height={1} />
+        <rect key="m20-23" x={23} y={20} width={1} height={1} />
+        <rect key="m20-24" x={24} y={20} width={1} height={1} />
+        <rect key="m21-12" x={12} y={21} width={1} height={1} />
+        <rect key="m21-13" x={13} y={21} width={1} height={1} />
+        <rect key="m21-16" x={16} y={21} width={1} height={1} />
+        <rect key="m21-17" x={17} y={21} width={1} height={1} />
+        <rect key="m21-18" x={18} y={21} width={1} height={1} />
+        <rect key="m21-20" x={20} y={21} width={1} height={1} />
+        <rect key="m21-22" x={22} y={21} width={1} height={1} />
+        <rect key="m21-23" x={23} y={21} width={1} height={1} />
+        <rect key="m22-10" x={10} y={22} width={1} height={1} />
+        <rect key="m22-12" x={12} y={22} width={1} height={1} />
+        <rect key="m22-13" x={13} y={22} width={1} height={1} />
+        <rect key="m22-15" x={15} y={22} width={1} height={1} />
+        <rect key="m22-16" x={16} y={22} width={1} height={1} />
+        <rect key="m22-18" x={18} y={22} width={1} height={1} />
+        <rect key="m22-19" x={19} y={22} width={1} height={1} />
+        <rect key="m22-21" x={21} y={22} width={1} height={1} />
+        <rect key="m22-24" x={24} y={22} width={1} height={1} />
+        <rect key="m23-8" x={8} y={23} width={1} height={1} />
+        <rect key="m23-9" x={9} y={23} width={1} height={1} />
+        <rect key="m23-10" x={10} y={23} width={1} height={1} />
+        <rect key="m23-11" x={11} y={23} width={1} height={1} />
+        <rect key="m23-13" x={13} y={23} width={1} height={1} />
+        <rect key="m23-14" x={14} y={23} width={1} height={1} />
+        <rect key="m23-15" x={15} y={23} width={1} height={1} />
+        <rect key="m23-18" x={18} y={23} width={1} height={1} />
+        <rect key="m23-21" x={21} y={23} width={1} height={1} />
+        <rect key="m24-9" x={9} y={24} width={1} height={1} />
+        <rect key="m24-11" x={11} y={24} width={1} height={1} />
+        <rect key="m24-12" x={12} y={24} width={1} height={1} />
+        <rect key="m24-13" x={13} y={24} width={1} height={1} />
+        <rect key="m24-15" x={15} y={24} width={1} height={1} />
+        <rect key="m24-16" x={16} y={24} width={1} height={1} />
+        <rect key="m24-18" x={18} y={24} width={1} height={1} />
+        <rect key="m24-19" x={19} y={24} width={1} height={1} />
+        <rect key="m24-20" x={20} y={24} width={1} height={1} />
+        <rect key="m24-23" x={23} y={24} width={1} height={1} />
+      </g>
+      {/* the three finder patterns */}
+      {[
+        [0, 0],
+        [18, 0],
+        [0, 18],
+      ].map(([fx, fy]) => (
+        <g key={`${fx}-${fy}`}>
+          <rect x={fx} y={fy} width={7} height={7} fill="#161616" />
+          <rect x={fx + 1} y={fy + 1} width={5} height={5} fill="#fff" />
+          <rect x={fx + 2} y={fy + 2} width={3} height={3} fill="#161616" />
+        </g>
+      ))}
+    </svg>
+  );
+}
 
 export function CheckoutScreen({
   invoice,
@@ -261,6 +554,7 @@ export function CheckoutScreen({
   methods,
   className = "",
   framed = true,
+  stage = "methods",
 }: {
   invoice: string;
   amount: string;
@@ -268,6 +562,9 @@ export function CheckoutScreen({
   methods: PaymentMethod[];
   className?: string;
   framed?: boolean;
+  /** Where the hosted page has got to: pick a method, scan the QR, or done.
+   *  The flow section shows "methods"; the hero plays all three. */
+  stage?: "methods" | "qris" | "success";
 }) {
   return (
     <div
@@ -288,50 +585,81 @@ export function CheckoutScreen({
         </p>
         <p className="mt-[3px] text-[12px] text-[#8A6246]">Pay before {expiry}</p>
       </div>
-      <div className="px-[15px] py-[13px]">
-        <p className="text-[12.5px] text-[#55504B]">Choose a payment method</p>
-        <ul className="mt-[9px] space-y-[6px]">
-          {methods.map((method, index) => {
-            const Icon = METHOD_ICON[method.id];
-            const on = index === 0;
-            return (
-              <li
-                key={method.id}
-                className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
-                  on ? "border-[#710014] bg-[#710014]/5" : "border-[#E6D8CD]"
-                }`}
-              >
-                <Icon
-                  className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#710014]" : "text-[#8A6246]"}`}
-                  strokeWidth={1.6}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[13.5px] font-medium text-[#161616]">
-                    {method.name}
-                  </span>
-                  <span className="block text-[12px] leading-snug text-[#55504B]">
-                    {method.note}
-                  </span>
-                </span>
-                <span
-                  className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
-                    on ? "border-[#710014]" : "border-[#161616]/25"
+      {stage === "success" ? (
+        <div key="success" className="lp-stage min-h-[262px] px-[15px] py-[22px] text-center">
+          <span className="lp-paid mx-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-[#1FA855]/12 text-[#1FA855]">
+            <Check className="h-[26px] w-[26px]" strokeWidth={3} />
+          </span>
+          <p className="mt-[11px] text-[15px] font-semibold text-[#161616]">Payment successful</p>
+          <p className="mt-[3px] text-[12.5px] text-[#55504B]">{invoice} · paid with QRIS</p>
+          <p className="mt-[10px] text-[19px] font-semibold tabular-nums tracking-tight text-[#161616]">
+            {amount}
+          </p>
+          <p className="mt-[12px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
+            <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
+            Hosted and processed by Xendit
+          </p>
+        </div>
+      ) : stage === "qris" ? (
+        <div key="qris" className="lp-stage min-h-[262px] px-[15px] py-[13px] text-center">
+          <p className="text-[12.5px] text-[#55504B]">Scan to pay with QRIS</p>
+          <div className="lp-qr mx-auto mt-[10px] w-[142px] rounded-[10px] border border-[#E6D8CD] bg-white p-[9px]">
+            <QrMark className="block h-[124px] w-[124px]" />
+          </div>
+          <p className="mt-[9px] text-[12px] text-[#55504B]">
+            Any bank or e‑wallet app · expires in 14:52
+          </p>
+          <p className="mt-[11px] flex items-center justify-center gap-[6px] text-[12.5px] text-[#8A6246]">
+            <span className="lp-dot h-[6px] w-[6px] rounded-full bg-[#8A6246]" />
+            Waiting for payment
+          </p>
+        </div>
+      ) : (
+        <div key="methods" className="lp-stage min-h-[262px] px-[15px] py-[13px]">
+          <p className="text-[12.5px] text-[#55504B]">Choose a payment method</p>
+          <ul className="mt-[9px] space-y-[6px]">
+            {methods.map((method, index) => {
+              const Icon = METHOD_ICON[method.id];
+              const on = index === 0;
+              return (
+                <li
+                  key={method.id}
+                  className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
+                    on ? "border-[#710014] bg-[#710014]/5" : "border-[#E6D8CD]"
                   }`}
                 >
-                  {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#710014]" /> : null}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
-          Pay Now
-        </p>
-        <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
-          <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
-          Hosted and processed by Xendit
-        </p>
-      </div>
+                  <Icon
+                    className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#710014]" : "text-[#8A6246]"}`}
+                    strokeWidth={1.6}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13.5px] font-medium text-[#161616]">
+                      {method.name}
+                    </span>
+                    <span className="block text-[12px] leading-snug text-[#55504B]">
+                      {method.note}
+                    </span>
+                  </span>
+                  <span
+                    className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
+                      on ? "border-[#710014]" : "border-[#161616]/25"
+                    }`}
+                  >
+                    {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#710014]" /> : null}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
+            Pay Now
+          </p>
+          <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
+            <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
+            Hosted and processed by Xendit
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -352,7 +680,7 @@ export type Beat =
   | { t: "type"; i: number }
   | { t: "armaTyping"; ms: number }
   | { t: "send"; i: number }
-  | { t: "checkout"; ms: number };
+  | { t: "checkout"; ms: number; stage?: "methods" | "qris" | "success" };
 
 export function LiveChat({
   messages,
@@ -370,6 +698,7 @@ export function LiveChat({
   const [draft, setDraft] = useState("");
   const [armaTyping, setArmaTyping] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [payStage, setPayStage] = useState<"methods" | "qris" | "success">("methods");
   const threadRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
 
@@ -393,6 +722,7 @@ export function LiveChat({
         setDraft("");
         setArmaTyping(false);
         setPaying(false);
+        setPayStage("methods");
         await wait(900);
 
         for (const beat of script) {
@@ -418,10 +748,12 @@ export function LiveChat({
           } else if (beat.t === "send") {
             setSent(beat.i + 1);
           } else if (beat.t === "checkout") {
+            setPayStage(beat.stage ?? "methods");
             setPaying(true);
             await wait(beat.ms);
             if (cancelled) return;
-            setPaying(false);
+            // the page only drops away once the last stage has been read
+            if (beat.stage === "success") setPaying(false);
           }
         }
         await wait(4200);
@@ -440,7 +772,7 @@ export function LiveChat({
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [sent, armaTyping, draft]);
 
-  // The field grows with the draft, up to five lines, then scrolls — so the
+  // The field grows with the draft, up to five lines, then scrolls, so the
   // line being typed is always the one in view.
   useEffect(() => {
     const el = fieldRef.current;
@@ -452,7 +784,7 @@ export function LiveChat({
   return (
     <div className={`lp-phone relative ${className}`}>
       <div className="relative overflow-hidden rounded-[34px] border-[8px] border-[#161616] bg-[#161616] shadow-[0_40px_90px_-32px_rgba(113,0,20,0.5)]">
-        <div className="lp-wa relative flex h-[618px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
+        <div className="lp-wa relative flex h-[560px] flex-col overflow-hidden rounded-[26px] bg-[#EFE7DE]">
           <StatusBar />
           <ChatHeader status={armaTyping ? "typing…" : "online"} />
 
@@ -515,7 +847,7 @@ export function LiveChat({
                 <span className="truncate">checkout.xendit.co</span>
                 <span className="h-[4px] w-[34px] rounded-full bg-[#161616]/15" />
               </p>
-              <CheckoutScreen framed={false} {...checkout} />
+              <CheckoutScreen framed={false} stage={payStage} {...checkout} />
             </div>
           </div>
         </div>
