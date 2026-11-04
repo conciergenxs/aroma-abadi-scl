@@ -677,9 +677,9 @@ function CompanyPage() {
             <Prose tone="cream" full>
               <p>
                 Aroma Abadi is an independent distributor, not the in-house arm of any one house. We
-                bring a brand into the Indonesian market and look after how it is placed, how it is
-                seen, and what it comes to be worth here. The portfolio runs past 25 names across
-                fragrance, makeup, skincare and hair care, fifteen of which appear in the row below.
+                bring a brand into Indonesia and look after how it is placed, how it is seen and
+                what it is worth here. The portfolio runs past 25 names across fragrance, makeup,
+                skincare and hair care, fifteen of them below.
               </p>
               <p>
                 Most of it reaches customers at partner retail counters, where our Beauty Advisors
