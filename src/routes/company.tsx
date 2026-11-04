@@ -811,7 +811,7 @@ function CompanyPage() {
                   <h3 className="text-[16px] font-semibold text-[#FBFAF8]">
                     A Separate Channel for Beauty Advisors
                   </h3>
-                  <p className="mt-[8px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/75">
+                  <p className="mt-[8px] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/75 lg:pr-9">
                     Our Beauty Advisors use an internal version of ARMA for product knowledge and
                     service procedures. That channel is for staff and retail partners only. It
                     processes no payments, holds no customer records, and nothing a customer sends

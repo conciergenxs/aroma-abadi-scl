@@ -184,7 +184,7 @@ export function Prose({
 }) {
   return (
     <div
-      className={`space-y-3 text-pretty text-[15.5px] leading-[1.62] ${full ? "" : "max-w-[62ch]"} ${BODY[tone]}`}
+      className={`space-y-3 text-pretty text-[15.5px] leading-[1.62] ${full ? "lg:pr-9" : "max-w-[62ch]"} ${BODY[tone]}`}
     >
       {children}
     </div>
@@ -380,7 +380,7 @@ export function Step({
             {(Array.isArray(body) ? body : [body]).map((paragraph, index) => (
               <p
                 key={index}
-                className={`max-w-[56ch] text-pretty text-[14.5px] leading-[1.62] text-[#55504B] ${
+                className={`text-pretty text-[14.5px] leading-[1.62] text-[#55504B] lg:pr-9 ${
                   index === 0 ? "mt-[9px]" : "mt-[11px]"
                 }`}
               >
