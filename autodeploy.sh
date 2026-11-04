@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# autodeploy.sh — auto git push saat ada perubahan file, dengan throttle
-# supaya tidak nge-spam Vercel (free tier: 100 deploy/hari).
+# autodeploy.sh — auto git commit + push saat ada perubahan file.
 # Jalankan sekali dari terminal lokal: bash ~/aroma-abadi-scl/autodeploy.sh
+#
+# 2026-11-04: namanya sudah tidak akurat — script ini TIDAK deploy apa pun.
+# Satu repo ini menyuapi tiga project Vercel (scl, scl-lite, company), jadi
+# satu push dulu = tiga deployment. Sekarang vercel.json menyetel
+# git.deploymentEnabled:false, jadi push cuma backup + sinkron ke GitHub.
+# Deploy dijalankan manual per site — perintahnya ada di AGENTS.md.
 #
 # 2026-09-04: ditambah MIN_INTERVAL setelah kena limit "100 deploy/hari" —
 # sebelumnya setiap save (walau cuma jeda 3 detik) langsung push+deploy baru,
@@ -60,7 +65,7 @@ push_changes() {
      git commit -m "auto: $(git diff --cached --name-only | head -3 | tr '\n' ', ' | sed 's/,$//') [autodeploy]" && \
      git push; then
     echo "$now" > "$LAST_PUSH_FILE"
-    log "✓ Push berhasil — Vercel sedang deploy."
+    log "✓ Push berhasil — tersimpan di GitHub. Deploy tetap manual (lihat AGENTS.md)."
   else
     log "✗ Push gagal."
   fi
