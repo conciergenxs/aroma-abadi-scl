@@ -144,7 +144,7 @@ export function Split({
       <Reveal className="self-start md:sticky md:top-[92px]">
         {Icon ? (
           <span
-            className={`mb-4 grid h-[38px] w-[38px] place-items-center rounded-full ${
+            className={`lp-mark mb-4 grid h-[38px] w-[38px] place-items-center rounded-full ${
               tone === "maroon" ? "bg-[#E7CF95]/15 text-[#E7CF95]" : "bg-[#710014]/7 text-[#710014]"
             }`}
           >
@@ -348,7 +348,9 @@ export function Step({
       {!last ? (
         <span
           aria-hidden
-          className="absolute bottom-0 left-[14px] top-[32px] w-px bg-[#161616]/12 sm:left-[17px] sm:top-[36px]"
+          className={`lp-spine absolute bottom-0 left-[14px] top-[32px] w-px bg-[#161616]/12 sm:left-[17px] sm:top-[36px] ${
+            inView ? "is-in" : ""
+          }`}
         />
       ) : null}
       <span

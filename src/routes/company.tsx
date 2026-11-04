@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
+  ArrowDown,
   Award,
   Ban,
   BellRing,
@@ -275,13 +276,6 @@ const SHOTS = [
     span: "col-span-12 sm:col-span-8",
     height: "h-[170px] sm:h-[230px]",
   },
-];
-
-const HERO_FACTS: { label: string; value: string }[] = [
-  { label: "Legal Entity", value: "PT Aroma Abadi" },
-  { label: "Line of Business", value: "Beauty distribution" },
-  { label: "Sales Channel", value: "WhatsApp (ARMA)" },
-  { label: "Payment Gateway", value: "Xendit" },
 ];
 
 const PROGRAM = [
@@ -608,22 +602,19 @@ function CompanyPage() {
               leaving the chat.
             </p>
 
-            <dl
+            {/* The facts that used to sit here are set out in full in the
+                profile below, so the hero points the reader down to them
+                instead of saying them twice. */}
+            <a
+              href="#profil"
               style={{ animationDelay: "240ms" }}
-              className="lp-enter mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4"
+              className="lp-enter lp-more press group mt-9 inline-flex items-center gap-[12px] rounded-full border border-[#710014]/30 py-[12px] pl-[24px] pr-[10px] text-[14.5px] font-semibold text-[#710014] transition-[background-color,border-color,color,transform,box-shadow] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[#710014] hover:bg-[#710014] hover:text-[#FBFAF8] hover:shadow-[0_16px_34px_-18px_rgba(113,0,20,0.6)]"
             >
-              {HERO_FACTS.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#FFF4ED]"
-                >
-                  <dt className="text-[12px] leading-tight text-[#9A5A63]">{fact.label}</dt>
-                  <dd className="mt-[7px] text-[14.5px] font-semibold leading-snug text-[#161616]">
-                    {fact.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+              More About Us
+              <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#710014]/8 transition-colors duration-[420ms] group-hover:bg-[#FBFAF8]/18">
+                <ArrowDown className="lp-bob h-[16px] w-[16px]" strokeWidth={1.9} />
+              </span>
+            </a>
           </div>
 
           <div

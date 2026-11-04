@@ -1362,3 +1362,109 @@ html {
     animation: none;
   }
 }
+
+/* ---- Read on ----
+   The hero ends by pointing down rather than by listing facts the profile
+   states properly a screen later. The arrow drifts, so the mark reads as an
+   invitation to keep going; hovering stops the drift and holds it down, and
+   a gold rule draws itself under the line being offered. */
+.lp-bob {
+  animation: lp-bob 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes lp-bob {
+  0%,
+  100% {
+    transform: translateY(-1px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+.lp-more:hover .lp-bob {
+  animation: none;
+  transform: translateY(3px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A gold ring breathes just outside the border, so the pill reads as the one
+   thing on the screen asking to be pressed without shouting about it. */
+.lp-more {
+  position: relative;
+}
+.lp-more::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(201, 164, 85, 0.55);
+  opacity: 0;
+  transform: scale(0.97);
+  animation: lp-ring 3.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+.lp-more:hover::before {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lp-ring {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  45% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-bob,
+  .lp-more:hover .lp-bob,
+  .lp-more::before {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* ---- The flow spine ----
+   The hairline joining one step to the next now grows downward as the step
+   arrives, so six separate cards read as one sequence. */
+.lp-spine {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+.lp-spine.is-in {
+  transform: scaleY(1);
+}
+
+/* ---- Section marks ----
+   The little round icon beside a section title settles rather than appears. */
+.lp-mark {
+  animation: lp-mark 0.65s cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+}
+@keyframes lp-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.72) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-spine {
+    transform: scaleY(1);
+    transition: none;
+  }
+  .lp-mark {
+    animation: none;
+  }
+}
