@@ -231,10 +231,17 @@ const SCHEMA: CategorySection[] = [
         id: "transactions",
         label: "Transactions",
         masterLabel: "Transactions Access",
-        // Nothing writes to the ledger from here: ARMA records every order on
-        // WhatsApp, so access is the whole of this permission.
+        // Nothing writes to the ledger from here — ARMA records every order on
+        // WhatsApp — but reading one order in full is its own step: the line
+        // items, the quantities and the customer behind them.
         masterDescription: "Read the orders ARMA recorded on WhatsApp.",
-        groups: [],
+        groups: [
+          {
+            id: "transactions-read",
+            label: "Orders",
+            items: [{ id: "transactions-detail", label: "Open Order Details" }],
+          },
+        ],
       },
     ],
   },
@@ -321,6 +328,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "ba-create",
       "ba-edit",
       "ba-password",
+      "transactions-detail",
     ],
   },
   Brand: {
@@ -335,7 +343,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: ["inbox-send"],
+    items: ["inbox-send", "transactions-detail"],
   },
   Trainer: {
     categories: ["inbox", "knowledge", "ba", "settings"],
@@ -353,7 +361,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: [],
+    items: ["transactions-detail"],
   },
 };
 

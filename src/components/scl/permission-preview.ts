@@ -258,6 +258,13 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     where: "/promo-codes",
   },
   {
+    id: "transactions-detail",
+    label: "Open Order Details",
+    section: "Commerce",
+    effect: "The ledger lists every order, but no row opens and (See more..) is locked.",
+    where: "/transactions",
+  },
+  {
     id: "referral-manage",
     label: "Create & Edit Referral Seasons",
     section: "Commerce",
