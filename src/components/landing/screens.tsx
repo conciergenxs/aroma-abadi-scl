@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Camera,
   Check,
+  ChevronDown,
   CreditCard,
   Landmark,
   Lock,
@@ -11,10 +12,12 @@ import {
   Phone,
   QrCode,
   Send,
+  ShoppingCart,
+  Smartphone,
   Smile,
   Video,
-  Wallet,
   Wifi,
+  X,
 } from "lucide-react";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 
@@ -268,14 +271,25 @@ export function ChatScreen({
   );
 }
 
-/* ── The Xendit payment page ─────────────────────────────────────────────
- * Grouped the way Xendit's own hosted page groups its Indonesian channels:
- * QRIS, virtual account, e-wallet and cards, each naming the networks it
- * actually covers. Drawn in our styling and labelled as Xendit's, it
- * stands in for the screen, it does not imitate it, and it asks nothing. */
+/* ── Xendit's hosted payment page ────────────────────────────────────────
+ * What a customer actually lands on when they open the link: Xendit's own
+ * invoice page, full screen in WhatsApp's in-app browser, not a panel of
+ * ours and not a sheet over the thread.
+ *
+ * It is drawn to that page's own tokens rather than restyled in ours,
+ * because the point of this section is to show where Aroma Abadi stops and
+ * Xendit begins. The values come off Xendit's own stylesheet: Open Sans,
+ * #4573FF for the merchant band and the amount, #00CF99 for the confirm
+ * button, #ECF1FF behind the fraud notice, and the grey ramp #FAFAFA,
+ * #EBEBEB, #DBDBDB, #7A7A7A, #5C5C5C, #3D3D3D for everything else.
+ *
+ * Nothing here is interactive. It takes no keystroke and submits nothing. */
 
-const METHOD_ICON = { qris: QrCode, va: Landmark, ewallet: Wallet, card: CreditCard };
-export type PaymentMethod = { id: keyof typeof METHOD_ICON; name: string; note: string };
+const METHOD_ICON = { qris: QrCode, va: Landmark, ewallet: Smartphone, card: CreditCard };
+
+/** The channels enabled on the account, under Xendit's own groupings. The
+ *  row names the first and counts the rest, the way the real page does. */
+export type PaymentMethod = { id: keyof typeof METHOD_ICON; name: string; channels: string[] };
 
 /* A QRIS mark for the mockup: the real finder squares and a fixed field of
  * modules, drawn so the payment step looks like the thing it stands for. It
@@ -547,11 +561,25 @@ function QrMark({ className = "" }: { className?: string }) {
   );
 }
 
+/** The "POWERED BY xendit" plate the invoice page closes on. */
+function PoweredBy() {
+  return (
+    <span className="inline-flex items-center gap-[5px] rounded-[4px] border border-[#DBDBDB] px-[9px] py-[5px]">
+      <span className="text-[9.5px] font-semibold uppercase tracking-[0.07em] text-[#7A7A7A]">
+        Powered by
+      </span>
+      <span className="text-[12.5px] font-semibold tracking-[-0.01em] text-[#4573FF]">xendit</span>
+    </span>
+  );
+}
+
 export function CheckoutScreen({
   invoice,
   amount,
   expiry,
+  paidAt,
   methods,
+  merchant = "PT Aroma Abadi",
   className = "",
   framed = true,
   stage = "methods",
@@ -559,107 +587,184 @@ export function CheckoutScreen({
   invoice: string;
   amount: string;
   expiry: string;
+  paidAt: string;
   methods: PaymentMethod[];
+  merchant?: string;
   className?: string;
   framed?: boolean;
-  /** Where the hosted page has got to: pick a method, scan the QR, or done.
+  /** Where the page has got to: choose a method, scan the QR, or done.
    *  The flow section shows "methods"; the hero plays all three. */
   stage?: "methods" | "qris" | "success";
 }) {
   return (
     <div
-      className={`overflow-hidden bg-white ${
+      className={`lp-xen flex h-full flex-col overflow-hidden bg-white text-[#3D3D3D] ${
         framed
           ? "rounded-[16px] border border-[#E6D8CD] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)]"
           : ""
       } ${className}`}
     >
-      <div className="border-b border-[#E6D8CD] bg-[#F3F0EC] px-[15px] py-[13px]">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[12.5px] text-[#55504B]">PT Aroma Abadi</span>
-          <span className="text-[13px] font-semibold tracking-tight text-[#161616]">xendit</span>
-        </div>
-        <p className="mt-[9px] text-[12px] text-[#55504B]">Total payment · {invoice}</p>
-        <p className="text-[23px] font-semibold tabular-nums leading-tight tracking-tight text-[#161616]">
-          {amount}
-        </p>
-        <p className="mt-[3px] text-[12px] text-[#8A6246]">Pay before {expiry}</p>
+      {/* the merchant band Xendit prints above every invoice */}
+      <div className="flex shrink-0 items-center gap-[8px] bg-[#4573FF] px-[12px] py-[7px]">
+        <span className="grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#710014]">
+          <img src={armaMark} alt="" className="h-[18px] w-[18px] object-contain" />
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold text-white">
+          {merchant}
+        </span>
+        <span className="flex shrink-0 items-center gap-[3px] rounded-[4px] bg-white px-[7px] py-[3px] text-[11.5px] leading-[15px]">
+          English
+          <ChevronDown className="h-[11px] w-[11px] text-[#7A7A7A]" strokeWidth={2.2} />
+        </span>
       </div>
-      {stage === "success" ? (
-        <div key="success" className="lp-stage min-h-[262px] px-[15px] py-[22px] text-center">
-          <span className="lp-paid mx-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-[#1FA855]/12 text-[#1FA855]">
-            <Check className="h-[26px] w-[26px]" strokeWidth={3} />
-          </span>
-          <p className="mt-[11px] text-[15px] font-semibold text-[#161616]">Payment successful</p>
-          <p className="mt-[3px] text-[12.5px] text-[#55504B]">{invoice} · paid with QRIS</p>
-          <p className="mt-[10px] text-[19px] font-semibold tabular-nums tracking-tight text-[#161616]">
-            {amount}
-          </p>
-          <p className="mt-[12px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
-            <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
-            Hosted and processed by Xendit
-          </p>
-        </div>
-      ) : stage === "qris" ? (
-        <div key="qris" className="lp-stage min-h-[262px] px-[15px] py-[13px] text-center">
-          <p className="text-[12.5px] text-[#55504B]">Scan to pay with QRIS</p>
-          <div className="lp-qr mx-auto mt-[10px] w-[142px] rounded-[10px] border border-[#E6D8CD] bg-white p-[9px]">
-            <QrMark className="block h-[124px] w-[124px]" />
-          </div>
-          <p className="mt-[9px] text-[12px] text-[#55504B]">
-            Any bank or e‑wallet app · expires in 14:52
-          </p>
-          <p className="mt-[11px] flex items-center justify-center gap-[6px] text-[12.5px] text-[#8A6246]">
-            <span className="lp-dot h-[6px] w-[6px] rounded-full bg-[#8A6246]" />
-            Waiting for payment
-          </p>
-        </div>
-      ) : (
-        <div key="methods" className="lp-stage min-h-[262px] px-[15px] py-[13px]">
-          <p className="text-[12.5px] text-[#55504B]">Choose a payment method</p>
-          <ul className="mt-[9px] space-y-[6px]">
-            {methods.map((method, index) => {
-              const Icon = METHOD_ICON[method.id];
-              const on = index === 0;
-              return (
-                <li
-                  key={method.id}
-                  className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[8px] ${
-                    on ? "border-[#710014] bg-[#710014]/5" : "border-[#E6D8CD]"
-                  }`}
-                >
-                  <Icon
-                    className={`h-[16px] w-[16px] shrink-0 ${on ? "text-[#710014]" : "text-[#8A6246]"}`}
-                    strokeWidth={1.6}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[13.5px] font-medium text-[#161616]">
-                      {method.name}
-                    </span>
-                    <span className="block text-[12px] leading-snug text-[#55504B]">
-                      {method.note}
-                    </span>
+
+      {/* on a phone the order summary rides collapsed at the top */}
+      <div className="flex shrink-0 items-center gap-[7px] border-b border-[#EBEBEB] px-[12px] py-[10px]">
+        <ShoppingCart className="h-[14px] w-[14px] shrink-0" strokeWidth={1.9} />
+        <span className="flex-1 text-[12px] font-bold uppercase tracking-[0.04em]">
+          Order Summary
+        </span>
+        <ChevronDown className="h-[15px] w-[15px] shrink-0 text-[#7A7A7A]" strokeWidth={2} />
+      </div>
+
+      <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto bg-white">
+        {stage === "success" ? (
+          <div key="success" className="lp-stage px-[14px] pb-[18px] pt-[24px]">
+            <p className="text-center text-[22px] font-bold leading-[28px]">Thank You!</p>
+            <p className="mx-auto mt-[7px] max-w-[228px] text-center text-[12px] leading-[17px] text-[#5C5C5C]">
+              Your order {invoice} has been paid for successfully
+            </p>
+            <dl className="mt-[20px] space-y-[12px] text-[12px] leading-[16px]">
+              <div className="flex items-center justify-between gap-3">
+                <dt className="font-bold">Amount Paid</dt>
+                <dd className="tabular-nums text-[#5C5C5C]">{amount}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="font-bold">Date Paid</dt>
+                <dd className="text-[#5C5C5C]">{paidAt}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="font-bold">Payment</dt>
+                <dd className="flex items-center gap-[6px] text-[#5C5C5C]">
+                  <span className="rounded-[3px] border border-[#EBEBEB] px-[5px] py-[2px] text-[11px] font-bold leading-[13px] tracking-[0.04em] text-[#3D3D3D]">
+                    QRIS
                   </span>
-                  <span
-                    className={`grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full border ${
-                      on ? "border-[#710014]" : "border-[#161616]/25"
+                  QR Payments
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-[22px] text-center">
+              <PoweredBy />
+            </p>
+          </div>
+        ) : stage === "qris" ? (
+          <div key="qris" className="lp-stage px-[14px] pb-[14px] pt-[11px]">
+            <div className="rounded-[6px] border border-[#EBEBEB] px-[12px] py-[11px] text-center">
+              <p className="text-[12px] font-bold tracking-[0.1em]">QRIS</p>
+              <div className="lp-qr mx-auto mt-[9px] w-[122px] rounded-[6px] border border-[#EBEBEB] bg-white p-[7px]">
+                <QrMark className="block h-[108px] w-[108px]" />
+              </div>
+              <p className="mt-[10px] text-[11.5px] text-[#7A7A7A]">Amount to Pay</p>
+              <p className="mt-[2px] text-[16px] font-semibold tabular-nums">{amount}</p>
+            </div>
+            <div className="mt-[9px] rounded-[6px] border border-[#4573FF]/35 bg-[#ECF1FF] px-[11px] py-[9px]">
+              <p className="text-[11.5px] font-bold leading-[16px]">
+                Protect Yourself Against Fraud
+              </p>
+              <p className="mt-[2px] text-[11.5px] leading-[16px] text-[#5C5C5C]">
+                Check the merchant name, the amount and the details before you scan.
+              </p>
+            </div>
+            <p className="mt-[10px] flex items-center justify-center gap-[6px] text-[11.5px] text-[#7A7A7A]">
+              <span className="lp-dot h-[6px] w-[6px] rounded-full bg-[#4573FF]" />
+              Waiting for payment, 14:52 left
+            </p>
+            <p className="mt-[10px] rounded-[4px] bg-[#00CF99] py-[9px] text-center text-[12.5px] font-semibold text-white">
+              Back
+            </p>
+          </div>
+        ) : (
+          <div key="methods" className="lp-stage px-[14px] pb-[18px] pt-[16px]">
+            <p className="text-balance text-center text-[11.5px] font-semibold uppercase leading-[16px] tracking-[0.03em] text-[#5C5C5C]">
+              Pay before {expiry}
+            </p>
+            <p className="mt-[5px] text-center text-[26px] leading-[33px] tracking-[-0.01em] text-[#4573FF] tabular-nums">
+              {amount}
+            </p>
+            <p className="mt-[18px] text-[11.5px] font-semibold uppercase tracking-[0.04em] text-[#7A7A7A]">
+              Payment Method
+            </p>
+            <ul className="mt-[7px] overflow-hidden rounded-[6px] border border-[#EBEBEB]">
+              {methods.map((method, index) => {
+                const Icon = METHOD_ICON[method.id];
+                return (
+                  <li
+                    key={method.id}
+                    className={`lp-xenrow flex items-center gap-[8px] px-[10px] py-[10px] ${
+                      index ? "border-t border-[#EBEBEB]" : ""
                     }`}
                   >
-                    {on ? <span className="h-[7px] w-[7px] rounded-full bg-[#710014]" /> : null}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-[12px] rounded-[8px] bg-[#710014] px-[10px] py-[9px] text-center text-[13.5px] font-medium text-white">
-            Pay Now
-          </p>
-          <p className="mt-[9px] flex items-center justify-center gap-[5px] text-[12px] text-[#55504B]">
-            <Lock className="h-[12px] w-[12px]" strokeWidth={2} />
-            Hosted and processed by Xendit
-          </p>
-        </div>
-      )}
+                    <Icon className="h-[17px] w-[17px] shrink-0 text-[#5C5C5C]" strokeWidth={1.6} />
+                    <span className="min-w-0 flex-1 text-[12.5px] leading-[16px]">
+                      {method.name}
+                    </span>
+                    <span className="flex shrink-0 items-center gap-[3px]">
+                      <span className="rounded-[3px] border border-[#EBEBEB] px-[4px] py-[2px] text-[11px] leading-[13px] text-[#5C5C5C]">
+                        {method.channels[0]}
+                      </span>
+                      {method.channels.length > 1 ? (
+                        <span className="rounded-[3px] border border-[#EBEBEB] px-[4px] py-[2px] text-[11px] leading-[13px] text-[#5C5C5C]">
+                          +{method.channels.length - 1}
+                        </span>
+                      ) : null}
+                    </span>
+                    <ChevronDown
+                      className="h-[14px] w-[14px] shrink-0 text-[#7A7A7A]"
+                      strokeWidth={2}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-[16px] text-center">
+              <PoweredBy />
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** WhatsApp opens a link in its own in-app browser: a whole screen with the
+ *  page title over its host, not a sheet pulled up over the thread. */
+export function BrowserFrame({
+  title,
+  host,
+  className = "",
+  children,
+}: {
+  title: string;
+  host: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`flex flex-col overflow-hidden bg-white ${className}`}>
+      <div className="flex shrink-0 items-center gap-[10px] border-b border-[#D5DBDE] bg-[#F6F6F6] px-[11px] py-[6px]">
+        <X className="h-[15px] w-[15px] shrink-0 text-[#54656F]" strokeWidth={2.2} />
+        <span className="min-w-0 flex-1 text-center">
+          <span className="block truncate text-[12.5px] font-medium leading-[16px] text-[#111B21]">
+            {title}
+          </span>
+          <span className="flex items-center justify-center gap-[3px] text-[11.5px] leading-[14px] text-[#667781]">
+            <Lock className="h-[9px] w-[9px] shrink-0" strokeWidth={2.6} />
+            <span className="truncate">{host}</span>
+          </span>
+        </span>
+        <MoreVertical className="h-[15px] w-[15px] shrink-0 text-[#54656F]" strokeWidth={2.2} />
+      </div>
+      <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
     </div>
   );
 }
@@ -690,7 +795,13 @@ export function LiveChat({
 }: {
   messages: ChatMessage[];
   script: Beat[];
-  checkout: { invoice: string; amount: string; expiry: string; methods: PaymentMethod[] };
+  checkout: {
+    invoice: string;
+    amount: string;
+    expiry: string;
+    paidAt: string;
+    methods: PaymentMethod[];
+  };
   className?: string;
 }) {
   const [live, setLive] = useState(false);
@@ -828,27 +939,23 @@ export function LiveChat({
             </span>
           </div>
 
+          {/* Tapping the link does not open a panel over the thread: WhatsApp
+              pushes its in-app browser up over the whole screen, and the
+              Xendit invoice fills it. */}
           <div
-            className={`absolute inset-0 flex flex-col justify-end ${
-              paying ? "pointer-events-auto" : "pointer-events-none"
+            aria-hidden={!paying}
+            className={`absolute inset-0 flex flex-col bg-white transition-transform duration-[560ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              paying ? "pointer-events-auto translate-y-0" : "pointer-events-none translate-y-full"
             }`}
           >
-            <div
-              className={`absolute inset-0 bg-[#161616]/45 transition-opacity duration-300 ${
-                paying ? "opacity-100" : "opacity-0"
-              }`}
-            />
-            <div
-              className={`relative max-h-full overflow-hidden rounded-t-[20px] bg-white transition-transform duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                paying ? "translate-y-0" : "translate-y-full"
-              }`}
+            <StatusBar />
+            <BrowserFrame
+              title="Complete your payment"
+              host="checkout.xendit.co"
+              className="min-h-0 flex-1"
             >
-              <p className="flex items-center justify-between border-b border-[#E6D8CD] px-[15px] py-[9px] text-[12px] text-[#55504B]">
-                <span className="truncate">checkout.xendit.co</span>
-                <span className="h-[4px] w-[34px] rounded-full bg-[#161616]/15" />
-              </p>
               <CheckoutScreen framed={false} stage={payStage} {...checkout} />
-            </div>
+            </BrowserFrame>
           </div>
         </div>
       </div>

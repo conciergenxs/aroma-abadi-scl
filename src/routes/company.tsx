@@ -43,6 +43,7 @@ import {
 } from "@/components/landing/parts";
 import {
   ChatScreen,
+  BrowserFrame,
   CheckoutScreen,
   LiveChat,
   type Beat,
@@ -93,17 +94,24 @@ const NAV = [
 
 /* The channels Xendit actually carries in Indonesia, grouped the way its own
  * hosted payment page groups them. */
+/* Xendit's own groupings and its own order, because this is Xendit's page
+ * rather than ours. Each row names its first channel and counts the rest. */
 const METHODS: PaymentMethod[] = [
-  { id: "qris", name: "QRIS", note: "Any bank or e‑wallet app" },
-  { id: "va", name: "Virtual Account", note: "BCA, Mandiri, BNI, BRI, Permata" },
-  { id: "ewallet", name: "E-Wallet", note: "OVO, DANA, ShopeePay, LinkAja" },
-  { id: "card", name: "Credit or Debit Card", note: "Visa, Mastercard, JCB" },
+  {
+    id: "va",
+    name: "Bank Transfer",
+    channels: ["BCA", "Mandiri", "BNI", "BRI", "Permata", "CIMB"],
+  },
+  { id: "card", name: "Credit / Debit Card", channels: ["Visa", "Mastercard", "JCB"] },
+  { id: "ewallet", name: "E-Wallet", channels: ["OVO", "DANA", "ShopeePay", "LinkAja", "GoPay"] },
+  { id: "qris", name: "QR Payments", channels: ["QRIS"] },
 ];
 
 const CHECKOUT = {
   invoice: "AA-2611",
-  amount: "Rp 2,714,310",
-  expiry: "3 Nov 2026, 09.40",
+  amount: "IDR 2.714.310",
+  expiry: "November 4, 2026 at 9:40 AM",
+  paidAt: "Nov 3, 2026, 9:41 AM",
   methods: METHODS,
 };
 
@@ -403,7 +411,7 @@ export const Route = createFileRoute("/company")({
     links: [
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500&display=swap",
       },
     ],
   }),
@@ -875,7 +883,15 @@ function CompanyPage() {
                 value: "Payment status and invoice number",
               },
             ]}
-            screen={<CheckoutScreen {...CHECKOUT} />}
+            screen={
+              <BrowserFrame
+                title="Complete your payment"
+                host="checkout.xendit.co"
+                className="rounded-[16px] border border-[#E6D8CD] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)]"
+              >
+                <CheckoutScreen framed={false} {...CHECKOUT} />
+              </BrowserFrame>
+            }
           />
           <Step
             n={5}

@@ -1311,6 +1311,49 @@ html {
    it. Swapping those steps outright read as a cut, so each one is dealt in:
    the body cross-fades and settles, and the sheet keeps a floor height so the
    frame never snaps between a tall step and a short one. */
+/* Xendit's page is drawn in Xendit's face, the way the thread above it is
+ * drawn in WhatsApp's: neither screen is ours, and neither should borrow
+ * our type. Open Sans is what checkout.xendit.co actually serves. */
+.lp-xen {
+  font-family:
+    "Open Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Noto Sans",
+    sans-serif;
+}
+
+/* The method rows arrive in sequence, so the list reads as a page settling
+ * rather than a block appearing all at once. */
+.lp-xenrow {
+  animation: lp-xenrow 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.lp-xenrow:nth-child(1) {
+  animation-delay: 0.14s;
+}
+.lp-xenrow:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.lp-xenrow:nth-child(3) {
+  animation-delay: 0.26s;
+}
+.lp-xenrow:nth-child(4) {
+  animation-delay: 0.32s;
+}
+@keyframes lp-xenrow {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .lp-stage {
   animation: lp-stage 0.46s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
@@ -1464,7 +1507,8 @@ html {
     transform: scaleY(1);
     transition: none;
   }
-  .lp-mark {
+  .lp-mark,
+  .lp-xenrow {
     animation: none;
   }
 }
