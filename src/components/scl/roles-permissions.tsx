@@ -16,7 +16,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import { LITE_MODE } from "@/lib/feature-flags";
-import { PREVIEW_CONDITIONS, previewLink } from "@/components/scl/permission-preview";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
