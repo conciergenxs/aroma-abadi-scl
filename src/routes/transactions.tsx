@@ -8,7 +8,7 @@ import {
   type Transaction,
   type TxStatus,
 } from "@/components/scl/transactions-store";
-import { usePreviewGate } from "@/components/scl/permission-preview";
+import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import { fmtDateEN, fmtNum } from "@/lib/fmt";
 import { Search, Receipt, TrendingUp, Wallet, Package, X } from "lucide-react";
 import { TransactionPeek } from "@/components/scl/transaction-peek";
@@ -63,6 +63,9 @@ const PAGE_NAV_BTN =
 
 function TransactionsPage() {
   usePreviewGate("transactions");
+  // The ledger itself is read-only, but drilling into an order shows every
+  // line, its quantities and the customer behind it — that is its own call.
+  const detailGate = usePermission("transactions-detail");
   const navigate = useNavigate();
   const { transactions } = useTransactionsStore();
   const [search, setSearch] = useState("");
@@ -76,7 +79,7 @@ function TransactionsPage() {
   useEffect(() => {
     if (!linkedTx) return;
     const match = transactions.find((t) => t.id === linkedTx);
-    if (match) setOpen(match);
+    if (match && detailGate.allowed) setOpen(match);
   }, [linkedTx, transactions]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -262,8 +265,11 @@ function TransactionsPage() {
                   return (
                     <tr
                       key={t.id}
-                      className="border-b border-border hover:bg-gray-50 cursor-pointer align-top transition-colors group"
-                      onClick={() => setOpen(t)}
+                      title={detailGate.allowed ? undefined : detailGate.reason}
+                      className={`border-b border-border hover:bg-gray-50 align-top transition-colors group ${
+                        detailGate.allowed ? "cursor-pointer" : "cursor-not-allowed"
+                      }`}
+                      onClick={() => detailGate.allowed && setOpen(t)}
                     >
                       {/* Invoice + date stacked */}
                       <Td>
@@ -335,10 +341,15 @@ function TransactionsPage() {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setOpen(t);
+                                      if (detailGate.allowed) setOpen(t);
                                     }}
-                                    title={`${hidden} more item${hidden === 1 ? "" : "s"} — open the order`}
-                                    className="press text-left text-muted-foreground hover:text-primary hover:underline underline-offset-2 transition-colors"
+                                    disabled={!detailGate.allowed}
+                                    title={
+                                      detailGate.allowed
+                                        ? `${hidden} more item${hidden === 1 ? "" : "s"} — open the order`
+                                        : detailGate.reason
+                                    }
+                                    className="press text-left text-muted-foreground hover:text-primary hover:underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground disabled:hover:no-underline transition-colors"
                                   >
                                     (See more..)
                                   </button>
