@@ -596,6 +596,15 @@ function RecentlyDeletedContactsPage() {
   const labelById = (id: string) => labels.find((l) => l.id === id);
   const listById = (id: string) => lists.find((l) => l.id === id);
 
+  // A Beauty Ambassador's LMS account lives in its own system, so a purge here
+  // never touches it. Saying so stops anyone hunting for a step that isn't
+  // there — a BA is not a workspace user and never appears in User Management.
+  const selectedBaCount = useMemo(
+    () =>
+      contacts.filter((c) => selected.has(c.id) && c.labelIds.includes("lb-ba")).length,
+    [contacts, selected],
+  );
+
   const allChecked = deletedContacts.length > 0 && deletedContacts.every((c) => selected.has(c.id));
   const toggleAll = () => {
     const next = new Set(selected);
@@ -764,7 +773,17 @@ function RecentlyDeletedContactsPage() {
               </div>
             </div>
             <div className="text-xs text-muted-foreground">
-              This action cannot be undone. All contact data will be removed.
+              This can't be undone. Their profile, labels, audiences, notes and activity are
+              deleted. Past orders stay in Transactions, so the sales record is unchanged.
+              {selectedBaCount > 0 && (
+                <>
+                  {" "}
+                  {selectedBaCount === 1
+                    ? "One of them is a Beauty Ambassador — their"
+                    : `${selectedBaCount} of them are Beauty Ambassadors — their`}{" "}
+                  LMS account is separate and keeps working.
+                </>
+              )}
             </div>
           </div>
         }
