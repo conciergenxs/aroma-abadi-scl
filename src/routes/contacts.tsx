@@ -233,6 +233,9 @@ function ContactsPage() {
         selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c,
       ),
     );
+  // Same point as on a single record: deleting a BA contact needs no detour
+  // through User Management, and their LMS account is untouched.
+  const selectedBaCount = selectedContacts.filter((c) => c.labelIds.includes("lb-ba")).length;
   const bulkDelete = () => {
     const count = selected.length;
     contactsStore.softDeleteContacts(selected);
@@ -768,7 +771,15 @@ function ContactsPage() {
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
-        description="They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        description={
+          selectedBaCount > 0
+            ? `They'll move to Recently Deleted in Settings → Data Management, where you can restore them. ${
+                selectedBaCount === 1
+                  ? "One of them is a Beauty Ambassador — their LMS account is separate and keeps working."
+                  : `${selectedBaCount} of them are Beauty Ambassadors — their LMS accounts are separate and keep working.`
+              }`
+            : "They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        }
         confirmLabel="Delete"
         onConfirm={bulkDelete}
         onClose={() => setBulkDeleteOpen(false)}

@@ -594,7 +594,13 @@ function ContactDetailPage() {
       <ConfirmDialog
         open={confirmDelete}
         title={`Delete ${contact.name}?`}
-        description="They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        description={
+          // A BA is not a workspace user, so there is no User Management step
+          // to do first — and their LMS account is a separate system.
+          isBA
+            ? "They'll move to Recently Deleted in Settings → Data Management, where you can restore them. Their LMS account is separate and keeps working."
+            : "They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        }
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onClose={() => setConfirmDelete(false)}

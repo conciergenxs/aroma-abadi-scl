@@ -600,8 +600,7 @@ function RecentlyDeletedContactsPage() {
   // never touches it. Saying so stops anyone hunting for a step that isn't
   // there — a BA is not a workspace user and never appears in User Management.
   const selectedBaCount = useMemo(
-    () =>
-      contacts.filter((c) => selected.has(c.id) && c.labelIds.includes("lb-ba")).length,
+    () => contacts.filter((c) => selected.has(c.id) && c.labelIds.includes("lb-ba")).length,
     [contacts, selected],
   );
 
@@ -779,9 +778,8 @@ function RecentlyDeletedContactsPage() {
                 <>
                   {" "}
                   {selectedBaCount === 1
-                    ? "One of them is a Beauty Ambassador — their"
-                    : `${selectedBaCount} of them are Beauty Ambassadors — their`}{" "}
-                  LMS account is separate and keeps working.
+                    ? "One of them is a Beauty Ambassador — their LMS account is separate and keeps working."
+                    : `${selectedBaCount} of them are Beauty Ambassadors — their LMS accounts are separate and keep working.`}
                 </>
               )}
             </div>
