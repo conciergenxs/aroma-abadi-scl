@@ -193,7 +193,7 @@ function AuthPage() {
       {/* RIGHT — Auth panel */}
       <main className="relative flex-1 flex items-center justify-center px-6 py-10">
         {/* Mobile background gradient */}
-        <div className="absolute inset-0 lg:hidden pointer-events-none">
+        <div className="absolute inset-0 lg:hidden pointer-events-none overflow-hidden">
           <div className="absolute -top-32 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-[100px]" />
           <div className="absolute bottom-0 -left-24 h-72 w-72 rounded-full bg-orange-500/10 blur-[100px]" />
         </div>
