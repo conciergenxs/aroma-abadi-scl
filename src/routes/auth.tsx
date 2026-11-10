@@ -10,7 +10,7 @@ import {
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import { matchBaCredentials } from "@/components/scl/ba-store";
 import { sessionStore } from "@/components/scl/session-store";
-import { Eye, EyeOff, Loader2, Phone, Mail, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Phone, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -50,20 +50,14 @@ function AuthPage() {
 
   // form state
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [company, setCompany] = useState("");
   const [remember, setRemember] = useState(true);
   const [otp, setOtp] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
   function validatePhone(v: string) {
     return /^\+?[\d\s-]{8,}$/.test(v.trim());
-  }
-  function validateEmail(v: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   }
 
   useEffect(() => {
@@ -141,12 +135,11 @@ function AuthPage() {
       }
       // Which workspace account signed in decides the role the dashboard runs
       // with — what they can reach follows from it.
-      const signedIn = sessionStore.signInAs(phone || email);
+      const signedIn = sessionStore.signInAs(phone);
       toast.success(`Welcome back, ${signedIn.name.split(" ")[0]}.`);
       navigate({ to: "/" });
       return;
     }
-
 
     if (mode === "forgot") {
       if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
@@ -525,7 +518,6 @@ function AuthPage() {
                 {mode === "signin" && (loading ? "Signing in…" : "Sign In")}
                 {mode === "forgot" && (loading ? "Sending code…" : "Send OTP")}
               </button>
-
             </form>
           )}
 
