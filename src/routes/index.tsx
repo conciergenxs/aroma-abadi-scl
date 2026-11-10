@@ -229,7 +229,7 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
             icon={MessageSquare}
             label="Message Received"
             value={fmtNum(broadcast.messageReceived)}
-            info="Messages customers started on their own, with no broadcast behind them. A message that arrives within 24 hours of a broadcast counts as a Conversation instead."
+            info="Chats customers start on their own, outside a broadcast's 24 hours."
           />
         </div>
         {inView && (
@@ -242,13 +242,13 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
                 icon={CheckCheck}
                 label="Delivery Rate"
                 value={fmtPct(broadcast.deliveryRate)}
-                info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)."
+                info="Broadcast messages delivered to contacts (Delivered ÷ Reach)."
               />
               <MetricStat
                 icon={Eye}
                 label="Read Rate"
                 value={fmtPct(broadcast.readRate)}
-                info="Share of delivered broadcast messages that were read (Read ÷ Delivered)."
+                info="Delivered broadcast messages that were read (Read ÷ Delivered)."
               />
             </div>
           </div>
@@ -476,7 +476,7 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             label="Avg. Basket Size"
             value={averages.avgBasketSize.toFixed(1)}
             sub="items / transaction"
-            info="Average number of items per paid transaction (Qty Sold ÷ Transactions)."
+            info="Items per paid transaction (Qty Sold ÷ Transactions)."
           />
         </div>
       </SectionCard>
@@ -515,13 +515,13 @@ function ConversionSection({
                 icon={Reply}
                 label="Conversation Rate"
                 value={fmtPct(funnelRates.conversationRate)}
-                info="Share of reached contacts who replied within 24 hours of the broadcast (Replies ÷ Broadcast Reach). A reply after that isn't counted against the broadcast."
+                info="Replied within 24 hours of a broadcast (Replies ÷ Reach)."
               />
               <MetricStat
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Share of those conversations that led to a paid transaction within 24 hours (Transactions ÷ Conversations)."
+                info="Paid within 24 hours of a conversation (Transactions ÷ Conversations)."
               />
             </div>
           </div>
