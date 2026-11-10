@@ -2,8 +2,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { conversations, recentActivity } from "@/components/scl/mock-data";
-import { useLiveContacts } from "@/components/scl/contacts-store";
 import { nowWIB } from "@/lib/wib";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
@@ -229,10 +227,9 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
           />
           <MetricStat
             icon={MessageSquare}
-            label="Broadcast Replies"
-            value={fmtNum(broadcast.broadcastReplies)}
-            sub="within 24 hours"
-            info="Contacts who sent a message within 24 hours of receiving a broadcast. The reply bubble isn't required — any message inside the window counts."
+            label="Message Received"
+            value={fmtNum(broadcast.messageReceived)}
+            info="Messages customers started on their own, with no broadcast behind them. A message that arrives within 24 hours of a broadcast counts as a Conversation instead."
           />
         </div>
         {inView && (
@@ -518,13 +515,13 @@ function ConversionSection({
                 icon={Reply}
                 label="Conversation Rate"
                 value={fmtPct(funnelRates.conversationRate)}
-                info="Share of reached contacts who replied within 3 days of the broadcast (Replies ÷ Broadcast Reach). A reply after that isn't counted against the broadcast."
+                info="Share of reached contacts who replied within 24 hours of the broadcast (Replies ÷ Broadcast Reach). A reply after that isn't counted against the broadcast."
               />
               <MetricStat
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Share of those conversations that led to a paid transaction (Transactions ÷ Conversations)."
+                info="Share of those conversations that led to a paid transaction within 24 hours (Transactions ÷ Conversations)."
               />
             </div>
           </div>
@@ -694,7 +691,6 @@ function DateRangePopover({
 // ── Component ──────────────────────────────────────────────────────────────
 function Dashboard() {
   const today = fmtDateEN(nowWIB());
-  const contacts = useLiveContacts();
   const txState = useTransactionsStore();
 
   const fullRange = useMemo(
@@ -760,67 +756,6 @@ function Dashboard() {
           />
 
           {!LITE_MODE && <CrmLoyaltyAnalytics />}
-
-          {/* Activity + Conversations */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <SectionCard title="Recent Activity" className="lg:col-span-1">
-              <ul className="divide-y divide-border">
-                {recentActivity.slice(0, 5).map((a) => (
-                  <li key={a.id} className="px-5 py-3 flex items-start gap-3">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
-                    <div className="flex-1">
-                      <p className="text-xs leading-relaxed">{a.text}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{a.time}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </SectionCard>
-
-            <SectionCard
-              title="Recent Conversations"
-              className="lg:col-span-2"
-              action={
-                <Link
-                  to="/inbox"
-                  className="text-[11px] font-semibold text-primary hover:underline transition-colors duration-150"
-                >
-                  OPEN INBOX →
-                </Link>
-              }
-            >
-              <ul className="divide-y divide-border stagger">
-                {conversations.slice(0, 6).map((c) => {
-                  const contact = contacts.find((x) => x.id === c.contactId);
-                  // A contact moved to Recently Deleted drops out of the feed
-                  // rather than crashing the dashboard.
-                  if (!contact) return null;
-                  return (
-                    <li
-                      key={c.id}
-                      className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
-                        {contact.avatar}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium truncate">{contact.name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">{c.preview}</p>
-                      </div>
-                      <div className="text-[10px] text-muted-foreground">{c.time}</div>
-                      {c.unread > 0 && (
-                        <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                          {c.unread}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </SectionCard>
-          </div>
         </div>
       </AppShell>
     </TooltipProvider>

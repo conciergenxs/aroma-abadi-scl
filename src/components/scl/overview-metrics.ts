@@ -78,7 +78,7 @@ export type BroadcastMetrics = {
   delivered: number;
   read: number;
   replied: number;
-  broadcastReplies: number;
+  messageReceived: number;
   deliveryRate: number;
   readRate: number;
 };
@@ -100,7 +100,7 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
     // Inbound organic volume has no real per-record date to filter by —
     // kept proportional to the selected range, and above `replied` since
     // replies are a subset of all customer-initiated messages received.
-    broadcastReplies: scaleStatic(2540, scale),
+    messageReceived: scaleStatic(2540, scale),
     deliveryRate: reach ? delivered / reach : 0,
     readRate: delivered ? read / delivered : 0,
   };

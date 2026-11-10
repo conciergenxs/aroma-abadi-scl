@@ -193,18 +193,11 @@ export function StepFunnel({ stages }: { stages: FunnelStage[] }) {
     <div className="p-4 space-y-2">
       {stages.map((s, i) => {
         const widthPct = Math.max((s.value / max) * 100, 10);
-        const prev = i > 0 ? stages[i - 1] : null;
-        const dropPct = prev && prev.value ? (s.value / prev.value) * 100 : null;
         return (
           <div key={s.label}>
             <div className="flex items-baseline justify-between gap-2 mb-1">
               <span className="text-xs font-medium text-foreground">{s.label}</span>
-              <span className="text-xs tabular-nums text-muted-foreground">
-                {fmtNum(s.value)}
-                {dropPct !== null && (
-                  <span className="ml-1.5 text-muted-foreground/70">({dropPct.toFixed(1)}%)</span>
-                )}
-              </span>
+              <span className="text-xs tabular-nums text-muted-foreground">{fmtNum(s.value)}</span>
             </div>
             <div className="h-4 rounded-md bg-muted overflow-hidden">
               <div
