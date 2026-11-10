@@ -523,19 +523,19 @@ function AuthPage() {
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
             By continuing you agree to our{" "}
-            <a
-              href="https://aroma-abadi-scl.vercel.app/"
+            <Link
+              to="/terms"
               className="text-primary hover:underline transition-colors duration-150"
             >
               Terms
-            </a>{" "}
+            </Link>{" "}
             &{" "}
-            <a
-              href="https://aroma-abadi-scl.vercel.app/"
+            <Link
+              to="/privacy"
               className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150"
             >
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </div>
