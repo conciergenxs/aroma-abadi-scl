@@ -229,9 +229,10 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
           />
           <MetricStat
             icon={MessageSquare}
-            label="Message Received"
-            value={fmtNum(broadcast.messageReceived)}
-            info="Number of messages received from customer-initiated conversations."
+            label="Broadcast Replies"
+            value={fmtNum(broadcast.broadcastReplies)}
+            sub="within 24 hours"
+            info="Contacts who sent a message within 24 hours of receiving a broadcast. The reply bubble isn't required — any message inside the window counts."
           />
         </div>
         {inView && (
@@ -459,13 +460,13 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             icon={Repeat}
             label="Avg. Messages / Transaction"
             value={avgMessagesBetweenTransaction.toFixed(1)}
-            info="Average number of messages exchanged between transactions."
+            info="Average number of messages exchanged per transaction."
           />
           <MetricStat
             icon={Wallet}
-            label="Avg. Order Value"
-            value={fmtIDR(averages.avgOrderValue)}
-            info="Average value per order (Sales ÷ Orders)."
+            label="Avg. Transaction Value"
+            value={fmtIDR(averages.avgTransactionValue)}
+            info="Average value per paid transaction (Sales ÷ Transactions)."
           />
           <MetricStat
             icon={Tags}
@@ -477,8 +478,8 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             icon={ShoppingBasket}
             label="Avg. Basket Size"
             value={averages.avgBasketSize.toFixed(1)}
-            sub="items / order"
-            info="Average number of items per order (Qty Sold ÷ Orders)."
+            sub="items / transaction"
+            info="Average number of items per paid transaction (Qty Sold ÷ Transactions)."
           />
         </div>
       </SectionCard>
@@ -517,13 +518,13 @@ function ConversionSection({
                 icon={Reply}
                 label="Conversation Rate"
                 value={fmtPct(funnelRates.conversationRate)}
-                info="Rate of conversations started since a broadcast was sent (Replies ÷ Broadcast Reach)."
+                info="Share of reached contacts who replied within 3 days of the broadcast (Replies ÷ Broadcast Reach). A reply after that isn't counted against the broadcast."
               />
               <MetricStat
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Rate of transactions resulting from conversations (Transactions ÷ Conversations)."
+                info="Share of those conversations that led to a paid transaction (Transactions ÷ Conversations)."
               />
             </div>
           </div>
@@ -577,7 +578,7 @@ function DateRangePopover({
   // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
   // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
   // just because it's listed first. Track the actual click instead.
-  const [selectedLabel, setSelectedLabel] = useState<string | null>("Last 90 Days");
+  const [selectedLabel, setSelectedLabel] = useState<string | null>("Lifetime");
 
   useEffect(() => {
     if (!open) return;
@@ -591,6 +592,7 @@ function DateRangePopover({
   // Presets can't reach further back than the real data actually goes.
   const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
   const presets: { label: string; range: DateRange }[] = [
+    { label: "Lifetime", range: fullRange },
     {
       label: "Last 7 Days",
       range: { start: clampStart(addDaysIso(fullRange.end, -6)), end: fullRange.end },
