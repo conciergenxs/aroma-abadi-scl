@@ -521,7 +521,7 @@ function ConversionSection({
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Paid within 24 hours of a conversation (Transactions ÷ Conversations)."
+                info="Paid within 24 hours (Transactions ÷ Conversations)."
               />
             </div>
           </div>
