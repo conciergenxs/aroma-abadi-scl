@@ -525,7 +525,7 @@ function AuthPage() {
             By continuing you agree to our{" "}
             <Link
               to="/terms"
-              className="text-primary hover:underline transition-colors duration-150"
+              className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150"
             >
               Terms
             </Link>{" "}
