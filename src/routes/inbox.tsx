@@ -929,13 +929,6 @@ function InboxPage() {
                 ),
               );
             }}
-            onChangeOwner={(ownerId) => {
-              contactsStore.setContacts((list) =>
-                list.map((c) =>
-                  c.id === contact.id ? { ...c, ownerId: ownerId ?? undefined } : c,
-                ),
-              );
-            }}
             onChangeCollaborators={(ids) => inboxStore.setCollaborators(active.id, ids)}
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
@@ -1465,7 +1458,6 @@ function ConversationHeader({
     </div>
   );
 }
-
 
 function CollaboratorsPopover({
   value,

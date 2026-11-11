@@ -224,8 +224,8 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "ba-create",
     label: "Add Beauty Ambassadors",
     section: "BA Enablement",
-    effect: "Add BA is locked above the BA view in Contacts.",
-    where: "/contacts?view=ba",
+    effect: "New Contact opens, but Beauty Ambassador can't be chosen as the type.",
+    where: "/contacts/new",
   },
   {
     id: "ba-edit",
