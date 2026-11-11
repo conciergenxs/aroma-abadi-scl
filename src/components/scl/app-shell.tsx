@@ -547,6 +547,9 @@ export function AppShell({
               )}
             </div>
 
+            {/* A page's own action is not workspace chrome like the bell and
+                the account menu, so a rule keeps the two groups apart. */}
+            {actions && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-border" />}
             {actions}
 
             <DropdownMenu>
