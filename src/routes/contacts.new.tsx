@@ -10,6 +10,7 @@ import { useBaStore, baStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
 import { labelColorDot } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
+import { usePermission } from "@/components/scl/permission-preview";
 
 export const Route = createFileRoute("/contacts/new")({
   head: () => ({ meta: [{ title: "Create New Contact — SCL" }] }),
@@ -29,6 +30,7 @@ function NewContactPage() {
   const navigate = useNavigate();
 
   // Step 1: choose type
+  const baCreateGate = usePermission("ba-create");
   const [contactType, setContactType] = useState<ContactType | null>(null);
 
   // Shared
@@ -241,8 +243,10 @@ function NewContactPage() {
                 {/* BA */}
                 <button
                   type="button"
-                  onClick={() => setContactType("ba")}
-                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-white p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] transition-all duration-150"
+                  onClick={() => baCreateGate.allowed && setContactType("ba")}
+                  disabled={!baCreateGate.allowed}
+                  title={baCreateGate.allowed ? undefined : baCreateGate.reason}
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border bg-white p-8 text-left hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border disabled:hover:bg-white transition-all duration-150"
                 >
                   <div className="h-14 w-14 rounded-full bg-violet-600/15 border border-violet-600/30 grid place-items-center group-hover:bg-violet-600/20 transition-colors">
                     <BadgeCheck className="h-6 w-6 text-violet-400" />
