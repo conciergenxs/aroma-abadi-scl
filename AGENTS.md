@@ -1,5 +1,27 @@
 # Aroma Abadi SCL — Engineering Notes
 
+## Three sites, one branch — the difference is an env var, not a branch
+
+All three projects build from `main`. What makes them different is a single
+build-time flag set on the Vercel project itself, read by
+`src/lib/feature-flags.ts`:
+
+| Site | Flag on the project | Result |
+| --- | --- | --- |
+| aroma-abadi-scl | *(none)* | full workspace |
+| aroma-abadi-scl-lite | `VITE_LITE_MODE=1` | reduced features |
+| aroma-abadi-company | `VITE_PUBLIC_SITE=1` | public company page |
+
+There is no "lite branch" and no "company branch". A `lite` branch exists in
+history and is kept level with `main`, but nothing deploys from it — the live
+lite site is a CLI upload of `main` (`source: cli`, `gitRepo: null`).
+
+This has already cost a developer a day: they pulled `lite`, got code ten days
+stale and missing the legal pages, and reported the site "didn't match". If
+someone needs to reproduce a variant locally, they pull `main` and set the
+flag in `.env.local` — see `.env.example`. Point people at the flag, not at a
+branch.
+
 ## Deployment
 
 **One repo, three sites — and pushing deploys none of them.**
