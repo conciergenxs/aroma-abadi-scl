@@ -16,7 +16,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import { LITE_MODE } from "@/lib/feature-flags";
-import { PREVIEW_CONDITIONS, previewLink } from "@/components/scl/permission-preview";
 import { toast } from "sonner";
 import { SectionCard } from "@/components/scl/app-shell";
 import { SclSelect, type SclSelectOption } from "@/components/scl/scl-select";
@@ -232,10 +231,17 @@ const SCHEMA: CategorySection[] = [
         id: "transactions",
         label: "Transactions",
         masterLabel: "Transactions Access",
-        // Nothing writes to the ledger from here: ARMA records every order on
-        // WhatsApp, so access is the whole of this permission.
+        // Nothing writes to the ledger from here — ARMA records every order on
+        // WhatsApp — but reading one order in full is its own step: the line
+        // items, the quantities and the customer behind them.
         masterDescription: "Read the orders ARMA recorded on WhatsApp.",
-        groups: [],
+        groups: [
+          {
+            id: "transactions-read",
+            label: "Orders",
+            items: [{ id: "transactions-detail", label: "Open Order Details" }],
+          },
+        ],
       },
     ],
   },
@@ -322,6 +328,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "ba-create",
       "ba-edit",
       "ba-password",
+      "transactions-detail",
     ],
   },
   Brand: {
@@ -336,7 +343,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: ["inbox-send"],
+    items: ["inbox-send", "transactions-detail"],
   },
   Trainer: {
     categories: ["inbox", "knowledge", "ba", "settings"],
@@ -354,7 +361,7 @@ const ROLE_GRANTS: Record<string, { categories: string[]; items: string[] }> = {
       "transactions",
       "settings",
     ],
-    items: [],
+    items: ["transactions-detail"],
   },
 };
 
@@ -794,8 +801,6 @@ export function RolesPermissionsModule() {
         </div>
       </SectionCard>
 
-      <PermissionPreviewLinks />
-
       <ConfirmDialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
@@ -805,84 +810,6 @@ export function RolesPermissionsModule() {
         confirmLabel="Delete"
       />
     </div>
-  );
-}
-
-/* ── One link per condition ───────────────────────────────────────────────
- * A checkbox in the tree above is a sentence about what someone can do; this
- * turns each one into something you can click. Every link opens the dashboard
- * with that single permission switched off, so a reviewer can see the result
- * instead of imagining it. */
-
-function PermissionPreviewLinks() {
-  const [copied, setCopied] = useState<string | null>(null);
-  const sections = Array.from(new Set(PREVIEW_CONDITIONS.map((c) => c.section)));
-
-  // The links render relative, so the server's HTML and the client's agree;
-  // the clipboard gets the whole URL, which is what gets pasted to someone.
-  const copy = async (c: (typeof PREVIEW_CONDITIONS)[number]) => {
-    await navigator.clipboard.writeText(previewLink(c.id, window.location.origin));
-    setCopied(c.id);
-    toast.success(`Link copied — ${c.label}`);
-    window.setTimeout(() => setCopied(null), 1600);
-  };
-
-  return (
-    <SectionCard>
-      <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-border">
-        <div>
-          <h3 className="text-[14px] font-semibold m-0">Preview Links</h3>
-          <p className="mt-0.5 text-[12px] text-muted-foreground m-0">
-            Each link opens the dashboard with one permission switched off, so the effect can be
-            seen rather than described. The preview lasts until Exit Preview, and changes nothing
-            for anyone else.
-          </p>
-        </div>
-        <span className="text-[12px] text-muted-foreground">
-          {PREVIEW_CONDITIONS.length} conditions
-        </span>
-      </div>
-
-      <div className="divide-y divide-border">
-        {sections.map((section) => (
-          <div key={section} className="px-5 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-2">
-              {section}
-            </div>
-            <ul className="space-y-1.5">
-              {PREVIEW_CONDITIONS.filter((c) => c.section === section).map((c) => (
-                <li
-                  key={c.id}
-                  className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md px-2 py-1.5 hover:bg-gray-50 transition-colors duration-150"
-                >
-                  <span className="text-[14px] font-medium">Without “{c.label}”</span>
-                  <span className="min-w-0 flex-1 truncate text-[12px] text-muted-foreground">
-                    {c.effect}
-                  </span>
-                  <button
-                    onClick={() => copy(c)}
-                    className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-2.5 h-8 text-[12px] hover:bg-card transition-colors duration-150"
-                  >
-                    {copied === c.id ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                    Copy Link
-                  </button>
-                  <a
-                    href={previewLink(c.id)}
-                    className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 h-8 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
-                  >
-                    Open
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </SectionCard>
   );
 }
 

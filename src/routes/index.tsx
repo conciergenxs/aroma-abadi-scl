@@ -2,8 +2,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { conversations, recentActivity } from "@/components/scl/mock-data";
-import { useLiveContacts } from "@/components/scl/contacts-store";
 import { nowWIB } from "@/lib/wib";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
@@ -231,7 +229,7 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
             icon={MessageSquare}
             label="Message Received"
             value={fmtNum(broadcast.messageReceived)}
-            info="Number of messages received from customer-initiated conversations."
+            info="Chats customers start on their own, outside a broadcast's 24 hours."
           />
         </div>
         {inView && (
@@ -244,13 +242,13 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
                 icon={CheckCheck}
                 label="Delivery Rate"
                 value={fmtPct(broadcast.deliveryRate)}
-                info="Share of broadcast messages successfully delivered to contacts (Delivered ÷ Reach)."
+                info="Broadcast messages delivered to contacts (Delivered ÷ Reach)."
               />
               <MetricStat
                 icon={Eye}
                 label="Read Rate"
                 value={fmtPct(broadcast.readRate)}
-                info="Share of delivered broadcast messages that were read (Read ÷ Delivered)."
+                info="Delivered broadcast messages that were read (Read ÷ Delivered)."
               />
             </div>
           </div>
@@ -459,13 +457,13 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             icon={Repeat}
             label="Avg. Messages / Transaction"
             value={avgMessagesBetweenTransaction.toFixed(1)}
-            info="Average number of messages exchanged between transactions."
+            info="Average number of messages exchanged per transaction."
           />
           <MetricStat
             icon={Wallet}
-            label="Avg. Order Value"
-            value={fmtIDR(averages.avgOrderValue)}
-            info="Average value per order (Sales ÷ Orders)."
+            label="Avg. Transaction Value"
+            value={fmtIDR(averages.avgTransactionValue)}
+            info="Average value per paid transaction (Sales ÷ Transactions)."
           />
           <MetricStat
             icon={Tags}
@@ -477,8 +475,8 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             icon={ShoppingBasket}
             label="Avg. Basket Size"
             value={averages.avgBasketSize.toFixed(1)}
-            sub="items / order"
-            info="Average number of items per order (Qty Sold ÷ Orders)."
+            sub="items / transaction"
+            info="Items per paid transaction (Qty Sold ÷ Transactions)."
           />
         </div>
       </SectionCard>
@@ -517,13 +515,13 @@ function ConversionSection({
                 icon={Reply}
                 label="Conversation Rate"
                 value={fmtPct(funnelRates.conversationRate)}
-                info="Rate of conversations started since a broadcast was sent (Replies ÷ Broadcast Reach)."
+                info="Replied within 24 hours of a broadcast (Replies ÷ Reach)."
               />
               <MetricStat
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Rate of transactions resulting from conversations (Transactions ÷ Conversations)."
+                info="Paid within 24 hours (Transactions ÷ Conversations)."
               />
             </div>
           </div>
@@ -577,7 +575,7 @@ function DateRangePopover({
   // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
   // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
   // just because it's listed first. Track the actual click instead.
-  const [selectedLabel, setSelectedLabel] = useState<string | null>("Last 90 Days");
+  const [selectedLabel, setSelectedLabel] = useState<string | null>("Lifetime");
 
   useEffect(() => {
     if (!open) return;
@@ -591,6 +589,7 @@ function DateRangePopover({
   // Presets can't reach further back than the real data actually goes.
   const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
   const presets: { label: string; range: DateRange }[] = [
+    { label: "Lifetime", range: fullRange },
     {
       label: "Last 7 Days",
       range: { start: clampStart(addDaysIso(fullRange.end, -6)), end: fullRange.end },
@@ -692,7 +691,6 @@ function DateRangePopover({
 // ── Component ──────────────────────────────────────────────────────────────
 function Dashboard() {
   const today = fmtDateEN(nowWIB());
-  const contacts = useLiveContacts();
   const txState = useTransactionsStore();
 
   const fullRange = useMemo(
@@ -758,67 +756,6 @@ function Dashboard() {
           />
 
           {!LITE_MODE && <CrmLoyaltyAnalytics />}
-
-          {/* Activity + Conversations */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <SectionCard title="Recent Activity" className="lg:col-span-1">
-              <ul className="divide-y divide-border">
-                {recentActivity.slice(0, 5).map((a) => (
-                  <li key={a.id} className="px-5 py-3 flex items-start gap-3">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
-                    <div className="flex-1">
-                      <p className="text-xs leading-relaxed">{a.text}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{a.time}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </SectionCard>
-
-            <SectionCard
-              title="Recent Conversations"
-              className="lg:col-span-2"
-              action={
-                <Link
-                  to="/inbox"
-                  className="text-[11px] font-semibold text-primary hover:underline transition-colors duration-150"
-                >
-                  OPEN INBOX →
-                </Link>
-              }
-            >
-              <ul className="divide-y divide-border stagger">
-                {conversations.slice(0, 6).map((c) => {
-                  const contact = contacts.find((x) => x.id === c.contactId);
-                  // A contact moved to Recently Deleted drops out of the feed
-                  // rather than crashing the dashboard.
-                  if (!contact) return null;
-                  return (
-                    <li
-                      key={c.id}
-                      className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-xs font-medium">
-                        {contact.avatar}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium truncate">{contact.name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">{c.preview}</p>
-                      </div>
-                      <div className="text-[10px] text-muted-foreground">{c.time}</div>
-                      {c.unread > 0 && (
-                        <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                          {c.unread}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </SectionCard>
-          </div>
         </div>
       </AppShell>
     </TooltipProvider>

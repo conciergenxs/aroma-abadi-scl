@@ -113,7 +113,7 @@ function SkuDetailPage() {
     return {
       unitsSold,
       revenue,
-      avgOrderValue: filteredTx.length ? Math.round(revenue / filteredTx.length) : 0,
+      avgTransactionValue: filteredTx.length ? Math.round(revenue / filteredTx.length) : 0,
       txCount: filteredTx.length,
     };
   }, [filteredTx, skuId]);
@@ -300,8 +300,8 @@ function SkuDetailPage() {
               bg: "bg-violet-50",
             },
             {
-              label: "Average Order",
-              value: formatIDR(metrics.avgOrderValue),
+              label: "Average Transaction",
+              value: formatIDR(metrics.avgTransactionValue),
               icon: TrendingUp,
               color: "text-amber-600",
               bg: "bg-amber-50",

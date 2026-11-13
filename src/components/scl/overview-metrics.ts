@@ -208,9 +208,11 @@ export const avgMessagesBetweenTransaction = 6.4;
 
 export function computeAverages(orders: OrdersAndSales) {
   return {
-    avgOrderValue: orders.totalOrders ? orders.totalSales / orders.totalOrders : 0,
+    avgTransactionValue: orders.totalTransactions
+      ? orders.totalSales / orders.totalTransactions
+      : 0,
     avgSellingPrice: orders.totalQty ? orders.totalSales / orders.totalQty : 0,
-    avgBasketSize: orders.totalOrders ? orders.totalQty / orders.totalOrders : 0,
+    avgBasketSize: orders.totalTransactions ? orders.totalQty / orders.totalTransactions : 0,
   };
 }
 

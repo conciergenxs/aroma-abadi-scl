@@ -10,9 +10,7 @@ import {
   labelColorDot,
 } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
-import { BAForm } from "@/components/scl/ba-form";
 import { useCan } from "@/components/scl/session-store";
-import { baStore } from "@/components/scl/ba-store";
 import {
   type Contact,
   type Channel,
@@ -86,7 +84,6 @@ function ContactsPage() {
   // list at all — Contacts reads as customers only.
   const baGate = usePermission("ba", useCan("ba.view"));
   const baSeen = baGate.allowed;
-  const baCreateGate = usePermission("ba-create");
   const createGate = usePermission("contacts-create");
   const deleteGate = usePermission("contacts-delete");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -102,7 +99,6 @@ function ContactsPage() {
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
   const [showFilterProps, setShowFilterProps] = useState(false);
-  const [addingBa, setAddingBa] = useState(false);
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [audiencePage, setAudiencePage] = useState(1);
@@ -233,6 +229,9 @@ function ContactsPage() {
         selected.includes(c.id) ? { ...c, listIds: c.listIds.filter((x) => x !== lsId) } : c,
       ),
     );
+  // Same point as on a single record: deleting a BA contact needs no detour
+  // through User Management, and their LMS account is untouched.
+  const selectedBaCount = selectedContacts.filter((c) => c.labelIds.includes("lb-ba")).length;
   const bulkDelete = () => {
     const count = selected.length;
     contactsStore.softDeleteContacts(selected);
@@ -302,20 +301,6 @@ function ContactsPage() {
             : activeView === "ba"
               ? `${visibleContacts.length} Beauty Ambassadors`
               : `${liveContacts.length} contacts · ${lists.length} audiences`
-      }
-      actions={
-        activeView === "ba" ? (
-          // A BA's LMS account is opened from here and changed on their own
-          // record — there is no separate directory page any more.
-          <button
-            onClick={() => baCreateGate.allowed && setAddingBa(true)}
-            disabled={!baCreateGate.allowed}
-            title={baCreateGate.allowed ? undefined : baCreateGate.reason}
-            className="press inline-flex items-center gap-1.5 rounded-md bg-primary px-4 h-9 text-[14px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary transition-colors duration-150"
-          >
-            <Plus className="h-3.5 w-3.5" /> Add BA
-          </button>
-        ) : undefined
       }
       noPadding
     >
@@ -563,17 +548,6 @@ function ContactsPage() {
         </div>
       </div>
 
-      {addingBa && (
-        <BAForm
-          initial={null}
-          onClose={() => setAddingBa(false)}
-          onSubmit={(input) => {
-            const created = baStore.add(input);
-            toast.success(`BA added. Password: ${created.password}`);
-            setAddingBa(false);
-          }}
-        />
-      )}
       {showFilterProps && (
         <FilterPropertiesModal
           properties={properties}
@@ -768,7 +742,15 @@ function ContactsPage() {
       <ConfirmDialog
         open={bulkDeleteOpen}
         title={`Delete ${selected.length} contact${selected.length === 1 ? "" : "s"}?`}
-        description="They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        description={
+          selectedBaCount > 0
+            ? `They'll move to Recently Deleted in Settings → Data Management, where you can restore them. ${
+                selectedBaCount === 1
+                  ? "One of them is a Beauty Ambassador — their LMS account is separate and keeps working."
+                  : `${selectedBaCount} of them are Beauty Ambassadors — their LMS accounts are separate and keep working.`
+              }`
+            : "They'll move to Recently Deleted in Settings → Data Management, where you can restore them."
+        }
         confirmLabel="Delete"
         onConfirm={bulkDelete}
         onClose={() => setBulkDeleteOpen(false)}

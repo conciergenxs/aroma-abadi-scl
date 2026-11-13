@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
+  ArrowDown,
   Award,
   Ban,
   BellRing,
@@ -42,6 +43,7 @@ import {
 } from "@/components/landing/parts";
 import {
   ChatScreen,
+  BrowserFrame,
   CheckoutScreen,
   LiveChat,
   type Beat,
@@ -50,10 +52,10 @@ import {
 } from "@/components/landing/screens";
 import armaMark from "@/assets/aroma-abadi-icon-sand.png";
 import whatsappMark from "@/assets/whatsapp.png";
-import shotRetail from "@/assets/shot-retail-counter.jpg";
-import shotGold from "@/assets/shot-gold-fragrance.jpg";
-import shotRose from "@/assets/shot-rose-fragrance.jpg";
-import shotAmber from "@/assets/shot-amber-set.jpg";
+import shotFragrancePair from "@/assets/shot-fragrance-pair.jpg";
+import shotFragranceTall from "@/assets/shot-fragrance-tall.jpg";
+import shotFoundation from "@/assets/shot-foundation.jpg";
+import shotSerum from "@/assets/shot-serum.jpg";
 
 /* Every mark in src/assets/brands, in filename order. Dropping a new SVG in
  * that folder puts it on the page; nothing here needs editing. */
@@ -65,7 +67,7 @@ const BRAND_FILES = import.meta.glob("/src/assets/brands/*.svg", {
 
 /* The public company page.
  *
- * Audience: Xendit's verification team. It is not a storefront — nothing
+ * Audience: Xendit's verification team. It is not a storefront, nothing
  * here sells, and there is no cart. Its job is to let a reviewer answer
  * three questions without having to ask: who is the legal entity, what does
  * the loyalty programme do, and at which screen does a customer pay through
@@ -92,17 +94,24 @@ const NAV = [
 
 /* The channels Xendit actually carries in Indonesia, grouped the way its own
  * hosted payment page groups them. */
+/* Xendit's own groupings and its own order, because this is Xendit's page
+ * rather than ours. Each row names its first channel and counts the rest. */
 const METHODS: PaymentMethod[] = [
-  { id: "qris", name: "QRIS", note: "Any bank or e‑wallet app" },
-  { id: "va", name: "Virtual Account", note: "BCA, Mandiri, BNI, BRI, Permata" },
-  { id: "ewallet", name: "E-Wallet", note: "OVO, DANA, ShopeePay, LinkAja" },
-  { id: "card", name: "Credit or Debit Card", note: "Visa, Mastercard, JCB" },
+  {
+    id: "va",
+    name: "Bank Transfer",
+    channels: ["BCA", "Mandiri", "BNI", "BRI", "Permata", "CIMB"],
+  },
+  { id: "card", name: "Credit / Debit Card", channels: ["Visa", "Mastercard", "JCB"] },
+  { id: "ewallet", name: "E-Wallet", channels: ["OVO", "DANA", "ShopeePay", "LinkAja", "GoPay"] },
+  { id: "qris", name: "QR Payments", channels: ["QRIS"] },
 ];
 
 const CHECKOUT = {
   invoice: "AA-2611",
-  amount: "Rp 2,714,310",
-  expiry: "3 Nov 2026, 09.40",
+  amount: "IDR 2.714.310",
+  expiry: "November 4, 2026 at 9:40 AM",
+  paidAt: "Nov 3, 2026, 9:41 AM",
   methods: METHODS,
 };
 
@@ -122,8 +131,9 @@ const ORDER = {
 };
 
 const PAY_LINK = {
-  title: "Payment for order AA-2611",
-  note: "Valid for 24 hours. QRIS, bank transfer, e-wallet or card.",
+  message: "Here is the payment link for AA\u20112611. It stays valid for 24 hours.",
+  title: "Complete your payment",
+  note: "PT Aroma Abadi \u00b7 Invoice AA\u20112611",
   host: "checkout.xendit.co",
   url: "checkout.xendit.co/od/aroma-abadi",
 };
@@ -156,21 +166,24 @@ const HERO_THREAD: ChatMessage[] = [
  * beat to answer, and the payment page stays open long enough to be read. */
 const HERO_SCRIPT: Beat[] = [
   { t: "type", i: 0 },
-  { t: "pause", ms: 650 },
-  { t: "armaTyping", ms: 2700 },
+  { t: "pause", ms: 500 },
+  { t: "armaTyping", ms: 1200 },
   { t: "send", i: 1 },
-  { t: "pause", ms: 2900 },
+  { t: "pause", ms: 2600 },
   { t: "type", i: 2 },
-  { t: "pause", ms: 550 },
-  { t: "armaTyping", ms: 2500 },
+  { t: "pause", ms: 420 },
+  { t: "armaTyping", ms: 1000 },
   { t: "send", i: 3 },
-  { t: "pause", ms: 2800 },
-  { t: "armaTyping", ms: 2000 },
+  { t: "pause", ms: 2500 },
+  { t: "armaTyping", ms: 900 },
   { t: "send", i: 4 },
-  { t: "pause", ms: 2700 },
-  { t: "checkout", ms: 5400 },
-  { t: "pause", ms: 900 },
-  { t: "armaTyping", ms: 2200 },
+  { t: "pause", ms: 2300 },
+  // the hosted page, played through: pick a method, scan, paid
+  { t: "checkout", ms: 2600, stage: "methods" },
+  { t: "checkout", ms: 3400, stage: "qris" },
+  { t: "checkout", ms: 2600, stage: "success" },
+  { t: "pause", ms: 700 },
+  { t: "armaTyping", ms: 900 },
   { t: "send", i: 5 },
 ];
 
@@ -243,18 +256,34 @@ const VALUES: { title: string; body: string }[] = [
   { title: "Innovation", body: "New ways to reach and serve customers." },
 ];
 
+/* Four frames, each shot chosen for the shape it has to fill: a wide one for
+ * the range being worked through, a tall one for a bottle standing up, a small
+ * square-ish one for a single compact, and a letterbox for a whole line-up. */
 const SHOTS = [
-  { src: shotRetail, alt: "Beauty products arranged on the shelves of a retail counter" },
-  { src: shotGold, alt: "A gold fragrance bottle resting on soft fabric" },
-  { src: shotRose, alt: "A cut-glass fragrance bottle on blush silk" },
-  { src: shotAmber, alt: "Amber glass bottles with gold caps in warm light" },
-];
-
-const HERO_FACTS: { label: string; value: string }[] = [
-  { label: "Legal Entity", value: "PT Aroma Abadi" },
-  { label: "Line of Business", value: "Beauty distribution" },
-  { label: "Sales Channel", value: "WhatsApp (ARMA)" },
-  { label: "Payment Gateway", value: "Xendit" },
+  {
+    src: shotFragrancePair,
+    alt: "A gold fragrance bottle beside its presentation box",
+    span: "col-span-12 sm:col-span-8",
+    height: "h-[200px] sm:h-[300px]",
+  },
+  {
+    src: shotFragranceTall,
+    alt: "A golden fragrance bottle among honeycomb and roses",
+    span: "col-span-6 sm:col-span-4",
+    height: "h-[180px] sm:h-[300px]",
+  },
+  {
+    src: shotSerum,
+    alt: "A Beverly Hills Polo Club fragrance beside its carton",
+    span: "col-span-6 sm:col-span-4",
+    height: "h-[180px] sm:h-[230px]",
+  },
+  {
+    src: shotFoundation,
+    alt: "Two Dolce & Gabbana fragrances among flowers and citrus",
+    span: "col-span-12 sm:col-span-8",
+    height: "h-[170px] sm:h-[230px]",
+  },
 ];
 
 const PROGRAM = [
@@ -368,7 +397,7 @@ const DESCRIPTION =
 export const Route = createFileRoute("/company")({
   head: () => ({
     meta: [
-      { title: "PT Aroma Abadi — Beauty distribution and WhatsApp loyalty program" },
+      { title: "PT Aroma Abadi: Beauty distribution and WhatsApp loyalty program" },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "PT Aroma Abadi" },
       { property: "og:description", content: DESCRIPTION },
@@ -382,7 +411,7 @@ export const Route = createFileRoute("/company")({
     links: [
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500&display=swap",
       },
     ],
   }),
@@ -390,8 +419,7 @@ export const Route = createFileRoute("/company")({
 });
 
 /** WhatsApp's mark drawn as an outline, so it sits with the line icons
- * everywhere it appears. The floating button keeps the full-colour glyph —
- * that one is meant to read as the app's own button. */
+ * everywhere it appears. The floating button keeps the full-colour glyph,  * that one is meant to read as the app's own button. */
 function WhatsAppIcon({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
@@ -477,7 +505,7 @@ function CompanyPage() {
         }`}
       >
         <div className="bg-[#4A000D]">
-          <div className="mx-auto flex h-[76px] w-full max-w-[1180px] items-center gap-6 px-6 md:px-10">
+          <div className="mx-auto flex h-[76px] w-full max-w-[1180px] items-center gap-6 px-4 md:px-7">
             <a
               href="#top"
               aria-label="PT Aroma Abadi, back to top"
@@ -561,7 +589,7 @@ function CompanyPage() {
           aria-hidden
           className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(192,112,124,0.12),transparent_68%)]"
         />
-        <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-6 py-12 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
+        <div className="relative mx-auto grid w-full max-w-[1180px] gap-12 px-4 py-12 md:px-7 md:py-14 lg:grid-cols-[minmax(0,1fr)_308px] lg:items-center lg:gap-16 lg:py-16">
           <div>
             <p className="lp-enter flex items-center gap-3 text-[12.5px] font-medium tracking-[0.02em] text-[#9A5A63]">
               <span className="h-px w-8 bg-[#C9A455]" />
@@ -582,22 +610,19 @@ function CompanyPage() {
               leaving the chat.
             </p>
 
-            <dl
+            {/* The facts that used to sit here are set out in full in the
+                profile below, so the hero points the reader down to them
+                instead of saying them twice. */}
+            <a
+              href="#profil"
               style={{ animationDelay: "240ms" }}
-              className="lp-enter mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-[#EAD3D7] bg-[#EAD3D7] sm:grid-cols-4"
+              className="lp-enter lp-more press group mt-9 inline-flex items-center gap-[12px] rounded-full border border-[#710014]/30 py-[12px] pl-[24px] pr-[10px] text-[14.5px] font-semibold text-[#710014] transition-[background-color,border-color,color,transform,box-shadow] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[#710014] hover:bg-[#710014] hover:text-[#FBFAF8] hover:shadow-[0_16px_34px_-18px_rgba(113,0,20,0.6)]"
             >
-              {HERO_FACTS.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="group bg-white px-4 py-[14px] transition-colors duration-300 hover:bg-[#FFF4ED]"
-                >
-                  <dt className="text-[12px] leading-tight text-[#9A5A63]">{fact.label}</dt>
-                  <dd className="mt-[7px] text-[14.5px] font-semibold leading-snug text-[#161616]">
-                    {fact.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+              More About Us
+              <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#710014]/8 transition-colors duration-[420ms] group-hover:bg-[#FBFAF8]/18">
+                <ArrowDown className="lp-bob h-[16px] w-[16px]" strokeWidth={1.9} />
+              </span>
+            </a>
           </div>
 
           <div
@@ -642,34 +667,43 @@ function CompanyPage() {
           title="Business Profile"
           lede="A registered company selling only BPOM-licensed products."
         >
-          <Reveal>
-            <Prose tone="cream">
+          <p className="flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9A5A63]">
+            <span aria-hidden className="h-px w-5 bg-[#C9A455]" />
+            Who We Are
+          </p>
+
+          <Reveal className="mt-4">
+            <Prose tone="cream" full>
               <p>
-                PT Aroma Abadi distributes international beauty brands across Indonesia through
-                partner retail counters and a trained team of Beauty Advisors who know the portfolio
-                — and, since our CRM program began, through WhatsApp.
+                Aroma Abadi is an independent distributor, not the in-house arm of any one house. We
+                bring a brand into Indonesia and look after how it is placed, how it is seen and
+                what it is worth here. The portfolio runs past 25 names across fragrance, makeup,
+                skincare and hair care, fifteen of them below.
+              </p>
+              <p>
+                Most of it reaches customers at partner retail counters, where our Beauty Advisors
+                match a shade or a scent on the spot. Since the CRM program began, that advice
+                reaches them on WhatsApp as well, and the order and its Xendit payment link stay in
+                the one conversation.
               </p>
             </Prose>
           </Reveal>
 
           {/* Supporting imagery: the category the company actually works in. */}
           <Reveal delay={40} className="mt-7">
-            <div className="lp-stagger grid grid-cols-3 gap-3">
-              <figure className="lp-shot col-span-3 m-0 overflow-hidden rounded-[18px]">
-                <img
-                  src={SHOTS[0].src}
-                  alt={SHOTS[0].alt}
-                  loading="lazy"
-                  className="h-[170px] w-full object-cover sm:h-[214px]"
-                />
-              </figure>
-              {SHOTS.slice(1).map((shot) => (
-                <figure key={shot.alt} className="lp-shot m-0 overflow-hidden rounded-[18px]">
+            {/* Two rows that mirror each other, wide then narrow, narrow then
+                wide, so the block has a rhythm instead of a uniform tile grid. */}
+            <div className="lp-stagger grid grid-cols-12 gap-3 sm:gap-5">
+              {SHOTS.map((shot) => (
+                <figure
+                  key={shot.alt}
+                  className={`lp-shot m-0 overflow-hidden rounded-[18px] ${shot.span}`}
+                >
                   <img
                     src={shot.src}
                     alt={shot.alt}
                     loading="lazy"
-                    className="h-[108px] w-full object-cover sm:h-[150px]"
+                    className={`w-full object-cover ${shot.height}`}
                   />
                 </figure>
               ))}
@@ -752,16 +786,7 @@ function CompanyPage() {
           title="CRM and Loyalty Program"
           lede="One WhatsApp number for advice, orders, points and promotions."
         >
-          <Reveal>
-            <Prose>
-              <p>
-                ARMA is the official Aroma Abadi WhatsApp assistant. Asking, ordering, paying and
-                tracking all happen in one conversation.
-              </p>
-            </Prose>
-          </Reveal>
-
-          <div className="mt-10 grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
+          <div className="grid gap-5 sm:auto-rows-fr sm:grid-cols-2">
             {PROGRAM.map((item, index) => (
               <Reveal key={item.title} delay={index * 60}>
                 <Panel icon={item.icon} title={item.title}>
@@ -785,10 +810,11 @@ function CompanyPage() {
                   <h3 className="text-[16px] font-semibold text-[#FBFAF8]">
                     A Separate Channel for Beauty Advisors
                   </h3>
-                  <p className="mt-[8px] max-w-[60ch] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/75">
+                  <p className="mt-[8px] text-pretty text-[14.5px] leading-[1.6] text-[#F3F0EC]/75 lg:pr-9">
                     Our Beauty Advisors use an internal version of ARMA for product knowledge and
-                    service procedures. That channel is for staff and retail partners only, and it
-                    processes no payments.
+                    service procedures. That channel is for staff and retail partners only. It
+                    processes no payments, holds no customer records, and nothing a customer sends
+                    ever reaches it. The two run on separate numbers and are never bridged.
                   </p>
                 </div>
               </div>
@@ -857,7 +883,15 @@ function CompanyPage() {
                 value: "Payment status and invoice number",
               },
             ]}
-            screen={<CheckoutScreen {...CHECKOUT} />}
+            screen={
+              <BrowserFrame
+                title="Complete your payment"
+                host="checkout.xendit.co"
+                className="rounded-[16px] border border-[#E6D8CD] shadow-[0_18px_44px_-24px_rgba(113,0,20,0.4)]"
+              >
+                <CheckoutScreen framed={false} {...CHECKOUT} />
+              </BrowserFrame>
+            }
           />
           <Step
             n={5}
@@ -944,7 +978,7 @@ function CompanyPage() {
 
       {/* ── Kontak & footer ─────────────────────────────────────────── */}
       <footer id="kontak" className="lp-dark scroll-mt-[76px] bg-[#3A000A]">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-12 md:px-10 md:py-16">
+        <div className="mx-auto w-full max-w-[1180px] px-4 py-12 md:px-7 md:py-16">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
               <img src={armaMark} alt="Aroma Abadi" className="w-[52px]" />

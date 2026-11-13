@@ -1122,9 +1122,8 @@ html {
 .lp-marquee-track {
   animation: lp-marquee 78s linear infinite;
 }
-.lp-marquee:hover .lp-marquee-track {
-  animation-play-state: paused;
-}
+/* The row keeps moving under the pointer; only the mark the pointer is on
+   answers, so hovering never costs the reader their place in the row. */
 
 @keyframes lp-marquee {
   to {
@@ -1304,5 +1303,212 @@ html {
   .lp-rule {
     transform: scaleX(1);
     transition: none;
+  }
+}
+
+/* ---- The hosted payment page ----
+   The sheet slides up once, then the page moves through its own steps inside
+   it. Swapping those steps outright read as a cut, so each one is dealt in:
+   the body cross-fades and settles, and the sheet keeps a floor height so the
+   frame never snaps between a tall step and a short one. */
+/* Xendit's page is drawn in Xendit's face, the way the thread above it is
+ * drawn in WhatsApp's: neither screen is ours, and neither should borrow
+ * our type. Open Sans is what checkout.xendit.co actually serves. */
+.lp-xen {
+  font-family:
+    "Open Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Noto Sans",
+    sans-serif;
+}
+
+/* The method rows arrive in sequence, so the list reads as a page settling
+ * rather than a block appearing all at once. */
+.lp-xenrow {
+  animation: lp-xenrow 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.lp-xenrow:nth-child(1) {
+  animation-delay: 0.14s;
+}
+.lp-xenrow:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.lp-xenrow:nth-child(3) {
+  animation-delay: 0.26s;
+}
+.lp-xenrow:nth-child(4) {
+  animation-delay: 0.32s;
+}
+@keyframes lp-xenrow {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lp-stage {
+  animation: lp-stage 0.46s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes lp-stage {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The QR earns a beat of its own: it reads as something being presented. */
+.lp-qr {
+  animation: lp-qr 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.06s backwards;
+}
+@keyframes lp-qr {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Paid: the tick lands, rather than appearing. */
+.lp-paid {
+  animation: lp-paid 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s backwards;
+}
+@keyframes lp-paid {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-stage,
+  .lp-qr,
+  .lp-paid {
+    animation: none;
+  }
+}
+
+/* ---- Read on ----
+   The hero ends by pointing down rather than by listing facts the profile
+   states properly a screen later. The arrow drifts, so the mark reads as an
+   invitation to keep going; hovering stops the drift and holds it down, and
+   a gold rule draws itself under the line being offered. */
+.lp-bob {
+  animation: lp-bob 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes lp-bob {
+  0%,
+  100% {
+    transform: translateY(-1px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+.lp-more:hover .lp-bob {
+  animation: none;
+  transform: translateY(3px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A gold ring breathes just outside the border, so the pill reads as the one
+   thing on the screen asking to be pressed without shouting about it. */
+.lp-more {
+  position: relative;
+}
+.lp-more::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(201, 164, 85, 0.55);
+  opacity: 0;
+  transform: scale(0.97);
+  animation: lp-ring 3.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+.lp-more:hover::before {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lp-ring {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  45% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-bob,
+  .lp-more:hover .lp-bob,
+  .lp-more::before {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* ---- The flow spine ----
+   The hairline joining one step to the next now grows downward as the step
+   arrives, so six separate cards read as one sequence. */
+.lp-spine {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+.lp-spine.is-in {
+  transform: scaleY(1);
+}
+
+/* ---- Section marks ----
+   The little round icon beside a section title settles rather than appears. */
+.lp-mark {
+  animation: lp-mark 0.65s cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+}
+@keyframes lp-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.72) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-spine {
+    transform: scaleY(1);
+    transition: none;
+  }
+  .lp-mark,
+  .lp-xenrow {
+    animation: none;
   }
 }

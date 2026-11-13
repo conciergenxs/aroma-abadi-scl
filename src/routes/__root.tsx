@@ -158,13 +158,16 @@ function RootComponent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const authed = window.localStorage.getItem("scl_authed") === "1";
-    // "/company" is the public company page — the only route a visitor can
-    // land on without an account. Everything else, "/" included, is the
-    // workspace and needs a session.
+    // The public routes: the company page, the ways in, and the two legal
+    // documents — which are linked from the sign-in page itself, so they have
+    // to open for someone who has not signed in. Everything else, "/"
+    // included, is the workspace and needs a session.
     const isPublicRoute =
       pathname === "/company" ||
       pathname === "/auth" ||
       pathname === "/access-denied" ||
+      pathname === "/terms" ||
+      pathname === "/privacy" ||
       pathname === "/invite/set-password";
     if (!authed && !isPublicRoute) {
       router.navigate({ to: "/auth", replace: true });

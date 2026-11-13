@@ -16,8 +16,10 @@ import { Route as ChannelsRouteImport } from './routes/channels'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SkuRouteImport } from './routes/sku'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as BroadcastsIndexRouteImport } from './routes/broadcasts.index'
 import { Route as BroadcastsBroadcastIdRouteImport } from './routes/broadcasts.$broadcastId'
@@ -77,6 +79,11 @@ const InboxRoute = InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -85,6 +92,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SkuRoute = SkuRouteImport.update({
   id: '/sku',
   path: '/sku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TransactionsRoute = TransactionsRouteImport.update({
@@ -213,8 +225,10 @@ export interface FileRoutesByFullPath {
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRouteWithChildren
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -247,8 +261,10 @@ export interface FileRoutesByTo {
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRouteWithChildren
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -282,8 +298,10 @@ export interface FileRoutesById {
   '/company': typeof CompanyRoute
   '/contacts': typeof ContactsRouteWithChildren
   '/inbox': typeof InboxRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sku': typeof SkuRouteWithChildren
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/broadcasts/$broadcastId': typeof BroadcastsBroadcastIdRoute
   '/broadcasts/new': typeof BroadcastsNewRoute
@@ -318,8 +336,10 @@ export interface FileRouteTypes {
     | '/company'
     | '/contacts'
     | '/inbox'
+    | '/privacy'
     | '/settings'
     | '/sku'
+    | '/terms'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -352,8 +372,10 @@ export interface FileRouteTypes {
     | '/company'
     | '/contacts'
     | '/inbox'
+    | '/privacy'
     | '/settings'
     | '/sku'
+    | '/terms'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -386,8 +408,10 @@ export interface FileRouteTypes {
     | '/company'
     | '/contacts'
     | '/inbox'
+    | '/privacy'
     | '/settings'
     | '/sku'
+    | '/terms'
     | '/transactions'
     | '/broadcasts/$broadcastId'
     | '/broadcasts/new'
@@ -421,8 +445,10 @@ export interface RootRouteChildren {
   CompanyRoute: typeof CompanyRoute
   ContactsRoute: typeof ContactsRouteWithChildren
   InboxRoute: typeof InboxRoute
+  PrivacyRoute: typeof PrivacyRoute
   SettingsRoute: typeof SettingsRoute
   SkuRoute: typeof SkuRouteWithChildren
+  TermsRoute: typeof TermsRoute
   TransactionsRoute: typeof TransactionsRoute
   BroadcastsBroadcastIdRoute: typeof BroadcastsBroadcastIdRoute
   BroadcastsNewRoute: typeof BroadcastsNewRoute
@@ -494,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -506,6 +539,13 @@ declare module '@tanstack/react-router' {
       path: '/sku'
       fullPath: '/sku'
       preLoaderRoute: typeof SkuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/transactions': {
@@ -708,8 +748,10 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyRoute: CompanyRoute,
   ContactsRoute: ContactsRouteWithChildren,
   InboxRoute: InboxRoute,
+  PrivacyRoute: PrivacyRoute,
   SettingsRoute: SettingsRoute,
   SkuRoute: SkuRouteWithChildren,
+  TermsRoute: TermsRoute,
   TransactionsRoute: TransactionsRoute,
   BroadcastsBroadcastIdRoute: BroadcastsBroadcastIdRoute,
   BroadcastsNewRoute: BroadcastsNewRoute,

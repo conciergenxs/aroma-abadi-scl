@@ -10,7 +10,7 @@ import {
 import sclIconAsset from "@/assets/aroma-abadi-icon-sand.png";
 import { matchBaCredentials } from "@/components/scl/ba-store";
 import { sessionStore } from "@/components/scl/session-store";
-import { Eye, EyeOff, Loader2, Phone, Mail, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Phone, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-type Mode = "signin" | "signup" | "forgot" | "forgot-otp" | "forgot-reset" | "ba";
+type Mode = "signin" | "forgot" | "forgot-otp" | "forgot-reset" | "ba";
 
 // Demo-only OTP — this app has no real SMS/WhatsApp gateway, so the reset
 // flow accepts any complete 6-digit code as verified.
@@ -50,20 +50,14 @@ function AuthPage() {
 
   // form state
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [company, setCompany] = useState("");
   const [remember, setRemember] = useState(true);
   const [otp, setOtp] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
   function validatePhone(v: string) {
     return /^\+?[\d\s-]{8,}$/.test(v.trim());
-  }
-  function validateEmail(v: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   }
 
   useEffect(() => {
@@ -141,31 +135,8 @@ function AuthPage() {
       }
       // Which workspace account signed in decides the role the dashboard runs
       // with — what they can reach follows from it.
-      const signedIn = sessionStore.signInAs(phone || email);
+      const signedIn = sessionStore.signInAs(phone);
       toast.success(`Welcome back, ${signedIn.name.split(" ")[0]}.`);
-      navigate({ to: "/" });
-      return;
-    }
-
-    if (mode === "signup") {
-      if (!fullName.trim()) return setError("Please enter your full name.");
-      if (!company.trim()) return setError("Please enter your company name.");
-      if (!validatePhone(phone)) return setError("Enter a valid WhatsApp number.");
-      if (email.trim() && !validateEmail(email)) return setError("Enter a valid email address.");
-      if (password.length < 6) return setError("Password must be at least 6 characters.");
-      if (password !== confirmPassword) return setError("Passwords don't match.");
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 900));
-      setLoading(false);
-      if (matchBaCredentials(phone, password)) {
-        navigate({ to: "/access-denied" });
-        return;
-      }
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("scl_authed", "1");
-        window.localStorage.setItem("scl_account_password", password);
-      }
-      toast.success("Workspace created. Welcome to SCL.");
       navigate({ to: "/" });
       return;
     }
@@ -222,7 +193,7 @@ function AuthPage() {
       {/* RIGHT — Auth panel */}
       <main className="relative flex-1 flex items-center justify-center px-6 py-10">
         {/* Mobile background gradient */}
-        <div className="absolute inset-0 lg:hidden pointer-events-none">
+        <div className="absolute inset-0 lg:hidden pointer-events-none overflow-hidden">
           <div className="absolute -top-32 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-[100px]" />
           <div className="absolute bottom-0 -left-24 h-72 w-72 rounded-full bg-orange-500/10 blur-[100px]" />
         </div>
@@ -252,14 +223,6 @@ function AuthPage() {
                 <h2 className="text-2xl font-semibold tracking-tight">Beauty Ambassador Login</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Sign in with your WhatsApp number and password.
-                </p>
-              </>
-            )}
-            {mode === "signup" && (
-              <>
-                <h2 className="text-2xl font-semibold tracking-tight">Create your workspace</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Get started with Aroma Abadi and manage customer conversations from one place.
                 </p>
               </>
             )}
@@ -471,34 +434,9 @@ function AuthPage() {
           )}
 
           {/* SCL Admin Forms */}
-          {(mode === "signin" || mode === "signup" || mode === "forgot") && (
+          {(mode === "signin" || mode === "forgot") && (
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
-              {mode === "signup" && (
-                <>
-                  <Field label="Full Name">
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Aria Kapoor"
-                      className={inputCls}
-                      autoComplete="name"
-                    />
-                  </Field>
-                  <Field label="Company Name">
-                    <input
-                      type="text"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Acme Brands"
-                      className={inputCls}
-                      autoComplete="organization"
-                    />
-                  </Field>
-                </>
-              )}
-
-              {(mode === "signin" || mode === "signup" || mode === "forgot") && (
+              {(mode === "signin" || mode === "forgot") && (
                 <Field label="Phone Number">
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -509,22 +447,6 @@ function AuthPage() {
                       placeholder="+62 812 3456 7890"
                       className={`${inputCls} pl-9`}
                       autoComplete="tel"
-                    />
-                  </div>
-                </Field>
-              )}
-
-              {mode === "signup" && (
-                <Field label="Email Address (Optional)">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@company.com"
-                      className={`${inputCls} pl-9`}
-                      autoComplete="email"
                     />
                   </div>
                 </Field>
@@ -569,19 +491,6 @@ function AuthPage() {
                 </Field>
               )}
 
-              {mode === "signup" && (
-                <Field label="Confirm Password">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className={inputCls}
-                    autoComplete="new-password"
-                  />
-                </Field>
-              )}
-
               {mode === "signin" && (
                 <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
                   <input
@@ -607,58 +516,26 @@ function AuthPage() {
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === "signin" && (loading ? "Signing in…" : "Sign In")}
-                {mode === "signup" && (loading ? "Creating account…" : "Create Account")}
                 {mode === "forgot" && (loading ? "Sending code…" : "Send OTP")}
               </button>
-
-              {mode === "signin" && (
-                <p className="text-center text-xs text-muted-foreground">
-                  Don't have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("signup");
-                      setError(null);
-                    }}
-                    className="text-primary hover:underline transition-colors duration-150"
-                  >
-                    Create Account
-                  </button>
-                </p>
-              )}
-              {mode === "signup" && (
-                <p className="text-center text-xs text-muted-foreground">
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("signin");
-                      setError(null);
-                    }}
-                    className="text-primary hover:underline transition-colors duration-150"
-                  >
-                    Sign In
-                  </button>
-                </p>
-              )}
             </form>
           )}
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
             By continuing you agree to our{" "}
-            <a
-              href="https://aroma-abadi-scl.vercel.app/"
-              className="text-primary hover:underline transition-colors duration-150"
+            <Link
+              to="/terms"
+              className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150"
             >
               Terms
-            </a>{" "}
+            </Link>{" "}
             &{" "}
-            <a
-              href="https://aroma-abadi-scl.vercel.app/"
+            <Link
+              to="/privacy"
               className="text-[oklch(0.62_0.17_40)] hover:underline transition-colors duration-150"
             >
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </div>

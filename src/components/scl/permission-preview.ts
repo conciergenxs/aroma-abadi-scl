@@ -224,8 +224,8 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     id: "ba-create",
     label: "Add Beauty Ambassadors",
     section: "BA Enablement",
-    effect: "Add BA is locked above the BA view in Contacts.",
-    where: "/contacts?view=ba",
+    effect: "New Contact opens, but Beauty Ambassador can't be chosen as the type.",
+    where: "/contacts/new",
   },
   {
     id: "ba-edit",
@@ -256,6 +256,13 @@ const ALL_CONDITIONS: PreviewCondition[] = [
     section: "Commerce",
     effect: "A code's row menu opens, but Edit and Delete are locked.",
     where: "/promo-codes",
+  },
+  {
+    id: "transactions-detail",
+    label: "Open Order Details",
+    section: "Commerce",
+    effect: "The ledger lists every order, but no row opens and (See more..) is locked.",
+    where: "/transactions",
   },
   {
     id: "referral-manage",

@@ -929,13 +929,6 @@ function InboxPage() {
                 ),
               );
             }}
-            onChangeOwner={(ownerId) => {
-              contactsStore.setContacts((list) =>
-                list.map((c) =>
-                  c.id === contact.id ? { ...c, ownerId: ownerId ?? undefined } : c,
-                ),
-              );
-            }}
             onChangeCollaborators={(ids) => inboxStore.setCollaborators(active.id, ids)}
             contextOpen={contextOpen}
             onToggleContext={() => setContextOpen((v) => !v)}
@@ -1354,7 +1347,6 @@ function ConversationHeader({
   collaborators,
   contextOpen,
   onChangeLifecycle,
-  onChangeOwner,
   onChangeCollaborators,
   onToggleContext,
   isPinned,
@@ -1369,7 +1361,6 @@ function ConversationHeader({
   collaborators: string[];
   contextOpen: boolean;
   onChangeLifecycle: (next: LifecycleStage | null) => void;
-  onChangeOwner: (ownerId: string | null) => void;
   onChangeCollaborators: (ids: string[]) => void;
   onToggleContext: () => void;
   isPinned: boolean;
@@ -1383,9 +1374,13 @@ function ConversationHeader({
   const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="relative z-30 min-h-[68px] px-3 sm:px-7 py-3 flex items-center gap-3 sm:gap-6 border-b border-border/60 bg-background/40 backdrop-blur">
-      {/* LEFT — contact name + lifecycle (single row) */}
+      {/* LEFT — who this conversation is with */}
       <div className="flex items-center gap-3 min-w-0">
         <span className="text-[13px] font-medium text-foreground truncate">{contact.name}</span>
+      </div>
+
+      {/* RIGHT — the stage this contact is at, then the view controls */}
+      <div className="ml-auto flex items-center gap-3">
         {!contact.labelIds.includes("lb-ba") && (
           <LifecycleSelect
             size="sm"
@@ -1393,13 +1388,6 @@ function ConversationHeader({
             onChange={onChangeLifecycle}
           />
         )}
-      </div>
-
-      {/* RIGHT — actions */}
-      <div className="ml-auto flex items-center gap-3">
-        {/* Who owns this conversation. The list filters by it and the store
-            has always accepted the change; this is where it is made. */}
-        <OwnerSelect value={contact.ownerId ?? null} onChange={onChangeOwner} />
         <div className="flex items-center gap-0.5 text-muted-foreground/70">
           <button
             onClick={onToggleSearch}
@@ -1467,156 +1455,6 @@ function ConversationHeader({
           </FloatingMenu>
         </div>
       </div>
-    </div>
-  );
-}
-
-function OwnerSelect({
-  value,
-  onChange,
-}: {
-  value: string | null;
-  onChange: (id: string | null) => void;
-}) {
-  const assignGate = usePermission("inbox-assign");
-  const [open, setOpen] = useState(false);
-  const [q, setQ] = useState("");
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const current = TEAM_USERS.find((u) => u.id === value);
-  const currentAgent = findAgent(value);
-  const filtered = TEAM_USERS.filter((u) => u.name.toLowerCase().includes(q.toLowerCase()));
-  const filteredAgents = AI_AGENTS.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()));
-  return (
-    <div className="relative">
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={() => assignGate.allowed && setOpen((o) => !o)}
-        disabled={!assignGate.allowed}
-        title={assignGate.reason || undefined}
-        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-md border border-white/10 bg-white/[0.04] hover:bg-gray-50 text-xs transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/[0.04]"
-      >
-        {current ? (
-          <>
-            <span className="h-5 w-5 rounded-full bg-gradient-to-br from-primary/40 to-card border border-border grid place-items-center text-[9px] font-medium">
-              {current.avatar}
-            </span>
-            <span className="text-foreground">{current.name}</span>
-          </>
-        ) : currentAgent ? (
-          <>
-            <span className="h-5 w-5 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
-              <Bot className="h-3 w-3 text-primary" />
-            </span>
-            <span className="text-foreground">{currentAgent.name}</span>
-            <span className="rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
-              AI Agent
-            </span>
-          </>
-        ) : (
-          <span className="text-muted-foreground">Unassigned</span>
-        )}
-        <ChevronDown
-          className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      <FloatingMenu
-        anchorRef={btnRef}
-        open={open}
-        onClose={() => setOpen(false)}
-        align="end"
-        width={256}
-      >
-        <div className="rounded-md border border-border bg-popover shadow-xl p-2">
-          <div className="relative mb-2">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-            <input
-              autoFocus
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search users"
-              className="h-7 w-full rounded border border-border bg-card/60 pl-7 pr-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
-            />
-          </div>
-          <div className="max-h-60 overflow-y-auto">
-            {filtered.length > 0 && (
-              <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-                People
-              </div>
-            )}
-            {TEAMS.map((team) => {
-              const members = filtered.filter((u) => u.team === team);
-              if (members.length === 0) return null;
-              return (
-                <div key={team} className="mb-1.5">
-                  <div className="px-3 pt-1 pb-1 text-[10px] font-medium text-muted-foreground/60">
-                    {team}
-                  </div>
-                  {members.map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => {
-                        onChange(u.id);
-                        setOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50 ${
-                        value === u.id ? "bg-white/[0.06]" : ""
-                      }`}
-                    >
-                      <span className="h-5 w-5 rounded-full bg-gradient-to-br from-white/10 to-white/0 border border-border grid place-items-center text-[9px]">
-                        {u.avatar}
-                      </span>
-                      <span className="flex-1 text-left">{u.name}</span>
-                      {value === u.id && <Check className="h-3.5 w-3.5 text-primary" />}
-                    </button>
-                  ))}
-                </div>
-              );
-            })}
-            {filteredAgents.length > 0 && (
-              <div className="mt-1 border-t border-border pt-1.5">
-                <div className="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-                  AI Agents
-                </div>
-                {filteredAgents.map((a) => (
-                  <button
-                    key={a.id}
-                    onClick={() => {
-                      onChange(a.id);
-                      setOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-gray-50 ${
-                      value === a.id ? "bg-white/[0.06]" : ""
-                    }`}
-                  >
-                    <span className="h-5 w-5 rounded-full bg-primary/15 border border-primary/30 grid place-items-center">
-                      <Bot className="h-3 w-3 text-primary" />
-                    </span>
-                    <span className="flex-1 text-left">{a.name}</span>
-                    <span className="rounded border border-primary/30 bg-primary/10 px-1 py-px text-[8px] font-semibold text-primary uppercase tracking-wider">
-                      AI
-                    </span>
-                    {value === a.id && <Check className="h-3.5 w-3.5 text-primary" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="border-t border-border mt-1 pt-1">
-            <button
-              type="button"
-              disabled={!value}
-              onClick={() => {
-                onChange(null);
-                setOpen(false);
-              }}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:bg-gray-50 hover:text-foreground disabled:opacity-40 transition-colors duration-150"
-            >
-              <XIcon className="h-3.5 w-3.5" /> Unassign
-            </button>
-          </div>
-        </div>
-      </FloatingMenu>
     </div>
   );
 }
