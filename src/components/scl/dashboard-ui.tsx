@@ -135,14 +135,28 @@ export function useMeasuredWidth<T extends HTMLElement>() {
  * here keeps one step the whole way across, and the step is simply the
  * smallest one the axis is wide enough to carry.
  */
+/** What the value axis and the chart's own margins take off the left before
+ *  any label can be drawn — measured at 93px against "320.0jt", rounded up.
+ *  Over-reserving only costs a label; under-reserving overlaps them. */
+const TREND_AXIS_INSET = 96;
+
+/** Room each label needs along the axis. The label's own width, plus half a
+ *  label again: the first and last are anchored inward so they stand clear of
+ *  the y-axis and the right edge, which pushes them toward their neighbours by
+ *  half their width. Ignoring that is what had "May 2025" and "Nov 2025"
+ *  touching at 390px. */
+const TREND_LABEL_PITCH = { day: 68, month: 80, year: 56 } as const;
+
 export function trendTicks(
   buckets: string[],
   granularity: "day" | "month" | "year",
   width: number,
 ): string[] {
   if (buckets.length === 0 || width <= 0) return [];
-  const labelWidth = granularity === "month" ? 68 : granularity === "year" ? 48 : 54;
-  const fits = Math.max(2, Math.floor(width / labelWidth));
+  const plot = Math.max(0, width - TREND_AXIS_INSET);
+  // n labels leave n-1 gaps between them, so the gaps are what the width has
+  // to cover — counting labels instead loses one every time.
+  const fits = Math.max(2, Math.floor(plot / TREND_LABEL_PITCH[granularity]) + 1);
   const step = Math.max(1, Math.ceil(buckets.length / fits));
   const out: string[] = [];
   for (let i = buckets.length - 1; i >= 0; i -= step) out.unshift(buckets[i]);
