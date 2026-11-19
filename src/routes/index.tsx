@@ -80,7 +80,7 @@ import {
   CornerStat,
   StepFunnel,
   type FunnelStage,
-  trendTick,
+  TrendAxisTick,
   trendLabel,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
@@ -355,14 +355,13 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
                   <XAxis
                     dataKey="bucket"
                     stroke={axisColor}
-                    tick={axisTick}
                     tickLine={false}
                     axisLine={false}
                     // The ends always carry a label; the middle thins out
                     // rather than overprinting when a month is tight.
                     interval="preserveStartEnd"
                     minTickGap={16}
-                    tickFormatter={(b: string) => trendTick(b, orders.trendGranularity)}
+                    tick={<TrendAxisTick granularity={orders.trendGranularity} />}
                   />
                   <YAxis
                     stroke={axisColor}
@@ -577,6 +576,10 @@ function DateRangePopover({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // A ledger has no future, so the end can reach today but no further. The
+  // start is open: asking about 2019 is a fair question, and an empty answer
+  // is a true one.
+  const todayIso = nowWIB().toISOString().slice(0, 10);
   // Presets can clamp to an identical range once the window is short enough
   // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
   // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"

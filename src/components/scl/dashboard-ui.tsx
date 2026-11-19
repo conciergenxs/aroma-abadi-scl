@@ -38,6 +38,39 @@ export function trendTick(bucket: string, granularity: "day" | "month" | "year")
   return granularity === "month" ? `${month} ${y.slice(2)}` : `${Number(d)} ${month}`;
 }
 
+/**
+ * The trend's x-axis label.
+ *
+ * Recharts centres a tick on its point, which hangs the first and last labels
+ * off the ends of the plot — "24 Jul" started to the left of the gridlines and
+ * read as belonging to the y-axis. The ends anchor inward instead, so the first
+ * label begins exactly where the gridlines begin and the last one finishes with
+ * them, and the row sits a few pixels lower, clear of the axis.
+ */
+export function TrendAxisTick({
+  x,
+  y,
+  payload,
+  index,
+  visibleTicksCount,
+  granularity,
+}: {
+  x?: number;
+  y?: number;
+  payload?: { value?: string };
+  index?: number;
+  visibleTicksCount?: number;
+  granularity: "day" | "month" | "year";
+}) {
+  const last = typeof visibleTicksCount === "number" && index === visibleTicksCount - 1;
+  const anchor = index === 0 ? "start" : last ? "end" : "middle";
+  return (
+    <text x={x} y={y} dy={14} textAnchor={anchor} fontSize={11} fill="var(--muted-foreground)">
+      {trendTick(payload?.value ?? "", granularity)}
+    </text>
+  );
+}
+
 /** The same bucket in a tooltip, where there is room to say it in full. */
 export function trendLabel(bucket: string, granularity: "day" | "month" | "year"): string {
   if (granularity === "year") return bucket;
