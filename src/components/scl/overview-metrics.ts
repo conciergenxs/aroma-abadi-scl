@@ -22,6 +22,35 @@ function brandFromSkuCode(skuCode: string): string {
 // dataset window instead.
 export type DateRange = { start: string; end: string }; // inclusive, "YYYY-MM-DD"
 
+export type TrendGranularity = "day" | "month" | "year";
+
+/**
+ * A trend is only readable while its ticks are. Under a month the interesting
+ * movement is day to day; past that a day per tick crowds the axis into a
+ * smear, and past a year even months do. So the span picks the bucket:
+ *
+ *   under 30 days   -> one point per day
+ *   30 days to a year -> one point per month
+ *   a year or more  -> one point per year
+ *
+ * Buckets cover only the span asked for: a 1 Jan – 5 Feb range plots January
+ * and February, not an empty December.
+ */
+export function trendGranularityFor(start: string, end: string): TrendGranularity {
+  const days = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;
+  if (days < 30) return "day";
+  if (days < 365) return "month";
+  return "year";
+}
+
+/** The bucket an ISO day falls in, as the key the axis prints. */
+function bucketOf(iso: string, granularity: TrendGranularity): string {
+  const day = iso.slice(0, 10);
+  if (granularity === "year") return day.slice(0, 4);
+  if (granularity === "month") return day.slice(0, 7);
+  return day;
+}
+
 function inRange(iso: string, range?: DateRange): boolean {
   if (!range) return true;
   const day = iso.slice(0, 10);
@@ -147,7 +176,10 @@ export type OrdersAndSales = {
   totalQty: number;
   qtyByBrand: { brand: string; qty: number }[];
   mostAddedToCart: RankedProduct[];
-  dailySales: { date: string; sales: number }[];
+  /** How the trend is bucketed — the span decides, so a year of data never
+   *  arrives as 365 ticks. */
+  trendGranularity: TrendGranularity;
+  salesTrend: { bucket: string; sales: number }[];
 };
 
 export function computeOrdersAndSales(
