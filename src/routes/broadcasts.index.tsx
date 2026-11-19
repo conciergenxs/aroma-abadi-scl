@@ -109,13 +109,13 @@ function BroadcastListPage() {
     const totalRead = sent.reduce((a, b) => a + b.read, 0);
     const scheduled = broadcasts.filter((b) => b.status === "Scheduled").length;
     return [
-      { l: "Reach · Last 30 Days", v: fmtNum(totalReach) },
+      { l: "Total reach (30d)", v: fmtNum(totalReach) },
       {
-        l: "Delivery Rate · Last 30 Days",
+        l: "Delivery rate",
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
       },
       {
-        l: "Read Rate · Last 30 Days",
+        l: "Read rate",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
       },
       { l: "Scheduled", v: String(scheduled) },

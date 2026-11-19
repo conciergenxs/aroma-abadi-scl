@@ -208,17 +208,20 @@ export function MetricStat({
           </div>
         )}
       </div>
+      {/* The unit rides on the same line as the figure it belongs to, pushed
+          to the far edge of the tile — "5.8" and "items / transaction" read as
+          one statement, and the tile keeps the height of the ones beside it. */}
       <div className="mt-2 flex items-end justify-between gap-2">
         <div className={VALUE_LG}>{value}</div>
+        {sub && (
+          <div
+            className={`shrink-0 pb-1 text-[12px] leading-none ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}
+          >
+            {sub}
+          </div>
+        )}
         {spark && <div className="shrink-0">{spark}</div>}
       </div>
-      {sub && (
-        <div
-          className={`mt-1 text-[11px] ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}
-        >
-          {sub}
-        </div>
-      )}
     </div>
   );
 }

@@ -119,13 +119,12 @@ function RankedBarList({ items, color }: { items: RankedProduct[]; color: string
           <span className="text-[11px] w-3.5 shrink-0 text-muted-foreground tabular-nums">
             {i + 1}
           </span>
-          {/* The brand is not decoration here: two different products in this
-              catalogue are both called "Translucent Loose Setting Powder", at
-              Rp 189.000 and Rp 745.000, and the name alone shows them as the
-              same row twice. */}
-          <span className="flex-1 min-w-0 truncate" title={`${item.name} · ${item.brand}`}>
-            <span className="text-[12px] text-foreground">{item.name}</span>
-            <span className="text-[11px] text-muted-foreground"> · {item.brand}</span>
+          {/* Keyed on brand + name, not name alone: two different products in
+              this catalogue are both called "Translucent Loose Setting
+              Powder", at Rp 189.000 and Rp 745.000, and React logs a
+              duplicate-key error when the name is the only identity. */}
+          <span className="text-[12px] flex-1 min-w-0 truncate text-foreground" title={item.name}>
+            {item.name}
           </span>
           <div className="w-16 shrink-0 h-1.5 rounded-full bg-muted overflow-hidden">
             <div
@@ -223,7 +222,6 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
             icon={Radio}
             label="Broadcast Sent"
             value={fmtNum(broadcast.broadcastSent)}
-            sub="campaigns sent"
             info="Number of broadcast campaigns sent."
           />
           <MetricStat
