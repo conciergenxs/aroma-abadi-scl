@@ -664,7 +664,6 @@ function DateRangePopover({
             <input
               type="date"
               value={range.start}
-              min={fullRange.start}
               max={range.end}
               onChange={(e) => {
                 if (e.target.value) {
@@ -678,7 +677,7 @@ function DateRangePopover({
               type="date"
               value={range.end}
               min={range.start}
-              max={fullRange.end}
+              max={todayIso}
               onChange={(e) => {
                 if (e.target.value) {
                   setSelectedLabel(null);
