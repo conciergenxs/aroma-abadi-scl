@@ -191,6 +191,9 @@ export function MetricStat({
   label: string;
   value: string;
   sub?: string;
+  /** Put `sub` on the value's own line, at the tile's right edge, rather than
+   *  on a line of its own underneath. For a unit, not for a sentence. */
+  subInline?: boolean;
   info: string;
   spark?: ReactNode;
   accent?: "up" | "down";
@@ -208,20 +211,25 @@ export function MetricStat({
           </div>
         )}
       </div>
-      {/* The unit rides on the same line as the figure it belongs to, pushed
-          to the far edge of the tile — "5.8" and "items / transaction" read as
-          one statement, and the tile keeps the height of the ones beside it. */}
       <div className="mt-2 flex items-end justify-between gap-2">
         <div className={VALUE_LG}>{value}</div>
-        {sub && (
+        {/* subInline: a short unit that belongs to the figure — "4.4" and
+            "items / transaction" read as one statement, so it rides the same
+            line, pushed to the tile's edge. A caption that is its own
+            sentence ("+12.4% vs previous period"), or a tile carrying a
+            sparkline, keeps the line below instead. */}
+        {sub && subInline && (
           <div
-            className={`shrink-0 pb-1 text-[12px] leading-none ${accent === "up" ? "text-emerald-600" : accent === "down" ? "text-rose-600" : "text-muted-foreground"}`}
+            className={`shrink-0 pb-1 text-[12px] leading-none ${SUB_TONE[accent ?? "none"]}`}
           >
             {sub}
           </div>
         )}
         {spark && <div className="shrink-0">{spark}</div>}
       </div>
+      {sub && !subInline && (
+        <div className={`mt-1 text-[11px] ${SUB_TONE[accent ?? "none"]}`}>{sub}</div>
+      )}
     </div>
   );
 }
