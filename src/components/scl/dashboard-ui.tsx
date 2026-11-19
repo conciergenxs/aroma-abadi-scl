@@ -35,7 +35,10 @@ export function trendTick(bucket: string, granularity: "day" | "month" | "year")
   if (granularity === "year") return bucket;
   const [y, m, d] = bucket.split("-");
   const month = MONTHS[Number(m) - 1] ?? m;
-  return granularity === "month" ? `${month} ${y.slice(2)}` : `${Number(d)} ${month}`;
+  // The year is written out for a month bucket. Abbreviated it read as a
+  // day — "May 26" on a two-year axis looks like the 26th of May, which is
+  // exactly how it was reported.
+  return granularity === "month" ? `${month} ${y}` : `${Number(d)} ${month}`;
 }
 
 /**
@@ -93,6 +96,51 @@ export const CAPTION = "text-[11px] font-medium uppercase tracking-wide text-mut
 
 export function fmtPct(n: number, digits = 1) {
   return `${(n * 100).toFixed(digits)}%`;
+}
+
+/** The element's own width, kept current as the window resizes. The trend
+ *  axis needs it to decide how many labels it can carry. */
+export function useMeasuredWidth<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof ResizeObserver === "undefined") {
+      setWidth(el.getBoundingClientRect().width);
+      return;
+    }
+    const obs = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    obs.observe(el);
+    setWidth(el.getBoundingClientRect().width);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, width };
+}
+
+/**
+ * Which buckets get a label — evenly stepped, anchored on the newest one.
+ *
+ * Recharts thins a crowded axis itself: it keeps the first and last label and
+ * drops whichever others do not fit. That leaves the rhythm broken wherever
+ * the drop happens to land — two years of months came out ... May 2026, Jul
+ * 2026, Nov 2026, with the final gap twice the width of every other, which
+ * reads as missing data rather than as a thinned axis. Choosing the ticks
+ * here keeps one step the whole way across, and the step is simply the
+ * smallest one the axis is wide enough to carry.
+ */
+export function trendTicks(
+  buckets: string[],
+  granularity: "day" | "month" | "year",
+  width: number,
+): string[] {
+  if (buckets.length === 0 || width <= 0) return [];
+  const labelWidth = granularity === "month" ? 68 : granularity === "year" ? 48 : 54;
+  const fits = Math.max(2, Math.floor(width / labelWidth));
+  const step = Math.max(1, Math.ceil(buckets.length / fits));
+  const out: string[] = [];
+  for (let i = buckets.length - 1; i >= 0; i -= step) out.unshift(buckets[i]);
+  return out;
 }
 
 // ── Reveal-on-scroll — mounts/animates content only once its section
