@@ -190,7 +190,96 @@ function seed(): Transaction[] {
       note: i % 5 === 0 ? "Customer minta sample shade lain lewat ARMA." : undefined,
     });
   }
-  return items;
+
+  // ── The history behind that fortnight ──────────────────────────────────
+  // The block above is the workspace's recent, dense activity, and the promo
+  // and referral seeds point at it by id. Everything before and after it is
+  // generated here so the Overview covers a real stretch of trading — from
+  // 1 Jan 2025 to today — and the Sales Trend can be read at every window the
+  // date filter offers, not just the one fortnight that used to exist.
+  const history: Transaction[] = [];
+  const rand = rng(20250101);
+  const firstDay = Date.UTC(2025, 0, 1);
+  const lastDay = todayWIBUtc();
+  const span = Math.max(1, lastDay - firstDay);
+
+  for (let t = firstDay; t <= lastDay; t += DAY_MS) {
+    const d = new Date(t);
+    const iso = d.toISOString().slice(0, 10);
+    // The fixed block already owns these days.
+    if (iso >= "2026-07-18" && iso <= "2026-07-30") continue;
+    if (QUIET_STRETCHES.some(([from, to]) => iso >= from && iso <= to)) continue;
+
+    // Orders a day: a business that grew, busier into the weekend, and busier
+    // again before Lebaran and over the year-end gifting season.
+    const progress = (t - firstDay) / span;
+    const dow = d.getUTCDay();
+    const weekend = dow === 0 || dow === 5 || dow === 6 ? 1.35 : 0.85;
+    const month = d.getUTCMonth() + 1;
+    const season = month === 3 ? 1.65 : month === 12 ? 1.4 : month === 6 ? 1.15 : 1;
+    const expected = (0.15 + 1.5 * progress * progress) * weekend * season;
+    let orderCount = Math.floor(expected);
+    if (rand() < expected - orderCount) orderCount += 1;
+
+    for (let n = 0; n < orderCount; n++) {
+      const cust = historyCustomers[Math.floor(rand() * historyCustomers.length)];
+      const lineCount = 1 + Math.floor(rand() * 5);
+      const lines: TxLine[] = [];
+      let subtotal = 0;
+      const brandSet = new Set<string>();
+      for (let l = 0; l < lineCount; l++) {
+        const sku = skus[cust.skuIndices[Math.floor(rand() * cust.skuIndices.length)]];
+        if (lines.some((line) => line.skuId === sku.skuId)) continue;
+        const qty = 1 + Math.floor(rand() * 3);
+        lines.push({
+          skuId: sku.skuId,
+          skuCode: sku.skuCode,
+          skuName: sku.skuName,
+          qty,
+          unitPrice: sku.price,
+        });
+        subtotal += sku.price * qty;
+        brandSet.add(sku.brand);
+      }
+      // An order placed somewhere between 08:00 and 21:00 WIB.
+      const hour = 1 + Math.floor(rand() * 13); // WIB 08:00–21:00 is UTC 01:00–14:00
+      const paymentMethod = payments[Math.floor(rand() * payments.length)];
+      const money = priceOrder(subtotal, 0, paymentMethod);
+      const roll = rand();
+      history.push({
+        id: "",
+        invoice: "",
+        date: new Date(t + hour * 3600 * 1000 + Math.floor(rand() * 60) * 60000).toISOString(),
+        customerId: cust.id,
+        customerName: cust.name,
+        city: cities[Math.floor(rand() * cities.length)],
+        brandName: Array.from(brandSet)[0],
+        brandNames: Array.from(brandSet),
+        items: lines,
+        ...money,
+        paymentMethod,
+        status: roll < 0.1 ? "Cancelled" : roll < 0.55 ? "Shipped" : "Processed",
+      });
+    }
+  }
+
+  // Invoice numbers run with the calendar, and the fixed block holds
+  // AA-82200 to AA-82235 — so the history before it counts up to AA-82199 and
+  // the history after it carries on from AA-82236.
+  history.sort((a, b) => a.date.localeCompare(b.date));
+  const before = history.filter((t) => t.date < "2026-07-18");
+  const after = history.filter((t) => t.date > "2026-07-30");
+  before.forEach((t, i) => {
+    t.id = `tx-h${String(i + 1).padStart(4, "0")}`;
+    t.invoice = `AA-${String(82200 - before.length + i).padStart(5, "0")}`;
+  });
+  after.forEach((t, i) => {
+    t.id = `tx-h${String(before.length + i + 1).padStart(4, "0")}`;
+    t.invoice = `AA-${String(82236 + i).padStart(5, "0")}`;
+  });
+
+  // Newest first, the order the Transactions table and the peek expect.
+  return [...items, ...history].sort((a, b) => b.date.localeCompare(a.date));
 }
 
 // v13: orders carry a money breakdown — subtotal, discount, PPN, admin fee.
