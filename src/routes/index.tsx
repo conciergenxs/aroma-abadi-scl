@@ -565,6 +565,22 @@ function addDaysIso(iso: string, days: number): string {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
+/** The whole field opens the calendar.
+ *
+ * Chrome only opens a date input's picker from its calendar indicator, and
+ * this one is moved to the left edge by `.scl-date-input`, so clicking the
+ * field — which is what the control looks like it wants — did nothing at all.
+ * showPicker() is a user-gesture API and throws if the browser declines;
+ * typing into the field still works either way.
+ */
+function openDatePicker(e: React.MouseEvent<HTMLInputElement>) {
+  try {
+    e.currentTarget.showPicker?.();
+  } catch {
+    /* the field is still typeable */
+  }
+}
+
 function DateRangePopover({
   range,
   fullRange,
@@ -668,6 +684,7 @@ function DateRangePopover({
               type="date"
               value={range.start}
               max={range.end}
+              onClick={openDatePicker}
               onChange={(e) => {
                 if (e.target.value) {
                   setSelectedLabel(null);
@@ -681,6 +698,7 @@ function DateRangePopover({
               value={range.end}
               min={range.start}
               max={todayIso}
+              onClick={openDatePicker}
               onChange={(e) => {
                 if (e.target.value) {
                   setSelectedLabel(null);
