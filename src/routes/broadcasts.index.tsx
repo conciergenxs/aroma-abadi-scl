@@ -12,6 +12,7 @@ import {
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
 import { fmtNum } from "@/lib/fmt";
+import { todayWIBUtc } from "@/lib/wib";
 import {
   Plus,
   Search,
@@ -98,19 +99,23 @@ function BroadcastListPage() {
   }, [kind]);
 
   const stats = useMemo(() => {
-    const sent = broadcasts.filter((b) => b.status === "Sent");
+    // The tiles say "last 30 days" and now have to mean it: this workspace
+    // holds two years of sends, so summing every broadcast ever would report
+    // a quarter of a million reach under a thirty-day label.
+    const since = new Date(todayWIBUtc() - 29 * 86_400_000).toISOString().slice(0, 10);
+    const sent = broadcasts.filter((b) => b.status === "Sent" && (b.sentAtDate ?? "") >= since);
     const totalReach = sent.reduce((a, b) => a + b.reach, 0);
     const totalDelivered = sent.reduce((a, b) => a + b.delivered, 0);
     const totalRead = sent.reduce((a, b) => a + b.read, 0);
     const scheduled = broadcasts.filter((b) => b.status === "Scheduled").length;
     return [
-      { l: "Total reach (30d)", v: fmtNum(totalReach) },
+      { l: "Reach · Last 30 Days", v: fmtNum(totalReach) },
       {
-        l: "Delivery rate",
+        l: "Delivery Rate · Last 30 Days",
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
       },
       {
-        l: "Read rate",
+        l: "Read Rate · Last 30 Days",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
       },
       { l: "Scheduled", v: String(scheduled) },
