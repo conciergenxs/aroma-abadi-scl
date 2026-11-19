@@ -484,6 +484,7 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             label="Avg. Basket Size"
             value={averages.avgBasketSize.toFixed(1)}
             sub="items / transaction"
+            subInline
             info="Items per paid transaction (Qty Sold ÷ Transactions)."
           />
         </div>

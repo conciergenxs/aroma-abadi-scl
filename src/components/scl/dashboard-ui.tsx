@@ -176,6 +176,12 @@ export function InfoHint({ text }: { text: string }) {
   );
 }
 
+const SUB_TONE = {
+  up: "text-emerald-600",
+  down: "text-rose-600",
+  none: "text-muted-foreground",
+} as const;
+
 // ── Single-metric stat tile — `spark` optionally renders a small trend
 // chart (e.g. <Sparkline/>) to the right of the value. ─────────────────────
 export function MetricStat({
@@ -183,6 +189,7 @@ export function MetricStat({
   label,
   value,
   sub,
+  subInline,
   info,
   spark,
   accent,
@@ -219,9 +226,7 @@ export function MetricStat({
             sentence ("+12.4% vs previous period"), or a tile carrying a
             sparkline, keeps the line below instead. */}
         {sub && subInline && (
-          <div
-            className={`shrink-0 pb-1 text-[12px] leading-none ${SUB_TONE[accent ?? "none"]}`}
-          >
+          <div className={`shrink-0 pb-1 text-[12px] leading-none ${SUB_TONE[accent ?? "none"]}`}>
             {sub}
           </div>
         )}
