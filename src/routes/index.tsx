@@ -400,7 +400,12 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
           <div className={`${CAPTION} mb-2 inline-flex items-center gap-1`}>
             Qty Sold — by Brand <InfoHint text="Number of items sold, by brand." />
           </div>
-          <div className="h-40">
+          {/* The row pitch is what is held fixed here, not the panel height: a
+              bar plus the air around it comes to 35px whether the range turned
+              up two brands or five, so the bars never crowd at one filter and
+              drift apart at another. The 36px covers the value axis beneath
+              them and the top margin. */}
+          <div style={{ height: Math.max(1, orders.qtyByBrand.length) * 35 + 36 }}>
             {inView && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
