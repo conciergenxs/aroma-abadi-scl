@@ -80,6 +80,8 @@ import {
   CornerStat,
   StepFunnel,
   type FunnelStage,
+  trendTick,
+  trendLabel,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
 import { LITE_MODE, PUBLIC_SITE } from "@/lib/feature-flags";
@@ -340,7 +342,7 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
             {inView && (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  data={orders.dailySales}
+                  data={orders.salesTrend}
                   margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
                 >
                   <defs>
@@ -351,12 +353,16 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                   <XAxis
-                    dataKey="date"
+                    dataKey="bucket"
                     stroke={axisColor}
                     tick={axisTick}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(d: string) => fmtDateEN(d).slice(0, 6)}
+                    // The ends always carry a label; the middle thins out
+                    // rather than overprinting when a month is tight.
+                    interval="preserveStartEnd"
+                    minTickGap={16}
+                    tickFormatter={(b: string) => trendTick(b, orders.trendGranularity)}
                   />
                   <YAxis
                     stroke={axisColor}
@@ -371,7 +377,7 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
                     contentStyle={chartTooltipStyle}
                     labelStyle={chartLabelStyle}
                     itemStyle={chartItemStyle}
-                    labelFormatter={(d: string) => fmtDateEN(d)}
+                    labelFormatter={(b: string) => trendLabel(b, orders.trendGranularity)}
                     formatter={(v: number) => [fmtIDR(Number(v)), "Sales"]}
                   />
                   <Area

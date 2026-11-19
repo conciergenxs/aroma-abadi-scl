@@ -27,6 +27,24 @@ export const axisColor = "var(--muted-foreground)";
 export const gridColor = "var(--border)";
 export const cursorFill = "oklch(0.42 0.12 25 / 6%)";
 export const axisTick = { fontSize: 11, fill: "var(--muted-foreground)" };
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** An axis tick for a trend bucket — short, because it repeats across the axis. */
+export function trendTick(bucket: string, granularity: "day" | "month" | "year"): string {
+  if (granularity === "year") return bucket;
+  const [y, m, d] = bucket.split("-");
+  const month = MONTHS[Number(m) - 1] ?? m;
+  return granularity === "month" ? `${month} ${y.slice(2)}` : `${Number(d)} ${month}`;
+}
+
+/** The same bucket in a tooltip, where there is room to say it in full. */
+export function trendLabel(bucket: string, granularity: "day" | "month" | "year"): string {
+  if (granularity === "year") return bucket;
+  const [y, m, d] = bucket.split("-");
+  const month = MONTHS[Number(m) - 1] ?? m;
+  return granularity === "month" ? `${month} ${y}` : `${Number(d)} ${month} ${y}`;
+}
 export const BRAND_COLORS = [
   "var(--chart-1)",
   "var(--chart-2)",

@@ -187,6 +187,12 @@ export function computeOrdersAndSales(
   range?: DateRange,
 ): OrdersAndSales {
   const scoped = range ? transactions.filter((t) => inRange(t.date, range)) : transactions;
+  // Without an explicit range the span is whatever the data covers, so the
+  // lifetime view buckets itself rather than drawing every day on record.
+  const days = scoped.map((t) => t.date.slice(0, 10)).sort();
+  const spanStart = range?.start ?? days[0] ?? "";
+  const spanEnd = range?.end ?? days[days.length - 1] ?? spanStart;
+  const trendGranularity = spanStart ? trendGranularityFor(spanStart, spanEnd) : "day";
   const totalOrders = scoped.length;
   const paid = scoped.filter((t) => t.status !== "Cancelled");
   const totalTransactions = paid.length;
@@ -194,12 +200,13 @@ export function computeOrdersAndSales(
 
   const qtyByBrandMap = new Map<string, number>();
   const skuMap = new Map<string, RankedProduct>();
-  const salesByDay = new Map<string, number>();
+  const salesByBucket = new Map<string, number>();
   let totalQty = 0;
 
   for (const t of paid) {
     const day = t.date.slice(0, 10);
-    salesByDay.set(day, (salesByDay.get(day) ?? 0) + t.total);
+    const bucket = bucketOf(t.date, trendGranularity);
+    salesByBucket.set(bucket, (salesByBucket.get(bucket) ?? 0) + t.total);
 
     for (const line of t.items) {
       totalQty += line.qty;
@@ -220,9 +227,9 @@ export function computeOrdersAndSales(
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  const dailySales = Array.from(salesByDay.entries())
-    .map(([date, sales]) => ({ date, sales }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const salesTrend = Array.from(salesByBucket.entries())
+    .map(([bucket, sales]) => ({ bucket, sales }))
+    .sort((a, b) => a.bucket.localeCompare(b.bucket));
 
   return {
     totalOrders,
@@ -231,7 +238,8 @@ export function computeOrdersAndSales(
     totalQty,
     qtyByBrand,
     mostAddedToCart,
-    dailySales,
+    trendGranularity,
+    salesTrend,
   };
 }
 
