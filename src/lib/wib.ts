@@ -15,3 +15,15 @@ export function wib(datetimeLocal: string) {
 export function nowWIB() {
   return new Date(Date.now() + 7 * 60 * 60 * 1000);
 }
+
+/** Midnight today in Jakarta, as a UTC timestamp — the anchor the seed data
+ * counts back from.
+ *
+ * The seeds have to reach the present or the Overview's "Last 7 Days" lands
+ * on an empty stretch. Resolving to the day rather than the millisecond keeps
+ * the server render and hydration identical: they can only disagree when the
+ * two happen either side of midnight in Jakarta. */
+export function todayWIBUtc(): number {
+  const now = nowWIB();
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+}

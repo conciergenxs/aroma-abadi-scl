@@ -12,7 +12,9 @@ type State = { broadcasts: Broadcast[] };
 // plus the blocked scheduled example.
 // v6 spreads the seeded sends across the days the Overview date picker can
 // reach, so narrowing the range actually moves the broadcast numbers.
-const STORAGE_KEY = "aroma_broadcasts_store_v6";
+// v7: two years of send history behind the authored five, so the Overview's
+// broadcast tiles report something in every window the date filter offers.
+const STORAGE_KEY = "aroma_broadcasts_store_v7";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];

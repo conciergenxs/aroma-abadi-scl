@@ -126,7 +126,26 @@ export function getTransactionDateBounds(transactions: Transaction[]): DateRange
   return { start: days[0], end: days[days.length - 1] };
 }
 
-export function computeRangeScale(range: DateRange, fullRange: DateRange): number {
+/**
+ * What share of the workspace a window represents — the multiplier every
+ * illustrative figure is cut down by.
+ *
+ * Measured in orders, not in days. Trade has grown steadily here, so the last
+ * thirty days hold about a tenth of every order ever placed while being only
+ * a twenty-fifth of the calendar; scaling by days would report a busy recent
+ * month as the quietest in the dataset, and leave "most asked" below "most
+ * added to cart" — fewer people asking than buying. Days are the fallback for
+ * a window with no orders in it at all, where there is no share to measure.
+ */
+export function computeRangeScale(
+  transactions: Transaction[],
+  range: DateRange,
+  fullRange: DateRange,
+): number {
+  const within = transactions.filter((t) => inRange(t.date, range)).length;
+  if (within > 0 && transactions.length > 0) {
+    return Math.min(1, Math.max(0.02, within / transactions.length));
+  }
   const dayCount = (r: DateRange) =>
     Math.round((new Date(r.end).getTime() - new Date(r.start).getTime()) / 86_400_000) + 1;
   const fullDays = dayCount(fullRange);
@@ -189,7 +208,7 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
     // Inbound organic volume has no real per-record date to filter by —
     // kept proportional to the selected range, and above `replied` since
     // replies are a subset of all customer-initiated messages received.
-    messageReceived: scaleStatic(2540, scale),
+    messageReceived: scaleStatic(34_600, scale),
     deliveryRate: reach ? delivered / reach : 0,
     readRate: delivered ? read / delivered : 0,
   };
@@ -200,24 +219,24 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
 // not a real conversation log — using its length here would make Conversion
 // Rate exceed 100% against the real transaction count. Kept illustrative,
 // consistent with the other volume metrics that have no real backing array.
-export const totalConversations = 1240;
+export const totalConversations = 16_800;
 
 export type RankedProduct = { name: string; brand: string; count: number };
 
 export const mostAskedProducts: RankedProduct[] = [
-  { name: "Real Flawless Foundation", brand: "Sisley", count: 214 },
-  { name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana", count: 176 },
-  { name: "Translucent Loose Setting Powder", brand: "Laura Mercier", count: 158 },
-  { name: "Blush Color Infusion", brand: "BareMinerals", count: 121 },
-  { name: "Translucent Hydrating Setting Spray Ultra-Blur", brand: "Rimmel", count: 96 },
+  { name: "Real Flawless Foundation", brand: "Sisley", count: 1180 },
+  { name: "Caviar Hydra-Crème Lipstick 42g", brand: "Dolce & Gabbana", count: 964 },
+  { name: "Translucent Loose Setting Powder", brand: "Laura Mercier", count: 842 },
+  { name: "Blush Color Infusion", brand: "BareMinerals", count: 673 },
+  { name: "Translucent Hydrating Setting Spray Ultra-Blur", brand: "Rimmel", count: 519 },
 ];
 
 export const mostUnfulfilledProducts: RankedProduct[] = [
-  { name: "Velvet Rouge Shade 03", brand: "Limited restock", count: 42 },
-  { name: "Laura Mercier Translucent Powder", brand: "Laura Mercier", count: 27 },
-  { name: "Glow Serum — 3-bottle bundle", brand: "Limited restock", count: 19 },
-  { name: "Vitamin C Serum", brand: "Limited restock", count: 11 },
-  { name: "Real Flawless Feather Matte Powder Foundation", brand: "Sisley", count: 7 },
+  { name: "Velvet Rouge Shade 03", brand: "Limited restock", count: 214 },
+  { name: "Laura Mercier Translucent Powder", brand: "Laura Mercier", count: 142 },
+  { name: "Glow Serum — 3-bottle bundle", brand: "Limited restock", count: 98 },
+  { name: "Vitamin C Serum", brand: "Limited restock", count: 61 },
+  { name: "Real Flawless Feather Matte Powder Foundation", brand: "Sisley", count: 33 },
 ];
 
 export function scaledTotalConversations(scale: number): number {

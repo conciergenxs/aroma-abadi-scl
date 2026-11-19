@@ -730,7 +730,10 @@ function Dashboard() {
   );
   const [range, setRange] = useState<DateRange>(fullRange);
 
-  const scale = useMemo(() => computeRangeScale(range, fullRange), [range, fullRange]);
+  const scale = useMemo(
+    () => computeRangeScale(txState.transactions, range, fullRange),
+    [txState.transactions, range, fullRange],
+  );
   const orders = useMemo(
     () => computeOrdersAndSales(txState.transactions, range),
     [txState.transactions, range],

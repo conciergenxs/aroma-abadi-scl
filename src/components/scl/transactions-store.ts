@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from "react";
+import { rng } from "@/lib/seed-rng";
+import { todayWIBUtc } from "@/lib/wib";
 // Currency is formatted in one place for the whole app — see lib/fmt.
 export { fmtIDR as formatIDR } from "@/lib/fmt";
 
@@ -69,28 +71,6 @@ export function priceOrder(
 }
 
 const DAY_MS = 86_400_000;
-
-/** A deterministic 32-bit PRNG (mulberry32). The seed has to come out
- *  byte-identical on the server and in the browser or hydration tears, so
- *  nothing below may reach for Math.random(). */
-function rng(seed: number) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let x = Math.imul(a ^ (a >>> 15), 1 | a);
-    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
-    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/** Midnight today in WIB, as a UTC timestamp. The seed has to reach the
- *  present or "Last 7 Days" lands on an empty stretch; resolving it to the
- *  day — not the millisecond — keeps the server render and hydration
- *  identical, since they only disagree either side of midnight in Jakarta. */
-function todayWIBUtc(): number {
-  const wib = new Date(Date.now() + 7 * 3600 * 1000);
-  return Date.UTC(wib.getUTCFullYear(), wib.getUTCMonth(), wib.getUTCDate());
-}
 
 /** Stretches with no orders at all — a quiet fortnight, a supply gap, and one
  *  full month. Trading is not uniform, and the Sales Trend has to stay honest

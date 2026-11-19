@@ -1,3 +1,5 @@
+import { rng } from "@/lib/seed-rng";
+import { todayWIBUtc } from "@/lib/wib";
 export type Channel = "whatsapp";
 export type LabelColor = "indigo" | "pink" | "emerald" | "amber" | "sky" | "violet" | "slate";
 
@@ -1692,7 +1694,7 @@ export type Broadcast = {
   failed?: number;
 };
 
-export const broadcasts: Broadcast[] = [
+const authoredBroadcasts: Broadcast[] = [
   {
     id: "b1",
     name: "Velvet Rouge — VIP Early Access",
@@ -1940,6 +1942,147 @@ export const broadcasts: Broadcast[] = [
     failed: 0,
   },
 ];
+
+/** Two years of sends behind the authored handful above.
+ *
+ * The five broadcasts written out by hand carry the detail the Broadcast
+ * module is built to show — recurring runs, per-recipient promo codes, a
+ * partial send. They all went out in one fortnight of July 2026, which was
+ * the whole of this workspace's history until the Overview learned to look
+ * further back. These fill in the rest: an ordinary weekly campaign cadence
+ * from January 2025 to today, against an audience that grows as the contact
+ * base does, so the Overview's broadcast tiles have something to report in
+ * every window the date filter offers. */
+function broadcastHistory(): Broadcast[] {
+  const MONTHS = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  // Written out rather than localised: toLocaleString resolves against the
+  // host locale, which is not the same on the server as in the browser.
+  const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  const CAMPAIGNS: { name: string; list: string; label: string; body: string }[] = [
+    {
+      name: "Restock Alert — Sisley Real Flawless",
+      list: "ls-vip",
+      label: "VIP",
+      body: "Hi {{name}}, Real Flawless Foundation sudah restock. Stok terbatas ya!",
+    },
+    {
+      name: "Promo Akhir Bulan — Semua Brand",
+      list: "ls-launch",
+      label: "All Customers",
+      body: "Hi {{name}}, promo akhir bulan sudah dibuka. Cek koleksi favoritmu sebelum kehabisan.",
+    },
+    {
+      name: "Beauty Club — Tips Shade Matching",
+      list: "ls-vip",
+      label: "Beauty Club",
+      body: "Hi {{name}}, bingung pilih shade? Balas chat ini, ARMA bantu carikan yang paling cocok.",
+    },
+    {
+      name: "Laura Mercier — Translucent Powder Bundle",
+      list: "ls-launch",
+      label: "All Customers",
+      body: "Hi {{name}}, bundle Translucent Powder + Setting Spray hemat Rp120.000 minggu ini.",
+    },
+    {
+      name: "Rimmel — Setting Spray Ultra-Blur",
+      list: "ls-surabaya",
+      label: "Surabaya",
+      body: "Hi {{name}}, Setting Spray Ultra-Blur sudah tersedia lagi. Pengiriman Surabaya 1 hari.",
+    },
+    {
+      name: "BareMinerals — Blush Color Infusion",
+      list: "ls-launch",
+      label: "All Customers",
+      body: "Hi {{name}}, Blush Color Infusion ada 6 shade baru. Mau lihat swatch-nya?",
+    },
+    {
+      name: "Dolce & Gabbana — Caviar Lipstick",
+      list: "ls-vip",
+      label: "VIP",
+      body: "Hi {{name}}, Caviar Hydra-Crème Lipstick edisi terbaru sudah bisa dipesan.",
+    },
+    {
+      name: "Reminder Keranjang — Belum Checkout",
+      list: "ls-launch",
+      label: "Pending Checkout",
+      body: "Hi {{name}}, pesananmu masih tersimpan. Mau ARMA bantu selesaikan sekarang?",
+    },
+  ];
+  const SENDERS = ["Putri Anggraini", "Noor Hassan", "Aria Kapoor"];
+
+  const out: Broadcast[] = [];
+  const first = Date.UTC(2025, 0, 8);
+  const last = todayWIBUtc();
+  const span = Math.max(1, last - first);
+  const rand = rng(77_2025);
+  let n = 0;
+
+  for (let t = first; t <= last; t += (5 + Math.floor(rand() * 5)) * 86_400_000) {
+    const d = new Date(t);
+    const iso = d.toISOString().slice(0, 10);
+    // July 2026 belongs to the authored sends.
+    if (iso >= "2026-07-18" && iso <= "2026-07-30") continue;
+
+    const progress = (t - first) / span;
+    const campaign = CAMPAIGNS[n % CAMPAIGNS.length];
+    const reach = Math.round((1400 + 2200 * progress) * (0.85 + rand() * 0.3));
+    const delivered = Math.round(reach * (0.975 + rand() * 0.02));
+    const read = Math.round(delivered * (0.78 + rand() * 0.15));
+    const clicks = Math.round(read * (0.2 + rand() * 0.22));
+    const replied = Math.round(read * (0.03 + rand() * 0.05));
+    const sentAt = `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()} · ${String(8 + Math.floor(rand() * 4)).padStart(2, "0")}:00`;
+
+    out.push({
+      id: `b-h${String(n + 1).padStart(3, "0")}`,
+      name: `${campaign.name} — ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+      channel: "whatsapp",
+      audience: `${campaign.label} · ${thousands(reach)}`,
+      reach,
+      delivered,
+      read,
+      clicks,
+      sentAt,
+      sentAtDate: iso,
+      status: "Sent",
+      channelId: "wa-main",
+      listIds: [campaign.list],
+      totalAudience: reach,
+      sendMode: "now",
+      createdAtDate: iso,
+      createdBy: SENDERS[n % SENDERS.length],
+      createdAt: sentAt,
+      contentMode: "manual",
+      body: campaign.body,
+      footer: "Balas STOP untuk berhenti.",
+      replied,
+      failed: reach - delivered,
+    });
+    n += 1;
+  }
+  return out.reverse();
+}
+
+/** Newest first — the order the Broadcast list and the Overview both read in.
+ *  A scheduled send has no sentAtDate and sorts by the date it will go out. */
+export const broadcasts: Broadcast[] = [...authoredBroadcasts, ...broadcastHistory()].sort((a, b) =>
+  (b.sentAtDate ?? b.scheduleDate ?? b.createdAtDate ?? "").localeCompare(
+    a.sentAtDate ?? a.scheduleDate ?? a.createdAtDate ?? "",
+  ),
+);
 
 export const recentActivity = [
   {
