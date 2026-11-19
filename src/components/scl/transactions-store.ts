@@ -77,6 +77,7 @@ const DAY_MS = 86_400_000;
  *  across the quiet: a month nobody bought in is still a month, and it belongs
  *  on the axis at zero rather than being closed up as if it never happened. */
 const QUIET_STRETCHES: [string, string][] = [
+  ["2023-07-03", "2023-07-19"],
   ["2024-09-05", "2024-09-22"],
   ["2025-02-10", "2025-02-27"],
   ["2025-08-01", "2025-08-31"],
@@ -230,12 +231,12 @@ function seed(): Transaction[] {
   // and referral seeds point at it by id. Everything before and after it is
   // generated here so the Overview covers a real stretch of trading — from
   // 1 Jan 2024 to today — and the Sales Trend can be read at every window the
-  // date filter offers, not just the one fortnight that used to exist. Three
-  // calendar years is also what it takes for the lifetime view to bucket by
-  // year rather than by month; see trendGranularityFor.
+  // date filter offers, not just the one fortnight that used to exist. It
+  // starts four calendar years back and ends today, so the lifetime view has
+  // four yearly points to draw; see trendGranularityFor.
   const history: Transaction[] = [];
   const rand = rng(20250101);
-  const firstDay = Date.UTC(2024, 0, 1);
+  const firstDay = Date.UTC(2023, 0, 1);
   const lastDay = todayWIBUtc();
   const span = Math.max(1, lastDay - firstDay);
 
@@ -326,7 +327,9 @@ function seed(): Transaction[] {
 // something to say at every window the date filter offers.
 // v18: it starts in Jan 2024 — three calendar years, which is what the
 // lifetime view needs before it buckets by year instead of by month.
-const STORAGE_KEY = "aroma_tx_store_v18";
+// v19: back to Jan 2023, so the longest range the date filter can offer is
+// four years and the lifetime axis carries four yearly points.
+const STORAGE_KEY = "aroma_tx_store_v19";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };

@@ -1950,7 +1950,7 @@ const authoredBroadcasts: Broadcast[] = [
  * partial send. They all went out in one fortnight of July 2026, which was
  * the whole of this workspace's history until the Overview learned to look
  * further back. These fill in the rest: an ordinary weekly campaign cadence
- * from January 2024 to today, against an audience that grows as the contact
+ * from January 2023 to today, against an audience that grows as the contact
  * base does, so the Overview's broadcast tiles have something to report in
  * every window the date filter offers. */
 function broadcastHistory(): Broadcast[] {
@@ -2025,7 +2025,7 @@ function broadcastHistory(): Broadcast[] {
   const SENDERS = ["Putri Anggraini", "Noor Hassan", "Aria Kapoor"];
 
   const out: Broadcast[] = [];
-  const first = Date.UTC(2024, 0, 8);
+  const first = Date.UTC(2023, 0, 8);
   const last = todayWIBUtc();
   const span = Math.max(1, last - first);
   const rand = rng(77_2025);

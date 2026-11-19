@@ -208,7 +208,7 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
     // Inbound organic volume has no real per-record date to filter by —
     // kept proportional to the selected range, and above `replied` since
     // replies are a subset of all customer-initiated messages received.
-    messageReceived: scaleStatic(34_600, scale),
+    messageReceived: scaleStatic(72_000, scale),
     deliveryRate: reach ? delivered / reach : 0,
     readRate: delivered ? read / delivered : 0,
   };
@@ -219,7 +219,7 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
 // not a real conversation log — using its length here would make Conversion
 // Rate exceed 100% against the real transaction count. Kept illustrative,
 // consistent with the other volume metrics that have no real backing array.
-export const totalConversations = 16_800;
+export const totalConversations = 38_800;
 
 export type RankedProduct = { name: string; brand: string; count: number };
 

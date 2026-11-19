@@ -14,7 +14,7 @@ type State = { broadcasts: Broadcast[] };
 // reach, so narrowing the range actually moves the broadcast numbers.
 // v7: two years of send history behind the authored five, so the Overview's
 // broadcast tiles report something in every window the date filter offers.
-const STORAGE_KEY = "aroma_broadcasts_store_v8";
+const STORAGE_KEY = "aroma_broadcasts_store_v9";
 
 function seed(): Broadcast[] {
   return [...seedBroadcasts];
