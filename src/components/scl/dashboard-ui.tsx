@@ -110,7 +110,13 @@ export function useMeasuredWidth<T extends HTMLElement>() {
       setWidth(el.getBoundingClientRect().width);
       return;
     }
-    const obs = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    const obs = new ResizeObserver(([entry]) => {
+      // Zero readings are discarded. The reveal animation parks the card off
+      // layout for a frame and the observer duly reports 0 — taking that at
+      // face value wiped the real measurement and left the axis falling back
+      // to Recharts' own thinning for the rest of the page's life.
+      if (entry.contentRect.width > 0) setWidth(entry.contentRect.width);
+    });
     obs.observe(el);
     setWidth(el.getBoundingClientRect().width);
     return () => obs.disconnect();

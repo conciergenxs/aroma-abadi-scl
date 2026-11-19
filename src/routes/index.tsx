@@ -74,6 +74,8 @@ import {
   CAPTION,
   fmtPct,
   useRevealOnScroll,
+  useMeasuredWidth,
+  trendTicks,
   Reveal,
   InfoHint,
   MetricStat,
@@ -316,6 +318,14 @@ function ConversationSection({
 // ── D. Orders & Sales ─────────────────────────────────────────────────────
 function OrdersSection({ orders }: { orders: OrdersAndSales }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
+  const { ref: trendRef, width: trendWidth } = useMeasuredWidth<HTMLDivElement>();
+  // Until the axis has been measured, Recharts' own thinning stands in — one
+  // frame of its spacing beats a frame of two labels.
+  const xTicks = trendTicks(
+    orders.salesTrend.map((p) => p.bucket),
+    orders.trendGranularity,
+    trendWidth,
+  );
   return (
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard title="Orders & Sales">
@@ -341,7 +351,7 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
         </div>
         <div className="border-t border-border p-4">
           <div className={`${CAPTION} mb-2`}>Sales Trend</div>
-          <div className="h-52">
+          <div className="h-52" ref={trendRef}>
             {inView && (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -360,9 +370,11 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
                     stroke={axisColor}
                     tickLine={false}
                     axisLine={false}
-                    // The ends always carry a label; the middle thins out
-                    // rather than overprinting when a month is tight.
-                    interval="preserveStartEnd"
+                    // Evenly stepped labels, chosen against the measured
+                    // width — see trendTicks. Recharts' own thinning only
+                    // stands in for the frame before the axis is measured.
+                    ticks={xTicks.length ? xTicks : undefined}
+                    interval={xTicks.length ? 0 : "preserveStartEnd"}
                     minTickGap={16}
                     tick={<TrendAxisTick granularity={orders.trendGranularity} />}
                   />
