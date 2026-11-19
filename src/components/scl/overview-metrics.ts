@@ -35,12 +35,31 @@ export type TrendGranularity = "day" | "month" | "year";
  *
  * Buckets cover only the span asked for: a 1 Jan – 5 Feb range plots January
  * and February, not an empty December.
+ *
+ * One guard sits on top of that: a trend needs at least three points to be a
+ * trend. A calendar year is twelve months, so the rule above buckets it by
+ * year and leaves a single dot with no line through it; "Last 30 Days" lands
+ * the same way across two months. Where the chosen bucket leaves fewer than
+ * three, the span drops one level — the rule still decides, it just never
+ * decides its way into a chart with nothing to read.
  */
+const FINER: Record<TrendGranularity, TrendGranularity | null> = {
+  year: "month",
+  month: "day",
+  day: null,
+};
+
+const MIN_TREND_POINTS = 3;
+
 export function trendGranularityFor(start: string, end: string): TrendGranularity {
   const days = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;
-  if (days < 30) return "day";
-  if (days < 365) return "month";
-  return "year";
+  let granularity: TrendGranularity = days < 30 ? "day" : days < 365 ? "month" : "year";
+  while (bucketSequence(start, end, granularity).length < MIN_TREND_POINTS) {
+    const finer = FINER[granularity];
+    if (!finer) break;
+    granularity = finer;
+  }
+  return granularity;
 }
 
 /** The bucket an ISO day falls in, as the key the axis prints. */
@@ -49,6 +68,47 @@ function bucketOf(iso: string, granularity: TrendGranularity): string {
   if (granularity === "year") return day.slice(0, 4);
   if (granularity === "month") return day.slice(0, 7);
   return day;
+}
+
+/**
+ * Every bucket the span covers, in order — including the ones nothing was
+ * bought in. A trend that only plots the buckets that have sales draws a
+ * quiet February as if it were adjacent to January, which moves every label
+ * after it onto the wrong point and reads as a flat line rather than a gap.
+ * So the axis is built from the calendar and the sales are hung on it.
+ */
+function bucketSequence(start: string, end: string, granularity: TrendGranularity): string[] {
+  const out: string[] = [];
+  if (!start || !end || end < start) return start ? [bucketOf(start, granularity)] : out;
+
+  if (granularity === "year") {
+    for (let y = Number(start.slice(0, 4)); y <= Number(end.slice(0, 4)); y++) out.push(String(y));
+    return out;
+  }
+
+  if (granularity === "month") {
+    let year = Number(start.slice(0, 4));
+    let month = Number(start.slice(5, 7));
+    const endYear = Number(end.slice(0, 4));
+    const endMonth = Number(end.slice(5, 7));
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+      out.push(`${year}-${String(month).padStart(2, "0")}`);
+      if (month === 12) {
+        month = 1;
+        year += 1;
+      } else {
+        month += 1;
+      }
+    }
+    return out;
+  }
+
+  // Parsed and stepped in UTC, so a daylight-saving boundary can never skip
+  // or repeat a day.
+  for (let t = Date.parse(start); t <= Date.parse(end); t += 86_400_000) {
+    out.push(new Date(t).toISOString().slice(0, 10));
+  }
+  return out;
 }
 
 function inRange(iso: string, range?: DateRange): boolean {
@@ -227,9 +287,10 @@ export function computeOrdersAndSales(
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  const salesTrend = Array.from(salesByBucket.entries())
-    .map(([bucket, sales]) => ({ bucket, sales }))
-    .sort((a, b) => a.bucket.localeCompare(b.bucket));
+  const salesTrend = bucketSequence(spanStart, spanEnd, trendGranularity).map((bucket) => ({
+    bucket,
+    sales: salesByBucket.get(bucket) ?? 0,
+  }));
 
   return {
     totalOrders,

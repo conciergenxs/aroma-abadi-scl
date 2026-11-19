@@ -68,6 +68,58 @@ export function priceOrder(
   return { subtotal, discount, tax, adminFee, total: net + tax + adminFee };
 }
 
+const DAY_MS = 86_400_000;
+
+/** A deterministic 32-bit PRNG (mulberry32). The seed has to come out
+ *  byte-identical on the server and in the browser or hydration tears, so
+ *  nothing below may reach for Math.random(). */
+function rng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let x = Math.imul(a ^ (a >>> 15), 1 | a);
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Midnight today in WIB, as a UTC timestamp. The seed has to reach the
+ *  present or "Last 7 Days" lands on an empty stretch; resolving it to the
+ *  day — not the millisecond — keeps the server render and hydration
+ *  identical, since they only disagree either side of midnight in Jakarta. */
+function todayWIBUtc(): number {
+  const wib = new Date(Date.now() + 7 * 3600 * 1000);
+  return Date.UTC(wib.getUTCFullYear(), wib.getUTCMonth(), wib.getUTCDate());
+}
+
+/** Stretches with no orders at all — a quiet fortnight, a supply gap, and one
+ *  full month. Trading is not uniform, and the Sales Trend has to stay honest
+ *  across the quiet: a month nobody bought in is still a month, and it belongs
+ *  on the axis at zero rather than being closed up as if it never happened. */
+const QUIET_STRETCHES: [string, string][] = [
+  ["2025-02-10", "2025-02-27"],
+  ["2025-08-01", "2025-08-31"],
+  ["2026-05-04", "2026-05-20"],
+];
+
+/** The twelve customers above are the ones the promo and referral seeds name;
+ *  these widen the base for the generated history, so two years of orders are
+ *  not twelve people buying thirty times each. */
+const EXTRA_CUSTOMERS: { id: string; name: string; skuIndices: number[] }[] = [
+  { id: "c5", name: "Rizky Maulana", skuIndices: [3, 4, 6, 0] },
+  { id: "c7", name: "Andika Saputra", skuIndices: [0, 3, 4, 1] },
+  { id: "c18", name: "Nita Kurniasari", skuIndices: [1, 2, 5, 6] },
+  { id: "c21", name: "Mira Rahmawati", skuIndices: [5, 6, 0, 2, 3] },
+  { id: "c31", name: "Mia Hartanti", skuIndices: [1, 5, 6, 4] },
+  { id: "c32", name: "Fauzan Akbar", skuIndices: [3, 4, 0, 6] },
+  { id: "c33", name: "Nadia Pramesti", skuIndices: [2, 1, 5, 0, 6] },
+  { id: "c34", name: "Bintang Ramadan", skuIndices: [0, 4, 3, 2] },
+  { id: "c35", name: "Clara Santika", skuIndices: [5, 2, 1, 6, 3] },
+  { id: "c36", name: "Ariel Wijaya", skuIndices: [4, 3, 6, 1] },
+  { id: "c37", name: "Fina Rahayu", skuIndices: [6, 0, 5, 2] },
+  { id: "c38", name: "Dodi Kurnia", skuIndices: [3, 0, 1, 4, 5] },
+];
+
 function seed(): Transaction[] {
   const items: Transaction[] = [];
   const cities = ["Jakarta", "Jakarta", "Bandung", "Surabaya", "Tangerang"];
@@ -141,6 +193,7 @@ function seed(): Transaction[] {
       brand: "BareMinerals",
     },
   ];
+  const historyCustomers = [...customers, ...EXTRA_CUSTOMERS];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
   const statuses: TxStatus[] = ["Processed", "Shipped", "Shipped", "Processed", "Cancelled"];
 
@@ -286,7 +339,9 @@ function seed(): Transaction[] {
 // v15: every customer shops several SKUs, so plenty of orders hold more than
 // the three products the table shows and more than the five the peek pages.
 // v16: discounts come from redeemed codes instead of being invented per order.
-const STORAGE_KEY = "aroma_tx_store_v16";
+// v17: the seed covers 1 Jan 2025 to today, not one fortnight, so the Sales
+// Trend has something to say at every window the date filter offers.
+const STORAGE_KEY = "aroma_tx_store_v17";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };

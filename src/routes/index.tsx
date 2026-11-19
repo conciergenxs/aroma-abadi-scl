@@ -115,12 +115,17 @@ function RankedBarList({ items, color }: { items: RankedProduct[]; color: string
   return (
     <div className="p-4 space-y-2">
       {items.map((item, i) => (
-        <div key={item.name} className="flex items-center gap-2.5">
+        <div key={`${item.brand}-${item.name}`} className="flex items-center gap-2.5">
           <span className="text-[11px] w-3.5 shrink-0 text-muted-foreground tabular-nums">
             {i + 1}
           </span>
-          <span className="text-[12px] flex-1 min-w-0 truncate text-foreground" title={item.name}>
-            {item.name}
+          {/* The brand is not decoration here: two different products in this
+              catalogue are both called "Translucent Loose Setting Powder", at
+              Rp 189.000 and Rp 745.000, and the name alone shows them as the
+              same row twice. */}
+          <span className="flex-1 min-w-0 truncate" title={`${item.name} · ${item.brand}`}>
+            <span className="text-[12px] text-foreground">{item.name}</span>
+            <span className="text-[11px] text-muted-foreground"> · {item.brand}</span>
           </span>
           <div className="w-16 shrink-0 h-1.5 rounded-full bg-muted overflow-hidden">
             <div
