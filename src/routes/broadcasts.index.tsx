@@ -255,13 +255,10 @@ function BroadcastListPage() {
                       type="button"
                       onClick={() => setKind(t.id)}
                       aria-pressed={active}
-                      // Solid primary is the page's one call to action (Create
-                      // Broadcast). These pick a view, same as the All / Sent /
-                      // Draft chips, so they wear that selected colour instead.
                       className={`h-8 rounded px-3 text-[13px] font-medium transition-colors duration-150 ${
                         active
-                          ? "bg-primary/15 text-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-card"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {t.label}
@@ -403,11 +400,9 @@ function BroadcastListPage() {
 
           {/* Pagination */}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 border-t border-border text-[11px] text-muted-foreground">
+            {/* How much is shown sits at the left edge, what is being shown at
+                the right, with the page buttons in between. */}
             <div className="flex items-center gap-3">
-              <span>
-                {rows.length === 0 ? "0" : `${fromIdx}–${toIdx}`} of {rows.length} broadcast
-                {rows.length !== 1 ? "s" : ""}
-              </span>
               <label className="flex items-center gap-1">
                 Rows
                 <select
@@ -426,43 +421,49 @@ function BroadcastListPage() {
                 </select>
               </label>
             </div>
-            {totalPages > 1 && (
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={safePage <= 1}
-                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                </button>
-                {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                  const p =
-                    totalPages <= 7
-                      ? i + 1
-                      : safePage <= 4
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={safePage <= 1}
+                    className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                  </button>
+                  {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                    const p =
+                      totalPages <= 7
                         ? i + 1
-                        : safePage >= totalPages - 3
-                          ? totalPages - 6 + i
-                          : safePage - 3 + i;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`tap h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={safePage >= totalPages}
-                  className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
+                        : safePage <= 4
+                          ? i + 1
+                          : safePage >= totalPages - 3
+                            ? totalPages - 6 + i
+                            : safePage - 3 + i;
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        className={`tap h-7 w-7 grid place-items-center rounded border text-[11px] font-medium transition-colors ${p === safePage ? "border-primary/40 bg-primary/15 text-foreground" : "border-border hover:bg-white text-muted-foreground"}`}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={safePage >= totalPages}
+                    className="tap h-7 w-7 grid place-items-center rounded border border-border hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+              <span className="tabular-nums">
+                {rows.length === 0 ? "0" : `${fromIdx}–${toIdx}`} of {rows.length} broadcast
+                {rows.length !== 1 ? "s" : ""}
+              </span>
+            </div>
           </div>
         </SectionCard>
       </div>
