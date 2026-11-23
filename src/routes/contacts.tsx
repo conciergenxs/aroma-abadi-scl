@@ -48,7 +48,6 @@ import {
   Tag as TagIcon,
   ListPlus,
   Check,
-  Settings2,
   RotateCcw,
   GripVertical,
   LayoutGrid,
@@ -99,6 +98,9 @@ function ContactsPage() {
   const setProperties = contactsStore.setProperties;
   const navigate = useNavigate();
   const [showFilterProps, setShowFilterProps] = useState(false);
+  /** A brand's contacts are the BAs who sell it and the customers who buy it
+   *  — two different questions, so the brand view can be narrowed to either. */
+  const [brandAudience, setBrandAudience] = useState<"all" | "customer" | "ba">("all");
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [audiencePage, setAudiencePage] = useState(1);
@@ -128,9 +130,11 @@ function ContactsPage() {
     else if (activeView === "mine") base = live.filter((c) => !c.labelIds.includes("lb-ba"));
     else if (activeView === "ba") base = live.filter((c) => c.labelIds.includes("lb-ba"));
     else if (activeView.startsWith("brand:")) {
-      // brand view: show all contacts (BA + customer) with this brand
+      // brand view: BAs and customers of this brand, narrowed by the toggle
       const brandId = activeView.slice(6);
       base = live.filter((c) => (c.brandIds ?? []).includes(brandId));
+      if (brandAudience === "customer") base = base.filter((c) => !c.labelIds.includes("lb-ba"));
+      else if (brandAudience === "ba") base = base.filter((c) => c.labelIds.includes("lb-ba"));
     } else base = live.filter((c) => c.listIds.includes(activeView));
     if (!query.trim()) return base;
     const q = query.toLowerCase();
@@ -140,7 +144,7 @@ function ContactsPage() {
         c.phone.toLowerCase().includes(q) ||
         (c.instagram ?? "").toLowerCase().includes(q),
     );
-  }, [contacts, activeView, query, baSeen]);
+  }, [contacts, activeView, query, baSeen, brandAudience]);
 
   useEffect(() => {
     if (!baSeen && activeView === "ba") setActiveView("all");
@@ -152,7 +156,7 @@ function ContactsPage() {
   }, [totalPages, page]);
   useEffect(() => {
     setPage(1);
-  }, [activeView, query, perPage]);
+  }, [activeView, query, perPage, brandAudience]);
 
   if (isChildRoute) return <Outlet />;
   const pageStart = (page - 1) * perPage;
@@ -209,20 +213,6 @@ function ContactsPage() {
           : c,
       ),
     );
-  const addAllVisibleToList = (lsId: string) => {
-    const ids = visibleContacts.map((c) => c.id);
-    setContacts((cs) =>
-      cs.map((c) =>
-        ids.includes(c.id) && !c.listIds.includes(lsId)
-          ? { ...c, listIds: [...c.listIds, lsId] }
-          : c,
-      ),
-    );
-    const aud = lists.find((l) => l.id === lsId);
-    toast.success(
-      `Added ${ids.length} contact${ids.length === 1 ? "" : "s"} to ${aud?.name ?? "audience"}`,
-    );
-  };
   const bulkRemoveList = (lsId: string) =>
     setContacts((cs) =>
       cs.map((c) =>
@@ -431,22 +421,30 @@ function ContactsPage() {
             </div>
             <div className="ml-auto flex items-center gap-2">
               {activeView.startsWith("brand:") && (
-                <PickerPopover
-                  label={`Add All (${visibleContacts.length}) to Audience`}
-                  icon={<ListPlus className="h-3.5 w-3.5" />}
-                  items={lists.map((l) => ({ id: l.id, name: l.name }))}
-                  onPick={(id) => addAllVisibleToList(id)}
-                />
+                <div className="inline-flex h-9 items-center rounded-md border border-border bg-card/60 p-0.5">
+                  {(
+                    [
+                      { id: "all", label: "All" },
+                      { id: "customer", label: "Customers" },
+                      { id: "ba", label: "BA" },
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setBrandAudience(opt.id)}
+                      aria-pressed={brandAudience === opt.id}
+                      className={`h-8 rounded px-3 text-[13px] transition-colors duration-150 active:scale-[0.98] ${
+                        brandAudience === opt.id
+                          ? "bg-primary/15 text-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground hover:bg-card"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               )}
-              <button
-                onClick={() => setShowFilterProps(true)}
-                className="press inline-flex items-center gap-1.5 rounded-md border border-border bg-card/60 px-4 h-9 text-[14px] hover:bg-card transition-colors duration-150"
-              >
-                <Settings2 className="h-3.5 w-3.5" /> Filter Properties
-                <span className="ml-0.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                  {properties.length}
-                </span>
-              </button>
               <button
                 onClick={() => navigate({ to: "/contacts/new" })}
                 disabled={!createGate.allowed}
@@ -462,14 +460,14 @@ function ContactsPage() {
             <div className="px-5 py-2.5 border-b border-border bg-primary/5 flex flex-wrap items-center gap-2 text-[11px]">
               <span className="text-muted-foreground">{selected.length} selected</span>
               <PickerPopover
-                label="Add to audience"
+                label="Add to Audience"
                 icon={<ListPlus className="h-3 w-3" />}
                 items={lists.map((l) => ({ id: l.id, name: l.name }))}
                 onPick={(id) => bulkAddList(id)}
               />
               {selectedHaveAnyList && (
                 <PickerPopover
-                  label="Remove from audience"
+                  label="Remove from Audience"
                   icon={<X className="h-3 w-3" />}
                   items={lists
                     .filter((l) => selectedContacts.some((c) => c.listIds.includes(l.id)))
@@ -478,32 +476,35 @@ function ContactsPage() {
                 />
               )}
               <PickerPopover
-                label="Add label"
+                label="Add Label"
                 icon={<TagIcon className="h-3 w-3" />}
                 items={labels.map((l) => ({ id: l.id, name: l.name, color: l.color }))}
                 onPick={(id) => bulkAddLabel(id)}
               />
               <PickerPopover
-                label="Remove label"
+                label="Remove Label"
                 icon={<X className="h-3 w-3" />}
                 items={labels
                   .filter((l) => selectedContacts.some((c) => c.labelIds.includes(l.id)))
                   .map((l) => ({ id: l.id, name: l.name, color: l.color }))}
                 onPick={(id) => bulkRemoveLabel(id)}
               />
+              {/* Ruled off from the four actions beside it: those change what a
+                  contact belongs to, this one removes the contact. */}
+              <span aria-hidden className="mx-0.5 h-4 w-px shrink-0 bg-border" />
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 disabled={!deleteGate.allowed}
                 title={deleteGate.reason || undefined}
-                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 hover:bg-destructive/10 transition-colors duration-150"
+                className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-2.5 py-1.5 text-xs hover:bg-destructive/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
               >
                 <Trash2 className="h-3 w-3" /> Delete Contacts
               </button>
               <button
                 onClick={() => setSelected([])}
-                className="ml-auto text-muted-foreground hover:text-foreground transition-colors duration-150"
+                className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
-                Clear selection
+                Clear
               </button>
             </div>
           )}

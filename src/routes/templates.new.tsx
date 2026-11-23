@@ -565,7 +565,7 @@ export function TemplateForm({ existing }: { existing?: Template }) {
                 items={[
                   "Use {{name}} for the customer name.",
                   "Pick a brand or promo code from the buttons above.",
-                  "Variables are named — previews show what each one stands for.",
+                  "The preview shows what each variable stands for.",
                   "Always provide a fallback value at send.",
                 ]}
               />

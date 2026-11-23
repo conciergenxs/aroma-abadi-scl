@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SclSelect, type SclSelectOption } from "./scl-select";
 import type { Contact } from "./mock-data";
@@ -125,20 +125,29 @@ function Pager({
     <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-t border-border">
       <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
         <span>Rows per page</span>
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setPage(1);
-          }}
-          className="h-6 rounded border border-border bg-card px-1 text-[10px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
-        >
-          {PAGE_SIZE_OPTIONS.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        {/* The browser's own arrow sits hard against the border with only a
+            pixel of padding to its right. Ours is drawn in the box's own
+            padding instead, so it stands clear of the edge. */}
+        <div className="relative">
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
+            className="h-6 appearance-none rounded border border-border bg-card pl-1.5 pr-6 text-[10px] text-foreground hover:bg-card/80 focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground"
+          />
+        </div>
       </div>
       <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
         <span>{total === 0 ? "0 of 0" : `${start}–${end} of ${total}`}</span>
