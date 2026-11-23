@@ -1,7 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BA_POSITIONS } from "@/components/scl/ba-store";
 import { AppShell } from "@/components/scl/app-shell";
-import { ArrowLeft, Check, ChevronDown, Plus, X, User, BadgeCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  X,
+  User,
+  BadgeCheck,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Contact, type ContactLabel, type LabelColor } from "@/components/scl/mock-data";
@@ -310,7 +320,7 @@ function NewContactPage() {
                 <FormSection title="Basic Information">
                   <FormGrid>
                     <Field label="Full Name" required className="md:col-span-2">
-                      <Input value={name} onChange={setName} placeholder="Dewi Lestari" />
+                      <Input value={name} onChange={setName} placeholder="Enter full name.." />
                     </Field>
                     <Field label="WA Number" required>
                       <Input
@@ -425,7 +435,7 @@ function NewContactPage() {
               <FormSection title="Basic Information">
                 <FormGrid>
                   <Field label="Full Name" required>
-                    <Input value={name} onChange={setName} placeholder="Putri Anggraini" />
+                    <Input value={name} onChange={setName} placeholder="Enter full name.." />
                   </Field>
                   <Field label="WA Number" required>
                     <Input
@@ -480,7 +490,7 @@ function NewContactPage() {
                 </div>
               </FormSection>
 
-              <FormSection title="Labels">
+              <FormSection title="Labels" optional>
                 <LabelMultiSelect
                   labels={labels}
                   selectedIds={labelIds}
@@ -512,6 +522,10 @@ function NewContactPage() {
     </AppShell>
   );
 }
+
+/** How many entries a picker's dropdown shows at once. Beyond this it pages,
+ *  because a list that only scrolls gives no sense of how much is left. */
+const DROPDOWN_PAGE_SIZE = 10;
 
 /* ── Layout helpers ───────────────────────────────────────────────────────── */
 
@@ -637,6 +651,17 @@ function LabelMultiSelect({
   const exact = labels.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
   const canCreate = search.trim().length > 0 && !exact;
 
+  // Paged rather than endlessly scrolled: the footer says how many entries
+  // there are, which a scrollbar alone never does.
+  const [page, setPage] = useState(1);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / DROPDOWN_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const shown = filtered.slice((safePage - 1) * DROPDOWN_PAGE_SIZE, safePage * DROPDOWN_PAGE_SIZE);
+  const firstShown = filtered.length === 0 ? 0 : (safePage - 1) * DROPDOWN_PAGE_SIZE + 1;
+  const lastShown = Math.min(safePage * DROPDOWN_PAGE_SIZE, filtered.length);
+  // A new search is a different list, so it starts again at the first page.
+  useEffect(() => setPage(1), [search]);
+
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -713,7 +738,7 @@ function LabelMultiSelect({
             />
           </div>
           <div className="max-h-48 overflow-y-auto p-1">
-            {filtered.map((l) => {
+            {shown.map((l) => {
               const on = selectedIds.includes(l.id);
               return (
                 <button
@@ -747,6 +772,31 @@ function LabelMultiSelect({
               </button>
             )}
           </div>
+          {pageCount > 1 && (
+            <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <ChevronLeft className="h-3 w-3" />
+                Previous
+              </button>
+              <span className="text-[12px] text-muted-foreground tabular-nums">
+                {firstShown}–{lastShown} of {filtered.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={safePage === pageCount}
+                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+              >
+                Next
+                <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -770,6 +820,17 @@ function AudienceMultiSelect({
   const filtered = lists.filter((l) => l.name.toLowerCase().includes(search.toLowerCase()));
   const exact = lists.some((l) => l.name.toLowerCase() === search.trim().toLowerCase());
   const canCreate = search.trim().length > 0 && !exact;
+
+  // Paged rather than endlessly scrolled: the footer says how many entries
+  // there are, which a scrollbar alone never does.
+  const [page, setPage] = useState(1);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / DROPDOWN_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const shown = filtered.slice((safePage - 1) * DROPDOWN_PAGE_SIZE, safePage * DROPDOWN_PAGE_SIZE);
+  const firstShown = filtered.length === 0 ? 0 : (safePage - 1) * DROPDOWN_PAGE_SIZE + 1;
+  const lastShown = Math.min(safePage * DROPDOWN_PAGE_SIZE, filtered.length);
+  // A new search is a different list, so it starts again at the first page.
+  useEffect(() => setPage(1), [search]);
 
   useEffect(() => {
     if (!open) return;
@@ -849,7 +910,7 @@ function AudienceMultiSelect({
             />
           </div>
           <div className="max-h-48 overflow-y-auto p-1">
-            {filtered.map((l) => {
+            {shown.map((l) => {
               const on = selectedIds.includes(l.id);
               return (
                 <button
@@ -883,6 +944,31 @@ function AudienceMultiSelect({
               </button>
             )}
           </div>
+          {pageCount > 1 && (
+            <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <ChevronLeft className="h-3 w-3" />
+                Previous
+              </button>
+              <span className="text-[12px] text-muted-foreground tabular-nums">
+                {firstShown}–{lastShown} of {filtered.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={safePage === pageCount}
+                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+              >
+                Next
+                <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

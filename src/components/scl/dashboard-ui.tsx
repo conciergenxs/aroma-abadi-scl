@@ -312,7 +312,9 @@ export function CornerStat({ value, label, info }: { value: string; label: strin
   return (
     <div className="text-right">
       <div className={VALUE_SM}>{value}</div>
-      <div className="inline-flex items-center gap-1 justify-end text-[10px] text-muted-foreground">
+      {/* 12px, not 10: this is the only name the figure above it has, and at
+          10px it read as a footnote to a number nobody could place. */}
+      <div className="inline-flex items-center gap-1 justify-end text-[12px] text-muted-foreground">
         {label} <InfoHint text={info} />
       </div>
     </div>
