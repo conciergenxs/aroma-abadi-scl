@@ -451,14 +451,6 @@ function ContactDetailPage() {
             <div className="px-4 lg:px-6 py-3 flex items-center justify-between gap-3 border-b border-border">
               <div className="flex flex-col gap-1 min-w-0">
                 <h1 className="text-base font-semibold truncate">{contact.name}</h1>
-                {!isBA && (
-                  <LifecycleDropdown
-                    disabled={!editGate.allowed}
-                    disabledReason={editGate.reason}
-                    value={contact.lifecycleStage ?? null}
-                    onChange={setLifecycle}
-                  />
-                )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Link

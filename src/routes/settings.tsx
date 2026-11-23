@@ -72,7 +72,6 @@ const NAV: NavSection[] = [
     label: "Data management",
     items: [
       { id: "labels", label: "Labels", enabled: true },
-      { id: "customer-lifecycle", label: "Customer Lifecycle", enabled: true },
       { id: "recently-deleted", label: "Recently Deleted Contacts", enabled: true },
     ],
   },
@@ -150,9 +149,9 @@ function SettingsPage() {
           {active === "general" && <GeneralPage />}
           {active === "user-management" && <UserManagementPage />}
           {active === "roles" && <RolesPermissionsModule />}
-          {(active === "labels" ||
-            active === "customer-lifecycle" ||
-            active === "recently-deleted") && <DataManagementModule section={active} />}
+          {(active === "labels" || active === "recently-deleted") && (
+            <DataManagementModule section={active} />
+          )}
         </div>
       </div>
     </AppShell>

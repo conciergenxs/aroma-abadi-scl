@@ -454,14 +454,6 @@ function NewContactPage() {
                       ]}
                     />
                   </Field>
-                  <Field label="Point Balance">
-                    <Input
-                      value={pointBalance}
-                      onChange={setPointBalance}
-                      placeholder="0"
-                      type="number"
-                    />
-                  </Field>
                 </FormGrid>
               </FormSection>
 
