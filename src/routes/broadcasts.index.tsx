@@ -229,7 +229,7 @@ function BroadcastListPage() {
                   <button
                     key={s}
                     onClick={() => setStatus(s)}
-                    className={`tap inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium border transition ${
+                    className={`tap inline-flex items-center rounded-full px-3.5 py-1.5 text-[12px] font-medium border transition ${
                       sel
                         ? "border-primary/40 bg-primary/15 text-primary"
                         : "border-border bg-white/[0.02] text-muted-foreground hover:text-foreground hover:bg-gray-50"
@@ -255,10 +255,12 @@ function BroadcastListPage() {
                       type="button"
                       onClick={() => setKind(t.id)}
                       aria-pressed={active}
+                      // Same selected colour as the All / Sent / Draft chips
+                      // beside them: both pick which rows to look at.
                       className={`h-8 rounded px-3 text-[13px] font-medium transition-colors duration-150 ${
                         active
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-primary/15 text-primary"
+                          : "text-muted-foreground hover:text-foreground hover:bg-card"
                       }`}
                     >
                       {t.label}
