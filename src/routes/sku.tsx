@@ -173,9 +173,10 @@ function LangToggle({
 
 /* Recommended source-image sizes, shown under the upload CTA when creating and
  * behind a corner tooltip on the photo once the record exists. Brands and
- * categories carry two images: the square profile photo that identifies them in
- * lists, and the wide cover that heads their page in the BA app. */
-const BRAND_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
+ * categories carry two images: the logo that identifies them in lists, and the
+ * wide cover that heads their page in the BA app. A brand's logo is landscape,
+ * because brand marks are set horizontally; a category's stays square. */
+const BRAND_PHOTO_HINT = "Brand logo, shown in lists.\nRecommended: 16:9 ratio (1920×1080px).";
 const BRAND_COVER_HINT =
   "Cover, shown at the top of the brand page.\nRecommended: 16:9 ratio (1920×1080px).";
 const CATEGORY_PHOTO_HINT = "Profile photo, shown in lists.\nRecommended: 1:1 ratio (1080×1080px).";
@@ -346,6 +347,9 @@ function DetailHeader({
     onPick: (dataUrl: string) => void;
     fit: "contain" | "cover";
     fallback: React.ReactNode;
+    /** The slot's box. Square unless the caller wants otherwise — a brand's
+     *  logo is 16:9, a category's is 1:1. */
+    boxClassName?: string;
   };
   name: string;
   meta: string;
@@ -369,7 +373,7 @@ function DetailHeader({
             className="h-[72px] w-32"
           />
           <div
-            className={`group relative h-[72px] w-[72px] rounded-lg border overflow-hidden shrink-0 ${
+            className={`group relative ${photo.boxClassName ?? "h-[72px] w-[72px]"} rounded-lg border overflow-hidden shrink-0 ${
               photo.url ? "bg-white border-border" : "bg-primary/5 border-dashed border-primary/30"
             }`}
           >
@@ -764,6 +768,7 @@ function BrandDetail({
           onPick: (dataUrl) => skuStore.updateBrand(brand.id, { logoUrl: dataUrl }),
           fit: "contain",
           fallback: <Package className="h-5 w-5" />,
+          boxClassName: "h-[72px] w-32",
         }}
       />
 
@@ -2535,7 +2540,7 @@ function BrandFormModal({
             <div>
               <ImageFieldLabel label="Logo" />
               <div
-                className={`group relative h-14 w-14 rounded-md border overflow-hidden shrink-0 ${
+                className={`group relative h-14 w-[100px] rounded-md border overflow-hidden shrink-0 ${
                   logoUrl
                     ? "bg-white border-border"
                     : "bg-primary/5 border-dashed border-primary/30"
@@ -2555,7 +2560,7 @@ function BrandFormModal({
                   className="h-full w-full grid place-items-center"
                 >
                   {logoUrl ? (
-                    <img src={logoUrl} alt="" className="img-fade h-full w-full object-cover" />
+                    <img src={logoUrl} alt="" className="img-fade h-full w-full object-contain" />
                   ) : (
                     <Package className="h-5 w-5 text-primary" />
                   )}
