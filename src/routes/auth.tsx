@@ -326,7 +326,7 @@ function AuthPage() {
                 </div>
               </Field>
               {error && (
-                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-600">
                   {error}
                 </div>
               )}
@@ -352,7 +352,7 @@ function AuthPage() {
                 }}
               />
               {error && (
-                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300 text-center">
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-600 text-center">
                   {error}
                 </div>
               )}
@@ -418,7 +418,7 @@ function AuthPage() {
                 />
               </Field>
               {error && (
-                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-600">
                   {error}
                 </div>
               )}
@@ -504,7 +504,7 @@ function AuthPage() {
               )}
 
               {error && (
-                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-600">
                   {error}
                 </div>
               )}
