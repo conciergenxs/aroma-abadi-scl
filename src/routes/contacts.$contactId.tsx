@@ -417,29 +417,6 @@ function ContactDetailPage() {
     toast.success("Contact updated");
   };
 
-  const setLifecycle = (next: LifecycleStage | null) => {
-    if (next === contact.lifecycleStage) return;
-    const prev = contact.lifecycleStage;
-    contactsStore.setContacts((cs) =>
-      cs.map((c) =>
-        c.id === contact.id
-          ? {
-              ...c,
-              lifecycleStage: next ?? undefined,
-              stageEnteredAt: next ? new Date().toISOString() : undefined,
-            }
-          : c,
-      ),
-    );
-    const msg = next
-      ? prev
-        ? `Lifecycle changed from ${prev} → ${next}`
-        : `Lifecycle set to ${next}`
-      : `Lifecycle cleared${prev ? ` (was ${prev})` : ""}`;
-    contactsStore.addActivity(contact.id, "lifecycle", msg);
-    toast.success("Lifecycle stage updated");
-  };
-
   return (
     <AppShell backTo="/contacts" title="Contact Details" noPadding>
       <div className="flex flex-col h-[calc(100vh-64px)] min-h-0">
@@ -670,6 +647,8 @@ const LIFECYCLE_STAGES: LifecycleStage[] = [
   "No Reply",
 ];
 
+/** Not rendered at the moment: the stage chip under the contact's name was
+ *  taken out of the header. Kept whole so putting it back is one line. */
 function LifecycleDropdown({
   value,
   onChange,

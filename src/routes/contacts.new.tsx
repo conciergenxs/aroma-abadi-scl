@@ -54,7 +54,6 @@ function NewContactPage() {
   const [leader, setAreaCoordinator] = useState("");
 
   // Customer-specific
-  const [pointBalance, setPointBalance] = useState("");
   const [customerBrandIds, setCustomerBrandIds] = useState<string[]>([]);
   const [labelIds, setLabelIds] = useState<string[]>([]);
   const [listIds, setListIds] = useState<string[]>([]);
@@ -199,7 +198,8 @@ function NewContactPage() {
       status: "Active",
       avatar: initials || "CX",
       ownerId: "arma",
-      pointBalance: pointBalance ? Number(pointBalance) : 0,
+      // Points are not set when a contact is created; they accrue from orders.
+      pointBalance: 0,
     };
     contactsStore.setContacts((cs) => [contact, ...cs]);
     contactsStore.addActivity(contact.id, "created", "Customer Contact created");
