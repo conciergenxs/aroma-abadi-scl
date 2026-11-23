@@ -1,7 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { variableLabel } from "./template-vars";
 import { Link } from "@tanstack/react-router";
-import { Search, Star, X as XIcon, FileText, ExternalLink, Plus } from "lucide-react";
+
+/** Templates shown per section before it pages. */
+const TEMPLATE_PAGE_SIZE = 10;
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  FileText,
+  Plus,
+  Search,
+  Star,
+  X as XIcon,
+} from "lucide-react";
 import { templatesStore, useTemplatesStore } from "@/components/scl/templates-store";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { MessageHeader } from "./message-header";
@@ -55,6 +67,12 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
   }, [filtered, starred, cat]);
 
   const orderedFiltered = useMemo(() => sections.flatMap((s) => s.items), [sections]);
+
+  /** Starred and All page independently, ten at a time — a section shorter
+   *  than that shows no pager at all. */
+  const [sectionPage, setSectionPage] = useState<Record<string, number>>({});
+  // A different search or category is a different list; both go back to page one.
+  useEffect(() => setSectionPage({}), [query, cat]);
 
   const selected = orderedFiltered.find((t) => t.id === selectedId) ?? orderedFiltered[0] ?? null;
 
@@ -114,17 +132,17 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/60">
           <FileText className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold">Use a template</h2>
-          <span className="text-[11px] text-muted-foreground">
-            Browse, search and insert reusable messages
-          </span>
+          <h2 className="text-sm font-semibold">Use a Template</h2>
           <div className="ml-auto flex items-center gap-1.5">
             <Link
               to="/templates"
               className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1.5 rounded-md border border-border hover:bg-gray-50 text-muted-foreground hover:text-foreground transition-colors duration-150"
             >
-              Manage templates <ExternalLink className="h-3 w-3" />
+              Manage Template <ExternalLink className="h-3 w-3" />
             </Link>
+            {/* Leaving for the Templates page is a different kind of move from
+                closing this dialog, so the two are ruled apart. */}
+            <span aria-hidden className="mx-0.5 h-4 w-px shrink-0 bg-border" />
             <button
               onClick={onClose}
               className="tap h-7 w-7 grid place-items-center rounded hover:bg-gray-50 text-muted-foreground transition-colors duration-150"
@@ -175,7 +193,16 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
               <EmptyState />
             ) : (
               <div>
-                {sections.map((section) => (
+                {sections.map((section) => {
+                  const pageCount = Math.max(1, Math.ceil(section.items.length / TEMPLATE_PAGE_SIZE));
+                  const page = Math.min(sectionPage[section.key] ?? 1, pageCount);
+                  const shown = section.items.slice(
+                    (page - 1) * TEMPLATE_PAGE_SIZE,
+                    page * TEMPLATE_PAGE_SIZE,
+                  );
+                  const setPage = (n: number) =>
+                    setSectionPage((prev) => ({ ...prev, [section.key]: n }));
+                  return (
                   <div key={section.key}>
                     <div className="sticky top-0 z-10 px-4 py-1.5 bg-card/95 backdrop-blur text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border/60 flex items-center gap-1.5">
                       {section.key === "starred" && (
@@ -185,7 +212,7 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                       <span className="text-muted-foreground/60">({section.items.length})</span>
                     </div>
                     <ul className="divide-y divide-border/60">
-                      {section.items.map((t) => {
+                      {shown.map((t) => {
                         const sel = selected?.id === t.id;
                         return (
                           <li key={t.id}>
@@ -238,8 +265,36 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                         );
                       })}
                     </ul>
+                    {pageCount > 1 && (
+                      <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
+                        <button
+                          type="button"
+                          onClick={() => setPage(Math.max(1, page - 1))}
+                          disabled={page === 1}
+                          className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                          <ChevronLeft className="h-3 w-3" />
+                          Previous
+                        </button>
+                        <span className="text-[12px] text-muted-foreground tabular-nums">
+                          {(page - 1) * TEMPLATE_PAGE_SIZE + 1}–
+                          {Math.min(page * TEMPLATE_PAGE_SIZE, section.items.length)} of{" "}
+                          {section.items.length}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPage(Math.min(pageCount, page + 1))}
+                          disabled={page === pageCount}
+                          className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                          Next
+                          <ChevronRight className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
