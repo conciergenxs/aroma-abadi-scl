@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { fmtDateEN, fmtIDR, fmtNum } from "@/lib/fmt";
+import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
 import { nowWIB } from "@/lib/wib";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
@@ -174,13 +174,17 @@ function AudienceSection({ scale }: { scale: number }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
           <MetricStat
             icon={Users}
-            label="Contacts"
+            label="Customer Contacts"
             value={fmtNum(audience.contacts)}
             info="Total number of contacts you own (Total Users)."
           />
+          {/* Named "Active Customers" at the owner's request, which the tile
+              beside it is called too. The two count different things — this
+              one everyone who interacted, the next only those who bought —
+              so the hint under each label is what tells them apart. */}
           <MetricStat
             icon={UserCheck}
-            label="Active Contacts"
+            label="Active Customers"
             value={fmtNum(audience.activeContacts)}
             info="Contacts who interacted with you in the last 6 months."
           />
@@ -737,7 +741,6 @@ function DateRangePopover({
 
 // ── Component ──────────────────────────────────────────────────────────────
 function Dashboard() {
-  const today = fmtDateEN(nowWIB());
   const txState = useTransactionsStore();
 
   const fullRange = useMemo(
