@@ -254,10 +254,13 @@ function BroadcastListPage() {
                       type="button"
                       onClick={() => setKind(t.id)}
                       aria-pressed={active}
+                      // Solid primary is the page's one call to action (Create
+                      // Broadcast). These pick a view, same as the All / Sent /
+                      // Draft chips, so they wear that selected colour instead.
                       className={`h-8 rounded px-3 text-[13px] font-medium transition-colors duration-150 ${
                         active
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-primary/15 text-primary"
+                          : "text-muted-foreground hover:text-foreground hover:bg-card"
                       }`}
                     >
                       {t.label}

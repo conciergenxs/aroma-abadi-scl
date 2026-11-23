@@ -194,7 +194,10 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
             ) : (
               <div>
                 {sections.map((section) => {
-                  const pageCount = Math.max(1, Math.ceil(section.items.length / TEMPLATE_PAGE_SIZE));
+                  const pageCount = Math.max(
+                    1,
+                    Math.ceil(section.items.length / TEMPLATE_PAGE_SIZE),
+                  );
                   const page = Math.min(sectionPage[section.key] ?? 1, pageCount);
                   const shown = section.items.slice(
                     (page - 1) * TEMPLATE_PAGE_SIZE,
@@ -203,96 +206,98 @@ export function TemplatePicker({ open, onClose, onInsert }: Props) {
                   const setPage = (n: number) =>
                     setSectionPage((prev) => ({ ...prev, [section.key]: n }));
                   return (
-                  <div key={section.key}>
-                    <div className="sticky top-0 z-10 px-4 py-1.5 bg-card/95 backdrop-blur text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border/60 flex items-center gap-1.5">
-                      {section.key === "starred" && (
-                        <Star className="h-3 w-3 fill-current text-amber-300" />
-                      )}
-                      {section.title}
-                      <span className="text-muted-foreground/60">({section.items.length})</span>
-                    </div>
-                    <ul className="divide-y divide-border/60">
-                      {shown.map((t) => {
-                        const sel = selected?.id === t.id;
-                        return (
-                          <li key={t.id}>
-                            <button
-                              onClick={() => setSelectedId(t.id)}
-                              onDoubleClick={() => {
-                                onInsert(t.body, t);
-                                onClose();
-                              }}
-                              className={`w-full text-left px-4 py-3 flex items-start gap-3 transition ${
-                                sel ? "bg-primary/10" : "hover:bg-gray-50"
-                              }`}
-                            >
-                              <ChannelIcon
-                                channel={t.channel}
-                                className="h-5 w-5 mt-0.5 shrink-0"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[13px] font-medium truncate">{t.name}</span>
-                                  <span className="inline-flex items-center rounded-full border border-border bg-white/[0.03] px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                                    {t.category}
-                                  </span>
-                                </div>
-                                <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-2">
-                                  {t.body}
-                                </p>
-                                <div className="mt-1 text-[10px] text-muted-foreground/70">
-                                  Updated {t.updated}
-                                </div>
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleStar(t.id);
-                                }}
-                                className={`h-7 w-7 grid place-items-center rounded shrink-0 ${
-                                  starred.has(t.id)
-                                    ? "text-amber-300"
-                                    : "text-muted-foreground/50 hover:text-amber-300"
-                                }`}
-                                aria-label="Toggle favorite"
-                              >
-                                <Star
-                                  className={`h-3.5 w-3.5 ${starred.has(t.id) ? "fill-current" : ""}`}
-                                />
-                              </button>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {pageCount > 1 && (
-                      <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
-                        <button
-                          type="button"
-                          onClick={() => setPage(Math.max(1, page - 1))}
-                          disabled={page === 1}
-                          className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-                        >
-                          <ChevronLeft className="h-3 w-3" />
-                          Previous
-                        </button>
-                        <span className="text-[12px] text-muted-foreground tabular-nums">
-                          {(page - 1) * TEMPLATE_PAGE_SIZE + 1}–
-                          {Math.min(page * TEMPLATE_PAGE_SIZE, section.items.length)} of{" "}
-                          {section.items.length}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setPage(Math.min(pageCount, page + 1))}
-                          disabled={page === pageCount}
-                          className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-                        >
-                          Next
-                          <ChevronRight className="h-3 w-3" />
-                        </button>
+                    <div key={section.key}>
+                      <div className="sticky top-0 z-10 px-4 py-1.5 bg-card/95 backdrop-blur text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border/60 flex items-center gap-1.5">
+                        {section.key === "starred" && (
+                          <Star className="h-3 w-3 fill-current text-amber-300" />
+                        )}
+                        {section.title}
+                        <span className="text-muted-foreground/60">({section.items.length})</span>
                       </div>
-                    )}
-                  </div>
+                      <ul className="divide-y divide-border/60">
+                        {shown.map((t) => {
+                          const sel = selected?.id === t.id;
+                          return (
+                            <li key={t.id}>
+                              <button
+                                onClick={() => setSelectedId(t.id)}
+                                onDoubleClick={() => {
+                                  onInsert(t.body, t);
+                                  onClose();
+                                }}
+                                className={`w-full text-left px-4 py-3 flex items-start gap-3 transition ${
+                                  sel ? "bg-primary/10" : "hover:bg-gray-50"
+                                }`}
+                              >
+                                <ChannelIcon
+                                  channel={t.channel}
+                                  className="h-5 w-5 mt-0.5 shrink-0"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[13px] font-medium truncate">
+                                      {t.name}
+                                    </span>
+                                    <span className="inline-flex items-center rounded-full border border-border bg-white/[0.03] px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                                      {t.category}
+                                    </span>
+                                  </div>
+                                  <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-2">
+                                    {t.body}
+                                  </p>
+                                  <div className="mt-1 text-[10px] text-muted-foreground/70">
+                                    Updated {t.updated}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleStar(t.id);
+                                  }}
+                                  className={`h-7 w-7 grid place-items-center rounded shrink-0 ${
+                                    starred.has(t.id)
+                                      ? "text-amber-300"
+                                      : "text-muted-foreground/50 hover:text-amber-300"
+                                  }`}
+                                  aria-label="Toggle favorite"
+                                >
+                                  <Star
+                                    className={`h-3.5 w-3.5 ${starred.has(t.id) ? "fill-current" : ""}`}
+                                  />
+                                </button>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      {pageCount > 1 && (
+                        <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
+                          <button
+                            type="button"
+                            onClick={() => setPage(Math.max(1, page - 1))}
+                            disabled={page === 1}
+                            className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+                          >
+                            <ChevronLeft className="h-3 w-3" />
+                            Previous
+                          </button>
+                          <span className="text-[12px] text-muted-foreground tabular-nums">
+                            {(page - 1) * TEMPLATE_PAGE_SIZE + 1}–
+                            {Math.min(page * TEMPLATE_PAGE_SIZE, section.items.length)} of{" "}
+                            {section.items.length}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setPage(Math.min(pageCount, page + 1))}
+                            disabled={page === pageCount}
+                            className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
+                          >
+                            Next
+                            <ChevronRight className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
