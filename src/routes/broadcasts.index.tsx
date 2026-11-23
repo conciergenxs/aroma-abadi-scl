@@ -27,6 +27,7 @@ import {
 import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import type { Broadcast } from "@/components/scl/mock-data";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -493,16 +494,41 @@ function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
   const recurringGate = usePermission("broadcast-recurring");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  /** Where to pin the menu, in viewport coordinates.
+   *
+   *  The table scrolls sideways, and a container with overflow-x set cannot
+   *  keep overflow-y visible — so an absolutely positioned menu is clipped by
+   *  the table's own box, which is what sank it into the rows. The menu is
+   *  rendered to the body instead and placed against the button's rect. */
+  const [at, setAt] = useState<{ top: number; right: number } | null>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const inMenu = ref.current?.contains(e.target as Node);
+      const inPanel = menuRef.current?.contains(e.target as Node);
+      if (!inMenu && !inPanel) setOpen(false);
     };
+    // Rather than chase the button while the page moves under it.
+    const dismiss = () => setOpen(false);
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    window.addEventListener("resize", dismiss);
+    window.addEventListener("scroll", dismiss, true);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("resize", dismiss);
+      window.removeEventListener("scroll", dismiss, true);
+    };
   }, [open]);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const openMenu = () => {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (r) setAt({ top: r.bottom + 4, right: Math.max(8, window.innerWidth - r.right) });
+    setOpen(true);
+  };
 
   const kind = broadcastKind(broadcast);
   const state = lifecycleStatus(broadcast);
@@ -514,52 +540,61 @@ function BroadcastRowMenu({ broadcast }: { broadcast: Broadcast }) {
   return (
     <div ref={ref} className="relative flex justify-end">
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? setOpen(false) : openMenu())}
+        aria-expanded={open}
         aria-label={`Actions for ${broadcast.name}`}
         className="h-8 w-8 grid place-items-center rounded-md border border-border hover:bg-gray-50 transition-colors duration-150"
       >
         <MoreHorizontal className="h-3.5 w-3.5" />
       </button>
-      {open && (
-        <div className="absolute right-0 top-9 z-30 w-56 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in">
-          {canToggle && (
+      {open &&
+        at &&
+        createPortal(
+          <div
+            ref={menuRef}
+            style={{ top: at.top, right: at.right }}
+            className="fixed z-50 w-44 rounded-lg border border-border bg-white shadow-lg py-1 animate-fade-in"
+          >
+            {canToggle && (
+              <button
+                type="button"
+                disabled={!recurringGate.allowed || (!isActive && activationReason !== "")}
+                title={
+                  recurringGate.reason || (!isActive ? activationReason || undefined : undefined)
+                }
+                onClick={() => {
+                  broadcastsStore.setActivation(broadcast.id, isActive ? "inactive" : "active");
+                  toast.success(isActive ? "Broadcast deactivated" : "Broadcast activated");
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                {isActive ? "Deactivate" : "Activate"}
+              </button>
+            )}
             <button
               type="button"
-              disabled={!recurringGate.allowed || (!isActive && activationReason !== "")}
-              title={
-                recurringGate.reason || (!isActive ? activationReason || undefined : undefined)
-              }
+              disabled={deleteReason !== ""}
+              title={deleteReason || undefined}
               onClick={() => {
-                broadcastsStore.setActivation(broadcast.id, isActive ? "inactive" : "active");
-                toast.success(isActive ? "Broadcast deactivated" : "Broadcast activated");
+                setConfirmDelete(true);
                 setOpen(false);
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              {isActive ? "Deactivate" : "Activate"}
+              <Trash2 className="h-3.5 w-3.5" /> Delete
             </button>
-          )}
-          <button
-            type="button"
-            disabled={deleteReason !== ""}
-            title={deleteReason || undefined}
-            onClick={() => {
-              setConfirmDelete(true);
-              setOpen(false);
-            }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </button>
-          {(activationReason || deleteReason) && (
-            <p className="px-3 pt-1 pb-2 text-[12px] text-amber-600">
-              {deleteReason || activationReason}
-            </p>
-          )}
-        </div>
-      )}
+            {(activationReason || deleteReason) && (
+              <p className="px-3 pt-1 pb-2 text-[12px] text-amber-600">
+                {deleteReason || activationReason}
+              </p>
+            )}
+          </div>,
+          document.body,
+        )}
 
       <ConfirmDialog
         open={confirmDelete}
