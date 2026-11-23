@@ -662,7 +662,7 @@ function DateRangePopover({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 h-7 rounded-md border border-border bg-card/60 px-2.5 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+        className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
       >
         <Calendar className="h-3 w-3 shrink-0" />
         <span className="max-w-[160px] truncate">{label}</span>
@@ -764,14 +764,16 @@ function Dashboard() {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <AppShell title="Overview" subtitle={`${today} · Aroma Abadi workspace`}>
+      <AppShell
+        title="Overview"
+        subtitle="ARMA Workspace"
+        titleAside={<DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />}
+      >
         <div className="space-y-5 pb-[50px]">
           {/* Header row */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="text-lg font-semibold">Hello, Aria 👋</div>
-              <span className="text-muted-foreground/40 text-[15px] select-none">|</span>
-              <DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Link

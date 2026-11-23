@@ -194,6 +194,7 @@ export function AppShell({
   children,
   title,
   subtitle,
+  titleAside,
   actions,
   noPadding,
   backTo,
@@ -201,6 +202,10 @@ export function AppShell({
   children: ReactNode;
   title?: string;
   subtitle?: string;
+  /** Sits immediately beside the title block, behind a separator — for a
+   *  control that scopes the page itself, such as Overview's date range.
+   *  `actions` is the far-right group instead. */
+  titleAside?: ReactNode;
   actions?: ReactNode;
   noPadding?: boolean;
   backTo?: string;
@@ -461,6 +466,17 @@ export function AppShell({
                 {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
               </div>
             )}
+            {titleAside ? (
+              <>
+                <span
+                  aria-hidden
+                  className="ml-1.5 text-muted-foreground/40 text-[15px] select-none"
+                >
+                  |
+                </span>
+                <div className="shrink-0">{titleAside}</div>
+              </>
+            ) : null}
           </div>
           <div className="ml-auto flex items-center gap-2">
             {/* Notification Bell */}
