@@ -468,12 +468,9 @@ export function AppShell({
             )}
             {titleAside ? (
               <>
-                <span
-                  aria-hidden
-                  className="ml-1.5 text-muted-foreground/40 text-[15px] select-none"
-                >
-                  |
-                </span>
+                {/* A rule, not a pipe character: a glyph is only as tall as its
+                    line box, so it stopped short of the control beside it. */}
+                <span aria-hidden className="ml-1.5 h-9 w-px shrink-0 bg-border" />
                 <div className="shrink-0">{titleAside}</div>
               </>
             ) : null}

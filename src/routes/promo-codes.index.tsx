@@ -391,10 +391,18 @@ function PromoCodesPage() {
                         )}
                       </div>
                     </td>
+                    {/* Held to 260px. At 420 this one column ran to 454px and
+                        pushed the row actions past the right edge, so reaching
+                        them meant scrolling the table sideways first. */}
                     <td className="px-4 py-3">
-                      <div className="text-[13px] font-medium text-foreground">{promo.name}</div>
                       <div
-                        className="text-[11px] text-primary/80 mt-0.5 max-w-[420px] truncate"
+                        className="text-[13px] font-medium text-foreground max-w-[260px] truncate"
+                        title={promo.name}
+                      >
+                        {promo.name}
+                      </div>
+                      <div
+                        className="text-[11px] text-primary/80 mt-0.5 max-w-[260px] truncate"
                         title={describePromoRule(promo.rule)}
                       >
                         {describePromoRule(promo.rule)}
