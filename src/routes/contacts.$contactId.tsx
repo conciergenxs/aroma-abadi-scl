@@ -1592,7 +1592,11 @@ function RightPanel({
       <RightSection title="Brands">
         <div className="flex flex-wrap gap-1.5 mb-2">
           {(contact.brandIds ?? []).length === 0 && (
-            <span className="text-[11px] text-muted-foreground">No brands assigned</span>
+            // A BA is assigned the brands they sell; a customer's brands are
+            // the ones they actually bought. Same list, two different facts.
+            <span className="text-[11px] text-muted-foreground">
+              {contact.labelIds.includes("lb-ba") ? "No brands assigned" : "No brands purchased"}
+            </span>
           )}
           {(contact.brandIds ?? []).map((bid) => {
             const brand = brands.find((b) => b.id === bid);

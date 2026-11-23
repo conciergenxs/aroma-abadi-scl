@@ -326,7 +326,7 @@ function NewContactPage() {
                       <Input
                         value={phone}
                         onChange={setPhone}
-                        placeholder="+62 811 1234 5678"
+                        placeholder="Enter WA number.."
                         type="tel"
                       />
                     </Field>
@@ -379,7 +379,6 @@ function NewContactPage() {
                             onClick={() => toggleBrand(b.id, brandIds, setBrandIds)}
                             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
                           >
-                            {on && <Check className="h-3 w-3 text-primary" />}
                             {b.name}
                           </button>
                         );
@@ -441,7 +440,7 @@ function NewContactPage() {
                     <Input
                       value={phone}
                       onChange={setPhone}
-                      placeholder="+62 812 3456 7890"
+                      placeholder="Enter WA number.."
                       type="tel"
                     />
                   </Field>
@@ -481,7 +480,6 @@ function NewContactPage() {
                           onClick={() => toggleBrand(b.id, customerBrandIds, setCustomerBrandIds)}
                           className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
                         >
-                          {on && <Check className="h-3 w-3 text-primary" />}
                           {b.name}
                         </button>
                       );
