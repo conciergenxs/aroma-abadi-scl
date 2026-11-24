@@ -488,6 +488,21 @@ button:active:not(:disabled),
   background-color: oklch(0.42 0.12 25 / 12%);
 }
 
+/* Stepper arrows are wrong on every number this app asks for: a usage cap, a
+   per-customer limit, a quantity in a promo rule. Nobody reaches 500 by
+   clicking up, and the arrows crowd a field that is read far more than it is
+   nudged. The field stays numeric; only the dial goes. */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
 /* ---- Input / textarea / select ---- */
 
 input,

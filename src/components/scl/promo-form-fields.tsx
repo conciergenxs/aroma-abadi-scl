@@ -49,9 +49,16 @@ export function emptyPromoForm(): PromoFormState {
   };
 }
 
-/** Today in Jakarta as YYYY-MM-DD, matching the date inputs' own format. */
+/**
+ * Today in Jakarta, at midnight, in the format a datetime-local input takes.
+ *
+ * This used to return YYYY-MM-DD. A datetime-local input rejects a value with
+ * no time in it, so the browser rendered the field blank and a promo created
+ * today still had no start date — the default was written but never shown.
+ * The store seeds the same shape ("2026-06-01T00:00"), so this round-trips.
+ */
 function todayIsoWIB() {
-  return new Date(todayWIBUtc()).toISOString().slice(0, 10);
+  return `${new Date(todayWIBUtc()).toISOString().slice(0, 10)}T00:00`;
 }
 
 export function promoFormFromExisting(promo: PromoCode): PromoFormState {

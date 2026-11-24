@@ -465,13 +465,13 @@ function PromoCodesPage() {
                       </span>
                       {promo.usageType === "one-to-one" ? (
                         (promo.assignedCodes?.length ?? 0) > 0 && (
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[12px] text-muted-foreground">
                             {" "}
                             / {promo.assignedCodes?.length}
                           </span>
                         )
                       ) : (
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[12px] text-muted-foreground">
                           {" "}
                           / {promo.maxUsage ?? "Unlimited"}
                         </span>
