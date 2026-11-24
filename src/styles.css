@@ -460,20 +460,32 @@ button:active:not(:disabled),
   position: relative;
   padding-left: 1.7rem;
 }
+/* The indicator is the only way to the calendar — a click in the text has to
+   stay a caret, or the picker eats the keystrokes — so it has to look and
+   measure like a button rather than a decoration. */
 .scl-date-input::-webkit-calendar-picker-indicator {
   position: absolute;
-  left: 0.45rem;
+  left: 0.3rem;
   top: 50%;
   transform: translateY(-50%);
+  width: 0.95rem;
+  height: 0.95rem;
   margin: 0;
-  padding: 0;
+  padding: 0.1rem;
+  border-radius: 0.25rem;
   cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.15s ease;
+  opacity: 0.55;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
 }
 .scl-date-input:hover::-webkit-calendar-picker-indicator,
 .scl-date-input:focus::-webkit-calendar-picker-indicator {
-  opacity: 0.85;
+  opacity: 0.9;
+}
+.scl-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: oklch(0.42 0.12 25 / 12%);
 }
 
 /* ---- Input / textarea / select ---- */

@@ -72,9 +72,11 @@ export function lifetimePresets(bounds: DateRange): RangePreset[] {
  * falls inside the bounds, and on blur snaps anything still outside them to
  * the nearest date the data actually has.
  *
- * The calendar opens from the icon, not from a click anywhere in the field:
- * a click inside the text is how you reach the year segment to type into,
- * and a picker opening there takes the field away just as you aim at it.
+ * The calendar opens from its icon, not from a click anywhere in the field.
+ * Opening it on any click was tried and measured: with the picker up, Chrome
+ * routes the keys to the calendar, so "01/06/2025" typed into the field came
+ * out as 01 Nov 2026. A click in the text is how you reach a segment to type
+ * into, so the icon keeps the picker and the text keeps the caret.
  */
 export function BoundedDateInput({
   value,
@@ -82,6 +84,8 @@ export function BoundedDateInput({
   max,
   label,
   onCommit,
+  allowEmpty = false,
+  className = "w-full",
 }: {
   /** The committed date, or "" when nothing is chosen yet. */
   value: string;
@@ -89,6 +93,9 @@ export function BoundedDateInput({
   max: string;
   label: string;
   onCommit: (iso: string) => void;
+  /** Clearing the field is a real answer — an open-ended filter. */
+  allowEmpty?: boolean;
+  className?: string;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
   const clamp = (iso: string) => (iso < min ? min : iso > max ? max : iso);
@@ -100,7 +107,10 @@ export function BoundedDateInput({
   const settle = () => {
     const typed = draft;
     setDraft(null);
-    if (!typed) return;
+    if (!typed) {
+      if (allowEmpty && typed === "" && value !== "") onCommit("");
+      return;
+    }
     const next = clamp(typed);
     if (next !== value) onCommit(next);
   };
@@ -130,7 +140,7 @@ export function BoundedDateInput({
           settle();
           e.currentTarget.blur();
         }}
-        className={`h-8 w-full rounded-md border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 cursor-text scl-date-input transition-colors duration-150 ${
+        className={`h-8 rounded-md border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 cursor-text scl-date-input transition-colors duration-150 ${className} ${
           willSnapTo
             ? "border-amber-500/70 focus:ring-amber-500/40"
             : "border-border focus:ring-primary/40"

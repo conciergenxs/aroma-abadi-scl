@@ -44,6 +44,8 @@ import {
 } from "@/components/scl/mock-data";
 import { getStageStyle } from "@/components/scl/contacts-store";
 import { LifecycleSelect } from "@/components/scl/lifecycle-select";
+import { BoundedDateInput } from "@/components/scl/date-range-popover";
+import { getTransactionDateBounds } from "@/components/scl/overview-metrics";
 import {
   useTransactionsStore,
   formatIDR,
@@ -108,6 +110,9 @@ function ContactDetailPage() {
   const contact = useMemo(() => contacts.find((c) => c.id === contactId), [contacts, contactId]);
   const [tab, setTab] = useState<Tab>("activity");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // The filter reaches exactly as far as the ledger does, so a typed year
+  // cannot put the tab into a window that has no transactions in it.
+  const ledgerBounds = useMemo(() => getTransactionDateBounds(transactions), [transactions]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const { bas } = useBaStore();
@@ -500,20 +505,24 @@ function ContactDetailPage() {
                     count={redeemCount}
                   />
                   <div className="ml-auto flex shrink-0 items-center gap-1.5 py-1.5">
-                    <input
-                      type="date"
+                    <BoundedDateInput
                       value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none scl-date-input"
-                      title="From date"
+                      min={ledgerBounds.start}
+                      max={dateTo || ledgerBounds.end}
+                      label="From date"
+                      allowEmpty
+                      className="w-[150px]"
+                      onCommit={setDateFrom}
                     />
-                    <span className="text-[10px] text-muted-foreground">—</span>
-                    <input
-                      type="date"
+                    <span className="text-[12px] text-muted-foreground">—</span>
+                    <BoundedDateInput
                       value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
-                      className="h-7 rounded border border-border bg-white px-2 text-[11px] focus:outline-none scl-date-input"
-                      title="To date"
+                      min={dateFrom || ledgerBounds.start}
+                      max={ledgerBounds.end}
+                      label="To date"
+                      allowEmpty
+                      className="w-[150px]"
+                      onCommit={setDateTo}
                     />
                     {(dateFrom || dateTo) && (
                       <button
@@ -521,7 +530,7 @@ function ContactDetailPage() {
                           setDateFrom("");
                           setDateTo("");
                         }}
-                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-150"
+                        className="text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-150"
                       >
                         Clear
                       </button>

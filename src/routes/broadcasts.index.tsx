@@ -112,13 +112,13 @@ function BroadcastListPage() {
     const totalRead = sent.reduce((a, b) => a + b.read, 0);
     return [
       {
-        l: "DELIVERY RATE",
+        l: "Delivery Rate",
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
         hint: "Messages WhatsApp confirmed as delivered, against everyone a broadcast reached. Counted across every broadcast ever sent.",
       },
       {
-        l: "READ RATE",
+        l: "Read Rate",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
         hint: "Delivered messages that were opened. Counted across every broadcast ever sent.",
@@ -183,7 +183,7 @@ function BroadcastListPage() {
                 key={s.l}
                 className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
               >
-                <div className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <div className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                   {s.l}
                   <InfoHint text={s.hint} />
                 </div>
