@@ -10,6 +10,8 @@ import {
   Search,
   Copy,
   Trash2,
+  PauseCircle,
+  PlayCircle,
   CheckCircle2,
   Clock,
   XCircle,
@@ -69,6 +71,15 @@ function StatusBadge({ status }: { status: PromoStatus }) {
         <XCircle className="h-2.5 w-2.5" /> Expired
       </span>
     );
+  if (status === "deactivated")
+    return (
+      <span
+        key={status}
+        className="badge-animate inline-flex items-center gap-1 rounded-full border border-amber-600 bg-amber-500 px-2 py-0.5 text-[10px] font-medium text-white"
+      >
+        <PauseCircle className="h-2.5 w-2.5" /> Deactivated
+      </span>
+    );
   return (
     <span
       key={status}
@@ -89,10 +100,14 @@ function ActionMenu({
   onSeeDetails,
   onEdit,
   onDelete,
+  isDeactivated,
+  onToggleActivation,
 }: {
   onSeeDetails: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isDeactivated: boolean;
+  onToggleActivation: () => void;
 }) {
   // Editing and deleting a code are the same privilege: both rewrite a promo
   // that may already be in a BA's hands.
@@ -144,6 +159,24 @@ function ActionMenu({
           className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted text-left transition-colors duration-150"
         >
           <Info className="h-3.5 w-3.5 text-muted-foreground" /> See Details
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen(false);
+            onToggleActivation();
+          }}
+          disabled={!editGate.allowed}
+          title={editGate.allowed ? undefined : editGate.reason}
+          className="flex w-full items-center gap-2 px-3 py-2 text-[12px] hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent text-left transition-colors duration-150"
+        >
+          {isDeactivated ? (
+            <PlayCircle className="h-3.5 w-3.5 text-muted-foreground" />
+          ) : (
+            <PauseCircle className="h-3.5 w-3.5 text-muted-foreground" />
+          )}
+          {isDeactivated ? "Activate" : "Deactivate"}
         </button>
         <div className="border-t border-border my-1" />
         <button
@@ -302,6 +335,7 @@ function PromoCodesPage() {
               { value: "active", label: "Active", dot: "bg-emerald-500" },
               { value: "scheduled", label: "Scheduled", dot: "bg-slate-400" },
               { value: "expired", label: "Expired", dot: "bg-rose-500" },
+              { value: "deactivated", label: "Deactivated", dot: "bg-amber-500" },
             ]}
           />
         </div>
@@ -429,19 +463,19 @@ function PromoCodesPage() {
                       <span className="text-[13px] font-semibold text-foreground">
                         {promo.redemptions.length}
                       </span>
-                      {promo.usageType === "one-to-one"
-                        ? (promo.assignedCodes?.length ?? 0) > 0 && (
-                            <span className="text-[10px] text-muted-foreground">
-                              {" "}
-                              / {promo.assignedCodes?.length}
-                            </span>
-                          )
-                        : promo.maxUsage && (
-                            <span className="text-[10px] text-muted-foreground">
-                              {" "}
-                              / {promo.maxUsage}
-                            </span>
-                          )}
+                      {promo.usageType === "one-to-one" ? (
+                        (promo.assignedCodes?.length ?? 0) > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {" "}
+                            / {promo.assignedCodes?.length}
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-[10px] text-muted-foreground">
+                          {" "}
+                          / {promo.maxUsage ?? "Unlimited"}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end">
@@ -456,6 +490,16 @@ function PromoCodesPage() {
                             })
                           }
                           onDelete={() => setDeletingPromo(promo)}
+                          isDeactivated={promo.activation === "inactive"}
+                          onToggleActivation={() => {
+                            const next = promo.activation === "inactive" ? "active" : "inactive";
+                            promoStore.setActivation(promo.id, next);
+                            toast.success(
+                              next === "inactive"
+                                ? `"${promo.name}" deactivated — the code stops working now`
+                                : `"${promo.name}" is active again`,
+                            );
+                          }}
                         />
                       </div>
                     </td>

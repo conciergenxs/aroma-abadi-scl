@@ -14,7 +14,6 @@ import {
 import { ConfirmDialog } from "@/components/scl/confirm-dialog";
 import { useMemo, useState } from "react";
 import { fmtNum } from "@/lib/fmt";
-import { todayWIBUtc } from "@/lib/wib";
 import {
   Plus,
   Search,

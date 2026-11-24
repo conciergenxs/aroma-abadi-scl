@@ -6,7 +6,7 @@ import { initialsFor } from "@/lib/codes";
 
 export { initialsFor };
 
-export type PromoStatus = "active" | "expired" | "scheduled";
+export type PromoStatus = "active" | "expired" | "scheduled" | "deactivated";
 
 // ── Rule model — a composable Condition × Reward engine ───────────────────────
 // Not a fixed catalog of promo "types" (that was the Odoo-style limitation).
@@ -298,6 +298,10 @@ export type PromoCode = {
   description: string;
   rule: PromoRule;
   usageType: "one-to-one" | "one-to-many";
+  /** Switched off by hand, regardless of the dates. A promo inside its window
+   *  can still need stopping — a budget runs out, a partner pulls out — and
+   *  editing the end date to yesterday loses what the window actually was. */
+  activation?: "active" | "inactive";
   /** 1-to-Many only — a 1-to-1 promo is capped by how many recipients a
    * Broadcast sends it to, so both of these stay null there. */
   maxUsage: number | null;
@@ -316,7 +320,13 @@ export type PromoCode = {
 
 // Status is never stored — it's always derived from the current time vs. the
 // promo's date range, so it can't drift out of sync with reality.
-export function getPromoStatus(promo: { startDate: string; endDate: string }): PromoStatus {
+export function getPromoStatus(promo: {
+  startDate: string;
+  endDate: string;
+  activation?: "active" | "inactive";
+}): PromoStatus {
+  // A hand switch beats the calendar: it is the one the operator set today.
+  if (promo.activation === "inactive") return "deactivated";
   if (!promo.startDate || !promo.endDate) return "scheduled";
   const now = Date.now();
   // Read as Jakarta time so the badge is the same in the SSR render and after
@@ -1042,6 +1052,11 @@ export const promoStore = {
     _save();
   },
 
+  setActivation(id: string, activation: "active" | "inactive") {
+    _ensureLoaded();
+    _promos = _promos.map((p) => (p.id === id ? { ...p, activation } : p));
+    _save();
+  },
   deletePromo(id: string) {
     _ensureLoaded();
     _promos = _promos.filter((p) => p.id !== id);

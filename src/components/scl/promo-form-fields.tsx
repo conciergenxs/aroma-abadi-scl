@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { todayWIBUtc } from "@/lib/wib";
 import { Infinity as InfinityIcon } from "lucide-react";
 import { PromoRuleBuilder } from "./promo-rule-builder";
 import {
@@ -40,10 +41,17 @@ export function emptyPromoForm(): PromoFormState {
     limitPerUser: "",
     limitPerUserUnlimited: true,
     codeFormat: "",
-    startDate: "",
+    // A promo written today starts today unless it is moved — an empty start
+    // date reads as "scheduled" on a code that was just created.
+    startDate: todayIsoWIB(),
     endDate: "",
     rule: defaultRule(),
   };
+}
+
+/** Today in Jakarta as YYYY-MM-DD, matching the date inputs' own format. */
+function todayIsoWIB() {
+  return new Date(todayWIBUtc()).toISOString().slice(0, 10);
 }
 
 export function promoFormFromExisting(promo: PromoCode): PromoFormState {

@@ -453,15 +453,30 @@ function InlineCurrency({
   onChange: (v: number) => void;
   placeholder?: string;
 }) {
+  // The field keeps the text as typed rather than the parsed number, so a
+  // trailing "." or a half-finished decimal survives the keystroke. A number
+  // input was wrong twice over here: it hangs spinner arrows off a money
+  // amount, where stepping by one is meaningless, and it fought the decimal.
+  const [draft, setDraft] = useState(value ? String(value) : "");
+  useEffect(() => {
+    if (Number(draft || 0) !== value) setDraft(value ? String(value) : "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 h-8 align-middle">
       <span className="text-[12px] text-muted-foreground">Rp</span>
       <input
-        type="number"
-        value={value || ""}
-        min={0}
+        type="text"
+        inputMode="decimal"
+        value={draft}
         placeholder={placeholder}
-        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+        onChange={(e) => {
+          // digits plus at most one decimal point
+          const cleaned = e.target.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+          setDraft(cleaned);
+          onChange(Math.max(0, Number(cleaned) || 0));
+        }}
         className="w-24 bg-transparent text-[13px] font-medium focus:outline-none"
       />
     </span>

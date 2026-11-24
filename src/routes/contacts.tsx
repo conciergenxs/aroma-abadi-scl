@@ -10,7 +10,7 @@ import {
   labelColorDot,
 } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
-import { useCan } from "@/components/scl/session-store";
+import { useCan, useCurrentUser } from "@/components/scl/session-store";
 import {
   type Contact,
   type Channel,
@@ -761,6 +761,18 @@ function ContactsPage() {
 }
 
 // ── Sidebar pager — 5 per page keeps both lists short enough to scan ─────────
+/** A contact's WhatsApp number, masked for everyone but a Super Admin.
+ *
+ *  The country code and the last two digits stay so a row can still be told
+ *  apart and matched against a screenshot; the middle — the part that is
+ *  enough to message someone — is covered. */
+function maskPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return "•".repeat(Math.max(digits.length, 4));
+  const head = phone.slice(0, phone.indexOf(" ") > 0 ? phone.indexOf(" ") : 3);
+  return `${head} ${"•".repeat(4)} ${"•".repeat(4)} ${digits.slice(-2)}`;
+}
+
 const SIDEBAR_PAGE_SIZE = 5;
 
 function SidebarPager({
@@ -910,6 +922,9 @@ function ContactsTable({
   const brandName = (id: string) =>
     brands.find((b) => b.id === id)?.name ?? id.replace("brand-", "").replace(/-/g, " ");
   const passwordGate = usePermission("ba-password");
+  // A full WhatsApp number is the one field here that is enough to contact
+  // someone off-platform, so only a Super Admin reads it unmasked.
+  const canSeeFullPhone = useCurrentUser().role === "Super Admin";
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   // Filter Properties' Visible toggle governs which of these optional
   // columns render — a property missing from the list defaults to shown so
@@ -1023,7 +1038,9 @@ function ContactsTable({
                     {c.gender ?? ba?.gender ?? <span className="text-muted-foreground">—</span>}
                   </td>
                 )}
-                <td className={`${tdCls} text-muted-foreground tabular-nums`}>{c.phone}</td>
+                <td className={`${tdCls} text-muted-foreground tabular-nums`}>
+                  {canSeeFullPhone ? c.phone : maskPhone(c.phone)}
+                </td>
                 <td className={tdCls}>
                   <ContactTypeChip isBA={isBA(c)} />
                 </td>
