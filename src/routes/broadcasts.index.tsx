@@ -1,5 +1,5 @@
 import { AppShell, SectionCard, ChannelDot, StatusPill } from "@/components/scl/app-shell";
-import { InfoHint } from "@/components/scl/dashboard-ui";
+import { MetricStat } from "@/components/scl/dashboard-ui";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   useBroadcastsStore,
@@ -24,6 +24,8 @@ import {
   MoreHorizontal,
   Play,
   Pause,
+  CheckCheck,
+  Eye,
 } from "lucide-react";
 import { usePermission, usePreviewGate } from "@/components/scl/permission-preview";
 import type { Broadcast } from "@/components/scl/mock-data";
@@ -115,13 +117,15 @@ function BroadcastListPage() {
         l: "Delivery Rate",
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
-        hint: "Messages WhatsApp confirmed as delivered, against everyone a broadcast reached. Counted across every broadcast ever sent.",
+        icon: CheckCheck,
+        hint: "Share of reached contacts WhatsApp confirmed as delivered. Across every broadcast ever sent.",
       },
       {
         l: "Read Rate",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
-        hint: "Delivered messages that were opened. Counted across every broadcast ever sent.",
+        icon: Eye,
+        hint: "Share of delivered messages that were opened. Across every broadcast ever sent.",
       },
     ];
   }, [broadcasts]);
@@ -178,18 +182,20 @@ function BroadcastListPage() {
       <div className="space-y-6">
         <TooltipProvider delayDuration={150}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
+            {/* The same tile Overview uses, so a rate reads the same in both
+                places: name and its hint on the left, the icon squared off on
+                the right, and the window the figure covers tucked at the
+                value's own right edge rather than on a line of its own. */}
             {stats.map((s) => (
-              <div
+              <MetricStat
                 key={s.l}
-                className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
-              >
-                <div className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                  {s.l}
-                  <InfoHint text={s.hint} />
-                </div>
-                <div className="mt-2 text-2xl font-semibold">{s.v}</div>
-                <div className="mt-1 text-[12px] text-muted-foreground">{s.period}</div>
-              </div>
+                icon={s.icon}
+                label={s.l}
+                value={s.v}
+                sub={s.period}
+                subInline
+                info={s.hint}
+              />
             ))}
           </div>
         </TooltipProvider>

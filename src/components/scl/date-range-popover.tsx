@@ -106,11 +106,9 @@ export function BoundedDateInput({
 
   const settle = () => {
     const typed = draft;
+    if (typed === null) return;
     setDraft(null);
-    if (!typed) {
-      if (allowEmpty && typed === "" && value !== "") onCommit("");
-      return;
-    }
+    if (!typed) return;
     const next = clamp(typed);
     if (next !== value) onCommit(next);
   };
@@ -126,7 +124,18 @@ export function BoundedDateInput({
         aria-invalid={willSnapTo ? true : undefined}
         onChange={(e) => {
           const next = e.target.value;
-          if (next && next === clamp(next)) {
+          if (next === "") {
+            // Half a date reads as "" too. badInput is what tells the two
+            // apart: with segments partly filled we must not set state at
+            // all, because re-rendering writes the bound value back over
+            // what is being typed — which is why a field that started empty
+            // could never be typed into.
+            if (e.currentTarget.validity.badInput) return;
+            setDraft(null);
+            if (allowEmpty && value !== "") onCommit("");
+            return;
+          }
+          if (next === clamp(next)) {
             setDraft(null);
             if (next !== value) onCommit(next);
             return;
