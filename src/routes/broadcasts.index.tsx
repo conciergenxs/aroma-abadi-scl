@@ -1,4 +1,6 @@
 import { AppShell, SectionCard, ChannelDot, StatusPill } from "@/components/scl/app-shell";
+import { InfoHint } from "@/components/scl/dashboard-ui";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   useBroadcastsStore,
   broadcastsStore,
@@ -102,24 +104,26 @@ function BroadcastListPage() {
   const stats = useMemo(() => {
     // The tiles say "last 30 days" and now have to mean it: this workspace
     // holds two years of sends, so summing every broadcast ever would report
-    // a quarter of a million reach under a thirty-day label.
-    const since = new Date(todayWIBUtc() - 29 * 86_400_000).toISOString().slice(0, 10);
-    const sent = broadcasts.filter((b) => b.status === "Sent" && (b.sentAtDate ?? "") >= since);
+    // Both rates are measured over every send on record, not a rolling
+    // window: a rate is only comparable against a stated period, and the
+    // period is spelled out on the tile rather than hidden in a label.
+    const sent = broadcasts.filter((b) => b.status === "Sent");
     const totalReach = sent.reduce((a, b) => a + b.reach, 0);
     const totalDelivered = sent.reduce((a, b) => a + b.delivered, 0);
     const totalRead = sent.reduce((a, b) => a + b.read, 0);
-    const scheduled = broadcasts.filter((b) => b.status === "Scheduled").length;
     return [
-      { l: "Total Reach (30d)", v: fmtNum(totalReach) },
       {
-        l: "Delivery Rate",
+        l: "DELIVERY RATE",
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
+        period: "Lifetime",
+        hint: "Messages WhatsApp confirmed as delivered, against everyone a broadcast reached. Counted across every broadcast ever sent.",
       },
       {
-        l: "Read Rate",
+        l: "READ RATE",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
+        period: "Lifetime",
+        hint: "Delivered messages that were opened. Counted across every broadcast ever sent.",
       },
-      { l: "Scheduled", v: String(scheduled) },
     ];
   }, [broadcasts]);
 
@@ -173,17 +177,23 @@ function BroadcastListPage() {
   return (
     <AppShell title="Broadcasts" subtitle="Send and track WhatsApp campaigns to your contacts.">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 stagger">
-          {stats.map((s) => (
-            <div
-              key={s.l}
-              className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
-            >
-              <div className="text-xs text-muted-foreground">{s.l}</div>
-              <div className="mt-2 text-2xl font-semibold">{s.v}</div>
-            </div>
-          ))}
-        </div>
+        <TooltipProvider delayDuration={150}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
+            {stats.map((s) => (
+              <div
+                key={s.l}
+                className="card-hover rounded-xl border border-border bg-card/60 p-5 glass transition-all duration-300"
+              >
+                <div className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {s.l}
+                  <InfoHint text={s.hint} />
+                </div>
+                <div className="mt-2 text-2xl font-semibold">{s.v}</div>
+                <div className="mt-1 text-[12px] text-muted-foreground">{s.period}</div>
+              </div>
+            ))}
+          </div>
+        </TooltipProvider>
 
         <SectionCard>
           {/* Card header carries the primary action; the row under it is for
