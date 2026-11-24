@@ -1908,6 +1908,39 @@ function FilterCheckList({
 // Message Row — bubble + hover actions + forward checkbox
 // ============================================================
 
+/** The light formatting WhatsApp itself applies to a message: *bold*, and
+ *  bare links the customer pasted. Anything else is left exactly as typed —
+ *  this renders what arrived, it does not interpret Markdown. */
+function RichMessageText({ text, isMe }: { text: string; isMe: boolean }) {
+  const parts = text.split(/(\*[^*\n]+\*|https?:\/\/\S+)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (/^\*[^*\n]+\*$/.test(part)) {
+          return <strong key={i}>{part.slice(1, -1)}</strong>;
+        }
+        if (/^https?:\/\/\S+$/.test(part)) {
+          return (
+            <a
+              key={i}
+              href={part}
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={(e) => e.stopPropagation()}
+              className={`underline underline-offset-2 break-all ${
+                isMe ? "text-primary-foreground" : "text-primary"
+              }`}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 function MessageRow({
   message,
   senderName,
@@ -1974,11 +2007,14 @@ function MessageRow({
             <ForwardIcon className="h-3 w-3" /> Forwarded
           </div>
         )}
-        <p className="whitespace-pre-wrap">
+        {/* break-words plus overflow-wrap:anywhere — a pasted link has no
+            space to break at, so without it the URL ran straight out of the
+            bubble instead of wrapping inside it. */}
+        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
           {highlightQuery ? (
             <HighlightedText text={m.text} query={highlightQuery} isActive={isActiveMatch} />
           ) : (
-            m.text
+            <RichMessageText text={m.text} isMe={isMe} />
           )}
         </p>
         <div

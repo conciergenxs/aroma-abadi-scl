@@ -827,7 +827,7 @@ export const threadsByContact: Record<string, Message[]> = {
       id: "m4",
       from: "me",
       sentBy: "arma",
-      text: "Sudah diaplikasikan. Link checkout privat: aroma.id/v/putri-22",
+      text: "Sudah diaplikasikan. Diskon *Beauty Club 15%* sudah masuk ya. Link checkout privat: https://aroma-abadi.id/checkout/velvet-rouge-03?ref=putri-22&promo=beautyclub15",
       time: "10:25",
       status: "read",
     },

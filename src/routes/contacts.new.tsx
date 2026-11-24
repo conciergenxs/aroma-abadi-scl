@@ -106,10 +106,6 @@ function NewContactPage() {
       toast.error("Gender is required");
       return;
     }
-    if (brandIds.length === 0) {
-      toast.error("Select at least one brand");
-      return;
-    }
     if (!position) {
       toast.error("Position is required");
       return;

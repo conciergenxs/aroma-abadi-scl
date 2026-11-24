@@ -114,6 +114,33 @@ function ContactDetailPage() {
   const { brands } = useSkuStore();
 
   const isBA = contact?.labelIds.includes("lb-ba") ?? false;
+
+  /* A customer's brands are a record of what they bought, so the orders decide
+   * them rather than someone ticking boxes after the fact. On opening a
+   * customer, any brand present in their order history that is not on the
+   * contact yet is added. A BA is left alone: their brands are an assignment,
+   * not a purchase history. */
+  useEffect(() => {
+    if (!contact || isBA) return;
+    const idByName = new Map(brands.map((b) => [b.name.toLowerCase(), b.id]));
+    const purchased = new Set<string>();
+    for (const t of transactions) {
+      if (t.customerId !== contact.id || t.status === "Cancelled") continue;
+      for (const name of t.brandNames ?? []) {
+        const id = idByName.get(name.toLowerCase());
+        if (id) purchased.add(id);
+      }
+    }
+    const current = new Set(contact.brandIds ?? []);
+    const missing = [...purchased].filter((id) => !current.has(id));
+    if (missing.length === 0) return;
+    contactsStore.setContacts((cs) =>
+      cs.map((c) => (c.id === contact.id ? { ...c, brandIds: [...current, ...missing] } : c)),
+    );
+    // Keyed on the contact, not on its brand list: re-running when the list
+    // changes would undo a brand the user has just taken off by hand.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contact?.id, isBA, brands, transactions]);
   const baRecord = useMemo(
     () =>
       contact

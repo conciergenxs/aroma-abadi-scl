@@ -4,7 +4,24 @@ import { todayWIBUtc } from "@/lib/wib";
 // Currency is formatted in one place for the whole app — see lib/fmt.
 export { fmtIDR as formatIDR } from "@/lib/fmt";
 
-export type TxStatus = "Processed" | "Shipped" | "Cancelled";
+/** Where an order has got to. The names follow Odoo's sequence — unpaid,
+ *  paid, despatched, received, cancelled — in the words a BA would use rather
+ *  than Odoo's own ("Sales Order", "Done"). */
+export type TxStatus =
+  | "Waiting for Payment"
+  | "Paid"
+  | "Shipped"
+  | "Delivered"
+  | "Cancelled";
+
+/** Whether an order counts as money taken.
+ *
+ *  Not simply "anything but cancelled" any more: an order waiting on payment
+ *  has produced no revenue either, and counting it would overstate every
+ *  sales figure on the Overview. */
+export function countsAsRevenue(status: TxStatus | string): boolean {
+  return status !== "Cancelled" && status !== "Waiting for Payment";
+}
 
 export type TxLine = {
   skuId: string;
@@ -177,7 +194,7 @@ function seed(): Transaction[] {
   ];
   const historyCustomers = [...customers, ...EXTRA_CUSTOMERS];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
-  const statuses: TxStatus[] = ["Processed", "Shipped", "Shipped", "Processed", "Cancelled"];
+  const statuses: TxStatus[] = ["Paid", "Shipped", "Delivered", "Paid", "Cancelled"];
 
   // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
   const BASE_EPOCH = 1785369600000; // 2026-07-30 00:00:00 UTC — fixed, never changes; kept anchored to "today" so the Overview date picker's range actually reaches the present
@@ -295,7 +312,16 @@ function seed(): Transaction[] {
         items: lines,
         ...money,
         paymentMethod,
-        status: roll < 0.1 ? "Cancelled" : roll < 0.55 ? "Shipped" : "Processed",
+        status:
+          roll < 0.07
+            ? "Cancelled"
+            : roll < 0.14
+              ? "Waiting for Payment"
+              : roll < 0.5
+                ? "Delivered"
+                : roll < 0.8
+                  ? "Shipped"
+                  : "Paid",
       });
     }
   }
@@ -329,7 +355,8 @@ function seed(): Transaction[] {
 // lifetime view needs before it buckets by year instead of by month.
 // v19: back to Jan 2023, so the longest range the date filter can offer is
 // four years and the lifetime axis carries four yearly points.
-const STORAGE_KEY = "aroma_tx_store_v19";
+// v20: orders carry the five-stage status, Waiting for Payment included.
+const STORAGE_KEY = "aroma_tx_store_v20";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
@@ -440,7 +467,9 @@ export function useTransactionsStore() {
 /** The colours an order's status wears — shared so the same order never looks
  * different in the table than it does in the side peek. */
 export function txStatusBadge(status: string) {
-  if (status === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
+  if (status === "Delivered") return "border-emerald-700 bg-emerald-600 text-white";
+  if (status === "Shipped") return "border-teal-700 bg-teal-600 text-white";
   if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
-  return "border-sky-700 bg-sky-600 text-white"; // Processed
+  if (status === "Waiting for Payment") return "border-amber-600 bg-amber-500 text-white";
+  return "border-sky-700 bg-sky-600 text-white"; // Paid
 }

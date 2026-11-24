@@ -36,7 +36,9 @@ const EMPTY: InboxState = {
   collaborators: {},
 };
 
-const STORAGE_KEY = "aroma_inbox_store_v1";
+// v2: one seeded message now carries *bold* and a long link, so the bubble's
+// wrapping and formatting can actually be seen.
+const STORAGE_KEY = "aroma_inbox_store_v2";
 
 /** Distinct object so the server render and the first client render agree —
  * same pattern as the other useSyncExternalStore stores here. */
