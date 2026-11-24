@@ -100,7 +100,10 @@ function ContactsPage() {
   const [showFilterProps, setShowFilterProps] = useState(false);
   /** A brand's contacts are the BAs who sell it and the customers who buy it
    *  — two different questions, so the brand view can be narrowed to either. */
-  const [brandAudience, setBrandAudience] = useState<"all" | "customer" | "ba">("all");
+  // A brand view always answers for one audience. "All" mixed the two into a
+  // single list whose columns measured differently each way, and the left
+  // rail already carries the unsplit counts.
+  const [brandAudience, setBrandAudience] = useState<"customer" | "ba">("customer");
   const [audienceModalId, setAudienceModalId] = useState<string | null>(null);
   const [audienceSearch, setAudienceSearch] = useState("");
   const [audiencePage, setAudiencePage] = useState(1);
@@ -133,8 +136,10 @@ function ContactsPage() {
       // brand view: BAs and customers of this brand, narrowed by the toggle
       const brandId = activeView.slice(6);
       base = live.filter((c) => (c.brandIds ?? []).includes(brandId));
-      if (brandAudience === "customer") base = base.filter((c) => !c.labelIds.includes("lb-ba"));
-      else if (brandAudience === "ba") base = base.filter((c) => c.labelIds.includes("lb-ba"));
+      base =
+        brandAudience === "ba"
+          ? base.filter((c) => c.labelIds.includes("lb-ba"))
+          : base.filter((c) => !c.labelIds.includes("lb-ba"));
     } else base = live.filter((c) => c.listIds.includes(activeView));
     if (!query.trim()) return base;
     const q = query.toLowerCase();
@@ -424,7 +429,6 @@ function ContactsPage() {
                 <div className="inline-flex h-9 items-center rounded-md border border-border bg-card/60 p-0.5">
                   {(
                     [
-                      { id: "all", label: "All" },
                       { id: "customer", label: "Customers" },
                       { id: "ba", label: "BA" },
                     ] as const
@@ -434,7 +438,7 @@ function ContactsPage() {
                       type="button"
                       onClick={() => setBrandAudience(opt.id)}
                       aria-pressed={brandAudience === opt.id}
-                      className={`h-8 rounded px-3 text-[13px] transition-colors duration-150 active:scale-[0.98] ${
+                      className={`inline-flex h-8 min-w-[94px] items-center justify-center rounded px-3 text-[13px] transition-colors duration-150 active:scale-[0.98] ${
                         brandAudience === opt.id
                           ? "bg-primary/15 text-foreground font-medium"
                           : "text-muted-foreground hover:text-foreground hover:bg-card"
@@ -946,7 +950,7 @@ function ContactsTable({
 
   const thCls =
     "sticky top-0 z-10 px-4 py-3 text-left font-medium whitespace-nowrap bg-card border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground shadow-[0_1px_0_0_oklch(1_0_0_/_6%)]";
-  const tdCls = "px-4 py-3 whitespace-nowrap align-middle text-xs";
+  const tdCls = "px-4 py-3 whitespace-nowrap align-middle text-xs overflow-hidden text-ellipsis";
 
   const isBA = (c: Contact) => c.labelIds.includes("lb-ba");
   const getBA = (c: Contact) =>
@@ -964,19 +968,31 @@ function ContactsTable({
   const showBaPosition = isBaView && isVisible("position");
   const showBaPassword = isBaView && isVisible("password");
 
-  // colSpan for empty state — base columns (checkbox, name, WA number, contact
-  // type) plus whichever optional columns are currently toggled on
-  const colSpan =
-    4 +
-    [
-      showGender,
-      showPointBalance,
-      showLastTransaction,
-      showBaBrand,
-      showBaGender,
-      showBaPosition,
-      showBaPassword,
-    ].filter(Boolean).length;
+  /**
+   * The columns in render order, each with the width it keeps.
+   *
+   * An auto-layout table measures its own content, so switching the audience
+   * toggle re-measured every column and the whole grid shifted sideways under
+   * the pointer — the same fields landing in different places depending on who
+   * was listed. Fixed widths cost nothing here (the fields are a name, a
+   * gender, a phone number and a chip, all of known size) and the table stops
+   * moving.
+   */
+  const columns: { key: string; width: string }[] = [
+    { key: "select", width: "48px" },
+    { key: "name", width: "280px" },
+    ...(showGender ? [{ key: "gender", width: "120px" }] : []),
+    { key: "phone", width: "200px" },
+    { key: "type", width: "150px" },
+    ...(showPointBalance ? [{ key: "point_balance", width: "150px" }] : []),
+    ...(showLastTransaction ? [{ key: "last_transaction", width: "220px" }] : []),
+    ...(showBaBrand ? [{ key: "ba_brand", width: "220px" }] : []),
+    ...(showBaGender ? [{ key: "ba_gender", width: "120px" }] : []),
+    ...(showBaPosition ? [{ key: "position", width: "170px" }] : []),
+    ...(showBaPassword ? [{ key: "password", width: "170px" }] : []),
+  ];
+  // colSpan for the empty state
+  const colSpan = columns.length;
 
   function toggleReveal(ba: BA | undefined) {
     if (!ba || !passwordGate.allowed) return;
@@ -990,7 +1006,12 @@ function ContactsTable({
 
   return (
     <>
-      <table className="min-w-full text-sm">
+      <table className="min-w-full table-fixed text-sm">
+        <colgroup>
+          {columns.map((c) => (
+            <col key={c.key} style={{ width: c.width }} />
+          ))}
+        </colgroup>
         <thead>
           <tr>
             <th className={`${thCls} w-10`}>

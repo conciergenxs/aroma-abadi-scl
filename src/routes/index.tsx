@@ -85,7 +85,7 @@ import {
   trendLabel,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
-import { BoundedDateInput } from "@/components/scl/date-range-popover";
+import { BoundedDateInput, fmtDateWithYear } from "@/components/scl/date-range-popover";
 import { LITE_MODE, PUBLIC_SITE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/")({
@@ -585,12 +585,6 @@ function fmtShortDate(iso: string) {
   const [, m, d] = iso.split("-").map(Number);
   return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
 }
-/** A bound carries its year. The custom fields are the one place a year can
- * be wrong, so the line that states the limit has to name one. */
-function fmtRangeBound(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number);
-  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y}`;
-}
 function addDaysIso(iso: string, days: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
@@ -716,7 +710,7 @@ function DateRangePopover({
               }}
             />
             <p className="px-2 pt-0.5 text-[12px] text-muted-foreground">
-              Data runs {fmtRangeBound(fullRange.start)} – {fmtRangeBound(fullRange.end)}.
+              Data runs {fmtDateWithYear(fullRange.start)} – {fmtDateWithYear(fullRange.end)}.
             </p>
           </div>
         </div>

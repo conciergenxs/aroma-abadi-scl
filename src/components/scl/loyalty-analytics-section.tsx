@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { SectionCard } from "@/components/scl/app-shell";
-import { BoundedDateInput } from "@/components/scl/date-range-popover";
+import { BoundedDateInput, fmtDateWithYear } from "@/components/scl/date-range-popover";
 import {
   chartTooltipStyle,
   chartLabelStyle,
@@ -149,27 +149,6 @@ function SubSection({ title, children }: { title: string; children: ReactNode })
 
 // ── Date Range control — presets + a Custom start/end popover, matching
 // the Overview page's own DateRangePopover pattern. ──────────────────────
-
-const BOUND_MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-/** Split on the ISO parts rather than parsing: `new Date(iso)` reads a
- * date-only string as UTC and can shift the day a timezone west. */
-function fmtLoyaltyBound(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number);
-  return `${String(d).padStart(2, "0")} ${BOUND_MONTHS[m - 1]} ${y}`;
-}
 function DateRangeControl({
   window,
   onSelectPreset,
@@ -253,8 +232,8 @@ function DateRangeControl({
               onCommit={(iso) => onCustomChange({ end: iso })}
             />
             <p className="px-2 pt-0.5 text-[12px] text-muted-foreground">
-              Loyalty data runs {fmtLoyaltyBound(CUSTOM_RANGE_MIN)} –{" "}
-              {fmtLoyaltyBound(CUSTOM_RANGE_MAX)}.
+              Loyalty data runs {fmtDateWithYear(CUSTOM_RANGE_MIN)} –{" "}
+              {fmtDateWithYear(CUSTOM_RANGE_MAX)}.
             </p>
           </div>
         </div>

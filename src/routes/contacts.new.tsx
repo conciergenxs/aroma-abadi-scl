@@ -287,7 +287,7 @@ function NewContactPage() {
                 onClick={() => setContactType(null)}
                 className="inline-flex items-center gap-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 px-2 h-7 text-xs font-medium transition-colors"
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> Back
+                <ArrowLeft className="h-3.5 w-3.5" />
               </button>
               <h1 className="text-sm font-medium">Create Beauty Ambassador</h1>
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">
@@ -429,7 +429,10 @@ function NewContactPage() {
             <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 animate-fade-in">
               <FormSection title="Basic Information">
                 <FormGrid>
-                  <Field label="Full Name" required>
+                  {/* A name is the longest thing typed on this form and the
+                      one most often pasted in full, so it takes the row; the
+                      number and the gender pair up underneath. */}
+                  <Field label="Full Name" required className="md:col-span-2">
                     <Input value={name} onChange={setName} placeholder="Enter full name.." />
                   </Field>
                   <Field label="WA Number" required>
@@ -512,6 +515,58 @@ function NewContactPage() {
 /** How many entries a picker's dropdown shows at once. Beyond this it pages,
  *  because a list that only scrolls gives no sense of how much is left. */
 const DROPDOWN_PAGE_SIZE = 10;
+
+/** The footer under a long picker list: what you are looking at on the left,
+ * the way to the rest of it on the right. The pair of chevrons sits together
+ * so the two moves are one control, and the count stays put while you page
+ * through — it is the only thing on the row that changes. */
+function DropdownPager({
+  from,
+  to,
+  total,
+  page,
+  pageCount,
+  onChange,
+}: {
+  from: number;
+  to: number;
+  total: number;
+  page: number;
+  pageCount: number;
+  onChange: (page: number) => void;
+}) {
+  if (pageCount <= 1) return null;
+  const btn =
+    "tap press h-6 w-6 grid place-items-center rounded border border-border text-muted-foreground hover:text-foreground hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent disabled:pointer-events-none transition-colors duration-150";
+  return (
+    <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5">
+      <span className="text-[12px] text-muted-foreground tabular-nums">
+        Showing {from}–{to} of {total}
+      </span>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(1, page - 1))}
+          disabled={page === 1}
+          aria-label="Previous page"
+          className={btn}
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(pageCount, page + 1))}
+          disabled={page === pageCount}
+          aria-label="Next page"
+          className={btn}
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 /* ── Layout helpers ───────────────────────────────────────────────────────── */
 
@@ -758,31 +813,14 @@ function LabelMultiSelect({
               </button>
             )}
           </div>
-          {pageCount > 1 && (
-            <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={safePage === 1}
-                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-              >
-                <ChevronLeft className="h-3 w-3" />
-                Previous
-              </button>
-              <span className="text-[12px] text-muted-foreground tabular-nums">
-                {firstShown}–{lastShown} of {filtered.length}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                disabled={safePage === pageCount}
-                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-              >
-                Next
-                <ChevronRight className="h-3 w-3" />
-              </button>
-            </div>
-          )}
+          <DropdownPager
+            from={firstShown}
+            to={lastShown}
+            total={filtered.length}
+            page={safePage}
+            pageCount={pageCount}
+            onChange={setPage}
+          />
         </div>
       )}
     </div>
@@ -930,31 +968,14 @@ function AudienceMultiSelect({
               </button>
             )}
           </div>
-          {pageCount > 1 && (
-            <div className="flex items-center justify-between gap-2 border-t border-border px-2 py-1.5">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={safePage === 1}
-                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-              >
-                <ChevronLeft className="h-3 w-3" />
-                Previous
-              </button>
-              <span className="text-[12px] text-muted-foreground tabular-nums">
-                {firstShown}–{lastShown} of {filtered.length}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                disabled={safePage === pageCount}
-                className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-[12px] text-muted-foreground hover:text-foreground hover:bg-gray-50 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none"
-              >
-                Next
-                <ChevronRight className="h-3 w-3" />
-              </button>
-            </div>
-          )}
+          <DropdownPager
+            from={firstShown}
+            to={lastShown}
+            total={filtered.length}
+            page={safePage}
+            pageCount={pageCount}
+            onChange={setPage}
+          />
         </div>
       )}
     </div>
