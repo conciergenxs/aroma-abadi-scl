@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { SectionCard } from "@/components/scl/app-shell";
+import { BoundedDateInput } from "@/components/scl/date-range-popover";
 import {
   chartTooltipStyle,
   chartLabelStyle,
@@ -148,6 +149,27 @@ function SubSection({ title, children }: { title: string; children: ReactNode })
 
 // ── Date Range control — presets + a Custom start/end popover, matching
 // the Overview page's own DateRangePopover pattern. ──────────────────────
+
+const BOUND_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+/** Split on the ISO parts rather than parsing: `new Date(iso)` reads a
+ * date-only string as UTC and can shift the day a timezone west. */
+function fmtLoyaltyBound(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${BOUND_MONTHS[m - 1]} ${y}`;
+}
 function DateRangeControl({
   window,
   onSelectPreset,
@@ -216,26 +238,24 @@ function DateRangeControl({
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">
               Custom Range
             </div>
-            <input
-              type="date"
+            <BoundedDateInput
               value={customRange?.start ?? ""}
               min={CUSTOM_RANGE_MIN}
               max={customRange?.end ?? CUSTOM_RANGE_MAX}
-              onChange={(e) => {
-                if (e.target.value) onCustomChange({ start: e.target.value });
-              }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              label="From date"
+              onCommit={(iso) => onCustomChange({ start: iso })}
             />
-            <input
-              type="date"
+            <BoundedDateInput
               value={customRange?.end ?? ""}
               min={customRange?.start ?? CUSTOM_RANGE_MIN}
               max={CUSTOM_RANGE_MAX}
-              onChange={(e) => {
-                if (e.target.value) onCustomChange({ end: e.target.value });
-              }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              label="To date"
+              onCommit={(iso) => onCustomChange({ end: iso })}
             />
+            <p className="px-2 pt-0.5 text-[12px] text-muted-foreground">
+              Loyalty data runs {fmtLoyaltyBound(CUSTOM_RANGE_MIN)} –{" "}
+              {fmtLoyaltyBound(CUSTOM_RANGE_MAX)}.
+            </p>
           </div>
         </div>
       )}

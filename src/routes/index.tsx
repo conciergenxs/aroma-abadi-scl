@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtIDR, fmtNum } from "@/lib/fmt";
 import { AppShell, SectionCard } from "@/components/scl/app-shell";
-import { nowWIB } from "@/lib/wib";
 import { useTransactionsStore } from "@/components/scl/transactions-store";
 import {
   avgMessagesBetweenTransaction,
@@ -86,6 +85,7 @@ import {
   trendLabel,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
+import { BoundedDateInput } from "@/components/scl/date-range-popover";
 import { LITE_MODE, PUBLIC_SITE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/")({
@@ -585,25 +585,15 @@ function fmtShortDate(iso: string) {
   const [, m, d] = iso.split("-").map(Number);
   return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
 }
+/** A bound carries its year. The custom fields are the one place a year can
+ * be wrong, so the line that states the limit has to name one. */
+function fmtRangeBound(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y}`;
+}
 function addDaysIso(iso: string, days: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
-}
-
-/** The whole field opens the calendar.
- *
- * Chrome only opens a date input's picker from its calendar indicator, and
- * this one is moved to the left edge by `.scl-date-input`, so clicking the
- * field — which is what the control looks like it wants — did nothing at all.
- * showPicker() is a user-gesture API and throws if the browser declines;
- * typing into the field still works either way.
- */
-function openDatePicker(e: React.MouseEvent<HTMLInputElement>) {
-  try {
-    e.currentTarget.showPicker?.();
-  } catch {
-    /* the field is still typeable */
-  }
 }
 
 function DateRangePopover({
@@ -617,10 +607,10 @@ function DateRangePopover({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  // A ledger has no future, so the end can reach today but no further. The
-  // start is open: asking about 2019 is a fair question, and an empty answer
-  // is a true one.
-  const todayIso = nowWIB().toISOString().slice(0, 10);
+  // Both ends are held to the data. A ledger has no future, and it has no
+  // prehistory either: a window reaching back to the year 121 is not a fair
+  // question with an empty answer, it is a typo that quietly empties every
+  // tile on the page. Out-of-range typing snaps to the nearest real date.
   // Presets can clamp to an identical range once the window is short enough
   // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
   // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
@@ -705,33 +695,29 @@ function DateRangePopover({
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">
               Custom Range
             </div>
-            <input
-              type="date"
+            <BoundedDateInput
               value={range.start}
+              min={fullRange.start}
               max={range.end}
-              onClick={openDatePicker}
-              onChange={(e) => {
-                if (e.target.value) {
-                  setSelectedLabel(null);
-                  onChange({ start: e.target.value, end: range.end });
-                }
+              label="From date"
+              onCommit={(iso) => {
+                setSelectedLabel(null);
+                onChange({ start: iso, end: range.end });
               }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
-            <input
-              type="date"
+            <BoundedDateInput
               value={range.end}
               min={range.start}
-              max={todayIso}
-              onClick={openDatePicker}
-              onChange={(e) => {
-                if (e.target.value) {
-                  setSelectedLabel(null);
-                  onChange({ start: range.start, end: e.target.value });
-                }
+              max={fullRange.end}
+              label="To date"
+              onCommit={(iso) => {
+                setSelectedLabel(null);
+                onChange({ start: range.start, end: iso });
               }}
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[12px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
             />
+            <p className="px-2 pt-0.5 text-[12px] text-muted-foreground">
+              Data runs {fmtRangeBound(fullRange.start)} – {fmtRangeBound(fullRange.end)}.
+            </p>
           </div>
         </div>
       )}

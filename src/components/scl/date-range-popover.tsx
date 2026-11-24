@@ -28,6 +28,13 @@ export function fmtShortDate(iso: string) {
   return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]}`;
 }
 
+/** A bound carries its year. The custom fields are the one place a year can
+ * be wrong, so anything that states a limit has to name one. */
+export function fmtDateWithYear(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y}`;
+}
+
 export function addDaysIso(iso: string, days: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
@@ -53,19 +60,6 @@ export function lifetimePresets(bounds: DateRange): RangePreset[] {
   ];
 }
 
-/** Opens the native calendar for a field the user clicked the icon of. Kept
- * off the field itself: a click inside the text is how you reach the year
- * segment to type into it, and a picker that opens there takes the field away
- * just as you aim at it. */
-function openDatePicker(e: React.MouseEvent<HTMLElement>) {
-  const input = (e.currentTarget as HTMLElement).querySelector("input");
-  try {
-    (input as HTMLInputElement | null)?.showPicker?.();
-  } catch {
-    /* the field is still typeable */
-  }
-}
-
 /**
  * A date field that can be typed into without the value it is bound to
  * fighting back, and that cannot leave the dates the data covers.
@@ -77,6 +71,10 @@ function openDatePicker(e: React.MouseEvent<HTMLElement>) {
  * only sometimes. This one holds what is being typed, commits the moment it
  * falls inside the bounds, and on blur snaps anything still outside them to
  * the nearest date the data actually has.
+ *
+ * The calendar opens from the icon, not from a click anywhere in the field:
+ * a click inside the text is how you reach the year segment to type into,
+ * and a picker opening there takes the field away just as you aim at it.
  */
 export function BoundedDateInput({
   value,
@@ -94,6 +92,10 @@ export function BoundedDateInput({
 }) {
   const [draft, setDraft] = useState<string | null>(null);
   const clamp = (iso: string) => (iso < min ? min : iso > max ? max : iso);
+  // A half-typed year is a date the data does not have, and the figures on
+  // the page still answer the last good one. Saying so beats a field that
+  // quietly disagrees with every tile beside it.
+  const willSnapTo = draft && draft !== clamp(draft) ? clamp(draft) : null;
 
   const settle = () => {
     const typed = draft;
@@ -104,13 +106,14 @@ export function BoundedDateInput({
   };
 
   return (
-    <div className="relative" onClick={openDatePicker}>
+    <div className="space-y-1">
       <input
         type="date"
         value={draft ?? value}
         min={min}
         max={max}
         aria-label={label}
+        aria-invalid={willSnapTo ? true : undefined}
         onChange={(e) => {
           const next = e.target.value;
           if (next && next === clamp(next)) {
@@ -127,8 +130,17 @@ export function BoundedDateInput({
           settle();
           e.currentTarget.blur();
         }}
-        className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-text scl-date-input"
+        className={`h-8 w-full rounded-md border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 cursor-text scl-date-input transition-colors duration-150 ${
+          willSnapTo
+            ? "border-amber-500/70 focus:ring-amber-500/40"
+            : "border-border focus:ring-primary/40"
+        }`}
       />
+      {willSnapTo && (
+        <p className="px-0.5 text-[12px] font-medium text-amber-700">
+          Outside the data — snaps to {fmtDateWithYear(willSnapTo)}.
+        </p>
+      )}
     </div>
   );
 }
@@ -206,27 +218,19 @@ export function DateRangePopover({
             <div className="text-[12px] uppercase tracking-wider text-muted-foreground px-2">
               Custom Range
             </div>
-            <input
-              type="date"
+            <BoundedDateInput
               value={range.start}
               min={bounds.start}
               max={range.end}
-              onChange={(e) => {
-                if (e.target.value) onChange({ start: e.target.value, end: range.end }, null);
-              }}
-              aria-label="From date"
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              label="From date"
+              onCommit={(iso) => onChange({ start: iso, end: range.end }, null)}
             />
-            <input
-              type="date"
+            <BoundedDateInput
               value={range.end}
               min={range.start}
               max={bounds.end}
-              onChange={(e) => {
-                if (e.target.value) onChange({ start: range.start, end: e.target.value }, null);
-              }}
-              aria-label="To date"
-              className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-pointer scl-date-input"
+              label="To date"
+              onCommit={(iso) => onChange({ start: range.start, end: iso }, null)}
             />
           </div>
         </div>
