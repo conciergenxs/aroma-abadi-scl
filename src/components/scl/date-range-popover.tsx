@@ -99,6 +99,12 @@ export function BoundedDateInput({
 }) {
   const [draft, setDraft] = useState<string | null>(null);
   const clamp = (iso: string) => (iso < min ? min : iso > max ? max : iso);
+  // Something outside the field moved the date — a preset, a Clear button,
+  // the other end of the range. Whatever was half-typed here is answering a
+  // question that has already been answered, so it goes.
+  useEffect(() => {
+    setDraft(null);
+  }, [value]);
   // A half-typed year is a date the data does not have, and the figures on
   // the page still answer the last good one. Saying so beats a field that
   // quietly disagrees with every tile beside it.
