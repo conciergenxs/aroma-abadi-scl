@@ -53,6 +53,86 @@ export function lifetimePresets(bounds: DateRange): RangePreset[] {
   ];
 }
 
+/** Opens the native calendar for a field the user clicked the icon of. Kept
+ * off the field itself: a click inside the text is how you reach the year
+ * segment to type into it, and a picker that opens there takes the field away
+ * just as you aim at it. */
+function openDatePicker(e: React.MouseEvent<HTMLElement>) {
+  const input = (e.currentTarget as HTMLElement).querySelector("input");
+  try {
+    (input as HTMLInputElement | null)?.showPicker?.();
+  } catch {
+    /* the field is still typeable */
+  }
+}
+
+/**
+ * A date field that can be typed into without the value it is bound to
+ * fighting back, and that cannot leave the dates the data covers.
+ *
+ * A native date input fires a change for every digit of the year, so typing
+ * "2025" walks through 0002, 0020 and 0202 first. A field that clamped on each
+ * of those would rewrite itself to the earliest date in the data three times
+ * and never let the fourth digit land — which is why typing here used to work
+ * only sometimes. This one holds what is being typed, commits the moment it
+ * falls inside the bounds, and on blur snaps anything still outside them to
+ * the nearest date the data actually has.
+ */
+export function BoundedDateInput({
+  value,
+  min,
+  max,
+  label,
+  onCommit,
+}: {
+  /** The committed date, or "" when nothing is chosen yet. */
+  value: string;
+  min: string;
+  max: string;
+  label: string;
+  onCommit: (iso: string) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const clamp = (iso: string) => (iso < min ? min : iso > max ? max : iso);
+
+  const settle = () => {
+    const typed = draft;
+    setDraft(null);
+    if (!typed) return;
+    const next = clamp(typed);
+    if (next !== value) onCommit(next);
+  };
+
+  return (
+    <div className="relative" onClick={openDatePicker}>
+      <input
+        type="date"
+        value={draft ?? value}
+        min={min}
+        max={max}
+        aria-label={label}
+        onChange={(e) => {
+          const next = e.target.value;
+          if (next && next === clamp(next)) {
+            setDraft(null);
+            if (next !== value) onCommit(next);
+            return;
+          }
+          setDraft(next);
+        }}
+        onBlur={settle}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          settle();
+          e.currentTarget.blur();
+        }}
+        className="h-8 w-full rounded-md border border-border bg-card px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 cursor-text scl-date-input"
+      />
+    </div>
+  );
+}
+
 export function DateRangePopover({
   range,
   bounds,
