@@ -312,7 +312,10 @@ export function PromoFormFields({
         </div>
       )}
 
-      {/* Start / End Date+Time */}
+      {/* Start / End Date+Time — the calendar opens from the field's own icon.
+          Opening it from a click anywhere in the field was measured breaking
+          typing: with the picker up Chrome sends the keys to the calendar, so
+          a typed timestamp came out as a different date entirely. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
         <div>
           <label className={labelCls}>Start Date &amp; Time</label>
@@ -322,7 +325,6 @@ export function PromoFormFields({
             value={form.startDate}
             max={form.endDate || undefined}
             onChange={(e) => set("startDate", e.target.value)}
-            onClick={() => startDateRef.current?.showPicker?.()}
             className={inputCls}
           />
         </div>
@@ -334,7 +336,6 @@ export function PromoFormFields({
             value={form.endDate}
             min={form.startDate || undefined}
             onChange={(e) => set("endDate", e.target.value)}
-            onClick={() => endDateRef.current?.showPicker?.()}
             className={inputCls}
           />
         </div>

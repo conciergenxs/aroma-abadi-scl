@@ -374,7 +374,9 @@ function PromoDetailPage() {
             value={
               isOneToOne
                 ? `${fmtNum(redemptions.length)}${assignedCodes.length ? ` / ${fmtNum(assignedCodes.length)}` : ""}`
-                : `${fmtNum(redemptions.length)}${promo.maxUsage ? ` / ${fmtNum(promo.maxUsage)}` : ""}`
+                : // No cap is still a denominator — "12" alone leaves the reader
+                  // asking twelve out of what, and the list already answers it.
+                  `${fmtNum(redemptions.length)} / ${promo.maxUsage ? fmtNum(promo.maxUsage) : "Unlimited"}`
             }
           />
           <StatTile
