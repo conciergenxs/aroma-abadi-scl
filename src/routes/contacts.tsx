@@ -792,7 +792,7 @@ function SidebarPager({
   const from = total === 0 ? 0 : (page - 1) * SIDEBAR_PAGE_SIZE + 1;
   const to = Math.min(page * SIDEBAR_PAGE_SIZE, total);
   return (
-    <div className="flex items-center justify-between px-3 pt-2 text-[10px] text-muted-foreground">
+    <div className="flex items-center justify-between px-3 pt-2 text-[12px] text-muted-foreground">
       <span className="tabular-nums">
         {from}–{to} of {total}
       </span>
@@ -802,7 +802,7 @@ function SidebarPager({
           onClick={() => onChange(page - 1)}
           disabled={page <= 1}
           aria-label="Previous page"
-          className="tap press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          className="tap press h-6 w-6 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
         >
           ‹
         </button>
@@ -811,7 +811,7 @@ function SidebarPager({
           onClick={() => onChange(page + 1)}
           disabled={page >= pages}
           aria-label="Next page"
-          className="tap press h-5 w-5 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          className="tap press h-6 w-6 grid place-items-center rounded border border-border hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
         >
           ›
         </button>

@@ -1178,11 +1178,6 @@ function InboxPage() {
               <Section title="Contact Information">
                 <InfoRow icon={<Phone className="h-3 w-3" />} label="Phone" value={contact.phone} />
                 <InfoRow
-                  icon={<MessageSquare className="h-3 w-3" />}
-                  label="Channel"
-                  value="WhatsApp"
-                />
-                <InfoRow
                   icon={<Clock className="h-3 w-3" />}
                   label="Last Interaction"
                   value={contact.lastInteraction}
@@ -1216,13 +1211,6 @@ function InboxPage() {
                       icon={<User2 className="h-3 w-3" />}
                       label="Gender"
                       value={contact.gender ?? "—"}
-                    />
-                    <InfoRow
-                      icon={<Coins className="h-3 w-3" />}
-                      label="Point Balance"
-                      value={
-                        contact.pointBalance != null ? `${fmtNum(contact.pointBalance)} pts` : "—"
-                      }
                     />
                   </>
                 )}

@@ -285,9 +285,10 @@ function NewContactPage() {
               <button
                 type="button"
                 onClick={() => setContactType(null)}
-                className="inline-flex items-center gap-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 px-2 h-7 text-xs font-medium transition-colors"
+                aria-label="Back to contact type"
+                className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
+                <ArrowLeft className="h-4 w-4" />
               </button>
               <h1 className="text-sm font-medium">Create Beauty Ambassador</h1>
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-violet-600 text-white border border-violet-700">
@@ -373,7 +374,7 @@ function NewContactPage() {
                             type="button"
                             key={b.id}
                             onClick={() => toggleBrand(b.id, brandIds, setBrandIds)}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors duration-150 ${on ? "border-primary/60 bg-primary/15 text-foreground" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
                           >
                             {b.name}
                           </button>
@@ -399,6 +400,7 @@ function NewContactPage() {
             <button
               type="button"
               onClick={() => setContactType(null)}
+              aria-label="Back to contact type"
               className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -461,6 +463,11 @@ function NewContactPage() {
                   <p className="text-[11px] text-muted-foreground">
                     Relevant product brands for this customer.
                   </p>
+                  {/* The weight is the same selected or not. A chip that
+                      thickens on click is wider on click, and every chip after
+                      it on the row moves — so the one you just picked shoves
+                      the next one out from under the pointer. Colour alone
+                      carries the state. */}
                   <div className="flex flex-wrap gap-2">
                     {brands.map((b) => {
                       const on = customerBrandIds.includes(b.id);
@@ -469,7 +476,7 @@ function NewContactPage() {
                           type="button"
                           key={b.id}
                           onClick={() => toggleBrand(b.id, customerBrandIds, setCustomerBrandIds)}
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary/60 bg-primary/15 text-foreground font-medium" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors duration-150 ${on ? "border-primary/60 bg-primary/15 text-foreground" : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
                         >
                           {b.name}
                         </button>
@@ -519,7 +526,9 @@ const DROPDOWN_PAGE_SIZE = 10;
 /** The footer under a long picker list: what you are looking at on the left,
  * the way to the rest of it on the right. The pair of chevrons sits together
  * so the two moves are one control, and the count stays put while you page
- * through — it is the only thing on the row that changes. */
+ * through — it is the only thing on the row that changes. It stays on a
+ * single-page list too: "Showing 1–9 of 9" is the answer to how long the list
+ * is, which is worth more than the row it costs. */
 function DropdownPager({
   from,
   to,
@@ -535,7 +544,6 @@ function DropdownPager({
   pageCount: number;
   onChange: (page: number) => void;
 }) {
-  if (pageCount <= 1) return null;
   const btn =
     "tap press h-6 w-6 grid place-items-center rounded border border-border text-muted-foreground hover:text-foreground hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent disabled:pointer-events-none transition-colors duration-150";
   return (
