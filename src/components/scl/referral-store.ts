@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { contacts as seedContacts } from "./mock-data";
-import { transactionsStore } from "./transactions-store";
+import { countsAsRevenue, transactionsStore } from "./transactions-store";
 import { promoStore, discountFor, type PromoRule } from "./promo-store";
 import { wib } from "@/lib/wib";
 
@@ -190,7 +190,7 @@ function seed(): ReferralSeason[] {
   );
   const referredAlready = new Set<string>();
   const orders = [...transactionsStore.state.transactions]
-    .filter((t) => t.customerId && t.status !== "Cancelled" && !promoOrders.has(t.id))
+    .filter((t) => t.customerId && countsAsRevenue(t.status) && !promoOrders.has(t.id))
     // Newest first, so the season running now gets its referrals before older
     // seasons use up the same customers.
     .sort((a, b) => +new Date(b.date) - +new Date(a.date));

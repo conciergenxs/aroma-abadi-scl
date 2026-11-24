@@ -37,7 +37,13 @@ function wibDay(iso: string) {
 /** Listed in the order an order actually travels, so the dropdown reads as a
  * journey rather than an alphabet. Typed as TxStatus so adding a stage to the
  * store without adding it here is a compile error. */
-const TX_STATUSES: TxStatus[] = ["Processed", "Shipped", "Cancelled"];
+const TX_STATUSES: TxStatus[] = [
+  "Waiting for Payment",
+  "Paid",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+];
 
 /** The table lists distinct products. An order can carry the same SKU on two
  * lines, and repeating the name tells the reader nothing — the quantities are

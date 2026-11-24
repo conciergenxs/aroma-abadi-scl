@@ -1,7 +1,12 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import { AppShell } from "@/components/scl/app-shell";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { useTransactionsStore, formatIDR } from "@/components/scl/transactions-store";
+import {
+  countsAsRevenue,
+  formatIDR,
+  type TxStatus,
+  useTransactionsStore,
+} from "@/components/scl/transactions-store";
 import { fmtDateEN as formatDate } from "@/lib/fmt";
 import { Fragment, useMemo, useState } from "react";
 import {
@@ -45,9 +50,7 @@ function SkuDetailPage() {
 
   // ── Filters ────────────────────────────────────────────────────────────
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "Processed" | "Shipped" | "Cancelled">(
-    "all",
-  );
+  const [filterStatus, setFilterStatus] = useState<"all" | TxStatus>("all");
   const [dateFrom, setDateFrom] = useState(defaultFrom);
   const [dateTo, setDateTo] = useState(defaultTo);
   const [page, setPage] = useState(1);
@@ -102,7 +105,7 @@ function SkuDetailPage() {
     let unitsSold = 0,
       revenue = 0;
     filteredTx.forEach((t) => {
-      if (t.status !== "Cancelled")
+      if (countsAsRevenue(t.status))
         t.items.forEach((i) => {
           if (i.skuId === skuId) {
             unitsSold += i.qty;
@@ -217,7 +220,9 @@ function SkuDetailPage() {
 
           {/* Status filter */}
           <div className="flex items-center gap-1">
-            {(["all", "Processed", "Shipped", "Cancelled"] as const).map((s) => (
+            {(
+              ["all", "Waiting for Payment", "Paid", "Shipped", "Delivered", "Cancelled"] as const
+            ).map((s) => (
               <button
                 key={s}
                 type="button"

@@ -3,7 +3,7 @@ import { ChevronDown, Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SclSelect, type SclSelectOption } from "./scl-select";
 import type { Contact } from "./mock-data";
-import { formatIDR, type Transaction } from "./transactions-store";
+import { countsAsRevenue, formatIDR, type Transaction } from "./transactions-store";
 
 const TOTAL_SPEND_OPTIONS: SclSelectOption[] = [
   { value: "0", label: "Any" },
@@ -48,7 +48,7 @@ const EMPTY_STATS: ContactStats = {
 };
 
 function computeStats(contactId: string, transactions: Transaction[]): ContactStats {
-  const txs = transactions.filter((t) => t.customerId === contactId && t.status !== "Cancelled");
+  const txs = transactions.filter((t) => t.customerId === contactId && countsAsRevenue(t.status));
   const brands = new Set<string>();
   for (const t of txs) {
     for (const b of t.brandNames?.length ? t.brandNames : [t.brandName]) brands.add(b);

@@ -1,4 +1,5 @@
 import type { Transaction } from "./transactions-store";
+import { countsAsRevenue } from "./transactions-store";
 import { broadcasts } from "./mock-data";
 
 // ── SKU code → brand lookup (transaction lines only carry skuCode/skuName) ──
@@ -273,7 +274,7 @@ export function computeOrdersAndSales(
   const spanEnd = range?.end ?? days[days.length - 1] ?? spanStart;
   const trendGranularity = spanStart ? trendGranularityFor(spanStart, spanEnd) : "day";
   const totalOrders = scoped.length;
-  const paid = scoped.filter((t) => t.status !== "Cancelled");
+  const paid = scoped.filter((t) => countsAsRevenue(t.status));
   const totalTransactions = paid.length;
   const totalSales = paid.reduce((s, t) => s + t.total, 0);
 

@@ -7,12 +7,7 @@ export { fmtIDR as formatIDR } from "@/lib/fmt";
 /** Where an order has got to. The names follow Odoo's sequence — unpaid,
  *  paid, despatched, received, cancelled — in the words a BA would use rather
  *  than Odoo's own ("Sales Order", "Done"). */
-export type TxStatus =
-  | "Waiting for Payment"
-  | "Paid"
-  | "Shipped"
-  | "Delivered"
-  | "Cancelled";
+export type TxStatus = "Waiting for Payment" | "Paid" | "Shipped" | "Delivered" | "Cancelled";
 
 /** Whether an order counts as money taken.
  *
