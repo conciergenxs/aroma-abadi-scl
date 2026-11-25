@@ -39,16 +39,24 @@ const TX_JOURNEY: TxStatus[] = [
   "Cancelled",
 ];
 
-/** Status for a seeded order, by cumulative weight. Complete dominates
- * because the seed stretches back to 2023 and a 2023 order is done; the rest
- * keep enough volume that filtering by any one of them returns a real list. */
+/**
+ * Status for a seeded order, by cumulative weight.
+ *
+ * Complete leads, because the seed stretches back to 2023 and a 2023 order has
+ * finished. The live stages keep a tenth each rather than the handful strict
+ * realism would leave them: this is the spec the team builds from, and a stage
+ * that appears twice in a thousand rows is a stage nobody sees rendered. Every
+ * page that lists orders — a customer's history, a SKU's — draws its first
+ * page from this mix, so the weights are what decides whether those pages
+ * exercise all seven chips or only the two most common.
+ */
 function rollStatus(roll: number): TxStatus {
   if (roll < 0.07) return "Cancelled";
-  if (roll < 0.12) return "Waiting for Payment";
-  if (roll < 0.2) return "Processed";
-  if (roll < 0.27) return "Waiting for Pickup";
-  if (roll < 0.35) return "Picked Up";
-  if (roll < 0.45) return "Sending";
+  if (roll < 0.14) return "Waiting for Payment";
+  if (roll < 0.24) return "Processed";
+  if (roll < 0.33) return "Waiting for Pickup";
+  if (roll < 0.43) return "Picked Up";
+  if (roll < 0.55) return "Sending";
   return "Complete";
 }
 
@@ -391,7 +399,11 @@ function seed(): Transaction[] {
   // payment through delivered — so walking the most recent ones around the
   // journey is both what the list needs to show and what the week looks like.
   // Everything older keeps its rolled status.
-  const recentFrom = new Date(lastDay - 6 * DAY_MS).toISOString().slice(0, 10);
+  // A month, not a week. A week is about a dozen orders, enough to fill the
+  // Transactions table's own first page but not enough to reach the narrower
+  // lists — one customer's history, one SKU's — which draw from a slice of
+  // the same orders and so saw only whichever stages happened to land in it.
+  const recentFrom = new Date(lastDay - 29 * DAY_MS).toISOString().slice(0, 10);
   const recent = history
     .filter((t) => t.date.slice(0, 10) >= recentFrom)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -418,8 +430,10 @@ function seed(): Transaction[] {
 // dice happened to deal it.
 // v22: the real status list — Waiting for Payment, Processed, Waiting for
 // Pickup, Picked Up, Sending, Complete, plus Cancelled as the exit.
+// v23: the journey walk covers a month and the live stages carry more weight,
+// so the narrower order lists show every chip too, not just the table.
 // v20: orders carry the five-stage status, Waiting for Payment included.
-const STORAGE_KEY = "aroma_tx_store_v22";
+const STORAGE_KEY = "aroma_tx_store_v23";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
