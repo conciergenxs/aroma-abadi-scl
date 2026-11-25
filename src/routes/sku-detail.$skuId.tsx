@@ -3,6 +3,7 @@ import { AppShell } from "@/components/scl/app-shell";
 import { useSkuStore } from "@/components/scl/sku-store";
 import {
   countsAsRevenue,
+  txStatusBadge,
   formatIDR,
   type TxStatus,
   useTransactionsStore,
@@ -35,12 +36,6 @@ function defaultFrom() {
 function defaultTo() {
   return new Date().toISOString().slice(0, 10);
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  Shipped: "border-emerald-700 bg-emerald-600 text-white",
-  Processed: "border-sky-700    bg-sky-500     text-white",
-  Cancelled: "border-rose-700   bg-rose-600    text-white",
-};
 
 function SkuDetailPage() {
   const { skuId } = useParams({ from: "/sku-detail/$skuId" });
@@ -393,7 +388,7 @@ function SkuDetailPage() {
                           </td>
                           <td className="px-4 py-3">
                             <span
-                              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${STATUS_COLORS[t.status] ?? "border-gray-400 bg-gray-400 text-white"}`}
+                              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${txStatusBadge(t.status)}`}
                             >
                               {t.status}
                             </span>
