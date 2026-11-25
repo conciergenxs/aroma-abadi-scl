@@ -19,7 +19,7 @@ import {
 } from "./promo-store";
 
 // ── Sentence-builder UI for promo rules ────────────────────────────────────────
-// A promo is "When [Condition] → Get [Reward]". Condition and Reward are each
+// A promo is "[Condition] · Get [Reward]". Condition and Reward are each
 // picked independently and every slot inside them (item, qty, amount, percent,
 // cap) is freely editable — so this single builder can express any
 // promo shape (Buy 1 Get 1, Buy 2 Get 1 of a different item, min-spend cashback,
@@ -68,7 +68,7 @@ const PRESETS: { label: string; build: () => PromoRule }[] = [
     }),
   },
   {
-    label: "Min. Spend → % Off",
+    label: "% Off Over Min. Spend",
     build: () => ({
       condition: { kind: "min-spend", amount: 500000 },
       reward: { kind: "percent-off", percent: 15, appliesTo: { kind: "any" }, maxDiscount: null },

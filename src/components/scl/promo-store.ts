@@ -161,8 +161,14 @@ function describeReward(r: PromoReward): string {
   }
 }
 
+/**
+ * The whole promo as one line: what has to happen, then what the customer
+ * gets. Joined by the separator the rest of the app uses rather than an
+ * arrow — in a table cell an arrow reads as a control you could press, and
+ * the reward already announces itself with "Get".
+ */
 export function describePromoRule(rule: PromoRule): string {
-  return `${describeCondition(rule.condition)} → ${describeReward(rule.reward)}`;
+  return `${describeCondition(rule.condition)} · ${describeReward(rule.reward)}`;
 }
 
 // ── What a reward hands out, in the unit that fits it ─────────────────────────
