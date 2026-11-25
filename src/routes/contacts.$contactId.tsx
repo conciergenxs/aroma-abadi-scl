@@ -48,6 +48,8 @@ import { BoundedDateInput } from "@/components/scl/date-range-popover";
 import { getTransactionDateBounds } from "@/components/scl/overview-metrics";
 import {
   useTransactionsStore,
+  txStatusBadge,
+  countsAsRevenue,
   formatIDR,
   type Transaction,
 } from "@/components/scl/transactions-store";
@@ -880,10 +882,14 @@ function TransactionsTab({
     );
   }
 
+  // Spend is money actually taken, so an order still waiting on payment is
+  // out along with the cancelled ones — the same rule the Overview uses.
   const totalSpend = transactions
-    .filter((t) => t.status !== "Cancelled")
+    .filter((t) => countsAsRevenue(t.status))
     .reduce((sum, t) => sum + t.total, 0);
-  const completedCount = transactions.filter((t) => t.status !== "Cancelled").length;
+  // "Completed" means the parcel arrived. It used to mean "not cancelled",
+  // which counted an order still sitting in the warehouse as finished.
+  const completedCount = transactions.filter((t) => t.status === "Complete").length;
 
   // Favorite Brand
   const favoriteBrand = (() => {
@@ -936,12 +942,6 @@ function TransactionsTab({
     const avg = Math.round(totalGap / (sorted.length - 1));
     return `Per ${avg} Days`;
   })();
-
-  function statusBadge(s: string) {
-    if (s === "Shipped") return "border-emerald-700 bg-emerald-600 text-white";
-    if (s === "Processed") return "border-amber-700 bg-amber-600 text-white";
-    return "border-rose-700 bg-rose-600 text-white";
-  }
 
   return (
     <div className="space-y-4">
@@ -1055,7 +1055,7 @@ function TransactionsTab({
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusBadge(t.status)}`}
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${txStatusBadge(t.status)}`}
                     >
                       {t.status}
                     </span>
@@ -1370,12 +1370,10 @@ function TransactionActivityCard({ message, at }: { message: string; at: string 
   const [header, items] = message.split("\n");
   const parts = header.replace("Transaction ", "").split(" · ");
   const [invoice, brand, total, status] = parts;
-  const statusColor =
-    status === "Shipped"
-      ? "border-emerald-700 bg-emerald-600 text-white"
-      : status === "Cancelled"
-        ? "border-rose-700 bg-rose-600 text-white"
-        : "border-sky-700 bg-sky-600 text-white"; // Processed
+  // Same chip the tables use. Its own copy of this map had gone stale: a
+  // status it did not recognise came out red, so a finished order read as a
+  // cancelled one.
+  const statusColor = txStatusBadge(status);
   return (
     <div className="rounded-md border border-border bg-card/60 px-3 py-2.5 mt-1 mb-1 space-y-1.5">
       <div className="flex items-center justify-between gap-2">

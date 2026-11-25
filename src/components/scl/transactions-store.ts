@@ -4,26 +4,63 @@ import { todayWIBUtc } from "@/lib/wib";
 // Currency is formatted in one place for the whole app — see lib/fmt.
 export { fmtIDR as formatIDR } from "@/lib/fmt";
 
-/** Where an order has got to. The names follow Odoo's sequence — unpaid,
- *  paid, despatched, received, cancelled — in the words a BA would use rather
- *  than Odoo's own ("Sales Order", "Done"). */
-export type TxStatus = "Waiting for Payment" | "Paid" | "Shipped" | "Delivered" | "Cancelled";
-
-/** Whether an order counts as money taken.
+/**
+ * Where an order has got to.
  *
- *  Not simply "anything but cancelled" any more: an order waiting on payment
- *  has produced no revenue either, and counting it would overstate every
- *  sales figure on the Overview. */
-/** The five stages in the order they happen. Typed as TxStatus so a stage
- * added to the union without being placed here is a compile error. */
+ * Six of these are the fulfilment sequence the business actually runs, in
+ * order: the customer owes, the warehouse is packing, the parcel is boxed and
+ * waiting on a courier, the courier has it, it is moving, it arrived. The
+ * two "waiting" stages are separate on purpose — one is blocked on the
+ * customer, the other on the courier, and they go wrong for different reasons.
+ *
+ * "Cancelled" is the seventh and is not a stage: an order leaves the sequence
+ * for it and never comes back. It is kept because the figures need somewhere
+ * to put an order that produced no money — see countsAsRevenue.
+ */
+export type TxStatus =
+  | "Waiting for Payment"
+  | "Processed"
+  | "Waiting for Pickup"
+  | "Picked Up"
+  | "Sending"
+  | "Complete"
+  | "Cancelled";
+
+/** The fulfilment sequence, in the order it happens, with the exit at the end.
+ * Typed as TxStatus so a stage added to the union without being placed here is
+ * a compile error. */
 const TX_JOURNEY: TxStatus[] = [
   "Waiting for Payment",
-  "Paid",
-  "Shipped",
-  "Delivered",
+  "Processed",
+  "Waiting for Pickup",
+  "Picked Up",
+  "Sending",
+  "Complete",
   "Cancelled",
 ];
 
+/** Status for a seeded order, by cumulative weight. Complete dominates
+ * because the seed stretches back to 2023 and a 2023 order is done; the rest
+ * keep enough volume that filtering by any one of them returns a real list. */
+function rollStatus(roll: number): TxStatus {
+  if (roll < 0.07) return "Cancelled";
+  if (roll < 0.12) return "Waiting for Payment";
+  if (roll < 0.2) return "Processed";
+  if (roll < 0.27) return "Waiting for Pickup";
+  if (roll < 0.35) return "Picked Up";
+  if (roll < 0.45) return "Sending";
+  return "Complete";
+}
+
+/**
+ * Whether an order counts as money taken.
+ *
+ * Not simply "anything but cancelled": an order waiting on payment has
+ * produced no revenue either, and counting it would overstate every sales
+ * figure on the Overview. Everything from Processed onwards has been paid for
+ * — the warehouse does not pack against an unpaid order — so the whole
+ * fulfilment tail counts, whether or not the parcel has arrived yet.
+ */
 export function countsAsRevenue(status: TxStatus | string): boolean {
   return status !== "Cancelled" && status !== "Waiting for Payment";
 }
@@ -199,7 +236,9 @@ function seed(): Transaction[] {
   ];
   const historyCustomers = [...customers, ...EXTRA_CUSTOMERS];
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
-  const statuses: TxStatus[] = ["Paid", "Shipped", "Delivered", "Paid", "Cancelled"];
+  // The fixed block sits in July 2026, months back, so it is mostly finished
+  // business with the odd cancellation — not a parade of live stages.
+  const statuses: TxStatus[] = ["Complete", "Sending", "Complete", "Picked Up", "Cancelled"];
 
   // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
   const BASE_EPOCH = 1785369600000; // 2026-07-30 00:00:00 UTC — fixed, never changes; kept anchored to "today" so the Overview date picker's range actually reaches the present
@@ -317,16 +356,12 @@ function seed(): Transaction[] {
         items: lines,
         ...money,
         paymentMethod,
-        status:
-          roll < 0.07
-            ? "Cancelled"
-            : roll < 0.14
-              ? "Waiting for Payment"
-              : roll < 0.5
-                ? "Delivered"
-                : roll < 0.8
-                  ? "Shipped"
-                  : "Paid",
+        // Weighted towards Complete, because almost every order in the seed
+        // is months old and a months-old order has finished. The live stages
+        // still get a few hundred orders between them, which is what the
+        // status filter and the pipeline figures need to have something to
+        // count.
+        status: rollStatus(roll),
       });
     }
   }
@@ -378,8 +413,13 @@ function seed(): Transaction[] {
 // lifetime view needs before it buckets by year instead of by month.
 // v19: back to Jan 2023, so the longest range the date filter can offer is
 // four years and the lifetime axis carries four yearly points.
+// v21: the last week of orders walks the stages in turn, so the first page
+// of the Transactions table shows every status rather than whichever ones the
+// dice happened to deal it.
+// v22: the real status list — Waiting for Payment, Processed, Waiting for
+// Pickup, Picked Up, Sending, Complete, plus Cancelled as the exit.
 // v20: orders carry the five-stage status, Waiting for Payment included.
-const STORAGE_KEY = "aroma_tx_store_v20";
+const STORAGE_KEY = "aroma_tx_store_v22";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
@@ -489,10 +529,21 @@ export function useTransactionsStore() {
 
 /** The colours an order's status wears — shared so the same order never looks
  * different in the table than it does in the side peek. */
+/**
+ * The chip for a status. One hue each, and far enough apart that the two
+ * waiting stages and the two in-transit stages can never be mistaken for one
+ * another at a glance. Every chip also carries its name, so colour is a
+ * second cue and never the only one.
+ *
+ * Waiting for Pickup is the neutral grey on purpose: it is the one stage where
+ * nothing is happening and nobody is working on the order.
+ */
 export function txStatusBadge(status: string) {
-  if (status === "Delivered") return "border-emerald-700 bg-emerald-600 text-white";
-  if (status === "Shipped") return "border-teal-700 bg-teal-600 text-white";
-  if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
   if (status === "Waiting for Payment") return "border-amber-600 bg-amber-500 text-white";
-  return "border-sky-700 bg-sky-600 text-white"; // Paid
+  if (status === "Processed") return "border-sky-700 bg-sky-600 text-white";
+  if (status === "Waiting for Pickup") return "border-slate-600 bg-slate-500 text-white";
+  if (status === "Picked Up") return "border-violet-700 bg-violet-600 text-white";
+  if (status === "Sending") return "border-teal-700 bg-teal-600 text-white";
+  if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
+  return "border-emerald-700 bg-emerald-600 text-white"; // Complete
 }

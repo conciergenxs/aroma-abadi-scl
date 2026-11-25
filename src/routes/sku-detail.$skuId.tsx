@@ -221,7 +221,16 @@ function SkuDetailPage() {
           {/* Status filter */}
           <div className="flex items-center gap-1">
             {(
-              ["all", "Waiting for Payment", "Paid", "Shipped", "Delivered", "Cancelled"] as const
+              [
+                "all",
+                "Waiting for Payment",
+                "Processed",
+                "Waiting for Pickup",
+                "Picked Up",
+                "Sending",
+                "Complete",
+                "Cancelled",
+              ] as const
             ).map((s) => (
               <button
                 key={s}

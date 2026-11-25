@@ -39,9 +39,11 @@ function wibDay(iso: string) {
  * store without adding it here is a compile error. */
 const TX_STATUSES: TxStatus[] = [
   "Waiting for Payment",
-  "Paid",
-  "Shipped",
-  "Delivered",
+  "Processed",
+  "Waiting for Pickup",
+  "Picked Up",
+  "Sending",
+  "Complete",
   "Cancelled",
 ];
 
