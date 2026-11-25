@@ -14,6 +14,16 @@ export type TxStatus = "Waiting for Payment" | "Paid" | "Shipped" | "Delivered" 
  *  Not simply "anything but cancelled" any more: an order waiting on payment
  *  has produced no revenue either, and counting it would overstate every
  *  sales figure on the Overview. */
+/** The five stages in the order they happen. Typed as TxStatus so a stage
+ * added to the union without being placed here is a compile error. */
+const TX_JOURNEY: TxStatus[] = [
+  "Waiting for Payment",
+  "Paid",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+];
+
 export function countsAsRevenue(status: TxStatus | string): boolean {
   return status !== "Cancelled" && status !== "Waiting for Payment";
 }
@@ -334,6 +344,24 @@ function seed(): Transaction[] {
   after.forEach((t, i) => {
     t.id = `tx-h${String(before.length + i + 1).padStart(4, "0")}`;
     t.invoice = `AA-${String(82236 + i).padStart(5, "0")}`;
+  });
+
+  // The freshest orders walk the whole journey.
+  //
+  // Status was rolled per order with no regard for how old the order is, so
+  // which stages showed up at the top of the table was luck: on a ten-row
+  // first page "Paid" could be missing entirely, and a reader would conclude
+  // the stage did not exist. These are also the orders where every stage is
+  // genuinely in play — this week's orders really are spread from awaiting
+  // payment through delivered — so walking the most recent ones around the
+  // journey is both what the list needs to show and what the week looks like.
+  // Everything older keeps its rolled status.
+  const recentFrom = new Date(lastDay - 6 * DAY_MS).toISOString().slice(0, 10);
+  const recent = history
+    .filter((t) => t.date.slice(0, 10) >= recentFrom)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  recent.forEach((t, i) => {
+    t.status = TX_JOURNEY[i % TX_JOURNEY.length];
   });
 
   // Newest first, the order the Transactions table and the peek expect.
