@@ -227,7 +227,12 @@ function AudienceSection({ audience }: { audience: AudienceReading }) {
   return (
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard title="Audience & Segmentation">
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
+        {/* One column on a phone, not two. These tiles each carry two
+            four-digit figures now, and "3.030 – 3.180" needs 130px where a
+            half-width tile at 390px leaves 118 — the dash wrapped away from
+            the number it joins. A full-width tile reads cleanly and the
+            three-across layout returns as soon as there is room for it. */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
           {tiles.map((t) => (
             <MetricStat
               key={t.label}

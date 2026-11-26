@@ -752,10 +752,15 @@ function SidebarButton({
         aria-label={label}
         disabled={disabled}
         title={disabled ? disabledReason : undefined}
-        className="flex items-center gap-3 h-10 px-2.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="flex items-center gap-3 min-h-10 px-2.5 py-1.5 rounded-lg transition-colors text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-white/[0.06] border border-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Icon className="h-[18px] w-[18px] shrink-0" />
-        <span className="flex-1 truncate text-left">{label}</span>
+        {/* Wraps rather than truncates. This is the rail's one action, and
+            "Invite Workspace Members" needs 192px where the rail leaves 166 —
+            truncating it to "Invite Workspace Me…" loses the only word that
+            says who is being invited. The nav links above are all short
+            enough to stay on one line regardless. */}
+        <span className="flex-1 text-left whitespace-normal leading-[1.2]">{label}</span>
       </button>
     );
   }
