@@ -279,7 +279,7 @@ export function MetricStat({
   /** Put `sub` on the value's own line, at the tile's right edge, rather than
    *  on a line of its own underneath. For a unit, not for a sentence. */
   subInline?: boolean;
-  /** Half-strength `sub`. For a line that qualifies the figure rather than
+  /** A quieter `sub`. For a line that qualifies the figure rather than
    *  adding to it — the window a standing count was read over, say, which
    *  repeats across a whole row and should not compete with the numbers. */
   subDim?: boolean;
@@ -327,7 +327,7 @@ export function MetricStat({
       </div>
       {sub && !subInline && (
         <div
-          className={`mt-1 text-[12px] ${SUB_TONE[accent ?? "none"]} ${subDim ? "opacity-50" : ""}`}
+          className={`mt-1 text-[12px] ${SUB_TONE[accent ?? "none"]} ${subDim ? "opacity-75" : ""}`}
         >
           {sub}
         </div>

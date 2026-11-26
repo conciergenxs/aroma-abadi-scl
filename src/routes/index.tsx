@@ -89,7 +89,11 @@ import {
   trendLabel,
 } from "@/components/scl/dashboard-ui";
 import { CrmLoyaltyAnalytics } from "@/components/scl/loyalty-analytics-section";
-import { BoundedDateInput, fmtDateWithYear } from "@/components/scl/date-range-popover";
+import {
+  BoundedDateInput,
+  fmtDateRange,
+  fmtDateWithYear,
+} from "@/components/scl/date-range-popover";
 import { LITE_MODE, PUBLIC_SITE } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/")({
@@ -180,9 +184,7 @@ function RankedListColumn({
 function AudienceSection({ audience }: { audience: AudienceReading }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   const { start, end, range, singleDay } = audience;
-  const period = singleDay
-    ? fmtDateWithYear(range.end)
-    : `${fmtDateWithYear(range.start)} – ${fmtDateWithYear(range.end)}`;
+  const period = singleDay ? fmtDateWithYear(range.end) : fmtDateRange(range.start, range.end);
   const tiles = [
     {
       icon: Users,
@@ -769,7 +771,7 @@ function DateRangePopover({
             ) : (
               <p className="px-2 pt-0.5 text-[12px] leading-snug text-muted-foreground">
                 Up to {MAX_RANGE_MONTHS} months, back to {fmtDateWithYear(windowStart)}. Data runs{" "}
-                {fmtDateWithYear(fullRange.start)} – {fmtDateWithYear(fullRange.end)}.
+                {fmtDateRange(fullRange.start, fullRange.end)}.
               </p>
             )}
           </div>

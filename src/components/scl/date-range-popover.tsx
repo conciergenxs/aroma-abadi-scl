@@ -35,6 +35,20 @@ export function fmtDateWithYear(iso: string) {
   return `${String(d).padStart(2, "0")} ${MONTHS_SHORT[m - 1]} ${y}`;
 }
 
+/**
+ * A range written the way a person says it out loud: the year once, at the
+ * end — "28 Oct – 26 Nov 2026". Printing it on both ends is how a label
+ * starts reading as two separate dates rather than one span.
+ *
+ * The year comes back on the start date the moment the two ends disagree
+ * about it, because that is exactly when leaving it off would mislead.
+ */
+export function fmtDateRange(start: string, end: string): string {
+  if (!start || start === end) return fmtDateWithYear(end || start);
+  const sameYear = start.slice(0, 4) === end.slice(0, 4);
+  return `${sameYear ? fmtShortDate(start) : fmtDateWithYear(start)} – ${fmtDateWithYear(end)}`;
+}
+
 export function addDaysIso(iso: string, days: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
