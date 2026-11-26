@@ -14,8 +14,12 @@ import {
   mostAskedProducts,
   mostUnfulfilledProducts,
   scaleRankedProducts,
-  scaledAudienceSegmentation,
   scaledTotalConversations,
+  clipToMaxWindow,
+  computeAudienceReading,
+  maxWindowFor,
+  MAX_RANGE_MONTHS,
+  type AudienceReading,
   type BroadcastMetrics,
   type DateRange,
   type OrdersAndSales,
@@ -145,11 +149,13 @@ function RankedBarList({ items, color }: { items: RankedProduct[]; color: string
 
 function RankedListColumn({
   title,
+  info,
   icon: Icon,
   items,
   color,
 }: {
   title: string;
+  info: string;
   icon: React.ElementType;
   items: RankedProduct[];
   color: string;
@@ -157,7 +163,7 @@ function RankedListColumn({
   return (
     <div>
       <div className={`flex items-center gap-1.5 px-4 pt-3 pb-0.5 ${CAPTION}`}>
-        <Icon className="h-3 w-3" /> {title}
+        <Icon className="h-3 w-3" /> {title} <InfoHint text={info} />
       </div>
       <RankedBarList items={items} color={color} />
     </div>
@@ -165,47 +171,74 @@ function RankedListColumn({
 }
 
 // ── A. Audience & Segmentation ───────────────────────────────────────────
-function AudienceSection({ scale }: { scale: number }) {
+/**
+ * Every tile here is a standing count, so a date range cannot total it — it
+ * can only say where the count stood at each end of the window. The two
+ * figures and the two dates are one statement, which is why the dates sit
+ * under the number rather than being left to the picker in the header.
+ */
+function AudienceSection({ audience }: { audience: AudienceReading }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
-  const audience = scaledAudienceSegmentation(scale);
+  const { start, end, range, singleDay } = audience;
+  const period = singleDay
+    ? fmtDateWithYear(range.end)
+    : `${fmtDateWithYear(range.start)} – ${fmtDateWithYear(range.end)}`;
+  const tiles = [
+    {
+      icon: Users,
+      label: "Customer Contacts",
+      from: start.contacts,
+      to: end.contacts,
+      info: "Number of contacts you own (Total Users).",
+    },
+    // "Active Contacts" and "Active Customers" count different things — this
+    // one everyone who interacted, the next only those who bought. Both were
+    // once labelled "Active Customers"; the owner's metric sheet names them
+    // apart, and the hint under each label is what settles which is which.
+    {
+      icon: UserCheck,
+      label: "Active Contacts",
+      from: start.activeContacts,
+      to: end.activeContacts,
+      info: "Contacts who interacted in the last 6 months.",
+    },
+    {
+      icon: BadgeCheck,
+      label: "Active Customers",
+      from: start.activeCustomers,
+      to: end.activeCustomers,
+      info: "Contacts who made a transaction in the last 6 months.",
+    },
+    {
+      icon: MoonStar,
+      label: "Sleeping Customers",
+      from: start.sleepingCustomers,
+      to: end.sleepingCustomers,
+      info: "Contacts who made a transaction before, but not in the last 6 months.",
+    },
+    {
+      icon: Sparkles,
+      label: "Potential Customers",
+      from: start.potentialCustomers,
+      to: end.potentialCustomers,
+      info: "Active Contacts who have never made a transaction.",
+    },
+  ];
   return (
     <Reveal innerRef={ref} inView={inView}>
       <SectionCard title="Audience & Segmentation">
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 p-4 stagger">
-          <MetricStat
-            icon={Users}
-            label="Customer Contacts"
-            value={fmtNum(audience.contacts)}
-            info="Total number of contacts you own (Total Users)."
-          />
-          {/* Named "Active Customers" at the owner's request, which the tile
-              beside it is called too. The two count different things — this
-              one everyone who interacted, the next only those who bought —
-              so the hint under each label is what tells them apart. */}
-          <MetricStat
-            icon={UserCheck}
-            label="Active Customers"
-            value={fmtNum(audience.activeContacts)}
-            info="Contacts who interacted with you in the last 6 months."
-          />
-          <MetricStat
-            icon={BadgeCheck}
-            label="Active Customers"
-            value={fmtNum(audience.activeCustomers)}
-            info="Contacts who made a transaction in the last 6 months."
-          />
-          <MetricStat
-            icon={MoonStar}
-            label="Sleeping Customers"
-            value={fmtNum(audience.sleepingCustomers)}
-            info="Contacts who transacted before, but not in the last 6 months."
-          />
-          <MetricStat
-            icon={Sparkles}
-            label="Potential Customers"
-            value={fmtNum(audience.potentialCustomers)}
-            info="Active Contacts who have never made a transaction."
-          />
+          {tiles.map((t) => (
+            <MetricStat
+              key={t.label}
+              icon={t.icon}
+              label={t.label}
+              value={fmtNum(t.to)}
+              valueRange={singleDay ? undefined : { from: fmtNum(t.from), to: fmtNum(t.to) }}
+              sub={period}
+              info={t.info}
+            />
+          ))}
         </div>
       </SectionCard>
     </Reveal>
@@ -216,8 +249,8 @@ function AudienceSection({ scale }: { scale: number }) {
 function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   const stages: FunnelStage[] = [
-    { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-1)" },
-    { label: "Delivered", value: broadcast.delivered, color: "var(--chart-2)" },
+    { label: "Broadcast Sent", value: broadcast.broadcastSent, color: "var(--chart-1)" },
+    { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-2)" },
     { label: "Read", value: broadcast.read, color: "var(--chart-3)" },
   ];
   return (
@@ -228,19 +261,20 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
             icon={Radio}
             label="Broadcast Sent"
             value={fmtNum(broadcast.broadcastSent)}
-            info="Number of broadcast campaigns sent."
+            sub={`across ${fmtNum(broadcast.campaignsSent)} broadcasts`}
+            info="Number of broadcast messages sent."
           />
           <MetricStat
             icon={Megaphone}
             label="Broadcast Reach"
             value={fmtNum(broadcast.reach)}
-            info="Number of contacts a broadcast message reached."
+            info="Number of broadcast message recipients."
           />
           <MetricStat
             icon={MessageSquare}
             label="Message Received"
             value={fmtNum(broadcast.messageReceived)}
-            info="Chats customers start on their own, outside a broadcast's 24 hours."
+            info="Number of messages received from conversations started by customers."
           />
         </div>
         {inView && (
@@ -253,13 +287,13 @@ function BroadcastSection({ broadcast }: { broadcast: BroadcastMetrics }) {
                 icon={CheckCheck}
                 label="Delivery Rate"
                 value={fmtPct(broadcast.deliveryRate)}
-                info="Broadcast messages delivered to contacts (Delivered ÷ Reach)."
+                info="Rate of broadcast messages received by contacts (Reach ÷ Sent)."
               />
               <MetricStat
                 icon={Eye}
                 label="Read Rate"
                 value={fmtPct(broadcast.readRate)}
-                info="Delivered broadcast messages that were read (Read ÷ Delivered)."
+                info="Rate of broadcast messages read by contacts."
               />
             </div>
           </div>
@@ -296,18 +330,21 @@ function ConversationSection({
           <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border border-t border-border">
             <RankedListColumn
               title="Most Asked"
+              info="Products asked about the most."
               icon={HelpCircle}
               items={scaleRankedProducts(mostAskedProducts, scale)}
               color="var(--chart-1)"
             />
             <RankedListColumn
               title="Most Added to Cart"
+              info="Products added to cart the most."
               icon={ShoppingCart}
               items={orders.mostAddedToCart}
               color="var(--chart-2)"
             />
             <RankedListColumn
               title="Most Unfulfilled"
+              info="Products asked about the most but not fulfilled because they are out of stock or not available."
               icon={PackageX}
               items={scaleRankedProducts(mostUnfulfilledProducts, scale)}
               color="var(--chart-3)"
@@ -344,13 +381,13 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
             icon={Receipt}
             label="Total Transactions"
             value={fmtNum(orders.totalTransactions)}
-            info="Number of transactions completed / paid (total count)."
+            info="Number of transactions made / paid (total count)."
           />
           <MetricStat
             icon={CircleDollarSign}
             label="Total Sales"
             value={fmtIDR(orders.totalSales)}
-            info="Total sales value (IDR)."
+            info="Total sales (IDR)."
           />
         </div>
         <div className="border-t border-border p-4">
@@ -414,7 +451,7 @@ function OrdersSection({ orders }: { orders: OrdersAndSales }) {
         </div>
         <div className="border-t border-border p-4">
           <div className={`${CAPTION} mb-2 inline-flex items-center gap-1`}>
-            Qty Sold — by Brand <InfoHint text="Number of items sold, by brand." />
+            Qty Sold — by Brand <InfoHint text="Number of items sold (per brand)." />
           </div>
           {/* The row pitch is what is held fixed here, not the panel height: a
               bar plus the air around it comes to 35px whether the range turned
@@ -484,15 +521,15 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 stagger">
           <MetricStat
             icon={Repeat}
-            label="Avg. Messages / Transaction"
+            label="Avg. Messages Between Transactions"
             value={avgMessagesBetweenTransaction.toFixed(1)}
-            info="Average number of messages exchanged per transaction."
+            info="Average number of messages sent between transactions."
           />
           <MetricStat
             icon={Wallet}
-            label="Avg. Transaction Value"
-            value={fmtIDR(averages.avgTransactionValue)}
-            info="Average value per paid transaction (Sales ÷ Transactions)."
+            label="Avg. Order Value"
+            value={fmtIDR(averages.avgOrderValue)}
+            info="Average order value (Sales ÷ Orders)."
           />
           <MetricStat
             icon={Tags}
@@ -504,9 +541,9 @@ function AveragesSection({ averages }: { averages: ReturnType<typeof computeAver
             icon={ShoppingBasket}
             label="Avg. Basket Size"
             value={averages.avgBasketSize.toFixed(1)}
-            sub="items / transaction"
+            sub="items / order"
             subInline
-            info="Items per paid transaction (Qty Sold ÷ Transactions)."
+            info="Average number of items per order (Qty Sold ÷ Orders)."
           />
         </div>
       </SectionCard>
@@ -528,7 +565,7 @@ function ConversionSection({
 }) {
   const { ref, inView } = useRevealOnScroll<HTMLDivElement>();
   const stages: FunnelStage[] = [
-    { label: "Broadcast Reach", value: broadcast.reach, color: "var(--chart-1)" },
+    { label: "Broadcast Sent", value: broadcast.broadcastSent, color: "var(--chart-1)" },
     { label: "Conversations", value: totalConversations, color: "var(--chart-2)" },
     { label: "Transactions", value: orders.totalTransactions, color: "var(--chart-3)" },
   ];
@@ -545,13 +582,13 @@ function ConversionSection({
                 icon={Reply}
                 label="Conversation Rate"
                 value={fmtPct(funnelRates.conversationRate)}
-                info="Replied within 24 hours of a broadcast (Replies ÷ Reach)."
+                info="Rate of conversations after a broadcast is sent (Total Replies ÷ Total Broadcast)."
               />
               <MetricStat
                 icon={TrendingUp}
                 label="Conversion Rate"
                 value={fmtPct(funnelRates.conversionRate)}
-                info="Paid within 24 hours (Transactions ÷ Conversations)."
+                info="Rate of transactions from conversations (Transactions ÷ Conversations)."
               />
             </div>
           </div>
@@ -590,26 +627,55 @@ function addDaysIso(iso: string, days: number): string {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
+/**
+ * The windows the Overview offers, longest-ago last.
+ *
+ * There is no "Lifetime" here any more. Every segment on this page is defined
+ * against the last six months, so an all-time view was answering a different
+ * question than the one its tiles were labelled with. "Today" took its place
+ * at the top of the list, and six months is the longest window offered —
+ * which is also the cap a custom range is held to.
+ *
+ * Every window is measured back from the last day the data has, not from the
+ * wall clock, so "Last 7 Days" is seven days of actual trading rather than a
+ * week that may be half empty.
+ */
+function overviewPresets(fullRange: DateRange): { label: string; range: DateRange }[] {
+  const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
+  const trailing = (days: number) => ({
+    start: clampStart(addDaysIso(fullRange.end, -(days - 1))),
+    end: fullRange.end,
+  });
+  const sixMonths = maxWindowFor(fullRange.end);
+  return [
+    { label: "Today", range: { start: fullRange.end, end: fullRange.end } },
+    { label: "Last 7 Days", range: trailing(7) },
+    { label: "Last 30 Days", range: trailing(30) },
+    { label: "Last 90 Days", range: trailing(90) },
+    { label: "Last 6 Months", range: { start: clampStart(sixMonths.start), end: sixMonths.end } },
+  ];
+}
+
 function DateRangePopover({
+  requested,
   range,
+  clipped,
   fullRange,
+  selectedLabel,
   onChange,
 }: {
+  /** What the user asked for — the custom pair as typed, before the
+   *  six-month rule has had its say. */
+  requested: DateRange;
+  /** What the page is actually reading. */
   range: DateRange;
+  clipped: boolean;
   fullRange: DateRange;
-  onChange: (r: DateRange) => void;
+  selectedLabel: string | null;
+  onChange: (range: DateRange, presetLabel: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  // Both ends are held to the data. A ledger has no future, and it has no
-  // prehistory either: a window reaching back to the year 121 is not a fair
-  // question with an empty answer, it is a typo that quietly empties every
-  // tile on the page. Out-of-range typing snaps to the nearest real date.
-  // Presets can clamp to an identical range once the window is short enough
-  // (e.g. Last 30 Days and Last 90 Days both hit the same data boundary) —
-  // matching by value alone would mislabel "Last 90 Days" as "Last 30 Days"
-  // just because it's listed first. Track the actual click instead.
-  const [selectedLabel, setSelectedLabel] = useState<string | null>("Lifetime");
 
   useEffect(() => {
     if (!open) return;
@@ -620,60 +686,42 @@ function DateRangePopover({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Presets can't reach further back than the real data actually goes.
-  const clampStart = (iso: string) => (iso < fullRange.start ? fullRange.start : iso);
-  const presets: { label: string; range: DateRange }[] = [
-    { label: "Lifetime", range: fullRange },
-    {
-      label: "Last 7 Days",
-      range: { start: clampStart(addDaysIso(fullRange.end, -6)), end: fullRange.end },
-    },
-    {
-      label: "Last 30 Days",
-      range: { start: clampStart(addDaysIso(fullRange.end, -29)), end: fullRange.end },
-    },
-    {
-      label: "Last 90 Days",
-      range: { start: clampStart(addDaysIso(fullRange.end, -89)), end: fullRange.end },
-    },
-  ];
-  const isKnownPreset = presets.some(
-    (p) => p.range.start === range.start && p.range.end === range.end,
-  );
-  const label =
-    isKnownPreset && selectedLabel
-      ? selectedLabel
-      : `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
+  const label = selectedLabel ?? `${fmtShortDate(range.start)} – ${fmtShortDate(range.end)}`;
+  const windowStart = maxWindowFor(fullRange.end).start;
 
   return (
     <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[12px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+        className="inline-flex items-center gap-1.5 h-9 rounded-md border border-border bg-card/60 px-3 text-[13px] text-muted-foreground hover:text-foreground hover:bg-card transition-colors duration-150"
       >
-        <Calendar className="h-3 w-3 shrink-0" />
+        <Calendar className="h-3.5 w-3.5 shrink-0" />
         <span className="max-w-[160px] truncate">{label}</span>
+        {clipped && (
+          <span className="shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5 text-[12px] font-medium text-amber-700 leading-none">
+            6 mo
+          </span>
+        )}
         <ChevronDown
-          className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-3 w-3 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
+        <div className="absolute left-0 top-full mt-1.5 z-50 w-72 rounded-xl border border-border bg-popover shadow-xl p-2 animate-scale-in origin-top-left">
           <div className="space-y-0.5">
-            {presets.map((p) => {
+            {overviewPresets(fullRange).map((p) => {
               const active = selectedLabel === p.label;
               return (
                 <button
                   key={p.label}
                   type="button"
                   onClick={() => {
-                    setSelectedLabel(p.label);
-                    onChange(p.range);
+                    onChange(p.range, p.label);
                     setOpen(false);
                   }}
-                  className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors ${
+                  className={`w-full text-left h-8 px-3 rounded-md text-[13px] font-medium transition-colors duration-150 ${
                     active
                       ? "bg-primary/15 text-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -686,32 +734,38 @@ function DateRangePopover({
           </div>
           <div className="my-2 border-t border-border" />
           <div className="px-1 pb-1 space-y-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground px-2">
+            <div className="text-[12px] uppercase tracking-wider text-muted-foreground px-2">
               Custom Range
             </div>
+            {/* Bound to the clipped dates, not to what was typed: these two
+                fields have to agree with the figures on the page, and the
+                badge below is what explains the difference. */}
             <BoundedDateInput
               value={range.start}
               min={fullRange.start}
               max={range.end}
               label="From date"
-              onCommit={(iso) => {
-                setSelectedLabel(null);
-                onChange({ start: iso, end: range.end });
-              }}
+              onCommit={(iso) => onChange({ start: iso, end: requested.end }, null)}
             />
             <BoundedDateInput
               value={range.end}
-              min={range.start}
+              min={fullRange.start}
               max={fullRange.end}
               label="To date"
-              onCommit={(iso) => {
-                setSelectedLabel(null);
-                onChange({ start: range.start, end: iso });
-              }}
+              onCommit={(iso) => onChange({ start: requested.start, end: iso }, null)}
             />
-            <p className="px-2 pt-0.5 text-[12px] text-muted-foreground">
-              Data runs {fmtDateWithYear(fullRange.start)} – {fmtDateWithYear(fullRange.end)}.
-            </p>
+            {clipped ? (
+              <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-[12px] leading-snug text-amber-700">
+                You asked for {fmtDateWithYear(requested.start)} – {fmtDateWithYear(requested.end)}
+                . Every segment here is defined over 6 months, so the last{" "}
+                {MAX_RANGE_MONTHS} months of it are shown.
+              </p>
+            ) : (
+              <p className="px-2 pt-0.5 text-[12px] leading-snug text-muted-foreground">
+                Up to {MAX_RANGE_MONTHS} months, back to {fmtDateWithYear(windowStart)}. Data runs{" "}
+                {fmtDateWithYear(fullRange.start)} – {fmtDateWithYear(fullRange.end)}.
+              </p>
+            )}
           </div>
         </div>
       )}

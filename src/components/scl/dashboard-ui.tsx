@@ -92,6 +92,10 @@ export const BRAND_COLORS = [
 // ── Type scale (kept to two sizes so every metric reads consistently) ──────
 export const VALUE_LG = "text-2xl font-semibold tracking-tight stat-value"; // primary tile numbers
 export const VALUE_SM = "text-xl font-semibold tracking-tight stat-value"; // header-corner badges
+// Two figures where a tile normally holds one. Dropped a step so "2,970 –
+// 3,180" still fits a five-across tile at 1280px without the dash wrapping
+// away from the number it belongs to.
+export const VALUE_RANGE = "text-xl font-semibold tracking-tight stat-value";
 export const CAPTION = "text-[11px] font-medium uppercase tracking-wide text-muted-foreground";
 
 export function fmtPct(n: number, digits = 1) {
@@ -256,6 +260,7 @@ export function MetricStat({
   icon: Icon,
   label,
   value,
+  valueRange,
   sub,
   subInline,
   info,
@@ -265,6 +270,10 @@ export function MetricStat({
   icon?: React.ElementType;
   label: string;
   value: string;
+  /** A standing count read over a window: where it started and where it
+   *  finished. Takes the place of `value`, which is then only the fallback
+   *  for a window too short to have two ends. */
+  valueRange?: { from: string; to: string };
   sub?: string;
   /** Put `sub` on the value's own line, at the tile's right edge, rather than
    *  on a line of its own underneath. For a unit, not for a sentence. */
@@ -287,7 +296,18 @@ export function MetricStat({
         )}
       </div>
       <div className="mt-2 flex items-end justify-between gap-2">
-        <div className={VALUE_LG}>{value}</div>
+        {valueRange ? (
+          // The dash is set lighter and smaller than the figures so the eye
+          // reads two numbers with a span between them, rather than one
+          // number that has gone wrong.
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <span className={VALUE_RANGE}>{valueRange.from}</span>
+            <span className="text-[15px] font-normal text-muted-foreground">–</span>
+            <span className={VALUE_RANGE}>{valueRange.to}</span>
+          </div>
+        ) : (
+          <div className={VALUE_LG}>{value}</div>
+        )}
         {/* subInline: a short unit that belongs to the figure — "4.4" and
             "items / transaction" read as one statement, so it rides the same
             line, pushed to the tile's edge. A caption that is its own
@@ -301,7 +321,7 @@ export function MetricStat({
         {spark && <div className="shrink-0">{spark}</div>}
       </div>
       {sub && !subInline && (
-        <div className={`mt-1 text-[11px] ${SUB_TONE[accent ?? "none"]}`}>{sub}</div>
+        <div className={`mt-1 text-[12px] ${SUB_TONE[accent ?? "none"]}`}>{sub}</div>
       )}
     </div>
   );

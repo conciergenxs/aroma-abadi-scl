@@ -3,7 +3,12 @@ import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
-import { formatIDR, txStatusBadge, type Transaction } from "./transactions-store";
+import {
+  formatIDR,
+  txStatusBadge,
+  TX_STATUS_META,
+  type Transaction,
+} from "./transactions-store";
 import { benefitFor, rewardKindLabel, usePromoStore } from "./promo-store";
 import { useReferralStore } from "./referral-store";
 import { useEscapeKey } from "@/lib/use-escape-key";
@@ -139,12 +144,22 @@ export function TransactionPeek({
           <PeekRow label="Payment Method">
             <span className="font-medium">{tx.paymentMethod}</span>
           </PeekRow>
+          {/* The peek has the width a table cell does not, so this is where
+              the status says the whole thing: the long label, and under it
+              the line the customer is reading in WhatsApp right now. Someone
+              answering "where is my order?" should not have to translate a
+              chip. */}
           <PeekRow label="Status">
-            <span
-              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${txStatusBadge(tx.status)}`}
-            >
-              {tx.status}
-            </span>
+            <div className="space-y-1">
+              <span
+                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[12px] font-medium ${txStatusBadge(tx.status)}`}
+              >
+                {TX_STATUS_META[tx.status].long}
+              </span>
+              <p className="text-[12px] leading-snug text-muted-foreground">
+                {TX_STATUS_META[tx.status].subtext}
+              </p>
+            </div>
           </PeekRow>
           {tx.note && (
             <PeekRow label="Order Note">

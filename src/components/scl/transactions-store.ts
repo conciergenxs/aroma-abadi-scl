@@ -408,7 +408,7 @@ function seed(): Transaction[] {
         items: lines,
         ...money,
         paymentMethod,
-        // Weighted towards Complete, because almost every order in the seed
+        // Weighted towards Delivered, because almost every order in the seed
         // is months old and a months-old order has finished. The live stages
         // still get a few hundred orders between them, which is what the
         // status filter and the pipeline figures need to have something to
@@ -476,6 +476,10 @@ function seed(): Transaction[] {
 // Pickup, Picked Up, Sending, Complete, plus Cancelled as the exit.
 // v23: the journey walk covers a month and the live stages carry more weight,
 // so the narrower order lists show every chip too, not just the table.
+// v24: the owner's own status sheet replaces the guessed names — Waiting for
+// Payment, Payment Received, Waiting for Courier, On the Way, Delivered, and
+// Order Cancelled as the exit. Each one now carries a long label and the
+// sentence the customer reads, see TX_STATUS_META.
 // v20: orders carry the five-stage status, Waiting for Payment included.
 const STORAGE_KEY = "aroma_tx_store_v24";
 

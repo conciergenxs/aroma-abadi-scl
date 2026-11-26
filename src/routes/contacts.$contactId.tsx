@@ -132,7 +132,7 @@ function ContactDetailPage() {
     const idByName = new Map(brands.map((b) => [b.name.toLowerCase(), b.id]));
     const purchased = new Set<string>();
     for (const t of transactions) {
-      if (t.customerId !== contact.id || t.status === "Cancelled") continue;
+      if (t.customerId !== contact.id || t.status === "Order Cancelled") continue;
       for (const name of t.brandNames ?? []) {
         const id = idByName.get(name.toLowerCase());
         if (id) purchased.add(id);
@@ -889,7 +889,7 @@ function TransactionsTab({
     .reduce((sum, t) => sum + t.total, 0);
   // "Completed" means the parcel arrived. It used to mean "not cancelled",
   // which counted an order still sitting in the warehouse as finished.
-  const completedCount = transactions.filter((t) => t.status === "Complete").length;
+  const completedCount = transactions.filter((t) => t.status === "Delivered").length;
 
   // Favorite Brand
   const favoriteBrand = (() => {

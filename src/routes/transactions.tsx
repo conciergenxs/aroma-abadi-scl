@@ -5,6 +5,7 @@ import {
   useTransactionsStore,
   formatIDR,
   txStatusBadge,
+  TX_JOURNEY,
   type Transaction,
   type TxStatus,
 } from "@/components/scl/transactions-store";
@@ -35,17 +36,10 @@ function wibDay(iso: string) {
 }
 
 /** Listed in the order an order actually travels, so the dropdown reads as a
- * journey rather than an alphabet. Typed as TxStatus so adding a stage to the
- * store without adding it here is a compile error. */
-const TX_STATUSES: TxStatus[] = [
-  "Waiting for Payment",
-  "Processed",
-  "Waiting for Pickup",
-  "Picked Up",
-  "Sending",
-  "Complete",
-  "Cancelled",
-];
+ * journey rather than an alphabet. Taken from the store rather than retyped:
+ * the list used to be duplicated here and went stale the first time the
+ * owner's status sheet changed. */
+const TX_STATUSES: TxStatus[] = TX_JOURNEY;
 
 /** The table lists distinct products. An order can carry the same SKU on two
  * lines, and repeating the name tells the reader nothing — the quantities are

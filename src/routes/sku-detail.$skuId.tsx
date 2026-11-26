@@ -4,6 +4,7 @@ import { useSkuStore } from "@/components/scl/sku-store";
 import {
   countsAsRevenue,
   txStatusBadge,
+  TX_JOURNEY,
   formatIDR,
   type TxStatus,
   useTransactionsStore,
@@ -215,18 +216,7 @@ function SkuDetailPage() {
 
           {/* Status filter */}
           <div className="flex items-center gap-1">
-            {(
-              [
-                "all",
-                "Waiting for Payment",
-                "Processed",
-                "Waiting for Pickup",
-                "Picked Up",
-                "Sending",
-                "Complete",
-                "Cancelled",
-              ] as const
-            ).map((s) => (
+            {(["all", ...TX_JOURNEY] as ("all" | TxStatus)[]).map((s) => (
               <button
                 key={s}
                 type="button"

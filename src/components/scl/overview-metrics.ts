@@ -158,6 +158,63 @@ function scaleStatic(baseline: number, scale: number): number {
   return Math.max(0, Math.round(baseline * scale));
 }
 
+// ── The window the Overview is allowed to read ──────────────────────────
+/**
+ * The furthest back any Overview figure may look.
+ *
+ * Every segment on this page is defined against "the last 6 months" — active,
+ * sleeping, potential all turn on that boundary. A filter that could reach
+ * back four years would be asking those definitions a question they cannot
+ * answer, so the window is capped at six months and a longer request is
+ * shortened rather than refused.
+ */
+export const MAX_RANGE_MONTHS = 6;
+
+/**
+ * The same day-of-month, N months earlier.
+ *
+ * Stepping by Date.UTC alone rolls an impossible day forward — 31 August less
+ * six months is 31 February, which JavaScript hands back as 3 March and makes
+ * the window two days short. The day is clamped to the length of the target
+ * month instead.
+ */
+export function monthsBackIso(iso: string, months: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const anchor = new Date(Date.UTC(y, m - 1 - months, 1));
+  const daysInMonth = new Date(
+    Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  return new Date(
+    Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), Math.min(d, daysInMonth)),
+  )
+    .toISOString()
+    .slice(0, 10);
+}
+
+/** The six-month window ending on `end`, inclusive of both ends — so a window
+ *  ending 19 Nov starts 20 May, not 19 May, and covers exactly six months. */
+export function maxWindowFor(end: string): DateRange {
+  const [y, m, d] = monthsBackIso(end, MAX_RANGE_MONTHS).split("-").map(Number);
+  return {
+    start: new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10),
+    end,
+  };
+}
+
+/**
+ * What the page will actually read, given what was asked for.
+ *
+ * A range longer than six months is not an error — the owner's rule is to
+ * take the last six months of it. `clipped` is what the caller needs to say
+ * so out loud, because silently returning different dates than the ones
+ * typed is how a dashboard loses someone's trust.
+ */
+export function clipToMaxWindow(range: DateRange): { range: DateRange; clipped: boolean } {
+  const limit = maxWindowFor(range.end).start;
+  if (range.start >= limit) return { range, clipped: false };
+  return { range: { start: limit, end: range.end }, clipped: true };
+}
+
 // ── A. Audience & Segmentation ──────────────────────────────────────────
 // The seeded contact list has no real interaction-recency history to compute
 // a 6-month window from, so these stay illustrative — but kept internally
@@ -170,24 +227,96 @@ export const audienceSegmentation = {
   sleepingCustomers: 412,
 };
 
-export function scaledAudienceSegmentation(scale: number) {
+export type AudienceSnapshot = {
+  contacts: number;
+  activeContacts: number;
+  activeCustomers: number;
+  potentialCustomers: number;
+  sleepingCustomers: number;
+};
+
+/**
+ * How much of the workspace existed by a given day.
+ *
+ * Measured in orders rather than in days, for the same reason computeRangeScale
+ * is: trade here has grown steadily, so a date two thirds of the way along the
+ * calendar is well past two thirds of the business. Orders are the only
+ * per-record dated history this seed has, so they stand in for how the
+ * contact book filled up.
+ */
+function historyShareAsOf(transactions: Transaction[], iso: string): number {
+  if (transactions.length === 0) return 1;
+  const upTo = transactions.filter((t) => t.date.slice(0, 10) <= iso).length;
+  return Math.min(1, Math.max(0, upTo / transactions.length));
+}
+
+/** The audience as it stood at the end of a given day. */
+export function audienceAsOf(transactions: Transaction[], iso: string): AudienceSnapshot {
+  const share = historyShareAsOf(transactions, iso);
+  // The two sub-segments are rounded first and the parent is their sum, so
+  // the invariant the tiles are read against — active customers plus
+  // potential customers make up every active contact — survives rounding.
+  const activeCustomers = scaleStatic(audienceSegmentation.activeCustomers, share);
+  const potentialCustomers = scaleStatic(audienceSegmentation.potentialCustomers, share);
   return {
-    contacts: scaleStatic(audienceSegmentation.contacts, scale),
-    activeContacts: scaleStatic(audienceSegmentation.activeContacts, scale),
-    activeCustomers: scaleStatic(audienceSegmentation.activeCustomers, scale),
-    potentialCustomers: scaleStatic(audienceSegmentation.potentialCustomers, scale),
-    sleepingCustomers: scaleStatic(audienceSegmentation.sleepingCustomers, scale),
+    contacts: scaleStatic(audienceSegmentation.contacts, share),
+    activeContacts: activeCustomers + potentialCustomers,
+    activeCustomers,
+    potentialCustomers,
+    sleepingCustomers: scaleStatic(audienceSegmentation.sleepingCustomers, share),
+  };
+}
+
+/**
+ * Audience over a window, read as two measurements rather than one total.
+ *
+ * A segment is a standing count, not something that accumulates: there is no
+ * such thing as "3,180 contacts during October". What a date range can
+ * honestly say about a standing count is where it started and where it
+ * finished, so every Audience tile carries both and names the two dates
+ * underneath. A one-day window has nothing to compare against, so it shows
+ * the single figure it actually has.
+ */
+export type AudienceReading = {
+  start: AudienceSnapshot;
+  end: AudienceSnapshot;
+  range: DateRange;
+  singleDay: boolean;
+};
+
+export function computeAudienceReading(
+  transactions: Transaction[],
+  range: DateRange,
+): AudienceReading {
+  return {
+    start: audienceAsOf(transactions, range.start),
+    end: audienceAsOf(transactions, range.end),
+    range,
+    singleDay: range.start === range.end,
   };
 }
 
 // ── B. Broadcast & Messaging — derived from the real broadcasts[] seed ──
+/**
+ * Measured in messages, not in campaigns.
+ *
+ * "Broadcast Sent" used to count sends — 24 of them — while the rate beneath
+ * it was a ratio of message volumes, so the three tiles in that row were not
+ * on the same footing and Delivery Rate could not be checked against them by
+ * eye. The owner's metric sheet settles it: Sent is how many messages went
+ * out, Reach is how many were received, and Delivery Rate is one over the
+ * other. `campaignsSent` is kept for anywhere that genuinely means "how many
+ * broadcasts did we run".
+ */
 export type BroadcastMetrics = {
+  /** Messages sent. */
   broadcastSent: number;
+  /** Messages received by a contact — the recipients. */
   reach: number;
-  delivered: number;
   read: number;
   replied: number;
   messageReceived: number;
+  campaignsSent: number;
   deliveryRate: number;
   readRate: number;
 };
@@ -196,22 +325,26 @@ export function computeBroadcastMetrics(range?: DateRange, scale = 1): Broadcast
   const sent = broadcasts.filter(
     (b) => b.status === "Sent" && (!range || inRange(b.sentAtDate ?? "", range)),
   );
-  const reach = sent.reduce((s, b) => s + b.reach, 0);
-  const delivered = sent.reduce((s, b) => s + b.delivered, 0);
+  // In the seed a broadcast's `reach` is the size of the send and `delivered`
+  // is how much of it landed, which is exactly Sent and Reach in the owner's
+  // vocabulary. Renamed here rather than in the seed so the Broadcast pages,
+  // which speak of a send's reach, keep reading the field they expect.
+  const messagesSent = sent.reduce((s, b) => s + b.reach, 0);
+  const received = sent.reduce((s, b) => s + b.delivered, 0);
   const read = sent.reduce((s, b) => s + b.read, 0);
   const replied = sent.reduce((s, b) => s + (b.replied ?? 0), 0);
   return {
-    broadcastSent: sent.length,
-    reach,
-    delivered,
+    broadcastSent: messagesSent,
+    reach: received,
     read,
     replied,
+    campaignsSent: sent.length,
     // Inbound organic volume has no real per-record date to filter by —
     // kept proportional to the selected range, and above `replied` since
     // replies are a subset of all customer-initiated messages received.
     messageReceived: scaleStatic(72_000, scale),
-    deliveryRate: reach ? delivered / reach : 0,
-    readRate: delivered ? read / delivered : 0,
+    deliveryRate: messagesSent ? received / messagesSent : 0,
+    readRate: received ? read / received : 0,
   };
 }
 
@@ -327,13 +460,19 @@ export function computeOrdersAndSales(
 // ── E. Averages / Basket Economics ──────────────────────────────────────
 export const avgMessagesBetweenTransaction = 6.4;
 
+/**
+ * Per order, not per paid transaction.
+ *
+ * The owner's metric sheet divides both of these by Orders. It is the harder
+ * denominator — every abandoned and cancelled order drags the average down —
+ * and that is the point: it is what an incoming order is worth on average,
+ * which is the number you plan stock and staffing against.
+ */
 export function computeAverages(orders: OrdersAndSales) {
   return {
-    avgTransactionValue: orders.totalTransactions
-      ? orders.totalSales / orders.totalTransactions
-      : 0,
+    avgOrderValue: orders.totalOrders ? orders.totalSales / orders.totalOrders : 0,
     avgSellingPrice: orders.totalQty ? orders.totalSales / orders.totalQty : 0,
-    avgBasketSize: orders.totalTransactions ? orders.totalQty / orders.totalTransactions : 0,
+    avgBasketSize: orders.totalOrders ? orders.totalQty / orders.totalOrders : 0,
   };
 }
 
@@ -344,7 +483,12 @@ export function computeFunnelRates(
   transactionsCount: number,
 ) {
   return {
-    conversationRate: broadcast.reach ? broadcast.replied / broadcast.reach : 0,
+    // Replies over messages sent, not over messages received: the question
+    // the rate answers is what a broadcast earns you, and you pay for the
+    // whole send whether or not every message lands.
+    conversationRate: broadcast.broadcastSent
+      ? broadcast.replied / broadcast.broadcastSent
+      : 0,
     conversionRate: conversationsCount ? transactionsCount / conversationsCount : 0,
   };
 }
