@@ -241,6 +241,7 @@ function AudienceSection({ audience }: { audience: AudienceReading }) {
               value={fmtNum(t.to)}
               valueRange={singleDay ? undefined : { from: fmtNum(t.from), to: fmtNum(t.to) }}
               sub={period}
+              subDim
               info={t.info}
             />
           ))}
