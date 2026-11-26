@@ -7,57 +7,95 @@ export { fmtIDR as formatIDR } from "@/lib/fmt";
 /**
  * Where an order has got to.
  *
- * Six of these are the fulfilment sequence the business actually runs, in
- * order: the customer owes, the warehouse is packing, the parcel is boxed and
- * waiting on a courier, the courier has it, it is moving, it arrived. The
- * two "waiting" stages are separate on purpose — one is blocked on the
- * customer, the other on the courier, and they go wrong for different reasons.
+ * Five of these are the fulfilment sequence the business actually runs, in
+ * order: the customer owes, the money landed and the warehouse is packing,
+ * the parcel is boxed and waiting on a courier, the courier has it, it
+ * arrived. The two "waiting" stages are separate on purpose — one is blocked
+ * on the customer, the other on the courier, and they go wrong for different
+ * reasons.
  *
- * "Cancelled" is the seventh and is not a stage: an order leaves the sequence
- * for it and never comes back. It is kept because the figures need somewhere
- * to put an order that produced no money — see countsAsRevenue.
+ * "Order Cancelled" is the sixth and is not a stage: an order leaves the
+ * sequence for it and never comes back. It is kept because the figures need
+ * somewhere to put an order that produced no money — see countsAsRevenue.
+ *
+ * These exact six, and the wording of each, come from the owner's status
+ * sheet. Do not invent a seventh or re-word one here: the customer sees these
+ * strings in WhatsApp, so the app and the message have to agree.
  */
 export type TxStatus =
   | "Waiting for Payment"
-  | "Processed"
-  | "Waiting for Pickup"
-  | "Picked Up"
-  | "Sending"
-  | "Complete"
-  | "Cancelled";
+  | "Payment Received"
+  | "Waiting for Courier"
+  | "On the Way"
+  | "Delivered"
+  | "Order Cancelled";
 
 /** The fulfilment sequence, in the order it happens, with the exit at the end.
  * Typed as TxStatus so a stage added to the union without being placed here is
- * a compile error. */
-const TX_JOURNEY: TxStatus[] = [
+ * a compile error. This is also the order every status filter lists. */
+export const TX_JOURNEY: TxStatus[] = [
   "Waiting for Payment",
-  "Processed",
-  "Waiting for Pickup",
-  "Picked Up",
-  "Sending",
-  "Complete",
-  "Cancelled",
+  "Payment Received",
+  "Waiting for Courier",
+  "On the Way",
+  "Delivered",
+  "Order Cancelled",
 ];
+
+/**
+ * What each status is called where there is room, and what it tells the
+ * customer.
+ *
+ * A chip in a table cell gets the short name — it has to sit beside five
+ * other columns. A side peek or a detail page has a line to spare, so it
+ * shows the long name and the sentence underneath, which is the same sentence
+ * the customer reads in WhatsApp. One table, so the two can never drift.
+ */
+export const TX_STATUS_META: Record<TxStatus, { long: string; subtext: string }> = {
+  "Waiting for Payment": {
+    long: "Waiting for Payment",
+    subtext: "Complete your payment to confirm the order.",
+  },
+  "Payment Received": {
+    long: "Payment Received, Preparing Order",
+    subtext: "We got your payment and are preparing your order.",
+  },
+  "Waiting for Courier": {
+    long: "Packed & Waiting for Courier",
+    subtext: "Your order is packed and waiting for courier pickup.",
+  },
+  "On the Way": {
+    long: "On the Way to You",
+    subtext: "The courier has picked up your order and is delivering it.",
+  },
+  Delivered: {
+    long: "Delivered to You",
+    subtext: "Your order has arrived.",
+  },
+  "Order Cancelled": {
+    long: "Order Cancelled",
+    subtext: "This order has been cancelled.",
+  },
+};
 
 /**
  * Status for a seeded order, by cumulative weight.
  *
- * Complete leads, because the seed stretches back to 2023 and a 2023 order has
- * finished. The live stages keep a tenth each rather than the handful strict
- * realism would leave them: this is the spec the team builds from, and a stage
- * that appears twice in a thousand rows is a stage nobody sees rendered. Every
- * page that lists orders — a customer's history, a SKU's — draws its first
- * page from this mix, so the weights are what decides whether those pages
- * exercise all seven chips or only the two most common.
+ * Delivered leads, because the seed stretches back to 2023 and a 2023 order
+ * has finished. The live stages keep roughly a tenth each rather than the
+ * handful strict realism would leave them: this is the spec the team builds
+ * from, and a stage that appears twice in a thousand rows is a stage nobody
+ * sees rendered. Every page that lists orders — a customer's history, a
+ * SKU's — draws its first page from this mix, so the weights are what decides
+ * whether those pages exercise all six chips or only the two most common.
  */
 function rollStatus(roll: number): TxStatus {
-  if (roll < 0.07) return "Cancelled";
-  if (roll < 0.14) return "Waiting for Payment";
-  if (roll < 0.24) return "Processed";
-  if (roll < 0.33) return "Waiting for Pickup";
-  if (roll < 0.43) return "Picked Up";
-  if (roll < 0.55) return "Sending";
-  return "Complete";
+  if (roll < 0.07) return "Order Cancelled";
+  if (roll < 0.15) return "Waiting for Payment";
+  if (roll < 0.26) return "Payment Received";
+  if (roll < 0.37) return "Waiting for Courier";
+  if (roll < 0.5) return "On the Way";
+  return "Delivered";
 }
 
 /**
@@ -65,12 +103,12 @@ function rollStatus(roll: number): TxStatus {
  *
  * Not simply "anything but cancelled": an order waiting on payment has
  * produced no revenue either, and counting it would overstate every sales
- * figure on the Overview. Everything from Processed onwards has been paid for
- * — the warehouse does not pack against an unpaid order — so the whole
- * fulfilment tail counts, whether or not the parcel has arrived yet.
+ * figure on the Overview. Everything from Payment Received onwards has been
+ * paid for — the warehouse does not pack against an unpaid order — so the
+ * whole fulfilment tail counts, whether or not the parcel has arrived yet.
  */
 export function countsAsRevenue(status: TxStatus | string): boolean {
-  return status !== "Cancelled" && status !== "Waiting for Payment";
+  return status !== "Order Cancelled" && status !== "Waiting for Payment";
 }
 
 export type TxLine = {
@@ -246,7 +284,13 @@ function seed(): Transaction[] {
   const payments: Transaction["paymentMethod"][] = ["QRIS", "Debit", "Credit Card", "Transfer"];
   // The fixed block sits in July 2026, months back, so it is mostly finished
   // business with the odd cancellation — not a parade of live stages.
-  const statuses: TxStatus[] = ["Complete", "Sending", "Complete", "Picked Up", "Cancelled"];
+  const statuses: TxStatus[] = [
+    "Delivered",
+    "On the Way",
+    "Delivered",
+    "Waiting for Courier",
+    "Order Cancelled",
+  ];
 
   // Use a fixed epoch so server and client produce identical dates (avoids SSR hydration mismatch)
   const BASE_EPOCH = 1785369600000; // 2026-07-30 00:00:00 UTC — fixed, never changes; kept anchored to "today" so the Overview date picker's range actually reaches the present
@@ -433,7 +477,7 @@ function seed(): Transaction[] {
 // v23: the journey walk covers a month and the live stages carry more weight,
 // so the narrower order lists show every chip too, not just the table.
 // v20: orders carry the five-stage status, Waiting for Payment included.
-const STORAGE_KEY = "aroma_tx_store_v23";
+const STORAGE_KEY = "aroma_tx_store_v24";
 
 function load(): { transactions: Transaction[] } {
   if (typeof window === "undefined") return { transactions: seed() };
@@ -545,19 +589,18 @@ export function useTransactionsStore() {
  * different in the table than it does in the side peek. */
 /**
  * The chip for a status. One hue each, and far enough apart that the two
- * waiting stages and the two in-transit stages can never be mistaken for one
- * another at a glance. Every chip also carries its name, so colour is a
- * second cue and never the only one.
+ * waiting stages can never be mistaken for one another at a glance. Every
+ * chip also carries its name, so colour is a second cue and never the only
+ * one.
  *
- * Waiting for Pickup is the neutral grey on purpose: it is the one stage where
- * nothing is happening and nobody is working on the order.
+ * Waiting for Courier is the neutral grey on purpose: it is the one stage
+ * where nothing is happening and nobody is working on the order.
  */
 export function txStatusBadge(status: string) {
   if (status === "Waiting for Payment") return "border-amber-600 bg-amber-500 text-white";
-  if (status === "Processed") return "border-sky-700 bg-sky-600 text-white";
-  if (status === "Waiting for Pickup") return "border-slate-600 bg-slate-500 text-white";
-  if (status === "Picked Up") return "border-violet-700 bg-violet-600 text-white";
-  if (status === "Sending") return "border-teal-700 bg-teal-600 text-white";
-  if (status === "Cancelled") return "border-rose-700 bg-rose-600 text-white";
-  return "border-emerald-700 bg-emerald-600 text-white"; // Complete
+  if (status === "Payment Received") return "border-sky-700 bg-sky-600 text-white";
+  if (status === "Waiting for Courier") return "border-slate-600 bg-slate-500 text-white";
+  if (status === "On the Way") return "border-violet-700 bg-violet-600 text-white";
+  if (status === "Order Cancelled") return "border-rose-700 bg-rose-600 text-white";
+  return "border-emerald-700 bg-emerald-600 text-white"; // Delivered
 }
