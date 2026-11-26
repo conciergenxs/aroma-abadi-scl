@@ -3,12 +3,7 @@ import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { fmtDateTimeEN } from "@/lib/fmt";
-import {
-  formatIDR,
-  txStatusBadge,
-  TX_STATUS_META,
-  type Transaction,
-} from "./transactions-store";
+import { formatIDR, txStatusBadge, TX_STATUS_META, type Transaction } from "./transactions-store";
 import { benefitFor, rewardKindLabel, usePromoStore } from "./promo-store";
 import { useReferralStore } from "./referral-store";
 import { useEscapeKey } from "@/lib/use-escape-key";

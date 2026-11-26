@@ -756,9 +756,9 @@ function DateRangePopover({
             />
             {clipped ? (
               <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-[12px] leading-snug text-amber-700">
-                You asked for {fmtDateWithYear(requested.start)} – {fmtDateWithYear(requested.end)}
-                . Every segment here is defined over 6 months, so the last{" "}
-                {MAX_RANGE_MONTHS} months of it are shown.
+                You asked for {fmtDateWithYear(requested.start)} – {fmtDateWithYear(requested.end)}.
+                Every segment here is defined over 6 months, so the last {MAX_RANGE_MONTHS} months
+                of it are shown.
               </p>
             ) : (
               <p className="px-2 pt-0.5 text-[12px] leading-snug text-muted-foreground">
@@ -781,11 +781,37 @@ function Dashboard() {
     () => getTransactionDateBounds(txState.transactions),
     [txState.transactions],
   );
-  const [range, setRange] = useState<DateRange>(fullRange);
+  // What was asked for, which is not always what gets read: a custom range
+  // longer than six months is shortened to its last six. Both are kept so
+  // the picker can show the dates in force and still say which ones were
+  // typed.
+  const [requested, setRequested] = useState<DateRange>(() => {
+    const end = fullRange.end;
+    const start = addDaysIso(end, -29);
+    return { start: start < fullRange.start ? fullRange.start : start, end };
+  });
+  // Opening on a single day would be a near-empty dashboard, and there is no
+  // all-time view left to open on, so the month is the landing window.
+  const [selectedLabel, setSelectedLabel] = useState<string | null>("Last 30 Days");
+  const { range, clipped } = useMemo(() => clipToMaxWindow(requested), [requested]);
+
+  const applyRange = (next: DateRange, presetLabel: string | null) => {
+    // Pulling the end date back behind the start leaves a window that runs
+    // backwards, and every tile on the page empties with no explanation. The
+    // date the user just set is the one they meant, so the other end follows
+    // it rather than the page breaking.
+    const ordered = next.end < next.start ? { start: next.end, end: next.end } : next;
+    setRequested(ordered);
+    setSelectedLabel(presetLabel);
+  };
 
   const scale = useMemo(
     () => computeRangeScale(txState.transactions, range, fullRange),
     [txState.transactions, range, fullRange],
+  );
+  const audience = useMemo(
+    () => computeAudienceReading(txState.transactions, range),
+    [txState.transactions, range],
   );
   const orders = useMemo(
     () => computeOrdersAndSales(txState.transactions, range),
@@ -804,7 +830,16 @@ function Dashboard() {
       <AppShell
         title="Overview"
         subtitle="ARMA Workspace"
-        titleAside={<DateRangePopover range={range} fullRange={fullRange} onChange={setRange} />}
+        titleAside={
+          <DateRangePopover
+            requested={requested}
+            range={range}
+            clipped={clipped}
+            fullRange={fullRange}
+            selectedLabel={selectedLabel}
+            onChange={applyRange}
+          />
+        }
       >
         <div className="space-y-5 pb-[50px]">
           {/* Header row */}
@@ -828,7 +863,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <AudienceSection scale={scale} />
+          <AudienceSection audience={audience} />
           <BroadcastSection broadcast={broadcast} />
           <ConversationSection
             orders={orders}

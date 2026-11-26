@@ -118,14 +118,14 @@ function BroadcastListPage() {
         v: totalReach ? `${((totalDelivered / totalReach) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
         icon: CheckCheck,
-        hint: "Share of reached contacts WhatsApp confirmed as delivered. Across every broadcast ever sent.",
+        hint: "Rate of broadcast messages received by contacts (Reach ÷ Sent). Measured across every broadcast ever sent.",
       },
       {
         l: "Read Rate",
         v: totalDelivered ? `${((totalRead / totalDelivered) * 100).toFixed(1)}%` : "—",
         period: "Lifetime",
         icon: Eye,
-        hint: "Share of delivered messages that were opened. Across every broadcast ever sent.",
+        hint: "Rate of broadcast messages read by contacts. Measured across every broadcast ever sent.",
       },
     ];
   }, [broadcasts]);

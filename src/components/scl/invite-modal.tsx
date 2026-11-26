@@ -49,7 +49,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
-            <h3 className="text-sm font-semibold">Invite to workspace</h3>
+            <h3 className="text-sm font-semibold">Invite Workspace Members</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               Send a WhatsApp invite and set the role it arrives with
             </p>

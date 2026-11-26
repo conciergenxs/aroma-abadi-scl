@@ -331,7 +331,7 @@ export function AppShell({
           className={`w-full pb-3 pt-2 flex flex-col gap-1.5 border-t border-sidebar-border ${expanded ? "px-2" : "items-center"}`}
         >
           <SidebarButton
-            label="Invite Members"
+            label="Invite Workspace Members"
             disabled={!invite.allowed}
             disabledReason={invite.reason}
             Icon={UserPlus}
@@ -394,7 +394,7 @@ export function AppShell({
             </nav>
             <nav className="border-t border-sidebar-border px-2 pb-3 pt-2 flex flex-col gap-1.5">
               <SidebarButton
-                label="Invite Members"
+                label="Invite Workspace Members"
                 disabled={!invite.allowed}
                 disabledReason={invite.reason}
                 Icon={UserPlus}

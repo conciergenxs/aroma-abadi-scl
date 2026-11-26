@@ -184,9 +184,7 @@ export function monthsBackIso(iso: string, months: number): string {
   const daysInMonth = new Date(
     Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + 1, 0),
   ).getUTCDate();
-  return new Date(
-    Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), Math.min(d, daysInMonth)),
-  )
+  return new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), Math.min(d, daysInMonth)))
     .toISOString()
     .slice(0, 10);
 }
@@ -486,9 +484,7 @@ export function computeFunnelRates(
     // Replies over messages sent, not over messages received: the question
     // the rate answers is what a broadcast earns you, and you pay for the
     // whole send whether or not every message lands.
-    conversationRate: broadcast.broadcastSent
-      ? broadcast.replied / broadcast.broadcastSent
-      : 0,
+    conversationRate: broadcast.broadcastSent ? broadcast.replied / broadcast.broadcastSent : 0,
     conversionRate: conversationsCount ? transactionsCount / conversationsCount : 0,
   };
 }
