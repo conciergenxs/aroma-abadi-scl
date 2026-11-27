@@ -6,8 +6,8 @@ import {
   ChannelDot,
   LabelChip,
   ListChip,
-  labelColorClass,
-  labelColorDot,
+  labelChipClass,
+  labelDotClass,
 } from "@/components/scl/app-shell";
 import { ChannelIcon } from "@/components/scl/channel-badge";
 import { useCan, useCurrentUser } from "@/components/scl/session-store";
@@ -715,7 +715,7 @@ function ContactsPage() {
                             return lbl ? (
                               <span
                                 key={lid}
-                                className={`text-[10px] px-1.5 py-0.5 rounded-full border ${labelColorClass[lbl.color]}`}
+                                className={`text-[12px] px-1.5 py-0.5 rounded-full border ${labelChipClass(lbl.color)}`}
                               >
                                 {lbl.name}
                               </span>
@@ -1563,7 +1563,7 @@ function PickerPopover({
                 className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
               >
                 {it.color ? (
-                  <span className={`h-2 w-2 rounded-full ${labelColorDot[it.color]}`} />
+                  <span className={`h-2 w-2 rounded-full ${labelDotClass(it.color)}`} />
                 ) : (
                   <span className="h-2 w-2 rounded-sm bg-primary/70" />
                 )}
@@ -1681,9 +1681,9 @@ function ColorSwatch({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`h-7 w-7 rounded-md border ${labelColorClass[color]} grid place-items-center`}
+        className={`h-7 w-7 rounded-md border ${labelChipClass(color)} grid place-items-center`}
       >
-        <span className={`h-2.5 w-2.5 rounded-full ${labelColorDot[color]}`} />
+        <span className={`h-2.5 w-2.5 rounded-full ${labelDotClass(color)}`} />
       </button>
       {open && (
         <>
@@ -1696,7 +1696,7 @@ function ColorSwatch({
                   onChange(c);
                   setOpen(false);
                 }}
-                className={`h-5 w-5 rounded-md border ${labelColorClass[c]} grid place-items-center`}
+                className={`h-5 w-5 rounded-md border ${labelChipClass(c)} grid place-items-center`}
               >
                 {c === color && <Check className="h-3 w-3" />}
               </button>
@@ -1866,7 +1866,7 @@ function Dropdown({
                 className="w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
               >
                 {it.color ? (
-                  <span className={`h-2 w-2 rounded-full ${labelColorDot[it.color]}`} />
+                  <span className={`h-2 w-2 rounded-full ${labelDotClass(it.color)}`} />
                 ) : (
                   <span className="h-2 w-2 rounded-sm bg-primary/70" />
                 )}
@@ -1948,7 +1948,7 @@ function LabelPicker({
                       onClick={() => onToggle(l.id)}
                       className="flex-1 text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
                     >
-                      <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
+                      <span className={`h-2 w-2 rounded-full ${labelDotClass(l.color)}`} />
                       <span className="flex-1">{l.name}</span>
                       {selected && <Check className="h-3 w-3 text-primary" />}
                     </button>

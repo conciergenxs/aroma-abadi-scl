@@ -18,7 +18,7 @@ import { type Contact, type ContactLabel, type LabelColor } from "@/components/s
 import { contactsStore, useContactsStore } from "@/components/scl/contacts-store";
 import { useBaStore, baStore } from "@/components/scl/ba-store";
 import { useSkuStore } from "@/components/scl/sku-store";
-import { labelColorDot } from "@/components/scl/app-shell";
+import { labelDotClass } from "@/components/scl/app-shell";
 import { SclSelect } from "@/components/scl/scl-select";
 import { usePermission } from "@/components/scl/permission-preview";
 

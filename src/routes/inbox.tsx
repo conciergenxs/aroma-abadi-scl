@@ -1,11 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  AppShell,
-  LabelChip,
-  ListChip,
-  labelColorClass,
-  labelColorDot,
-} from "@/components/scl/app-shell";
+import { AppShell, LabelChip, ListChip, labelDotClass } from "@/components/scl/app-shell";
 import {
   conversations,
   threadsByContact,
