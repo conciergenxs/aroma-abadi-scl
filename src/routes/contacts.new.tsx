@@ -748,7 +748,7 @@ function LabelMultiSelect({
               key={id}
               className="inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px]"
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[l.color]}`} />
+              <span className={`h-1.5 w-1.5 rounded-full ${labelDotClass(l.color)}`} />
               {l.name}
               <span
                 role="button"
@@ -795,7 +795,7 @@ function LabelMultiSelect({
                   onClick={() => onToggle(l.id)}
                   className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-50 inline-flex items-center gap-2 transition-colors duration-150"
                 >
-                  <span className={`h-2 w-2 rounded-full ${labelColorDot[l.color]}`} />
+                  <span className={`h-2 w-2 rounded-full ${labelDotClass(l.color)}`} />
                   <span className="flex-1">{l.name}</span>
                   {on && <Check className="h-3 w-3 text-primary" />}
                 </button>

@@ -884,6 +884,34 @@ export const labelColorDot: Record<LabelColor, string> = {
   slate: "bg-slate-400",
 };
 
+/**
+ * The chip and dot classes for a label's colour, whatever it turns out to be.
+ *
+ * Read straight off the map, a colour the palette does not know returns
+ * undefined, and the chip loses its background, its text colour and its dot
+ * in one go. A pale label then renders as white text on a white card: the
+ * chip is still there, still removable, and completely invisible. That is
+ * worse than a wrong colour, because nothing tells the reader a label is
+ * even there.
+ *
+ * Slate is the fallback because it is the palette's own neutral, so an
+ * unrecognised colour reads as a label with no colour set rather than as a
+ * label that belongs to some other category.
+ *
+ * `color` is typed loosely on purpose: the union only constrains what this
+ * app writes, and a label can also arrive from storage or an import written
+ * by a build that allowed colours this one has never heard of.
+ */
+const FALLBACK_LABEL_COLOR: LabelColor = "slate";
+
+export function labelChipClass(color: LabelColor | string): string {
+  return labelColorClass[color as LabelColor] ?? labelColorClass[FALLBACK_LABEL_COLOR];
+}
+
+export function labelDotClass(color: LabelColor | string): string {
+  return labelColorDot[color as LabelColor] ?? labelColorDot[FALLBACK_LABEL_COLOR];
+}
+
 /** The count that rides along in a tab label — a soft primary disc with the
  * number in the brand red. Shared so the promo and referral tab strips can't
  * drift into two different-looking badges. */
@@ -898,9 +926,9 @@ export function TabCount({ value }: { value: number }) {
 export function LabelChip({ label, onRemove }: { label: ContactLabel; onRemove?: () => void }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[12px] font-medium ${labelColorClass[label.color]}`}
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[12px] font-medium ${labelChipClass(label.color)}`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${labelColorDot[label.color]}`} />
+      <span className={`h-1.5 w-1.5 rounded-full ${labelDotClass(label.color)}`} />
       {label.name}
       {onRemove && (
         <button

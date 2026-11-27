@@ -620,7 +620,7 @@ function InboxPage() {
                   onClick={() => setLabelFilter(active ? null : lbl.id)}
                   className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-[12px] transition-colors ${active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-gray-50"}`}
                 >
-                  <span className={`h-2 w-2 rounded-full ${labelColorDot[lbl.color]}`} />
+                  <span className={`h-2 w-2 rounded-full ${labelDotClass(lbl.color)}`} />
                   <span className="flex-1 text-left truncate">{lbl.name}</span>
                   <span className="text-[10px] text-muted-foreground">{count}</span>
                 </button>
